@@ -5,10 +5,10 @@
 package gorm.tools.security.services
 
 import groovy.transform.CompileStatic
-
 import org.grails.datastore.gorm.GormEnhancer
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.core.GenericTypeResolver
-import groovy.util.logging.Slf4j
 
 import gorm.tools.security.domain.AppUser
 
@@ -16,8 +16,9 @@ import gorm.tools.security.domain.AppUser
  * common generic helpers for security, implement with generics D for the domain entity and I for the id type
  */
 @CompileStatic
-@Slf4j
 trait SecService<D> {
+
+    final private static Logger log = LoggerFactory.getLogger(SecService)
 
     /**
      * The java class for the Gorm domain (persistence entity) that is the user

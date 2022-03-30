@@ -5,9 +5,8 @@
 package gorm.tools.security.services
 
 import groovy.transform.CompileStatic
+
 import org.grails.datastore.gorm.GormEnhancer
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.core.GenericTypeResolver
 
 import gorm.tools.security.domain.AppUser
@@ -17,8 +16,6 @@ import gorm.tools.security.domain.AppUser
  */
 @CompileStatic
 trait SecService<D> {
-
-    final private static Logger log = LoggerFactory.getLogger(SecService)
 
     /**
      * The java class for the Gorm domain (persistence entity) that is the user
@@ -75,7 +72,6 @@ trait SecService<D> {
      * Used when User is something like OauthUser
      */
     Serializable getUserIdByUsername(String username) {
-        log.debug("Username is $username")
         if (!isLoggedIn()) {
             return null
         }

@@ -8,6 +8,7 @@ import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEnhancer
 import org.springframework.core.GenericTypeResolver
+import groovy.util.logging.Slf4j
 
 import gorm.tools.security.domain.AppUser
 
@@ -15,6 +16,7 @@ import gorm.tools.security.domain.AppUser
  * common generic helpers for security, implement with generics D for the domain entity and I for the id type
  */
 @CompileStatic
+@Slf4j
 trait SecService<D> {
 
     /**
@@ -72,6 +74,7 @@ trait SecService<D> {
      * Used when User is something like OauthUser
      */
     Serializable getUserIdByUsername(String username) {
+        log.debug("Username is $username")
         if (!isLoggedIn()) {
             return null
         }

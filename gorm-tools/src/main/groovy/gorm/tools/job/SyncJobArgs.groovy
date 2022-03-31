@@ -103,7 +103,8 @@ class SyncJobArgs {
     List<String> includes = ['id']
 
     /**
-     * Includes for building the error response - null by default, return entire original map back.
+     * List of keys to include from the data map that failed.
+     * default is null which means it returns the originalData that was submitted.
      */
     List<String> errorIncludes = null
 

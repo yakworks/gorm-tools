@@ -76,8 +76,10 @@ class XlsxMapWriter {
                                 } else if(dta instanceof LocalDate || dta instanceof LocalDateTime || dta instanceof Date){
                                     value DateUtil.convertToDate(dta)
                                     style {
-                                        format "dd/mm/yyyy"
+                                        format "mm/dd/yyyy"
                                     }
+                                } else {
+                                    value dta
                                 }
                             }
                         }

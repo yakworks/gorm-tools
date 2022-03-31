@@ -6,9 +6,7 @@ package gorm.tools.excel.render
 
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.temporal.Temporal
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.apache.poi.ss.usermodel.Cell
@@ -25,6 +23,7 @@ import com.opencsv.CSVWriter
 import yakworks.commons.lang.DateUtil
 import yakworks.commons.map.MapFlattener
 
+@SuppressWarnings(['NestedBlockDepth'])
 @CompileStatic
 class XlsxMapWriter {
     CSVWriter csvWriter

@@ -111,4 +111,22 @@ class MapFlattenerSpec extends Specification {
         res['book.author.name'] == 'foo'
         res['book.author.age'] == null
     }
+
+    void "test numbers"() {
+        setup:
+        Map testMap = [
+            customer  : [
+                id     : 1,
+                amount   : 100.00
+            ]
+        ]
+
+        when:
+        Map res = MapFlattener.of(testMap).convertObjectToString(false).flatten()
+
+        then:
+        res.'customer.id' instanceof Integer
+        res.'customer.amount' instanceof BigDecimal
+
+    }
 }

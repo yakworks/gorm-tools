@@ -66,7 +66,7 @@ class BulkControllerSupport<D> {
 
         Map includesMap = includesConfig.getIncludes(entityClass)
         List bulkIncludes = IncludesConfig.getFieldIncludes(includesMap, [IncludesKey.bulk.name()])
-        List bulkErrorIncludes = IncludesConfig.getFieldIncludes(includesMap, [IncludesKey.bulkError.name()])
+        List bulkErrorIncludes = includesMap['bulkError'] as List<String>
 
         SyncJobArgs syncJobArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludes, errorIncludes: bulkErrorIncludes,
             sourceId: sourceKey, source: params.jobSource, params: params)

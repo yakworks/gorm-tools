@@ -224,8 +224,8 @@ class SyncJobContext {
                     code: r.code,
                     title: ResultUtils.getMessage(msgService, r),
                     detail: r.detail,
-                    errors: r.violations
                 ])
+                if(r.violations) map["errors"] = r.violations //put errors only if violations are not empty
             } else {
                 map.data = r.payload as Map
             }

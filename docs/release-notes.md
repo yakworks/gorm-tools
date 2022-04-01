@@ -1,3 +1,17 @@
+### v7.0.8-v.64
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.63...v7.0.8-v.64)
+- release change to error list [link](https://github.com/yakworks/gorm-tools/commit/74f4e6d8a7f6bbbfb4c6b061a3e8c760c79aec21)
+-  don't put error if it's empty list 9ci/domain9#884 (#506) [link](https://github.com/yakworks/gorm-tools/commit/ef4317ad83ac65238124b2d093233147416918ae)
+- Get restify work with bootRun (#504) [link](https://github.com/yakworks/gorm-tools/commit/dfc345b6d05aa675b838e2e09b6eac9a04e345b6)
+- Allow publishEvent to work with object instead of requiring spring ApplicationEvent [link](https://github.com/yakworks/gorm-tools/commit/35aa88b33b3eda95b28e28893251d48fb579232c)
+- Oapi api-docs (#497) [link](https://github.com/yakworks/gorm-tools/commit/12801c702363767415186e98850f1fca56999a18)
+- Oapi (#496) [link](https://github.com/yakworks/gorm-tools/commit/ebcfbf4ebf17a059491514677e4a677ea63a9f70)
+- Oapi (#495) [link](https://github.com/yakworks/gorm-tools/commit/5896ad4b84a63a41ff381c875fde339cba9e6f90)
+- fix includesKey and includes getting picked up as fields. (#494) [link](https://github.com/yakworks/gorm-tools/commit/fbec7efabc940e874f2fc7c1676cc6b6d8f1db3d)
+-  9ci/domain9#726 Add tests (#486) [link](https://github.com/yakworks/gorm-tools/commit/93d6555a65a9cf5510b6b5ebaeab8b5b0113a7e3)
+- #491 Add test to verify that SyncjobContext generates proper json whe… (#493) [link](https://github.com/yakworks/gorm-tools/commit/213abd51e1aae5dddfe6a42ab38dd4c3ddc9b202)
+
 ### v7.0.8-v.63
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.62...v7.0.8-v.63)

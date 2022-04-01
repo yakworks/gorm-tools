@@ -10,8 +10,6 @@ import org.springframework.jdbc.core.JdbcTemplate
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import spock.lang.Ignore
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.gorm.testing.model.KitchenSink
 import yakworks.gorm.testing.model.KitchenSinkRepo
@@ -215,8 +213,6 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
     }
 
-
-
     void "test failures and errors"() {
         given:
         List list = KitchenSink.generateDataList(20)
@@ -252,7 +248,6 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         results[1].errors[0].field == "ext.name"
     }
 
-
     void "DataAccessException rollback slice but should process the rest"() {
         setup:
         Org.withNewTransaction {
@@ -278,6 +273,25 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         json != null
         json.findAll({ it.ok == true}).size() == 299
         OrgFlex.findAllWhere(text1: 'goGoGadget').size() == 299
+
+        when:
+        Map failed =  json.find({ it.ok == false})
+
+        then:
+        failed != null
+        failed.ok == false
+        failed.code.contains "uniqueConstraintViolation"
+        failed.title.contains "Unique index or primary key violation"
+        !failed.containsKey("errors") //in this case violations would be empty, so errors field should not be present
+
+        and: "Verify data is not empty"
+        failed.data != null
+        failed.data instanceof Map
+        failed.data.num == "testorg-1"
+        failed.data.name == "org-2"
+        failed.data.info instanceof Map
+        failed.data.flex instanceof Map
+
 
         cleanup:
         Org.withNewTransaction {

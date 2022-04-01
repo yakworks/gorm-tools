@@ -16,8 +16,8 @@ class BookExcelStylesheet implements Stylesheet {
 
     @Override
     void declareStyles(CanDefineStyle stylable) {
-        stylable.style(STYLE_HEADER, { st ->
+        stylable.style(STYLE_HEADER) { st ->
             st.font { f -> f.style(FontStyle.BOLD) }
-        })
+        }
     }
 }

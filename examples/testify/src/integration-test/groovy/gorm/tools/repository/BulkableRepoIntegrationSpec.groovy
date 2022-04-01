@@ -213,8 +213,6 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
     }
 
-
-
     void "test failures and errors"() {
         given:
         List list = KitchenSink.generateDataList(20)
@@ -285,6 +283,14 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         failed.code.contains "uniqueConstraintViolation"
         failed.title.contains "Unique index or primary key violation"
         !failed.containsKey("errors") //in this case violations would be empty, so errors field should not be present
+
+        and: "Verify data is not empty"
+        failed.data != null
+        failed.data instanceof Map
+        failed.data.num == "testorg-1"
+        failed.data.name == "org-2"
+        failed.data.info instanceof Map
+        failed.data.flex instanceof Map
 
 
         cleanup:

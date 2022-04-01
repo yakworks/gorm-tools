@@ -1,3 +1,15 @@
+### v7.0.8-v.65
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.64...v7.0.8-v.65)
+- trigger release [link](https://github.com/yakworks/gorm-tools/commit/1920ae5e5eacd02616a58d22cc9f0fba546def3a)
+- bump to 0.5.2 for external messages.properties (#505) [link](https://github.com/yakworks/gorm-tools/commit/1a4ea8816afa1ce7dd4fe14e8f2174db1b5e3d42)
+- 9ci/domain9#888 Add test to verify tht bulk response contains original data if there was error (#507) [link](https://github.com/yakworks/gorm-tools/commit/202e39b29a13b3c6d343f037e665e42b33475bea)
+- fix excel formatting [link](https://github.com/yakworks/gorm-tools/commit/18815f062ff0715a31b364c64ad539eb8080df80)
+- fix excel formatting (#508) [link](https://github.com/yakworks/gorm-tools/commit/2c6e5075a06069f0b7ee7ff8d345d8317917b0eb)
+- remove logger [link](https://github.com/yakworks/gorm-tools/commit/96654161d5e850d88b8211efefd0475c3d83b2b2)
+- Update SecService.groovy [link](https://github.com/yakworks/gorm-tools/commit/5186cac2ed670805146a67632a677280334782ce)
+- add log.debug for username [link](https://github.com/yakworks/gorm-tools/commit/12f792ba247b6714387af9fc0fd4288c69cf7ccf)
+
 ### v7.0.8-v.64
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.63...v7.0.8-v.64)

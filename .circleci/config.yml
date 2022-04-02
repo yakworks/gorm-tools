@@ -47,6 +47,9 @@ jobs:
       - checkout
       - restore_cache: &build-cache-restore
           key: build-{{ .Branch }}-{{ .Revision }}
+
+      # download vault and decrypts
+      - run: make vault.decrypt
       - run: make git.config-bot-user # configs the bot user for git
       - run: make ship.gh-pages
 

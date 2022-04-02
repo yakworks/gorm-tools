@@ -1,3 +1,13 @@
+### v7.0.8-v.66
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.65...v7.0.8-v.66)
+- trigger release [link](https://github.com/yakworks/gorm-tools/commit/84529da1bb6bf5280bc33366afdba41c5a816f8d)
+- no signed commits for pages (#513) [link](https://github.com/yakworks/gorm-tools/commit/44c956e06620f3bedc06f974d6286ad33b97b871)
+- decrypt vault for pages so it has gpg key for signing (#512) [link](https://github.com/yakworks/gorm-tools/commit/312e938752c22e61162e1f8cd5158c7a3ff2aa25)
+- mods for vault and new restriction (#511) [link](https://github.com/yakworks/gorm-tools/commit/a68b6efeb97db94c24b9a623dd9077ea22e642d3)
+- Merge pull request #510 from yakworks/bulkErrorIncludes [link](https://github.com/yakworks/gorm-tools/commit/1c66f31e7298fb21708ec01d737ecf28915e75d9)
+- change for bulkErrorIncludes [link](https://github.com/yakworks/gorm-tools/commit/f1b387d8719a183c8df296c25df16f9b9154d888)
+
 ### v7.0.8-v.65
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.64...v7.0.8-v.65)

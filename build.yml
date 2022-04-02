@@ -37,9 +37,10 @@ app:
 
 bot:
   email: 9cibot@9ci.com
-  user: 9cibot
+  sign_commits: true
 
-vault_url: https://github.com/9ci/vault.git
+vault:
+  repo: 9ci/vault
 
 version:
   # after release, will set version.properties back to snapshot=true

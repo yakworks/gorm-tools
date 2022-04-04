@@ -36,9 +36,6 @@ import static gorm.tools.mango.MangoOps.CRITERIA
 @CompileStatic
 class QueryArgs {
 
-    //common valida param keys to remove so that will not be considered a filte
-    static List<String> COMMON_PARAMS=['controller', 'action', 'format', 'nd', '_search', 'includes', 'includesKey' ]
-
     /**
      * extra closure that can be passed to MangoCriteria
      */
@@ -146,7 +143,8 @@ class QueryArgs {
         Map params = Maps.clone(paramsMap) as Map<String, Object>
 
         //remove the fields that grails adds for controller and action
-        params.removeAll {it.key in ['controller', 'action', 'format', 'nd', '_search'] }
+        // this is done in EntityResponder now
+        // params.removeAll {it.key in ['controller', 'action', 'format', 'nd', '_search'] }
 
         // pull out the max, page and offset and assume the rest is criteria,
         // if pager is already set then we do nothing with the pagerMap

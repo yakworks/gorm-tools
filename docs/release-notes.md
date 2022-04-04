@@ -1,3 +1,39 @@
+### v7.0.8-v.66
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.65...v7.0.8-v.66)
+- trigger release [link](https://github.com/yakworks/gorm-tools/commit/84529da1bb6bf5280bc33366afdba41c5a816f8d)
+- no signed commits for pages (#513) [link](https://github.com/yakworks/gorm-tools/commit/44c956e06620f3bedc06f974d6286ad33b97b871)
+- decrypt vault for pages so it has gpg key for signing (#512) [link](https://github.com/yakworks/gorm-tools/commit/312e938752c22e61162e1f8cd5158c7a3ff2aa25)
+- mods for vault and new restriction (#511) [link](https://github.com/yakworks/gorm-tools/commit/a68b6efeb97db94c24b9a623dd9077ea22e642d3)
+- Merge pull request #510 from yakworks/bulkErrorIncludes [link](https://github.com/yakworks/gorm-tools/commit/1c66f31e7298fb21708ec01d737ecf28915e75d9)
+- change for bulkErrorIncludes [link](https://github.com/yakworks/gorm-tools/commit/f1b387d8719a183c8df296c25df16f9b9154d888)
+
+### v7.0.8-v.65
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.64...v7.0.8-v.65)
+- trigger release [link](https://github.com/yakworks/gorm-tools/commit/1920ae5e5eacd02616a58d22cc9f0fba546def3a)
+- bump to 0.5.2 for external messages.properties (#505) [link](https://github.com/yakworks/gorm-tools/commit/1a4ea8816afa1ce7dd4fe14e8f2174db1b5e3d42)
+- 9ci/domain9#888 Add test to verify tht bulk response contains original data if there was error (#507) [link](https://github.com/yakworks/gorm-tools/commit/202e39b29a13b3c6d343f037e665e42b33475bea)
+- fix excel formatting [link](https://github.com/yakworks/gorm-tools/commit/18815f062ff0715a31b364c64ad539eb8080df80)
+- fix excel formatting (#508) [link](https://github.com/yakworks/gorm-tools/commit/2c6e5075a06069f0b7ee7ff8d345d8317917b0eb)
+- remove logger [link](https://github.com/yakworks/gorm-tools/commit/96654161d5e850d88b8211efefd0475c3d83b2b2)
+- Update SecService.groovy [link](https://github.com/yakworks/gorm-tools/commit/5186cac2ed670805146a67632a677280334782ce)
+- add log.debug for username [link](https://github.com/yakworks/gorm-tools/commit/12f792ba247b6714387af9fc0fd4288c69cf7ccf)
+
+### v7.0.8-v.64
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.63...v7.0.8-v.64)
+- release change to error list [link](https://github.com/yakworks/gorm-tools/commit/74f4e6d8a7f6bbbfb4c6b061a3e8c760c79aec21)
+-  don't put error if it's empty list 9ci/domain9#884 (#506) [link](https://github.com/yakworks/gorm-tools/commit/ef4317ad83ac65238124b2d093233147416918ae)
+- Get restify work with bootRun (#504) [link](https://github.com/yakworks/gorm-tools/commit/dfc345b6d05aa675b838e2e09b6eac9a04e345b6)
+- Allow publishEvent to work with object instead of requiring spring ApplicationEvent [link](https://github.com/yakworks/gorm-tools/commit/35aa88b33b3eda95b28e28893251d48fb579232c)
+- Oapi api-docs (#497) [link](https://github.com/yakworks/gorm-tools/commit/12801c702363767415186e98850f1fca56999a18)
+- Oapi (#496) [link](https://github.com/yakworks/gorm-tools/commit/ebcfbf4ebf17a059491514677e4a677ea63a9f70)
+- Oapi (#495) [link](https://github.com/yakworks/gorm-tools/commit/5896ad4b84a63a41ff381c875fde339cba9e6f90)
+- fix includesKey and includes getting picked up as fields. (#494) [link](https://github.com/yakworks/gorm-tools/commit/fbec7efabc940e874f2fc7c1676cc6b6d8f1db3d)
+-  9ci/domain9#726 Add tests (#486) [link](https://github.com/yakworks/gorm-tools/commit/93d6555a65a9cf5510b6b5ebaeab8b5b0113a7e3)
+- #491 Add test to verify that SyncjobContext generates proper json whe… (#493) [link](https://github.com/yakworks/gorm-tools/commit/213abd51e1aae5dddfe6a42ab38dd4c3ddc9b202)
+
 ### v7.0.8-v.63
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.62...v7.0.8-v.63)

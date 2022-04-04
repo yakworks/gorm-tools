@@ -4,8 +4,6 @@
 */
 package gorm.tools.csv
 
-import groovy.transform.CompileStatic
-
 interface CsvToMapTransformer {
 
 

@@ -13,6 +13,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
 import java.time.ZoneId
+import java.time.temporal.Temporal
 import java.time.temporal.TemporalAccessor
 
 import groovy.transform.CompileStatic
@@ -171,6 +172,18 @@ class DateUtil {
     static Date fromLocalDateTime(LocalDateTime localDate, ZoneId zoneId = ZoneId.systemDefault()) {
         if(!localDate) return null
         return Date.from(localDate.atZone(zoneId).toInstant())
+    }
+
+    /**
+     * takes a date, localDate or localDateTime and returns is as date, using system zone
+     * used in spots like export to excel to just a date that compatible
+     */
+    static Date convertToDate(Object temporal) {
+        if(!temporal) return null
+        if(temporal instanceof Date) return temporal
+        if(temporal instanceof LocalDate) return fromLocalDate(temporal)
+        if(temporal instanceof LocalDateTime) return fromLocalDateTime(temporal)
+        return null
     }
 
     static boolean isSameDay(Date date1, Date date2){

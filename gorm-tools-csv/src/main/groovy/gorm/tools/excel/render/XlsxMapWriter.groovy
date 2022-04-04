@@ -4,7 +4,9 @@
 */
 package gorm.tools.excel.render
 
-import groovy.transform.CompileDynamic
+import java.time.LocalDate
+import java.time.LocalDateTime
+
 import groovy.transform.CompileStatic
 
 import org.apache.poi.ss.usermodel.Cell
@@ -18,14 +20,16 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 
 import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import com.opencsv.CSVWriter
+import yakworks.commons.lang.DateUtil
 import yakworks.commons.map.MapFlattener
 
+@SuppressWarnings(['NestedBlockDepth'])
 @CompileStatic
 class XlsxMapWriter {
     CSVWriter csvWriter
     Set<String> headers
     OutputStream outputStream
-    public static final String SHEET_NAME = "Data"
+    public static final String SHEET_NAME = "data"
 
     XlsxMapWriter(OutputStream outstream){
         this.outputStream = outstream
@@ -59,11 +63,25 @@ class XlsxMapWriter {
                 dataList.eachWithIndex{ rowData, int i->
                     //get all the values for the masterHeaders keys
                     def flatData = flattenMap(rowData as Map)
-                    def vals = headers.collect{ flatData[it] as String}
+                    def vals = headers.collect{ flatData[it]}
 
                     row {
                         vals.each { dta ->
-                            cell(dta)
+                            cell {
+                                if(dta instanceof BigDecimal){
+                                    value dta
+                                    style {
+                                        format "#,##0.00"
+                                    }
+                                } else if(dta instanceof LocalDate || dta instanceof LocalDateTime || dta instanceof Date){
+                                    value DateUtil.convertToDate(dta)
+                                    style {
+                                        format "mm/dd/yyyy"
+                                    }
+                                } else {
+                                    value dta
+                                }
+                            }
                         }
                     }
                 }
@@ -72,7 +90,7 @@ class XlsxMapWriter {
     }
 
     Map flattenMap(Map map){
-        MapFlattener.of(map).convertObjectToString(true).flatten()
+        MapFlattener.of(map).convertObjectToString(false).flatten()
     }
 
     /**

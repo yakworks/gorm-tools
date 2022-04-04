@@ -23,7 +23,7 @@ class DomainValidationSpec extends GormToolsHibernateSpec {
     Closure doWithDomains() { { ->
         messageSource(GrailsICUMessageSource){
             searchClasspath = true
-            messageBundleLocationPattern = "classpath*:*messages*.properties"
+            messageBundleLocations = "classpath*:*messages*.properties"
         }
     }}
 

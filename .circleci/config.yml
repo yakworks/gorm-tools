@@ -47,8 +47,10 @@ jobs:
       - checkout
       - restore_cache: &build-cache-restore
           key: build-{{ .Branch }}-{{ .Revision }}
-      - run: make git.config-bot-user # configs the bot user for git
-      - run: make ship.gh-pages
+
+      # download vault and decrypts
+      - run: BOT_SIGN_COMMITS=false make git.config-bot-user # configs the bot user for git
+      - run: BOT_SIGN_COMMITS=false make ship.gh-pages
 
   ship-it:
     docker:

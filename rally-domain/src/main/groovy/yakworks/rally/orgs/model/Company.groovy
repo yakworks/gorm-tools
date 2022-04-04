@@ -17,8 +17,8 @@ class Company implements NameNum, RepoEntity<Company>, Serializable {
     public static final Long DEFAULT_COMPANY_ID = 2
     public static final Long BAD_DEBT_COMPANY_ID = 5
 
-    String website //XXX whats this for? can't we get it from org.info
-    String sourceId //XXX whats this for?
+    String website //FIXME whats this for? can't we get it from org.info
+    String sourceId //FIXME whats this for?
     static belongsTo = [org: Org]
 
     static mapping = {

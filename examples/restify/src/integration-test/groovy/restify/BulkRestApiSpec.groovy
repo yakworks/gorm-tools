@@ -112,7 +112,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
     }
     void "one fails - verify success & error includes"() {
         List<Map> jsonList =  [[num: "foox1", name: "Foox1", type: "Customer"], [num: "Foox2", name: "Foox2", type: "Customer"]]
-        jsonList[0].num = StringUtils.rightPad("ORG-1-", 110, "X")
+        jsonList[0].num = StringUtils.rightPad("ORG-1-", 110, "Z")
 
         when:
         Response resp = post(path, jsonList)
@@ -138,7 +138,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         json[0].ok == false
         json[0].data instanceof Map
         json[0].data.size() == 2 //just two error fields - num and name
-        json[0].data.num.startsWith "ORG-1-XXX"
+        json[0].data.num.startsWith "ORG-1-ZZZ"
         json[0].data.name ==  "Foox1"
 
         and: "Verify success fields"

@@ -15,7 +15,6 @@ import yakworks.commons.map.Maps
  *
  * @author Joshua Burnett (@basejump)
  */
-//XXX needs test for merge
 @CompileStatic
 class Pogo {
 
@@ -30,6 +29,7 @@ class Pogo {
     /**
      * Merge the a map, nested or not, onto the pogo. Uses the InvokerHelper.setProperties(values)
      */
+    //FIXME needs test for merge
     static void merge( Map args = [:], Object pogo, Map values){
         boolean ignoreNulls = args.containsKey('ignoreNulls') ? args['ignoreNulls'] : true
         if(ignoreNulls){

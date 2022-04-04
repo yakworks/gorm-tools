@@ -98,7 +98,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
         TagLink.remove(activity)
 
         AttachmentLink.repo.remove(activity)
-        //XXX missing removal for attachments if its not linked to anything else
+        //FIXME missing removal for attachments if its not linked to anything else
         //  meaning attachment should also be deleted if it only exists for this activity
         ActivityLink.repo.remove(activity)
         ActivityContact.repo.remove(activity)

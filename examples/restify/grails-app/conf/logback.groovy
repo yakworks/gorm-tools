@@ -25,7 +25,7 @@ appender('STDOUT', ConsoleAppender) {
 root(WARN, ['STDOUT'])
 
 
-logger("org.hibernate", OFF)  //XXX https://github.com/9ci/domain9/issues/600
+logger("org.hibernate", OFF)
 
 //TURN ON for benchmarks
 // logger "org.hibernate", INFO

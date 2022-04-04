@@ -80,7 +80,7 @@ class ActivityTests extends Specification implements DomainIntTest {
         params.note.body == updatedActivity.note.body
     }
 
-    @Ignore //XXX need to fix attachments delteing, should be tested and working in gorm-tools first
+    @Ignore //FIXME need to fix attachments delteing, should be tested and working in gorm-tools first
     def "delete attachments in update"() {
         when:
         Map params = [id: 22, note: [body: 'Test updated Note body']]

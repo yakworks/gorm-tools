@@ -15,6 +15,8 @@ import yakworks.gorm.testing.DomainIntTest
 import yakworks.problem.Problem
 import yakworks.rally.attachment.model.Attachment
 
+import static yakworks.commons.json.JsonEngine.parseJson
+
 @Integration
 @Rollback
 class SyncJobContextTests extends Specification implements DomainIntTest {
@@ -137,18 +139,24 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         SyncJobContext jobContext = createJob()
         List<Map> renderResults = [[ok: true, status: 200, data: ['boo':'foo']] ,
                                     [ok: true, status: 200, data: ['boo2':'foo2']] ]
-        Problem  problem = Problem.ofCode('security.validation.password.error')
         List<Map> renderErrorResults = [[ok: false, status: 500, detail: 'error detail'] ]
-        //do the failed
-            when:
-        //tests finish the job
+        when:
         jobContext.finishJob(renderResults, renderErrorResults)
 
         then:
         SyncJob job = SyncJob.get(jobContext.jobId)
         job.errorBytes
-        //XXX add errorBytes assert
-        job.dataToString().contains("boo")
+        List jsonData = parseJson(job.dataToString())
+        jsonData.size() == 2
+        jsonData[0].ok == true
+        jsonData[0].status == 200
+        jsonData[0].data == ['boo':'foo']
+        List jsonErrors = parseJson(job.errorToString())
+        jsonErrors.size() == 1
+        jsonErrors[0].ok == false
+        jsonErrors[0].status == 500
+        jsonErrors[0].detail == "error detail"
+
     }
 
 

@@ -54,6 +54,10 @@ class SyncJobRepo implements GormRepo<SyncJob>, IdGeneratorRepo<SyncJob> {
         job.payloadId ? attachmentRepo.get(job.payloadId).getText() : getJsonString(job.payloadBytes)
     }
 
+    String errorToString(SyncJob job){
+        getJsonString(job.errorBytes)
+    }
+
     String getJsonString(byte[] bytes){
         return bytes ? new String(bytes, "UTF-8") : '[]'
     }

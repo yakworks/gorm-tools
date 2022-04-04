@@ -29,6 +29,10 @@ class SyncJob implements SyncJobEntity<SyncJob>, Serializable {
     String dataToString(){
         getRepo().dataToString(this)
     }
+    @Override
+    String errorToString(){
+        getRepo().errorToString(this)
+    }
 
     @Override
     String payloadToString(){

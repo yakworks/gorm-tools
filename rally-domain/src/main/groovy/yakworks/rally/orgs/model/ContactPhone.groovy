@@ -12,7 +12,7 @@ import grails.persistence.Entity
 @GrailsCompileStatic
 class ContactPhone implements RepoEntity<ContactPhone>, Serializable {
 
-    String kind //XXX what is this, should be enum?
+    String kind //FIXME what is this, should be enum?
     String num
     Boolean isPrimary = false
 

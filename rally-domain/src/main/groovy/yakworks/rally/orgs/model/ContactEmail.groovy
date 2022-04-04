@@ -14,7 +14,7 @@ import grails.persistence.Entity
 @GrailsCompileStatic
 class ContactEmail implements RepoEntity<ContactEmail>, Serializable {
 
-    String kind //XXX is this used?
+    String kind //FIXME is this used?
     String address
     Boolean isPrimary = false
 

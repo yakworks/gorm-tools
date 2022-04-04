@@ -76,12 +76,12 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
     enum VisibleTo { Company, Everyone, Owner, Role }
 
     static mapping = {
-        name column: 'summary' //XXX rename column
+        name column: 'summary' //FIXME rename column
         note column: 'noteId'
         org column: 'orgId'
         template column: 'templateId'
         task column: 'taskId'
-        source column: 'sourceEntity' //XXX why are we mapping this like this
+        source column: 'sourceEntity' //FIXME why are we mapping this like this
     }
 
     static Map constraintsMap = [

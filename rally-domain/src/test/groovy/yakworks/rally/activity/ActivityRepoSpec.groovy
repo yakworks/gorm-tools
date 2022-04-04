@@ -17,7 +17,7 @@ class ActivityRepoSpec extends Specification implements DomainRepoTest<Activity>
 
     ActivityRepo activityRepo
 
-    @Ignore //XXX String-based queries like [executeQuery] are currently not supported in this implementation of GORM. Use criteria instead.
+    @Ignore //FIXME String-based queries like [executeQuery] are currently not supported in this implementation of GORM. Use criteria instead.
     void "test create activity lookup org by sourceId"() {
         when:
         Org org = build(Org)

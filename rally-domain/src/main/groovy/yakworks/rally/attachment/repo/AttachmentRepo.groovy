@@ -97,7 +97,7 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo<Attachment
             }
             if (!p.mimeType) p.mimeType = FileUtil.extractMimeType(p.name as String)
             if (!p.extension) p.extension = FileUtil.getExtension(p.name as String)
-            //XXX hard coded design needs to be refactored out and simplified
+            //FIXME hard coded design needs to be refactored out and simplified
             if (p.isCreditFile) p.locationKey = "attachments.creditFiles.location"
         }
 
@@ -127,7 +127,7 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo<Attachment
         }
     }
 
-    // XXX needs test
+    // FIXME needs test
     @RepoListener
     void beforeRemove(Attachment attachment, BeforeRemoveEvent e) {
         if (attachment.location) {

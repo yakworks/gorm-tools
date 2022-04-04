@@ -30,7 +30,7 @@ class ActivityCopyTests extends Specification implements DomainIntTest {
     ActivityRepo activityRepo
     AppResourceLoader appResourceLoader
 
-    @Ignore //XXX need to fix activity copy https://github.com/9ci/domain9/issues/271
+    @Ignore //FIXME need to fix activity copy https://github.com/9ci/domain9/issues/271
     void testCopy() {
         when:
         Org org = Org.first()

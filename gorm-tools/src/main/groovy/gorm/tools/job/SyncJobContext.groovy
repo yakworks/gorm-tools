@@ -169,7 +169,6 @@ class SyncJobContext {
 
     SyncJobEntity finishJob(List<Map> renderResults = [], List<Map> renderErrorResults = []) {
         Map data = [id: jobId, state: SyncJobState.Finished] as Map<String, Object>
-        // XXX how do I insert these renderErrorResults into data.errorBytes ?
         if(renderErrorResults){
             //it fails, they are still ProblemTraits
             data.errorBytes = JsonEngine.toJson(renderErrorResults).bytes

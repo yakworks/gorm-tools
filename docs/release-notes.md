@@ -1,3 +1,10 @@
+### v7.0.8-v.67
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.66...v7.0.8-v.67)
+- trigger release [link](https://github.com/yakworks/gorm-tools/commit/43825f005694b3f5096421dd94565434d5cfd045)
+- move XXX for activity to fixme as its one big realted issue (#514) [link](https://github.com/yakworks/gorm-tools/commit/763eb07538aa8736455b2a533d3ddf87291c9f81)
+- Sync job transform results closure (#457) [link](https://github.com/yakworks/gorm-tools/commit/7645835e929905e8463306877fb1b6bb109ab084)
+
 ### v7.0.8-v.66
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.65...v7.0.8-v.66)

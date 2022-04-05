@@ -17,6 +17,7 @@ import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 import groovy.util.logging.Slf4j
 
+import gorm.tools.beans.AppCtx
 import gorm.tools.repository.model.IdGeneratorRepo
 import yakworks.api.ApiResults
 import yakworks.api.Result
@@ -185,6 +186,7 @@ class SyncJobContext {
             data.ok = ok.get()
         }
         return syncJobService.updateJob(data)
+        AppCtx.publishEvent(SyncJobFinishedEvent.of(this))
     }
 
     /**

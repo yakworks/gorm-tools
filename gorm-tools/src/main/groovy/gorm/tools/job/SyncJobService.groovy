@@ -8,6 +8,7 @@ import java.nio.file.Path
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.beans.AppCtx
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -35,11 +36,14 @@ trait SyncJobService<D> {
      * creates and saves the Job and returns the SyncJobContext with the jobId
      */
     SyncJobContext createJob(SyncJobArgs args, Object payload){
+        SyncJobContext jobContext
         //keep it in its own transaction so it doesn't depend on wrapping
         trxService.withNewTrx {
-            SyncJobContext jobContext = new SyncJobContext(args: args, syncJobService: this, payload: payload )
-            return jobContext.createJob()
+            jobContext = new SyncJobContext(args: args, syncJobService: this, payload: payload )
+            jobContext.createJob()
         }
+        AppCtx.publishEvent(SyncJobStartEvent.of(jobContext))
+        return jobContext
     }
 
     /**

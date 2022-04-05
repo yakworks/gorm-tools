@@ -1,3 +1,9 @@
+### v7.0.8-v.68
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.67...v7.0.8-v.68)
+- Merge pull request #515 from yakworks/queryargs_remove_ctrl_params [link](https://github.com/yakworks/gorm-tools/commit/25041a354699338f4b71d783bc662ad885953928)
+- fix for filtering out params [link](https://github.com/yakworks/gorm-tools/commit/205a20a3bb3170f3b93e6167db5aa258de2d5d54)
+
 ### v7.0.8-v.67
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.66...v7.0.8-v.67)

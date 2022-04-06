@@ -66,6 +66,16 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         then:
         json
         json.size() == 3
+
+        when: "verify org & events"
+        Org org = Org.findByNum("testorg-1")
+
+        then:
+        org != null
+        org.comments != null
+        org.comments == "testorg-1-SyncjobEventListener"
+        org.info != null
+        org.info.fax == "SyncjobEventListener"
     }
 
     @NotTransactional

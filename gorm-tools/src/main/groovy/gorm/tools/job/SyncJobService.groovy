@@ -8,11 +8,11 @@ import java.nio.file.Path
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.beans.AppCtx
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 
+import gorm.tools.beans.AppCtx
 import gorm.tools.repository.GormRepo
 import gorm.tools.transaction.TrxService
 import yakworks.i18n.icu.ICUMessageSource

@@ -184,8 +184,9 @@ class SyncJobContext {
             data.dataBytes = JsonEngine.toJson(renderResults).bytes
             data.ok = ok.get()
         }
-        return syncJobService.updateJob(data)
+        SyncJobEntity entity = syncJobService.updateJob(data)
         AppCtx.publishEvent(SyncJobFinishedEvent.of(this))
+        return entity
     }
 
     /**

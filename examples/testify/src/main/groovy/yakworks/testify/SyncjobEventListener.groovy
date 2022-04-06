@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component
 
 import gorm.tools.job.SyncJobFinishedEvent
 import gorm.tools.job.SyncJobStartEvent
+import gorm.tools.repository.model.DataOp
 import yakworks.api.OkResult
 import yakworks.rally.orgs.model.Org
 
@@ -16,6 +17,7 @@ class SyncjobEventListener {
 
     @EventListener
     void onBulk(SyncJobFinishedEvent<Org> event) {
+        if(event.context.args.op != DataOp.add) return
         assert event.domainClass.isAssignableFrom(Org)
         event.context.results.each {
             if (it instanceof OkResult) {
@@ -31,6 +33,7 @@ class SyncjobEventListener {
 
     @EventListener
     void beforeBulk(SyncJobStartEvent<Org> event) {
+        if(event.context.args.op != DataOp.add) return
         if(event.context.payload && event.context.payload instanceof Collection) {
             event.context.payload.each {
                 if(it['info']) {

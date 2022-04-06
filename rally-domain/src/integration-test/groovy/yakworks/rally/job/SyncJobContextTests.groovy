@@ -14,6 +14,7 @@ import yakworks.commons.json.JsonEngine
 import yakworks.gorm.testing.DomainIntTest
 import yakworks.problem.Problem
 import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.orgs.model.Org
 
 import static yakworks.commons.json.JsonEngine.parseJson
 
@@ -26,6 +27,7 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
     SyncJobContext createJob(){
         def samplePaylod = [1,2,3,4]
         SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source')
+        syncJobArgs.domainClass = Org
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, samplePaylod)
     }
 

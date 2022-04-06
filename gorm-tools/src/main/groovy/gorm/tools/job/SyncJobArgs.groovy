@@ -147,6 +147,12 @@ class SyncJobArgs {
      */
     Long jobId
 
+    /**
+     * The domain on which the bulk is being performed
+     * Used by event listeners to filter and process selectively
+     */
+    Class entityClass
+
     static SyncJobArgs of(DataOp dataOp){
         new SyncJobArgs(op: dataOp)
     }

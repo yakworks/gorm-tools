@@ -17,7 +17,6 @@ class SyncJobImplSpec extends Specification  implements DomainRepoTest<TestSyncJ
         TestSyncJob job = new TestSyncJob(sourceType: SourceType.ERP, sourceId: 'ar/org')
         job.validate()
         job.persist()
-        //job.source == "foo"  //XXX It should pick up TestRepoJobService
     }
 
     void "convert json to byte array"() {

@@ -17,6 +17,7 @@ import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 import groovy.util.logging.Slf4j
 
+import gorm.tools.beans.AppCtx
 import gorm.tools.repository.model.IdGeneratorRepo
 import yakworks.api.ApiResults
 import yakworks.api.Result
@@ -168,7 +169,6 @@ class SyncJobContext {
 
     SyncJobEntity finishJob(List<Map> renderResults = [], List<Map> renderErrorResults = []) {
         Map data = [id: jobId, state: SyncJobState.Finished] as Map<String, Object>
-        // XXX how do I insert these renderErrorResults into data.errorBytes ?
         if(renderErrorResults){
             //it fails, they are still ProblemTraits
             data.errorBytes = JsonEngine.toJson(renderErrorResults).bytes
@@ -184,7 +184,9 @@ class SyncJobContext {
             data.dataBytes = JsonEngine.toJson(renderResults).bytes
             data.ok = ok.get()
         }
-        return syncJobService.updateJob(data)
+        SyncJobEntity entity = syncJobService.updateJob(data)
+        AppCtx.publishEvent(SyncJobFinishedEvent.of(this))
+        return entity
     }
 
     /**

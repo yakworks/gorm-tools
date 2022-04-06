@@ -21,4 +21,8 @@ enum SyncJobState implements IdEnum<SyncJobState, Integer> {
     SyncJobState(Integer id) {
         this.id = id
     }
+
+    boolean isComplete(){
+        this == Finished || this == Cancelled
+    }
 }

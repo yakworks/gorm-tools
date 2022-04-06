@@ -8,25 +8,28 @@ import org.springframework.context.ApplicationEvent
 import org.springframework.core.ResolvableType
 import org.springframework.core.ResolvableTypeProvider
 
+import yakworks.commons.lang.Validate
+
 class SyncJobStartEvent<D> extends ApplicationEvent implements ResolvableTypeProvider {
 
     Long jobId
     SyncJobContext context
-    Class domainClass //domain class for which this sync job is
+    Class entityClass //domain class for which this sync job is
 
     SyncJobStartEvent(SyncJobContext ctx) {
         super(ctx)
         this.context = ctx
         this.jobId = ctx.jobId
-        this.domainClass = ctx.args.domainClass
+        this.entityClass = ctx.args.entityClass ?: Object //if no entityClass - eg for exportSync
     }
 
     static SyncJobStartEvent of(SyncJobContext ctx) {
+        Validate.notNull(ctx, "syncJobContext is null")
         return new SyncJobStartEvent(ctx)
     }
 
     @Override
     ResolvableType getResolvableType() {
-        return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forClass(domainClass))
+        return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forClass(entityClass))
     }
 }

@@ -15,24 +15,23 @@ class SyncJobFinishedEvent<D> extends ApplicationEvent implements ResolvableType
     Long jobId
     Boolean ok
     SyncJobContext context
-    Class domainClass
+    Class entityClass
 
     SyncJobFinishedEvent(SyncJobContext ctx) {
         super(ctx)
         this.context = ctx
         this.jobId = ctx.jobId
         this.ok = ctx.ok.get()
-        this.domainClass = ctx.args.domainClass
+        this.entityClass = ctx.args.entityClass ?: Object //if no entityClass - eg for exportSync
     }
 
     static SyncJobFinishedEvent of(SyncJobContext ctx){
         Validate.notNull(ctx, "syncJobContext is null")
-        Validate.notNull(ctx.args.domainClass, "syncJobContext.args.domainClass is null")
         return new SyncJobFinishedEvent(ctx)
     }
 
     @Override
     ResolvableType getResolvableType() {
-        return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forClass(domainClass))
+        return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forClass(entityClass))
     }
 }

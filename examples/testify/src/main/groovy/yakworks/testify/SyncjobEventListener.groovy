@@ -17,8 +17,8 @@ class SyncjobEventListener {
 
     @EventListener
     void onBulk(SyncJobFinishedEvent<Org> event) {
+        assert event.entityClass.isAssignableFrom(Org) //verify, tht listener is called for only org events based on generic
         if(event.context.args.op != DataOp.add) return
-        assert event.domainClass.isAssignableFrom(Org)
         event.context.results.each {
             if (it instanceof OkResult) {
                 Long id = it.payload.id as Long
@@ -33,6 +33,7 @@ class SyncjobEventListener {
 
     @EventListener
     void beforeBulk(SyncJobStartEvent<Org> event) {
+        assert event.entityClass.isAssignableFrom(Org)
         if(event.context.args.op != DataOp.add) return
         if(event.context.payload && event.context.payload instanceof Collection) {
             event.context.payload.each {
@@ -40,6 +41,22 @@ class SyncjobEventListener {
                     it['info'].fax = "SyncjobEventListener"
                 }
             }
+        }
+    }
+
+    @EventListener
+    void withoutEntityClassStart(SyncJobStartEvent<Object> event) {
+        if(event.entityClass != Object) return //apply just for the event without entityClass
+        if(event.context.payload && event.context.payload instanceof Collection) {
+           event.context.payload << 5 //add a new item to payload which can be verified by test
+        }
+    }
+
+    @EventListener
+    void withoutEntityClassfinish(SyncJobFinishedEvent<Object> event) {
+        if(event.entityClass != Object) return
+        if(event.context.payload && event.context.payload instanceof Collection) {
+            event.context.payload << 6
         }
     }
 }

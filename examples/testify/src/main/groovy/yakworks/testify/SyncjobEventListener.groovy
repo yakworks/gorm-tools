@@ -8,6 +8,9 @@ import gorm.tools.job.SyncJobStartEvent
 import yakworks.api.OkResult
 import yakworks.rally.orgs.model.Org
 
+/**
+ * Used for testing sync job events
+ */
 @Component
 class SyncjobEventListener {
 

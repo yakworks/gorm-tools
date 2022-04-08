@@ -1,3 +1,9 @@
+### v7.0.8-v.69
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.68...v7.0.8-v.69)
+- trigger release [link](https://github.com/yakworks/gorm-tools/commit/524dd07ff8366dbdc51ed9f5b36d95084b4e02ed)
+- basic design flushed out (#516) [link](https://github.com/yakworks/gorm-tools/commit/191c70375084b21e01f41bea7835f87730dd57b9)
+
 ### v7.0.8-v.68
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.67...v7.0.8-v.68)

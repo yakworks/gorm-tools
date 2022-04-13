@@ -1,6 +1,7 @@
 package gorm.tools.security
 
 import gorm.tools.security.services.AppUserService
+import spock.lang.Issue
 
 import java.time.LocalDateTime
 
@@ -33,6 +34,30 @@ class AppUserDetailsServiceSpec extends Specification implements DataIntegration
         then:
         user.name== 'karen'
     }
+
+    @Issue("https://github.com/9ci/domain9/issues/962")
+    void "should not fail when password is null"() {
+        when:
+        AppUser user = AppUser.repo.create([username:"karen", email:"karen@9ci.com"])
+        flush()
+
+        then:
+        user.password == null
+
+        when:
+        GrailsUser gUser = userDetailsService.loadUserByUsername('karen')
+
+        then:
+        noExceptionThrown()
+        gUser != null
+
+        when:
+        user = AppUser.get(gUser.id)
+
+        then:
+        user.name== 'karen'
+    }
+
 
     //FIXME add a test for when credentialsNonExpired = true
     void "test expired password"() {

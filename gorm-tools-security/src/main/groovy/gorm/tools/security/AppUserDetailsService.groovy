@@ -7,6 +7,7 @@ package gorm.tools.security
 
 import groovy.util.logging.Slf4j
 
+import org.apache.commons.lang3.RandomStringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -39,12 +40,21 @@ class AppUserDetailsService implements GrailsUserDetailsService {
 
         Boolean mustChange = userService.isPasswordExpired(user)
 
+        /**
+         *  Oauth users may not have password in db,
+         *  `org.springframework.security.core.userdetail.User` which is used by security plugins, needs a password or would error from constructor
+         *  so here we generate a random password on the fly for Oauth user
+         *  However the password will never be used for this case, as oauth user does not get authenticated through DaoAuthenticationProvider
+         *  See https://github.com/9ci/domain9/issues/962
+         */
+        String pass = user.passwordHash ?: RandomStringUtils.random(8)
+
         List<SimpleGrantedAuthority> authorities = []
 
         if (loadRoles) {
             authorities = user.roles.collect { new SimpleGrantedAuthority(it.springSecRole) }
         }
-        new GrailsUser(user.username, user.passwordHash,
+        new GrailsUser(user.username, pass,
             user.enabled, true, !mustChange, true,
             authorities as Collection<GrantedAuthority>,
             user.id)

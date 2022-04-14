@@ -4,7 +4,6 @@
 */
 package yakworks.rally.orgs
 
-
 import javax.inject.Inject
 
 import groovy.transform.CompileStatic
@@ -15,7 +14,7 @@ import org.springframework.stereotype.Service
 
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.services.SecService
-import yakworks.rally.orgs.model.Contact
+import yakworks.commons.lang.Validate
 import yakworks.rally.orgs.model.Org
 
 @Service @Lazy
@@ -33,10 +32,10 @@ class UserOrgService {
     }
 
     /**
-     * gets the org from contact for the passed in AppUser
+     * gets the org for the passed in AppUser
      */
     Org getUserOrg(AppUser appUser){
-        Contact contact = Contact.findByUser(appUser)
-        contact.org
+        Validate.notNull(appUser.orgId, "User.orgId is null for user ${appUser.id}:${appUser.username}")
+        return Org.get(appUser.orgId)
     }
 }

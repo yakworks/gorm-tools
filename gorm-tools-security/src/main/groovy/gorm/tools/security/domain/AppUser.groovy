@@ -26,33 +26,6 @@ class AppUser implements NamedEntity, AuditStampTrait, GormRepoEntity<AppUser, A
         stamp: ['id', 'username', 'name']  //picklist or minimal for joins
     ]
 
-    static constraintsMap = [
-        username:[ d: '''\
-            The unique user name, also known as your handle –– what you put after the “@” symbol ala github or twitter
-            to mention others in comments or notes. appears in your profile URL. username is used to log in to your account,
-            and is visible when sending and receiving. All lowercase and no spaces or special characters.
-            ''',
-            nullable: false, unique: true, maxSize: 50],
-        name:[ d: "The full name, may come from contact, will default to username if not populated",
-                 nullable: false, required: false,  maxSize: 50],
-        email:[ d: "The email",
-                 nullable: false, email: true, unique: true],
-        inactive:[ d: 'True if user is inactive which means they cannot login but are still here for history',
-                   editable: false],
-        password:[ d: "The pwd", oapi:'CU', password: true],
-        roles:[ d: 'The roles assigned to this user', oapi: [read: true, edit: ['id']]],
-        passwordHash:[ d: "The pwd hash, internal use only, never show this",
-                 nullable: true, maxSize: 60, bindable: false, display:false, password: true],
-        passwordChangedDate:[ d: "The date password was changed",
-                 nullable: true, bindable: false, oapi:'R'],
-        passwordExpired:[ d: "The password expired",
-                 bindable: false, editable: false],
-        resetPasswordToken:[ d: "temp token for a password reset, internal use only",
-                 nullable: true, bindable: false, display:false],
-        resetPasswordDate:[ d: "date when user requested to reset password, adds resetPasswordExpireDays to see if its still valid",
-                 nullable: true, bindable: false, display:false]
-    ]
-
     String username
     String  name // the full name or display name, may come from contact or defaults to username if not populated
     String  email // users email for username or lost password
@@ -62,6 +35,8 @@ class AppUser implements NamedEntity, AuditStampTrait, GormRepoEntity<AppUser, A
     Boolean inactive = false // !enabled
     String  resetPasswordToken // temp token for a password reset, TODO move to userToken once we have that setup?
     LocalDateTime resetPasswordDate // //date when user requested to reset password, adds resetPasswordExpireDays to see if its still valid
+
+    Long orgId
 
     @Transient
     boolean getEnabled() { !inactive }
@@ -85,9 +60,35 @@ class AppUser implements NamedEntity, AuditStampTrait, GormRepoEntity<AppUser, A
         table 'Users' // AppCtx.config.getProperty('gorm.tools.security.user.table', 'Users')
         // table Holders.config.getProperty('gorm.tools.security.user.table', 'Users')
         passwordHash column: "`password`"
-        passwordExpired column: "mustChangePassword" // TODO change the column name in nine-db
-        username column: "login"
     }
+
+    static constraintsMap = [
+        username:[ d: '''\
+            The unique user name, also known as your handle –– what you put after the “@” symbol ala github or twitter
+            to mention others in comments or notes. appears in your profile URL. username is used to log in to your account,
+            and is visible when sending and receiving. All lowercase and no spaces or special characters.
+            ''',
+                   nullable: false, unique: true, maxSize: 50],
+        name:[ d: "The full name, may come from contact, will default to username if not populated",
+               nullable: false, required: false,  maxSize: 50],
+        email:[ d: "The email",
+                nullable: false, email: true, unique: true],
+        inactive:[ d: 'True if user is inactive which means they cannot login but are still here for history',
+                   editable: false],
+        password:[ d: "The pwd", oapi:'CU', password: true],
+        orgId:[ d: "The org to which this user belongs to", bindable: true, editable: false, nullable: true],
+        roles:[ d: 'The roles assigned to this user', oapi: [read: true, edit: ['id']]],
+        passwordHash:[ d: "The pwd hash, internal use only, never show this",
+                       nullable: true, maxSize: 60, bindable: false, display:false, password: true],
+        passwordChangedDate:[ d: "The date password was changed",
+                              nullable: true, bindable: false, oapi:'R'],
+        passwordExpired:[ d: "The password expired",
+                          bindable: false, editable: false],
+        resetPasswordToken:[ d: "temp token for a password reset, internal use only",
+                             nullable: true, bindable: false, display:false],
+        resetPasswordDate:[ d: "date when user requested to reset password, adds resetPasswordExpireDays to see if its still valid",
+                            nullable: true, bindable: false, display:false]
+    ]
 
     @CompileDynamic
     static AppUser getByUsername(String uname) {

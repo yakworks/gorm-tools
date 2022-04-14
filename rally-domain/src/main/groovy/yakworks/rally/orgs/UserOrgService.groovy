@@ -32,7 +32,7 @@ class UserOrgService {
     }
 
     /**
-     * gets the org from contact for the passed in AppUser
+     * gets the org for the passed in AppUser
      */
     Org getUserOrg(AppUser appUser){
         Validate.notNull(appUser.orgId, "User.orgId is null for user ${appUser.id}:${appUser.username}")

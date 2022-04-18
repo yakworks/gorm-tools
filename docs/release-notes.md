@@ -1,3 +1,9 @@
+### v7.0.8-v.70
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.69...v7.0.8-v.70)
+- trigger release [link](https://github.com/yakworks/gorm-tools/commit/f479ba3729bcdb514e11f7657ad01d5c3475475f)
+- 9ci/domain9#961 Add orgId column to user (#518) [link](https://github.com/yakworks/gorm-tools/commit/b8049c2d5f2c1be35b31e42a38330d34c4961aa4)
+
 ### v7.0.8-v.69
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.68...v7.0.8-v.69)

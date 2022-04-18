@@ -23,6 +23,8 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 class SecRole implements NameDescription, RepoEntity<SecRole>, Serializable {
 
     static final String ADMINISTRATOR = "Administrator" //full access, system user
+    static final String ADMIN = "Administrator" //.Alias
+
     static transients = ['springSecRole']
 
     String name
@@ -47,6 +49,6 @@ class SecRole implements NameDescription, RepoEntity<SecRole>, Serializable {
      * it allows us to save role names in db without prefix ROLE_
      */
     String getSpringSecRole() {
-        return "ROLE_${name}".toString()
+        return "ROLE_${name}".toString().toUpperCase()
     }
 }

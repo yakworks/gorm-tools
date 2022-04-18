@@ -25,11 +25,6 @@ import yakworks.rally.tag.model.Taggable
 @GrailsCompileStatic
 class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEntity<Activity, ActivityRepo>, Attachable, Taggable, Serializable {
     // static transients = ['hasAttachments']
-    // XXX Sync changes with database
-    //  - database has a whole bunch of fields that are not needed, like forCustome, templateId, etc...
-    //  - remove title as its just a dup of name
-    //  - rename summary to just name
-    //  - remove arTranId
 
     Kind kind = Kind.Note
 
@@ -37,7 +32,7 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
     // If activity is on org level activityLink has org id as well.
     Org org
     //the parent note that this is a comment for.
-    Long parentId
+    // Long parentId
 
     // a 255 char string summary of the activity. Will be the title if its a task and if note it will ends with ... if there is more to the note.
     String name

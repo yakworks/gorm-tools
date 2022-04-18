@@ -145,7 +145,7 @@ class SpringSecService<D> implements SecService<D>{
         for (String auth : roleNames) {
             auth = auth.trim()
             if (auth.length() > 0) {
-                auth = "ROLE_" + auth
+                auth = auth.startsWith("ROLE_") ? auth : "ROLE_" + auth.toUpperCase()
                 requiredAuthorities.add(new SimpleGrantedAuthority(auth))
             }
         }

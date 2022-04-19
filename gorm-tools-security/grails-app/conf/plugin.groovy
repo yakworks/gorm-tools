@@ -10,7 +10,7 @@ grails.plugin.springsecurity.userLookup.accountExpiredPropertyName = null
 grails.plugin.springsecurity.userLookup.accountLockedPropertyName = null
 grails.plugin.springsecurity.userLookup.passwordExpiredPropertyName = null
 grails.plugin.springsecurity.authority.className = 'gorm.tools.security.domain.SecRole'
-grails.plugin.springsecurity.authority.nameField = 'springSecRole'
+grails.plugin.springsecurity.authority.nameField = 'code'
 
             // interceptUrlMap = [
             //     // all accesible anoymously by default

@@ -94,12 +94,12 @@ class SecRoleUser implements RepoEntity<SecRoleUser>, Serializable {
         Set userRoleNames = []
         if (userInstance.id) {
             for (r in userInstance.roles) {
-                userRoleNames << r.springSecRole
+                userRoleNames << r.code
             }
         }
         Map<SecRole, Boolean> roleMap = [:]
         for (r in roles) {
-            roleMap[(r)] = userRoleNames.contains(r.springSecRole)
+            roleMap[(r)] = userRoleNames.contains(r.code)
         }
 
         return roleMap

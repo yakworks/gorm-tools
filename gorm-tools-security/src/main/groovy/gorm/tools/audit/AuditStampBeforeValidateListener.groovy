@@ -14,7 +14,8 @@ import gorm.tools.repository.events.BeforeValidateEvent
 /**
  * listens for the BeforeValidateEvent so it can get set and nullable errors are not fired
  * we do this with the gorm-tools BeforeValidateEvent because the ValidationEvent doesn't get fired
- * during a cascade to associations in gorm-hibernate
+ * during a cascade to associations in gorm-hibernate. Validation is overriden in RepoEntityValidator
+ * and uses RepoEventPublisher to publish the event.
  */
 @CompileStatic
 class AuditStampBeforeValidateListener {// implements ApplicationListener<BeforeValidateEvent> {

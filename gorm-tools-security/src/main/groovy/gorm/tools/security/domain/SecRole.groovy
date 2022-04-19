@@ -6,6 +6,7 @@ package gorm.tools.security.domain
 
 import groovy.transform.EqualsAndHashCode
 
+import gorm.tools.model.NameCodeDescription
 import gorm.tools.model.NameDescription
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
@@ -15,22 +16,31 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 
 /**
  * SecRole class for Authority.
+ * Spring security plugin needs all authorities to be prefixed with ROLE_ and hence all roles must
+ * be saved in database with code such as ROLE_MANAGER etc.
  */
-
 @Entity
 @EqualsAndHashCode(includes='name', useCanEqual=false)
 @GrailsCompileStatic
-class SecRole implements NameDescription, RepoEntity<SecRole>, Serializable {
+class SecRole implements NameCodeDescription, RepoEntity<SecRole>, Serializable {
 
-    static final String ADMINISTRATOR = "Administrator" //full access, system user
-    static final String ADMIN = "Administrator" //.Alias
+    static final String ADMINISTRATOR = "ROLE_ADMIN" //full access, system user
+    static final String ADMIN = "ROLE_ADMIN" //.Alias
 
-    static transients = ['springSecRole']
+    // static transients = ['springSecRole']
 
     String name
     Boolean inactive = false
 
+    void beforeValidate() {
+        if(!this.name && this.code) this.name = code.replaceAll('-', ' ')
+        if(!code.startsWith('ROLE_')) code =  "ROLE_${code}".toString().toUpperCase()
+        if(code.toUpperCase() != code) code = code.toUpperCase()
+    }
+
     static constraintsMap = [
+        code:[ d: 'Upper case role key, starts with ROLE_ always',
+               nullable: false, maxSize: 10, matches: "[A-Z0-9-_]+" ],
         name: [d: "The name of the role",
             nullable: false, maxSize: 20],
         description: [d: "A longer description",
@@ -42,13 +52,4 @@ class SecRole implements NameDescription, RepoEntity<SecRole>, Serializable {
         cache "read-write"
     }
 
-    /**
-     * Spring security plugin needs all authorities to be prefixed with ROLE_ and hence all roles must
-     * be saved in database with name such as ROLE_MANAGER etc. However we use custom user detail service,
-     * and call getSpringSecRole when populating a authorities for the UserDetail.
-     * it allows us to save role names in db without prefix ROLE_
-     */
-    String getSpringSecRole() {
-        return "ROLE_${name}".toString().toUpperCase()
-    }
 }

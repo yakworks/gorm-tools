@@ -34,13 +34,14 @@ class SecRole implements NameCodeDescription, RepoEntity<SecRole>, Serializable 
 
     void beforeValidate() {
         if(!this.name && this.code) this.name = code.replaceAll('-', ' ')
+        if(this.name && !this.code) this.code = name.replaceAll(' ', '_')
         if(!code.startsWith('ROLE_')) code =  "ROLE_${code}".toString().toUpperCase()
         if(code.toUpperCase() != code) code = code.toUpperCase()
     }
 
     static constraintsMap = [
         code:[ d: 'Upper case role key, starts with ROLE_ always',
-               nullable: false, maxSize: 10, matches: "[A-Z0-9-_]+" ],
+               nullable: false, maxSize: 30, matches: "[A-Z0-9-_]+" ],
         name: [d: "The name of the role",
             nullable: false, maxSize: 20],
         description: [d: "A longer description",

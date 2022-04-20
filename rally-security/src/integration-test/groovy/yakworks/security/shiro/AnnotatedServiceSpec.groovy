@@ -7,6 +7,7 @@ import grails.gorm.transactions.Rollback
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.testing.mixin.integration.Integration
+import spock.lang.IgnoreRest
 import yakworks.security.Roles
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authz.UnauthenticatedException
@@ -323,31 +324,6 @@ class AnnotatedServiceSpec extends Specification {
         thrown UnauthenticatedException
     }
 
-    @Ignore
-    void testSpringSecured() {
-        setup:
-        setupPerms()
-
-        when:
-        testService.requireAdminSpringSecured()
-
-        then:
-        thrown UnauthenticatedException
-
-        when:
-        login 'user1'
-
-        then:
-        testService.requireAdminSpringSecured()
-
-        when:
-        logout()
-        login 'user2'
-
-        then:
-        testService.requireAdminSpringSecured()
-    }
-
     void testRequiresGuest() {
         setup:
         setupPerms()
@@ -388,8 +364,8 @@ class AnnotatedServiceSpec extends Specification {
         AppUser user1 = AppUser.create(getUserParams('user1'))
         AppUser user2 = AppUser.create(getUserParams('user2'))
         AppUser user3 = AppUser.create(getUserParams('user3'))
-        SecRole roleAdmin = SecRole.create(code: "Admin")
-        SecRole roleUser = SecRole.create(code: 'Customer')
+        SecRole roleAdmin = SecRole.create(code: "ROLE_ADMIN")
+        SecRole roleUser = SecRole.create(code: 'ROLE_CUST')
 
         save new SecUserPermission(user1, 'printer:print:*')
 

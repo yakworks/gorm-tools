@@ -1,3 +1,7 @@
+/*
+* Copyright 2022 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
+* You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+*/
 package yakworks.security.shiro
 
 import groovy.transform.CompileStatic
@@ -13,9 +17,9 @@ class GormShiroRolePermissionResolver implements RolePermissionResolver {
 
     @Override
     Collection<Permission> resolvePermissionsInRole(String roleString) {
-        if (roleString.startsWith('ROLE_')) roleString = roleString.substring('ROLE_'.length())
+        // if (roleString.startsWith('ROLE_')) roleString = roleString.substring('ROLE_'.length())
         List<String> stringPermissions = SecRolePermission.executeQuery("""
-            Select sr.permission FROM SecRolePermission sr WHERE lower(sr.role.name) = :roleString
+            Select sr.permission FROM SecRolePermission sr WHERE upper(sr.role.code) = upper(:roleString)
         """, [roleString: roleString.toLowerCase()]) as List<String>
 
         List<Permission> permissions = []

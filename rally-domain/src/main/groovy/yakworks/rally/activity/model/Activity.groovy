@@ -100,9 +100,6 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
             d: 'The Org this activity belongs to',
             nullable: false
         ],
-        parentId: [
-            d: 'The parent note that this is a comment for'
-        ],
         source: [
             d: ''' The source description for where this activity came from.
                 The gorm domain name of the record that generated this such as CollectionStep, Promise'''

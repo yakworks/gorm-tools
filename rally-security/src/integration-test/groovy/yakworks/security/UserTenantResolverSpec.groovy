@@ -1,15 +1,18 @@
-package nine.security
+package yakworks.security
 
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import nine.rally.testing.DomainIntTest
+
 import org.grails.datastore.mapping.multitenancy.exceptions.TenantNotFoundException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.context.SecurityContextHolder
+import spock.lang.Ignore
 import spock.lang.Specification
+import yakworks.gorm.testing.DomainIntTest
 import yakworks.rally.tenant.UserTenantResolver
 
+@Ignore //WIP
 @Integration
 @Rollback
 class UserTenantResolverSpec extends Specification implements DomainIntTest {//, ApplicationContextAware {

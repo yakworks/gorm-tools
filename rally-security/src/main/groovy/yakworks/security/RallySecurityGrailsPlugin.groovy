@@ -1,3 +1,7 @@
+/*
+* Copyright 2022 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
+* You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+*/
 package yakworks.security
 
 import groovy.transform.CompileDynamic
@@ -8,11 +12,11 @@ import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSource
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler
 
 import grails.plugin.springsecurity.SecurityFilterPosition
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugins.Plugin
-import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler
 import yakworks.rally.tenant.UserRequest
 import yakworks.rally.tenant.UserTenantResolver
 import yakworks.security.rest.NineOauthUserDetailsService
@@ -71,10 +75,13 @@ class RallySecurityGrailsPlugin extends Plugin {
         println "Configuring 9ci's rest security setup"
         //add only if sec plugins enabled, or else it would fail.
         oauthUserDetailsService(NineOauthUserDetailsService)
-        tokenStorageService(PostgresTokenStorageService)
+        // tokenStorageService(PostgresTokenStorageService)
         tokenReader(HeaderTokenReader)
         restAuthenticationProvider(RestAuthenticationProvider) {
             useJwt = false
+        }
+        if(config.getProperty('dataSource.driverClassName').contains('postgre')){
+            tokenStorageService(PostgresTokenStorageService)
         }
     }}
 

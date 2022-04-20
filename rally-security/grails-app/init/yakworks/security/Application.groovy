@@ -1,4 +1,8 @@
-package nine.security
+/*
+* Copyright 2022 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
+* You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+*/
+package yakworks.security
 
 import org.springframework.context.annotation.ComponentScan
 
@@ -9,11 +13,10 @@ import grails.plugins.metadata.PluginSource
 /**
  * In place for integration testing
  */
-@ComponentScan(['yakworks.security'])
+@ComponentScan(['yakworks.rally', 'yakworks.security'])
 @PluginSource
 class Application extends GrailsAutoConfiguration { // implements ScanningAutoConfigTrait {
-    List commonScanPackages = [ 'gorm.tools.security', 'yakworks.rally', 'yakworks.security',
-                                'nine.rally', 'nine.security']
+    List commonScanPackages = [ 'gorm.tools.security', 'yakworks.rally']
     static void main(String[] args) {
         GrailsApp.run(Application, args)
     }

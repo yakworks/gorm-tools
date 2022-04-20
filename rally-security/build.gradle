@@ -25,6 +25,8 @@ dependencies {
   }
 
   compileOnly("org.grails:grails-web-mvc")
+  //for AppResourceLoader in AttachmentSupport
+  compileOnly "org.grails.plugins:view-tools:$vViewTools"
 
   implementation "org.springframework.boot:spring-boot-starter-logging"
   implementation "org.springframework.boot:spring-boot-autoconfigure"

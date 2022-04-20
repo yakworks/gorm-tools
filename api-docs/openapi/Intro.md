@@ -312,7 +312,7 @@ curl -H 'Content-Type: application/json' -X POST \
 {
     "username": "someUser",
     "roles": [
-        "ROLE_Administrator"
+        "Administrator"
     ],
     "token_type": "Bearer",
     "access_token": "4g2134lkjlkj1324....."

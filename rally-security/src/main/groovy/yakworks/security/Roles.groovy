@@ -12,8 +12,8 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class Roles {
     // enabled by default in base data
-    static final String ADMINISTRATOR = "ROLE_ADMIN" //full access, system user
-    static final String ADMIN = "ROLE_ADMIN" //alias
+    //full access, system user
+    static final String ADMIN = "ADMIN" //alias
     static final String POWER_USER = "Power User"
     //default user, access to all the screens, not manager (cannot approve, view other's tasks or delete cash system data)
     static final String MANAGER = "Manager" //access to all user's tasks, approval, can delete cash system data

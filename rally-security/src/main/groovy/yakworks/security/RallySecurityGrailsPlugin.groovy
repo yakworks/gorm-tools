@@ -92,13 +92,13 @@ class RallySecurityGrailsPlugin extends Plugin {
             SecurityFilterPosition.SECURITY_CONTEXT_FILTER.order + 1
 
         //replace so we can set the role prefix to be blank and not ROLE_
-        // webExpressionHandler(DefaultWebSecurityExpressionHandler) {
-        //     expressionParser = ref('voterExpressionParser')
-        //     permissionEvaluator = ref('permissionEvaluator')
-        //     roleHierarchy = ref('roleHierarchy')
-        //     trustResolver = ref('authenticationTrustResolver')
-        //     defaultRolePrefix = ''
-        // }
+        webExpressionHandler(DefaultWebSecurityExpressionHandler) {
+            expressionParser = ref('voterExpressionParser')
+            permissionEvaluator = ref('permissionEvaluator')
+            roleHierarchy = ref('roleHierarchy')
+            trustResolver = ref('authenticationTrustResolver')
+            defaultRolePrefix = ''
+        }
 
         shiroLifecycleBeanPostProcessor(LifecycleBeanPostProcessor)
 

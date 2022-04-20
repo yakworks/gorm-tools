@@ -16,31 +16,26 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 
 /**
  * SecRole class for Authority.
- * Spring security plugin needs all authorities to be prefixed with ROLE_ and hence all roles must
- * be saved in database with code such as ROLE_MANAGER etc.
+ *
  */
 @Entity
 @EqualsAndHashCode(includes='name', useCanEqual=false)
 @GrailsCompileStatic
 class SecRole implements NameCodeDescription, RepoEntity<SecRole>, Serializable {
 
-    static final String ADMINISTRATOR = "ROLE_ADMIN" //full access, system user
-    static final String ADMIN = "ROLE_ADMIN" //.Alias
-
-    // static transients = ['springSecRole']
+    static final String ADMIN = "ADMIN" //full access, system user
 
     String name
     Boolean inactive = false
 
     void beforeValidate() {
-        if(!this.name && this.code) this.name = code.replaceAll('-', ' ')
+        if(!this.name && this.code) this.name = code.replaceAll('-', ' ').replaceAll('_', ' ')
         if(this.name && !this.code) this.code = name.replaceAll(' ', '_')
-        if(!code.startsWith('ROLE_')) code =  "ROLE_${code}".toString().toUpperCase()
         if(code.toUpperCase() != code) code = code.toUpperCase()
     }
 
     static constraintsMap = [
-        code:[ d: 'Upper case role key, starts with ROLE_ always',
+        code:[ d: 'Upper case role key',
                nullable: false, maxSize: 30, matches: "[A-Z0-9-_]+" ],
         name: [d: "The name of the role",
             nullable: false, maxSize: 20],

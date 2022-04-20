@@ -27,7 +27,7 @@ hibernate:
     region.factory_class: org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
   jdbc:
     time_zone: 'UTC'
-  dialect: 'org.hibernate.dialect.H2Dialect'
+#  dialect: 'org.hibernate.dialect.H2Dialect'
 
 dataSource:
   type: com.zaxxer.hikari.HikariDataSource

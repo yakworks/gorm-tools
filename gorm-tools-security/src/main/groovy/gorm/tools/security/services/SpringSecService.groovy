@@ -107,7 +107,7 @@ class SpringSecService<D> implements SecService<D>{
     void loginAsSystemUser() {
         AppUser user = AppUser.get(1)
         assert user
-        List<GrantedAuthority> authorities = parseAuthoritiesString([SecRole.ADMINISTRATOR] as String[])
+        List<GrantedAuthority> authorities = parseAuthoritiesString([SecRole.ADMIN] as String[])
         GrailsUser grailsUser = new GrailsUser(user.username, user.passwordHash, user.enabled, true, !user.passwordExpired, true, authorities, user.id)
         SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(grailsUser, user.passwordHash, authorities)
     }
@@ -145,8 +145,7 @@ class SpringSecService<D> implements SecService<D>{
         for (String auth : roleNames) {
             auth = auth.trim()
             if (auth.length() > 0) {
-                auth = auth.startsWith("ROLE_") ? auth : "ROLE_" + auth.toUpperCase()
-                requiredAuthorities.add(new SimpleGrantedAuthority(auth))
+                requiredAuthorities.add(new SimpleGrantedAuthority(auth.toUpperCase()))
             }
         }
 

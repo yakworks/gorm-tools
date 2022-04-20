@@ -27,13 +27,13 @@ class TestService {
     @RequiresUser
     boolean requireUser() { true }
 
-    @Secured('ROLE_ADMIN')
+    @Secured('ADMIN')
     boolean requireAdminSpringSecured() { true }
 
-    @RequiresRoles(value=['ROLE_ADMIN', 'ROLE_CUST'], logical=Logical.OR)
+    @RequiresRoles(value=['ADMIN', 'CUST'], logical=Logical.OR)
     boolean requireUserOrAdmin() { true }
 
-    @RequiresRoles(value=['ROLE_ADMIN', 'ROLE_CUST'])
+    @RequiresRoles(value=['ADMIN', 'CUST'])
     boolean requireUserAndAdmin() { true }
 
     @RequiresGuest

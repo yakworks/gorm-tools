@@ -27,8 +27,6 @@ import yakworks.rally.orgs.model.Contact
 @Slf4j
 @CompileStatic
 class RallyUserService {
-    public static final String ROLE_MANAGER = "Manager"
-    public static final String ROLE_COLLECTIONS_MANAGER = "Collections Manager"
 
     SecService secService
     def freeMarkerViewService
@@ -71,16 +69,6 @@ class RallyUserService {
     //         throw new IllegalArgumentException("Not a branch $branch")
     //     }
     //     getOrgManagers(branch.id)
-    // }
-
-    // @Deprecated
-    // AppUser getManager(Org org) {
-    //     if (!org) throw new IllegalArgumentException("Org is null")
-    //     List<SecRole> roles = SecRole.findAllByNameInList([ROLE_MANAGER, ROLE_COLLECTIONS_MANAGER])
-    //
-    //     SecRoleUser sru = SecRoleUser.find("")
-    //
-    //     return (AppUser)sru?.user
     // }
 
     /**

@@ -163,7 +163,7 @@ class RallySeedData {
             user.persist()
             assert user.id == 1
 
-            SecRole admin = new SecRole(id:1, name: SecRole.ADMINISTRATOR).persist()
+            SecRole admin = new SecRole(id:1, name: SecRole.ADMIN).persist()
             SecRole power = new SecRole(id:2, name: "Power User").persist()
             SecRole guest = new SecRole(id:3, name: "Guest").persist()
 

@@ -17,10 +17,9 @@ class GormShiroRolePermissionResolver implements RolePermissionResolver {
 
     @Override
     Collection<Permission> resolvePermissionsInRole(String roleString) {
-        // if (roleString.startsWith('ROLE_')) roleString = roleString.substring('ROLE_'.length())
         List<String> stringPermissions = SecRolePermission.executeQuery("""
-            Select sr.permission FROM SecRolePermission sr WHERE upper(sr.role.code) = upper(:roleString)
-        """, [roleString: roleString.toLowerCase()]) as List<String>
+            Select sr.permission FROM SecRolePermission sr WHERE upper(sr.role.code) = :roleString
+        """, [roleString: roleString.toUpperCase()]) as List<String>
 
         List<Permission> permissions = []
 

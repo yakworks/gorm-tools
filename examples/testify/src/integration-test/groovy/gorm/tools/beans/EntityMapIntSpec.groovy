@@ -57,10 +57,10 @@ class EntityMapIntSpec extends Specification implements DataIntegrationTest, Sec
         def user = AppUser.get(1)
         assert user.roles.size() == 2
         // def emap = EntityMapFactory.createEntityMap(user, ['username', 'stringList'])
-        def emap = metaMapEntityService.createMetaMap(user, ['username', 'roles.id', 'roles.name'])
+        def emap = metaMapEntityService.createMetaMap(user, ['username', 'roles.id', 'roles.code'])
 
         then:
-        emap['roles'] == [ [id:1, name:'Administrator'] , [id:2, name:'Power User']]
+        emap['roles'] == [ [id:1, code:'ADMIN'] , [id:2, code:'POWER_USER']]
 
     }
 

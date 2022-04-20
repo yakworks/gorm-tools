@@ -17,7 +17,7 @@ public class SecServiceSpec extends Specification implements SecuritySpecHelper,
     SecService secService
 
     def setup() {
-        authenticate(AppUser.get(1), SecRole.ADMINISTRATOR)
+        authenticate(AppUser.get(1), SecRole.ADMIN)
     }
 
     def testGetPrincipal() {
@@ -47,12 +47,12 @@ public class SecServiceSpec extends Specification implements SecuritySpecHelper,
 
     def testIfAllGranted() {
         expect: "All roles of current user"
-        secService.ifAllGranted(SecRole.ADMINISTRATOR)
+        secService.ifAllGranted(SecRole.ADMIN)
     }
 
     def testIfAnyGranted(){
         expect:
-        secService.ifAnyGranted(SecRole.ADMINISTRATOR, "FakeRole")
+        secService.ifAnyGranted(SecRole.ADMIN, "FakeRole")
     }
 
     def testIfNotGranted() {

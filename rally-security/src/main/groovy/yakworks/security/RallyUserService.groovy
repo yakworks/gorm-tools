@@ -65,24 +65,6 @@ class RallyUserService {
         return token
     }
 
-    // List<AppUser> getBranchManagers(Org branch) {
-    //     Validate.notNull(branch, "Branch is null")
-    //     if (branch.orgTypeId != OrgType.BRANCH) {
-    //         throw new IllegalArgumentException("Not a branch $branch")
-    //     }
-    //     getOrgManagers(branch.id)
-    // }
-
-    // @Deprecated
-    // AppUser getManager(Org org) {
-    //     if (!org) throw new IllegalArgumentException("Org is null")
-    //     List<SecRole> roles = SecRole.findAllByNameInList([ROLE_MANAGER, ROLE_COLLECTIONS_MANAGER])
-    //
-    //     SecRoleUser sru = SecRoleUser.find("")
-    //
-    //     return (AppUser)sru?.user
-    // }
-
     /**
      * List of managers for specified organization
      */

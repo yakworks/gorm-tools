@@ -37,8 +37,7 @@ class DbDialectService {
         int result = UNKNOWN
         // just to make the stuff below easier to read.
         if (!dialectName) {
-            if(AppCtx.config.hasProperty('hibernate.dialect'))
-                dialectName = AppCtx.config.getProperty('hibernate.dialect')
+            dialectName = AppCtx.config.getProperty('hibernate.dialect')
         }
 
         //fallback to H2 just like how Datasources plugin does. if H2 is present in classpath

@@ -33,7 +33,7 @@ trait SecuritySpecHelper implements WithTrx{
     }
 
     void authenticate(AppUser user, String... roles) {
-        roles = roles.collect { "ROLE_" + it}
+        roles = roles.collect { it}
         List authorities = AuthorityUtils.createAuthorityList(roles)
 
         GrailsUser grailsUser = new GrailsUser(user.username, user.passwordHash, user.enabled, true, !user.passwordExpired, true, authorities, user.id)

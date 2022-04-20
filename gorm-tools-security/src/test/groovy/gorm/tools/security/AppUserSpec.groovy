@@ -105,15 +105,15 @@ class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, Secu
 
     def "insert with roles"() {
         setup:
-        SecRole.create(TestDataJson.buildMap([save:false, name: 'ROLE_1'], SecRole))
-        SecRole.create(TestDataJson.buildMap([save:false, name: 'ROLE_2'], SecRole))
+        SecRole.create(code: 'A')
+        SecRole.create(code: 'B')
 
         expect:
         SecRole.get(1) != null
-        SecRole.get(1).name == "ROLE_1"
+        SecRole.get(1).code == "A"
 
         SecRole.get(2) != null
-        SecRole.get(2).name == "ROLE_2"
+        SecRole.get(2).code == "B"
 
         when:
         Map data = buildMap([:])

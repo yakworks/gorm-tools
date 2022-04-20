@@ -86,7 +86,7 @@ class GormToolsBeanConfig {
 
         asyncService(AsyncService, lazy())
 
-        DbDialectService.dialectName = application.config.hibernate.dialect
+        DbDialectService.dialectName = config.getProperty("hibernate.dialect")
 
         dbDialectService(DbDialectService) { bean ->
             bean.lazyInit = true

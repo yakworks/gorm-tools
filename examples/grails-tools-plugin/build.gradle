@@ -1,0 +1,24 @@
+version "0.1"
+
+apply plugin:"groovy"
+apply plugin:"org.grails.grails-plugin"
+apply plugin:"org.grails.grails-gsp"
+
+dependencies {
+
+    compile "org.springframework.boot:spring-boot-starter-actuator"
+    provided "org.springframework.boot:spring-boot-starter-tomcat"
+
+    profile "org.grails.profiles:web-plugin"
+    provided "org.grails:grails-plugin-services"
+    provided "org.grails:grails-plugin-domain-class"
+
+}
+
+bootRun {
+  //  ignoreExitValue true
+  jvmArgs('-Dspring.output.ansi.enabled=always', '-noverify', '-XX:TieredStopAtLevel=1', '-Xmx1024m')
+  sourceResources sourceSets.main
+  String springProfilesActive = 'spring.profiles.active'
+  systemProperty springProfilesActive, System.getProperty(springProfilesActive)
+}

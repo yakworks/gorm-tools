@@ -129,6 +129,7 @@ class SpringSecService<D> implements SecService<D>{
      * @param username the user's username name
      * @param password optional
      */
+    @Override
     void reauthenticate(String username, String password = null) {
         springSecurityService.reauthenticate username, password
     }

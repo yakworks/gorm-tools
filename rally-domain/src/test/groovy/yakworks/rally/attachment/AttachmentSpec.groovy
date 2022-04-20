@@ -10,7 +10,7 @@ import org.springframework.mock.web.MockMultipartFile
 import gorm.tools.problem.ValidationProblem
 import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
-import grails.plugin.viewtools.AppResourceLoader
+import yakworks.grails.resource.AppResourceLoader
 import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport

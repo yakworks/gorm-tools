@@ -10,6 +10,7 @@ dependencies {
   profile "org.grails.profiles:rest-api"
 
   compile project(":rally-domain")
+  compile project(":grails-tools")
 
   api("org.grails.plugins:spring-security-rest:$vSpringSecurityRest"){
     exclude group: 'net.minidev', module: 'json-smart'
@@ -25,8 +26,6 @@ dependencies {
   }
 
   compileOnly("org.grails:grails-web-mvc")
-  //for AppResourceLoader in AttachmentSupport
-  compileOnly "org.grails.plugins:view-tools:$vViewTools"
 
   implementation "org.springframework.boot:spring-boot-starter-logging"
   implementation "org.springframework.boot:spring-boot-autoconfigure"

@@ -20,7 +20,7 @@ import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 
-import grails.plugin.viewtools.AppResourceLoader
+import yakworks.grails.resource.AppResourceLoader
 import yakworks.rally.attachment.model.Attachment
 
 /**

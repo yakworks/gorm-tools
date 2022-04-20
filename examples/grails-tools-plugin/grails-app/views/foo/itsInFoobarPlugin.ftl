@@ -1,0 +1,1 @@
+fooplugin itsInFoobarPlugin.ftl success

@@ -8,9 +8,7 @@ dependencies {
   api project(":gorm-tools")
   api project(":gorm-tools-security")
   api project(":gorm-tools-csv")
-
-  //for AppResourceLoader in AttachmentSupport
-  compileOnly "org.grails.plugins:view-tools:$vViewTools"
+  compileOnly project(":grails-tools")
 
   // for the mock and seed data
   compileOnly("org.grails.plugins:build-test-data:$vBuildTestData"){

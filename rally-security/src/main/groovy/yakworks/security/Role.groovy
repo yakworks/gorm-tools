@@ -8,10 +8,7 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.security.domain.SecRole
 import yakworks.commons.lang.EnumUtils
-import yakworks.commons.lang.NameUtils
 import yakworks.commons.model.IdEnum
-import yakworks.rally.orgs.model.OrgTypeSetup
-
 
 @CompileStatic
 enum Role implements IdEnum<Role, Long> {

@@ -50,6 +50,8 @@ trait SecService<D> {
      */
     abstract void loginAsSystemUser()
 
+    abstract void reauthenticate(String username, String password)
+
     abstract boolean ifAnyGranted(String... roles)
 
     /**

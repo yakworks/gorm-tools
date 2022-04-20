@@ -14,6 +14,7 @@ import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreato
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler
 
+import gorm.tools.security.domain.AppUser
 import grails.plugin.springsecurity.SecurityFilterPosition
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugins.Plugin
@@ -86,10 +87,13 @@ class RallySecurityGrailsPlugin extends Plugin {
     }}
 
     Closure getShiroBeans() { { ->
-        println "Integrate Shiro Permissions with Spring Security"
+        println ".. Integrate Shiro Permissions with Spring Security"
         //Shiro Permission integration
         SpringSecurityUtils.registerFilter 'shiroSubjectBindingFilter',
             SecurityFilterPosition.SECURITY_CONTEXT_FILTER.order + 1
+
+        //override the secService
+        secService(SpringShiroSecService, AppUser){ bean -> bean.lazyInit = true}
 
         //replace so we can set the role prefix to be blank and not ROLE_
         webExpressionHandler(DefaultWebSecurityExpressionHandler) {

@@ -3,6 +3,7 @@ package yakworks.security.shiro
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
 import gorm.tools.security.domain.SecRoleUser
+import gorm.tools.security.services.SecService
 import grails.gorm.transactions.Rollback
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.SpringSecurityUtils
@@ -30,23 +31,25 @@ class AnnotatedServiceSpec extends Specification {
 
     WebSecurityManager shiroSecurityManager
     Realm springSecurityRealm
+    SecService<AppUser> secService
     @Autowired TestService testService
 
-    private request = new MockHttpServletRequest()
-    private response = new MockHttpServletResponse()
+
+    // private request = new MockHttpServletRequest()
+    // private response = new MockHttpServletResponse()
 
     void setup() {
         assert shiroSecurityManager
         ThreadContext.bind shiroSecurityManager
-
         logout()
     }
 
     private void login(String username) {
-        SpringSecurityUtils.reauthenticate username, 'password'
-        request.getSession()
-        ShiroUtils.bindSubject SecurityContextHolder.context.authentication,
-            springSecurityRealm, shiroSecurityManager, request, response
+        secService.reauthenticate(username, 'password')
+        // SpringSecurityUtils.reauthenticate username, 'password'
+        // // request.getSession()
+        // ShiroUtils.bindSubject SecurityContextHolder.context.authentication,
+        //     springSecurityRealm, shiroSecurityManager, request, response
     }
 
     private void logout() {

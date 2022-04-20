@@ -10,13 +10,18 @@ include 'rally-security'
 include 'commons'
 include 'gorm-test-support'
 include 'gorm-test-domain'
+include 'grails-tools'
 //findProject(':security').name = 'gorm-tools-security' // the name that will be published
 
 // tests will be included in main runs but not deploy tasks and doc tasks
 include "examples/testify"
 include 'examples/restify'
 include 'examples/benchmarks'
+include 'examples/grails-tools-app'
+include 'examples/grails-tools-plugin'
 
 findProject(':examples/testify').name = 'testify'
 findProject(':examples/restify').name = 'restify'
 findProject(':examples/benchmarks').name = 'benchmarks'
+findProject(':examples/grails-tools-app').name = 'grails-tools-app'
+findProject(':examples/grails-tools-plugin').name = 'grails-tools-plugin'

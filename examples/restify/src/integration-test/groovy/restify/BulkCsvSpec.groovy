@@ -4,7 +4,7 @@ import gorm.tools.async.AsyncService
 import gorm.tools.repository.RepoUtil
 import gorm.tools.rest.controller.RestRepoApiController
 import grails.gorm.transactions.Rollback
-import grails.plugin.viewtools.AppResourceLoader
+import yakworks.grails.resource.AppResourceLoader
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.commons.io.FileUtil

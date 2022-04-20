@@ -28,7 +28,6 @@ dependencies {
   compile project(":gorm-tools-security")
   compile project(":gorm-tools-rest")
 
-  compile "org.grails.plugins:view-tools:$vViewTools"
   //??wtf
   compile "commons-lang:commons-lang:2.6"
   runtime "org.grails.plugins:external-config:$vExternalConfig"

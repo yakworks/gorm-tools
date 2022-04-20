@@ -76,7 +76,7 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
         org column: 'orgId'
         template column: 'templateId'
         task column: 'taskId'
-        source column: 'sourceEntity' //FIXME why are we mapping this like this
+        // source column: 'sourceEntity' //FIXME why are we mapping this like this
     }
 
     static Map constraintsMap = [

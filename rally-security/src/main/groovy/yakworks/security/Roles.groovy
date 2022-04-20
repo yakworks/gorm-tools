@@ -14,25 +14,25 @@ class Roles {
     // enabled by default in base data
     //full access, system user
     static final String ADMIN = "ADMIN" //alias
-    static final String POWER_USER = "Power User"
+    static final String POWER_USER = "POWER_USER"
     //default user, access to all the screens, not manager (cannot approve, view other's tasks or delete cash system data)
-    static final String MANAGER = "Manager" //access to all user's tasks, approval, can delete cash system data
-    static final String GUEST = "Guest" //read only
-    static final String CUSTOMER = "Customer" //greenbill single customer user
+    static final String MANAGER = "MANAGER" //access to all user's tasks, approval, can delete cash system data
+    static final String GUEST = "GUEST" //read only
+    static final String CUSTOMER = "CUSTOMER" //greenbill single customer user
 
     // disabled by default in base data, more speific roles
-    static final String COLLECTIONS = "Collections" //non cash
-    static final String COLLECTIONS_MANAGER = "Collections Manager"  //can see other collector tasks, approvals
+    static final String AR_COLLECTOR = "AR_COLLECTOR" //non cash
+    static final String AR_MANAGER = "AR_MANAGER"  //can see other collector tasks, approvals
 
-    static final String AUTOCASH = "Autocash" //cash, cannot delete system data
-    static final String AUTOCASH_MANAGER = "Autocash Manager" //cash, can delete system data
-    static final String AUTOCASH_OFFSET = "Autocash Offset" //cash, can only do $0 payments
+    static final String AUTOCASH = "AUTOCASH" //cash, cannot delete system data
+    static final String AUTOCASH_MANAGER = "AUTOCASH_MANAGER" //cash, can delete system data
+    static final String AUTOCASH_OFFSET = "AUTOCASH_OFFSET" //cash, can only do $0 payments
 
-    static final String ADMIN_CONFIG = "Admin Config" //setup
-    static final String ADMIN_SEC = "Admin Sec" //user sec. management (acl)
+    static final String ADMIN_CONFIG = "ADMIN_CONFIG" //setup
+    static final String ADMIN_SEC = "ADMIN_SEC" //user sec. management (acl)
 
-    static final String SALES = "Sales" //review, approve disputes
-    static final String BRANCH = "Branch"
+    static final String SALES = "SALES" //review, approve disputes
+    static final String BRANCH = "BRANCH"
     //branch, store user with limited access to customer and transaction screen only.
 
 }

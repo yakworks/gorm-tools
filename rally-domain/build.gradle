@@ -8,7 +8,7 @@ dependencies {
   api project(":gorm-tools")
   api project(":gorm-tools-security")
   api project(":gorm-tools-csv")
-  compileOnly project(":grails-tools")
+  api project(":grails-tools")
 
   // for the mock and seed data
   compileOnly("org.grails.plugins:build-test-data:$vBuildTestData"){

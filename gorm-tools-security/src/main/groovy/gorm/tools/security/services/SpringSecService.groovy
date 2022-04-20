@@ -20,6 +20,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.web.WebAttributes
+import org.springframework.web.context.request.RequestContextHolder
 
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
@@ -190,10 +191,13 @@ class SpringSecService<D> implements SecService<D>{
      * Logout current user programmatically
      */
     void logout() {
-        HttpSession session = WebUtils.retrieveGrailsWebRequest().currentRequest.getSession(false)
-        if (session) {
-            session.invalidate()
+        if(RequestContextHolder.getRequestAttributes()){
+            HttpSession session = WebUtils.retrieveGrailsWebRequest()?.currentRequest?.getSession(false)
+            if (session) {
+                session.invalidate()
+            }
         }
+
         SecurityContextHolder.context.setAuthentication(null)
         SecurityContextHolder.clearContext()
     }

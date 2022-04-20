@@ -53,8 +53,7 @@ class AnnotatedServiceSpec extends Specification {
     }
 
     private void logout() {
-        SecurityContextHolder.clearContext()
-        SecurityUtils.subject.logout()
+        secService.logout()
     }
 
     void "sanity check"() {

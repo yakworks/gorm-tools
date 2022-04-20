@@ -71,6 +71,11 @@ class TestingSecService<D> implements SecService<D> {
     }
 
     @Override
+    void logout() {
+
+    }
+
+    @Override
     void reauthenticate(String username, String password = null) {
 
     }

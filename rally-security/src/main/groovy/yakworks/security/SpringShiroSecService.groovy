@@ -83,15 +83,7 @@ class SpringShiroSecService<D> extends SpringSecService<D> {
      * Logout current user programmatically
      */
     void logout() {
-        if(RequestContextHolder.getRequestAttributes()){
-            HttpSession session = WebUtils.retrieveGrailsWebRequest()?.currentRequest?.getSession(false)
-            if (session) {
-                session.invalidate()
-            }
-        }
-
-        SecurityContextHolder.context.setAuthentication(null)
-        SecurityContextHolder.clearContext()
+        super.logout()
         SecurityUtils.subject.logout() //shiro logout
     }
 

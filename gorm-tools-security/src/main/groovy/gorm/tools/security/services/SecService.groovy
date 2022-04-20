@@ -49,7 +49,7 @@ trait SecService<D> {
      * Used in automation to username a bot/system user, also used for tests
      */
     abstract void loginAsSystemUser()
-
+    abstract void logout()
     abstract void reauthenticate(String username, String password)
 
     abstract boolean ifAnyGranted(String... roles)

@@ -27,9 +27,6 @@ class TestService {
     @RequiresUser
     boolean requireUser() { true }
 
-    @Secured('ADMIN')
-    boolean requireAdminSpringSecured() { true }
-
     @RequiresRoles(value=['ADMIN', 'CUST'], logical=Logical.OR)
     boolean requireUserOrAdmin() { true }
 

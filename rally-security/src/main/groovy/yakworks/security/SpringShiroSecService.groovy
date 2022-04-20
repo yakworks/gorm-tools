@@ -83,8 +83,8 @@ class SpringShiroSecService<D> extends SpringSecService<D> {
      * Logout current user programmatically
      */
     void logout() {
-        super.logout()
-        SecurityUtils.subject.logout() //shiro logout
+        SecurityContextHolder.clearContext()
+        SecurityUtils.subject.logout()
     }
 
 

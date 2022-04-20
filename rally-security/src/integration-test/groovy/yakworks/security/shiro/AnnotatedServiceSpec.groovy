@@ -46,10 +46,6 @@ class AnnotatedServiceSpec extends Specification {
 
     private void login(String username) {
         secService.reauthenticate(username, 'password')
-        // SpringSecurityUtils.reauthenticate username, 'password'
-        // // request.getSession()
-        // ShiroUtils.bindSubject SecurityContextHolder.context.authentication,
-        //     springSecurityRealm, shiroSecurityManager, request, response
     }
 
     private void logout() {

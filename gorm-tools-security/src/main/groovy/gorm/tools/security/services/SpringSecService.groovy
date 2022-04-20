@@ -191,12 +191,12 @@ class SpringSecService<D> implements SecService<D>{
      * Logout current user programmatically
      */
     void logout() {
-        if(RequestContextHolder.getRequestAttributes()){
-            HttpSession session = WebUtils.retrieveGrailsWebRequest()?.currentRequest?.getSession(false)
-            if (session) {
-                session.invalidate()
-            }
-        }
+        // if(RequestContextHolder.getRequestAttributes()){
+        //     HttpSession session = WebUtils.retrieveGrailsWebRequest()?.currentRequest?.getSession(false)
+        //     if (session) {
+        //         session.invalidate()
+        //     }
+        // }
 
         SecurityContextHolder.context.setAuthentication(null)
         SecurityContextHolder.clearContext()

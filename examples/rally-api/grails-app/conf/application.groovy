@@ -71,7 +71,8 @@ else {
     // grails.plugin.springsecurity.rest.login.endpointUrl = '/api/login'
     // grails.plugin.springsecurity.rest.token.storage.grailsCacheName = 'authTokens'
     // grails.plugin.springsecurity.rest.token.generation.useSecureRandom = true
-    grails.plugin.springsecurity.rest.token.storage.jwt.useSignedJwt = false
+    grails.plugin.springsecurity.rest.token.storage.useJwt=false
+    grails.plugin.springsecurity.rest.token.storage.jwt.useSignedJwt=false
 
     grails.plugin.springsecurity.rest.token.storage.useGorm = true
     grails.plugin.springsecurity.rest.token.storage.gorm.tokenDomainClassName = 'gorm.tools.security.domain.AppUserToken'

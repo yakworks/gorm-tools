@@ -22,6 +22,7 @@ import yakworks.rally.tenant.UserRequest
 import yakworks.rally.tenant.UserTenantResolver
 import yakworks.security.rest.NineOauthUserDetailsService
 import yakworks.security.rest.RestAuthenticationProvider
+import yakworks.security.rest.token.GormTokenStorageService
 import yakworks.security.rest.token.HeaderTokenReader
 import yakworks.security.rest.token.PostgresTokenStorageService
 import yakworks.security.shiro.GormShiroPermissionResolver
@@ -83,6 +84,8 @@ class RallySecurityGrailsPlugin extends Plugin {
         }
         if(config.getProperty('dataSource.driverClassName').contains('postgre')){
             tokenStorageService(PostgresTokenStorageService)
+        } else {
+            tokenStorageService(GormTokenStorageService)
         }
     }}
 

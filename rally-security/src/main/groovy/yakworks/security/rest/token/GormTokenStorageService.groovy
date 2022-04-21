@@ -16,13 +16,15 @@
  */
 package yakworks.security.rest.token
 
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import grails.core.GrailsApplication
-import grails.plugin.springsecurity.SpringSecurityUtils
+import gorm.tools.security.domain.AppUserToken
+import gorm.tools.support.ConfigAware
+import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.rest.token.storage.TokenNotFoundException
 import grails.plugin.springsecurity.rest.token.storage.TokenStorageService
-import grails.util.Holders
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 
@@ -34,83 +36,50 @@ import org.springframework.security.core.userdetails.UserDetailsService
  * information.
  */
 @Slf4j
-class GormTokenStorageService implements TokenStorageService {
+@CompileStatic
+class GormTokenStorageService implements TokenStorageService, ConfigAware {
 
-    GrailsApplication grailsApplication
-
-    UserDetailsService userDetailsService
-
-    public GormTokenStorageService() {
-        this.grailsApplication = Holders.grailsApplication
-    }
+    @Autowired UserDetailsService userDetailsService
 
     UserDetails loadUserByToken(String tokenValue) throws TokenNotFoundException {
         log.debug "Finding token ${tokenValue} in GORM"
-        def conf = SpringSecurityUtils.securityConfig
-        String usernamePropertyName = conf.rest.token.storage.gorm.usernamePropertyName
-        def existingToken = findExistingToken(tokenValue)
-
-        if (existingToken) {
-            def username = existingToken."${usernamePropertyName}"
+        String username = findUsernameForExistingToken(tokenValue)
+        if (username) {
             return userDetailsService.loadUserByUsername(username)
         }
 
         throw new TokenNotFoundException("Token ${tokenValue} not found")
-
     }
 
+    // String getConfigVal(String subkey, String defaultVal){
+    //     String key = "grails.plugin.springsecurity.rest.$subkey"
+    //     config.getProperty(key, String, defaultVal)
+    // }
+
+    @Transactional
     void storeToken(String tokenValue, UserDetails principal) {
-        log.debug "Storing principal for token: ${tokenValue}"
-        log.debug "Principal: ${principal}"
-
-        def conf = SpringSecurityUtils.securityConfig
-        String tokenClassName = conf.rest.token.storage.gorm.tokenDomainClassName
-        String tokenValuePropertyName = conf.rest.token.storage.gorm.tokenValuePropertyName
-        String usernamePropertyName = conf.rest.token.storage.gorm.usernamePropertyName
-        def dc = grailsApplication.getClassForName(tokenClassName)
-
-        //TODO check at startup, not here
-        if (!dc) {
-            throw new IllegalArgumentException("The specified token domain class '$tokenClassName' is not a domain class ")
-        }
-
-        dc.withTransaction { status ->
-            def newTokenObject = dc.newInstance((tokenValuePropertyName): tokenValue, (usernamePropertyName): principal.username)
-            newTokenObject.save()
-        }
+        // log.debug "Storing principal for token: ${tokenValue}"
+        log.debug "Storing principal for token: ${principal}"
+        def newTokenObject = new AppUserToken(tokenValue: tokenValue, username: principal.username)
+        newTokenObject.persist(flush: true)
     }
 
+    @Transactional
     void removeToken(String tokenValue) throws TokenNotFoundException {
-        log.debug "Removing token ${tokenValue} from GORM"
-        def conf = SpringSecurityUtils.securityConfig
-        String tokenClassName = conf.rest.token.storage.gorm.tokenDomainClassName
-        def existingToken = findExistingToken(tokenValue)
+        def existingToken = AppUserToken.findWhere(tokenValue: tokenValue)
         if (existingToken) {
-            def dc = grailsApplication.getClassForName(tokenClassName)
-            dc.withTransaction() {
-                existingToken.delete()
-            }
+            existingToken.remove()
         } else {
-            throw new TokenNotFoundException("Token ${tokenValue} not found")
+            throw new TokenNotFoundException("Token not found")
         }
 
     }
 
-    private findExistingToken(String tokenValue) {
-        log.debug "Searching in GORM for UserDetails of token ${tokenValue}"
-        def conf = SpringSecurityUtils.securityConfig
-        String tokenClassName = conf.rest.token.storage.gorm.tokenDomainClassName
-        String tokenValuePropertyName = conf.rest.token.storage.gorm.tokenValuePropertyName
-        def dc = grailsApplication.getClassForName(tokenClassName)
 
-        //TODO check at startup, not here
-        if (!dc) {
-            throw new IllegalArgumentException("The specified token domain class '$tokenClassName' is not a domain class")
-        }
-
-        dc.withTransaction() { status ->
-            return dc.findWhere((tokenValuePropertyName): tokenValue)
-        }
+    @Transactional
+    String findUsernameForExistingToken(String tokenValue) {
+        log.debug "Searching in GORM for UserDetails of token"
+        return AppUserToken.findWhere(tokenValue: tokenValue)?.username
     }
 
 }

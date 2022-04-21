@@ -1,4 +1,5 @@
 # Use Httyak plugin https://github.com/AnWeber/vscode-httpyac
+# @host = https://rcm-dev-api.9ci.io
 @host = http://localhost:8080
 @base_url = {{host}}/api
 @contentType = application/json
@@ -19,11 +20,34 @@ Content-Type: application/json
 
 {"username":"cust","password":"123Foo"}
 
+### VALIDATE AUTH
+# @ref login
+GET {{base_url}}/validate
+Authorization: Bearer {{login.access_token}}
+{{
+  test.status(200);
+}}
 
 ### Org
-GET http://localhost:8080
-Content-Type: application/json
+GET {{base_url}}/rally/org
+Authorization: {{Authorization}}
 
-### Contact
+### Org/contact list
+GET {{base_url}}/rally/org/1/contact/1
+Authorization: {{Authorization}}
+
+### Org/contact get
+GET {{base_url}}/rally/org/1/contact/1
+Authorization: {{Authorization}}
+
+### Contact list
 GET {{base_url}}/rally/contact
-Content-Type: application/json
+Authorization: {{Authorization}}
+
+### Contact get
+GET {{base_url}}/rally/contact/1
+Authorization: {{Authorization}}
+
+### Health
+GET {{base_url}}/actuator/health
+Authorization: {{Authorization}}

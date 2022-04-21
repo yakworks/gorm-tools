@@ -1,0 +1,40 @@
+---
+api:
+  defaultPackage: yakworks.rally.api
+  namespaces: {rally: 'Core / Rally'}
+  paths:
+    rally:
+      activity:
+        entityClass: yakworks.rally.activity.model.Activity
+        bulkOps: true
+      activityNote:
+        entityClass: yakworks.rally.activity.model.ActivityNote
+      attachment:
+        entityClass: yakworks.rally.attachment.model.Attachment
+        allowedOps: [ read, update, delete ]
+      company:
+        entityClass: yakworks.rally.orgs.model.Company
+      contact:
+        entityClass: yakworks.rally.orgs.model.Contact
+        bulkOps: true
+      org:
+        entityClass: yakworks.rally.orgs.model.Org
+        bulkOps: true
+      orgTypeSetup:
+        entityClass: yakworks.rally.orgs.model.OrgTypeSetup
+        allowedOps: [ update ]
+      tag:
+        entityClass: yakworks.rally.tag.model.Tag
+      syncJob:
+        entityClass: yakworks.rally.job.SyncJob
+        allowedOps: [ read ]
+
+      # Security
+      user:
+        entityClass: gorm.tools.security.domain.AppUser
+      role:
+        entityClass: gorm.tools.security.domain.SecRole
+        allowedOps: [read]
+      roleUser:
+        entityClass: gorm.tools.security.domain.SecRoleUser
+        allowedOps: [create, delete]

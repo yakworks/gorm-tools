@@ -1,0 +1,67 @@
+apply plugin:"groovy"
+//apply plugin:"war"
+apply plugin:"org.grails.grails-web"
+apply plugin:"org.grails.plugins.views-json"
+
+repositories {
+  maven { url "https://build.shibboleth.net/nexus/content/repositories/releases/" } //for pac4j deps
+}
+
+dependencies {
+  console "org.grails:grails-console"
+  profile "org.grails.profiles:rest-api"
+
+  compile "org.grails:grails-plugin-i18n"
+  compile "org.grails:grails-plugin-rest"
+  compile "org.grails:grails-plugin-url-mappings"
+  compile "org.grails:grails-plugin-codecs"
+  compile "org.grails:grails-plugin-interceptors"
+  compile "org.grails:grails-web-boot"
+  compile "org.grails:grails-web-url-mappings"
+  compile "org.grails.plugins:async"
+
+  compile "org.grails.plugins:views-json:$vViews"
+  compile "org.grails.plugins:views-json-templates:$vViews"
+
+  compile "org.grails.plugins:hibernate5:$vGormHibernate"
+  compile "org.hibernate:hibernate-core:$vHibernate"
+  compile "org.hibernate:hibernate-ehcache:$vHibernate"
+
+  compile project(":gorm-tools-security")
+  compile project(":gorm-tools-rest")
+  compile project(":rally-domain")
+  compile project(":rally-security")
+
+  //??wtf
+  compile "commons-lang:commons-lang:2.6"
+  runtime "org.grails.plugins:external-config:$vExternalConfig"
+
+  // dk.glasius not working, load twice
+  // runtimeOnly "dk.glasius:external-config:$vExternalConfig"
+  runtime "org.grails.plugins:external-config:$vExternalConfig"
+  runtimeOnly "com.h2database:h2"
+  runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"
+  runtimeOnly "com.zaxxer:HikariCP:$vHikari"
+
+  //for rest api testing
+  testCompile "com.squareup.okhttp3:okhttp:$vOkhttp"
+  //okhttp3 needs this
+  testCompile "org.jetbrains.kotlin:kotlin-stdlib:$vKotlin"
+}
+
+bootRun {
+  //  ignoreExitValue true
+  jvmArgs('-Dspring.output.ansi.enabled=always', '-noverify', '-XX:TieredStopAtLevel=1', '-Xmx1024m')
+  sourceResources sourceSets.main
+  String springProfilesActive = 'spring.profiles.active'
+  systemProperty springProfilesActive, System.getProperty(springProfilesActive)
+}
+
+bootJar.enabled = true
+bootJar.archiveFileName = 'restify.jar'
+
+integrationTest {
+  testlogger {
+    showPassed false
+  }
+}

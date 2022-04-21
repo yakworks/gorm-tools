@@ -4,7 +4,9 @@
 */
 package gorm.tools.security.domain
 
+import groovy.transform.CompileDynamic
 
+import grails.gorm.DetachedCriteria
 import org.codehaus.groovy.util.HashCodeHelper
 
 import gorm.tools.repository.model.RepoEntity
@@ -52,4 +54,45 @@ class SecRolePermission implements RepoEntity<SecRolePermission>, Serializable  
         }
         hashCode
     }
+
+    static List<SecRolePermission> getByRole(long securityRoleId) {
+        query([role:[id: securityRoleId]]).list()
+    }
+
+    static SecRolePermission get(long securityRoleId, String perm) {
+        SecRolePermission.where {
+            role == AppUser.load(securityRoleId) && permission == perm
+        }.get()
+    }
+
+    static SecRolePermission create(SecRole role, String perm, boolean flush = false) {
+        def instance = new SecRolePermission(role: role, permission: perm)
+        instance.save(flush: flush, insert: true)
+        instance
+    }
+
+    static boolean remove(SecRole role, String perm, boolean flush = false) {
+        SecRolePermission instance = SecRolePermission.findByRoleAndPermission(role, perm)
+        if (!instance) {
+            return false
+        }
+
+        instance.delete(flush: flush)
+        true
+    }
+
+    static void removeAll(SecRole role) {
+        executeUpdate 'DELETE FROM SecRolePermission WHERE role=:role', [role: role]
+    }
+
+    static boolean exists(long securityRoleId) {
+        criteriaFor(securityRoleId).count()
+    }
+
+    private static DetachedCriteria criteriaFor(long securityRoleId) {
+        SecRolePermission.where {
+            role == AppUser.load(securityRoleId)
+        }
+    }
+
 }

@@ -108,6 +108,6 @@ class ShiroGrailsExceptionResolver extends GrailsExceptionResolver {
             }
             parentThrowable = childThrowable
         }
-        return e
+        return null
     }
 }

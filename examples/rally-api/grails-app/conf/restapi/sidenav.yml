@@ -1,0 +1,24 @@
+nav:
+  home:
+    i18n: dashboard
+    route: home
+
+  receivables:
+    i18n: 'ar.receivables'
+    routes:
+      - key: ar.trans
+
+  autocash:
+    routes:
+      - key: autocash.batches
+
+  customers:
+    i18n: ar.customers
+    routes:
+      - key: ar.customers
+      - key: ar.custaccounts
+
+  admin:
+    routes:
+      - key: admin.users
+

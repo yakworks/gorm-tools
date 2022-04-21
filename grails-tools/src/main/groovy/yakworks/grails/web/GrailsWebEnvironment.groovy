@@ -18,6 +18,7 @@ import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.web.context.WebApplicationContext
 import org.springframework.web.context.request.RequestContextHolder
+import org.springframework.web.context.request.ServletWebRequest
 import org.springframework.web.servlet.DispatcherServlet
 import org.springframework.web.servlet.support.RequestContextUtils
 
@@ -54,7 +55,7 @@ class GrailsWebEnvironment implements AutoCloseable{
         if (!renderLocale && originalRequestAttributes) {
             renderLocale = RequestContextUtils.getLocale(originalRequestAttributes.request)
         }
-        renderRequestAttributes = bindMockWebRequest(applicationContext, out, renderLocale)
+        renderRequestAttributes = (GrailsWebRequest)bindMockWebRequest(applicationContext, out, renderLocale)
 
         if (originalRequestAttributes) {
             renderRequestAttributes.controllerName = originalRequestAttributes.controllerName
@@ -93,17 +94,17 @@ class GrailsWebEnvironment implements AutoCloseable{
         renderRequestAttributes.controllerName
     }
 
-    static GrailsWebRequest bindRequestIfNull() {
+    static ServletWebRequest bindRequestIfNull() {
 
         return bindRequestIfNull(Holders.grailsApplication.mainContext)
     }
 
-    static GrailsWebRequest bindRequestIfNull(ApplicationContext appCtx) {
+    static ServletWebRequest bindRequestIfNull(ApplicationContext appCtx) {
         return bindRequestIfNull(appCtx, new StringWriter())
     }
 
-    static GrailsWebRequest bindRequestIfNull(ApplicationContext appCtx, Writer out, Locale preferredLocale = null) {
-        GrailsWebRequest grailsWebRequest = (GrailsWebRequest) RequestContextHolder.getRequestAttributes()
+    static ServletWebRequest bindRequestIfNull(ApplicationContext appCtx, Writer out, Locale preferredLocale = null) {
+        ServletWebRequest grailsWebRequest = (ServletWebRequest) RequestContextHolder.getRequestAttributes()
         if (grailsWebRequest) {
             //TODO unbindRequest = false
             log.debug("grailsWebRequest exists")
@@ -114,7 +115,7 @@ class GrailsWebEnvironment implements AutoCloseable{
     }
 
     @CompileDynamic
-    static GrailsWebRequest bindMockWebRequest(ApplicationContext appCtx, Writer wout, Locale preferredLocale = null) {
+    static ServletWebRequest bindMockWebRequest(ApplicationContext appCtx, Writer wout, Locale preferredLocale = null) {
         //TODO unbindRequest = true
         log.debug("a mock grailsWebRequest is being bound")
 

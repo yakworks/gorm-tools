@@ -1,68 +1,170 @@
-[![CircleCI](https://circleci.com/gh/9ci/rally/tree/master.svg?style=svg&circle-token=6f714429ffea67eb858f4947e97dc079841d9c41)](https://circleci.com/gh/9ci/rally/tree/master])
+## Introduction to the Spring Security Shiro Plugin
 
-# Rally Grails Plugin
+The Spring Security Shiro plugin adds some support for using a hybrid approach combining http://projects.spring.io/spring-security/[Spring Security] and https://shiro.apache.org/[Shiro]. It currently only supports Shiro ACLs, since Spring Security ACLs are very powerful but can be very cumbersome to use, and the Shiro approach is straightforward and simple.
 
-## Dev Quick Start
+The majority of the authentication and authorization work is still done by Spring Security. This plugin listens for Spring Security authentication events and uses the Spring Security `Authentication` instance to build and register a Shiro `Subject` instance. It also removes the Shiro credentials when you explicitly logout.
 
-### Prerequisites
 
-1. Credentials for repo.9ci.com and Docker hub for dock9
-2. Java 8 or higher
-3. Docker
+## Usage
 
-### Setup
+To use the plugin, register a dependency by adding it to the `dependencies` block in build.gradle:
 
-1. run `docker login` and enter credentials so build process can download nine-db for testing
+```
+dependencies {
+...
+compile 'org.grails.plugins:spring-security-shiro:{project-version}'
+...
+}
+```
 
-2. Add credentials for repo.9ci into the ~/.gradle/gradle.properties
-	```
-	mavenRepoUser=YouUserName
-	mavenRepoKey=YourPassword
-	```
+and run the `compile` command to resolve the dependencies:
 
-### Make
 
-run `make check` for mysql test or `make sqlserver check`
+```
+$ grails compile
+```
 
-This will make sure a fresh db is started with `db-start` and run the standard `./gradlew check`. 
-To run without `make` see the next sections
 
-### Running Docker DB
+This will transitively install the http://grails.org/plugin/spring-security-core[Spring Security Core] plugin, so you'll need to configure that by running the `s2-quickstart` script.
 
-To manuall run the db
+### User Permissions
 
-- `make db-start` or `./build.sh db-start` will fire up a mysql database
-- `make sqlserver db-start` or `./build.sh db-start sqlserver` will fire up a sql-server database
+To use the Shiro annotations and methods you need a way to associate roles and permissions with users. The Spring Security Core plugin already handles the role part for you, so you must configure permissions for this plugin. There is no script to create a domain class, but it's a very simple class and easy to create yourself. It can have any name and be in any package, but otherwise the structure must look like this:
 
-Both will be accesible on 127.0.0.1 on default ports with password for root or sa as 123Foobar. These dockers images have both `rcm_9ci_dev` and `rcm_9ci_test`
 
-### Running Tests
+```
+package com.mycompany.myapp
 
-Once you have a db docker running you can test using the following:
+class Permission {
 
-- `./gradlew check` will do the full monty against mysql
-- `./gradlew -DBMS=sqlserver check` will do the full monty against Sql Server
+  User user
+  String permission
+  
+  static constraints = {
+    permission unique: 'user'
+  }
+}
+```
 
-#### Grails
+Register the class name along with the other Spring Security attributes in `application.groovy` (or `application.yml`) using the `grails.plugin.springsecurity.shiro.permissionDomainClassName` property, e.g.
 
-install the Grails version matching whats in gradle.properties using [sdkman](https://sdkman.io)
+[source,java]
+----
+grails.plugin.springsecurity.shiro.permissionDomainClassName =
+'com.mycompany.myapp.Permission'
+----
 
-- `grails test-app`
+You can add other properties and methods, but the plugin expects that there is a one-to-many between your user and permission classes, that the user property name is "`user`" (regardless of the actual class name), and the permission property name is "`permission`".
 
-#### Make
+If you need more flexibility, or perhaps to create this as a many-to-many, you can replace the Spring bean that looks up permissions. Create a class in src/main/groovy that implements the `grails.plugin.springsecurity.shiro.ShiroPermissionResolver` interface, and define the `Set<String> resolvePermissions(String username)` method any way you like. Register your bean as the `shiroPermissionResolver` bean in `resources.groovy`, for example
 
-while gradle is the build tool behind spring/grails, make is used for docker and setting up env for testing
+[source,java]
+----
+import com.mycompany.myapp.MyShiroPermissionResolver
 
-Target              | Description
---------------------|------------------------------------
-builder-remove      | stops and removes the jdk-builder docker
-builder-shell       | opens up a shell into the jdk-builder docker
-builder-start       | start the docker jdk-builder if its not started yet, unless USE_DOCK_BUILDER=false
-check               | makes sure db is started and runs gradlew check
-clean               | removes build dir
-db-down             | stop and remove the docker DOCK_DB_BUILD_NAME
-db-start            | starts the DOCK_DB_BUILD_NAME db if its not started yet, unless USE_DOCK_DB_BUILDER=false
-dock-remove-all     | runs `make dock-remove` for sqlserver and mysql
-dock-remove         | stops/removes the builder and DB dockers
-log-vars            | logs the BUILD_VARS in the build/make env
-startup             | calls db-start if USE_DOCK_DB_BUILDER=true and builder-start if USE_DOCK_BUILDER=true
+beans = {
+shiroPermissionResolver(MyShiroPermissionResolver)
+}
+----
+
+=== Role Permissions
+
+Shiro can use both user-based and role-based permissions. The Spring Security Shiro plugin includes optional support for this capability. If role-based permissions are enabled, the effective permissions for a user becomes the union of both the user-based permissions and the role-based permissions for the user's roles, and all calls that expect permissions will use the union of the two. The Spring Security Core plugin handles the roles for you but you must configure permissions for the role.
+
+As with the user-based permissions, there is no script to create a domain class, but it is simple to create one. It can also have any name and be in any package, but otherwise the structure must look like this:
+
+[source,java]
+----
+package com.mycompany.myapp
+
+class RolePermission {
+Role role
+String permission
+
+    RolePermission(Role role, String permission) {
+        this.role = role
+    this.permission = permission
+    }
+
+    static constraints = {
+        permission unique: 'role'
+    }
+}
+----
+
+Register the class name along with the other Spring Security attributes in `application.groovy` (or `application.yml`) using the `grails.plugin.springsecurity.shiro.rolePermissionDomainClassName` property, e.g.
+
+[source,java]
+----
+grails.plugin.springsecurity.shiro.rolePermissionDomainClassName = 'com.mycompany.myapp.RolePermission'
+----
+
+You can add other properties and methods, but the plugin expects that there is a one-to-many between your role and permission classes, that the role property name is "`role`" (regardless of the actual class name), and the permission property name is "`permission`".
+
+If you need more flexibility, you can replace the Spring bean that looks up role-based permissions. Create a class in src/main/groovy that implements the `import org.apache.shiro.authz.permission.RolePermissionResolver` interface, and define the `Collection<Permission> resolvePermissionsInRole(String roleString)` method any way you like. Note that the collection of permissions returned are of type `org.apache.shiro.authz.Permission`, not the Permission you have defined in your application. You can use the `grails.plugin.springsecurity.shiro.GormShiroRolePermissionResolver` as an example for your own implementation.
+
+Register your bean as the `shiroRolePermissionResolver` bean in `resources.groovy`, for example
+
+[source,java]
+----
+import com.mycompany.myapp.MyShiroRolePermissionResolver
+
+beans = {
+shiroRolePermissionResolver(MyShiroRolePermissionResolver)
+}
+----
+
+=== Annotated service methods
+
+Currently only Grails services and other Spring beans can be annotated, so this feature isn't available in controllers. You can use any of https://shiro.apache.org/static/1.2.3/apidocs/org/apache/shiro/authz/annotation/RequiresAuthentication.html[RequiresAuthentication], https://shiro.apache.org/static/1.2.3/apidocs/org/apache/shiro/authz/annotation/RequiresGuest.html[RequiresGuest], https://shiro.apache.org/static/1.2.3/apidocs/org/apache/shiro/authz/annotation/RequiresPermissions.html[RequiresPermissions], https://shiro.apache.org/static/1.2.3/apidocs/org/apache/shiro/authz/annotation/RequiresRoles.html[RequiresRoles], and https://shiro.apache.org/static/1.2.3/apidocs/org/apache/shiro/authz/annotation/RequiresUser.html[RequiresUser]. See the https://shiro.apache.org/documentation.html[Shiro documentation] and https://shiro.apache.org/static/1.2.3/apidocs/[Javadoc] for the annotation syntax.
+
+=== Using Shiro directly
+
+You should use the annotations to keep from cluttering your code with explicit security checks, but the standard `Subject` methods will work:
+
+[source,java]
+----
+import org.apache.shiro.SecurityUtils
+import org.apache.shiro.subject.Subject
+
+...
+
+Subject subject = SecurityUtils.getSubject()
+
+subject.checkPermission('printer:print:lp7200')
+
+subject.isPermitted('printer:print:lp7200')
+
+subject.checkRole('ROLE_ADMIN')
+
+subject.hasRole('ROLE_ADMIN')
+
+subject.isAuthenticated()
+
+... etc
+----
+
+[[configuration]]
+== Configuration
+
+There are a few configuration options for the Shiro integration.
+
+[NOTE]
+====
+All of these property overrides must be specified in `grails-app/conf/application.groovy` (or `application.yml`) using the `grails.plugin.springsecurity` suffix, for example
+[source,java]
+----
+grails.plugin.springsecurity.shiro.permissionDomainClassName =
+'com.mycompany.myapp.Permission'
+----
+====
+
+[width="100%",options="header"]
+|====================
+| *Name*                              | *Default*           | *Meaning*
+| shiro.active                        | `true`              | if `false` the plugin is disabled
+| shiro.permissionDomainClassName     | _none_, must be set | the full class name of the permission domain class
+| shiro.rolePermissionDomainClassName | _none_              | if set, the full class name of the role permissions domain class
+| shiro.useCache                      | `true`              | whether to cache permission lookup; if you disable this they will be loaded from the database for every request
+| shiro.inspectShiroAnnotations       | `true`              | Whether to enable/disable shiroAttributeSourceAdvisor
+|====================

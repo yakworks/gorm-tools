@@ -1,5 +1,4 @@
 # Use Httyak plugin https://github.com/AnWeber/vscode-httpyac
-# @host = https://rcm-dev-api.9ci.io
 @host = http://localhost:8080
 @base_url = {{host}}/api
 @contentType = application/json

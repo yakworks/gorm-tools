@@ -42,7 +42,7 @@ else {
     //PRODUCTION
     //enable shiro
     shiro.active = false
-
+    grails.plugin.springsecurity.useSecurityEventListener = true
     // Added by the Spring Security Core plugin:
     grails.plugin.springsecurity.securityConfigType = "InterceptUrlMap"
     grails.plugin.springsecurity.interceptUrlMap = [
@@ -76,10 +76,10 @@ else {
     // grails.plugin.springsecurity.rest.login.endpointUrl = '/api/login'
     // grails.plugin.springsecurity.rest.token.storage.grailsCacheName = 'authTokens'
     // grails.plugin.springsecurity.rest.token.generation.useSecureRandom = true
-    // grails.plugin.springsecurity.rest.token.storage.useJwt=false
-    // grails.plugin.springsecurity.rest.token.storage.jwt.useSignedJwt=false
-    grails.plugin.springsecurity.rest.token.storage.jwt.secret='qrD6h8K6S9503Q06Y6Rfk21TErImPYqa'
-    grails.plugin.springsecurity.rest.token.validation.enableAnonymousAccess = true
+    grails.plugin.springsecurity.rest.token.storage.useJwt=false
+    grails.plugin.springsecurity.rest.token.storage.jwt.useSignedJwt=false
+    // grails.plugin.springsecurity.rest.token.storage.jwt.secret='qrD6h8K6S9503Q06Y6Rfk21TErImPYqa'
+    // grails.plugin.springsecurity.rest.token.validation.enableAnonymousAccess = true
 
 }
 

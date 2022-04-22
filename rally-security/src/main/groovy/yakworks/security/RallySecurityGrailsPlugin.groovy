@@ -36,7 +36,12 @@ import yakworks.security.shiro.SpringSecurityRealm
 @SuppressWarnings(['Indentation', 'Println'])
 @CompileDynamic //ok
 class RallySecurityGrailsPlugin extends Plugin {
-    def loadAfter = ['rally', 'springSecurityCore']
+    //FIXME This is not working
+    // !!! THIS IS IMPORTANT FOR SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL)
+    // We set that in doWithApplicationContext so thread spun off get the same security.
+    // needs to be called after spring-security-core
+    def loadAfter = ['spring-security-core', 'spring-security-ldap', 'spring-security-rest',
+                     'gorm-tools', 'rally-domain', 'datasource', 'jasper-reports', 'hibernate5']
 
     boolean getShiroActive(){ return config.getProperty('shiro.active', Boolean, true) }
 
@@ -56,20 +61,23 @@ class RallySecurityGrailsPlugin extends Plugin {
 
         if (secConf.active) {
 
-            // if(shiroActive) {
-            //     registerBeans(shiroBeans, delegate)
-            // }
-            //
-            // if(secConf.rest.active) {
-            //     registerBeans(restSecurityBeans, delegate)
-            // }
+            if(shiroActive) {
+                registerBeans(shiroBeans, delegate)
+            }
+
+            if(secConf.rest.active) {
+                registerBeans(restSecurityBeans, delegate)
+            }
         }
     }}
 
     @Override
     void doWithApplicationContext() {
+        //FIXME This is not working, See line 222ish of AbstractSecurityInterceptor, that should blow error
+        // but it seems that is gets the last logged in user. Seems to work with setting in rally in domain9 but not
+        // with rest-api example here
         // this make sure the any threads that are spun off also get the user who is logged in already
-        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL)
+        // SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL)
         def conf = SpringSecurityUtils.securityConfig
         if (conf && conf.active ) {
             applicationContext.logoutHandlers.add 0, applicationContext.shiroLogoutHandler // must be before SecurityContextLogoutHandler

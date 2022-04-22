@@ -16,39 +16,3 @@ grails.plugin.springsecurity.authority.nameField = 'code'
 // grails.plugin.springsecurity.scr.allowSessionCreation = false
 // grails.plugin.springsecurity.scpf.forceEagerSessionCreation = false
 // grails.plugin.springsecurity.apf.allowSessionCreation = false
-
-            // interceptUrlMap = [
-            //     // all accesible anoymously by default
-            //     [pattern: '/**', access: ['IS_AUTHENTICATED_ANONYMOUSLY']]
-            // ]
-            //MAPPING and AUTH
-            // userLookup {
-            //     authoritiesPropertyName = 'roles'
-            //     authorityJoinClassName = 'gorm.tools.security.domain.SecRoleUser'
-            //     enabledPropertyName = 'enabled'
-            //     passwordPropertyName = 'passwordHash'
-            //     userDomainClassName = 'gorm.tools.security.domain.AppUser'
-            //     usernamePropertyName = 'username'
-            //     accountExpiredPropertyName = null
-            //     accountLockedPropertyName = null
-            //     passwordExpiredPropertyName = null
-            // }
-            // authority.nameField = 'springSecRole'
-
-            // // securityConfigType = "InterceptUrlMap"
-            // // adh.errorPage = null //null out so it send just 403 error
-            // logout.handlerNames = ['rememberMeServices', 'secLogoutHandler']
-
-            //events
-            // useSecurityEventListener = true
-            // onInteractiveAuthenticationSuccessEvent = { e, appCtx ->
-            //     // handle AuthenticationSuccessEvent
-            //     def userService = appCtx.getBean('userService')
-            //     userService.trackUserLogin()
-            // }
-            // rest {
-            //     token.storage.jwt.secret = 'sWXY3VMm4wKAGoRZg8r3ftZcjrKvmExghY'
-            // }
-//         }
-//     }
-// }

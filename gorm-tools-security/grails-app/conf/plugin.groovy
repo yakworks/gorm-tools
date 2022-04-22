@@ -12,6 +12,11 @@ grails.plugin.springsecurity.userLookup.passwordExpiredPropertyName = null
 grails.plugin.springsecurity.authority.className = 'gorm.tools.security.domain.SecRole'
 grails.plugin.springsecurity.authority.nameField = 'code'
 
+//try to turn off sessions
+// grails.plugin.springsecurity.scr.allowSessionCreation = false
+// grails.plugin.springsecurity.scpf.forceEagerSessionCreation = false
+// grails.plugin.springsecurity.apf.allowSessionCreation = false
+
             // interceptUrlMap = [
             //     // all accesible anoymously by default
             //     [pattern: '/**', access: ['IS_AUTHENTICATED_ANONYMOUSLY']]

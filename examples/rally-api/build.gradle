@@ -7,6 +7,9 @@ repositories {
   maven { url "https://build.shibboleth.net/nexus/content/repositories/releases/" } //for pac4j deps
 }
 
+//use common loggin in root
+sourceSets.main.resources.srcDirs += "../../logback"
+
 dependencies {
   console "org.grails:grails-console"
   profile "org.grails.profiles:rest-api"

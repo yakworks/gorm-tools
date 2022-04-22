@@ -106,7 +106,7 @@ endif
 ## shows gorm-tools:dependencies --configuration runtime
 gradle.dependencies:
 	# ./gradlew gorm-tools:dependencies --configuration compileClasspath
-	./gradlew rally-domain:dependencies --configuration compileClasspath
+	./gradlew gorm-tools-rest:dependencies --configuration compileClasspath
 
 ## runs the benchmark tests
 run-benchmarks:

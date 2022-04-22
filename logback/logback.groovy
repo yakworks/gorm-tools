@@ -5,6 +5,8 @@ import org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverte
 
 import java.nio.charset.Charset
 
+statusListener ch.qos.logback.core.status.NopStatusListener //turns off its own logging
+
 conversionRule 'clr', ColorConverter
 conversionRule 'wex', WhitespaceThrowableProxyConverter
 
@@ -34,7 +36,6 @@ if (Environment.isDevelopmentMode() && targetDir != null) {
     logger("StackTrace", ERROR, ['FULL_STACKTRACE'], false)
 }
 root(ERROR, ['STDOUT'])
-
 
 // logger("org.hibernate", OFF)  //See https://github.com/9ci/domain9/issues/600
 logger("org.hibernate.orm.deprecation", OFF)

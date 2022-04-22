@@ -38,6 +38,8 @@ import yakworks.security.shiro.SpringSecurityRealm
 class RallySecurityGrailsPlugin extends Plugin {
     def loadAfter = ['rally', 'springSecurityCore']
 
+    boolean getShiroActive(){ return config.getProperty('shiro.active', Boolean, true) }
+
     Closure doWithSpring() { { ->
         // xmlns context:"http://www.springframework.org/schema/context"
         // context.'component-scan'('base-package': 'nine.security')
@@ -53,13 +55,14 @@ class RallySecurityGrailsPlugin extends Plugin {
         def secConf = SpringSecurityUtils.securityConfig
 
         if (secConf.active) {
-            registerBeans(shiroBeans, delegate)
 
-            if(secConf.rest.active) {
-                registerBeans(restBeans, delegate)
-            }
-
-            // registerBeans(ldapBeans, delegate)
+            // if(shiroActive) {
+            //     registerBeans(shiroBeans, delegate)
+            // }
+            //
+            // if(secConf.rest.active) {
+            //     registerBeans(restSecurityBeans, delegate)
+            // }
         }
     }}
 
@@ -70,10 +73,14 @@ class RallySecurityGrailsPlugin extends Plugin {
         def conf = SpringSecurityUtils.securityConfig
         if (conf && conf.active ) {
             applicationContext.logoutHandlers.add 0, applicationContext.shiroLogoutHandler // must be before SecurityContextLogoutHandler
+            if(shiroActive) {
+                applicationContext.shiroSecurityManager.subjectDAO.sessionStorageEvaluator.sessionStorageEnabled = false
+            }
         }
+
     }
 
-    Closure getRestBeans() { { ->
+    Closure getRestSecurityBeans() { { ->
         println "Configuring 9ci's rest security setup"
         //add only if sec plugins enabled, or else it would fail.
         oauthUserDetailsService(NineOauthUserDetailsService)
@@ -87,16 +94,6 @@ class RallySecurityGrailsPlugin extends Plugin {
         } else {
             tokenStorageService(GormTokenStorageService)
         }
-    }}
-
-    Closure getShiroBeans() { { ->
-        println ".. Integrate Shiro Permissions with Spring Security"
-        //Shiro Permission integration
-        SpringSecurityUtils.registerFilter 'shiroSubjectBindingFilter',
-            SecurityFilterPosition.SECURITY_CONTEXT_FILTER.order + 1
-
-        //override the secService
-        secService(SpringShiroSecService, AppUser){ bean -> bean.lazyInit = true}
 
         //replace so we can set the role prefix to be blank and not ROLE_
         webExpressionHandler(DefaultWebSecurityExpressionHandler) {
@@ -106,6 +103,17 @@ class RallySecurityGrailsPlugin extends Plugin {
             trustResolver = ref('authenticationTrustResolver')
             defaultRolePrefix = ''
         }
+        // securityContextRepository(org.springframework.security.web.context.NullSecurityContextRepository)
+    }}
+
+    Closure getShiroBeans() { { ->
+        println ".. Integrate Shiro Permissions with Spring Security"
+        //Shiro Permission integration, do 2 after ANONYMOUS_FILTER so it runs after the restTokenValidationFilter
+        SpringSecurityUtils.registerFilter 'shiroSubjectBindingFilter',
+            SecurityFilterPosition.ANONYMOUS_FILTER.order + 2
+
+        //override the secService
+        secService(SpringShiroSecService, AppUser){ bean -> bean.lazyInit = true}
 
         shiroLifecycleBeanPostProcessor(LifecycleBeanPostProcessor)
 
@@ -122,7 +130,8 @@ class RallySecurityGrailsPlugin extends Plugin {
 
         shiroRolePermissionResolver(GormShiroRolePermissionResolver)
 
-        //override to replace so the shiro annotation exceptions can be handled properly since the fire outside the normal
+        //override to replace so the shiro annotation exceptions can be handled properly
+        // since they fire outside the normal grails handling
         exceptionHandler(ShiroGrailsExceptionResolver) {
             exceptionMappings = [
                 'java.lang.Exception': '/error',

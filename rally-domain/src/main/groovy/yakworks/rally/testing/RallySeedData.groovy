@@ -8,12 +8,12 @@ import java.time.LocalDate
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.security.domain.SecRolePermission
 import org.springframework.jdbc.core.JdbcTemplate
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
+import gorm.tools.security.domain.SecRolePermission
 import gorm.tools.security.domain.SecRoleUser
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.orgs.model.Contact

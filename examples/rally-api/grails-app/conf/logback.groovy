@@ -2,8 +2,9 @@ import grails.util.BuildSettings
 import grails.util.Environment
 import org.springframework.boot.logging.logback.ColorConverter
 import org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter
-
 import java.nio.charset.StandardCharsets
+
+statusListener ch.qos.logback.core.status.NopStatusListener //turns off its own logging
 
 conversionRule 'clr', ColorConverter
 conversionRule 'wex', WhitespaceThrowableProxyConverter
@@ -27,6 +28,7 @@ root(WARN, ['STDOUT'])
 
 logger("org.hibernate", OFF)
 
+logger("yakworks.security.shiro", DEBUG)
 //TURN ON for benchmarks
 // logger "org.hibernate", INFO
 //

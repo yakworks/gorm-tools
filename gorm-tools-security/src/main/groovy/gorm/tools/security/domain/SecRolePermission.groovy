@@ -6,11 +6,11 @@ package gorm.tools.security.domain
 
 import groovy.transform.CompileDynamic
 
-import grails.gorm.DetachedCriteria
 import org.codehaus.groovy.util.HashCodeHelper
 
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
+import grails.gorm.DetachedCriteria
 import grails.persistence.Entity
 
 @Entity

@@ -6,6 +6,7 @@ package gorm.tools.rest
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.rest.mapping.RepoApiMappingsService
 import org.grails.core.artefact.ControllerArtefactHandler
 import org.grails.core.artefact.DomainClassArtefactHandler
 
@@ -23,6 +24,7 @@ import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.core.GrailsControllerClass
 import grails.plugins.Plugin
+import org.grails.datastore.gorm.validation.constraints.registry.DefaultConstraintRegistry
 import yakworks.commons.lang.NameUtils
 
 @SuppressWarnings(['UnnecessarySelfAssignment', 'Println', 'EmptyMethod', 'Indentation'])
@@ -36,7 +38,10 @@ class GormToolsRestGrailsPlugin extends Plugin {
     Closure doWithSpring() { {->
 
         tomcatWebServerCustomizer(RestTomcatWebServerCustomizer)
-
+        //setup to try and speed up constraint eval so its only setup once.
+        urlMappingsConstraintRegistry(DefaultConstraintRegistry, ref('messageSource'))
+        //the default UrlMappings calls this.
+        repoApiMappingsService(RepoApiMappingsService)
         //renderers
         mapJsonRenderer(JsonGeneratorRenderer, Map)
         apiResultsRenderer(ApiResultsRenderer)

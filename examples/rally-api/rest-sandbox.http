@@ -30,9 +30,11 @@ Authorization: Bearer {{login.access_token}}
 ### Org
 # @no-cookie-jar
 GET {{base_url}}/rally/org
+Authorization: {{Authorization}}
 
 ### Org
 GET {{base_url}}/rally/contact
+Authorization: {{Authorization}}
 
 ### Org/contact list
 # @ref login

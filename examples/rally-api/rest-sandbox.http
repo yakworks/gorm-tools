@@ -38,7 +38,7 @@ Authorization: {{Authorization}}
 
 ### Org/contact list
 # @ref login
-GET {{base_url}}/rally/org/1/contact
+GET {{base_url}}/rally/org/1/contact.csv
 Authorization: Bearer {{login.access_token}}
 
 ### Org/contact get

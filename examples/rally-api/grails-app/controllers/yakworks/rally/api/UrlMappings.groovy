@@ -4,6 +4,7 @@
 */
 package yakworks.rally.api
 
+import gorm.tools.rest.mapping.RepoApiMappingsService
 import gorm.tools.rest.mapping.UrlMappingsHelper
 
 class UrlMappings {
@@ -12,8 +13,14 @@ class UrlMappings {
         println "parsing restify UrlMappings"
         "/"(controller: 'application', action:'index')
 
-        Closure mappingClosure = UrlMappingsHelper.getCrudMapping('rally', 'contact', 'org')
-        runClosure(mappingClosure, delegate)
+        RepoApiMappingsService repoApiMappingsService = getApplicationContext().getBean('repoApiMappingsService', RepoApiMappingsService)
+        // repoApiMappingsService.createMappings(delegate)
+
+        //creates nested /rally/org/$orgId/contact....
+        repoApiMappingsService.createNestedMappings('rally', 'org', 'orgId', 'contact', delegate)
+
+        // Closure mappingClosure = UrlMappingsHelper.getCrudMapping('rally', 'contact', 'org')
+        // runClosure(mappingClosure, delegate)
 
         // get "/api/rally/org/${getProperty('orgId')}/contact"(controller: "contact", action: "list", namespace: 'rally'){
         //     rootResource = 'org'

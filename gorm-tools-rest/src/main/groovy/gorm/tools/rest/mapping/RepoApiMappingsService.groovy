@@ -7,19 +7,20 @@ package gorm.tools.rest.mapping
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
+import org.grails.core.artefact.ControllerArtefactHandler
+import org.grails.datastore.gorm.validation.constraints.registry.ConstraintRegistry
+import org.springframework.beans.factory.annotation.Autowired
+
 import gorm.tools.rest.controller.RestRepoApiController
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
-import org.grails.core.artefact.ControllerArtefactHandler
-import org.grails.core.artefact.UrlMappingsArtefactHandler
-import org.grails.datastore.gorm.validation.constraints.registry.ConstraintRegistry
-import org.springframework.beans.factory.annotation.Autowired
 import yakworks.commons.lang.ClassUtils
 
 /**
  * Service that gets called from the static mapping in default UrlMappings in this plugin.
  * Can also be used to setup more and make nested child resources
  */
+@SuppressWarnings('Indentation')
 @CompileStatic
 class RepoApiMappingsService {
     //the root/base dir for the paths TODO get this from config
@@ -41,10 +42,21 @@ class RepoApiMappingsService {
             if (isApi) {
                 String nspace = ClassUtils.getStaticPropertyValue(controller.clazz, 'namespace', String)
                 CrudUrlMappingsBuilder.of(contextPath, nspace, ctrlName).build(builderDelegate)
-                // Closure mappingClosure = UrlMappingsHelper.getCrudMapping(nspace, ctrlName)
-                // runClosure(mappingClosure, delegate)
-                Closure bulkMappingClosure = getBulkMapping(nspace, ctrlName)
-                runClosure(bulkMappingClosure, builderDelegate)
+
+                // bulks ops at /bulk
+                SimpleUrlMappingBuilder.of(contextPath, nspace, ctrlName)
+                    .httpMethod('POST').action('bulkCreate').suffix('/bulk')
+                    .urlMappingBuilder(builderDelegate).build()
+                SimpleUrlMappingBuilder.of(contextPath, nspace, ctrlName)
+                    .httpMethod('PUT').action('bulkUpdate').suffix('/bulk')
+                    .urlMappingBuilder(builderDelegate).build()
+
+                //allow POST any action added to the controller
+                // /api/nspace/controller/$action
+                // post "/$action(.$format)?"(controller: cName)
+                SimpleUrlMappingBuilder.of(contextPath, nspace, ctrlName)
+                    .httpMethod('POST').suffix('/(*)').matchParams(['action'])
+                    .urlMappingBuilder(builderDelegate).build()
             }
         }
     }
@@ -59,6 +71,21 @@ class RepoApiMappingsService {
             put "/bulk(.$format)?"(controller: ctrl, action: "bulkUpdate", namespace: namespace)
         }
     } }
+
+    /**
+     * creates mapping under a resource.
+     * for example passing in [namespace: rally, parentCtrl: org, parentParam: orgId, ctrl: contact]
+     * would result in standard crud mappings like following
+     * GET /rally/org/$orgId/contact
+     * GET /rally/org/$orgId/contact/$id
+     * POST /rally/org/$orgId/contact
+     * etc...
+     */
+    void createNestedMappings(String namespace, String parentCtrl, String parentParam, String ctrl, Object builderDelegate){
+        CrudUrlMappingsBuilder.of(contextPath, namespace, ctrl)
+            .withParent(parentCtrl, parentParam)
+            .build(builderDelegate)
+    }
 
     void runClosure(Closure mappingClosure, Object delegate) {
         mappingClosure.delegate = delegate

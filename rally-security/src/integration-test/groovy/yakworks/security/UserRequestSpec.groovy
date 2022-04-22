@@ -14,7 +14,7 @@ import org.springframework.web.context.request.RequestContextHolder
 import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.gorm.testing.DomainIntTest
-import yakworks.rally.tenant.UserRequest
+import yakworks.security.tenant.UserRequest
 
 /**
  * Proof of concept.

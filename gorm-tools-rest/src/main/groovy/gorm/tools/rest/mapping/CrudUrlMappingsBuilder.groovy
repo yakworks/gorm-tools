@@ -4,10 +4,7 @@
 */
 package gorm.tools.rest.mapping
 
-
 import groovy.transform.CompileStatic
-
-import org.grails.datastore.gorm.validation.constraints.registry.ConstraintRegistry
 
 @SuppressWarnings(['Indentation'])
 @CompileStatic
@@ -16,6 +13,7 @@ class CrudUrlMappingsBuilder {
     String namespace
     String ctrl
     String parentResource
+    String parentParam
     Object builderDelegate
 
     CrudUrlMappingsBuilder(String namespace, String ctrl) {
@@ -43,22 +41,24 @@ class CrudUrlMappingsBuilder {
         return bldr
     }
 
-    CrudUrlMappingsBuilder withParent(String parentResource){
+    CrudUrlMappingsBuilder withParent(String parentResource, String parentParam = null){
+        if(!parentParam) parentParam = "${parentResource}Id"
         this.parentResource = parentResource
+        this.parentParam = parentParam
         return this
     }
 
     /**
      * building url maps is pretty hacky in grails and there is no good clean way to do it without builder hacking.
      */
-    void build(Object builderDelegate) {
+    CrudUrlMappingsBuilder build(Object builderDelegate) {
         this.builderDelegate = builderDelegate
-        build()
+        return build()
     }
     /**
      * building url maps is pretty hacky in grails and there is no good clean way to do it without builder hacking.
      */
-    void build() {
+    CrudUrlMappingsBuilder build() {
         // String apiPathBase = namespace ? "${rootPath}/${namespace}".toString() : rootPath
         // Map params = parentResource ? [rootResource: parentResource] : [:]
 
@@ -67,7 +67,7 @@ class CrudUrlMappingsBuilder {
         // GET /namespace/controller/$id
         getBuilder('get').withIdPattern().build()
         // GET /namespace/controller/picklist
-        getBuilder('picklist').pattern('/picklist').build()
+        getBuilder('picklist').suffix('/picklist').build()
         // POST /namespace/controller
         getBuilder('post', 'POST').build()
         // POST /namespace/controller/$id
@@ -81,6 +81,8 @@ class CrudUrlMappingsBuilder {
         // post "${apiPath}/$action(.$format)?"(controller: ctrl, namespace: namespace) {
         //     rootResource = rootResource
         // }
+
+        return this
     }
 
     SimpleUrlMappingBuilder getBuilder(String action, String httpMethod = 'GET'){
@@ -89,6 +91,7 @@ class CrudUrlMappingsBuilder {
         def smb = SimpleUrlMappingBuilder.of(contextPath, namespace, ctrl).action(action)
             .httpMethod(httpMethod).parameters(params)
             .urlMappingBuilder(builderDelegate)
+        if(parentResource) smb.withParent(parentResource, parentParam)
         return smb
     }
 

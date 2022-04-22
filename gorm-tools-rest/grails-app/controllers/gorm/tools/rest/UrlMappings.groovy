@@ -6,16 +6,10 @@ package gorm.tools.rest
 
 import groovy.transform.CompileDynamic
 
-import gorm.tools.rest.controller.RestRepoApiController
-import gorm.tools.rest.mapping.CrudUrlMappingsBuilder
 import gorm.tools.rest.mapping.RepoApiMappingsService
-import gorm.tools.rest.mapping.UrlMappingsHelper
-import org.grails.datastore.gorm.validation.constraints.eval.ConstraintsEvaluator
-import yakworks.commons.lang.ClassUtils
 
 @CompileDynamic
 class UrlMappings {
-    static String rootPath = '/api'
 
     static mappings = {
         RepoApiMappingsService repoApiMappingsService = getApplicationContext().getBean('repoApiMappingsService', RepoApiMappingsService)

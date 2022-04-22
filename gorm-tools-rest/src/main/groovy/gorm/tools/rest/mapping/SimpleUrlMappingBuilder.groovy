@@ -9,16 +9,16 @@ import groovy.transform.CompileStatic
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
+import org.grails.datastore.gorm.validation.constraints.registry.ConstraintRegistry
+import org.grails.web.mapping.DefaultUrlMappingParser
+import org.grails.web.mapping.RegexUrlMapping
+
 import grails.core.GrailsApplication
 import grails.gorm.validation.ConstrainedProperty
 import grails.gorm.validation.DefaultConstrainedProperty
 import grails.web.mapping.UrlMapping
 import grails.web.mapping.UrlMappingData
 import grails.web.mapping.UrlMappingParser
-import org.grails.datastore.gorm.validation.constraints.registry.ConstraintRegistry
-import org.grails.web.mapping.DefaultUrlMappingParser
-import org.grails.web.mapping.RegexUrlMapping
-import org.springframework.context.ApplicationContext
 
 import static grails.web.mapping.UrlMapping.CAPTURED_WILDCARD
 import static grails.web.mapping.UrlMapping.OPTIONAL_EXTENSION_WILDCARD
@@ -34,17 +34,23 @@ class SimpleUrlMappingBuilder {
     GrailsApplication grailsApplication
 
     boolean appendFormat = true
+    boolean withIdPattern = false
+    boolean withFormat = true //appends the optional .format
     String urlPattern
     String controller
     String action
     String namespace
+    String suffix = ''
     String httpMethod = 'GET'
     List<String> matchParams = [] as List<String>
     UrlMappingData mappingData
     List<ConstrainedProperty> constrainedProperties
     Map parameters = [:]
 
-    SimpleUrlMappingBuilder(){}
+    String parentResource
+    String parentParam
+
+    // SimpleUrlMappingBuilder(){}
 
     /**
      * initializes fields from the delegate which is a UrlMappingBuilder.
@@ -69,26 +75,48 @@ class SimpleUrlMappingBuilder {
     /**
      * appends to base pattern
      */
-    SimpleUrlMappingBuilder pattern(String suffix) {
-        urlPattern = namespace ? "${contextPath}/${namespace}/${controller}" : "${contextPath}/${controller}"
+    SimpleUrlMappingBuilder buildUrlPattern() {
+        urlPattern = namespace ? "${contextPath}/${namespace}" : "${contextPath}"
+        if(parentResource){
+            urlPattern = "${urlPattern}/${parentResource}/${CAPTURED_WILDCARD}"
+            matchParams.add(parentParam)
+        }
+        urlPattern = "${urlPattern}/${controller}"
+        if(withIdPattern){
+            matchParams.add('id')
+            urlPattern = "${urlPattern}/${CAPTURED_WILDCARD}"
+        }
+
         urlPattern = "${urlPattern}${suffix}"
+
+        if(withFormat){
+            urlPattern = "${urlPattern}${OPTIONAL_EXTENSION_WILDCARD}?"
+            matchParams.add('format?')
+        }
         return this
     }
     /**
      * appends to base pattern
      */
     SimpleUrlMappingBuilder withIdPattern() {
-        matchParams.add('id')
-        return pattern("/${CAPTURED_WILDCARD}")
-    }
-
-    SimpleUrlMappingBuilder _appendFormat() {
-        if(!urlPattern.endsWith(OPTIONAL_EXTENSION_WILDCARD)){
-            urlPattern = "${urlPattern}${OPTIONAL_EXTENSION_WILDCARD}?"
-            matchParams.add('format?')
-        }
+        withIdPattern = true
         return this
     }
+
+    SimpleUrlMappingBuilder withParent(String parentResource, String parentParam = null){
+        if(!parentParam) parentParam = "${parentResource}Id"
+        this.parentResource = parentResource
+        this.parentParam = parentParam
+        return this
+    }
+
+    // SimpleUrlMappingBuilder _appendFormat() {
+    //     if(!urlPattern.endsWith(OPTIONAL_EXTENSION_WILDCARD)){
+    //         urlPattern = "${urlPattern}${OPTIONAL_EXTENSION_WILDCARD}?"
+    //         matchParams.add('format?')
+    //     }
+    //     return this
+    // }
 
     // SimpleUrlMappingBuilder pattern(String uriPattern, List<String> matchProps){
     //     mappingData = urlParser.parse(uriPattern)
@@ -121,9 +149,9 @@ class SimpleUrlMappingBuilder {
 
     RegexUrlMapping build(){
         //if no string pattern then build it
-        if(!urlPattern) pattern('')
+        if(!urlPattern) buildUrlPattern()
         // if appendFormat true(default) then do it
-        if(appendFormat) _appendFormat()
+        // if(appendFormat) _appendFormat()
         //convert the matchParams to contrained props
         constrainedProperties = matchParams.collect { getConstrainedProperty(it) }
         //now parse the pattern
@@ -133,7 +161,7 @@ class SimpleUrlMappingBuilder {
             UrlMapping.ANY_VERSION, constrainedProperties as ConstrainedProperty[], grailsApplication)
 
         parameters['controller'] = controller
-        parameters['action'] = action
+        if(action) parameters['action'] = action
 
         m.setParameterValues(parameters)
         addToMappings(m)

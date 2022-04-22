@@ -6,20 +6,17 @@ package yakworks.security
 
 import groovy.transform.CompileDynamic
 
-import org.apache.shiro.cache.MemoryConstrainedCacheManager
+import org.apache.shiro.hazelcast.cache.HazelcastCacheManager
 import org.apache.shiro.spring.LifecycleBeanPostProcessor
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler
 
 import gorm.tools.security.domain.AppUser
 import grails.plugin.springsecurity.SecurityFilterPosition
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugins.Plugin
-import yakworks.rally.tenant.UserRequest
-import yakworks.rally.tenant.UserTenantResolver
 import yakworks.security.rest.NineOauthUserDetailsService
 import yakworks.security.rest.RestAuthenticationProvider
 import yakworks.security.rest.token.GormTokenStorageService
@@ -32,6 +29,8 @@ import yakworks.security.shiro.ShiroLogoutHandler
 import yakworks.security.shiro.ShiroSpringSecurityEventListener
 import yakworks.security.shiro.ShiroSubjectBindingFilter
 import yakworks.security.shiro.SpringSecurityRealm
+import yakworks.security.tenant.UserRequest
+import yakworks.security.tenant.UserTenantResolver
 
 @SuppressWarnings(['Indentation', 'Println'])
 @CompileDynamic //ok
@@ -49,13 +48,13 @@ class RallySecurityGrailsPlugin extends Plugin {
         // xmlns context:"http://www.springframework.org/schema/context"
         // context.'component-scan'('base-package': 'nine.security')
 
+        rallyUserService(RallyUserService, autowireLazy())
+
         userTenantResolver(UserTenantResolver)
 
         userRequest(UserRequest){ bean ->
             bean.scope = 'request'
         }
-
-        rallyUserService(RallyUserService, autowireLazy())
 
         def secConf = SpringSecurityUtils.securityConfig
 
@@ -151,7 +150,7 @@ class RallySecurityGrailsPlugin extends Plugin {
         boolean useCache = true // conf.shiro.useCache
 
         if (useCache) {
-            shiroCacheManager(MemoryConstrainedCacheManager)
+            shiroCacheManager(HazelcastCacheManager)
         }
 
         springSecurityRealm(SpringSecurityRealm) {

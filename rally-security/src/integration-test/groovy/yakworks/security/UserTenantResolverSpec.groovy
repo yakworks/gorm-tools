@@ -10,7 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.gorm.testing.DomainIntTest
-import yakworks.rally.tenant.UserTenantResolver
+import yakworks.security.tenant.UserTenantResolver
 
 @Ignore //WIP
 @Integration

@@ -6,15 +6,16 @@ package gorm.tools.rest
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.rest.mapping.RepoApiMappingsService
 import org.grails.core.artefact.ControllerArtefactHandler
 import org.grails.core.artefact.DomainClassArtefactHandler
+import org.grails.datastore.gorm.validation.constraints.registry.DefaultConstraintRegistry
 
 import gorm.tools.csv.render.CSVPagerRenderer
 import gorm.tools.excel.render.XlsxPagerRenderer
 import gorm.tools.openapi.GormToSchema
 import gorm.tools.openapi.MetaMapSchemaService
 import gorm.tools.openapi.OpenApiGenerator
+import gorm.tools.rest.mapping.RepoApiMappingsService
 import gorm.tools.rest.render.ApiResultsRenderer
 import gorm.tools.rest.render.JsonGeneratorRenderer
 import gorm.tools.rest.render.PagerRenderer
@@ -24,7 +25,6 @@ import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.core.GrailsControllerClass
 import grails.plugins.Plugin
-import org.grails.datastore.gorm.validation.constraints.registry.DefaultConstraintRegistry
 import yakworks.commons.lang.NameUtils
 
 @SuppressWarnings(['UnnecessarySelfAssignment', 'Println', 'EmptyMethod', 'Indentation'])

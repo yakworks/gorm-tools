@@ -66,7 +66,7 @@ class EntityMapIntSpec extends Specification implements DataIntegrationTest, Sec
 
     void "test no roles user"() {
         when:
-        def user = AppUser.get(2)
+        def user = AppUser.get(3)
         assert user.roles.size() == 0
         // def emap = EntityMapFactory.createEntityMap(user, ['username', 'stringList'])
         def emap = metaMapEntityService.createMetaMap(user, ['username', 'roles.id', 'roles.name'])

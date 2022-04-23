@@ -13,6 +13,7 @@ grails {
 
 // grails.config.locations = ["classpath:api.yml", "classpath:gorm-tools/defaults.groovy"]
 
+// This part is only applicable to rally-domain and rally-spring but its doesnt hurt that the other plugins get it
 app {
     resources {
         currentTenant = {

@@ -4,8 +4,8 @@ repositories {
   maven { url "https://build.shibboleth.net/nexus/content/repositories/releases/" } //for pac4j deps
 }
 
-//shared resources to tests since external config doesnt pick up in time for hibernateTests
-sourceSets.test.resources.srcDirs += "${rootProject.projectDir}/test-resources"
+//shared resources to pick up the Gorm defaults from application.groovy, as well as simple logback
+sourceSets.test.resources.srcDirs += [project(':gorm-test-support').sourceSets.main.resources]
 
 dependencies {
 

@@ -1,8 +1,0 @@
-
-model {
-    Object object
-    Map renderArgs = [:]
-}
-// println("_object $object")
-System.out.println "Model in plugins _object $binding.variables"
-json g.render(object, renderArgs)

@@ -8,8 +8,6 @@ grails {
     }
 }
 
-gorm.tools.security.user.table = 'Users'
-
 // add some api configs for testing
 api {
     paths {

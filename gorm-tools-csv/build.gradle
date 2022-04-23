@@ -1,5 +1,8 @@
 apply plugin: "yakworks.grails-plugin"
 
+//shared resources to tests since external config doesnt pick up in time for hibernateTests
+sourceSets.test.resources.srcDirs += "${rootProject.projectDir}/test-resources"
+
 dependencies {
   console "org.grails:grails-console"
 

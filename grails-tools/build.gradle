@@ -13,5 +13,7 @@ dependencies {
 
     api project(":commons")
 
+    api "org.grails.plugins:external-config:$vExternalConfig"
+
     compile "org.springframework:spring-test"
 }

@@ -17,6 +17,7 @@ import gorm.tools.security.domain.AppUser
 import grails.plugin.springsecurity.SecurityFilterPosition
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugins.Plugin
+import grails.util.Environment
 import yakworks.security.rest.NineOauthUserDetailsService
 import yakworks.security.rest.RestAuthenticationProvider
 import yakworks.security.rest.token.GormTokenStorageService
@@ -147,7 +148,7 @@ class RallySecurityGrailsPlugin extends Plugin {
             // statusCodes = [ '/unauthorized': 403 ]
         }
 
-        boolean useCache = true // conf.shiro.useCache
+        boolean useCache = Environment.getCurrent() != Environment.TEST // conf.shiro.useCache
 
         if (useCache) {
             shiroCacheManager(HazelcastCacheManager)

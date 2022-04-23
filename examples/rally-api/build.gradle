@@ -8,7 +8,7 @@ repositories {
 }
 
 //use common loggin in root
-sourceSets.main.resources.srcDirs += "../../logback"
+// sourceSets.main.resources.srcDirs += "../../logback"
 
 dependencies {
   console "org.grails:grails-console"
@@ -34,6 +34,10 @@ dependencies {
   compile project(":gorm-tools-rest")
   compile project(":rally-domain")
   compile project(":rally-security")
+
+  //Hazelcast
+  runtime "com.hazelcast:hazelcast-hibernate53:$vHazelcastHib"
+  runtime "com.hazelcast:hazelcast:$vHazelcast"
 
   //??wtf
   compile "commons-lang:commons-lang:2.6"

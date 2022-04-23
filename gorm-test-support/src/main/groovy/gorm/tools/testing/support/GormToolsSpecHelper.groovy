@@ -98,6 +98,7 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         metaMapEntityService(MetaMapEntityService)
         problemHandler(ProblemHandler)
         messageSource(GrailsICUMessageSource)
+        externalConfigLoader(ExternalConfigLoader)
     }}
 
     /**

@@ -12,6 +12,9 @@ class UrlMappings {
     static mappings = {
         println "parsing restify UrlMappings"
         "/"(controller: 'application', action:'index')
+        "/hazel"(controller: 'application', action:'hazel')
+
+        "/info/$action"(controller: 'appInfo')
 
         RepoApiMappingsService repoApiMappingsService = getApplicationContext().getBean('repoApiMappingsService', RepoApiMappingsService)
         // repoApiMappingsService.createMappings(delegate)

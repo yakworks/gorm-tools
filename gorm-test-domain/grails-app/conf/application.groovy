@@ -1,4 +1,4 @@
-// For testing
+// For testing only,
 grails {
 //    gorm.default.mapping = {
 //        id generator:'gorm.tools.hibernate.SpringBeanIdGenerator'

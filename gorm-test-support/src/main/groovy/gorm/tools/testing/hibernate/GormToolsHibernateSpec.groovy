@@ -16,6 +16,7 @@ import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
+import gorm.tools.testing.support.ExternalConfigLoader
 import gorm.tools.testing.support.GormToolsSpecHelper
 import gorm.tools.testing.support.MockJdbcIdGenerator
 import gorm.tools.validation.RepoValidatorRegistry
@@ -61,6 +62,7 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
             jdbcIdGenerator(MockJdbcIdGenerator)
             idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"))
             messageSource(GrailsICUMessageSource)
+            externalConfigLoader(ExternalConfigLoader)
 
             for(Class domainClass in datastore.mappingContext.persistentEntities*.javaClass){
                 Class repoClass = findRepoClass(domainClass)

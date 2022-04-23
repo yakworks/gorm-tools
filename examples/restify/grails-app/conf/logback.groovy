@@ -24,6 +24,7 @@ appender('STDOUT', ConsoleAppender) {
 
 root(WARN, ['STDOUT'])
 
+logger("org.hibernate.orm.deprecation", OFF) // turn off Criteria API is deprecated
 
 logger("org.hibernate", OFF)
 

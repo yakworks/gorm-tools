@@ -4,9 +4,14 @@
 */
 package yakworks.rally.api
 
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.autoconfigure.hazelcast.HazelcastAutoConfiguration
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 
 import gorm.tools.rest.RestApiFromConfig
+import gorm.tools.rest.appinfo.AppInfoBuilder
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
 
@@ -14,6 +19,7 @@ import grails.boot.config.GrailsAutoConfiguration
 // the services marked with @Component
 @ComponentScan(['yakworks.security', 'gorm.tools.security', 'yakworks.rally'])
 @RestApiFromConfig
+@EnableAutoConfiguration(exclude = [HazelcastAutoConfiguration]) // in order to avoid autoconfiguring an extra Hazelcast instance
 class Application extends GrailsAutoConfiguration {
     static void main(String[] args) {
         GrailsApp.run(Application, args)
@@ -33,5 +39,24 @@ class Application extends GrailsAutoConfiguration {
     Collection<String> packageNames() {
         super.packageNames() + ['yakworks.rally', 'gorm.tools.security']
     }
+
+    @Bean
+    AppInfoBuilder appInfoBuilder() {
+        return new AppInfoBuilder()
+    }
+
+    @SuppressWarnings('Indentation')
+    @Override
+    Closure doWithSpring() {{ ->
+        appInfoBuilder(AppInfoBuilder)
+
+        // openApiGenerator(OpenApiGenerator) { bean ->
+        //     bean.lazyInit = true
+        //     apiSrc = 'api-docs/openapi'
+        //     apiBuild = 'api-docs/dist/openapi'
+        //     namespaceList = ['rally']
+        // }
+
+    }}
 
 }

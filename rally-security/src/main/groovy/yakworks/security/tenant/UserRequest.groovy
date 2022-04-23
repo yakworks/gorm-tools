@@ -54,10 +54,17 @@ class UserRequest {
     }
 
     /**
-     * Initial config returned to ui, such as the current user info, sidebar menu config, etc..
+     * Gets user fields to send to client about their login
      */
     Map getUserMap() {
-        List incs = ['username', 'name', 'email', 'orgId']
+        List incs = ['id', 'username', 'name', 'email', 'orgId']
+        return getUserMap(incs)
+    }
+
+    /**
+     * Gets user fields to send to client about their login
+     */
+    Map getUserMap(List incs) {
         Map userMap = metaMapEntityService.createMetaMap(secService.user, incs).clone() as Map
         if (isCustomer()) userMap.put('isCustomer', true)
         return userMap

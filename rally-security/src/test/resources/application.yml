@@ -1,0 +1,35 @@
+grails:
+  profile: plugin
+  config:
+    locations: ["classpath:security-configs/anonymous.yml"]
+
+logging:
+  level:
+    root: WARN
+    org.springframework: WARN
+    org.hibernate.orm.deprecation: OFF # turns off deprecation notices
+
+hibernate:
+  format_sql: false
+  schema_management_tool: 'gorm.tools.hibernate.schema.CustomSchemaManagementTool'
+  naming_strategy: 'org.hibernate.cfg.DefaultNamingStrategy'
+  show_sql: false
+  cache:
+    queries: false
+    use_second_level_cache: true
+    use_query_cache: false
+    provider_class: 'org.hibernate.cache.EhCacheProvider'
+    region.factory_class: org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
+  jdbc:
+    time_zone: 'UTC'
+#  dialect: 'org.hibernate.dialect.H2Dialect'
+
+dataSource:
+  type: com.zaxxer.hikari.HikariDataSource
+  pooled: true
+  jmxExport: true
+  driverClassName: org.h2.Driver
+  username: sa
+  password:
+  dbCreate: create-drop
+  url: jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE

@@ -4,6 +4,9 @@ repositories {
   maven { url "https://build.shibboleth.net/nexus/content/repositories/releases/" } //for pac4j deps
 }
 
+//shared resources to tests since external config doesnt pick up in time for hibernateTests
+sourceSets.test.resources.srcDirs += "${rootProject.projectDir}/test-resources"
+
 dependencies {
 
   console "org.grails:grails-console"
@@ -15,14 +18,18 @@ dependencies {
   api("org.grails.plugins:spring-security-rest:$vSpringSecurityRest"){
     exclude group: 'net.minidev', module: 'json-smart'
   }
-  api "org.pac4j:pac4j-oidc:3.8.3"
-  api "org.pac4j:pac4j-saml:3.8.3"
-
   //bump to deal with vulnerability in one above and was not downloading
   api "net.minidev:json-smart:$vJsonSmart"
 
-  ['aspectj', 'core', 'spring', 'web', 'hazelcast'].each {
+  compileOnly "org.pac4j:pac4j-oidc:3.8.3"
+  compileOnly "org.pac4j:pac4j-saml:3.8.3"
+
+  ['aspectj', 'core', 'spring', 'web'].each {
     api "org.apache.shiro:shiro-$it:$vShiro"
+  }
+
+  api("org.apache.shiro:shiro-hazelcast:$vShiro"){
+    exclude group: 'com.hazelcast', module: 'hazelcast'
   }
 
   compileOnly("org.grails:grails-web-mvc")

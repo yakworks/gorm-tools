@@ -1,4 +1,6 @@
-
+/**
+ * Deafaults for our domains. Deployed and automatically merged in with plugin
+ */
 grails.plugin.springsecurity.active = true
 grails.plugin.springsecurity.userLookup.authoritiesPropertyName = 'roles'
 grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'gorm.tools.security.domain.SecRoleUser'

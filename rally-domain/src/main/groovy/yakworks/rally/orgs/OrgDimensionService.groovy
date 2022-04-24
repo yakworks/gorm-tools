@@ -102,7 +102,6 @@ class OrgDimensionService {
         grailsCacheAdminService?.clearCache("orgDimension")
     }
 
-    @Cacheable('orgDimension')
     List<OrgType> getLevels(DimLevel dimLevel, OrgType orgType) {
         DimensionLevel dimensionLevel = dimensionsCache[orgType]
         if (!dimensionLevel) return []
@@ -112,12 +111,12 @@ class OrgDimensionService {
         if (dimLevel == DimLevel.CHILDREN) {
             dimensionLevel.children.each {
                 levels.add(it.orgType)
-                levels.addAll(getChildLevels(it.orgType))
+                levels.addAll(getLevels(DimLevel.CHILDREN, it.orgType))
             }
         } else if (dimLevel == DimLevel.PARENTS) {
             dimensionLevel.parents.each {
                 levels.add(it.orgType)
-                levels.addAll(getParentLevels(it.orgType))
+                levels.addAll(getLevels(DimLevel.PARENTS, it.orgType))
             }
         }
         return levels.unique().collect()
@@ -126,6 +125,7 @@ class OrgDimensionService {
     /**
      * Get all child levels for given orgtype
      */
+    @Cacheable('OrgDimension.childLevels')
     List<OrgType> getChildLevels(OrgType typeEnum) {
         return getLevels(DimLevel.CHILDREN, typeEnum)
     }
@@ -133,6 +133,7 @@ class OrgDimensionService {
     /**
      * Get all parent levels for given orgtype
      */
+    @Cacheable('OrgDimension.parentLevels')
     List<OrgType> getParentLevels(OrgType type) {
         return getLevels(DimLevel.PARENTS, type)
     }

@@ -41,7 +41,7 @@ class IncludesConfig implements ConfigAware {
         return (incsMap ? incsMap[key] : []) as List<String>
     }
 
-    @Cacheable('apiConfig.includesByClass')
+    @Cacheable('ApiConfig.includesByClass')
     Map getIncludes(Class entityClass){
         Map includesMap = getClassStaticIncludes(entityClass)
         Map pathConfig = findConfigByEntityClass(entityClass.name)
@@ -102,7 +102,7 @@ class IncludesConfig implements ConfigAware {
      * @param entityClass the entity class to look for statics on
      * @param mergeIncludes may be passed in from controller etc, provides overrrides for whats in config and domain
      */
-    @Cacheable('apiConfig.includes')
+    @Cacheable('ApiConfig.includesByKey')
     Map getIncludes(String entityKey, String namespace, Class entityClass, Map mergeIncludes){
         // look for includes map on the domain first
         Map includesMap = getClassStaticIncludes(entityClass)

@@ -7,6 +7,7 @@ package gorm.tools.metamap
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
 
 import gorm.tools.beans.AppCtx
@@ -33,7 +34,7 @@ class MetaMapEntityService {
      * @return the EntityMap object
      */
     MetaMap createMetaMap(Object entity, List<String> includes = [], List<String> excludes = []) {
-        MetaMapIncludes includesMap = getCachedMetaMapIncludes(entity.class.name, includes, excludes)
+        MetaMapIncludes includesMap = bean().getCachedMetaMapIncludes(entity.class.name, includes, excludes)
         return new MetaMap(entity, includesMap)
     }
 
@@ -66,7 +67,7 @@ class MetaMapEntityService {
         if(entityList) {
             //use first item to get the class
             Class entityClass = entityList[0].class.name
-            MetaMapIncludes includesMap = getCachedMetaMapIncludes(entityClass.name, includes, excludes)
+            MetaMapIncludes includesMap = bean().getCachedMetaMapIncludes(entityClass.name, includes, excludes)
             return new MetaMapList(entityList, includesMap)
         }
         // return empty list
@@ -81,7 +82,7 @@ class MetaMapEntityService {
      * @param excludes the excludes list in dot notation
      * @return the created EntityMapIncludes
      */
-    @Cacheable('metaMapIncludes')
+    @Cacheable('MetaMapIncludes')
     MetaMapIncludes getCachedMetaMapIncludes(String entityClassName, List<String> includes, List<String> excludes) {
         return MetaMapIncludesBuilder.build(entityClassName, includes, excludes)
     }

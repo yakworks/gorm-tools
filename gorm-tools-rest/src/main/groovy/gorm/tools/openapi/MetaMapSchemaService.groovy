@@ -23,7 +23,6 @@ import gorm.tools.metamap.MetaMapIncludes
 @CompileStatic
 class MetaMapSchemaService {
 
-
     @Autowired MetaMapEntityService metaMapEntityService
 
     OapiSupport oapiSupport
@@ -38,13 +37,13 @@ class MetaMapSchemaService {
     }
 
     /**
-     * get the MetaMapSchema from the MetaMapIncludes
+     * get the MetaMapSchema using the MetaMapIncludes
      */
-    @Cacheable('metaMapSchema')
     MetaMapSchema getSchema(MetaMapIncludes mmi) {
         return MetaMapSchema.of(mmi)
     }
 
+    @Cacheable('MetaMapSchema')
     MetaMapSchema getSchema(String entityClassName, List<String> includes, List<String> excludes = []) {
         MetaMapIncludes mmIncs = metaMapEntityService.getCachedMetaMapIncludes(entityClassName, includes, excludes)
         MetaMapSchema mmSchema = getSchema(mmIncs)

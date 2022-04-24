@@ -13,6 +13,7 @@ repositories {
 dependencies {
   console "org.grails:grails-console"
   profile "org.grails.profiles:rest-api"
+  compile("org.springframework.boot:spring-boot-starter-actuator"){ exclude module: 'micrometer-core' }
 
   compile "org.grails:grails-plugin-i18n"
   compile "org.grails:grails-plugin-rest"
@@ -40,7 +41,8 @@ dependencies {
   runtime "com.hazelcast:hazelcast:$vHazelcast"
   runtime "com.hazelcast:hazelcast-spring:$vHazelcast"
   //compatible micrometer
-  compile "io.micrometer:micrometer-core:1.5.0"
+  // compile "io.micrometer:micrometer-core:1.5.0"
+
   //??wtf
   compile "commons-lang:commons-lang:2.6"
   runtime "org.grails.plugins:external-config:$vExternalConfig"

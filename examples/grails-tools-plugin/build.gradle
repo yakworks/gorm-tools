@@ -6,7 +6,7 @@ apply plugin:"org.grails.grails-gsp"
 
 dependencies {
 
-    compile "org.springframework.boot:spring-boot-starter-actuator"
+    compile("org.springframework.boot:spring-boot-starter-actuator"){ exclude module: 'micrometer-core' }
     provided "org.springframework.boot:spring-boot-starter-tomcat"
 
     profile "org.grails.profiles:web-plugin"

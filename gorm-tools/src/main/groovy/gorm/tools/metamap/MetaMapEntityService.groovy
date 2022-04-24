@@ -7,8 +7,9 @@ package gorm.tools.metamap
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import gorm.tools.beans.AppCtx
 import org.springframework.cache.annotation.Cacheable
+
+import gorm.tools.beans.AppCtx
 import yakworks.commons.json.JsonEngine
 
 /**

@@ -16,7 +16,7 @@ import yakworks.commons.lang.NameUtils
 @Slf4j
 @EqualsAndHashCode(includes=["rootClassName", "props"], useCanEqual=false) //because its used as cache key
 @CompileStatic
-class MetaMapIncludes {
+class MetaMapIncludes implements Serializable{
     //the root class name for this includes.
     String rootClassName
     //value will be null if normal prop, if association then will have another nested MetaMapIncludes

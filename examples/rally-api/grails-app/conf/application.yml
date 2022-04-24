@@ -101,7 +101,7 @@ hibernate:
   cache:
     queries: false
     use_second_level_cache: true
-    use_query_cache: false
+    use_query_cache: true
     provider_class: 'com.hazelcast.cache.HazelcastCachingProvider'
     region.factory_class: 'com.hazelcast.hibernate.HazelcastCacheRegionFactory'
     hazelcast:

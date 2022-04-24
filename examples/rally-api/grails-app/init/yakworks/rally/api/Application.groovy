@@ -4,13 +4,14 @@
 */
 package yakworks.rally.api
 
+import org.springframework.cache.annotation.EnableCaching
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.ComponentScan
+
 import gorm.tools.rest.RestApiFromConfig
 import gorm.tools.rest.appinfo.AppInfoBuilder
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
-import org.springframework.cache.annotation.EnableCaching
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.ComponentScan
 
 // the component scan here does not seem to be the same as the packageNames and is needed to pick up the
 // the services marked with @Component

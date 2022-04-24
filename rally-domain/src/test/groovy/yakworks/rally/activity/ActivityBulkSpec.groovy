@@ -22,6 +22,7 @@ import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
@@ -43,7 +44,7 @@ class ActivityBulkSpec extends Specification implements DomainRepoTest<Activity>
             activityBulk(ActivityBulk)
         }
         mockDomains(Customer, Activity, ActivityNote, ActivityLink,
-            Org, OrgTag, Payment, AttachmentLink, Attachment, Task, TaskType, TaskStatus
+            Org, OrgTag, Location, Payment, AttachmentLink, Attachment, Task, TaskType, TaskStatus
         )
     }
 

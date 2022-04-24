@@ -4,8 +4,12 @@
 */
 package yakworks.rally.orgs.repo
 
+import javax.annotation.Nullable
+import javax.inject.Inject
+
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataRetrievalFailureException
 import org.springframework.validation.Errors
 
@@ -33,15 +37,20 @@ import yakworks.rally.orgs.model.OrgType
  */
 @CompileStatic
 abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo<Org> {
-
+    //Making these nullable makes it easier to wire up for tests.
+    @Autowired(required=false)
     LocationRepo locationRepo
 
+    @Autowired(required=false)
     ContactRepo contactRepo
 
+    @Autowired(required=false)
     OrgTagRepo orgTagRepo
 
+    @Autowired(required=false)
     OrgSourceRepo orgSourceRepo
 
+    @Autowired(required=false)
     OrgMemberService orgMemberService
 
     List<String> toOneAssociations = ['flex', 'info', 'calc', 'member']

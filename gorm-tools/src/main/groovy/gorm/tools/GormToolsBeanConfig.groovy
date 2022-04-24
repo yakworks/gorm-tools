@@ -96,6 +96,7 @@ class GormToolsBeanConfig {
         trxService(TrxService, lazy())
         problemHandler(ProblemHandler, lazy())
 
+        //setup bean for the repo class marked with the @GormRepository annotation
         def repoClasses = application.repositoryClasses
         for(GrailsRepositoryClass repoClass : repoClasses){
             def beanClosure = getRepoBeanClosure(repoClass)
@@ -103,15 +104,15 @@ class GormToolsBeanConfig {
             beanClosure()
         }
 
+        // now cycle through all domains and make sure each domain has a repository,
+        // if not set up a DefaultGormRepo for it.
         for (GrailsClass grailsClass in application.getArtefacts(DomainClassArtefactHandler.TYPE)) {
             final domainClass = grailsClass.clazz
 
-            // make sure each domain has a repository, if not set up a DefaultGormRepo for it.
             String repoName = RepoUtil.getRepoBeanName(domainClass)
             def hasRepo = repoClasses.find { it.propertyName == repoName }
             if (!hasRepo) {
                 "${repoName}"(DefaultGormRepo, domainClass) { bean ->
-                    bean.autowire = true
                     bean.lazyInit = true
                 }
             }
@@ -132,7 +133,6 @@ class GormToolsBeanConfig {
 
         Closure bClosure = {
             "${repoClass.propertyName}"(repoClass.getClazz()) { bean ->
-                bean.autowire = true
                 bean.lazyInit = lazyInit
             }
         }

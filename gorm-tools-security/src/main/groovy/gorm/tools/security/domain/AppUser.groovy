@@ -56,7 +56,7 @@ class AppUser implements NamedEntity, AuditStampTrait, GormRepoEntity<AppUser, A
     // boolean accountLocked = false //not used right now
 
     static mapping = {
-        cache true
+        // cache "nonstrict-read-write"
         table 'Users' // AppCtx.config.getProperty('gorm.tools.security.user.table', 'Users')
         // table Holders.config.getProperty('gorm.tools.security.user.table', 'Users')
         passwordHash column: "`password`"

@@ -71,6 +71,7 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCrite
     ]
 
     static mapping = {
+
         id generator: 'assigned'
         orgTypeId column: 'orgTypeId', insertable: false, updateable: false
         type column: 'orgTypeId', enumType: 'identity'

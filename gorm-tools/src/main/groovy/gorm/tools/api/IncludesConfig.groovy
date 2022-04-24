@@ -10,7 +10,7 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.support.ConfigAware
-import grails.plugin.cache.Cacheable
+import org.springframework.cache.annotation.Cacheable
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.map.Maps
 

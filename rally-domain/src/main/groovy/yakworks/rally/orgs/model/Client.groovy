@@ -22,7 +22,7 @@ class Client implements NameNum, RepoEntity<Client>, Serializable {
     //static belongsTo = [ org: Org ]
 
     static mapping = {
-        cache true
+        cache "nonstrict-read-write"
         id generator: 'assigned'
         //org insertable: false, updateable: false, column:'id'
         org column: 'orgId'

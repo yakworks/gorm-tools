@@ -28,7 +28,7 @@ dependencies {
 
   compile "org.grails.plugins:hibernate5:$vGormHibernate"
   compile "org.hibernate:hibernate-core:$vHibernate"
-  compile "org.hibernate:hibernate-ehcache:$vHibernate"
+  // compile "org.hibernate:hibernate-ehcache:$vHibernate"
 
   compile project(":gorm-tools-security")
   compile project(":gorm-tools-rest")
@@ -38,7 +38,9 @@ dependencies {
   //Hazelcast
   runtime "com.hazelcast:hazelcast-hibernate53:$vHazelcastHib"
   runtime "com.hazelcast:hazelcast:$vHazelcast"
-
+  runtime "com.hazelcast:hazelcast-spring:$vHazelcast"
+  //compatible micrometer
+  compile "io.micrometer:micrometer-core:1.5.0"
   //??wtf
   compile "commons-lang:commons-lang:2.6"
   runtime "org.grails.plugins:external-config:$vExternalConfig"

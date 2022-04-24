@@ -23,7 +23,7 @@ class OrgTypeSetup implements NameCodeDescription, RepoEntity<OrgTypeSetup>, Ser
 
     static mapping = {
         table 'OrgType'
-        cache true
+        cache "nonstrict-read-write"
         id generator: 'assigned'
     }
 

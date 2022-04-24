@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
 import grails.gorm.transactions.Transactional
-import grails.plugin.cache.Cacheable
+import org.springframework.cache.annotation.Cacheable
 import grails.plugin.cache.GrailsCacheAdminService
 import yakworks.commons.lang.EnumUtils
 import yakworks.rally.orgs.model.OrgType

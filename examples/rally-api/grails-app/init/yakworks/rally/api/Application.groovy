@@ -4,22 +4,20 @@
 */
 package yakworks.rally.api
 
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.autoconfigure.hazelcast.HazelcastAutoConfiguration
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.ComponentScan
-
 import gorm.tools.rest.RestApiFromConfig
 import gorm.tools.rest.appinfo.AppInfoBuilder
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
+import org.springframework.cache.annotation.EnableCaching
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.ComponentScan
 
 // the component scan here does not seem to be the same as the packageNames and is needed to pick up the
 // the services marked with @Component
 @ComponentScan(['yakworks.security', 'gorm.tools.security', 'yakworks.rally'])
 @RestApiFromConfig
-@EnableAutoConfiguration(exclude = [HazelcastAutoConfiguration]) // in order to avoid autoconfiguring an extra Hazelcast instance
+@EnableCaching
+// @EnableAutoConfiguration(exclude = [HazelcastAutoConfiguration]) // in order to avoid autoconfiguring an extra Hazelcast instance
 class Application extends GrailsAutoConfiguration {
     static void main(String[] args) {
         GrailsApp.run(Application, args)
@@ -56,6 +54,14 @@ class Application extends GrailsAutoConfiguration {
         //     apiBuild = 'api-docs/dist/openapi'
         //     namespaceList = ['rally']
         // }
+
+        //hack to make sure hazel get setup before the one that is setup for hibernates L2 cache as that one
+        //is configured to join the name of the one setup in spring.
+        def hibernateDatastoreBeanDef = getBeanDefinition('hibernateDatastore')
+        if (hibernateDatastoreBeanDef) {
+            // make it depend on my bean
+            hibernateDatastoreBeanDef.dependsOn = ['hazelcastInstance'] as String[]
+        }
 
     }}
 

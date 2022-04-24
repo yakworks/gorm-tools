@@ -23,6 +23,7 @@ class SecRoleUser implements RepoEntity<SecRoleUser>, Serializable {
     static transients = ['roleName', 'userName']
 
     static mapping = {
+        cache "nonstrict-read-write"
         id composite: ['user', 'role']
         version false
         user column:'userId'

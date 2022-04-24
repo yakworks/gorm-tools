@@ -107,7 +107,7 @@ subprojects { subprj ->
 
       compileOnly "org.grails.plugins:hibernate5:$vGormHibernate"
       compileOnly "org.hibernate:hibernate-core:$vHibernate"
-      compileOnly "org.hibernate:hibernate-ehcache:$vHibernate"
+      // compileOnly "org.hibernate:hibernate-ehcache:$vHibernate"
 
       // tests deps
       testRuntime "com.h2database:h2"

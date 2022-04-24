@@ -1,7 +1,7 @@
 apply plugin: "yakworks.grails-plugin"
 
 dependencies {
-    compile "org.springframework.boot:spring-boot-starter-actuator"
+    // compile "org.springframework.boot:spring-boot-starter-actuator"
     provided "org.springframework.boot:spring-boot-starter-tomcat"
 
     profile "org.grails.profiles:web-plugin"

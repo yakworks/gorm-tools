@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import gorm.tools.beans.AppCtx
 import gorm.tools.metamap.MetaMapEntityService
 import gorm.tools.metamap.MetaMapIncludes
-import grails.plugin.cache.Cacheable
+import org.springframework.cache.annotation.Cacheable
 
 /**
  * Service to generate the MetaMapSchema from a MetaMapIncludes thats cached.

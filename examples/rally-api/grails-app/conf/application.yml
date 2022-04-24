@@ -3,6 +3,9 @@ grails:
   profile: rest-api
   codegen:
     defaultPackage: restify
+  cache:
+    enabled: false
+
 info:
   app:
     name: '@info.app.name@'
@@ -14,7 +17,8 @@ spring:
   groovy:
     template:
       check-template-location: false
-#server:
+server:
+  port: 8081
 #  servlet:
 #    context-path: /api
 management:
@@ -36,7 +40,7 @@ management:
 
 logging:
   level:
-    root: WARN
+    root: INFO
     org.springframework: WARN
     org.hibernate.orm.deprecation: OFF # turns off deprecation notices
     com.hazelcast: INFO
@@ -98,10 +102,12 @@ hibernate:
     queries: false
     use_second_level_cache: true
     use_query_cache: false
-#    provider_class: 'org.hibernate.cache.EhCacheProvider'
-    region.factory_class: com.hazelcast.hibernate.HazelcastCacheRegionFactory
-#    hazelcast:
-#      instance_name: dev
+    provider_class: 'com.hazelcast.cache.HazelcastCachingProvider'
+    region.factory_class: 'com.hazelcast.hibernate.HazelcastCacheRegionFactory'
+    hazelcast:
+#      use_native_client: true
+      instance_name: hz-member-1
+      shutdown_on_session_factory_close: false
   jdbc:
     time_zone: 'UTC'
 

@@ -8,7 +8,7 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import gorm.tools.beans.AppCtx
-import grails.plugin.cache.Cacheable
+import org.springframework.cache.annotation.Cacheable
 import yakworks.commons.json.JsonEngine
 
 /**

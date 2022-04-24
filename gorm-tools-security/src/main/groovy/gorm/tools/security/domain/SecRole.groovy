@@ -16,7 +16,6 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 
 /**
  * SecRole class for Authority.
- *
  */
 @Entity
 @EqualsAndHashCode(includes='name', useCanEqual=false)

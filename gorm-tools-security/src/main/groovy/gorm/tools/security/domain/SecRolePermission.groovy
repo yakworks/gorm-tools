@@ -31,6 +31,7 @@ class SecRolePermission implements RepoEntity<SecRolePermission>, Serializable  
     }
 
     static mapping = {
+        cache "nonstrict-read-write"
         id composite: ['role', 'permission']
         version false
         role column:'roleId'

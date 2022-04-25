@@ -6,6 +6,7 @@ package yakworks.security
 
 import groovy.transform.CompileDynamic
 
+import org.apache.shiro.cache.MemoryConstrainedCacheManager
 import org.apache.shiro.hazelcast.cache.HazelcastCacheManager
 import org.apache.shiro.spring.LifecycleBeanPostProcessor
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor
@@ -151,7 +152,7 @@ class RallySecurityGrailsPlugin extends Plugin {
         boolean useCache = Environment.getCurrent() != Environment.TEST // conf.shiro.useCache
 
         if (useCache) {
-            shiroCacheManager(HazelcastCacheManager)
+            shiroCacheManager(MemoryConstrainedCacheManager)
         }
 
         springSecurityRealm(SpringSecurityRealm) {

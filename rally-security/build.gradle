@@ -12,8 +12,7 @@ dependencies {
   console "org.grails:grails-console"
   profile "org.grails.profiles:rest-api"
 
-  compile project(":rally-domain")
-  compile project(":grails-tools")
+  api project(":rally-domain")
 
   api("org.grails.plugins:spring-security-rest:$vSpringSecurityRest"){
     exclude group: 'net.minidev', module: 'json-smart'
@@ -28,9 +27,9 @@ dependencies {
     api "org.apache.shiro:shiro-$it:$vShiro"
   }
 
-  api("org.apache.shiro:shiro-hazelcast:$vShiro"){
-    exclude group: 'com.hazelcast', module: 'hazelcast'
-  }
+  // api("org.apache.shiro:shiro-hazelcast:$vShiro"){
+  //   exclude group: 'com.hazelcast', module: 'hazelcast'
+  // }
 
   compileOnly("org.grails:grails-web-mvc")
 
@@ -41,8 +40,6 @@ dependencies {
 
   implementation "org.grails:grails-web-boot"
   implementation "org.grails:grails-plugin-services"
-
-  runtime "org.grails.plugins:external-config:$vExternalConfig"
 
   testRuntime "org.grails.plugins:external-config:$vExternalConfig"
   testRuntime "com.h2database:h2"

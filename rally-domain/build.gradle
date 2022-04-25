@@ -11,7 +11,7 @@ dependencies {
   api project(":gorm-tools")
   api project(":gorm-tools-security")
   api project(":gorm-tools-csv")
-  api project(":grails-tools")
+  api "org.yakworks:grails-kit:4.0.0-SNAPSHOT"
 
   // for the mock and seed data
   compileOnly("org.grails.plugins:build-test-data:$vBuildTestData"){

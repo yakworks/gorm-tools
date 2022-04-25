@@ -1,1 +1,0 @@
-foo/index.hbr success

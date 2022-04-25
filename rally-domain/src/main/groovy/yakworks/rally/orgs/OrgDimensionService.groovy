@@ -10,12 +10,12 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
 import grails.gorm.transactions.Transactional
-import grails.plugin.cache.GrailsCacheAdminService
 import yakworks.commons.lang.EnumUtils
 import yakworks.rally.orgs.model.OrgType
 
@@ -32,7 +32,7 @@ import yakworks.rally.orgs.model.OrgType
 class OrgDimensionService {
 
     @Autowired(required = false) //required = false so unit tests work
-    GrailsCacheAdminService grailsCacheAdminService
+    CacheManager cacheManager
 
     //this is what should be inject at startup
     Map<String, String> dimensionsConfig
@@ -99,7 +99,8 @@ class OrgDimensionService {
     void clearCache(){
         dimensionsCache.clear()
         allLevels.clear()
-        grailsCacheAdminService?.clearCache("orgDimension")
+        cacheManager?.getCache("OrgDimension.parentLevels")?.clear()
+        cacheManager?.getCache("OrgDimension.childLevels")?.clear()
     }
 
     List<OrgType> getLevels(DimLevel dimLevel, OrgType orgType) {

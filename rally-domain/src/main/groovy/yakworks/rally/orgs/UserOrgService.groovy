@@ -9,6 +9,7 @@ import javax.inject.Inject
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
@@ -22,7 +23,7 @@ import yakworks.rally.orgs.model.Org
 @CompileStatic
 class UserOrgService {
 
-    @Inject SecService<AppUser> secService
+    @Autowired(required=false) SecService<AppUser> secService
 
     /**
      * gets the org from contact for the currently logged in user

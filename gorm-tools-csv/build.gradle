@@ -7,6 +7,8 @@ dependencies {
   console "org.grails:grails-console"
 
   compileOnly "org.grails:grails-plugin-rest"
+
+  // compileOnly "org.grails:grails-plugin-rest"
   compile "com.opencsv:opencsv:$vOpenCsv"
 
   //see http://spreadsheet.dsl.builders/ and https://guides.grails.org/grails-file-download-excel/guide/index.html

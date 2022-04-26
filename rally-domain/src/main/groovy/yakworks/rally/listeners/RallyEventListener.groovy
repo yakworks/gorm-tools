@@ -17,6 +17,9 @@ import gorm.tools.security.domain.AppUser
 import gorm.tools.security.services.SecService
 import yakworks.rally.orgs.model.Company
 
+/**
+ * temp in place to assign defualt orgId to user as Company default (2)
+ */
 @Slf4j
 @CompileStatic
 class RallyEventListener {

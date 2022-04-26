@@ -21,6 +21,7 @@ class RallyDomainGrailsPlugin extends grails.plugins.Plugin {
             userOrgService(UserOrgService)
         }
 
+        //temp in place to assign defualt orgId to user as Company default (2)
         rallyEventListener(RallyEventListener) { bean ->
             bean.lazyInit = true
             bean.autowire = true

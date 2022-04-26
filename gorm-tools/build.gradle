@@ -9,7 +9,7 @@ dependencies {
   api "org.yakworks:grails-icu4j:$vYakworksICU4J"
 
   implementation "org.codehaus.groovy:groovy-sql:$groovyVersion"
-  compileOnly "org.codehaus.gpars:gpars:$vGpars"
+  // compileOnly "org.codehaus.gpars:gpars:$vGpars"
 
   // implementation "org.apache.commons:commons-lang3:$vCommonsLang3"
 

@@ -66,10 +66,19 @@ bootRun {
   sourceResources sourceSets.main
   String springProfilesActive = 'spring.profiles.active'
   systemProperty springProfilesActive, System.getProperty(springProfilesActive)
+  //fix hazel cast Not supported: "http://javax.xml.XMLConstants/property/accessExternalDTD"
+  // FIXME the pac4j dependency adds some XML lib that is screwing this up
+  systemProperty 'hazelcast.ignoreXxeProtectionFailures', true
 }
 
 bootJar.enabled = true
 bootJar.archiveFileName = 'restify.jar'
+
+integrationTest.doFirst {
+  //fix hazel cast Not supported: "http://javax.xml.XMLConstants/property/accessExternalDTD"
+  // FIXME the pac4j dependency adds some XML lib that is screwing this up
+  systemProperty 'hazelcast.ignoreXxeProtectionFailures', true
+}
 
 integrationTest {
   testlogger {

@@ -1,3 +1,8 @@
+### v7.0.8-v.71
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.70...v7.0.8-v.71)
+- Assign default orgid on user create 9ci/domain9#987 (#520) [link](https://github.com/yakworks/gorm-tools/commit/b6cc3f75eae14ed508956510c600d5422e46cd65)
+
 ### v7.0.8-v.70
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.69...v7.0.8-v.70)

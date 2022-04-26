@@ -15,11 +15,11 @@ import org.springframework.context.event.EventListener
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.services.SecService
+import yakworks.rally.orgs.model.Company
 
 @Slf4j
 @CompileStatic
 class RallyEventListener {
-    private static final Long DEFAULT_ORG_ID = 2
 
     @Autowired @Nullable
     SecService<AppUser> secService
@@ -34,7 +34,7 @@ class RallyEventListener {
             if(secService.isLoggedIn() && secService.user?.orgId != null) {
                 user.orgId = secService.user.orgId
             } else {
-                user.orgId = DEFAULT_ORG_ID
+                user.orgId = Company.DEFAULT_COMPANY_ID
             }
         }
     }

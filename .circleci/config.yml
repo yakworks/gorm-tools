@@ -66,8 +66,8 @@ jobs:
           key: build-{{ .Branch }}-{{ .Revision }}
 
       # setup the docker
-      - setup_remote_docker
-      - run: apk add docker
+#      - setup_remote_docker
+#      - run: apk add docker
 
       # download vault and decrypts
       - run: make vault.decrypt

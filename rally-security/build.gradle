@@ -20,8 +20,8 @@ dependencies {
   //bump to deal with vulnerability in one above and was not downloading
   api "net.minidev:json-smart:$vJsonSmart"
 
-  compileOnly "org.pac4j:pac4j-oidc:3.8.3"
-  compileOnly "org.pac4j:pac4j-saml:3.8.3"
+  api "org.pac4j:pac4j-oidc:3.8.3"
+  api "org.pac4j:pac4j-saml:3.8.3"
 
   ['aspectj', 'core', 'spring', 'web'].each {
     api "org.apache.shiro:shiro-$it:$vShiro"

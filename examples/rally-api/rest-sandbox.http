@@ -33,6 +33,12 @@ GET {{base_url}}/rally/org
 Authorization: {{Authorization}}
 
 ### Org
+# @no-cookie-jar
+GET {{base_url}}/rally/org
+Authorization: {{Authorization}}
+
+
+### Org
 GET {{base_url}}/rally/contact
 Authorization: {{Authorization}}
 

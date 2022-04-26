@@ -7,8 +7,6 @@ package gorm.tools.security.domain
 import javax.annotation.Nullable
 import javax.inject.Inject
 
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.security.crypto.password.PasswordEncoder
 
 import gorm.tools.databinding.BindAction
@@ -20,7 +18,6 @@ import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
-import gorm.tools.security.services.SecService
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 
@@ -28,14 +25,9 @@ import grails.gorm.transactions.Transactional
 @GrailsCompileStatic
 class AppUserRepo implements GormRepo<AppUser> {
     /** dependency injection for the password encoder */
-
-    private static final Long DEFAULT_ORG_ID = 2
-
     @Inject @Nullable
     PasswordEncoder passwordEncoder
-
-    @Inject @Nullable
-    SecService<AppUser> secService
+    // SecService secService
 
     /**
      * overrides the bindAndCreate method vs events
@@ -75,13 +67,6 @@ class AppUserRepo implements GormRepo<AppUser> {
     void beforePersist(AppUser user, BeforePersistEvent e) {
         if(user.password) {
             user.passwordHash = encodePassword(user.password)
-        }
-        if(user.orgId == null) {
-            if(secService.isLoggedIn() && secService.user?.orgId != null) {
-                user.orgId = secService.user.orgId
-            } else {
-                user.orgId = DEFAULT_ORG_ID
-            }
         }
         if(!user.name) user.name = user.username
     }

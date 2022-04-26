@@ -11,7 +11,6 @@ import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Specification
-import yakworks.gorm.testing.TestingSecService
 
 class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, SecurityTest {
 
@@ -45,35 +44,6 @@ class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, Secu
         entity.persist(flush: true)
 
         get(entity.id)
-    }
-
-    void "test orgid assignment"() {
-        setup:
-        Map args = buildMap()
-        args.orgId = 100
-        AppUser loggedInUser = AppUser.create(args)
-
-        expect:
-        loggedInUser.id == 1
-
-        when: "assign logged in user orgid"
-        args = buildMap()
-        AppUser user = AppUser.create(args)
-
-        then:
-        user.id == 2
-        user.orgId != null
-        user.orgId == loggedInUser.orgId
-        user.orgId == 100
-
-        when: "logged in orgid is null"
-        loggedInUser.orgId = null
-        loggedInUser.save()
-        user = AppUser.create(buildMap())
-
-        then:
-        user.orgId != null
-        user.orgId == 2 //default
     }
 
     @Override

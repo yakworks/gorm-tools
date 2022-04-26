@@ -21,7 +21,10 @@ dependencies {
   api "net.minidev:json-smart:$vJsonSmart"
 
   api "org.pac4j:pac4j-oidc:3.8.3"
-  api "org.pac4j:pac4j-saml:3.8.3"
+  api("org.pac4j:pac4j-saml:3.8.3"){
+    // fix hazel cast Not supported: "http://javax.xml.XMLConstants/property/accessExternalDTD"
+    exclude module: 'xalan'
+  }
 
   ['aspectj', 'core', 'spring', 'web'].each {
     api "org.apache.shiro:shiro-$it:$vShiro"

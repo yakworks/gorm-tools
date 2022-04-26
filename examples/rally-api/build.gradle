@@ -68,7 +68,7 @@ bootRun {
   systemProperty springProfilesActive, System.getProperty(springProfilesActive)
   //fix hazel cast Not supported: "http://javax.xml.XMLConstants/property/accessExternalDTD"
   // FIXME the pac4j dependency adds some XML lib that is screwing this up
-  systemProperty 'hazelcast.ignoreXxeProtectionFailures', true
+  // systemProperty 'hazelcast.ignoreXxeProtectionFailures', true
 }
 
 bootJar.enabled = true

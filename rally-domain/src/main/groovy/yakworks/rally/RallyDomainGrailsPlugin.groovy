@@ -5,6 +5,7 @@
 package yakworks.rally
 
 import grails.plugin.springsecurity.SpringSecurityUtils
+import yakworks.rally.listeners.RallyEventListener
 import yakworks.rally.orgs.UserOrgService
 
 @SuppressWarnings('Indentation')
@@ -18,6 +19,11 @@ class RallyDomainGrailsPlugin extends grails.plugins.Plugin {
         def securityConf = SpringSecurityUtils.securityConfig
         if (securityConf.active) {
             userOrgService(UserOrgService)
+        }
+
+        rallyEventListener(RallyEventListener) { bean ->
+            bean.lazyInit = true
+            bean.autowire = true
         }
 
         // orgCopier(OrgCopier, lazy())

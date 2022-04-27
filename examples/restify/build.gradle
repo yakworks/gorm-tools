@@ -38,6 +38,10 @@ dependencies {
   // compile "org.grails.plugins:spring-security-rest-grailscache:$vSpringSecurityRest"
   compile "org.grails.plugins:spring-security-rest-gorm:$vSpringSecurityRest"
 
+  //Adds the shedlock for jobs iwth multiple replicas
+  compile "net.javacrumbs.shedlock:shedlock-spring:4.34.0"
+  compile "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.34.0"
+
   // ** for the openApi parsing, doesnt come through for some reason **
   // runtime "io.swagger.parser.v3:swagger-parser:$vSwagger"
   // runtime "io.swagger.parser.v3:swagger-parser-v3:$vSwagger"

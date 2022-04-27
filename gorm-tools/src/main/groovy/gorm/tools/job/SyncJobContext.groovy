@@ -210,6 +210,14 @@ class SyncJobContext {
         }
     }
 
+    /**
+     * Transforms the results for the data and easy json conversion.
+     * Called as its processing if saveDataAsFile so it can be streamed out.
+     * Or called during finishJob if saved in data from the main results.
+     *
+     * @param apiResults the current results to transsform
+     * @return the transformed list of maps
+     */
     List<Map> transformResults(ApiResults apiResults) {
         // exit fast if closure is used
         if(transformResultsClosure) {

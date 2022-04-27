@@ -4,6 +4,8 @@
 */
 package restify
 
+import org.springframework.jdbc.core.JdbcTemplate
+
 // import yakworks.gorm.testing.model.Taskify
 
 // import restify.domain.OrgType
@@ -12,11 +14,18 @@ package restify
 
 class BootStrap {
     static Random rand = new Random()
+    JdbcTemplate jdbcTemplate
 
     def init = { servletContext ->
         createBooks()
+        println("creating shedlock table")
+        jdbcTemplate.execute("""
+            CREATE TABLE shedlock(name VARCHAR(64) NOT NULL, lock_until TIMESTAMP(3) NOT NULL,
+            locked_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3), locked_by VARCHAR(255) NOT NULL,
+            PRIMARY KEY (name));
+         """)
 
-//        def data = new JsonSlurper().parse(new File("../resources/Contacts.json"))
+        //        def data = new JsonSlurper().parse(new File("../resources/Contacts.json"))
 //        data.each{
 //            Contact contact = new resttutorial.Contact(it)
 //            contact.save(failOnError:true, flush: true)

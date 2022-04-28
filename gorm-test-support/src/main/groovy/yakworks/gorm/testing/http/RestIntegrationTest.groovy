@@ -32,6 +32,8 @@ trait RestIntegrationTest extends DataIntegrationTest {
 
     // Object controller
     String controllerName
+    // Object controller
+    String namespace
 
     /**
      * A web application context instance which is used for mocking the controller.
@@ -72,7 +74,13 @@ trait RestIntegrationTest extends DataIntegrationTest {
     void setControllerName(String name){
         def ctrls = grailsApplication.getArtefactInfo(ControllerArtefactHandler.TYPE).grailsClasses
 
-        def grailsCtrlClass = ctrls.find{it.name == name || it.shortName == name}
+        def grailsCtrlClass
+        def grailsCtrlClasses = ctrls.findAll{it.name == name || it.shortName == name}
+        if(namespace) {
+            grailsCtrlClass = grailsCtrlClasses.find{ it.clazz.namespace == namespace}
+        } else {
+            grailsCtrlClass = grailsCtrlClasses[0]
+        }
         assert grailsCtrlClass : "can't find controller name $name"
         controller = AppCtx.get(grailsCtrlClass.getClazz())
         controllerName = grailsCtrlClass.getLogicalPropertyName()

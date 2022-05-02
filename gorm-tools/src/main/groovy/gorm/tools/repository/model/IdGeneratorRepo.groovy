@@ -67,7 +67,7 @@ trait IdGeneratorRepo<D> implements GenerateId<Long> {
     /**
      * replace the one in gormRepo
      */
-    @Override
+    // @Override
     void doBeforePersist(D entity, PersistArgs args){
         generateId((Persistable)entity)
         if (args.bindAction && args.data){

@@ -7,6 +7,10 @@ package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.DataRetrievalFailureException
+import org.springframework.validation.Errors
+
 import gorm.tools.databinding.BindAction
 import gorm.tools.model.Persistable
 import gorm.tools.model.SourceType
@@ -19,9 +23,6 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.validation.Rejector
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.dao.DataRetrievalFailureException
-import org.springframework.validation.Errors
 import yakworks.rally.orgs.OrgMemberService
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location

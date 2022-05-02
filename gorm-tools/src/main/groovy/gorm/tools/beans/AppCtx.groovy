@@ -8,7 +8,6 @@ import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import org.springframework.context.ApplicationContext
-import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationEventPublisher
 
 import grails.config.Config

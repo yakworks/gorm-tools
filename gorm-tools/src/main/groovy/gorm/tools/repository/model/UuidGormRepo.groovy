@@ -8,40 +8,46 @@ package gorm.tools.repository.model
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEntity
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.GenericTypeResolver
 
+import com.github.f4b6a3.uuid.UuidCreator
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
-import gorm.tools.repository.events.RepoEventPublisher
 
 /**
- * A trait that adds id generator to repo for manually generating ids during validation and for persist
- * instead of waiting for hibernate to generate it. Used when associations get messy and for performance when inserting.
- * uses the default Long type from IdGenerator bean
+ * Default implementation of repo that uses time ordered UUID for ids.
  *
  * @author Joshua Burnett (@basejump)
- * @since 7.0.3
+ * @since 7.0.8
  */
 @CompileStatic
-trait UuidGeneratorRepo<D> implements GenerateId<UUID> {
+class UuidGormRepo<D> implements GormRepo<D>, GenerateId<UUID>  {
 
-    @Autowired RepoEventPublisher repoEventPublisher
-
-    // should be implemented by GormRepo
-    abstract Class<D> getEntityClass()
-    abstract void doBeforePersistWithData(D entity, PersistArgs args)
-
-    /**
-     * calls the idGenerator.getNextId(getIdGeneratorKey())
-     */
-    UUID generateId() {
-        return UUID.randomUUID()
+    UuidGormRepo() {
+        this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormRepo)
     }
 
+    UuidGormRepo(Class<D> clazz) {
+        setEntityClass(clazz)
+    }
+
+    @Override
+    UUID generateId() {
+        // return UUID.randomUUID()
+        return UuidCreator.getTimeOrderedWithRandom()
+    }
+
+    @Override
+    UUID generateId(Persistable<UUID> entity){
+        if (entity.getId() == null)
+            entity.setId(generateId())
+        return entity.getId()
+    }
     /**
      * replace the one in gormRepo
      */
+    @Override
     void doBeforePersist(D entity, PersistArgs args){
         generateId((Persistable<UUID>)entity)
         if (args.bindAction && args.data){
@@ -49,5 +55,4 @@ trait UuidGeneratorRepo<D> implements GenerateId<UUID> {
         }
         getRepoEventPublisher().doBeforePersist((GormRepo)this, (GormEntity)entity, args)
     }
-
 }

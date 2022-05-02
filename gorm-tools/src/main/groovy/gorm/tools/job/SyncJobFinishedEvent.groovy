@@ -4,12 +4,15 @@
 */
 package gorm.tools.job
 
+import groovy.transform.CompileStatic
+
 import org.springframework.context.ApplicationEvent
 import org.springframework.core.ResolvableType
 import org.springframework.core.ResolvableTypeProvider
 
 import yakworks.commons.lang.Validate
 
+@CompileStatic
 class SyncJobFinishedEvent<D> extends ApplicationEvent implements ResolvableTypeProvider   {
 
     Long jobId

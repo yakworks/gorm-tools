@@ -16,10 +16,5 @@ public interface GenerateId<ID> {
 
     ID generateId();
 
-    default ID generateId(Persistable<ID> entity){
-        if (entity.getId() == null)
-            entity.setId(generateId());
-        return entity.getId();
-    }
-
+    ID generateId(Persistable<ID> entity);
 }

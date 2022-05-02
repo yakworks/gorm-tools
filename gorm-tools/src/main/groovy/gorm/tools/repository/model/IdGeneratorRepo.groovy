@@ -51,6 +51,7 @@ trait IdGeneratorRepo<D> implements GenerateId<Long> {
      * if entity.id is null then generates and assigns new id to id property on entity,
      * if entity.id is already set then it just returns it
      */
+    @Override
     Long generateId(Persistable<Long> entity){
         if (entity.id == null) entity.id = generateId()
         return entity.id
@@ -67,7 +68,6 @@ trait IdGeneratorRepo<D> implements GenerateId<Long> {
     /**
      * replace the one in gormRepo
      */
-    // @Override
     void doBeforePersist(D entity, PersistArgs args){
         generateId((Persistable)entity)
         if (args.bindAction && args.data){

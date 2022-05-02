@@ -5,6 +5,7 @@
 package gorm.tools.repository
 
 import gorm.tools.repository.model.IdGeneratorRepo
+import gorm.tools.repository.model.UuidGormRepo
 import gorm.tools.testing.RepoTestData
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import testing.UuidSample
@@ -18,7 +19,7 @@ class UuidRepoSpec extends GormToolsHibernateSpec {
 
     def "assert proper repos are setup"() {
         expect:
-        UuidSample.repo instanceof GormRepo
+        UuidSample.repo instanceof UuidGormRepo
         // UuidSample.repo instanceof IdGeneratorRepo
     }
 

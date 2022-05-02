@@ -17,7 +17,6 @@ import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.model.Persistable
 import gorm.tools.problem.ProblemHandler
-import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.events.AfterBindEvent
@@ -25,7 +24,7 @@ import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
-import gorm.tools.repository.model.IdGeneratorRepo
+import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.security.services.SecService
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.ReadOnly
@@ -49,7 +48,7 @@ import static yakworks.rally.activity.model.Activity.VisibleTo
 
 @GormRepository
 @CompileStatic
-class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
+class ActivityRepo extends LongIdGormRepo<Activity> {
 
     @Inject @Nullable
     ActivityLinkRepo activityLinkRepo

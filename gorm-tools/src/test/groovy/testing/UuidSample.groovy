@@ -16,7 +16,7 @@ class UuidSample implements UuidRepoEntity<UuidSample, GormRepo<UuidSample>> {
     String name
 
     static mapping = {
-        id generator: "uuid2"
+        id generator: "assigned"
     }
     static constraints = {
         name nullable: false

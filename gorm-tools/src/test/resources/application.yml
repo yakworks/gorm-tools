@@ -14,7 +14,7 @@ hibernate:
   format_sql: false
   schema_management_tool: 'gorm.tools.hibernate.schema.CustomSchemaManagementTool'
   naming_strategy: 'org.hibernate.cfg.DefaultNamingStrategy'
-  dialect: gorm.tools.hibernate.ExtendedH2Dialect
+  dialect: 'gorm.tools.hibernate.ExtendedH2Dialect'
   show_sql: false
   cache:
     queries: false

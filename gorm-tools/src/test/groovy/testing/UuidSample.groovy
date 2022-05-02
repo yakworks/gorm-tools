@@ -4,14 +4,15 @@
 */
 package testing
 
-import gorm.tools.repository.GormRepo
+
+import gorm.tools.repository.model.UuidGormRepo
 import gorm.tools.repository.model.UuidRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
 @Entity
 @GrailsCompileStatic
-class UuidSample implements UuidRepoEntity<UuidSample, GormRepo<UuidSample>> {
+class UuidSample implements UuidRepoEntity<UuidSample, UuidGormRepo<UuidSample>> {
     UUID id
     String name
 

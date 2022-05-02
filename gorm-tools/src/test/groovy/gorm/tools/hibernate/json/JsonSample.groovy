@@ -4,29 +4,43 @@
 */
 package gorm.tools.hibernate.json
 
-import com.vladmihalcea.hibernate.type.json.JsonType
-import gorm.tools.repository.GormRepo
+import groovy.transform.CompileDynamic
+
+import gorm.tools.hibernate.type.JsonType
+import gorm.tools.repository.model.UuidGormRepo
 import gorm.tools.repository.model.UuidRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-import org.hibernate.annotations.Type
-import org.hibernate.annotations.TypeDef
-import com.vladmihalcea.hibernate.type.json.JsonType
+
+import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 
 @Entity
-// @TypeDef(name = "json", typeClass = JsonType.class)
 @GrailsCompileStatic
-class JsonSample implements UuidRepoEntity<JsonSample, GormRepo<JsonSample>> {
+class JsonSample implements UuidRepoEntity<JsonSample, UuidGormRepo<JsonSample>> {
     UUID id
     String name
 
-    @Type(type = 'com.vladmihalcea.hibernate.type.json.JsonType')
     Map json = [:]
+    List someList = []
 
-    static mapping = {
-        id generator: "uuid2"
-        // json type: JsonType, sqlType: 'json'
-    }
+    // static mapping = orm {
+    //     id generator: "assigned"
+    //     version false
+    //     property("json", [type: JsonType, params: [clazz: Map.name] ])
+    //     // property("someList", [type: JsonType, params: [clazz: ArrayList.name] ])
+    //     property("someList", {
+    //         column([name: "someList"])
+    //         type = JsonType
+    //         typeParams = [clazz: ArrayList.name]
+    //     })
+    // }
+    @CompileDynamic
+    static Closure getMapping(){ { ->
+        id generator: "assigned"
+        json type: JsonType, params: [type: Map]
+        someList type: JsonType, params: [type: ArrayList]
+    }}
+
     static constraints = {
         name nullable: false
     }

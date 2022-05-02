@@ -24,6 +24,7 @@ class JsonSampleSpec extends GormToolsHibernateSpec {
         when:
         def o = RepoTestData.build(JsonSample, save: false)
         o.json = [foo: 'bar']
+        o.someList = [1, 2, 3]
         o.persist()
         def id = o.id
         flushAndClear()
@@ -33,6 +34,7 @@ class JsonSampleSpec extends GormToolsHibernateSpec {
         o.id
         o2.id
         o2.json.foo == 'bar'
+        o2.someList == [1, 2, 3]
     }
 
 }

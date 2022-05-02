@@ -7,7 +7,6 @@ package gorm.tools.metamap
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
 
 import gorm.tools.beans.AppCtx

@@ -30,6 +30,8 @@ import gorm.tools.repository.artefact.GrailsRepositoryClass
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
+import gorm.tools.repository.model.UuidGormRepo
+import gorm.tools.repository.model.UuidRepoEntity
 import gorm.tools.transaction.TrxService
 import gorm.tools.validation.RepoValidatorRegistry
 import grails.config.Config
@@ -112,8 +114,10 @@ class GormToolsBeanConfig {
             String repoName = RepoUtil.getRepoBeanName(domainClass)
             def hasRepo = repoClasses.find { it.propertyName == repoName }
             if (!hasRepo) {
-                "${repoName}"(DefaultGormRepo, domainClass) { bean ->
-                    bean.lazyInit = true
+                if(UuidRepoEntity.isAssignableFrom(domainClass)) {
+                    "${repoName}"(UuidGormRepo, domainClass, lazy())
+                } else {
+                    "${repoName}"(DefaultGormRepo, domainClass, lazy())
                 }
             }
         }

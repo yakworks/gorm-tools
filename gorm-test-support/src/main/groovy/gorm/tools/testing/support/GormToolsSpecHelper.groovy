@@ -32,6 +32,8 @@ import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
+import gorm.tools.repository.model.UuidGormRepo
+import gorm.tools.repository.model.UuidRepoEntity
 import gorm.tools.transaction.TrxService
 import gorm.tools.validation.RepoEntityValidator
 import grails.persistence.support.NullPersistentContextInterceptor
@@ -63,7 +65,7 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
 
     /**
      * Finds repository class in same package as domain class.
-     * returns a default DefaultGormRepo if no explicit ones are found
+     * returns a default DefaultGormRepo or UuidGormRepo if no explicit ones are found
      */
     Class findRepoClass(Class entityClass) {
         String repoClassName = RepositoryArtefactHandler.getRepoClassName(entityClass)
@@ -77,7 +79,11 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         if(repoClass && repoClass != GormRepo){
             return repoClass
         }
-        return DefaultGormRepo
+        if(UuidRepoEntity.isAssignableFrom(entityClass)) {
+            return UuidGormRepo
+        } else {
+            return DefaultGormRepo
+        }
     }
 
     Closure commonBeans(){ { ->
@@ -126,14 +132,10 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
                 grailsApplication.addArtefact(RepositoryArtefactHandler.TYPE, repoClass)
                 String repoName = RepoUtil.getRepoBeanName(domainClass)
 
-                if (repoClass == DefaultGormRepo) {
-                    "$repoName"(repoClass, domainClass){ bean ->
-                        bean.autowire = true
-                    }
+                if (repoClass == DefaultGormRepo || repoClass == UuidGormRepo) {
+                    "$repoName"(repoClass, domainClass, lazy())
                 } else {
-                    "$repoName"(repoClass){ bean ->
-                        bean.autowire = true
-                    }
+                    "$repoName"(repoClass, lazy())
                 }
             }
         }
@@ -158,6 +160,10 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         // ctx.getBean('repoEventPublisher').applicationEventPublisher = grailsApplication.mainContext
         // RepoValidatorRegistry.init(datastore, ctx.getBean('messageSource'))
     }
+
+    Closure lazy() {{ bean ->
+        bean.lazyInit = true
+    }}
 
     /**
      * allows to pass in a list of bean closures, calling defineBeans sometimes causes problems so this allows

@@ -110,7 +110,7 @@ subprojects { subprj ->
       // compileOnly "org.hibernate:hibernate-ehcache:$vHibernate"
 
       // tests deps
-      testRuntime "com.h2database:h2"
+      testRuntime "com.h2database:h2:$vH2"
       testRuntime "com.zaxxer:HikariCP:$vHikari"
 
       testCompile project(":gorm-test-support") //this might seem circular but it can be added to itself as it dif config

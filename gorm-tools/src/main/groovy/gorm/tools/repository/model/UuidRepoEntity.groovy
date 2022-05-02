@@ -10,9 +10,12 @@ import gorm.tools.mango.api.QueryMangoEntity
 import gorm.tools.repository.GormRepo
 
 /**
- * A trait for an entity that has a composite id.
+ * Default trait for a domain that has a concrete implemented repo and mango query methods.
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileStatic
-trait CompositeRepoEntity<D> implements PersistableRepoEntity<D, GormRepo<D>, Serializable>, QueryMangoEntity<D> {
+trait UuidRepoEntity<D, R extends GormRepo<D>> implements PersistableRepoEntity<D, R, UUID>, QueryMangoEntity<D> {
 
 }

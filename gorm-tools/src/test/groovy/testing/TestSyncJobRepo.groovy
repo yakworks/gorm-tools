@@ -4,19 +4,18 @@
 */
 package testing
 
+import groovy.transform.CompileStatic
 
 import gorm.tools.model.SourceType
-import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.RepoListener
-import gorm.tools.repository.model.IdGeneratorRepo
-import groovy.transform.CompileStatic
+import gorm.tools.repository.model.LongIdGormRepo
 import yakworks.commons.json.JsonEngine
 
 @GormRepository
 @CompileStatic
-class TestSyncJobRepo implements GormRepo<TestSyncJob>, IdGeneratorRepo<TestSyncJob> {
+class TestSyncJobRepo extends LongIdGormRepo<TestSyncJob> {
 
     @RepoListener
     void beforeBind(TestSyncJob job, Map data, BeforeBindEvent be) {

@@ -10,17 +10,16 @@ import org.apache.commons.io.IOUtils
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.model.SourceType
-import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.RepoListener
-import gorm.tools.repository.model.IdGeneratorRepo
+import gorm.tools.repository.model.LongIdGormRepo
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.repo.AttachmentRepo
 
 @GormRepository
 @CompileStatic
-class SyncJobRepo implements GormRepo<SyncJob>, IdGeneratorRepo<SyncJob> {
+class SyncJobRepo extends LongIdGormRepo<SyncJob> {
 
     @Autowired
     AttachmentSupport attachmentSupport

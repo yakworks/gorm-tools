@@ -6,15 +6,14 @@ package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
-import gorm.tools.repository.model.IdGeneratorRepo
+import gorm.tools.repository.model.LongIdGormRepo
 import yakworks.rally.orgs.model.Location
 
 @GormRepository
 @CompileStatic
-class LocationRepo implements GormRepo<Location>, IdGeneratorRepo<Location> {
+class LocationRepo extends LongIdGormRepo<Location> {
 
     @RepoListener
     void beforeValidate(Location location) {

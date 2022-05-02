@@ -9,6 +9,7 @@ import javax.persistence.Transient
 import gorm.tools.repository.model.CompositeRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import org.springframework.lang.Nullable
 
 @Entity
 @GrailsCompileStatic
@@ -25,6 +26,11 @@ class CompositeNoVersion implements CompositeRepoEntity<CompositeNoVersion>, Ser
     static constraints = {
         linkedId nullable: false
         name nullable: false
+    }
+
+    // @Override
+    void setId(@Nullable Serializable serializable) {
+
     }
 
     @Transient

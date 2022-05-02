@@ -4,18 +4,20 @@
 */
 package gorm.tools.repository.model
 
+
 import groovy.transform.CompileStatic
 
-import gorm.tools.mango.api.QueryMangoEntity
 import gorm.tools.repository.GormRepo
 
 /**
- * Default trait for a domain that has a concrete implemented repo and mango query methods.
+ * A trait that adds id generator to repo for manually generating ids during validation and for persist
+ * instead of waiting for hibernate to generate it. Used when associations get messy and for performance when inserting.
+ * uses the default Long type from IdGenerator bean
  *
  * @author Joshua Burnett (@basejump)
- * @since 6.1
+ * @since 7.0.3
  */
 @CompileStatic
-trait GormRepoEntity<D, R extends GormRepo<D>> implements PersistableRepoEntity<D, R, Long>, QueryMangoEntity<D> {
+class LongIdGormRepo<D> implements GormRepo<D>, IdGeneratorRepo<D> {
 
 }

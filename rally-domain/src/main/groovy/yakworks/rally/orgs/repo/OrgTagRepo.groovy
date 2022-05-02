@@ -63,7 +63,7 @@ class OrgTagRepo extends AbstractLinkedEntityRepo<OrgTag, Tag> {
      */
     void copyToOrg(Org fromOrg, Org toOrg) {
         List<Long> tagsIds = collectLongIds(list(fromOrg), "tagId")
-        if (tagsIds) add(toOrg, tagsIds)
+        if (tagsIds) add(toOrg as Persistable, tagsIds)
     }
 
 }

@@ -50,7 +50,7 @@ dependencies {
   // dk.glasius not working, load twice
   // runtimeOnly "dk.glasius:external-config:$vExternalConfig"
   runtime "org.grails.plugins:external-config:$vExternalConfig"
-  runtimeOnly "com.h2database:h2"
+  runtimeOnly "com.h2database:h2:$vH2"
   runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"
   runtimeOnly "com.zaxxer:HikariCP:$vHikari"
 

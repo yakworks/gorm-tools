@@ -36,7 +36,7 @@ abstract class AbstractLinkedEntityRepo<X, R extends Persistable> extends Abstra
      * this is the map that makes the composite key across the 3 fields.
      */
     @Override
-    Map getKeyMap(Persistable main, R related){
+    Map getKeyMap(Persistable<Long> main, R related){
         getKeyMap(main.id, getLinkedEntityName(main), related)
     }
 

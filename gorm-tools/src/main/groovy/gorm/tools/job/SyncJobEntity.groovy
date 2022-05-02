@@ -48,7 +48,7 @@ transform example when in a job
  */
 
 @CompileStatic
-trait SyncJobEntity<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo<D>> {
+trait SyncJobEntity<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo<D>, Long> {
 
     public static int MAX_MEG_IN_BYTES = 1024 * 1024 * 10 //10 megabytes
 

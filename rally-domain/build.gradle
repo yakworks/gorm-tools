@@ -29,7 +29,7 @@ dependencies {
   runtime "org.grails.plugins:external-config:$vExternalConfig"
 
   testRuntime "org.grails.plugins:external-config:$vExternalConfig"
-  testRuntime "com.h2database:h2"
+  testRuntime "com.h2database:h2:$vH2"
   testRuntime "javax.xml.bind:jaxb-api:2.3.1"
   testRuntime "com.zaxxer:HikariCP:$vHikari"
 

@@ -290,7 +290,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
     }
 
     @ReadOnly
-    boolean hasActivityWithAttachments(Persistable linkedEntity, Activity.Kind kind = null) {
+    boolean hasActivityWithAttachments(Persistable<Long> linkedEntity, Activity.Kind kind = null) {
         def actLinkExists = getActivityLinkCriteria(linkedEntity.id, linkedEntity.class.simpleName)
 
         def laQuery = Activity.query {

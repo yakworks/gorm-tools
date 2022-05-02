@@ -21,7 +21,7 @@ import gorm.tools.validation.ApiConstraints
  * @since 6.1
  */
 @CompileStatic
-trait PersistableRepoEntity<D, R extends GormRepo<D>> implements HasRepo<D, R>, Persistable {
+trait PersistableRepoEntity<D, R extends GormRepo<D>, ID> implements HasRepo<D, R>, Persistable<ID> {
 
     static R getRepo() { return (R) RepoLookup.findRepo(this) }
 

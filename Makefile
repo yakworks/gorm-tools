@@ -10,7 +10,8 @@ include $(SHIPKIT_DIR)/makefiles/ship-gh-pages.make
 
 ## Run spotlessApply and normal check
 check:
-	$(gradlew) spotlessApply check
+	# $(gradlew) spotlessApply
+	$(gradlew) check --max-workers=3
 
 # should run vault.decrypt before this,
 # sets up github, kubernetes and docker login

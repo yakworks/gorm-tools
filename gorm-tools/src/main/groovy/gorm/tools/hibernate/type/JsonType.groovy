@@ -1,3 +1,7 @@
+/*
+* Copyright 2022 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
+* You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+*/
 package gorm.tools.hibernate.type
 
 import java.lang.reflect.Type
@@ -5,9 +9,10 @@ import java.lang.reflect.Type
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import com.vladmihalcea.hibernate.type.json.internal.JsonTypeDescriptor
 import org.hibernate.type.descriptor.sql.SqlTypeDescriptor
 import org.hibernate.usertype.ParameterizedType
+
+import com.vladmihalcea.hibernate.type.json.internal.JsonTypeDescriptor
 import yakworks.commons.lang.ClassUtils
 
 /**

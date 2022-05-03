@@ -37,4 +37,20 @@ class JsonSampleSpec extends GormToolsHibernateSpec {
         o2.someList == [1, 2, 3]
     }
 
+    void "json to object"() {
+        when:
+        def o = new JsonSample(name: 'with addy')
+        o.addy = new Addy(city: 'Denver', state: 'CO', zipCode: '80439')
+        o.persist()
+        def id = o.id
+        flushAndClear()
+        def o2 = JsonSample.get(id)
+
+        then:
+        o.id
+        o2.id
+        o.addy.city == 'Denver'
+        o.addy.zipCode == '80439'
+    }
+
 }

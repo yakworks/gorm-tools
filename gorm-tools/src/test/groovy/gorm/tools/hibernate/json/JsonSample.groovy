@@ -23,6 +23,9 @@ class JsonSample implements UuidRepoEntity<JsonSample, UuidGormRepo<JsonSample>>
     Map json = [:]
     List someList = []
 
+    //json mapped to pogo
+    Addy addy
+
     // static mapping = orm {
     //     id generator: "assigned"
     //     version false
@@ -39,6 +42,7 @@ class JsonSample implements UuidRepoEntity<JsonSample, UuidGormRepo<JsonSample>>
         id generator: "assigned"
         json type: JsonType, params: [type: Map]
         someList type: JsonType, params: [type: ArrayList]
+        addy type: JsonType, params: [type: Addy]
     }}
 
     static constraints = {

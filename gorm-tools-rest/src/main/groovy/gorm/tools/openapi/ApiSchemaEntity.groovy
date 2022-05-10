@@ -462,11 +462,12 @@ class ApiSchemaEntity {
                 typeFormat.type = 'integer'
                 typeFormat.format = 'int64'
                 break
-            case [Double, Float, BigDecimal]:
+            case [Double, Float]:
                 typeFormat.type = 'number'
                 break
             case [BigDecimal]:
                 typeFormat.type = 'number'
+                //defaults to money
                 typeFormat.format = 'money'
                 break
             case [LocalDate]:

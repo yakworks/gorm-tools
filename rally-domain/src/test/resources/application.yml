@@ -6,9 +6,12 @@ grails:
 
 logging:
   level:
-    root: DEBUG
+    root: WARN
     org.springframework: WARN
     org.hibernate.orm.deprecation: OFF # turns off deprecation notices
+    # uncomment to turn on sql logging
+#    org.hibernate.stat: DEBUG
+#    org.hibernate.SQL: DEBUG
 
 hibernate:
   format_sql: false
@@ -21,6 +24,9 @@ hibernate:
     use_query_cache: false
   jdbc:
     time_zone: 'UTC'
+  enhancer:
+    enableLazyInitialization: true
+    enableAssociationManagement: true
 
 dataSource:
   type: com.zaxxer.hikari.HikariDataSource

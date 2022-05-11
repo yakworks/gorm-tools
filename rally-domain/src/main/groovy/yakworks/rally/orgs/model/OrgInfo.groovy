@@ -7,12 +7,14 @@ package yakworks.rally.orgs.model
 import gorm.tools.audit.AuditStamp
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
+import grails.gorm.hibernate.annotation.ManagedEntity
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 
 @Entity
 @AuditStamp
 @IdEqualsHashCode
+// @ManagedEntity
 @GrailsCompileStatic
 class OrgInfo implements RepoEntity<OrgInfo>, Serializable {
     static belongsTo = [Org]

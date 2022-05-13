@@ -41,6 +41,7 @@ class MetaMapSchema implements Serializable {
 
     MetaMapSchema build(MetaMapIncludes metaMapIncludes) {
         Schema rootSchema = oapiSupport.getSchema(metaMapIncludes.shortClassName)
+        if(!rootSchema) return this
         this.rootClassName = metaMapIncludes.rootClassName
         this.schema = rootSchema
         def mmiProps = metaMapIncludes.props

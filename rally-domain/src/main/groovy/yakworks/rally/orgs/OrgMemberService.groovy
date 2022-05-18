@@ -39,7 +39,7 @@ class OrgMemberService {
      *               map should contain [division: [id: 123], sales: [id: 234]]
      */
     void setupMember(Org org, Map params) {
-        if(!orgDimensionService.orgMemberEnabled) return
+        if(!orgDimensionService?.orgMemberEnabled) return
         List<OrgType> immediateParents = orgDimensionService.getImmediateParents(org.type)
         //if it has parents so going to need to have a member too. kicks in validation in OrgMemberRepo
         if(immediateParents && !org.member) org.member = OrgMember.make(org)

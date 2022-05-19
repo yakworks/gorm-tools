@@ -44,7 +44,9 @@ class AppUserDetailsService implements GrailsUserDetailsService {
         if (loadRoles) {
             authorities = user.roles.collect { new SimpleGrantedAuthority(it.code) }
         }
-        new GrailsUser(user.username, user.passwordHash,
+        String password = user.passwordHash ?: "N/A"
+
+        new GrailsUser(user.username, password,
             user.enabled, true, !mustChange, true,
             authorities as Collection<GrantedAuthority>,
             user.id)

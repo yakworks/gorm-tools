@@ -34,6 +34,22 @@ class AppUserDetailsServiceSpec extends Specification implements DataIntegration
         user.name== 'karen'
     }
 
+    void "test when user has empty password when using token"() {
+        when:
+        AppUser.repo.create([username:"karen", repassword:"karen", email:"karen@9ci.com"])
+        flush()
+        GrailsUser gUser = userDetailsService.loadUserByUsername('karen')
+
+        then:
+        gUser != null
+
+        when:
+        AppUser user = AppUser.get(gUser.id)
+
+        then:
+        user.name== 'karen'
+    }
+
     //FIXME add a test for when credentialsNonExpired = true
     void "test expired password"() {
         given:

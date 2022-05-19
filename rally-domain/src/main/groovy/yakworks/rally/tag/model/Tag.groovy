@@ -27,7 +27,7 @@ class Tag implements NameCodeDescription, RepoEntity<Tag>, Serializable {
     private List entityNameList
 
     static mapping = {
-        cache true
+        cache "nonstrict-read-write"
     }
 
     static constraintsMap = [

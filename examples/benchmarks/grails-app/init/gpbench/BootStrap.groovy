@@ -41,8 +41,8 @@ class BootStrap {
         SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL)
 
         GrailsUser grailsUser = new GrailsUser("test", "test", true,
-            true, false, true, AuthorityUtils.createAuthorityList('ROLE_ADMIN'), 1 as Long)
-        SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(grailsUser, "test", AuthorityUtils.createAuthorityList('ROLE_ADMIN'))
+            true, false, true, AuthorityUtils.createAuthorityList('ADMIN'), 1 as Long)
+        SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(grailsUser, "test", AuthorityUtils.createAuthorityList('ADMIN'))
     }
 
 }

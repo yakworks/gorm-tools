@@ -22,7 +22,7 @@ class Company implements NameNum, RepoEntity<Company>, Serializable {
     static belongsTo = [org: Org]
 
     static mapping = {
-        cache true
+        cache "nonstrict-read-write"
         id generator: 'foreign', params: [property: 'org']
         org insertable: false, updateable: false, column: 'id'
     }

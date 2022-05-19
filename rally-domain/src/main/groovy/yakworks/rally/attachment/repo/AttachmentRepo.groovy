@@ -19,14 +19,13 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.model.Persistable
-import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
-import gorm.tools.repository.model.IdGeneratorRepo
+import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.validation.Rejector
 import grails.gorm.DetachedCriteria
 import yakworks.commons.io.FileUtil
@@ -40,7 +39,7 @@ import yakworks.rally.tag.model.TagLink
 @Slf4j
 @GormRepository
 @CompileStatic
-class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo<Attachment> {
+class AttachmentRepo extends LongIdGormRepo<Attachment> {
     public static final String ATTACHMENT_LOCATION_KEY = "attachments.location"
 
     @Inject @Nullable

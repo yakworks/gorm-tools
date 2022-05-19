@@ -6,6 +6,7 @@ package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataRetrievalFailureException
 import org.springframework.validation.Errors
 
@@ -19,7 +20,7 @@ import gorm.tools.repository.events.AfterRemoveEvent
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
-import gorm.tools.repository.model.IdGeneratorRepo
+import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.validation.Rejector
 import yakworks.rally.orgs.OrgMemberService
 import yakworks.rally.orgs.model.Contact
@@ -32,16 +33,21 @@ import yakworks.rally.orgs.model.OrgType
  * base or OrgRepo. common functionality refactored out so can be overriden in application.
  */
 @CompileStatic
-abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo<Org> {
-
+abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
+    //Making these nullable makes it easier to wire up for tests.
+    @Autowired(required=false)
     LocationRepo locationRepo
 
+    @Autowired(required=false)
     ContactRepo contactRepo
 
+    @Autowired(required=false)
     OrgTagRepo orgTagRepo
 
+    @Autowired(required=false)
     OrgSourceRepo orgSourceRepo
 
+    @Autowired(required=false)
     OrgMemberService orgMemberService
 
     List<String> toOneAssociations = ['flex', 'info', 'calc', 'member']
@@ -95,7 +101,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo<Org> {
 
     @Override
     void persistToOneAssociations(Org org, List<String> associations){
-        GormRepo.super.persistToOneAssociations(org, associations)
+        super.persistToOneAssociations(org, associations)
         if(org.location?.isNewOrDirty()) org.location.persist() //FIXME is this already validated?
         if(org.contact?.isNewOrDirty()) org.contact.persist()
     }

@@ -94,22 +94,23 @@ subprojects { subprj ->
 
     dependencies {
       compileOnly "io.micronaut:micronaut-inject-groovy"
+      implementation "org.springframework.boot:spring-boot-starter-logging"
       implementation "org.springframework.boot:spring-boot-autoconfigure"
       implementation "org.grails:grails-core"
       implementation "org.grails:grails-web-boot"
       implementation "org.grails:grails-databinding"
 
-      implementation "org.grails.plugins:cache"
+      // implementation "org.grails.plugins:cache"
 
       implementation "org.apache.logging.log4j:log4j-to-slf4j:$vLog4j"
       implementation "org.apache.logging.log4j:log4j-api:$vLog4j"
 
       compileOnly "org.grails.plugins:hibernate5:$vGormHibernate"
       compileOnly "org.hibernate:hibernate-core:$vHibernate"
-      compileOnly "org.hibernate:hibernate-ehcache:$vHibernate"
+      // compileOnly "org.hibernate:hibernate-ehcache:$vHibernate"
 
       // tests deps
-      testRuntime "com.h2database:h2"
+      testRuntime "com.h2database:h2:$vH2"
       testRuntime "com.zaxxer:HikariCP:$vHikari"
 
       testCompile project(":gorm-test-support") //this might seem circular but it can be added to itself as it dif config
@@ -139,6 +140,8 @@ subprojects { subprj ->
     }
 
   }
+
+
 
   configurations {
     testCompile.extendsFrom compileOnly //includes the compileOnly in tests too so we don't have to list twice

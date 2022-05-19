@@ -30,6 +30,8 @@ import gorm.tools.repository.artefact.GrailsRepositoryClass
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
+import gorm.tools.repository.model.UuidGormRepo
+import gorm.tools.repository.model.UuidRepoEntity
 import gorm.tools.transaction.TrxService
 import gorm.tools.validation.RepoValidatorRegistry
 import grails.config.Config
@@ -86,7 +88,7 @@ class GormToolsBeanConfig {
 
         asyncService(AsyncService, lazy())
 
-        DbDialectService.dialectName = application.config.hibernate.dialect
+        DbDialectService.dialectName = config.getProperty("hibernate.dialect")
 
         dbDialectService(DbDialectService) { bean ->
             bean.lazyInit = true
@@ -96,6 +98,7 @@ class GormToolsBeanConfig {
         trxService(TrxService, lazy())
         problemHandler(ProblemHandler, lazy())
 
+        //setup bean for the repo class marked with the @GormRepository annotation
         def repoClasses = application.repositoryClasses
         for(GrailsRepositoryClass repoClass : repoClasses){
             def beanClosure = getRepoBeanClosure(repoClass)
@@ -103,16 +106,18 @@ class GormToolsBeanConfig {
             beanClosure()
         }
 
+        // now cycle through all domains and make sure each domain has a repository,
+        // if not set up a DefaultGormRepo for it.
         for (GrailsClass grailsClass in application.getArtefacts(DomainClassArtefactHandler.TYPE)) {
             final domainClass = grailsClass.clazz
 
-            // make sure each domain has a repository, if not set up a DefaultGormRepo for it.
             String repoName = RepoUtil.getRepoBeanName(domainClass)
             def hasRepo = repoClasses.find { it.propertyName == repoName }
             if (!hasRepo) {
-                "${repoName}"(DefaultGormRepo, domainClass) { bean ->
-                    bean.autowire = true
-                    bean.lazyInit = true
+                if(UuidRepoEntity.isAssignableFrom(domainClass)) {
+                    "${repoName}"(UuidGormRepo, domainClass, lazy())
+                } else {
+                    "${repoName}"(DefaultGormRepo, domainClass, lazy())
                 }
             }
         }
@@ -132,7 +137,6 @@ class GormToolsBeanConfig {
 
         Closure bClosure = {
             "${repoClass.propertyName}"(repoClass.getClazz()) { bean ->
-                bean.autowire = true
                 bean.lazyInit = lazyInit
             }
         }

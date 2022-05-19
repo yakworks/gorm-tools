@@ -4,14 +4,18 @@
 */
 package gorm.tools.idgen
 
+import gorm.tools.async.ParallelStreamTools
+import gorm.tools.async.ParallelTools
 import gorm.tools.testing.support.MockJdbcIdGenerator
 import gorm.tools.testing.unit.DataRepoTest
-import groovyx.gpars.GParsPool
+// import groovyx.gpars.GParsPool
 import spock.lang.Shared
 import spock.lang.Specification
 import testing.Cust
 
 class PooledIdGeneratorSpec extends Specification implements DataRepoTest {
+
+    ParallelStreamTools parallelTools
 
     // @Shared
     // MockJdbcIdGenerator jdbcIdGenerator
@@ -83,10 +87,9 @@ class PooledIdGeneratorSpec extends Specification implements DataRepoTest {
         List ids = Collections.synchronizedList([])
 
         when:
-        GParsPool.withPool(10) {
-            (0..99).eachParallel {
-                ids.add(batchgen.getNextId("table2.id"))
-            }
+        parallelTools.asyncService.asyncEnabled = true
+        parallelTools.each(0..99) {
+            ids.add(batchgen.getNextId("table2.id"))
         }
 
         mockdbgen.getNextId('table2.id', 17)

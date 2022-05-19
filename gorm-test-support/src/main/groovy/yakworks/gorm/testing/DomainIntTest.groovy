@@ -6,9 +6,10 @@ package yakworks.gorm.testing
 
 import groovy.transform.CompileStatic
 
+import org.springframework.cache.CacheManager
+
 import gorm.tools.beans.AppCtx
 import gorm.tools.testing.integration.DataIntegrationTest
-import grails.plugin.cache.GrailsCacheAdminService
 
 /**
  * core integration test trait that consolodated the traits
@@ -17,10 +18,10 @@ import grails.plugin.cache.GrailsCacheAdminService
 trait DomainIntTest implements DataIntegrationTest, SecuritySpecHelper {
 
     void clearAppConfigCache(){
-        getGrailsCacheAdminService().clearCache("appConfig")
+        getCacheManager()?.getCache("appConfig")?.clear()
     }
 
-    GrailsCacheAdminService getGrailsCacheAdminService(){
-        AppCtx.get('grailsCacheAdminService', GrailsCacheAdminService)
+    CacheManager getCacheManager(){
+        AppCtx.get('cacheManager', CacheManager)
     }
 }

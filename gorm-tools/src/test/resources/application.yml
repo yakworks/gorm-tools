@@ -1,0 +1,35 @@
+# FOR TESTING ONLY, reminder that nothing here get published with jar
+grails:
+  profile: plugin
+  config:
+    locations: ["classpath:api.yml.bak"]
+
+logging:
+  level:
+    root: DEBUG
+    org.springframework: WARN
+    org.hibernate.orm.deprecation: OFF # turns off deprecation notices
+
+hibernate:
+  format_sql: false
+  schema_management_tool: 'gorm.tools.hibernate.schema.CustomSchemaManagementTool'
+  naming_strategy: 'org.hibernate.cfg.DefaultNamingStrategy'
+  dialect: 'gorm.tools.hibernate.ExtendedH2Dialect'
+  show_sql: false
+  cache:
+    queries: false
+    use_second_level_cache: false
+    use_query_cache: false
+  jdbc:
+    time_zone: 'UTC'
+
+dataSource:
+  type: com.zaxxer.hikari.HikariDataSource
+  pooled: true
+  jmxExport: true
+  driverClassName: org.h2.Driver
+  username: sa
+  password:
+  dbCreate: create-drop
+  url: jdbc:h2:mem:testDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+

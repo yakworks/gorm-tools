@@ -8,7 +8,7 @@ import org.apache.commons.io.FileUtils
 
 import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
-import grails.plugin.viewtools.AppResourceLoader
+import yakworks.grails.resource.AppResourceLoader
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport
 import yakworks.rally.activity.model.Activity

@@ -375,6 +375,30 @@ class MapsSpec extends Specification {
         assertMapsEqual(copy[0], [num1:1, num2:2, nested:[num1:1, num2:2], list:[1,2,3], listOfMap:[[one:1]]])
     }
 
+    void "test getBoolean"() {
+        when:
+        def maps = [foo: true, bar: false]
+
+
+        then:
+        Maps.getBoolean('foo', maps)
+        !Maps.getBoolean('bar', maps)
+        Maps.getBoolean('nothing', maps, true)
+        !Maps.getBoolean('nothing2', maps, false)
+    }
+
+    void "test boolean"() {
+        when:
+        def maps = [foo: true, bar: false]
+
+
+        then:
+        Maps.boolean(maps, 'foo')
+        !Maps.boolean(maps, 'bar')
+        Maps.boolean(maps, 'nothing', true)
+        !Maps.boolean(maps, 'nothing2', false)
+    }
+
     void "test deep merge"() {
         given:
         Map m1 = [num1:1, num2:2, nested:[num1:1, num2:2], list:[1,2,3]]

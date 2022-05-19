@@ -121,7 +121,7 @@ class OrgDimensionServiceTests extends Specification implements DomainIntTest {
 
         cleanup:
         // clearAppConfigCache()
-        grailsCacheAdminService.clearCache("orgDimension")
+        orgDimensionService.clearCache()
         orgDimensionService.testInit(null)
 
     }

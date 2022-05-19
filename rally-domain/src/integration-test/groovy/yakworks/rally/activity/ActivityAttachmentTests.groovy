@@ -2,7 +2,7 @@ package yakworks.rally.activity
 
 import gorm.tools.repository.PersistArgs
 import grails.gorm.transactions.Rollback
-import grails.plugin.viewtools.AppResourceLoader
+import yakworks.grails.resource.AppResourceLoader
 import grails.testing.mixin.integration.Integration
 import org.apache.commons.io.FileUtils
 import org.springframework.jdbc.core.JdbcTemplate

@@ -8,8 +8,12 @@ dependencies {
   // api "jakarta.json.bind:jakarta.json.bind-api:2.0.0"
   api "org.yakworks:grails-icu4j:$vYakworksICU4J"
 
+  // see https://github.com/f4b6a3/uuid-creator
+  api "com.github.f4b6a3:uuid-creator:$vUuidCreator"
+  api "com.vladmihalcea:hibernate-types-52:$vHibTypes"
+
   implementation "org.codehaus.groovy:groovy-sql:$groovyVersion"
-  compileOnly "org.codehaus.gpars:gpars:$vGpars"
+  // compileOnly "org.codehaus.gpars:gpars:$vGpars"
 
   // implementation "org.apache.commons:commons-lang3:$vCommonsLang3"
 
@@ -24,6 +28,4 @@ dependencies {
   testCompile "org.slf4j:slf4j-simple:${vSlf4j}"
   testCompile project(":gorm-test-domain")
   testCompile project(":gorm-tools-security")
-
-  // compileOnly "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1" // needed for groovydoc?
 }

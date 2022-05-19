@@ -6,56 +6,16 @@ package gorm.tools.rest
 
 import groovy.transform.CompileDynamic
 
-import gorm.tools.rest.controller.RestRepoApiController
-import yakworks.commons.lang.ClassUtils
+import gorm.tools.rest.mapping.RepoApiMappingsService
 
 @CompileDynamic
 class UrlMappings {
 
     static mappings = {
-
-        for (controller in getGrailsApplication().controllerClasses) {
-            // println "controler $controller.fullName"
-            String cName = controller.logicalPropertyName
-            boolean isApi = RestRepoApiController.isAssignableFrom(controller.clazz)
-            String namespace = ClassUtils.getStaticPropertyValue(controller.clazz, 'namespace', String)
-           // println "controller $cName with namespace $namespace"
-
-            if (isApi) {
-                String apiPath = namespace ? "/api/$namespace" : "/api"
-                // println "apiPath: $apiPath controller: $cName"
-                group("${apiPath}/${cName}") {
-                    get "(.$format)?"(controller: cName, action: "list")
-                    get "/$id(.$format)?"(controller: cName, action: "get")
-                    get "/picklist(.$format)?"(controller: cName, action: "picklist")
-
-                    post "/bulk(.$format)?"(controller: cName, action: "bulkCreate")
-                    put "/bulk(.$format)?"(controller: cName, action: "bulkUpdate")
-
-                    post "(.$format)?"(controller: cName, action: "post")
-                    put "/$id(.$format)?"(controller: cName, action: "put")
-                    patch "/$id(.$format)?"(controller: cName, action: "put")
-
-                    delete "/$id(.$format)?"(controller: cName, action: "delete")
-
-                    //when a post is called allows an action
-                    post "/$action(.$format)?"(controller: cName)
-
-                    "/schema"(controller: "schema", action: "index") {
-                        id = cName
-                    }
-
-                }
-            }
-        }
+        RepoApiMappingsService repoApiMappingsService = getApplicationContext().getBean('repoApiMappingsService', RepoApiMappingsService)
+        repoApiMappingsService.createMappings(delegate)
 
         // "/schema/$id?(.$format)?"(controller: "schema", action: "index")
-
-        // "/$controller/$action?/$id?(.$format)?" {
-        //     constraints {
-        //         // apply constraints here
-        //     }
-        // }
 
         "/"(view: "/index")
 
@@ -66,4 +26,5 @@ class UrlMappings {
         "404"(view: '/notFound404')
         "400"(view: '/badRequest400')
     }
+
 }

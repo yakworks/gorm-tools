@@ -20,6 +20,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.web.WebAttributes
+import org.springframework.web.context.request.RequestContextHolder
 
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
@@ -107,7 +108,7 @@ class SpringSecService<D> implements SecService<D>{
     void loginAsSystemUser() {
         AppUser user = AppUser.get(1)
         assert user
-        List<GrantedAuthority> authorities = parseAuthoritiesString([SecRole.ADMINISTRATOR] as String[])
+        List<GrantedAuthority> authorities = parseAuthoritiesString([SecRole.ADMIN] as String[])
         GrailsUser grailsUser = new GrailsUser(user.username, user.passwordHash, user.enabled, true, !user.passwordExpired, true, authorities, user.id)
         SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(grailsUser, user.passwordHash, authorities)
     }
@@ -129,6 +130,7 @@ class SpringSecService<D> implements SecService<D>{
      * @param username the user's username name
      * @param password optional
      */
+    @Override
     void reauthenticate(String username, String password = null) {
         springSecurityService.reauthenticate username, password
     }
@@ -145,8 +147,7 @@ class SpringSecService<D> implements SecService<D>{
         for (String auth : roleNames) {
             auth = auth.trim()
             if (auth.length() > 0) {
-                auth = "ROLE_" + auth
-                requiredAuthorities.add(new SimpleGrantedAuthority(auth))
+                requiredAuthorities.add(new SimpleGrantedAuthority(auth.toUpperCase()))
             }
         }
 
@@ -190,10 +191,13 @@ class SpringSecService<D> implements SecService<D>{
      * Logout current user programmatically
      */
     void logout() {
-        HttpSession session = WebUtils.retrieveGrailsWebRequest().currentRequest.getSession(false)
-        if (session) {
-            session.invalidate()
-        }
+        // if(RequestContextHolder.getRequestAttributes()){
+        //     HttpSession session = WebUtils.retrieveGrailsWebRequest()?.currentRequest?.getSession(false)
+        //     if (session) {
+        //         session.invalidate()
+        //     }
+        // }
+
         SecurityContextHolder.context.setAuthentication(null)
         SecurityContextHolder.clearContext()
     }

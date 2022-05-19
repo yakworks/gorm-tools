@@ -10,14 +10,13 @@ import org.springframework.dao.DataRetrievalFailureException
 
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
-import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.AfterPersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
-import gorm.tools.repository.model.IdGeneratorRepo
+import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.security.domain.AppUser
 import gorm.tools.utils.GormUtils
 import grails.gorm.DetachedCriteria
@@ -36,7 +35,7 @@ import yakworks.rally.tag.model.TagLink
 
 @GormRepository
 @CompileStatic
-class ContactRepo implements GormRepo<Contact>, IdGeneratorRepo<Contact> {
+class ContactRepo extends LongIdGormRepo<Contact> {
 
     List<String> toOneAssociations = ['flex']
 
@@ -117,10 +116,10 @@ class ContactRepo implements GormRepo<Contact>, IdGeneratorRepo<Contact> {
     void doAfterPersistWithData(Contact contact, PersistArgs args) {
         Map data = args.data
 
-        if(data.locations) persistToManyData(contact, Location.repo, data.locations as List<Map>, "contact")
-        if(data.phones) persistToManyData(contact, ContactPhone.repo, data.phones as List<Map>, "contact")
-        if(data.emails) persistToManyData(contact, ContactEmail.repo, data.emails as List<Map>, "contact")
-        if(data.sources) persistToManyData(contact, ContactSource.repo, data.sources as List<Map>, "contact")
+        if(data.locations) super.persistToManyData(contact, Location.repo, data.locations as List<Map>, "contact")
+        if(data.phones) super.persistToManyData(contact, ContactPhone.repo, data.phones as List<Map>, "contact")
+        if(data.emails) super.persistToManyData(contact, ContactEmail.repo, data.emails as List<Map>, "contact")
+        if(data.sources) super.persistToManyData(contact, ContactSource.repo, data.sources as List<Map>, "contact")
         if(data.tags) TagLink.addOrRemoveTags(contact, data.tags)
     }
 

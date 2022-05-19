@@ -21,7 +21,7 @@ import yakworks.commons.lang.Validate
  * a trait to be used for colating/slicing a list into "batches" to then asynchronously with Transactions
  * insert or update for maximum performance.
  *
- * @see GparsParallelTools  GparsParallelTools - for a concrete implementation
+ * @see ParallelStreamTools  - for a concrete implementation
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.1

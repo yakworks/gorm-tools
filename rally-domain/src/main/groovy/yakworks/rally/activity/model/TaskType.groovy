@@ -23,7 +23,7 @@ class TaskType implements NameCodeDescription, RepoEntity<TaskType>, Serializabl
     Boolean validForAr // valid  the Ar area of the app
 
     static mapping = {
-        cache true
+        cache "nonstrict-read-write"
     }
 
     static constraints = {

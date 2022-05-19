@@ -13,8 +13,7 @@ dependencies {
   // api project(":gorm-tools-csv")
   api project(":rally-domain")
   api project(":gorm-test-domain")
-
-  api "org.grails.plugins:view-tools:$vViewTools"
+  api "org.yakworks:grails-kit:$vYakGrailsKit"
 
   runtime "org.grails.plugins:external-config:$vExternalConfig"
   // runtime "org.glassfish.web:el-impl:2.1.2-b03"

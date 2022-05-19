@@ -11,7 +11,6 @@ import org.grails.datastore.gorm.GormStaticApi
 import org.grails.orm.hibernate.GrailsHibernateTemplate
 import org.grails.orm.hibernate.HibernateGormStaticApi
 import org.grails.orm.hibernate.query.HibernateHqlQuery
-import org.hibernate.ScrollMode
 import org.hibernate.ScrollableResults
 import org.hibernate.Session
 import org.hibernate.query.Query

@@ -13,8 +13,7 @@ import groovy.util.logging.Slf4j
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
-import gorm.tools.repository.GormRepo
-import gorm.tools.repository.model.IdGeneratorRepo
+import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.utils.GormUtils
 import grails.gorm.transactions.Transactional
 import yakworks.api.ApiResults
@@ -33,7 +32,7 @@ import yakworks.rally.tag.model.TagLink
 @Service @Lazy
 @Slf4j
 @CompileStatic
-class ActivityCopier implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
+class ActivityCopier extends LongIdGormRepo<Activity> {
 
     @Inject @Nullable
     ActivityLinkRepo activityLinkRepo

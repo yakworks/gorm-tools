@@ -14,6 +14,7 @@ import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
+import yakworks.commons.lang.Transform
 import yakworks.commons.lang.Validate
 
 import static gorm.tools.utils.GormUtils.collectLongIds
@@ -284,7 +285,7 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     }
 
     List<X> add(P main, List<Long> ids){
-        List<Map> itemsToAddMap = listToIdMap(ids)
+        List<Map> itemsToAddMap = Transform.listToIdMap(ids)
         return addOrRemoveList(main, itemsToAddMap)
     }
 

@@ -1,0 +1,207 @@
+ar:
+  picklists:
+
+    customer:
+      input: select
+      options:
+        isValueObject: true
+        propertyLabel: ['num', 'name']
+        minSearchChars: 3
+        dataApi:
+          key: ar.customer
+          q: {inactive: false}
+
+    custParent:
+      input: select
+      options:
+        isValueObject: true
+        propertyLabel: ['num', 'name']
+        minSearchChars: 3
+        dataApi:
+          key: ar.customer
+          q: {"$or": [{custFamilyType: "Parent"},{custFamilyType: 'Grandparent'}]}
+
+    custAccount:
+      input: select
+      options:
+        isValueObject: true
+        propertyLabel: ['num', 'name']
+        minSearchChars: 3
+        dataApi:
+          key: ar.custAccount
+          q: {inactive: false}
+
+    class1:
+      input: select
+      options:
+        isValueObject: true
+        dataApi:
+          key: ar.custClass
+          q: { $or: [{validFor: 'class1'}, {validFor: '$isNull'}]}
+          params: { max: 20 }
+
+    class2:
+      input: select
+      options:
+        isValueObject: true
+        dataApi:
+          key: ar.custClass
+          q: { $or: [{validFor: 'class2'}, {validFor: '$isNull'}]}
+          params: { max: 20 }
+
+    class3:
+      input: select
+      options:
+        isValueObject: true
+        dataApi:
+          key: ar.custClass
+          q: {validFor: 'class3'}
+          params: { max: 20 }
+
+    lockbox:
+      input: select
+      type: string
+      options:
+        propertyKey: num
+        propertyLabel: num
+        dataApi:
+          key: ar.lockbox
+          params: { max: 100 }
+          q: {visibleToAutocash: 1}
+
+    batchType:
+      input: select
+      type: string
+      options:
+        dataApi: { key: ar.batchType }
+
+    status:
+      input: select
+      options:
+        isValueObject: true
+        dataApi:
+          key: ar.status
+          q: { inactive: false }
+
+    state:
+      input: select
+      options:
+        data:
+          - { id: 0, name: "Open" }
+          - { id: 1, name: "Closed" }
+          - { id: 2, name: "Draft" }
+          - { id: 3, name: "Void" }
+
+    docType:
+      type: string
+      enum: [PA, CM, DM, DD, IN]
+
+    tranType:
+      input: select
+      options:
+        isValueObject: true
+        dataApi:
+          key: ar.tranType
+
+    reason:
+      label: Reason
+      input: select
+      options:
+        isValueObject: true
+        dataApi:
+          key: ar.reason
+          q: { "$or": [{restrictUpdate: "$isNull"},{restrictUpdate: 2}] }
+
+    reasonGroup:
+      input: select
+      options:
+        isValueObject: true
+        dataApi:
+          key: ar.reasonGroup
+
+    buckets:
+      label: 'Buckets'
+      input: select
+      options:
+        propertyKey: code
+        propertyLabel: name
+        dataApi:
+          key: ar.agingSetup
+          q: { isUsed: true }
+
+rally:
+  picklists:
+    inactive:
+      input: select
+      type: boolean
+      options:
+        data: [ { id: true, name: "inactive" }, { id: false, name: "active" } ]
+
+    division:
+      input: select
+      label: State
+      options:
+        isValueObject: true
+        dataApi:
+          key: rally.org
+          q: { orgTypeId: 4 }
+          params: { max: 100 }
+
+    branch:
+      input: select
+      label: Market
+      options:
+        isValueObject: true
+        dataApi:
+          key: rally.org
+          q: { orgTypeId: 3 }
+          params: { max: 100 }
+
+    tags:
+      input: select
+      options:
+        dataApi:
+          key: rally.tag
+          propertyLabel: code
+
+    isPrimary:
+      input: select
+      type: boolean
+      options:
+        data: [ { id: true, name: "primary" }, { id: false, name: "not primary" } ]
+
+autocash:
+  picklists:
+
+    paymentTranType:
+      label: Tran Type
+      type: string
+      input: select
+      options:
+        propertyKey: code
+        propertyLabel: code
+        dataApi:
+          key: ar.tranType
+          q: {visibleToAutocash: 1, $or:{"docType":"PA", "code":"RD"}}
+
+    detailTranType:
+      label: Tran Type
+      type: string
+      input: select
+      options:
+        propertyKey: code
+        propertyLabel: code
+        dataApi:
+          key: ar.tranType
+          q: { visibleToAutocash: 1, isOpposingTran: 0, docType: { '$ne': 'PA' }, code: { '$ne': 'RD' } }
+          addData: { id: '*', code: '*' }
+
+    detailReason:
+      label: Reason
+      type: integer
+      input: select
+      options:
+        propertyLabel: name
+        dataApi:
+          key: ar.reason
+          q: {"$or": [{restrictUpdate: "$isNull"},{restrictUpdate: 1}]}

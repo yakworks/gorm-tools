@@ -4,7 +4,7 @@ jobs:
   build:
     docker:
       - image: yakworks/builder:jdk8
-    resource_class: 'medium+'
+    resource_class: 'large'
 
     steps:
       - checkout
@@ -20,6 +20,7 @@ jobs:
           key: gradle-{{ checksum "cache-key.tmp" }}
 
       - run: make compile
+
       - run:
           name: ✔︎ -- Test
           command: make check

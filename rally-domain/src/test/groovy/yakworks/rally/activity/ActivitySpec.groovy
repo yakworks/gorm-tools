@@ -2,7 +2,7 @@ package yakworks.rally.domain
 
 import gorm.tools.model.Persistable
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
-import grails.plugin.viewtools.AppResourceLoader
+import yakworks.grails.resource.AppResourceLoader
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Ignore
 import spock.lang.IgnoreRest

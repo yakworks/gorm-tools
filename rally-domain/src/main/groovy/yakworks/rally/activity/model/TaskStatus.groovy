@@ -34,7 +34,7 @@ class TaskStatus implements NameCodeDescription, RepoEntity<TaskStatus>, Seriali
     Boolean validForAr //can be used from A/R & collections area of the app
 
     static mapping = {
-        cache true
+        cache "nonstrict-read-write"
         state enumType: 'identity'
     }
 

@@ -26,7 +26,7 @@ import gorm.tools.repository.events.RepoEventPublisher
  * @since 7.0.3
  */
 @CompileStatic
-trait IdGeneratorRepo<D> {
+trait IdGeneratorRepo<D> implements GenerateId<Long> {
 
     @Resource(name="idGenerator")
     IdGenerator idGenerator
@@ -42,6 +42,7 @@ trait IdGeneratorRepo<D> {
     /**
      * calls the idGenerator.getNextId(getIdGeneratorKey())
      */
+    @Override
     Long generateId() {
         return idGenerator.getNextId(getIdGeneratorKey())
     }
@@ -50,7 +51,8 @@ trait IdGeneratorRepo<D> {
      * if entity.id is null then generates and assigns new id to id property on entity,
      * if entity.id is already set then it just returns it
      */
-    Long generateId(Persistable entity){
+    @Override
+    Long generateId(Persistable<Long> entity){
         if (entity.id == null) entity.id = generateId()
         return entity.id
     }

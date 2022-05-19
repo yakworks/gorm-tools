@@ -70,6 +70,15 @@ class TestingSecService<D> implements SecService<D> {
 
     }
 
+    @Override
+    void logout() {
+
+    }
+
+    @Override
+    void reauthenticate(String username, String password = null) {
+
+    }
     /**
      * Get the current user's roles.
      * @return a list of roles (empty if not authenticated).

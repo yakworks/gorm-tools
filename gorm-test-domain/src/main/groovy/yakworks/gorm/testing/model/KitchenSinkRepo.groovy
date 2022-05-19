@@ -9,20 +9,19 @@ import java.time.LocalDateTime
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.RepoListener
-import gorm.tools.repository.model.IdGeneratorRepo
+import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.validation.Rejector
 import grails.gorm.transactions.Transactional
 import yakworks.commons.lang.IsoDateUtil
 
 @GormRepository
 @CompileStatic
-class KitchenSinkRepo implements GormRepo<KitchenSink>, IdGeneratorRepo<KitchenSink>  {
+class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
 
     List<String> toOneAssociations = [ 'ext' ]
 
@@ -73,7 +72,7 @@ class KitchenSinkRepo implements GormRepo<KitchenSink>, IdGeneratorRepo<KitchenS
     @Override
     void doAfterPersistWithData(KitchenSink kitchenSink, PersistArgs args) {
         Map data = args.data
-        if(data.sinkItems) persistToManyData(kitchenSink, SinkItem.repo, data.sinkItems as List<Map>, "kitchenSink")
+        if(data.sinkItems) super.persistToManyData(kitchenSink, SinkItem.repo, data.sinkItems as List<Map>, "kitchenSink")
     }
 
     void auditStamp(Object ent){

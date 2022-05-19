@@ -5,6 +5,7 @@
 package gorm.tools.openapi
 
 import groovy.transform.CompileStatic
+import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Slf4j
 
 import gorm.tools.metamap.MetaMapIncludes
@@ -17,8 +18,9 @@ import yakworks.commons.map.MapFlattener
  * See MetaMapSchemaSpec unit tests and rally-domain for how it works
  */
 @Slf4j
+@EqualsAndHashCode(includes=["rootClassName", "props"], useCanEqual=false) //because its used as cache key
 @CompileStatic
-class MetaMapSchema {
+class MetaMapSchema implements Serializable {
     //fully qualified root class
     String rootClassName
     //value will be either another MetaMapSchema or the Schema for the prop
@@ -39,6 +41,7 @@ class MetaMapSchema {
 
     MetaMapSchema build(MetaMapIncludes metaMapIncludes) {
         Schema rootSchema = oapiSupport.getSchema(metaMapIncludes.shortClassName)
+        if(!rootSchema) return this
         this.rootClassName = metaMapIncludes.rootClassName
         this.schema = rootSchema
         def mmiProps = metaMapIncludes.props

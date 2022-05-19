@@ -1,5 +1,8 @@
 apply plugin: "yakworks.grails-plugin"
 
+//shared resources to pick up the Gorm defaults from application.groovy, as well as simple logback
+sourceSets.test.resources.srcDirs += [project(':gorm-test-support').sourceSets.main.resources]
+
 dependencies {
 
   console "org.grails:grails-console"
@@ -8,9 +11,7 @@ dependencies {
   api project(":gorm-tools")
   api project(":gorm-tools-security")
   api project(":gorm-tools-csv")
-
-  //for AppResourceLoader in AttachmentSupport
-  compileOnly "org.grails.plugins:view-tools:$vViewTools"
+  api "org.yakworks:grails-kit:$vYakGrailsKit"
 
   // for the mock and seed data
   compileOnly("org.grails.plugins:build-test-data:$vBuildTestData"){
@@ -28,7 +29,7 @@ dependencies {
   runtime "org.grails.plugins:external-config:$vExternalConfig"
 
   testRuntime "org.grails.plugins:external-config:$vExternalConfig"
-  testRuntime "com.h2database:h2"
+  testRuntime "com.h2database:h2:$vH2"
   testRuntime "javax.xml.bind:jaxb-api:2.3.1"
   testRuntime "com.zaxxer:HikariCP:$vHikari"
 

@@ -8,15 +8,14 @@ import groovy.transform.CompileStatic
 
 import org.springframework.validation.Errors
 
-import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
-import gorm.tools.repository.model.IdGeneratorRepo
+import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.validation.Rejector
 
 @GormRepository
 @CompileStatic
-class ThingRepo implements GormRepo<Thing>, IdGeneratorRepo<Thing> {
+class ThingRepo extends LongIdGormRepo<Thing> {
 
     @RepoListener
     void beforeValidate(Thing thing, Errors errors) {

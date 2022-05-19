@@ -8,9 +8,8 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.model.SourceType
-import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
-import gorm.tools.repository.model.IdGeneratorRepo
+import gorm.tools.repository.model.LongIdGormRepo
 import grails.gorm.transactions.Transactional
 import yakworks.commons.lang.Validate
 import yakworks.rally.orgs.model.Org
@@ -19,7 +18,7 @@ import yakworks.rally.orgs.model.OrgType
 
 @GormRepository
 @CompileStatic
-class OrgSourceRepo implements GormRepo<OrgSource>, IdGeneratorRepo<OrgSource> {
+class OrgSourceRepo extends LongIdGormRepo<OrgSource> {
 
     /**
      * creates the source from org and its data and sets it to its org.source

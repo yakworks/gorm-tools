@@ -73,7 +73,7 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
     ]
 
     static mapping = {
-        cache true
+        cache "read-write"
         orgId column: 'orgId'
         org column: 'orgId', insertable: false, updateable: false
         flex column: 'flexId'

@@ -1,7 +1,7 @@
 package yakworks.rally.common
 
 import gorm.tools.testing.unit.DataRepoTest
-import grails.plugin.viewtools.AppResourceLoader
+import yakworks.grails.resource.AppResourceLoader
 import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.commons.io.FileUtil

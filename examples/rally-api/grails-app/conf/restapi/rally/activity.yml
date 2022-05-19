@@ -1,0 +1,6 @@
+api:
+  paths:
+    rally:
+      activity:
+        includes:
+          get: ['*', note.body, note.contentType, createdByName]

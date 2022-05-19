@@ -18,14 +18,14 @@ import org.springframework.lang.Nullable
  * @since 7.0.x
  */
 @CompileStatic
-trait Persistable { //implements IPersistable<Long>, Ident<Long> {
+trait Persistable<ID> { //implements IPersistable<Long>, Ident<Long> {
     //used in gorm/hibernate to check if its in the session
     abstract boolean isAttached()
     abstract Serializable getVersion()
 
     @Nullable
-    abstract Long getId()
-    abstract void setId(@Nullable Long id)
+    abstract ID getId()
+    abstract void setId(@Nullable ID id)
 
     /**
      * Returns if the {@code Persistable} is new or was persisted already.

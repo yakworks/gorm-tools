@@ -63,6 +63,8 @@ class SpringBeanIdGenerator implements IdentifierGenerator, org.hibernate.id.Con
     }
 
     Serializable generate(SharedSessionContractImplementor session, Object obj) {
+        //XXX for some reason setting at class level to override is not being picked up, os just return it for now
+        if(obj['id'] instanceof UUID) return obj['id'] as Serializable
         // println "${obj.class.name} obj.id ${obj['id']}"
         if(idGenerator == null) idGenerator = AppCtx.get(idGeneratorBeanName, IdGenerator)
         // if the object has an assigned id then use it.

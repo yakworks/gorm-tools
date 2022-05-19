@@ -34,6 +34,10 @@ class RepoLookup {
         return USE_CACHE
     }
 
+    /**
+     * Lookup repo in the cache, if not found then uses getRepoBeanName(entityClass) to find bean
+     * in the applicationContext.
+     */
     protected static <D> GormRepo<D> findRepoCached(Class<D> entity) {
         String className = NameUtils.getClassName(entity)
         def repo = REPO_CACHE.get(className)

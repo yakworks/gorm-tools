@@ -1,6 +1,6 @@
 package yakworks.rally.activity
 
-import grails.plugin.viewtools.AppResourceLoader
+import yakworks.grails.resource.AppResourceLoader
 
 import java.time.LocalDateTime
 

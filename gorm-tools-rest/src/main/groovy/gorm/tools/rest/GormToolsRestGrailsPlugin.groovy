@@ -8,12 +8,14 @@ import groovy.transform.CompileStatic
 
 import org.grails.core.artefact.ControllerArtefactHandler
 import org.grails.core.artefact.DomainClassArtefactHandler
+import org.grails.datastore.gorm.validation.constraints.registry.DefaultConstraintRegistry
 
 import gorm.tools.csv.render.CSVPagerRenderer
 import gorm.tools.excel.render.XlsxPagerRenderer
 import gorm.tools.openapi.GormToSchema
 import gorm.tools.openapi.MetaMapSchemaService
 import gorm.tools.openapi.OpenApiGenerator
+import gorm.tools.rest.mapping.RepoApiMappingsService
 import gorm.tools.rest.render.ApiResultsRenderer
 import gorm.tools.rest.render.JsonGeneratorRenderer
 import gorm.tools.rest.render.PagerRenderer
@@ -36,7 +38,10 @@ class GormToolsRestGrailsPlugin extends Plugin {
     Closure doWithSpring() { {->
 
         tomcatWebServerCustomizer(RestTomcatWebServerCustomizer)
-
+        //setup to try and speed up constraint eval so its only setup once.
+        urlMappingsConstraintRegistry(DefaultConstraintRegistry, ref('messageSource'))
+        //the default UrlMappings calls this.
+        repoApiMappingsService(RepoApiMappingsService)
         //renderers
         mapJsonRenderer(JsonGeneratorRenderer, Map)
         apiResultsRenderer(ApiResultsRenderer)

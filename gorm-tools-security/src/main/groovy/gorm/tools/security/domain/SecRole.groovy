@@ -6,6 +6,7 @@ package gorm.tools.security.domain
 
 import groovy.transform.EqualsAndHashCode
 
+import gorm.tools.model.NameCodeDescription
 import gorm.tools.model.NameDescription
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
@@ -16,19 +17,25 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 /**
  * SecRole class for Authority.
  */
-
 @Entity
 @EqualsAndHashCode(includes='name', useCanEqual=false)
 @GrailsCompileStatic
-class SecRole implements NameDescription, RepoEntity<SecRole>, Serializable {
+class SecRole implements NameCodeDescription, RepoEntity<SecRole>, Serializable {
 
-    static final String ADMINISTRATOR = "Administrator" //full access, system user
-    static transients = ['springSecRole']
+    static final String ADMIN = "ADMIN" //full access, system user
 
     String name
     Boolean inactive = false
 
+    void beforeValidate() {
+        if(!this.name && this.code) this.name = code.replaceAll('-', ' ').replaceAll('_', ' ')
+        if(this.name && !this.code) this.code = name.replaceAll(' ', '_')
+        if(code.toUpperCase() != code) code = code.toUpperCase()
+    }
+
     static constraintsMap = [
+        code:[ d: 'Upper case role key',
+               nullable: false, maxSize: 30, matches: "[A-Z0-9-_]+" ],
         name: [d: "The name of the role",
             nullable: false, maxSize: 20],
         description: [d: "A longer description",
@@ -40,13 +47,4 @@ class SecRole implements NameDescription, RepoEntity<SecRole>, Serializable {
         cache "read-write"
     }
 
-    /**
-     * Spring security plugin needs all authorities to be prefixed with ROLE_ and hence all roles must
-     * be saved in database with name such as ROLE_MANAGER etc. However we use custom user detail service,
-     * and call getSpringSecRole when populating a authorities for the UserDetail.
-     * it allows us to save role names in db without prefix ROLE_
-     */
-    String getSpringSecRole() {
-        return "ROLE_${name}".toString()
-    }
 }

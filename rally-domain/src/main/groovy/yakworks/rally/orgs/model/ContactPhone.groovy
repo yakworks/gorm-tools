@@ -21,7 +21,7 @@ class ContactPhone implements RepoEntity<ContactPhone>, Serializable {
     ]
     static belongsTo = [contact: Contact]
     static mapping = {
-        cache true
+        cache "nonstrict-read-write"
         contact column: 'contactId'
     }
 

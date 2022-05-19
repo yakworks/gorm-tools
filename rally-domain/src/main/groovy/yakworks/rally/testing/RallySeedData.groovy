@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import gorm.tools.beans.AppCtx
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
+import gorm.tools.security.domain.SecRolePermission
 import gorm.tools.security.domain.SecRoleUser
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.orgs.model.Contact
@@ -163,16 +164,53 @@ class RallySeedData {
             user.persist()
             assert user.id == 1
 
-            SecRole admin = new SecRole(id:1, name: SecRole.ADMINISTRATOR).persist()
-            SecRole power = new SecRole(id:2, name: "Power User").persist()
-            SecRole guest = new SecRole(id:3, name: "Guest").persist()
+            AppUser custUser = new AppUser(id: 2, username: "cust", email: "cust@9ci.com", password:"123Foo")
+            custUser.persist()
+            assert custUser.id == 2
+
+            SecRole admin = new SecRole(id:1, code: SecRole.ADMIN).persist()
+            adminPermissions(admin)
+            SecRole power = new SecRole(id:2, code: "POWER_USER").persist()
+            SecRole custRole = new SecRole(id:3, code: "CUSTOMER").persist()
+            custPermissions(custRole)
 
             SecRoleUser.create(user, admin, true)
             SecRoleUser.create(user, power, true)
+            SecRoleUser.create(custUser, custRole, true)
 
-            AppUser noRoleUser = AppUser.create([id: 2, username: "noroles", email: "noroles@9ci.com", password:"123Foo"], bindId: true)
-            assert noRoleUser.id == 2
+            AppUser noRoleUser = AppUser.create([id: 3, username: "noroles", email: "noroles@9ci.com", password:"123Foo"], bindId: true)
+            assert noRoleUser.id == 3
             return
         }
     }
+
+    static void adminPermissions(SecRole role){
+
+        ['rally:org:*',
+         'rally:activityNote:*',
+         'rally:company:list,get,post',
+         'rally:orgTypeSetup:list,get,post',
+         'rally:syncJob:list,get',
+         'rally:user:*',
+         'rally:role:read',
+         'rally:contact:*',
+         'rally:activity:*',
+         'rally:attachment:*',
+         'rally:tag:*'
+        ].each{
+            SecRolePermission.create(role, it)
+        }
+    }
+
+    static void custPermissions(SecRole role){
+        ['rally:org:list,get,post',
+         // 'rally:contact:*',
+         'rally:activity:list,get',
+         'rally:attachment:*',
+         'rally:tag:list,get'
+        ].each{
+            SecRolePermission.create(role, it)
+        }
+    }
+
 }

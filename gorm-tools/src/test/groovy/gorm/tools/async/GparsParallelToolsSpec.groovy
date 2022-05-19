@@ -16,7 +16,7 @@ import testing.CustType
 @Ignore // not used right now.
 class GparsParallelToolsSpec extends GormToolsHibernateSpec implements AutowiredTest {
 
-    GparsParallelTools parallelTools
+    // GparsParallelTools parallelTools
 
     List<Class> getDomainClasses() { [CustType] }
 

@@ -36,7 +36,9 @@ class DbDialectService {
     private static int setupDialect() {
         int result = UNKNOWN
         // just to make the stuff below easier to read.
-        if (!dialectName) dialectName = AppCtx.config.getProperty('hibernate.dialect')
+        if (!dialectName) {
+            dialectName = AppCtx.config.getProperty('hibernate.dialect')
+        }
 
         //fallback to H2 just like how Datasources plugin does. if H2 is present in classpath
         if ((dialectName == null && ClassUtils.isPresent("org.h2.Driver"))
@@ -49,7 +51,7 @@ class DbDialectService {
 
         if (result == UNKNOWN) {
             throw new SQLException("Unknown dialect ${dialectName} in gorm.tools.jdbc.DbDialectService.\n"
-                    + "Please use a known dialect or make accommodation for a new dialect.")
+                    + "Please specify a known for for config hibernate.dialect")
         }
 
         return result

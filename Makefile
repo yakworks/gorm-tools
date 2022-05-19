@@ -72,13 +72,13 @@ api-sanity-check:
 	curl -i -G http://localhost:$(PORT)/api/rally/org/1
 
 api-check-login:
-	curl -H "Content-Type: application/json" -X POST -d '{"username":"admin","password":"Br1ck#ouse"}' \
+	curl -H "Content-Type: application/json" -X POST -d '{"username":"admin","password":"!@#Foo"}' \
 		http://localhost:8080/api/login
 
 ## gets token from curl and used that for sanity check
 api-check-with-token:
 	curl_call="curl --silent -H 'Content-Type: application/json' -X POST \
-		-d '{\"username\":\"admin\",\"password\":\"Br1ck#ouse\"}' \
+		-d '{\"username\":\"admin\",\"password\":\"!@#Foo\"}' \
 		http://localhost:$(PORT)/api/login"
 	resp=`eval "$$curl_call"`
 	echo -e "login response: $$resp \n"
@@ -87,15 +87,6 @@ api-check-with-token:
 	echo -e "$$curl_call \n"
 	eval $$curl_call
 	echo -e "\n$@ success"
-
-## login to the deployed restify app, see notes for `api-check-login`
-api-check-deployed-login:
-	curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X POST \
-	  -d '{"username":"admin","password":"123Foo"}' https://$(APP_KUBE_INGRESS_URL)/api/login
-
-## use TOKEN after api-check-deployed-login ex: `make api-check-deployed-with-token TOKEN=asdfasdfasdf`
-api-check-deployed-with-token:
-	curl -i -G -H "Authorization: Bearer $(TOKEN)" https://$(APP_KUBE_INGRESS_URL)/api/rally/org/1
 
 # -- helpers --
 

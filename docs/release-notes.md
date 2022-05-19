@@ -1,3 +1,10 @@
+### v7.0.8-v.72
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.71...v7.0.8-v.72)
+- trigger release [link](https://github.com/yakworks/gorm-tools/commit/19d52def5994572b7b023a778ed359b71c0e9d7b)
+- Dev merge, fairly large amount of changes (#527) [link](https://github.com/yakworks/gorm-tools/commit/5d8852768443cebc62e9252782d45cd21d638cda)
+- notes for future ref and remove the docker/k8s stuff [link](https://github.com/yakworks/gorm-tools/commit/0731b61027b09a8c4c0d4ef3465dde1ac46a9579)
+
 ### v7.0.8-v.71
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.70...v7.0.8-v.71)

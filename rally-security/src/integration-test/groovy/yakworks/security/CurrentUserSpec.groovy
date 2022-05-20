@@ -5,6 +5,7 @@ import javax.inject.Provider
 import gorm.tools.security.domain.AppUser
 import grails.boot.test.GrailsApplicationContextLoader
 import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ContextConfiguration
@@ -14,29 +15,31 @@ import org.springframework.web.context.request.RequestContextHolder
 import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.gorm.testing.DomainIntTest
+import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.OrgType
 import yakworks.security.tenant.UserRequest
 
 /**
  * Proof of concept.
  */
-@Ignore
 // @Rollback
-@WebAppConfiguration
-@SpringBootTest
-@ContextConfiguration(
-    loader = GrailsApplicationContextLoader,
-    classes = [Application]
-)
+// @WebAppConfiguration
+// @SpringBootTest
+// @ContextConfiguration(
+//     loader = GrailsApplicationContextLoader,
+//     classes = [Application]
+// )
+@Integration
 @Rollback
-class UserRequestSpec extends Specification implements DomainIntTest {//, ApplicationContextAware {
+class CurrentUserSpec extends Specification implements DomainIntTest {//, ApplicationContextAware {
 
     // ApplicationContext ctx
 
     @Autowired
     WebApplicationContext ctx
 
-    @Autowired(required = false)
-    Provider<UserRequest> userRequest
+    @Autowired
+    CurrentUser currentUser
 
     // @Before
     // void controllerIntegrationSetup() {
@@ -53,25 +56,25 @@ class UserRequestSpec extends Specification implements DomainIntTest {//, Applic
     void "getUserMap admin"() {
 
         when:
-        UserRequest ureq = userRequest.get()
-        def userMap = ureq.getUserMap()
+        def userMap = currentUser.getUserMap()
 
         then:
-        ureq.org.id == 2
-        RequestContextHolder.currentRequestAttributes()
+        currentUser.org.id == 2
         userMap.username == 'admin'
     }
 
     void "getUserMap for customer user"() {
         when:
+        def org = Org.get(2)
+        org.type = OrgType.Customer
+        org.persist(flush: true)
         authenticate(AppUser.get(1), Roles.CUSTOMER)
-        UserRequest ureq = userRequest.get()
-        def userMap = ureq.getUserMap()
+        def userMap = currentUser.getUserMap()
 
         then:
-        ureq.org.id == 205
-        ureq.isCustomer()
-        userMap.username == 'gbcust'
+        currentUser.org.id == 2
+        userMap.isCustomer
+        currentUser.isCustomer()
     }
 
 }

@@ -50,6 +50,7 @@ class RallySecurityGrailsPlugin extends Plugin {
         // context.'component-scan'('base-package': 'nine.security')
 
         rallyUserService(RallyUserService, autowireLazy())
+        currentUser(CurrentUser, autowireLazy())
 
         userTenantResolver(UserTenantResolver)
 

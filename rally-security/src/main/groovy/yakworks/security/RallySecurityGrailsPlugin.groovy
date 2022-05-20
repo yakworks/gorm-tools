@@ -11,6 +11,7 @@ import org.apache.shiro.spring.LifecycleBeanPostProcessor
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler
 
 import gorm.tools.security.domain.AppUser
@@ -74,11 +75,11 @@ class RallySecurityGrailsPlugin extends Plugin {
 
     @Override
     void doWithApplicationContext() {
-        //FIXME This is not working, See line 222ish of AbstractSecurityInterceptor, that should blow error
+        // FIXME This is not working, See line 222ish of AbstractSecurityInterceptor, that should blow error
         // but it seems that is gets the last logged in user. Seems to work with setting in rally in domain9 but not
         // with rest-api example here
         // this make sure the any threads that are spun off also get the user who is logged in already
-        // SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL)
+        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL)
         def conf = SpringSecurityUtils.securityConfig
         if (conf && conf.active ) {
             applicationContext.logoutHandlers.add 0, applicationContext.shiroLogoutHandler // must be before SecurityContextLogoutHandler

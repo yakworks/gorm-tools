@@ -1,3 +1,8 @@
+### v7.0.8-v.73
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.72...v7.0.8-v.73)
+- AsyncSecureService (#529) [link](https://github.com/yakworks/gorm-tools/commit/0d77767a6af4bf4b03ebbb0501696529085393b8)
+
 ### v7.0.8-v.72
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.71...v7.0.8-v.72)

@@ -19,6 +19,9 @@ import gorm.tools.async.AsyncService
 
 /**
  * AsyncService that copies the authentication to context while in the new thread
+ * see https://github.com/spring-projects/spring-security/issues/6856
+ * MODE_INHERITABLETHREADLOCAL does not work with our CompletbaleFutures,
+ * It also makes it insecure as the prior user is used during auth check during rest
  */
 @Slf4j
 @CompileStatic

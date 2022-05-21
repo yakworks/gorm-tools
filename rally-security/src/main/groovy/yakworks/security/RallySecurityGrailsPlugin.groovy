@@ -79,7 +79,7 @@ class RallySecurityGrailsPlugin extends Plugin {
         // but it seems that is gets the last logged in user. Seems to work with setting in rally in domain9 but not
         // with rest-api example here
         // this make sure the any threads that are spun off also get the user who is logged in already
-        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL)
+        // SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL)
         def conf = SpringSecurityUtils.securityConfig
         if (conf && conf.active ) {
             applicationContext.logoutHandlers.add 0, applicationContext.shiroLogoutHandler // must be before SecurityContextLogoutHandler

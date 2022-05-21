@@ -4,8 +4,9 @@
 */
 package yakworks.rally
 
-import grails.plugin.springsecurity.SpringSecurityUtils
 import org.springframework.security.core.context.SecurityContextHolder
+
+import grails.plugin.springsecurity.SpringSecurityUtils
 import yakworks.rally.listeners.RallyEventListener
 import yakworks.rally.orgs.UserOrgService
 
@@ -33,8 +34,4 @@ class RallyDomainGrailsPlugin extends grails.plugins.Plugin {
         // orgMemberService(OrgMemberService, lazy())
     }}
 
-    @Override
-    void doWithApplicationContext() {
-        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL)
-    }
 }

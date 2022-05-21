@@ -4,7 +4,6 @@
 */
 package gorm.tools.security.domain
 
-import groovy.transform.CompileDynamic
 
 import org.codehaus.groovy.util.HashCodeHelper
 

@@ -4,6 +4,8 @@
 */
 package yakworks.rally
 
+import org.springframework.security.core.context.SecurityContextHolder
+
 import grails.plugin.springsecurity.SpringSecurityUtils
 import yakworks.rally.listeners.RallyEventListener
 import yakworks.rally.orgs.UserOrgService
@@ -31,4 +33,5 @@ class RallyDomainGrailsPlugin extends grails.plugins.Plugin {
         // orgDimensionService(OrgDimensionService, lazy())
         // orgMemberService(OrgMemberService, lazy())
     }}
+
 }

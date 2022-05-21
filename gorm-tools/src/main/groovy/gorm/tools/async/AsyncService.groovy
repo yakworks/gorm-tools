@@ -74,14 +74,7 @@ class AsyncService implements ConfigAware  {
      * @return the CompletableFuture
      */
     CompletableFuture<Void> runAsync(AsyncConfig asyncConfig, Closure runnable){
-        Closure wrappedClosure = wrapClosure(asyncConfig, false, runnable)
-        if(shouldAsync(asyncConfig)){
-            return CompletableFuture.runAsync(wrappedClosure)
-        } else {
-            //run it now and return a dummy CompletableFuture
-            wrappedClosure.call()
-            return CompletableFuture.completedFuture(null) as CompletableFuture<Void>
-        }
+        return supplyAsync( asyncConfig, runnable as Supplier<Void>)
     }
 
     /**
@@ -123,9 +116,9 @@ class AsyncService implements ConfigAware  {
     /**
      * calls wrapSessionOrTransaction setting passItem to true
      */
-    Closure wrapClosure(AsyncConfig asyncArgs, Closure closure){
-        wrapClosure(asyncArgs, true, closure)
-    }
+    // Closure wrapClosure(AsyncConfig asyncArgs, Closure closure){
+    //     wrapClosure(asyncArgs, true, closure)
+    // }
     /**
      * checks args for session or trx and wraps the closure if needed
      */
@@ -137,37 +130,17 @@ class AsyncService implements ConfigAware  {
      * @param closure the closure to wrap
      * @return the wrapped closure
      */
-    Closure wrapClosure(AsyncConfig asyncArgs, boolean passItem, Closure closure){
-        Closure wrappedClosure = closure
-        if(asyncArgs.transactional){
-            verifyDatastore(asyncArgs)
-            wrappedClosure = passItem ? wrapTrx(asyncArgs.datastore, closure) : wrapClosureTrx(asyncArgs.datastore, closure)
-        } else if(asyncArgs.session){
-            verifyDatastore(asyncArgs)
-            wrappedClosure = passItem ? wrapSession(asyncArgs.datastore, closure) : wrapClosureSession(asyncArgs.datastore, closure)
-        }
-        wrappedClosure
-    }
-
-    /**
-     * checks args for session or trx and wraps the closure if needed
-     *
-     * @param asyncArgs the args that decide if its a trx or session
-     * @param passItem it true then resulting closure will accept an item arg so it can be used to pass to an each
-     * @param closure the closure to wrap
-     * @return the wrapped supplier
-     */
-    public <T> Supplier<T> wrapSupplier(AsyncConfig asyncArgs, Supplier<T> supplier){
-        Supplier<T> wrappedSupplier = supplier
-        if(asyncArgs.transactional){
-            verifyDatastore(asyncArgs)
-            wrappedSupplier = wrapSupplierTrx(asyncArgs.datastore, supplier)
-        } else if(asyncArgs.session){
-            verifyDatastore(asyncArgs)
-            wrappedSupplier = wrapSupplierSession(asyncArgs.datastore, supplier)
-        }
-        wrappedSupplier
-    }
+    // Closure wrapClosure(AsyncConfig asyncArgs, boolean passItem, Closure closure){
+    //     Closure wrappedClosure = closure
+    //     if(asyncArgs.transactional){
+    //         verifyDatastore(asyncArgs)
+    //         wrappedClosure = passItem ? wrapTrx(asyncArgs.datastore, closure) : wrapClosureTrx(asyncArgs.datastore, closure)
+    //     } else if(asyncArgs.session){
+    //         verifyDatastore(asyncArgs)
+    //         wrappedClosure = passItem ? wrapSession(asyncArgs.datastore, closure) : wrapClosureSession(asyncArgs.datastore, closure)
+    //     }
+    //     wrappedClosure
+    // }
 
     /**
      * if args doesn't have a datastore then it grabs the default one from the trxService
@@ -179,62 +152,33 @@ class AsyncService implements ConfigAware  {
     }
 
     /**
-     * Wrap closure in a transaction for an item, use for and each iterator
+     * checks args for session or trx and wraps the closure if needed
+     *
+     * @param asyncArgs the args that decide if its a trx or session
+     * @param passItem it true then resulting closure will accept an item arg so it can be used to pass to an each
+     * @param closure the closure to wrap
+     * @return the wrapped supplier
      */
-    public <T> Closure<T> wrapTrx(Datastore ds, Closure<T> c) {
-        return { T item ->
-            trxService.withTrx(ds) { TransactionStatus status ->
-                c.call(item)
-            }
+    public <T> Supplier<T> wrapSupplier(AsyncConfig asyncArgs, Supplier<T> supplier){
+        Supplier<T> wrappedSupplier
+        if(asyncArgs.transactional){
+            verifyDatastore(asyncArgs)
+            wrappedSupplier = wrapSupplierTrx(asyncArgs.datastore, supplier)
+        } else if(asyncArgs.session){
+            verifyDatastore(asyncArgs)
+            wrappedSupplier = wrapSupplierSession(asyncArgs.datastore, supplier)
+        } else {
+            wrappedSupplier = wrapSupplier(supplier)
         }
-    }
-
-    Closure wrapClosureTrx(Datastore ds, Closure c) {
-        return { ->
-            trxService.withTrx(ds) { TransactionStatus status ->
-                c.call(status)
-            }
-        }
-    }
-
-    /**
-     * wrap closure in a session
-     */
-    @SuppressWarnings(["EmptyCatchBlock"])
-    Closure wrapClosureSession(Datastore ds, Closure wrapped) {
-        return { ->
-            persistenceInterceptor.init()
-            try {
-                wrapped.call()
-            } finally {
-                try {
-                    //only destroys if new one was created, otherwise does nothing
-                    persistenceInterceptor.destroy()
-                } catch (Exception e) {
-                    //ignore errors
-                }
-            }
-        }
+        wrappedSupplier
     }
 
     /**
-     * wrap closure in a session
+     * just returns the passed in supplier by default, an be overriden in a super
+     * which is done for the AsyncSecurityService
      */
-    @SuppressWarnings(["EmptyCatchBlock"])
-    public <T> Closure<T> wrapSession(Datastore ds, Closure<T> wrapped) {
-        return { T item ->
-            persistenceInterceptor.init()
-            try {
-                wrapped.call(item)
-            } finally {
-                try {
-                    //only destroys if new one was created, otherwise does nothing
-                    persistenceInterceptor.destroy()
-                } catch (Exception e) {
-                    //ignore errors
-                }
-            }
-        }
+    public <T> Supplier<T> wrapSupplier(Supplier<T> sup) {
+        return sup
     }
 
     public <T> Supplier<T> wrapSupplierTrx(Datastore ds, Supplier<T> sup) {
@@ -280,9 +224,16 @@ class AsyncService implements ConfigAware  {
             wrappedConsumer = wrapConsumerSession(asyncArgs.datastore, consumer)
         } else {
             // no wrap so just do closure
-            wrappedConsumer = consumer
+            wrappedConsumer = wrapConsumer(consumer)
         }
         wrappedConsumer
+    }
+
+    /**
+     * wrap the consumer, can be overriden in super which is is done in AsyncSecureService
+     */
+    public <T> Consumer<T> wrapConsumer(Consumer<T> consumer) {
+        return consumer
     }
 
     public <T> Consumer<T> wrapConsumerTrx(Datastore ds, Consumer<T> consumer) {

@@ -29,6 +29,7 @@ class GormToolsSecurityGrailsPlugin extends Plugin {
         def securityConf = SpringSecurityUtils.securityConfig
         if (securityConf.active) {
 
+            asyncService(AsyncSecureService){ bean -> bean.lazyInit = true}
             passwordValidator(PasswordValidator){ bean -> bean.lazyInit = true}
 
             // spring security uses an older deprecated interface security.authentication.encoding.PasswordEncoder

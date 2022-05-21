@@ -38,7 +38,7 @@ class BootStrap {
 
     void mockAuthentication() {
         //makes sure that each spawned thread has the access to the logged in user
-        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL)
+        // SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL)
 
         GrailsUser grailsUser = new GrailsUser("test", "test", true,
             true, false, true, AuthorityUtils.createAuthorityList('ADMIN'), 1 as Long)

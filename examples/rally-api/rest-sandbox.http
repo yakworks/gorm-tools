@@ -27,6 +27,14 @@ Authorization: Bearer {{login.access_token}}
   test.status(200);
 }}
 
+### logout
+# @ref login
+POST {{base_url}}/logout
+Authorization: Bearer {{login.access_token}}
+{{
+  test.status(200);
+}}
+
 ### Org
 # @no-cookie-jar
 GET {{base_url}}/rally/org

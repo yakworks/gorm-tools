@@ -28,6 +28,7 @@ publish:
 			$(logr) "publishing SNAPSHOT"
 			$(gradlew) publishJavaLibraryPublicationToMavenRepository
 		else
+			${gradlew} rally-domain:verifyNoSnapshots
 			$(logr) "publishing to repo.9ci"
 			$(gradlew) publishJavaLibraryPublicationToMavenRepository
 			$(logr) "publishing to Sonatype Maven Central"

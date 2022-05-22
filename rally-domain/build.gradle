@@ -79,3 +79,20 @@ integrationTest {
     showSummary true
   }
 }
+
+tasks.register("verifyNoSnapshots") {
+  group = "verification"
+  description = "Check whether there are any SNAPSHOT dependencies."
+  doLast {
+    def snapshotsList = project.configurations
+      .findAll { it.name == "compileClasspath" || it.name == "runtimeClasspath" }
+      .findAll { it.canBeResolved }
+      .resolvedConfiguration.resolvedArtifacts.flatten()
+      .findAll { it.moduleVersion.id.version.endsWith('-SNAPSHOT') }.unique()
+    // println "checkSnapshots"
+    // println snapshotsList
+    if (!snapshotsList.isEmpty()) {
+      throw new GradleException("Please get rid of snapshots for following dependencies before releasing $snapshotsList")
+    }
+  }
+}

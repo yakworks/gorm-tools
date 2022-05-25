@@ -39,6 +39,7 @@ class DataProblemSpec extends Specification {
         DataProblemException e = DataProblem.ex("foo error")
 
         then:
+        e.detail == "foo error"
         e.message.startsWith "foo error"
         e instanceof ProblemException
         e.problem instanceof DataProblem

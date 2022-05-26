@@ -4,6 +4,7 @@
 */
 package yakworks.security.rest.token
 
+import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
@@ -20,6 +21,10 @@ import grails.plugin.springsecurity.rest.token.bearer.BearerTokenReader
 @Slf4j
 @CompileStatic
 class HeaderTokenReader extends BearerTokenReader {
+
+    final static String DEFAULT_COOKIE_NAME = 'jwt'
+
+    String cookieName = DEFAULT_COOKIE_NAME
 
     /**
      * find access token in header.
@@ -57,6 +62,10 @@ class HeaderTokenReader extends BearerTokenReader {
             log.debug "Found bearer token in request body"
             String tokenValue = request.parameterMap['access_token']?.first()
             if(tokenValue) accessToken = new AccessToken( tokenValue )
+        } else if (findTokenCookie(request)) {
+            log.debug "Found cookie"
+            String tokenValue = findTokenCookie(request)
+            if(tokenValue) accessToken = new AccessToken( tokenValue )
         } else {
             log.debug "No token found"
         }
@@ -65,5 +74,12 @@ class HeaderTokenReader extends BearerTokenReader {
 
     boolean isFormEncoded(HttpServletRequest servletRequest) {
         servletRequest.contentType && MediaType.parseMediaType(servletRequest.contentType).isCompatibleWith(MediaType.APPLICATION_FORM_URLENCODED)
+    }
+
+    String findTokenCookie(HttpServletRequest request) {
+
+        Cookie cookie = request.getCookies()?.find { Cookie cookie -> cookie.name.equalsIgnoreCase(cookieName) }
+
+        return cookie?.value
     }
 }

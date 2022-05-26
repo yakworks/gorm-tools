@@ -19,8 +19,10 @@ import grails.plugin.springsecurity.SecurityFilterPosition
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugins.Plugin
 import grails.util.Environment
+import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler
 import yakworks.security.rest.NineOauthUserDetailsService
 import yakworks.security.rest.RestAuthenticationProvider
+import yakworks.security.rest.RestAuthenticationSuccessHandler
 import yakworks.security.rest.token.GormTokenStorageService
 import yakworks.security.rest.token.HeaderTokenReader
 import yakworks.security.rest.token.PostgresTokenStorageService
@@ -104,6 +106,10 @@ class RallySecurityGrailsPlugin extends Plugin {
         } else {
             tokenStorageService(GormTokenStorageService)
         }
+
+        //stores the token in a secure cookie. and enables the logout clearing. its all under jwt even if its not technically a jwt
+        restAuthenticationSuccessHandler(RestAuthenticationSuccessHandler)
+        cookieClearingLogoutHandler(CookieClearingLogoutHandler, ['jwt'])
 
         //replace so we can set the role prefix to be blank and not ROLE_
         webExpressionHandler(DefaultWebSecurityExpressionHandler) {

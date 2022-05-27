@@ -1,3 +1,10 @@
+### v7.0.8-v.74
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.73...v7.0.8-v.74)
+- release [link](https://github.com/yakworks/gorm-tools/commit/40ccede0c655c73f5ad0d3e935e1423866d7b0c0)
+- Rally-Security jwt cookie token, DataProblem.ex goes to details (#530) [link](https://github.com/yakworks/gorm-tools/commit/150d4f5e108c88d98edb95c3ea9048bd2d9327aa)
+- added verify-no-snapshots [link](https://github.com/yakworks/gorm-tools/commit/bf62472d748d906f2258bdb7170c742152c3afb0)
+
 ### v7.0.8-v.73
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.72...v7.0.8-v.73)

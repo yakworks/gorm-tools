@@ -12,10 +12,12 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class DataProblem implements DataProblemTrait<DataProblem> {
     String defaultCode = 'error.data.problem'
+
     /**
-     * helper for legacy to throw a DataProblemException with a message
+     * helper for legacy to throw a DataProblemException with a
+     * Title will blank so it can come from the code on render and detail will have the custom message
      */
-    static DataProblemException ex(String message){
-        return (DataProblemException) DataProblem.withTitle(message).toException()
+    static DataProblemException ex(String detailMessage){
+        return (DataProblemException) withDetail(detailMessage).toException()
     }
 }

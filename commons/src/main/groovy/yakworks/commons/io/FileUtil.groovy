@@ -196,13 +196,31 @@ class FileUtil {
         ZipOutputStream zout = new ZipOutputStream(fout)
         zout.setLevel(Deflater.BEST_COMPRESSION)
 
-        files.each { File f ->
-            ZipEntry entry = new ZipEntry(f.name)
-            zout.putNextEntry(entry)
-            f.withInputStream { fin ->
-                zout << fin
+        Closure addZipEntry
+        addZipEntry = { ZipOutputStream zoutStream, File fileToZip, String parent ->
+            if (fileToZip == null || !fileToZip.exists()) return
+            String zipEntryName = fileToZip.getName()
+            if (parent!=null && !parent.isEmpty()) {
+                zipEntryName = parent + "/" + fileToZip.getName()
             }
-            zout.closeEntry()
+
+            if (fileToZip.isDirectory()) {
+                for (File file : fileToZip.listFiles()) {
+                    addZipEntry(zoutStream, file, zipEntryName);
+                }
+            } else {
+                ZipEntry entry = new ZipEntry(zipEntryName)
+                zoutStream.putNextEntry(entry)
+                fileToZip.withInputStream { fin ->
+                    zoutStream << fin
+                }
+                zoutStream.closeEntry()
+            }
+        }
+
+
+        files.each { File f ->
+            addZipEntry(zout, f, null)
         }
         zout.close()
         return zip

@@ -1,7 +1,9 @@
 package yakworks.commons.io
 
+import org.springframework.util.FileCopyUtils
 import yakworks.commons.lang.DateUtil
 import spock.lang.Specification
+import yakworks.commons.lang.Validate
 import yakworks.commons.util.BuildSupport
 
 class FileUtilTests extends Specification {
@@ -130,9 +132,36 @@ class FileUtilTests extends Specification {
         files.size() == 1
         files[0].name == "test.txt"
 
-
         cleanup:
         files[0].delete()
+        zip.delete()
+    }
+
+    void "test zip dir recursively"() {
+        setup:
+        File csvDir =  new File(BuildSupport.gradleRootProjectDir,"examples/resources/csv")
+        //create a dir inside resources/csv/
+        File nestedDir = new File(csvDir, "test")
+        nestedDir.mkdirs()
+        File contactCopy = new File(nestedDir, "contact2.csv")
+        contactCopy.createNewFile()
+
+        FileCopyUtils.copy(new File(csvDir, "contact.csv"), contactCopy)
+        assert contactCopy.exists()
+
+
+        when: "zip dir with all its files and sub dirs"
+        File test = new File(BuildSupport.gradleRootProjectDir,"examples/resources/csv")
+        File zip = FileUtil.zip("test.zip", test.parentFile, test)
+
+        then:
+        zip.exists()
+        FileUtil.getZipEntryInputStream(zip, "csv/contact.csv") != null
+        FileUtil.getZipEntryInputStream(zip, "csv/test/contact2.csv") != null
+
+        cleanup:
+        contactCopy.delete()
+        nestedDir.delete()
         zip.delete()
     }
 

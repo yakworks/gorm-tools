@@ -7,8 +7,6 @@ package yakworks.rally.activity
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import io.micronaut.core.annotation.Nullable
-import jakarta.inject.Inject
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
@@ -16,6 +14,8 @@ import gorm.tools.model.SourceType
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.security.services.SecService
 import grails.gorm.transactions.Transactional
+import io.micronaut.core.annotation.Nullable
+import jakarta.inject.Inject
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.Task
 import yakworks.rally.activity.model.TaskStatus

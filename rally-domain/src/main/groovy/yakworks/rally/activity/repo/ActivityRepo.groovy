@@ -5,7 +5,6 @@
 package yakworks.rally.activity.repo
 
 import java.time.LocalDateTime
-import jakarta.annotation.Nullable
 import javax.inject.Inject
 import javax.persistence.criteria.JoinType
 
@@ -29,6 +28,7 @@ import gorm.tools.security.services.SecService
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.ReadOnly
 import grails.gorm.transactions.Transactional
+import jakarta.annotation.Nullable
 import yakworks.commons.lang.Validate
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact

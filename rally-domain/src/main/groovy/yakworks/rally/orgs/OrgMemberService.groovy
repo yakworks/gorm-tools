@@ -4,7 +4,6 @@
 */
 package yakworks.rally.orgs
 
-import jakarta.annotation.Nullable
 import javax.inject.Inject
 
 import groovy.transform.CompileStatic
@@ -13,6 +12,7 @@ import groovy.util.logging.Slf4j
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
+import jakarta.annotation.Nullable
 import yakworks.commons.lang.Validate
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgMember

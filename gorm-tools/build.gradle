@@ -25,7 +25,7 @@ dependencies {
   // compileOnly "org.grails.plugins:views-json-templates:$vViews"
   compileOnly "org.grails:grails-plugin-mimetypes"
 
-  testCompile "org.slf4j:slf4j-simple:${vSlf4j}"
-  testCompile project(":gorm-test-domain")
-  testCompile project(":gorm-tools-security")
+  testImplementation "org.slf4j:slf4j-simple:${vSlf4j}"
+  testImplementation project(":gorm-test-domain")
+  testImplementation project(":gorm-tools-security")
 }

@@ -6,10 +6,11 @@ buildscript {
     maven { url "https://repo.grails.org/grails/core" }
   }
   dependencies {
-    classpath "org.grails:grails-gradle-plugin:$grailsVersion"
+    classpath "org.grails:grails-gradle-plugin:$grailsGradlePluginVersion"
     classpath "org.grails.plugins:hibernate5:$vGormHibernate"
     classpath "org.yakworks:gradle-plugins:$vShipyak"
     classpath "io.github.gradle-nexus:publish-plugin:$vMavenNexus"
+    // classpath "org.grails.plugins:views-gradle:2.2.1"
     classpath "org.grails.plugins:views-gradle:$vViews"
   }
 }
@@ -34,10 +35,10 @@ subprojects { subprj ->
 
   repositories {
     mavenLocal()
-    maven { url "https://repo.grails.org/grails/core" }
     mavenCentral()
-    maven { url "http://repo.9ci.com/public-libs" }
-    maven { url "http://repo.9ci.com/oss-snapshots" }
+    maven { url "https://repo.grails.org/grails/core" }
+    maven { url "http://repo.9ci.com/public-libs"; allowInsecureProtocol = true }
+    maven { url "http://repo.9ci.com/oss-snapshots"; allowInsecureProtocol = true }
   }
   // get prop with default if null, converts to boolean
   Closure getProp = { pname, defualtv -> (subprj.findProperty(pname)?:defualtv).toBoolean() }
@@ -110,19 +111,19 @@ subprojects { subprj ->
       // compileOnly "org.hibernate:hibernate-ehcache:$vHibernate"
 
       // tests deps
-      testRuntime "com.h2database:h2:$vH2"
-      testRuntime "com.zaxxer:HikariCP:$vHikari"
+      testRuntimeOnly "com.h2database:h2:$vH2"
+      testRuntimeOnly "com.zaxxer:HikariCP:$vHikari"
 
-      testCompile project(":gorm-test-support") //this might seem circular but it can be added to itself as it dif config
+      testImplementation project(":gorm-test-support") //this might seem circular but it can be added to itself as it dif config
 
-      testCompile "org.apache.commons:commons-lang3:$vCommonsLang3"
-      testCompile "org.mockito:mockito-core"
-      testCompile "org.grails:grails-gorm-testing-support"
-      testCompile "org.grails:grails-web-testing-support"
-      testCompile "org.grails.plugins:build-test-data:$vBuildTestData"
+      testImplementation "org.apache.commons:commons-lang3:$vCommonsLang3"
+      testImplementation "org.mockito:mockito-core"
+      testImplementation "org.grails:grails-gorm-testing-support"
+      testImplementation "org.grails:grails-web-testing-support"
+      testImplementation "org.grails.plugins:build-test-data:$vBuildTestData"
       // testCompile "org.grails:views-json-testing-support:$vViews"
-      testCompile "net.javacrumbs.json-unit:json-unit-assertj:2.28.0"
-      testCompile "com.fasterxml.jackson.core:jackson-databind:2.9.10"
+      testImplementation "net.javacrumbs.json-unit:json-unit-assertj:2.28.0"
+      testImplementation "com.fasterxml.jackson.core:jackson-databind:2.9.10"
 
     }
 

@@ -82,12 +82,11 @@ class EventLogger {
     }
 
     //Write the log to database in a seperate independent transaction.
-    @GrailsCompileStatic
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     private EventLog logTransactional(Map params) {
         EventLog row = new EventLog()
         row.bind(params)
-        row.appName = row.appName ?: "${Metadata.current.'app.name'}"
+        row.appName = row.appName ?: Metadata.current.getApplicationName()
 
         String message = params['message']
         if (message?.size() > MAX_MESSAGE_SIZE)

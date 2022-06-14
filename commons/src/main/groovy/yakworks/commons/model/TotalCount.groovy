@@ -12,5 +12,5 @@ import groovy.transform.CompileStatic
  */
 @CompileStatic
 trait TotalCount {
-    int totalCount
+    Integer totalCount
 }

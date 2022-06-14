@@ -9,17 +9,17 @@ dependencies {
   compileOnly "org.grails:grails-plugin-rest"
 
   // compileOnly "org.grails:grails-plugin-rest"
-  compile "com.opencsv:opencsv:$vOpenCsv"
+  api "com.opencsv:opencsv:$vOpenCsv"
 
   //see http://spreadsheet.dsl.builders/ and https://guides.grails.org/grails-file-download-excel/guide/index.html
-  compile "builders.dsl:spreadsheet-builder-poi:$vExcelBuilder"
-  compile "builders.dsl:spreadsheet-builder-groovy:$vExcelBuilder"
+  api "builders.dsl:spreadsheet-builder-poi:$vExcelBuilder"
+  api "builders.dsl:spreadsheet-builder-groovy:$vExcelBuilder"
   // compileOnly "org.apache.poi:poi:$vPoi"
   // compileOnly "org.apache.poi:poi-ooxml:$vPoi"
 
   compileOnly project(":gorm-tools")
 
-  testCompile project(":gorm-test-support")
-  testCompile "org.grails:grails-gorm-testing-support"
-  testCompile "org.grails.plugins:build-test-data:$vBuildTestData"
+  testImplementation project(":gorm-test-support")
+  testImplementation "org.grails:grails-gorm-testing-support"
+  testImplementation "org.grails.plugins:build-test-data:$vBuildTestData"
 }

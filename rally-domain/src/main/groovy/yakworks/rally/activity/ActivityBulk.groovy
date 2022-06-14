@@ -4,12 +4,11 @@
 */
 package yakworks.rally.activity
 
-import javax.annotation.Nullable
-import javax.inject.Inject
-
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import io.micronaut.core.annotation.Nullable
+import jakarta.inject.Inject
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 

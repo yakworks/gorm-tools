@@ -12,7 +12,7 @@ dependencies {
   api project(":gorm-tools-security")
   api project(":gorm-tools-csv")
   api "org.yakworks:grails-kit:$vYakGrailsKit"
-
+  api 'jakarta.annotation:jakarta.annotation-api:2.1.0'
   // for the mock and seed data
   compileOnly("org.grails.plugins:build-test-data:$vBuildTestData"){
     exclude group:"org.grails", module: "grails-gorm-testing-support"

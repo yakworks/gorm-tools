@@ -6,7 +6,7 @@ package yakworks.rally.attachment.repo
 
 import java.nio.file.Files
 import java.nio.file.Path
-import javax.annotation.Nullable
+import io.micronaut.core.annotation.Nullable
 import javax.inject.Inject
 
 import groovy.transform.CompileStatic

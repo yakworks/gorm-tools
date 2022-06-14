@@ -4,7 +4,7 @@
 */
 package yakworks.rally.activity
 
-import javax.annotation.Nullable
+import jakarta.annotation.Nullable
 import javax.inject.Inject
 
 import groovy.transform.CompileStatic

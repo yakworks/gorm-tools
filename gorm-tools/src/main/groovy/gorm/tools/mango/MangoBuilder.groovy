@@ -73,7 +73,12 @@ class MangoBuilder {
         Map criteria = qargs.criteria
         def tidyMap = MangoTidyMap.tidy(criteria)
         applyMapOrList(mangoCriteria, tidyMap)
-        if (callable) mangoCriteria.with callable
+
+        if (callable) {
+            final Closure clonedClosure = (Closure) callable.clone()
+            clonedClosure.setResolveStrategy(Closure.DELEGATE_FIRST)
+            mangoCriteria.with(clonedClosure)
+        }
 
         if(qargs.sort && !criteria.containsKey(SORT)){
             order(mangoCriteria, qargs.sort)

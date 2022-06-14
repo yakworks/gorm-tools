@@ -5,7 +5,7 @@
 package yakworks.rally.activity.repo
 
 import java.time.LocalDateTime
-import javax.annotation.Nullable
+import jakarta.annotation.Nullable
 import javax.inject.Inject
 import javax.persistence.criteria.JoinType
 

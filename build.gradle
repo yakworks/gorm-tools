@@ -106,6 +106,9 @@ subprojects { subprj ->
       implementation "org.apache.logging.log4j:log4j-to-slf4j:$vLog4j"
       implementation "org.apache.logging.log4j:log4j-api:$vLog4j"
 
+      implementation 'com.fasterxml.jackson.core:jackson-core:2.13.3'
+      implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
+
       compileOnly "org.grails.plugins:hibernate5:$vGormHibernate"
       compileOnly "org.hibernate:hibernate-core:$vHibernate"
       // compileOnly "org.hibernate:hibernate-ehcache:$vHibernate"
@@ -155,6 +158,7 @@ subprojects { subprj ->
   }
 
   tasks.withType(Test) {
+    useJUnitPlatform()
     //so that we can use in config and share resources/rootlocation across projects for testing
     systemProperty "gradle.rootProjectDir", rootProject.projectDir.absolutePath
     systemProperty "gradle.projectDir", project.projectDir.absolutePath

@@ -4,15 +4,14 @@
 */
 package yakworks.rally.orgs
 
-import javax.inject.Inject
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
-import jakarta.annotation.Nullable
 import yakworks.commons.lang.Validate
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgMember
@@ -26,7 +25,7 @@ import yakworks.rally.orgs.model.OrgType
 @CompileStatic
 class OrgMemberService {
 
-    @Inject @Nullable
+    @Autowired(required = false)
     OrgDimensionService orgDimensionService
 
     /**

@@ -7,6 +7,7 @@ package yakworks.rally.activity
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
@@ -14,8 +15,6 @@ import gorm.tools.model.SourceType
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.security.services.SecService
 import grails.gorm.transactions.Transactional
-import io.micronaut.core.annotation.Nullable
-import jakarta.inject.Inject
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.Task
 import yakworks.rally.activity.model.TaskStatus
@@ -36,19 +35,19 @@ import yakworks.rally.orgs.model.Org
 @CompileStatic
 class ActivityBulk {
 
-    @Inject @Nullable
+    @Autowired(required = false)
     ActivityRepo activityRepo
 
-    @Inject @Nullable
+    @Autowired(required = false)
     ActivityLinkRepo activityLinkRepo
 
-    @Inject @Nullable
+    @Autowired(required = false)
     AttachmentRepo attachmentRepo
 
-    @Inject @Nullable
+    @Autowired(required = false)
     SecService secService
 
-    @Inject @Nullable
+    @Autowired(required = false)
     ProblemHandler problemHandler
 
     List<String> toOneAssociations = ['note', 'task']

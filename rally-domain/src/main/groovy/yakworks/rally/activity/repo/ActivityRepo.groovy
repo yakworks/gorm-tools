@@ -5,12 +5,12 @@
 package yakworks.rally.activity.repo
 
 import java.time.LocalDateTime
-import javax.inject.Inject
 import javax.persistence.criteria.JoinType
 
 import groovy.transform.CompileStatic
 
 import org.apache.commons.lang3.StringUtils
+import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
@@ -28,7 +28,6 @@ import gorm.tools.security.services.SecService
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.ReadOnly
 import grails.gorm.transactions.Transactional
-import jakarta.annotation.Nullable
 import yakworks.commons.lang.Validate
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
@@ -50,16 +49,16 @@ import static yakworks.rally.activity.model.Activity.VisibleTo
 @CompileStatic
 class ActivityRepo extends LongIdGormRepo<Activity> {
 
-    @Inject @Nullable
+    @Autowired(required = false)
     ActivityLinkRepo activityLinkRepo
 
-    @Inject @Nullable
+    @Autowired(required = false)
     AttachmentRepo attachmentRepo
 
-    @Inject @Nullable
+    @Autowired(required = false)
     SecService secService
 
-    @Inject @Nullable
+    @Autowired(required = false)
     ProblemHandler problemHandler
 
     List<String> toOneAssociations = ['note', 'task']

@@ -4,18 +4,17 @@
 */
 package yakworks.rally.activity
 
-import javax.inject.Inject
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
 import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.utils.GormUtils
 import grails.gorm.transactions.Transactional
-import jakarta.annotation.Nullable
 import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.rally.activity.model.Activity
@@ -34,10 +33,10 @@ import yakworks.rally.tag.model.TagLink
 @CompileStatic
 class ActivityCopier extends LongIdGormRepo<Activity> {
 
-    @Inject @Nullable
+    @Autowired(required = false)
     ActivityLinkRepo activityLinkRepo
 
-    @Inject @Nullable
+    @Autowired(required = false)
     AttachmentRepo attachmentRepo
 
     @Transactional

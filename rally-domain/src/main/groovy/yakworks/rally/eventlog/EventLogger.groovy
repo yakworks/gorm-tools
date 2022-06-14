@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 
 import gorm.tools.beans.Pager
-import grails.compiler.GrailsCompileStatic
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.util.Metadata

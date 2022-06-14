@@ -4,6 +4,7 @@ import gorm.tools.testing.RepoTestData
 import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
 import spock.lang.Specification
+import yakworks.rally.activity.ActivityCopier
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.attachment.model.AttachmentLink
@@ -37,6 +38,7 @@ class OrgCopierSpec extends Specification implements DataRepoTest, SecurityTest 
         )
         defineBeans {
             orgCopier(OrgCopier)
+            activityCopier(ActivityCopier)
         }
     }
 

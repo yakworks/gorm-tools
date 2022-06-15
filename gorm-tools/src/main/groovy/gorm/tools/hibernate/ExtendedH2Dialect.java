@@ -22,10 +22,8 @@ public class ExtendedH2Dialect extends H2Dialect {
      */
     public ExtendedH2Dialect() {
         super();
-
-
         registerColumnType(Types.OTHER, "json");
-
+        registerColumnType( Types.VARBINARY, "BLOB" );
     }
 
 }

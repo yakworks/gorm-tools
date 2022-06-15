@@ -45,11 +45,12 @@ dependencies {
 
   //??wtf
   implementation "commons-lang:commons-lang:2.6"
-  runtimeOnly "org.grails.plugins:external-config:$vExternalConfig"
+  // runtimeOnly "org.grails.plugins:external-config:$vExternalConfig"
+  runtimeOnly "dk.glasius:external-config:$vExternalConfig"
 
   // dk.glasius not working, load twice
-  // runtimeOnly "dk.glasius:external-config:$vExternalConfig"
-  runtimeOnly "org.grails.plugins:external-config:$vExternalConfig"
+  // runtimeOnly "org.grails.plugins:external-config:$vExternalConfig"
+  runtimeOnly "dk.glasius:external-config:$vExternalConfig"
   runtimeOnly "com.h2database:h2:$vH2"
   runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"
   runtimeOnly "com.zaxxer:HikariCP:$vHikari"

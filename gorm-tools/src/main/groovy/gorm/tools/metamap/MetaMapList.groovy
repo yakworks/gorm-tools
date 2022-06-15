@@ -33,7 +33,7 @@ class MetaMapList extends AbstractList<MetaMap> implements TotalCount  {
     }
 
     @Override
-    Integer getTotalCount() {
+    int getTotalCount() {
         if(resultList instanceof PagedResultList) {
             return (resultList as PagedResultList).getTotalCount()
         } else if(resultList instanceof TotalCount) {

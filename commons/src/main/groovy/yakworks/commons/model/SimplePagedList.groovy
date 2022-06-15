@@ -15,7 +15,7 @@ import groovy.transform.CompileStatic
 class SimplePagedList<E> implements TotalCount {
     @Delegate List<E> results
 
-    SimplePagedList(List<E> results, Integer tot) {
+    SimplePagedList(List<E> results, int tot) {
         this.results = results
         setTotalCount(tot)
     }

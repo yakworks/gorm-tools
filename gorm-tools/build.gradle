@@ -10,7 +10,8 @@ dependencies {
 
   // see https://github.com/f4b6a3/uuid-creator
   api "com.github.f4b6a3:uuid-creator:$vUuidCreator"
-  api "com.vladmihalcea:hibernate-types-52:$vHibTypes"
+  // api "com.vladmihalcea:hibernate-types-52:$vHibTypes"
+  api "com.vladmihalcea:$vHibTypes"
 
   implementation "org.codehaus.groovy:groovy-sql:$groovyVersion"
   // compileOnly "org.codehaus.gpars:gpars:$vGpars"
@@ -25,7 +26,10 @@ dependencies {
   // compileOnly "org.grails.plugins:views-json-templates:$vViews"
   compileOnly "org.grails:grails-plugin-mimetypes"
 
-  testCompile "org.slf4j:slf4j-simple:${vSlf4j}"
-  testCompile project(":gorm-test-domain")
-  testCompile project(":gorm-tools-security")
+  testImplementation "org.slf4j:slf4j-simple:${vSlf4j}"
+  testImplementation project(":gorm-test-domain")
+  testImplementation project(":gorm-tools-security")
+  //
+  // testImplementation "com.vladmihalcea:hibernate-types-52:$vHibTypes"
+  //
 }

@@ -22,3 +22,5 @@ findProject(':examples/testify').name = 'testify'
 findProject(':examples/restify').name = 'restify'
 findProject(':examples/benchmarks').name = 'benchmarks'
 findProject(':examples/rally-api').name = 'rally-api'
+
+//project(':testify').projectDir = new File('examples/testify')

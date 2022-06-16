@@ -3,11 +3,12 @@ package restify
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+import yakworks.gorm.testing.http.RestIntTest
 import yakworks.gorm.testing.http.RestIntegrationTest
 
 @Rollback
 @Integration
-class ApiResultsTestControllerTests extends Specification implements RestIntegrationTest {
+class ApiResultsTestControllerTests extends RestIntTest{
 
     ApiResultsTestController controller
 

@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 
 import gorm.tools.beans.Pager
-import grails.compiler.GrailsCompileStatic
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.util.Metadata
@@ -82,12 +81,11 @@ class EventLogger {
     }
 
     //Write the log to database in a seperate independent transaction.
-    @GrailsCompileStatic
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     private EventLog logTransactional(Map params) {
         EventLog row = new EventLog()
         row.bind(params)
-        row.appName = row.appName ?: "${Metadata.current.'app.name'}"
+        row.appName = row.appName ?: Metadata.current.getApplicationName()
 
         String message = params['message']
         if (message?.size() > MAX_MESSAGE_SIZE)

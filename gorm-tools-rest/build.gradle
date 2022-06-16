@@ -22,5 +22,5 @@ dependencies {
   compileOnly "com.squareup.okhttp3:okhttp:$vOkhttp"
 
   //tests use the rally domains for the MetaMaps
-  testCompile project(":rally-domain")
+  testImplementation project(":rally-domain")
 }

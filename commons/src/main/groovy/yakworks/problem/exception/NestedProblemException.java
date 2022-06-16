@@ -18,7 +18,7 @@ package yakworks.problem.exception;
 
 import yakworks.problem.ProblemUtils;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Handy class for wrapping runtime {@code Exceptions} with a root cause.

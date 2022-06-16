@@ -7,13 +7,14 @@ import spock.lang.Ignore
 import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.commons.map.Maps
+import yakworks.gorm.testing.http.RestIntTest
 import yakworks.gorm.testing.http.RestIntegrationTest
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
 
 @Rollback
 @Integration
-class OrgControllerTests extends Specification implements RestIntegrationTest {
+class OrgControllerTests extends RestIntTest {
 
     RestRepoApiController<Org> controller
 

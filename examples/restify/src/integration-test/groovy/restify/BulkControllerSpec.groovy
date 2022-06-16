@@ -7,6 +7,7 @@ import grails.testing.mixin.integration.Integration
 import okhttp3.Response
 import org.apache.commons.lang3.StringUtils
 import spock.lang.Specification
+import yakworks.gorm.testing.http.RestIntTest
 import yakworks.gorm.testing.http.RestIntegrationTest
 import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Org
@@ -15,7 +16,7 @@ import static org.springframework.http.HttpStatus.MULTI_STATUS
 
 // @Rollback
 @Integration
-class BulkControllerSpec extends Specification implements RestIntegrationTest {
+class BulkControllerSpec extends RestIntTest {
 
     RestRepoApiController<Org> controller
 

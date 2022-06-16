@@ -37,7 +37,7 @@ class ExternalConfigLoader implements ApplicationContextAware{
             //run ExternalConfigRunListener it will add all the property sources to environment
             Constructor c = Class.forName("grails.plugin.externalconfig.ExternalConfigRunListener").getConstructor(SpringApplication, String[].class)
             Object listener = c.newInstance(null, null)
-            listener.environmentPrepared(applicationContext.environment)
+            listener.environmentPrepared(null, applicationContext.environment)
             postProcessor.loadApplicationConfig()
         }catch (ClassNotFoundException e) {
             //external config plugin is not installed

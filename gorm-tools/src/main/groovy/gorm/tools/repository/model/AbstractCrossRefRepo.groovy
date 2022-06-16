@@ -158,7 +158,7 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
      * for example calling this and passing in Contacts will return the list of tags
      */
     List<R> listRelated(P main) {
-        queryFor(main).list().collect {it[relatedPropName] } as List<R>
+        queryFor(main).list().collect {it[getRelatedPropName()] as R } as List<R>
     }
 
     MangoDetachedCriteria<X> queryFor(Persistable entity){

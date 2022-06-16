@@ -41,7 +41,7 @@ subprojects { subprj ->
     maven { url "http://repo.9ci.com/oss-snapshots"; allowInsecureProtocol = true }
   }
   // get prop with default if null, converts to boolean
-  Closure getProp = { pname, defualtv -> (subprj.findProperty(pname)?:defualtv).toBoolean() }
+  Closure getProp = { pname, defualtv -> (subprj.findProperty(pname) ?: defualtv).toBoolean() }
 
   ext { // see gradle.properties in sub-projects
     //default true for isGormLibrary and isPublishable, set to false in gradle.props
@@ -145,9 +145,6 @@ subprojects { subprj ->
     }
 
   }
-
-
-
   configurations {
     testCompile.extendsFrom compileOnly //includes the compileOnly in tests too so we don't have to list twice
     testCompile.extendsFrom implementation

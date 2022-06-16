@@ -309,6 +309,60 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         }
     }
 
+    void "DataAccessException during processing slice errors"() {
+        setup:
+        Org.withNewTransaction {
+            jdbcTemplate.execute("CREATE UNIQUE INDEX org_num_unique ON Org(num)")
+        }
+
+        List<Map> jsonList = generateOrgData(10)
+        //change a item in array so fails on unique num
+        jsonList[0].type = null //this one will fail the batch
+        jsonList[3].num = "testorg-2" //this one should cause error when processing slice errors
+
+        when:
+        Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create())
+        SyncJob job = SyncJob.repo.getWithTrx(jobId)
+
+        then:
+        noExceptionThrown()
+        job.data != null
+
+        when: "verify json"
+        List json = parseJson(job.dataToString())
+
+        then:
+        json != null
+        json.findAll({ it.ok == true}).size() == 8
+
+        when:
+        Map failed =  json.find({ it.ok == false})
+
+        then:
+        failed != null
+        failed.ok == false
+
+        /*
+        failed.code.contains "uniqueConstraintViolation"
+        failed.title.contains "Unique index or primary key violation"
+        !failed.containsKey("errors") //in this case violations would be empty, so errors field should not be present
+
+        and: "Verify data is not empty"
+        failed.data != null
+        failed.data instanceof Map
+        failed.data.num == "testorg-1"
+        failed.data.name == "org-2"
+        failed.data.info instanceof Map
+        failed.data.flex instanceof Map
+         */
+
+
+        cleanup:
+        Org.withNewTransaction {
+            jdbcTemplate.execute("DROP index org_num_unique")
+        }
+    }
+
     private List<Map> generateOrgData(int numRecords) {
         List<Map> list = []
         (1..numRecords).each { int index ->

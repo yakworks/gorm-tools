@@ -1,5 +1,4 @@
-apply plugin:"groovy"
-//apply plugin:"war"
+apply plugin:"war"
 apply plugin:"org.grails.grails-web"
 apply plugin:"org.grails.plugins.views-json"
 

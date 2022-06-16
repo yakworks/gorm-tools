@@ -15,6 +15,7 @@ import org.codehaus.groovy.runtime.InvokerHelper
 import org.codehaus.groovy.transform.trait.Traits
 
 @CompileStatic
+@SuppressWarnings("unchecked")
 class ClassUtils {
 
     protected static final List BASIC_TYPES = [

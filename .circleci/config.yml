@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: yakworks/builder:jdk8
+      - image: yakworks/builder:jdk11
     resource_class: 'large'
 
     steps:
@@ -55,7 +55,7 @@ jobs:
 
   ship-it:
     docker:
-      - image: yakworks/builder:jdk8
+      - image: yakworks/builder:jdk11
     resource_class: 'medium+'
 
     steps:

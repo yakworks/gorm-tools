@@ -23,7 +23,8 @@ class HibernateProxyInitSpec extends Specification implements DataIntegrationTes
         proxy.getId()
         // getId should also not unwrap the proxy
         !Hibernate.isInitialized(proxy)
-
+        //def proxyHandler = Org.getGormPersistentEntity().mappingContext.proxyHandler
+        // !proxyHandler.isInitialized(proxy)
         // id should also not unwrap the proxy
         // proxy.id
         // !Hibernate.isInitialized(proxy)

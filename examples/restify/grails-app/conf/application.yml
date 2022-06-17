@@ -11,6 +11,7 @@ info:
 spring:
   main:
     banner-mode: "off"
+    lazy-initialization: true
   groovy:
     template:
       check-template-location: false

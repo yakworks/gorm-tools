@@ -12,6 +12,8 @@ dependencies {
   api project(":gorm-tools-security")
   api project(":gorm-tools-csv")
   api "org.yakworks:grails-kit:$vYakGrailsKit"
+  api "org.yakworks:grails-external-config:$vYakGrailsKit"
+  //api "dk.glasius:external-config:$vExternalConfig"
   api 'jakarta.annotation:jakarta.annotation-api:2.1.0'
   // for the mock and seed data
   compileOnly("org.grails.plugins:build-test-data:$vBuildTestData"){
@@ -26,11 +28,6 @@ dependencies {
   implementation "org.grails:grails-web-boot"
   implementation "org.grails:grails-plugin-services"
 
-  // runtimeOnly "org.grails.plugins:external-config:$vExternalConfig"
-  runtimeOnly "dk.glasius:external-config:$vExternalConfig"
-
-  // testRuntimeOnly "org.grails.plugins:external-config:$vExternalConfig"
-  testRuntimeOnly "dk.glasius:external-config:$vExternalConfig"
   testRuntimeOnly "com.h2database:h2:$vH2"
   testRuntimeOnly "javax.xml.bind:jaxb-api:2.3.1"
   testRuntimeOnly "com.zaxxer:HikariCP:$vHikari"

@@ -341,7 +341,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         then:
         failed != null
         failed.ok == false
-        
+
         cleanup:
         Org.withNewTransaction {
             jdbcTemplate.execute("DROP index org_num_unique")

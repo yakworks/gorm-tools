@@ -30,7 +30,7 @@ class AttachmentRepoSpec extends Specification implements DomainIntTest {
     @Ignore //FIXME need to flush this out
     def "bulkCreate test"() {
         setup:
-        File origFile = new File(appResourceLoader.rootLocation, "freemarker/grails_logo.jpg")
+        File origFile = appResourceLoader.rootPath.resolve("freemarker/grails_logo.jpg").toFile()
         byte[] data = FileUtils.readFileToByteArray(origFile)
         File tmpFile = appResourceLoader.createTempFile('grails_logo.jpg', data)
         tmpFile.deleteOnExit()

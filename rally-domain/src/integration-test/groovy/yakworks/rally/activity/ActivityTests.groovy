@@ -79,7 +79,8 @@ class ActivityTests extends Specification implements DomainIntTest {
         when:
         Map params = [id: 22, note: [body: 'Test updated Note body']]
         Activity activity = Activity.get(22)
-        File startFile = new File(appResourceLoader.rootLocation, "freemarker/grails_logo.jpg")
+        File startFile = appResourceLoader.rootPath.resolve("freemarker/grails_logo.jpg").toFile()
+
         byte[] bytes = FileUtils.readFileToByteArray(startFile)
         File tmpFile = appResourceLoader.createTempFile('grails_logo.jpg', bytes)
         String tempFileName = appResourceLoader.getRelativeTempPath(tmpFile)

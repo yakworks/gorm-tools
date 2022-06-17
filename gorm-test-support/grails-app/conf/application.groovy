@@ -10,25 +10,10 @@ grails {
         '*'(nullable: true)
     }
 }
-
-// grails.config.locations = ["classpath:api.yml", "classpath:gorm-tools/defaults.groovy"]
-
-// This part is only applicable to rally-domain and rally-spring but its doesnt hurt that the other plugins get it
 app {
     resources {
-        currentTenant = {
-            return [num: 'virgin', id: 2]
-        }
-        rootLocation = { args ->
-            File file = new File("./build/rootLocation/${args.tenantSubDomain}-${args.tenantId}")
-            if (!file.exists()) file.mkdirs()
-            return file.canonicalPath
-        }
-        tempDir = {
-            File file = new File("./build/rootLocation/tempDir")
-            if (!file.exists()) file.mkdirs()
-            return file.canonicalPath
-        }
+        rootLocation = "./build/rootLocation/"
+        tempDir = "./build/rootLocation/tempDir"
         attachments.location = 'attachments'
     }
 }

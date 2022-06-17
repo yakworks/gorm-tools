@@ -1,5 +1,7 @@
 package yakworks.rally.common
 
+import java.nio.file.Files
+
 import gorm.tools.testing.unit.DataRepoTest
 import yakworks.grails.resource.AppResourceLoader
 import spock.lang.Shared
@@ -34,7 +36,7 @@ class DefaultCsvToMapTransformerSpec extends Specification implements DataRepoTe
     void "sanity checks"() {
         expect:
         appResourceLoader != null
-        appResourceLoader.rootLocation.exists()
+        Files.exists(appResourceLoader.rootPath)
         csvToMapTransformer != null
 
         new File(BuildSupport.gradleRootProjectDir, "examples/resources/csv/contact.csv").exists()

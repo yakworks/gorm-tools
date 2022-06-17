@@ -87,18 +87,8 @@ else {
 String projectRoot = BuildSupport.gradleRootProjectDir
 app {
     resources {
-        currentTenant = {
-            return [num: 'virgin', id: 2]
-        }
-        rootLocation = { args ->
-            File root = new File("${projectRoot}/examples/resources")
-            return root.canonicalPath
-        }
-        tempDir = {
-            File file = new File("./build/rootLocation/tempDir")
-            if (!file.exists()) file.mkdirs()
-            return file.canonicalPath
-        }
+        rootLocation = "${projectRoot}/examples/resources"
+        tempDir = "./build/rootLocation/tempDir"
         attachments.location = 'attachments'
     }
 }

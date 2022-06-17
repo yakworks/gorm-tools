@@ -1,3 +1,10 @@
+### v7.0.8-v.75
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.74...v7.0.8-v.75)
+- release [link](https://github.com/yakworks/gorm-tools/commit/3ee06a428b6b8b7507c895f8a9ba7689fd4170e0)
+- Merge pull request #532 from yakworks/zip-util [link](https://github.com/yakworks/gorm-tools/commit/9c55ebab3d06402cca84280b59b45ac522e5ab0d)
+- Update zip util to zip directories recursively [link](https://github.com/yakworks/gorm-tools/commit/5f0d66f228130b0353eacd262964d3da03acc781)
+
 ### v7.0.8-v.74
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.73...v7.0.8-v.74)

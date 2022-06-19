@@ -6,7 +6,6 @@ package yakworks.rally.attachment.repo
 
 import java.nio.file.Files
 import java.nio.file.Path
-import javax.inject.Inject
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -28,7 +27,6 @@ import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.validation.Rejector
 import grails.gorm.DetachedCriteria
-import io.micronaut.core.annotation.Nullable
 import yakworks.commons.io.FileUtil
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment

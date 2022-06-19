@@ -3,6 +3,7 @@ package yakworks.rally.common
 import java.nio.file.Files
 
 import gorm.tools.testing.unit.DataRepoTest
+import yakworks.commons.io.ZipUtils
 import yakworks.grails.resource.AppResourceLoader
 import spock.lang.Shared
 import spock.lang.Specification
@@ -15,18 +16,13 @@ import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.model.FileData
 
 class DefaultCsvToMapTransformerSpec extends Specification implements DataRepoTest, SecurityTest {
-    @Shared
-    AppResourceLoader appResourceLoader
 
     @Shared
     DefaultCsvToMapTransformer csvToMapTransformer
 
     def setupSpec() {
         defineBeans {
-            appResourceLoader(AppResourceLoader) {
-                grailsApplication = grailsApplication
-                resourcesConfigRootKey = "app.resources"
-            }
+            appResourceLoader(AppResourceLoader)
             attachmentSupport(AttachmentSupport)
             csvToMapTransformer(DefaultCsvToMapTransformer)
         }
@@ -35,20 +31,17 @@ class DefaultCsvToMapTransformerSpec extends Specification implements DataRepoTe
 
     void "sanity checks"() {
         expect:
-        appResourceLoader != null
-        Files.exists(appResourceLoader.rootPath)
         csvToMapTransformer != null
-
-        new File(BuildSupport.gradleRootProjectDir, "examples/resources/csv/contact.csv").exists()
+        def csvFile = BuildSupport.gradleRootProjectPath.resolve("examples/resources/csv/contact.csv")
+        Files.exists(csvFile)
     }
 
     void "test with zip"() {
-        setup:
-        def dataCsv =  new File(BuildSupport.gradleRootProjectDir, "examples/resources/csv/contact.csv")
-        File zip = FileUtil.zip("test.zip", null, dataCsv)
+        when:
+        def csvFile = BuildSupport.gradleRootProjectPath.resolve("examples/resources/csv/contact.csv")
+        File zip = ZipUtils.zip("test.zip", null, csvFile.toFile())
 
-        expect:
-        dataCsv.exists()
+        then:
         zip.exists()
 
         when: "create attachment"
@@ -59,7 +52,7 @@ class DefaultCsvToMapTransformerSpec extends Specification implements DataRepoTe
         noExceptionThrown()
         attachment != null
         attachment.id != null
-        attachment.resource.getFile().exists()
+        attachment.resource.exists()
 
         when:
         List<Map> rows = csvToMapTransformer.process([attachmentId:attachment.id, dataFilename:"contact.csv"])

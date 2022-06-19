@@ -4,6 +4,8 @@
 */
 package yakworks.commons.util
 
+import java.nio.file.Path
+
 import groovy.transform.CompileStatic
 
 @CompileStatic
@@ -26,6 +28,10 @@ class BuildSupport {
         return System.getProperty("gradle.projectDir")
     }
 
+    static Path getGradleProjectPath(){
+        return Path.of(getGradleProjectDir())
+    }
+
     /**
      * on multiproject builds this returns the gradle.rootProjectDir property
      * example:
@@ -37,5 +43,9 @@ class BuildSupport {
      */
     static String getGradleRootProjectDir(){
         return System.getProperty("gradle.rootProjectDir")
+    }
+
+    static Path getGradleRootProjectPath(){
+        return Path.of(getGradleRootProjectDir())
     }
 }

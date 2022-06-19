@@ -25,9 +25,7 @@ class TaskSpec extends Specification implements DataRepoTest, SecurityTest { //i
 
     void setupSpec(){
         defineBeans{
-            appResourceLoader(AppResourceLoader) {
-                grailsApplication = grailsApplication
-            }
+            appResourceLoader(AppResourceLoader)
             attachmentSupport(AttachmentSupport)
         }
         mockDomains(AttachmentLink, ActivityLink, Activity, Task, TaskType, TaskStatus,

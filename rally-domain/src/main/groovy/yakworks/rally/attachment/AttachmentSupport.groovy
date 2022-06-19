@@ -99,7 +99,7 @@ class AttachmentSupport {
      * date yyyy-MM sub-directory.
      */
     Path getAttachmentsPath(String locationKey = ATTACHMENTS_LOCATION_KEY) {
-        Path rootPath = appResourceLoader.getLocation(locationKey).toPath()
+        Path rootPath = appResourceLoader.getPath(locationKey)
         Path attachmentPath = rootPath.resolve(getMonthDir())
         //make sure it exists
         if(!Files.exists(attachmentPath)) Files.createDirectories(attachmentPath)
@@ -112,16 +112,20 @@ class AttachmentSupport {
      * and the file is '/var/9ci/attachments/2020-12/foo123.jpg' this will return '2020-12/foo123.jpg'
      */
     String getRelativePath(Path file, String locationKey = ATTACHMENTS_LOCATION_KEY) {
-        Path rootPath = appResourceLoader.getLocation(locationKey).toPath()
+        Path rootPath = appResourceLoader.getPath(locationKey)
         Path relativePath = rootPath.relativize(file)
         return relativePath.toString()
+    }
+
+    String getRelativePath(File file, String locationKey = ATTACHMENTS_LOCATION_KEY) {
+        getRelativePath(file.toPath(), locationKey)
     }
 
     /**
      * uses appResourceLoader to get the tempDir pat
      */
     Path getTempPath() {
-        appResourceLoader.getTempDir().toPath()
+        appResourceLoader.getTempDirectory()
     }
 
     /**
@@ -132,13 +136,17 @@ class AttachmentSupport {
      * @return a Path instance pointing to file
      */
     Path createTempFile(String fileName, Object data){
-        appResourceLoader.createTempFile(fileName, data).toPath()
+        appResourceLoader.createTempFile(fileName, data)
     }
 
     Path getFile(String location, String locationKey = ATTACHMENTS_LOCATION_KEY) {
-        Path rootPath = appResourceLoader.getLocation(locationKey).toPath()
+        Path rootPath = appResourceLoader.getPath(locationKey)
         Path attachmentPath = rootPath.resolve(location)
         return attachmentPath
+    }
+
+    Path getFile(Attachment attachment){
+        return getFile(attachment.location, attachment.locationKey?:ATTACHMENTS_LOCATION_KEY)
     }
 
     /**
@@ -153,11 +161,11 @@ class AttachmentSupport {
     boolean deleteFile(String location, String locationKey = ATTACHMENTS_LOCATION_KEY) {
         Path attachedFile = getFile(location, locationKey)
         if(attachedFile) return Files.deleteIfExists(attachedFile)
+        return false
     }
 
     Resource getResource(Attachment attachment){
-        Path path = getFile(attachment.location, attachment.locationKey?:ATTACHMENTS_LOCATION_KEY)
-        log.debug "File location is ${path} which ${Files.exists(path)?'exists.':'does not exist.'}"
+        Path path = getFile(attachment)
         return new FileSystemResource(path)
     }
 
@@ -166,6 +174,11 @@ class AttachmentSupport {
         //FIXME this needs to be dealt with so it returns a full url that ends with file name such as
         //https://foo.9ci.io/attachment/123/theFileName.pdf
         "/attachment/download/${attachment.id}"
+    }
+
+    //Used to clean up after testing.
+    boolean rimrafAttachmentsDirectory() {
+        appResourceLoader.deleteDirectory("attachments.location")
     }
 
     /****** STATICS ********/

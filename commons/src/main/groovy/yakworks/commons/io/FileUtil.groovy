@@ -6,11 +6,6 @@ package yakworks.commons.io
 
 import java.nio.channels.FileLock
 import java.nio.charset.Charset
-import java.util.zip.Deflater
-import java.util.zip.ZipEntry
-import java.util.zip.ZipFile
-import java.util.zip.ZipInputStream
-import java.util.zip.ZipOutputStream
 
 import groovy.text.SimpleTemplateEngine
 import groovy.transform.CompileStatic
@@ -140,100 +135,6 @@ class FileUtil {
             it.write(content) //or writeLine
         }
         return thefile
-    }
-
-    /**
-     * Unzip files to specified directory
-     *
-     */
-    static List<File> unzip(File zip, File destDir) {
-        List files = []
-        if (!destDir.exists()) {
-            destDir.mkdir()
-        }
-
-        ZipInputStream zis = new ZipInputStream(new FileInputStream(zip))
-        ZipEntry zepEntry
-
-        while ((zepEntry = zis.nextEntry) != null) {
-            String fileName = zepEntry.name
-            File newFile = new File(destDir, fileName)
-            newFile.getParentFile().mkdirs() //ensure all dirs are created
-            if(zepEntry.isDirectory()) newFile.mkdir()
-            else {
-                FileOutputStream fos = new FileOutputStream(newFile)
-
-                fos << zis
-                fos.flush()
-                fos.close()
-                files << newFile
-            }
-        }
-        zis.closeEntry()
-        zis.close()
-        return files
-    }
-
-    /**
-     * Returns input stream for a specific file inside zip if exists
-     */
-    static InputStream getZipEntryInputStream(File zip, String entryName) {
-        ZipFile zipFile = new ZipFile(zip)
-        ZipEntry entry = zipFile.getEntry(entryName)
-        if(entry) return zipFile.getInputStream(entry)
-        return null
-    }
-
-    /**
-     * Zips multiple files into single zip
-     */
-    static File zip(String zipName, File destinationDir, File[] files) {
-        if(!files) return
-
-        if (!destinationDir) destinationDir = files[0].parentFile
-        File zip = new File(destinationDir, zipName)
-        FileOutputStream fout = new FileOutputStream(zip)
-        ZipOutputStream zout = new ZipOutputStream(fout)
-        zout.setLevel(Deflater.BEST_COMPRESSION)
-
-        Closure addZipEntry
-        addZipEntry = { ZipOutputStream zoutStream, File fileToZip, String parent ->
-            if (fileToZip == null || !fileToZip.exists()) return
-            String zipEntryName = fileToZip.getName()
-            if (parent!=null && !parent.isEmpty()) {
-                zipEntryName = parent + "/" + fileToZip.getName()
-            }
-
-            if (fileToZip.isDirectory()) {
-                for (File file : fileToZip.listFiles()) {
-                    addZipEntry(zoutStream, file, zipEntryName);
-                }
-            } else {
-                ZipEntry entry = new ZipEntry(zipEntryName)
-                zoutStream.putNextEntry(entry)
-                fileToZip.withInputStream { fin ->
-                    zoutStream << fin
-                }
-                zoutStream.closeEntry()
-            }
-        }
-
-
-        files.each { File f ->
-            addZipEntry(zout, f, null)
-        }
-        zout.close()
-        return zip
-    }
-
-    /**
-     * Zips given file
-     */
-    static File zip(File file, File destDir = null) {
-        assert file.exists()
-        if (!destDir) destDir = file.parentFile
-        String name = changeExtension(file.name, 'ZIP')
-        return zip(name, destDir, file)
     }
 
     /**

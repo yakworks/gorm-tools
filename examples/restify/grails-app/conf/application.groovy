@@ -13,13 +13,7 @@ grails {
     }
 }
 
-List restConfigs = ["classpath:restapi-config.yml"]
-// rally rest configs
-["contact.yml", "org.yml", "role.yml", "roleUser.yml", "user.yml"].each { fname ->
-    restConfigs.add "classpath:restapi/$fname"
-}
-
-grails.config.locations = restConfigs
+grails.config.locations = ["classpath:restapi-config.yml", "classpath*:restapi/*.yml"]
 
 //grails.plugin.fields.disableLookupCache = true
 //grails.converters.domain.include.version = true

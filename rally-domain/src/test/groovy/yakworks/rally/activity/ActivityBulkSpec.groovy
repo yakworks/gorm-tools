@@ -1,5 +1,7 @@
 package yakworks.rally.domain
 
+import java.nio.file.Path
+
 import yakworks.commons.lang.IsoDateUtil
 import gorm.tools.repository.model.RepoEntity
 import yakworks.gorm.testing.SecurityTest
@@ -32,14 +34,12 @@ import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 class ActivityBulkSpec extends Specification implements DomainRepoTest<Activity>, SecurityTest  {
 
     ActivityRepo activityRepo
-    AppResourceLoader appResourceLoader
     ActivityBulk activityBulk
+    AttachmentSupport attachmentSupport
 
     def setupSpec() {
         defineBeans {
-            appResourceLoader(AppResourceLoader) {
-                grailsApplication = grailsApplication
-            }
+            appResourceLoader(AppResourceLoader)
             attachmentSupport(AttachmentSupport)
             activityBulk(ActivityBulk)
         }
@@ -82,8 +82,8 @@ class ActivityBulkSpec extends Specification implements DomainRepoTest<Activity>
 
         File origFile = new File(BuildSupport.gradleRootProjectDir, "examples/resources/test.txt")
         byte[] bytes = FileUtils.readFileToByteArray(origFile)
-        File tmpFile = appResourceLoader.createTempFile('test.txt', bytes)
-        String tempFileName = appResourceLoader.getRelativeTempPath(tmpFile)
+        Path tmpFile = attachmentSupport.createTempFile('test.txt', bytes)
+        String tempFileName = tmpFile.fileName
 
         Map changes = [
             name: 'attachment_test',
@@ -116,10 +116,7 @@ class ActivityBulkSpec extends Specification implements DomainRepoTest<Activity>
             Activity activity = link?.activity
             Attachment attachment = activity?.attachments[0]
             if (attachment) {
-                File dir = appResourceLoader.getLocation("attachments.location")
-                File file = new File(dir, attachment.location)
-                file.delete()
-                file.exists()
+                attachmentSupport.getResource(attachment).file.delete()
             }
         }
     }

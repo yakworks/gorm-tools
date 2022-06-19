@@ -1,23 +1,18 @@
 package yakworks.rally.activity
 
-import yakworks.grails.resource.AppResourceLoader
-
-import java.time.LocalDateTime
-
-import org.apache.commons.io.IOUtils
-
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import org.apache.commons.io.IOUtils
 import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.gorm.testing.DomainIntTest
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
-import yakworks.rally.activity.model.Task
 import yakworks.rally.activity.model.TaskStatus
 import yakworks.rally.activity.model.TaskType
 import yakworks.rally.activity.repo.ActivityRepo
+import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
@@ -28,7 +23,7 @@ import yakworks.rally.tag.model.TagLink
 @Rollback
 class ActivityCopyTests extends Specification implements DomainIntTest {
     ActivityRepo activityRepo
-    AppResourceLoader appResourceLoader
+    AttachmentSupport attachmentSupport
 
     @Ignore //FIXME need to fix activity copy https://github.com/9ci/domain9/issues/271
     void testCopy() {
@@ -117,7 +112,7 @@ class ActivityCopyTests extends Specification implements DomainIntTest {
         copy.tags.size() == 1
 
         cleanup:
-        if(copy && copy.attachments) appResourceLoader.getFile(copy.attachments[0].location).delete()
+        if(copy && copy.attachments) attachmentSupport.getResource(copy.attachments[0]).getFile().delete()
     }
 
 }

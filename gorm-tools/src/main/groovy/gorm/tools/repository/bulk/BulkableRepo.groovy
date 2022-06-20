@@ -143,7 +143,7 @@ trait BulkableRepo<D> {
                 } catch(Exception ex) {
                     log.error("BulkableRepo unexpected exception", ex)
                     // just in case, unexpected errors as we should have intercepted them all already in doBulk
-                    jobContext.results << problemHandler.handleUnexpected(ex)
+                    jobContext.results << problemHandler.handleException(ex)
                 }
             }
         }

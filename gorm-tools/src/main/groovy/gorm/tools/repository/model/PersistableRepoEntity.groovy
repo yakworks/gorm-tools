@@ -9,9 +9,12 @@ import javax.persistence.Transient
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
+import org.grails.datastore.gorm.GormEntity
+
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
+import gorm.tools.utils.GormMetaUtils
 import gorm.tools.validation.ApiConstraints
 
 /**

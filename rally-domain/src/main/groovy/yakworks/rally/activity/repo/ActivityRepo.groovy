@@ -289,7 +289,7 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
 
     @ReadOnly
     boolean hasActivityWithAttachments(Persistable<Long> linkedEntity, Activity.Kind kind = null) {
-        def actLinkExists = getActivityLinkCriteria(linkedEntity.id, linkedEntity.class.simpleName)
+        def actLinkExists = getActivityLinkCriteria(linkedEntity.getId(), linkedEntity.class.simpleName)
 
         def laQuery = Activity.query {
             setAlias 'activity_'

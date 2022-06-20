@@ -72,8 +72,8 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
      */
     void validateCreate(P main, R related){
         //by default check that ids are set when creating, no proxys as they just caue problems in this context
-        Validate.notNull(main.id, "main entity.id can't be null: %s", mainClass )
-        Validate.notNull(related.id, "related entity.id can't be null: %s", relatedClass)
+        Validate.notNull(main.getId(), "main entity.id can't be null: %s", mainClass )
+        Validate.notNull(related.getId(), "related entity.id can't be null: %s", relatedClass)
     }
 
     /**

@@ -34,7 +34,7 @@ import yakworks.security.shiro.ShiroSpringSecurityEventListener
 import yakworks.security.shiro.ShiroSubjectBindingFilter
 import yakworks.security.shiro.SpringSecurityRealm
 import yakworks.security.tenant.UserRequest
-import yakworks.security.tenant.UserTenantResolver
+// import yakworks.security.tenant.UserTenantResolver
 
 @SuppressWarnings(['Indentation', 'Println'])
 @CompileDynamic //ok
@@ -55,7 +55,7 @@ class RallySecurityGrailsPlugin extends Plugin {
         rallyUserService(RallyUserService, autowireLazy())
         currentUser(CurrentUser, autowireLazy())
 
-        userTenantResolver(UserTenantResolver)
+        // userTenantResolver(UserTenantResolver)
 
         userRequest(UserRequest){ bean ->
             bean.scope = 'request'

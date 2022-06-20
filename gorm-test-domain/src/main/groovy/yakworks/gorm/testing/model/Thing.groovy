@@ -7,12 +7,14 @@ package yakworks.gorm.testing.model
 import gorm.tools.model.NamedEntity
 import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
+import grails.gorm.hibernate.annotation.ManagedEntity
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 
 @Entity
 @IdEqualsHashCode
 @GrailsCompileStatic
+// @ManagedEntity
 class Thing implements NamedEntity, GormRepoEntity<Thing, ThingRepo> {
 
     // address fields

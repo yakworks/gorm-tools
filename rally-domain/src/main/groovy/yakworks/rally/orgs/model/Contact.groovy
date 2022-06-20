@@ -133,7 +133,7 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
 
     /** flag 'isPrimary' to be displayed on grid on list of contacts under Org (Customer) */
     boolean getIsPrimary() {
-        return (id == org?.contact?.id)
+        return (id == org?.contact?.getId())
     }
 
 
@@ -146,7 +146,7 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
 
     void setOrg(Org o){
         org = o
-        if(o.id != orgId) orgId = o.id
+        if(o.id != orgId) orgId = o.getId()
     }
 
     /**

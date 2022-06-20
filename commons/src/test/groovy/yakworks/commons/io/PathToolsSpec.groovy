@@ -1,7 +1,7 @@
 package yakworks.commons.io
 
 import java.nio.file.Path
-
+import java.nio.file.Paths
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -48,7 +48,7 @@ class PathToolsSpec extends Specification {
 
     void "test match extension full"() {
         expect:
-        PathTools.getExtension(Path.of('foo.tar.gz'), true) == 'tar.gz'
+        PathTools.getExtension(Paths.get('foo.tar.gz'), true) == 'tar.gz'
     }
 
     void "test extractMimeType"() {

@@ -120,7 +120,7 @@ class AppUserRepo implements GormRepo<AppUser> {
             // otherwise convert value to long and assume it s list of ids
             (it instanceof Map) ? it['id'] as Long : it as Long
         }
-        List<Long> existingRoles = SecRoleUser.getByUser(userId)*.role.id
+        List<Long> existingRoles = SecRoleUser.getByUser(userId).collect{ it.role.getId() }
 
         List<Long> deleting
         List<Long> addition

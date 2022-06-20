@@ -7,6 +7,7 @@ package yakworks.commons.io
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.StandardCopyOption
 import java.nio.file.attribute.BasicFileAttributes
@@ -95,7 +96,7 @@ abstract class PathTools {
     }
 
     static String getBaseName(String filename) {
-        return getBaseName(Path.of(filename))
+        return getBaseName(Paths.get(filename))
     }
 
     /**
@@ -133,7 +134,7 @@ abstract class PathTools {
      */
     static String getExtension(String fileName) {
         if (!fileName) return ''
-        getExtension(Path.of(fileName))
+        getExtension(Paths.get(fileName))
     }
 
     static String getExtension(Path path, boolean wholeExtension = false) {
@@ -146,7 +147,7 @@ abstract class PathTools {
     }
 
     static String extractMimeType(String filename) {
-        extractMimeType(Path.of(filename))
+        extractMimeType(Paths.get(filename))
     }
     /**
      * Gets mime type from file name

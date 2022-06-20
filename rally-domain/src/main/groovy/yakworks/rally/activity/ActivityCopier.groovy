@@ -81,7 +81,7 @@ class ActivityCopier extends LongIdGormRepo<Activity> {
             try {
                 Activity copy = copy(activity, new Activity(org: toOrg))
                 if (copy) {
-                    Map queryParams = [edDate: activity['editedDate'], crDate: activity['createdDate'], newid: copy.id]
+                    Map queryParams = [edDate: activity['editedDate'], crDate: activity['createdDate'], newid: copy.getId()]
                     Activity.executeUpdate("update Activity act set act.editedDate=:edDate, act.createdDate=:crDate where act.id=:newid ", queryParams)
                 }
             } catch (e) {

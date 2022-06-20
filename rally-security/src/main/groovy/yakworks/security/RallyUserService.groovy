@@ -99,7 +99,7 @@ class RallyUserService {
         if (!contact.user) {
             AppUser user = new AppUser(username: contact.email, email: contact.email)
             user.password = password //plain text password gets encrypted on persist to passHash
-            user.id = contact.id
+            user.id = contact.getId()
             contact.user = user
             user.persist()
         }

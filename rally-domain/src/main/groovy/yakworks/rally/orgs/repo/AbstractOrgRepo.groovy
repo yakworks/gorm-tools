@@ -108,7 +108,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
 
     void persistManyList(Org org, GormRepo assocRepo, List<Map> assocList){
         if(!assocList) return
-        assocList.each { it['orgId'] = org.id}
+        assocList.each { it['orgId'] = org.getId()}
         assocRepo.createOrUpdate(assocList)
     }
 
@@ -133,9 +133,9 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
      */
     @RepoListener
     void afterRemove(Org org, AfterRemoveEvent e) {
-        Location.query(orgId: org.id).deleteAll()
-        Contact.query(orgId: org.id).deleteAll()
-        OrgSource.query(orgId: org.id).deleteAll()
+        Location.query(orgId: org.getId()).deleteAll()
+        Contact.query(orgId: org.getId()).deleteAll()
+        OrgSource.query(orgId: org.getId()).deleteAll()
     }
 
     /**
@@ -158,16 +158,16 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
             //if data has id
             Long cid = data.id as Long
             //if data has id and its different then replace
-            if(cid && org.contact.id != cid) {
-                org.contact = Contact.get(cid)
+            if(cid && org.contact.getId() != cid) {
+                org.contact = Contact.load(cid)
                 return org.contact
             } else if(!cid) {
-                data.id = org.contact.id
+                data.id = org.contact.getId()
             }
         }
         //make sure it has the right settings
         data.isPrimary = true
-        data.orgId = org.id
+        data.orgId = org.getId()
         org.contact = contactRepo.createOrUpdate(data)
         return org.contact
     }
@@ -175,7 +175,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
     Location createOrUpdatePrimaryLocation(Org org, Map data){
         if(!data) return
         //make sure params has org key
-        data.orgId = org.id
+        data.orgId = org.getId()
         // if it had an op of remove then will return null and this set primary location to null
         org.location = locationRepo.createOrUpdate(data)
         return org.location

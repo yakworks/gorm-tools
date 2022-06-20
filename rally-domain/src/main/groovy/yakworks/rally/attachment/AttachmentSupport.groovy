@@ -173,7 +173,7 @@ class AttachmentSupport {
         //grailsLinkGenerator.link(uri: "/attachment/download/${attachment.id}")
         //FIXME this needs to be dealt with so it returns a full url that ends with file name such as
         //https://foo.9ci.io/attachment/123/theFileName.pdf
-        "/attachment/download/${attachment.id}"
+        "/attachment/download/${attachment.getId()}"
     }
 
     //Used to clean up after testing.

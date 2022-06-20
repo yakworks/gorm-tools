@@ -102,7 +102,7 @@ class Location implements GormRepoEntity<Location, LocationRepo>, Serializable {
 
     void setOrg(Org o){
         org = o
-        if(o.id != orgId) orgId = o.id
+        if(o.id != orgId) orgId = o.getId()
     }
 
     static List<Location> listByContact(Contact con){

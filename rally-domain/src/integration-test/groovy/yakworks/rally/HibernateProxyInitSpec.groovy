@@ -1,5 +1,7 @@
 package yakworks.rally
 
+import gorm.tools.utils.GormMetaUtils
+import grails.core.support.proxy.ProxyHandler
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import org.hibernate.Hibernate
 
@@ -14,15 +16,24 @@ import yakworks.rally.orgs.model.Org
 @Rollback
 class HibernateProxyInitSpec extends Specification implements DataIntegrationTest {
 
+    ProxyHandler proxyHandler
+
     void "calling id prop should not unwrap proxy"() {
         when:
         def proxy = Org.load(2)
 
         then: "load returns a proxy"
-        !Hibernate.isInitialized(proxy)
-        proxy.getId()
+        proxy
+        !proxyHandler.isInitialized(proxy)
+        proxy.getId() == GormMetaUtils.getId(proxy)
         // getId should also not unwrap the proxy
-        !Hibernate.isInitialized(proxy)
+        !proxyHandler.isInitialized(proxy)
+
+        //this triggers it, seems any method call does it
+        // proxy.isAttached()
+        // GormMetaUtils.getId(proxy)
+        // getId should also not unwrap the proxy
+        // !proxyHandler.isInitialized(proxy)
         //def proxyHandler = Org.getGormPersistentEntity().mappingContext.proxyHandler
         // !proxyHandler.isInitialized(proxy)
         // id should also not unwrap the proxy

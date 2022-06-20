@@ -10,14 +10,14 @@ import org.springframework.security.core.context.SecurityContextHolder
 import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.gorm.testing.DomainIntTest
-import yakworks.security.tenant.UserTenantResolver
+// import yakworks.security.tenant.UserTenantResolver
 
 @Ignore //WIP
 @Integration
 @Rollback
 class UserTenantResolverSpec extends Specification implements DomainIntTest {//, ApplicationContextAware {
 
-    @Autowired UserTenantResolver userTenantResolver
+    // @Autowired UserTenantResolver userTenantResolver
     // @Autowired SpringSecService secService
 
     void logout(){

@@ -39,7 +39,7 @@ class SecRolePermission implements RepoEntity<SecRolePermission>, Serializable  
     @Override
     boolean equals(Object other) {
         if (other instanceof SecRolePermission) {
-            other.permission == permission && other.roleId == role?.id
+            other.permission == permission && other.roleId == role?.getId()
         }
     }
 
@@ -50,7 +50,7 @@ class SecRolePermission implements RepoEntity<SecRolePermission>, Serializable  
             hashCode = HashCodeHelper.updateHash(hashCode, permission)
         }
         if (role) {
-            hashCode = HashCodeHelper.updateHash(hashCode, role.id)
+            hashCode = HashCodeHelper.updateHash(hashCode, role.getId())
         }
         hashCode
     }

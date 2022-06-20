@@ -124,8 +124,8 @@ class ActivityBulk {
             String entityName = target.getClass().getSimpleName()
             Org org = (entityName == "ArTran" ? target['customer']['org'] : target['org']) as Org //possible candidates, ArTran,Customer,CustAccount,Payment
             Activity activity
-            if (createdActivities[org.id] && entityName != "Payment") {
-                activity = createdActivities[org.id]
+            if (createdActivities[org.getId()] && entityName != "Payment") {
+                activity = createdActivities[org.getId()]
             } else {
                 List copiedAttachments = attachments
                 //Here !=0 = for first payment use the original attachments and for all rest of the payments copy it.
@@ -134,7 +134,7 @@ class ActivityBulk {
                     copiedAttachments = attachments.collect { attachmentRepo.copy(it as Attachment)}
                 }
                 activity = createActivity(activityData.name.toString(), org, (Map) activityData.task, copiedAttachments, entityName, source)
-                createdActivities[org.id as Long] = activity
+                createdActivities[org.getId() as Long] = activity
             }
 
             Long linkedId = target['id'] as Long

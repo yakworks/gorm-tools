@@ -27,7 +27,7 @@ class OrgTagRepo extends AbstractLinkedEntityRepo<OrgTag, Tag> {
 
     @Override
     void validateCreate(Persistable entity, Tag tag) {
-        Validate.notNull(entity.id, "[linkEntity.id]")
+        Validate.notNull(entity.getId(), "[linkEntity.id]")
         Org org = (Org) entity
         if (!tag.isValidFor(org.type.name()))
             throw new IllegalArgumentException("Tags entityName: ${tag.entityName} not valid for org type ${org.type.name()}")
@@ -44,7 +44,7 @@ class OrgTagRepo extends AbstractLinkedEntityRepo<OrgTag, Tag> {
     //override since there is no linkedEntity field
     @Override
     MangoDetachedCriteria<OrgTag> queryByMain(Persistable entity){
-        query(linkedId: entity.id)
+        query(linkedId: entity.getId())
     }
 
     List<Tag> listTags(Persistable org) {

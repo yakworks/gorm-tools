@@ -24,7 +24,10 @@ dependencies {
   api("org.pac4j:pac4j-saml:3.8.3"){
     // fix hazel cast Not supported: "http://javax.xml.XMLConstants/property/accessExternalDTD"
     exclude module: 'xalan'
+    exclude module: 'org.hibernate'
   }
+  // this is here beacause the org.opensaml:opensaml-storage-impl in pac4j deps depends on it
+  api("org.hibernate:hibernate-entitymanager:$vHibernate")
 
   ['aspectj', 'core', 'spring', 'web'].each {
     api "org.apache.shiro:shiro-$it:$vShiro"

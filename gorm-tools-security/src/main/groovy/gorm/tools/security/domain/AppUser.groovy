@@ -12,14 +12,16 @@ import groovy.transform.EqualsAndHashCode
 
 import gorm.tools.audit.AuditStampTrait
 import gorm.tools.model.NamedEntity
+import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.GormRepoEntity
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
 @Entity
 @GrailsCompileStatic
 @EqualsAndHashCode(includes='username', useCanEqual=false)
-class AppUser implements NamedEntity, AuditStampTrait, GormRepoEntity<AppUser, AppUserRepo>, Serializable {
+class AppUser implements NamedEntity, AuditStampTrait, RepoEntity<AppUser>, Serializable {
 
     static Map includes = [
         qSearch: ['username', 'name', 'email'], // quick search includes
@@ -54,6 +56,8 @@ class AppUser implements NamedEntity, AuditStampTrait, GormRepoEntity<AppUser, A
     // other default fields
     // boolean accountExpired = false //not used right now
     // boolean accountLocked = false //not used right now
+
+    static AppUserRepo getRepo() { RepoLookup.findRepo(this) as AppUserRepo }
 
     static mapping = {
         // cache "nonstrict-read-write"

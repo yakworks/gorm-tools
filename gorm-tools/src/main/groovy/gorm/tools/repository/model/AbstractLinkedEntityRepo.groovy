@@ -29,7 +29,7 @@ abstract class AbstractLinkedEntityRepo<X, R extends Persistable> extends Abstra
 
     @Override
     void validateCreate(Persistable linkEntity, R related){
-        Validate.notNull(linkEntity.id, "[linkEntity.id]")
+        Validate.notNull(linkEntity.getId(), "[linkEntity.id]")
     }
 
     /**
@@ -37,7 +37,7 @@ abstract class AbstractLinkedEntityRepo<X, R extends Persistable> extends Abstra
      */
     @Override
     Map getKeyMap(Persistable<Long> main, R related){
-        getKeyMap(main.id, getLinkedEntityName(main), related)
+        getKeyMap(main.getId(), getLinkedEntityName(main), related)
     }
 
     /**
@@ -66,7 +66,7 @@ abstract class AbstractLinkedEntityRepo<X, R extends Persistable> extends Abstra
 
     @Override
     MangoDetachedCriteria<X> queryByMain(Persistable entity){
-        query(linkedId: entity.id, linkedEntity: getLinkedEntityName(entity))
+        query(linkedId: entity.getId(), linkedEntity: getLinkedEntityName(entity))
     }
 
 

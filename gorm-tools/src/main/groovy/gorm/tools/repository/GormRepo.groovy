@@ -120,7 +120,8 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
     void validateAndSave(D entity, PersistArgs args) {
         validate(entity, args)
         doAfterValidateBeforeSave(entity, args)
-        gormSave(entity, args) //save without validate
+        args.validate = false //set it false so we dont do it again
+        gormSave(entity, args)
     }
 
     /**
@@ -485,7 +486,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
                 //if its a proxy then its already setup and not new
                 if(!proxyHandler.isProxy(assoc) && !gentity.getAssociationId(fld)){
                     PersistableRepoEntity assocEntity = assoc as PersistableRepoEntity
-                    assocEntity.id = pentity.id
+                    assocEntity.id = pentity.getId()
                     assocEntity.persist(validate: false, insert: true)
                 }
                 // TODO, after benchmark checks might need to also check if dirty and persist here.

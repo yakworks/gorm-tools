@@ -93,7 +93,7 @@ class SecRoleUser implements RepoEntity<SecRoleUser>, Serializable {
     static Map<SecRole, Boolean> getRoleMap(AppUser userInstance) {
         List roles = SecRole.list()
         Set userRoleNames = []
-        if (userInstance.id) {
+        if (userInstance.getId()) {
             for (r in userInstance.roles) {
                 userRoleNames << r.code
             }
@@ -109,7 +109,7 @@ class SecRoleUser implements RepoEntity<SecRoleUser>, Serializable {
     @Override
     boolean equals(Object other) {
         if (other instanceof SecRoleUser) {
-            other.userId == user?.id && other.roleId == role?.id
+            other.userId == user?.getId() && other.roleId == role?.getId()
         }
     }
 
@@ -117,10 +117,10 @@ class SecRoleUser implements RepoEntity<SecRoleUser>, Serializable {
     int hashCode() {
         int hashCode = HashCodeHelper.initHash()
         if (user) {
-            hashCode = HashCodeHelper.updateHash(hashCode, user.id)
+            hashCode = HashCodeHelper.updateHash(hashCode, user.getId())
         }
         if (role) {
-            hashCode = HashCodeHelper.updateHash(hashCode, role.id)
+            hashCode = HashCodeHelper.updateHash(hashCode, role.getId())
         }
         hashCode
     }

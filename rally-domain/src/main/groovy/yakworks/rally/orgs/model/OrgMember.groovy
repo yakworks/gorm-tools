@@ -70,7 +70,7 @@ class OrgMember implements GormRepoEntity<OrgMember, OrgMemberRepo>, Serializabl
 
     static OrgMember make(Org org){
         //assert org.id
-        return new OrgMember(id: org.id, org: org)
+        return new OrgMember(id: org.getId(), org: org)
     }
 
 }

@@ -5,6 +5,7 @@
 package yakworks.commons.util
 
 import java.nio.file.Path
+import java.nio.file.Paths
 
 import groovy.transform.CompileStatic
 
@@ -29,7 +30,7 @@ class BuildSupport {
     }
 
     static Path getGradleProjectPath(){
-        return Path.of(getGradleProjectDir())
+        return Paths.get(getGradleProjectDir())
     }
 
     /**
@@ -46,6 +47,6 @@ class BuildSupport {
     }
 
     static Path getGradleRootProjectPath(){
-        return Path.of(getGradleRootProjectDir())
+        return Paths.get(getGradleRootProjectDir())
     }
 }

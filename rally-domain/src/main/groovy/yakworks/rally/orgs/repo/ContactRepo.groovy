@@ -93,7 +93,7 @@ class ContactRepo extends LongIdGormRepo<Contact> {
                 throw new DataRetrievalFailureException("Multiple Contacts found for num: ${data.num}, lookup key must return a unique Contact")
             }
         }
-        return load(contact?.id)
+        return load(contact?.getId())
     }
 
     @RepoListener
@@ -173,10 +173,10 @@ class ContactRepo extends LongIdGormRepo<Contact> {
         // data.orgId wins if its set, only do lookup if its not set
         if (!data.orgId) {
             if (data.org && data.org instanceof Map) {
-                contact.orgId = Org.repo.findWithData(data.org as Map)?.id
+                contact.orgId = Org.repo.findWithData(data.org as Map)?.getId()
             }
             else if(data.org && data.org instanceof Org){
-                contact.orgId = ((Org)data.org).id
+                contact.orgId = ((Org)data.org).getId()
             }
         }
     }
@@ -189,7 +189,7 @@ class ContactRepo extends LongIdGormRepo<Contact> {
         if (!contact.user) {
             AppUser user = new AppUser(username: contact.email, email: contact.email)
             user.password = password //plain text password gets encrypted on persist to passHash
-            user.id = contact.id
+            user.id = contact.getId()
             contact.user = user
             user.persist()
         }

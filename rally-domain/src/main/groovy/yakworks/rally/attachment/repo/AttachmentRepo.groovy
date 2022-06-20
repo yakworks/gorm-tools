@@ -27,7 +27,7 @@ import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.validation.Rejector
 import grails.gorm.DetachedCriteria
-import yakworks.commons.io.FileUtil
+import yakworks.commons.io.PathTools
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.tag.model.TagLink
@@ -93,8 +93,8 @@ class AttachmentRepo extends LongIdGormRepo<Attachment> {
                 Rejector.of(attachment).withNotNullError('name')
                 return
             }
-            if (!p.mimeType) p.mimeType = FileUtil.extractMimeType(p.name as String)
-            if (!p.extension) p.extension = FileUtil.getExtension(p.name as String)
+            if (!p.mimeType) p.mimeType = PathTools.extractMimeType(p.name as String)
+            if (!p.extension) p.extension = PathTools.getExtension(p.name as String)
             //FIXME hard coded design needs to be refactored out and simplified
             if (p.isCreditFile) p.locationKey = "attachments.creditFiles.location"
         }
@@ -112,6 +112,7 @@ class AttachmentRepo extends LongIdGormRepo<Attachment> {
     @RepoListener
     void afterBind(Attachment attachment, Map p, AfterBindEvent ev) {
         if (ev.isBindCreate()) {
+            if(attachment.hasErrors()) return //if it has errors the exit
             Path attachedFile = createFile(attachment, p)
             if(attachedFile){
                 p.attachedFile = attachedFile //used later in exeption handling to delete the file
@@ -174,7 +175,7 @@ class AttachmentRepo extends LongIdGormRepo<Attachment> {
      */
     Path createFile(Attachment attachment, Map p){
         String fileName = p.name as String
-
+        // Validate.notNull(fileName)
         if (p.tempFileName) { //this would be primary way to upload files via UI and api
             return attachmentSupport.createFileFromTempFile(attachment.id, fileName, p.tempFileName as String, attachment.locationKey)
         }

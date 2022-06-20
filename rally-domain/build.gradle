@@ -15,6 +15,7 @@ dependencies {
   api "org.yakworks:grails-external-config:$vYakGrailsKit"
   //api "dk.glasius:external-config:$vExternalConfig"
   api 'jakarta.annotation:jakarta.annotation-api:2.1.0'
+
   // for the mock and seed data
   compileOnly("org.grails.plugins:build-test-data:$vBuildTestData"){
     exclude group:"org.grails", module: "grails-gorm-testing-support"

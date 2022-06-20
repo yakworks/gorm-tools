@@ -12,7 +12,6 @@ import java.time.format.DateTimeFormatter
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.apache.commons.io.FilenameUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.core.io.FileSystemResource
@@ -20,6 +19,7 @@ import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 
+import yakworks.commons.io.PathTools
 import yakworks.grails.resource.AppResourceLoader
 import yakworks.rally.attachment.model.Attachment
 
@@ -196,10 +196,10 @@ class AttachmentSupport {
      *  @return the unique file name
      */
     static String concatFileNameId(String fileName, Long id) {
-        String extension = FilenameUtils.getExtension(fileName)
+        String extension = PathTools.getExtension(fileName)
         if(extension) extension = ".${extension}"
 
-        String baseName = FilenameUtils.getBaseName(fileName)
+        String baseName = PathTools.getBaseName(fileName)
         return "${baseName}_${id}${extension}"
     }
 
@@ -210,7 +210,7 @@ class AttachmentSupport {
         params['name'] = params.name ?: multipartFile.originalFilename
         params['mimeType'] = multipartFile.contentType
         params['bytes'] = multipartFile.bytes
-        params['extension'] = FilenameUtils.getExtension(multipartFile.originalFilename)
+        params['extension'] = PathTools.getExtension(multipartFile.originalFilename)
 
         return params
     }

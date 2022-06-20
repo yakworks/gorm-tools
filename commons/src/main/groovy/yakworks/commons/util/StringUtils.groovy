@@ -6,6 +6,7 @@ package yakworks.commons.util
 
 import java.util.regex.Pattern
 
+import groovy.text.SimpleTemplateEngine
 import groovy.transform.CompileStatic
 
 /**
@@ -92,5 +93,17 @@ class StringUtils {
      */
     public static boolean isNotEmpty(CharSequence str) {
         return !isEmpty(str);
+    }
+
+    /**
+     * Accepts a string which is formatted like a GString, and a binding map for values.  Parses the values and
+     * returns a string based on those values.  An example of where this would be used is Config.groovy, where the
+     * values of the GString have not yet been created.
+     */
+    static String parseStringAsGString(String theString, Map binding) {
+        def engine = new SimpleTemplateEngine()
+        def template = engine.createTemplate(theString)
+        def result = template.make(binding).toString()
+        return result
     }
 }

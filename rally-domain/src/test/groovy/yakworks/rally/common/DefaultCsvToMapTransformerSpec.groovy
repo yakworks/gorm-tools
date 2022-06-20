@@ -7,7 +7,6 @@ import yakworks.commons.io.ZipUtils
 import yakworks.grails.resource.AppResourceLoader
 import spock.lang.Shared
 import spock.lang.Specification
-import yakworks.commons.io.FileUtil
 import yakworks.commons.util.BuildSupport
 import yakworks.gorm.testing.SecurityTest
 import yakworks.rally.attachment.AttachmentSupport

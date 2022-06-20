@@ -4,9 +4,13 @@
 */
 package yakworks.rally.attachment.model
 
+import java.nio.charset.Charset
+
 import groovy.transform.CompileDynamic
 
+import org.apache.commons.io.IOUtils
 import org.springframework.core.io.Resource
+import org.springframework.util.FileCopyUtils
 
 import gorm.tools.audit.AuditStamp
 import gorm.tools.audit.AuditStampTrait
@@ -15,7 +19,6 @@ import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-import yakworks.commons.io.FileUtil
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.tag.model.Taggable
@@ -125,7 +128,8 @@ class Attachment implements NameDescription, Taggable, AuditStampTrait, RepoEnti
     /** if the file/data is text then this returns the String/Text */
     String getText() {
         if (getResource()?.exists()) {
-            return FileUtil.readFileToString(getResource().file)
+            return FileCopyUtils.copyToString(new InputStreamReader(getResource().inputStream, Charset.defaultCharset()))
+            // return IOUtils.toString(getResource().inputStream, Charset.defaultCharset())
         } else if (fileData?.data) {
             return new String(fileData.data, 'UTF-8')
         } else {

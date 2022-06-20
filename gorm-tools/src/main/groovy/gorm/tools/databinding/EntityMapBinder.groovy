@@ -23,8 +23,10 @@ import org.grails.web.databinding.DataBindingEventMulticastListener
 import org.grails.web.databinding.GrailsWebDataBindingListener
 import org.grails.web.databinding.SpringConversionServiceAdapter
 import org.springframework.context.MessageSource
+import org.springframework.validation.AbstractBindingResult
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.BindingResult
+import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 
@@ -123,7 +125,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
 
         fastBind(object, source, whiteList, listenerWrapper, errors)
 
-        populateErrors(object, bindingResult)
+        if(bindingResult.hasErrors())populateErrors(object, bindingResult)
     }
 
     /**
@@ -531,11 +533,10 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             }
             bindingResult = newResult
         }
-        def mc = GroovySystem.getMetaClassRegistry().getMetaClass(obj.getClass())
-        if (mc.hasProperty(obj, "errors")!=null && bindingResult!=null) {
-            def errors = new ValidationErrors(obj)
+        def mc = obj.metaClass
+        if (mc.hasProperty(obj, "errors") != null && bindingResult != null) {
+            def errors = obj['errors'] as AbstractBindingResult //this has the addError method
             errors.addAllErrors(bindingResult)
-            mc.setProperty(obj, "errors", errors)
         }
     }
 

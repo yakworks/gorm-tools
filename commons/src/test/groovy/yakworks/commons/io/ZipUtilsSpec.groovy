@@ -13,7 +13,7 @@ class ZipUtilsSpec extends Specification {
         when:
         Path zip = BuildSupport.gradleRootProjectPath.resolve("examples/resources/attachments/zip-test.zip")
         Path build = BuildSupport.gradleProjectPath.resolve('build/zipTest')
-        FileSystemUtils.deleteRecursively(build) //clean it
+        PathTools.deleteDirectory(build) //clean it
         // Files.createDirectories(build)
 
         ZipUtils.unzip(zip, build)
@@ -34,7 +34,7 @@ class ZipUtilsSpec extends Specification {
         zip.exists()
 
         when:
-        String extension = FileUtil.getExtension(zip.name)
+        String extension = PathTools.getExtension(zip.name)
 
         then:
         "zip".equalsIgnoreCase(extension)

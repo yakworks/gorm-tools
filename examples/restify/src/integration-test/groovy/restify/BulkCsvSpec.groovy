@@ -4,7 +4,6 @@ import gorm.tools.repository.RepoUtil
 import gorm.tools.rest.controller.RestRepoApiController
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import yakworks.commons.io.FileUtil
 import yakworks.commons.io.ZipUtils
 import yakworks.commons.util.BuildSupport
 import yakworks.gorm.testing.http.RestIntTest

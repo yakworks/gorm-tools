@@ -14,8 +14,10 @@ dependencies {
   api "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
 
   api 'jakarta.annotation:jakarta.annotation-api:2.1.0'
+
+  api "commons-io:commons-io:$vCommonsIO"
+
   //libs
-  // implementation "commons-io:commons-io:$vCommonsIO"
   api "org.yakworks:i18n:$vYakworksICU4J"
 
   api "net.lingala.zip4j:zip4j:$vZip4j"

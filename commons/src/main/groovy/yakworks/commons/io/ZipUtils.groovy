@@ -14,6 +14,8 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import net.lingala.zip4j.ZipFile
+import net.lingala.zip4j.io.inputstream.ZipInputStream
+
 /*
  * Util methods for file processing such as deleting temp files or zipping
  */
@@ -38,6 +40,16 @@ class ZipUtils {
         if(entry) return zipFile.getInputStream(entry)
         return null
     }
+
+    // static InputStream getZipEntryInputStream(InputStream inputStream, String entryName) {
+    //     ZipInputStream zip = new ZipInputStream(inputStream);
+    //     var zipis = new java.util.zip.ZipInputStream(inputStream)
+    //     zipis.get
+    //     FileHeader fileHeader = zip.getFileHeader("entry_name_in_zip.txt");
+    //     InputStream inputStream = zipFile.getInputStream(fileHeader);
+    //
+    //     getZipEntryInputStream(zip.toFile(), entryName)
+    // }
 
     /**
      * Zips multiple files into single zip
@@ -87,7 +99,7 @@ class ZipUtils {
     static File zip(File file, File destDir = null) {
         assert file.exists()
         if (!destDir) destDir = file.parentFile
-        String name = FileUtil.changeExtension(file.name, 'ZIP')
+        String name = PathTools.changeExtension(file.name, 'zip')
         return zip(name, destDir, file)
     }
 }

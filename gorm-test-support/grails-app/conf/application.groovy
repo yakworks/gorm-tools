@@ -13,7 +13,7 @@ grails {
 app {
     resources {
         rootLocation = "./build/rootLocation/"
-        tempDir = "./build/rootLocation/tempDir"
+        tempDir = "tempDir"
         attachments.location = 'attachments'
     }
 }

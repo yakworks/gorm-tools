@@ -147,8 +147,8 @@ class RallySeedData {
 
     static void buildTags(){
         Tag.withTransaction {
-            def t1 = new Tag(id: 1, code: "CPG", entityName: 'Customer').persist(flush: true)
-            def t2 = new Tag(id: 2, code: "MFG", entityName: 'Customer').persist(flush: true)
+            def t1 = new Tag(id: 1 as Long, code: "CPG", entityName: 'Customer').persist(flush: true)
+            def t2 = new Tag(id: 2 as Long, code: "MFG", entityName: 'Customer').persist(flush: true)
         }
     }
 

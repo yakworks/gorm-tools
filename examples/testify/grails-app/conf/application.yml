@@ -20,8 +20,8 @@ logging:
     org.springframework: WARN
     org.hibernate.orm.deprecation: OFF # turns off deprecation notices
     # uncomment to turn on sql logging
-    org.hibernate.stat: DEBUG
-    org.hibernate.SQL: DEBUG
+#    org.hibernate.stat: DEBUG
+#    org.hibernate.SQL: DEBUG
 
 hibernate:
   format_sql: false

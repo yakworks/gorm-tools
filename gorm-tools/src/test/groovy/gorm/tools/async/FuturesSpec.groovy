@@ -19,7 +19,7 @@ class FuturesSpec extends GormToolsHibernateSpec implements AutowiredTest  {
         when:
         String message
 
-        def supplierFunc = { return 'foo' } as Supplier<String>
+        Supplier<String> supplierFunc = () -> { return 'foo' }
 
         asyncService.supplyAsync(new AsyncConfig(enabled:false), supplierFunc).whenComplete{ String result, ex ->
             assert result == 'foo'
@@ -36,7 +36,7 @@ class FuturesSpec extends GormToolsHibernateSpec implements AutowiredTest  {
         when:
         String message
 
-        def supplierFunc = { throw new RuntimeException('some exception') } as Supplier<String>
+        Supplier supplierFunc = () -> { throw new RuntimeException('some exception') }
 
         asyncService.supplyAsync(new AsyncConfig(enabled:false), supplierFunc).whenComplete{ String result, ex ->
             assert result == null
@@ -54,9 +54,7 @@ class FuturesSpec extends GormToolsHibernateSpec implements AutowiredTest  {
         when:
         String message
 
-        def supplierFunc = { 'foo' } as Supplier<String>
-
-        CompletableFuture completableFuture = asyncService.supplyAsync(supplierFunc).whenComplete{ String result, ex ->
+        CompletableFuture completableFuture = asyncService.supplyAsync(() -> 'foo').whenComplete{ String result, ex ->
             message = result
             println "CompletableFuture whenComplete with $result"
         }

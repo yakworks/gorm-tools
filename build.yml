@@ -58,6 +58,7 @@ maven:
   snapshotUrl: http://repo.9ci.com/oss-snapshots
 
 codenarc:
+#  toolVersion: 2.2.0
   main:
     excludes: ['**/BootStrap.*', '**/UrlMappings.*']
 

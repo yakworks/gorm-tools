@@ -78,7 +78,7 @@ trait BulkableRepo<D> {
     Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs) {
         syncJobArgs.entityClass = getEntityClass()
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
-        def supplierFunc = { doBulkParallel(dataList, jobContext) } as Supplier
+        Supplier supplierFunc = () -> doBulkParallel(dataList, jobContext)
         return bulk(supplierFunc, jobContext)
     }
 

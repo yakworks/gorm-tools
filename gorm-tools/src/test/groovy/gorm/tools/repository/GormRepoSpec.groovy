@@ -374,7 +374,8 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test update with transaction rollback"() {
         setup:
-        TestTrxRollback org = new TestTrxRollback(name: "test_update_withTrx").save()
+        // call save to bypass persist
+        TestTrxRollback org = new TestTrxRollback(name: "test_update_withTrx").save(failOnError: true)
         Map params = [name: 'foo', id: org.id]
         TestTrxRollback.repo.clear()
 

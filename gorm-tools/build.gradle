@@ -1,5 +1,7 @@
 apply plugin: "yakworks.grails-plugin"
 
+// sourceSets.test.resources.srcDirs += [project(':gorm-test-support').sourceSets.main.resources]
+
 dependencies {
   console "org.grails:grails-console"
 

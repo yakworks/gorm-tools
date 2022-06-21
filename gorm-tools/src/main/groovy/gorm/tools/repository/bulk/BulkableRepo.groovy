@@ -78,7 +78,7 @@ trait BulkableRepo<D> {
     Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs) {
         syncJobArgs.entityClass = getEntityClass()
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
-        def supplierFunc = { doBulkParallel(dataList, jobContext) } as Supplier
+        Supplier supplierFunc = () -> doBulkParallel(dataList, jobContext)
         return bulk(supplierFunc, jobContext)
     }
 
@@ -143,7 +143,7 @@ trait BulkableRepo<D> {
                 } catch(Exception ex) {
                     log.error("BulkableRepo unexpected exception", ex)
                     // just in case, unexpected errors as we should have intercepted them all already in doBulk
-                    jobContext.results << problemHandler.handleUnexpected(ex)
+                    jobContext.results << problemHandler.handleException(ex)
                 }
             }
         }

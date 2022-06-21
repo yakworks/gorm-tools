@@ -194,22 +194,20 @@ class AsyncService implements ConfigAware  {
 
     @SuppressWarnings(["EmptyCatchBlock"])
     public <T> Supplier<T> wrapSupplierSession(Datastore ds, Supplier<T> sup) {
-        return new Supplier<T>() {
-            @Override
-            T get() {
-                persistenceInterceptor.init()
+        Supplier<T> newsup = () -> {
+            persistenceInterceptor.init()
+            try {
+                return sup.get()
+            } finally {
                 try {
-                    return sup.get()
-                } finally {
-                    try {
-                        //only destroys if new one was created, otherwise does nothing
-                        persistenceInterceptor.destroy()
-                    } catch (Exception e) {
-                        //ignore errors
-                    }
+                    //only destroys if new one was created, otherwise does nothing
+                    persistenceInterceptor.destroy()
+                } catch (Exception e) {
+                    //ignore errors
                 }
             }
         }
+        return newsup
     }
 
 
@@ -230,41 +228,37 @@ class AsyncService implements ConfigAware  {
     }
 
     /**
-     * wrap the consumer, can be overriden in super which is is done in AsyncSecureService
+     * wrap the consumer, can be overriden in super which is is done in AsyncSecureService to copy security context into new thread
      */
     public <T> Consumer<T> wrapConsumer(Consumer<T> consumer) {
         return consumer
     }
 
     public <T> Consumer<T> wrapConsumerTrx(Datastore ds, Consumer<T> consumer) {
-        return new Consumer<T>() {
-            @Override
-            void accept(T item) {
-                trxService.withTrx(ds) { TransactionStatus status ->
-                    consumer.accept(item)
-                }
+        Consumer<T> newcon = (T item) -> {
+            trxService.withTrx(ds) { TransactionStatus status ->
+                consumer.accept(item)
             }
         }
+        return newcon
     }
 
     @SuppressWarnings(["EmptyCatchBlock"])
     public <T> Consumer<T> wrapConsumerSession(Datastore ds, Consumer<T> consumer) {
-        return new Consumer<T>() {
-            @Override
-            void accept(T item) {
-                persistenceInterceptor.init()
+        Consumer<T> newcon = (T item) -> {
+            persistenceInterceptor.init()
+            try {
+                consumer.accept(item)
+            } finally {
                 try {
-                    consumer.accept(item)
-                } finally {
-                    try {
-                        //only destroys if new one was created, otherwise does nothing
-                        persistenceInterceptor.destroy()
-                    } catch (Exception e) {
-                        //ignore errors
-                    }
+                    //only destroys if new one was created, otherwise does nothing
+                    persistenceInterceptor.destroy()
+                } catch (Exception e) {
+                    //ignore errors
                 }
             }
         }
+        return newcon
     }
 
 }

@@ -42,6 +42,10 @@ class Tag implements NameCodeDescription, RepoEntity<Tag>, Serializable {
         Tag.where { name == theName && entityName == theEntityName }.get()
     }
 
+    static Tag getByCode(String theCode, String theEntityName){
+        Tag.where { code == theCode && entityName == theEntityName }.get()
+    }
+
     boolean isValidFor(String entName){
         if(entityNameList == null){ //initialize
             String entityNameTrim = entityName?.trim()

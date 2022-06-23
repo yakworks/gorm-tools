@@ -74,6 +74,7 @@ class DomainValidationSpec extends GormToolsHibernateSpec {
         def isValid = entity.validate()
         def errors = entity.errors
         def codesCount = 2
+
         then:
         !isValid
 
@@ -119,7 +120,7 @@ class DomainValidationSpec extends GormToolsHibernateSpec {
         def isValid = entity.validate()
         def errors = entity.errors
         def codesCount = 2
-        JakartaValidationCodeAdaptor
+        // JakartaValidationCodeAdaptor
 
         then:
         errors.errorCount == 10

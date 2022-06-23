@@ -9,7 +9,7 @@ dependencies {
   implementation "org.grails:grails-plugin-controllers"
   //used for bundled Test traits
   implementation "org.grails:grails-gorm-testing-support"
-  implementation "org.grails.plugins:build-test-data:$vBuildTestData"
+  implementation "io.github.longwa:build-test-data:$vBuildTestData"
 
   //used for json parsing but require it to be added to project that uses this
   compileOnly("org.grails.plugins:views-json:$vViews") {

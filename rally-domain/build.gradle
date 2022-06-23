@@ -17,7 +17,7 @@ dependencies {
   api 'jakarta.annotation:jakarta.annotation-api:2.1.0'
 
   // for the mock and seed data
-  compileOnly("org.grails.plugins:build-test-data:$vBuildTestData"){
+  compileOnly("io.github.longwa:build-test-data:$vBuildTestData"){
     exclude group:"org.grails", module: "grails-gorm-testing-support"
   }
 

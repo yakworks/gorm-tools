@@ -63,13 +63,19 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>, ID> implements HasRepo<D, 
      */
     @CompileDynamic
     static Closure getConstraints(){
+        //groovy 3.0.11 hack, the `this` is not working in traits when inside the closure
+        Class _clazz = this
         return {
-            apiConstraints(getDelegate())
+            apiConstraints(_clazz, getDelegate())
         }
     }
 
+    static void apiConstraints(Class cls, Object builder){
+        ApiConstraints.processConstraints(cls, builder)
+    }
+
     static void apiConstraints(Object builder){
-        ApiConstraints.processConstraints(this, builder)
+        apiConstraints(this, builder)
     }
 
     // static ApiConstraints getApiConstraints(){

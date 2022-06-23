@@ -12,7 +12,7 @@ dependencies {
   // for the org.grails.web.util.WebUtils
   // compileOnly "org.grails:grails-web-common"
 
-  testCompile project(":gorm-test-support")
-  testCompile "org.grails:grails-gorm-testing-support"
-  testCompile "org.grails.plugins:build-test-data:$vBuildTestData"
+  testImplementation project(":gorm-test-support")
+  testImplementation "org.grails:grails-gorm-testing-support"
+  testImplementation "io.github.longwa:build-test-data:$vBuildTestData"
 }

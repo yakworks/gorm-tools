@@ -21,5 +21,5 @@ dependencies {
 
   testImplementation project(":gorm-test-support")
   testImplementation "org.grails:grails-gorm-testing-support"
-  testImplementation "org.grails.plugins:build-test-data:$vBuildTestData"
+  testImplementation "io.github.longwa:build-test-data:$vBuildTestData"
 }

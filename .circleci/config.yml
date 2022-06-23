@@ -15,11 +15,11 @@ jobs:
 
 #      - run: make gradle.resolve-dependencies
 
-      - run: make compile
+      - run: ./gradlew classes --max-workers=4
 
       - run:
           name: ✔︎ -- Test
-          command: make check
+          command: ./gradlew check --max-workers=4
 
       - save_cache:
           paths: ["~/.m2", "~/.gradle"]

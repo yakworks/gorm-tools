@@ -15,15 +15,15 @@ jobs:
 
 #      - run: make gradle.resolve-dependencies
 
-#      - run: ./gradlew classes --max-workers=4
-
-      - run:
-          name: ✔︎ -- Test
-          command: ./gradlew check --max-workers=4 --no-daemon
+      - run: ./gradlew classes --max-workers=4
 
       - save_cache:
           paths: ["~/.m2", "~/.gradle"]
           key: gradle-{{ checksum "cache-key.tmp" }}
+
+      - run:
+          name: ✔︎ -- Test
+          command: ./gradlew check --max-workers=4 --no-daemon
 
       # merge test results to store in circle
       - run:

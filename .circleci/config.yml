@@ -13,17 +13,17 @@ jobs:
       - restore_cache: &gradle-cache-restore
           key: gradle-{{ checksum "cache-key.tmp" }}
 
-      - run: make gradle.resolve-dependencies
-
-      - save_cache:
-          paths: [ "~/.m2", "~/.gradle" ]
-          key: gradle-{{ checksum "cache-key.tmp" }}
+#      - run: make gradle.resolve-dependencies
 
       - run: make compile
 
       - run:
           name: ✔︎ -- Test
           command: make check
+
+      - save_cache:
+          paths: ["~/.m2", "~/.gradle"]
+          key: gradle-{{ checksum "cache-key.tmp" }}
 
       # merge test results to store in circle
       - run:
@@ -62,8 +62,7 @@ jobs:
       - checkout
       - run: make cache-key-file
       - restore_cache: *gradle-cache-restore
-      - restore_cache:
-          key: build-{{ .Branch }}-{{ .Revision }}
+      - restore_cache: *build-cache-restore
 
       # setup the docker
 #      - setup_remote_docker

@@ -51,8 +51,8 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>, ID> implements HasRepo<D, 
         getRepo().update(data, args)
     }
 
-    static void removeById(Map args = [:], Serializable id) {
-        getRepo().removeById(id, args)
+    static void removeById(Serializable id) {
+        getRepo().removeById(id)
     }
 
     /**

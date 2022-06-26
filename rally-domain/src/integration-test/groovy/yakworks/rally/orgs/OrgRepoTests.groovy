@@ -283,7 +283,8 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         def org = Org.get(9)
         org.source.sourceType = SourceType.ERP
         org.source.persist(flush:true)
-        orgRepo.removeById(org.id)
+        //onyl works for remove, remove by ID will bypass all the events.
+        orgRepo.remove(org)
 
         then:
         ValidationProblem.Exception e = thrown()

@@ -307,7 +307,12 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
 
     // ***** some gormRepo methods should not be called with an XRef tables so blow errors for these
     @Override
-    void removeById(Serializable id, Map args) {
+    Number removeById(Serializable id) {
+        throw new UnsupportedOperationException("Method removeById is not supported by this implementation")
+    }
+
+    @Override
+    void removeByIds(List<Serializable> ids) {
         throw new UnsupportedOperationException("Method removeById is not supported by this implementation")
     }
 

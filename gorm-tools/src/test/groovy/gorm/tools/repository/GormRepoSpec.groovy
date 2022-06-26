@@ -226,18 +226,30 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         Cust org = build(Cust)
 
         when:
-        Cust.repo.removeById(org.id)
-
+        def res = Cust.repo.removeById(org.id)
+        flushAndClear()
         then:
+        res == 1
         Cust.get(org.id) == null
     }
 
     def "test remove by Id with non-existent id"() {
+        expect :
+        Cust.repo.removeById(99999999) == 0
+    }
+
+    def "test remove by Id list"() {
+        setup:
+        Cust org = build(Cust)
+        Cust org2 = build(Cust)
+
         when:
-        Cust.repo.removeById(99999999)
+        Cust.repo.removeByIds([org.id, org2.id])
+        flushAndClear()
 
         then:
-        thrown NotFoundProblem.Exception
+        Cust.get(org.id) == null
+        Cust.get(org2.id) == null
     }
 
     def "test bind"() {

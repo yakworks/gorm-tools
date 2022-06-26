@@ -326,19 +326,28 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
     }
 
     /**
-     * Remove by ID
+     * Remove by ID using a query so it does not load it first.
+     * NOTE: DOES NOT FIRE BeforeRemoveEvent or AfterRemoveEvent
      *
      * @param id - the id to delete
-     * @param args - the args to pass to delete. flush being the most common
-     *
-     * @throws NotFoundProblem.Exception if its not found or if a DataIntegrityViolationException is thrown
      */
-    void removeById(Serializable id, Map args = [:]) {
+    Number removeById(Serializable id) {
+        query(id: id).deleteAll()
+    }
+
+    /**
+     * Transactional. Iterates over the list of ids and calls removeById on each one
+     *
+     * @param id - the id to delete
+     */
+    void removeByIds(List<Serializable> idList) {
         withTrx {
-            D entity = get(id, null)
-            doRemove(entity, PersistArgs.of(args))
+            for (Serializable id : idList) {
+                removeById(id)
+            }
         }
     }
+
 
     /**
      * Transactional, Calls delete always with flush = true so we can intercept any DataIntegrityViolationExceptions.

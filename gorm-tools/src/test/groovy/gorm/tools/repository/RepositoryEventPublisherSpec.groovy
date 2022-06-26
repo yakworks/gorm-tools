@@ -146,20 +146,20 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
         city.events.afterBind
     }
 
-    void "test subscriber listener when removing an entity"() {
-        when:
-        City city = City.create(name: 'Denver') //City.create(params)
-        City city2 = City.create(name: 'Chicago') //City.create(params)
-        city.remove()
-        City.removeById(city2.id)
-
-        then:
-        sleep(100)
-        city.events.beforeRemove
-        city.events.afterRemove
-        city2.events.beforeRemove
-        city2.events.afterRemove
-    }
+    // void "test subscriber listener when removing an entity"() {
+    //     when:
+    //     City city = City.create(name: 'Denver') //City.create(params)
+    //     City city2 = City.create(name: 'Chicago') //City.create(params)
+    //     city.remove()
+    //     City.removeById(city2.id)
+    //
+    //     then:
+    //     sleep(100)
+    //     city.events.beforeRemove
+    //     city.events.afterRemove
+    //     city2.events.beforeRemove
+    //     city2.events.afterRemove
+    // }
 
     void "test subscriber listener when updating an entity"() {
         setup:

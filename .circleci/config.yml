@@ -67,7 +67,6 @@ jobs:
       # setup the docker
 #      - setup_remote_docker
 #      - run: apk add docker
-
       # download vault and decrypts
       - run: make vault.decrypt
       # sets up git config, kubectl and docker login

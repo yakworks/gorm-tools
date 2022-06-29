@@ -1,3 +1,10 @@
+### v7.0.8-v.76
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.75...v7.0.8-v.76)
+- pub [link](https://github.com/yakworks/gorm-tools/commit/6a2b1a0955441b372bdd1536fd7fb99f7f716cd2)
+- add lookup by tag code (#538) [link](https://github.com/yakworks/gorm-tools/commit/4cc798434c346028f0bbbcb5fe68ae34ea5bc018)
+- 9ci/domain9#1118 Add test, replace handleUnexpected with handleException (#533) [link](https://github.com/yakworks/gorm-tools/commit/4c38c9bfe79d07b136548c98fa90b2a7f875544a)
+
 ### v7.0.8-v.75
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.74...v7.0.8-v.75)

@@ -1,0 +1,12 @@
+apply plugin: 'java-library'
+// gpg signing required by nexus/sonatype
+apply plugin: 'signing'
+afterEvaluate {
+  if(!isSnapshot) {
+    signing {
+      required { gradle.taskGraph.hasTask("publish") }
+      useGpgCmd()
+      sign publishing.publications.javaLibrary
+    }
+  }
+}

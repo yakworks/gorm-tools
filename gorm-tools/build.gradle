@@ -28,6 +28,9 @@ dependencies {
   // compileOnly "org.grails.plugins:views-json-templates:$vViews"
   compileOnly "org.grails:grails-plugin-mimetypes"
 
+  //gets rid of the 'warning: unknown enum constant When.MAYBE' until we can figure out where it comes from
+  compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+
   testImplementation "org.slf4j:slf4j-simple:${vSlf4j}"
   testImplementation project(":gorm-test-domain")
   testImplementation project(":gorm-tools-security")

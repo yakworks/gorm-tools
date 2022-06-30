@@ -1,6 +1,7 @@
 apply plugin:"war"
 apply plugin:"org.grails.grails-web"
 apply plugin:"org.grails.plugins.views-json"
+apply from: "${rootProject.projectDir}/gradle/test-integration.gradle"
 
 repositories {
   maven { url "https://build.shibboleth.net/nexus/content/repositories/releases/" } //for pac4j deps
@@ -73,10 +74,4 @@ integrationTest.doFirst {
   //fix hazel cast Not supported: "http://javax.xml.XMLConstants/property/accessExternalDTD"
   // FIXME the pac4j dependency adds some XML lib that is screwing this up
   systemProperty 'hazelcast.ignoreXxeProtectionFailures', true
-}
-
-integrationTest {
-  testlogger {
-    showPassed false
-  }
 }

@@ -50,121 +50,27 @@ subprojects { subprj ->
     isExample = getProp('isExample', false)
   }
 
-  plugins.withId('java') {
-    sourceCompatibility = "$javaCompatibility"
-    targetCompatibility = "$javaCompatibility"
-    tasks.withType(JavaCompile) {
-      options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
-    }
-  }
-
-  plugins.withId('groovy') {
-    // compileGroovy {
-    //   groovyOptions.fork = true
-    //   groovyOptions.forkOptions.jvmArgs = ['-Dgradle.projectDir=' + project.projectDir.absolutePath]
-    // }
-    tasks.withType(GroovyCompile) {
-      // options.debug = true
-      configure(groovyOptions) {
-        // verbose = true
-        // sets the path to sys properties so we can use it find grails-app/conf during AST
-        //illegal-access=permit hides 'illegal reflective access operation has occurred'
-        // forkOptions.jvmArgs = ['-Xmx1524m', '-Dgradle.projectDir=' + project.projectDir.absolutePath, '--illegal-access=permit']
-        forkOptions.jvmArgs = ['-Xmx1524m', '-Dgradle.projectDir=' + project.projectDir.absolutePath, '--illegal-access=permit']
-      }
-    }
-  }
+  apply from: "${rootProject.projectDir}/gradle/compile.gradle"
 
   // if its a lib then setup gpg signing, see signing.gnupg.keyName
   if (isPublishable){
-    apply plugin: 'java-library'
-    // gpg signing required by nexus/sonatype
-    apply plugin: 'signing'
-    afterEvaluate {
-      if(!isSnapshot) {
-        signing {
-          required { gradle.taskGraph.hasTask("publish") }
-          useGpgCmd()
-          sign publishing.publications.javaLibrary
-        }
-      }
-    }
-
-  } // end isPublishable
-
+    apply from: "${rootProject.projectDir}/gradle/publish.gradle"
+  }
   if (isGormLibrary) {
-    apply plugin: 'groovy'
-
-    dependencies {
-      compileOnly "io.micronaut:micronaut-inject-groovy"
-      implementation "org.springframework.boot:spring-boot-starter-logging"
-      implementation "org.springframework.boot:spring-boot-autoconfigure"
-      implementation "org.grails:grails-core"
-      implementation "org.grails:grails-web-boot"
-      implementation "org.grails:grails-databinding"
-
-      // implementation "org.grails.plugins:cache"
-
-      implementation "org.apache.logging.log4j:log4j-to-slf4j:$vLog4j"
-      implementation "org.apache.logging.log4j:log4j-api:$vLog4j"
-
-      implementation 'com.fasterxml.jackson.core:jackson-core:2.13.3'
-      implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
-
-      // implementation "org.grails:grails-datastore-gorm:${vGorm}"
-      implementation "org.grails:grails-datastore-gorm-hibernate5:$vGormHibernate"
-      implementation "org.grails.plugins:hibernate5:$vGormHibernate"
-      implementation "org.hibernate:hibernate-core:$vHibernate"
-      // compileOnly "org.hibernate:hibernate-ehcache:$vHibernate"
-
-      // tests deps
-      testRuntimeOnly "com.h2database:h2:$vH2"
-      testRuntimeOnly "com.zaxxer:HikariCP:$vHikari"
-
-      testImplementation project(":gorm-test-support") //this might seem circular but it can be added to itself as it dif config
-
-      testImplementation "org.apache.commons:commons-lang3:$vCommonsLang3"
-      testImplementation "org.mockito:mockito-core"
-      testImplementation "org.grails:grails-gorm-testing-support"
-      testImplementation "org.grails:grails-web-testing-support"
-      // testImplementation "org.grails.plugins:build-test-data:$vBuildTestData"
-      testImplementation "io.github.longwa:build-test-data:$vBuildTestData"
-      // testCompile "org.grails:views-json-testing-support:$vViews"
-      testImplementation "net.javacrumbs.json-unit:json-unit-assertj:2.28.0"
-      testImplementation "com.fasterxml.jackson.core:jackson-databind:2.9.10"
-
-    }
-
+    apply from: "${rootProject.projectDir}/gradle/gorm-lib.gradle"
   }
-
   if (isExample) {
-    dependencies {
-      implementation "org.springframework.boot:spring-boot-starter-logging"
-      implementation "org.springframework.boot:spring-boot-starter-validation"
-      implementation "org.springframework.boot:spring-boot-autoconfigure"
-      implementation "org.grails:grails-core"
-      implementation "org.springframework.boot:spring-boot-starter-actuator"
-      implementation "org.springframework.boot:spring-boot-starter-tomcat"
-
-      // implementation 'org.codehaus.groovy:groovy-dateutil'
-      // implementation "io.activej:activej-boot:5.0-rc3"
-      // implementation "io.activej:activej-promise:5.0-rc3"
-    }
-
+    apply from: "${rootProject.projectDir}/gradle/example.gradle"
   }
+
+  apply from: "${rootProject.projectDir}/gradle/test-unit.gradle"
+
   configurations {
     //includes the compileOnly in tests too so we don't have to list twice
     testImplementation.extendsFrom compileOnly
     all {
       resolutionStrategy.cacheChangingModulesFor 1, 'seconds' //when changing = true this sets the cache time
     }
-  }
-
-  tasks.withType(Test) {
-    useJUnitPlatform()
-    //so that we can use in config and share resources/rootlocation across projects for testing
-    systemProperty "gradle.rootProjectDir", rootProject.projectDir.absolutePath
-    systemProperty "gradle.projectDir", project.projectDir.absolutePath
   }
 }
 
@@ -174,41 +80,3 @@ ext.codenarcRuleset= '''
   getRule('FieldName').enabled = false
   getRule('SynchronizedMethod').enabled = false
 '''
-
-//logging
-subprojects { subprj ->
-  test {
-    // Defaults from https://github.com/radarsh/gradle-test-logger-plugin
-    testlogger {
-      logLevel 'quiet'
-      // theme 'standard'
-      showExceptions true
-      showStandardStreams = true //shows the printlns in console
-      showPassed false
-      showSkipped true
-      showFailed true
-      // slowThreshold 2000 //if tests take longer than this will show time it took
-      showSummary true
-      // showSimpleNames false
-      // showPassed true
-      // showSkipped true
-      // showFailed true
-      // showPassedStandardStreams true
-      // showSkippedStandardStreams true
-      // showFailedStandardStreams true
-    }
-  }
-
-  //deal with log4j thing
-  dependencies {
-    constraints {
-      implementation("org.apache.logging.log4j:log4j-core") {
-        version {
-          strictly("[2.17, 3[")
-          prefer("2.17.0")
-        }
-        because("CVE-2021-44228, CVE-2021-45046, CVE-2021-45105: Log4j vulnerable to remote code execution and other critical security vulnerabilities")
-      }
-    }
-  }
-}

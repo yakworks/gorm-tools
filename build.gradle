@@ -64,13 +64,13 @@ subprojects { subprj ->
     //   groovyOptions.forkOptions.jvmArgs = ['-Dgradle.projectDir=' + project.projectDir.absolutePath]
     // }
     tasks.withType(GroovyCompile) {
-      options.debug = true
+      // options.debug = true
       configure(groovyOptions) {
-        verbose = true
+        // verbose = true
         // sets the path to sys properties so we can use it find grails-app/conf during AST
         //illegal-access=permit hides 'illegal reflective access operation has occurred'
         // forkOptions.jvmArgs = ['-Xmx1524m', '-Dgradle.projectDir=' + project.projectDir.absolutePath, '--illegal-access=permit']
-        forkOptions.jvmArgs = ['-Xmx1524m', '-Dgradle.projectDir=' + project.projectDir.absolutePath]
+        forkOptions.jvmArgs = ['-Xmx1524m', '-Dgradle.projectDir=' + project.projectDir.absolutePath, '--illegal-access=permit']
       }
     }
   }
@@ -153,10 +153,8 @@ subprojects { subprj ->
 
   }
   configurations {
-    testCompile.extendsFrom compileOnly //includes the compileOnly in tests too so we don't have to list twice
-    testCompile.extendsFrom implementation
+    //includes the compileOnly in tests too so we don't have to list twice
     testImplementation.extendsFrom compileOnly
-    // compile.extendsFrom implementation
     all {
       resolutionStrategy.cacheChangingModulesFor 1, 'seconds' //when changing = true this sets the cache time
     }

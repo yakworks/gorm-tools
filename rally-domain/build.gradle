@@ -53,10 +53,10 @@ bootRun {
 }
 
 //BootStrap fires for some reason in 4.x so exclude it
-jar {
-  exclude('yakworks/rally/BootStrap.class')
-  exclude('yakworks/rally/BootStrap$*.class')
-}
+// jar {
+//   exclude('yakworks/rally/BootStrap.class')
+//   exclude('yakworks/rally/BootStrap$*.class')
+// }
 
 // sourceSets.main.resources.srcDirs += "src/main/groovy"
 

@@ -1,6 +1,6 @@
 # check for build/shipkit and clone if not there, this should come first
 SHIPKIT_DIR = build/shipkit
-$(shell [ ! -e $(SHIPKIT_DIR) ] && git clone -b v2.0.1 https://github.com/yakworks/shipkit.git $(SHIPKIT_DIR) >/dev/null 2>&1)
+$(shell [ ! -e $(SHIPKIT_DIR) ] && git clone -b v2.0.4 https://github.com/yakworks/shipkit.git $(SHIPKIT_DIR) >/dev/null 2>&1)
 # Shipkit.make first, which does all the lifting to create makefile.env for the BUILD_VARS
 include $(SHIPKIT_DIR)/Shipkit.make
 include $(SHIPKIT_DIR)/makefiles/vault.make
@@ -77,8 +77,8 @@ api-check-login:
 	curl -H "Content-Type: application/json" -X POST -d '{"username":"admin","password":"!@#Foo"}' \
 		http://localhost:8080/api/login
 
-## gets token from curl and used that for sanity check
-api-check-with-token:
+# gets token from curl and used that for sanity check
+test.api-check-with-token:
 	curl_call="curl --silent -H 'Content-Type: application/json' -X POST \
 		-d '{\"username\":\"admin\",\"password\":\"!@#Foo\"}' \
 		http://localhost:$(PORT)/api/login"
@@ -105,7 +105,7 @@ gradle.dependencies:
 	#./gradlew rally-security:dependencies --configuration compileClasspath
 
 ## runs the benchmark tests
-run-benchmarks:
+test.benchmarks:
 	$(gradlew) benchmarks:assemble
 	cd examples/benchmarks
 	java -server -Xmx3g -XX:MaxMetaspaceSize=256m \

@@ -31,9 +31,9 @@ class JpqlQueryBuilderSpec extends GormToolsHibernateSpec implements AutowiredTe
         def queryInfo = builder.buildUpdate(name:"SinkUp")
 
         then:"The query is valid"
-        queryInfo.query == strip('''
-            UPDATE yakworks.gorm.testing.model.KitchenSink kitchenSink SET kitchenSink.name=:p1
-            WHERE (kitchenSink.amount=:p2 AND lower(kitchenSink.name) like lower(:p3))
+        queryInfo.query == strip('''\
+        UPDATE yakworks.gorm.testing.model.KitchenSink kitchenSink SET kitchenSink.name=:p1
+        WHERE (kitchenSink.amount=:p2 AND lower(kitchenSink.name) like lower(:p3))
         ''')
     }
 

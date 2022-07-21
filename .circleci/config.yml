@@ -1,5 +1,14 @@
 # circleCI build file
 version: 2.1
+commands:
+  restore_gradle_cache:
+    description: "Common pattern for gradle cache"
+    steps:
+      - run: make gradle.cache-key-file
+      - restore_cache:
+          key: gradle-{{ checksum "cache-key.tmp" }}
+      - restore_cache:
+          key: gradlew-75-{{ checksum "gradlew" }}
 jobs:
   build:
     docker:
@@ -8,14 +17,9 @@ jobs:
 
     steps:
       - checkout
-
-      - run: &gradle-cache-key make gradle.cache-key-file
-      - restore_cache: &gradle-cache-restore
-          key: gradle-{{ checksum "cache-key.tmp" }}
-      - restore_cache: &gradlew-75-cache-restore
-          key: gradlew-75-{{ checksum "gradlew" }}
+      - restore_gradle_cache
       - restore_cache: &build-cache-restore
-          key: build-{{ checksum "version.properties" }}
+          key: build-{{ .Branch }}-{{ checksum "version.properties" }}
 
       - run: ./gradlew classes --no-daemon
 
@@ -67,14 +71,8 @@ jobs:
 
     steps:
       - checkout
-      - run: *gradle-cache-key
-      - restore_cache: *gradlew-75-cache-restore
-      - restore_cache: *gradle-cache-restore
+      - restore_gradle_cache
       - restore_cache: *build-cache-restore
-
-      # setup the docker
-      # - setup_remote_docker
-      # - run: apk add docker
 
       # download vault and decrypts
       - run: make vault.decrypt

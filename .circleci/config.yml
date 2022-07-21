@@ -1,34 +1,61 @@
 # circleCI build file
 version: 2.1
-jobs:
-  build:
-    docker:
-      - image: yakworks/circle:jdk11
-    resource_class: 'xlarge'
-
+commands:
+  restore_gradle_cache:
+    description: "Common pattern for gradle cache"
     steps:
-      - checkout
-
-      - run: &gradle-cache-key make gradle.cache-key-file
-      - restore_cache: &gradle-cache-restore
+      - run: make gradle.cache-key-file
+      - restore_cache:
           key: gradle-{{ checksum "cache-key.tmp" }}
-      - restore_cache: &gradle-wrapper-cache-restore
-          key: gradle-wrapper7-{{ checksum "gradlew" }}
-      - restore_cache: &build-cache-restore
-          key: build-{{ checksum "version.properties" }}
+      - restore_cache:
+          key: gradlew-75-{{ checksum "gradlew" }}
 
-      - run: ./gradlew classes --no-daemon
+  restore_build_cache:
+    description: "combines version.props with day date to use as the key"
+    steps:
+      # combines version.props with today to use as the key
+      - run: make circle.day-version-cache-key-file
+      - restore_cache:
+          key: build-{{ checksum "day-version-cache-key.tmp" }}
 
+  save_gradle_cache:
+    description: "saves gradle caches"
+    steps:
       - save_cache:
           paths: ["~/.gradle/wrapper"]
-          key: gradle-wrapper-{{ checksum "gradlew" }}
+          key: gradlew-75-{{ checksum "gradlew" }}
       - save_cache:
           paths: [ "~/.gradle/caches" ]
           key: gradle-{{ checksum "cache-key.tmp" }}
 
+  save_build_cache:
+    description: "saves build cache"
+    steps:
+      - save_cache:
+          paths: [
+            ".gradle", ".build-cache", "./commons/build",
+            "./gorm-test-domain/build", "./gorm-test-support/build", "./gorm-tools/build",
+            "./gorm-tools-csv/build", "./gorm-tools-rest/build", "./gorm-tools-security/build",
+            "./rally-domain/build", "./rally-security/build"
+          ]
+          key: build-{{ checksum "day-version-cache-key.tmp" }}
+# ---------------------------------------------------------------------------
+jobs:
+  build:
+    docker:
+      - image: yakworks/builder:jdk11
+    resource_class: 'large'
+
+    steps:
+      - checkout
+      - restore_gradle_cache
+      - restore_build_cache
+
       - run:
-          name: ✔︎ -- Test
-          command: ./gradlew check --no-daemon
+          name: ✔︎ -- Tests
+          command: ./gradlew check --max-workers=3 --no-daemon
+
+      - save_gradle_cache
 
       # merge test results to store in circle
       - run:
@@ -41,14 +68,7 @@ jobs:
 #      - store_artifacts:
 #          path: build/reports/
 #          destination: /
-      - save_cache:
-          paths: [
-            ".gradle", ".build-cache", "./build", "./commons/build",
-            "./gorm-test-domain/build", "./gorm-test-support/build", "./gorm-tools/build",
-            "./gorm-tools-csv/build", "./gorm-tools-rest/build", "./gorm-tools-security/build",
-            "./rally-domain/build", "./rally-security/build"
-          ]
-          key: build-{{ checksum "version.properties" }}
+      - save_build_cache
 
   ship-gh-pages:
     docker:
@@ -62,19 +82,13 @@ jobs:
 
   ship-it:
     docker:
-      - image: yakworks/circle:jdk11
-    resource_class: 'medium+'
+      - image: yakworks/builder:jdk11
+    resource_class: 'large'
 
     steps:
       - checkout
-      - run: *gradle-cache-key
-      - restore_cache: *gradle-wrapper-cache-restore
-      - restore_cache: *gradle-cache-restore
-      - restore_cache: *build-cache-restore
-
-      # setup the docker
-      # - setup_remote_docker
-      # - run: apk add docker
+      - restore_gradle_cache
+      - restore_build_cache
 
       # download vault and decrypts
       - run: make vault.decrypt

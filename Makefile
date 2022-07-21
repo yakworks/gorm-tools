@@ -1,11 +1,11 @@
 # check for build/shipkit and clone if not there, this should come first
 SHIPKIT_DIR = build/shipkit
-$(shell [ ! -e $(SHIPKIT_DIR) ] && git clone -b v2.0.4 https://github.com/yakworks/shipkit.git $(SHIPKIT_DIR) >/dev/null 2>&1)
+$(shell [ ! -e $(SHIPKIT_DIR) ] && git clone -b v2.0.7 https://github.com/yakworks/shipkit.git $(SHIPKIT_DIR) >/dev/null 2>&1)
 # Shipkit.make first, which does all the lifting to create makefile.env for the BUILD_VARS
 include $(SHIPKIT_DIR)/Shipkit.make
+include $(SHIPKIT_DIR)/makefiles/circle.make
 include $(SHIPKIT_DIR)/makefiles/vault.make
 include $(SHIPKIT_DIR)/makefiles/spring-common.make
-include $(SHIPKIT_DIR)/makefiles/git-dev.make
 include $(SHIPKIT_DIR)/makefiles/ship-gh-pages.make
 # DB = true # set this to true to turn on the DB environment options
 
@@ -184,3 +184,13 @@ oapi.shell:
 	  -p 4567:4567 \
 	  yakworks/builder:node14 /bin/bash
 
+BIN_BASH=/bin/bash
+DOCKER_CIRCLE=yakworks/circle:jdk11
+# for testing set up .env or export both GITHUB_TOKEN and the base64 enocded GPG_KEY from lastpass.
+docker.circle.shell:
+	docker run -it --rm \
+	-e GITHUB_TOKEN \
+	-e GPG_KEY \
+	-v ~/.gradle_docker:/home/circleci/.gradle \
+	-v `pwd`:/home/circleci/project \
+	$(DOCKER_CIRCLE) $(BIN_BASH)

@@ -5,6 +5,7 @@ $(shell [ ! -e $(SHIPKIT_DIR) ] && git clone -b v2.0.4 https://github.com/yakwor
 include $(SHIPKIT_DIR)/Shipkit.make
 include $(SHIPKIT_DIR)/makefiles/vault.make
 include $(SHIPKIT_DIR)/makefiles/spring-common.make
+include $(SHIPKIT_DIR)/makefiles/git-dev.make
 include $(SHIPKIT_DIR)/makefiles/ship-gh-pages.make
 # DB = true # set this to true to turn on the DB environment options
 

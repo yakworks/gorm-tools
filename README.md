@@ -19,13 +19,17 @@
     |    |(  <_> |  <_> )  |__\___ \               `!!! !!!! !!  )!!!!!!!!!!!!!
     |____| \____/ \____/|____/____  >               !!  ! ! \( \(  !!!|/!  |/!
                                   \/               /_(      /_(/_(    /_(  /_(   
-         Version: 7.0.8-v.76
+         Version: 7.3.20
          
 </pre>
 
 **6.1.x is for grails 3.3.x and gorm 6.1.x**
 
-**7.0.x is for grails 4.x and gorm 7.0.x**
+**7.0.8-vX is for grails 4.x and gorm 7.0.8**
+
+**7.3.20+ is for grails 5.x and gorm 7.3+ , see notes**
+
+
 
 > *DOCS ARE OUT OF DATE AND BEING UPDATED FOR BREAKING CHANGES after 6.1.12-v.X*
 > *ALSO MERGING IN DOCS FOR THE REST-API AND AUDITSTAMP THAT WAS MERGED INTO HERE*
@@ -48,7 +52,9 @@ repositories {
 compile "org.yakworks:gorm-tools:7.0.8-v.33"
 ``` 
 
-## Sub Projects
+## Groovy 3, Grails 5 and Gorm 7.3
+
+Versioning will track the `gorm.version` for example gorm-tools 7.3.20, 7.3.21, etc will be compiled against gorm.version 7.3.2.
 
 
 

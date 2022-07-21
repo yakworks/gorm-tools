@@ -13,7 +13,7 @@ commands:
     description: "combines version.props with day date to use as the key"
     steps:
       # combines version.props with today to use as the key
-      - run: make circle.circle.day-version-cache-key-file
+      - run: make circle.day-version-cache-key-file
       - restore_cache:
           key: build-{{ checksum "day-version-cache-key.tmp" }}
   save_build_cache:

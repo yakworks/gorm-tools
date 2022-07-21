@@ -51,13 +51,11 @@ jobs:
       - restore_gradle_cache
       - restore_build_cache
 
-      - run: ./gradlew classes --max-workers=3 --no-daemon
+      - run:
+          name: ✔︎ -- Tests
+          command: ./gradlew check --max-workers=3 --no-daemon
 
       - save_gradle_cache
-
-      - run:
-          name: ✔︎ -- Test
-          command: ./gradlew check --max-workers=3 --no-daemon
 
       # merge test results to store in circle
       - run:

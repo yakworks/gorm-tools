@@ -12,7 +12,7 @@ commands:
 jobs:
   build:
     docker:
-      - image: yakworks/circle:jdk11
+      - image: yakworks/builder:jdk11
     resource_class: 'xlarge'
 
     steps:
@@ -66,8 +66,8 @@ jobs:
 
   ship-it:
     docker:
-      - image: yakworks/circle:jdk11
-    resource_class: 'medium+'
+      - image: yakworks/builder:jdk11
+    resource_class: 'large'
 
     steps:
       - checkout

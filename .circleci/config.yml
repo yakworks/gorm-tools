@@ -9,6 +9,7 @@ commands:
           key: gradle-{{ checksum "cache-key.tmp" }}
       - restore_cache:
           key: gradlew-75-{{ checksum "gradlew" }}
+
   restore_build_cache:
     description: "combines version.props with day date to use as the key"
     steps:
@@ -16,6 +17,17 @@ commands:
       - run: make circle.day-version-cache-key-file
       - restore_cache:
           key: build-{{ checksum "day-version-cache-key.tmp" }}
+
+  save_gradle_cache:
+    description: "saves gradle caches"
+    steps:
+      - save_cache:
+          paths: ["~/.gradle/wrapper"]
+          key: gradlew-75-{{ checksum "gradlew" }}
+      - save_cache:
+          paths: [ "~/.gradle/caches" ]
+          key: gradle-{{ checksum "cache-key.tmp" }}
+
   save_build_cache:
     description: "saves build cache"
     steps:
@@ -27,30 +39,25 @@ commands:
             "./rally-domain/build", "./rally-security/build"
           ]
           key: build-{{ checksum "day-version-cache-key.tmp" }}
-
+# ---------------------------------------------------------------------------
 jobs:
   build:
     docker:
       - image: yakworks/builder:jdk11
-    resource_class: 'xlarge'
+    resource_class: 'large'
 
     steps:
       - checkout
       - restore_gradle_cache
       - restore_build_cache
 
-      - run: ./gradlew classes --no-daemon
+      - run: ./gradlew classes --max-workers=3 --no-daemon
 
-      - save_cache:
-          paths: ["~/.gradle/wrapper"]
-          key: gradlew-75-{{ checksum "gradlew" }}
-      - save_cache:
-          paths: [ "~/.gradle/caches" ]
-          key: gradle-{{ checksum "cache-key.tmp" }}
+      - save_gradle_cache
 
       - run:
           name: ✔︎ -- Test
-          command: ./gradlew check --no-daemon
+          command: ./gradlew check --max-workers=3 --no-daemon
 
       # merge test results to store in circle
       - run:

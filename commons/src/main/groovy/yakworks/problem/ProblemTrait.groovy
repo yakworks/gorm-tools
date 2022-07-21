@@ -4,6 +4,7 @@
 */
 package yakworks.problem
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import yakworks.api.ApiStatus
@@ -32,7 +33,12 @@ trait ProblemTrait<E extends ProblemTrait> extends ResultTrait<E> implements IPr
     String detail
 
     //if there is a cause we want to retian when we convert to exception
-    Throwable cause
+    Throwable problemCause
+
+    // here for compatibility. can override setCause in java17
+    Throwable getCause(){
+        problemCause
+    }
 
     // URI instance
     List<Violation> violations = [] as List<Violation> //Collections.emptyList();
@@ -45,8 +51,9 @@ trait ProblemTrait<E extends ProblemTrait> extends ResultTrait<E> implements IPr
         return (E)this
     }
 
+    @CompileDynamic
     E cause(Throwable exCause){
-        this.cause = exCause
+        this.problemCause = exCause
         return (E)this
     }
 
@@ -55,6 +62,7 @@ trait ProblemTrait<E extends ProblemTrait> extends ResultTrait<E> implements IPr
         return ProblemUtils.problemToString(this)
     }
 
+    @CompileDynamic
     ProblemException toException(){
         return getCause() ? new DefaultProblemException(getCause()).problem(this) : new DefaultProblemException().problem(this)
     }
@@ -66,7 +74,7 @@ trait ProblemTrait<E extends ProblemTrait> extends ResultTrait<E> implements IPr
     }
 
     static E of(Object payload) {
-        return this.newInstance().payload(payload)
+        return create().payload(payload)
     }
 
     static E ofCode(String code){
@@ -78,24 +86,24 @@ trait ProblemTrait<E extends ProblemTrait> extends ResultTrait<E> implements IPr
     }
 
     static E ofMsg(MsgKey mkey){
-        return this.newInstance().msg(mkey)
+        return create().msg(mkey)
     }
 
     static E withStatus(ApiStatus status) {
-        return this.newInstance().status(status)
+        return create().status(status)
     }
 
     static E withTitle(String title) {
-        return this.newInstance().title(title)
+        return create().title(title)
     }
 
     static E withDetail(String detail) {
-        return this.newInstance().detail(detail)
+        return create().detail(detail)
     }
 
-    static E ofCause(final Throwable cause) {
-        def dap = this.newInstance([cause: cause])
-        dap.detail(ProblemUtils.getRootCause(cause).message)
+    static E ofCause(final Throwable problemCause) {
+        def dap = this.newInstance([problemCause: problemCause])
+        dap.detail(ProblemUtils.getRootCause(problemCause).message)
     }
 
 }

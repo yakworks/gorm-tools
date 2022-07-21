@@ -6,7 +6,10 @@ sourceSets.test.resources.srcDirs += [project(':gorm-test-support').sourceSets.m
 dependencies {
   console "org.grails:grails-console"
 
-  api "org.grails.plugins:spring-security-core:$vSpringSecurity"
+  api("org.grails.plugins:spring-security-core:$vSpringSecurity"){
+    exclude group: 'org.grails', module: 'grails-dependencies'
+    exclude group: 'org.grails', module: 'grails-web-boot'
+  }
 
   compileOnly project(":gorm-tools")
   // for the org.grails.web.util.WebUtils
@@ -16,3 +19,7 @@ dependencies {
   testImplementation "org.grails:grails-gorm-testing-support"
   testImplementation "io.github.longwa:build-test-data:$vBuildTestData"
 }
+
+// configurations.api {
+//   exclude group: 'org.grails', module: 'grails-plugin-controllers'
+// }

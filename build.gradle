@@ -37,8 +37,14 @@ subprojects { subprj ->
     mavenLocal()
     mavenCentral()
     maven { url "https://repo.grails.org/grails/core" }
+    maven {
+      url "http://repo.9ci.com/oss-snapshots"
+      allowInsecureProtocol = true
+      mavenContent {
+        snapshotsOnly()
+      }
+    }
     maven { url "http://repo.9ci.com/public-libs"; allowInsecureProtocol = true }
-    maven { url "http://repo.9ci.com/oss-snapshots"; allowInsecureProtocol = true }
   }
   // get prop with default if null, converts to boolean
   Closure getProp = { pname, defualtv -> (subprj.findProperty(pname) ?: defualtv).toBoolean() }

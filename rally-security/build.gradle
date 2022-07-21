@@ -67,7 +67,7 @@ bootRun {
 }
 
 //BootStrap fires for some reason in 4.x so exclude it
-jar {
-  exclude('yakworks/security/BootStrap.class')
-  exclude('yakworks/security/BootStrap$*.class')
-}
+// jar {
+//   exclude('yakworks/security/BootStrap.class')
+//   exclude('yakworks/security/BootStrap$*.class')
+// }

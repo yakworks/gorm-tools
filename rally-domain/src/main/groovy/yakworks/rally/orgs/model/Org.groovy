@@ -26,6 +26,8 @@ import yakworks.rally.tag.model.Tag
 @GrailsCompileStatic
 class Org implements NameNum, RepoEntity<Org>, HasTags, CreateCriteriaSupport, Serializable {
 
+    static List<String> toOneAssociations = ['flex', 'info', 'calc', 'member']
+
     String  comments
     Long    companyId
     Long    orgTypeId

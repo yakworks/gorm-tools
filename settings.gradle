@@ -24,3 +24,10 @@ findProject(':examples/benchmarks').name = 'benchmarks'
 findProject(':examples/rally-api').name = 'rally-api'
 
 //project(':testify').projectDir = new File('examples/testify')
+
+buildCache {
+  local {
+    directory = new File('.', '.build-cache')
+    removeUnusedEntriesAfterDays = 10
+  }
+}

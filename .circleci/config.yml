@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: yakworks/bullseye:jdk11
+      - image: cimg/openjdk:11.0
     resource_class: 'xlarge'
 
     steps:
@@ -38,9 +38,9 @@ jobs:
 
       - store_test_results:
           path: build/test-results/
-      - store_artifacts:
-          path: build/reports/
-          destination: /
+#      - store_artifacts:
+#          path: build/reports/
+#          destination: /
       - save_cache:
           paths: [
             ".gradle", ".build-cache", "./build", "./commons/build",

@@ -1,23 +1,15 @@
 package yakworks.security
 
-import javax.inject.Provider
 
 import gorm.tools.security.domain.AppUser
-import grails.boot.test.GrailsApplicationContextLoader
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.web.WebAppConfiguration
 import org.springframework.web.context.WebApplicationContext
-import org.springframework.web.context.request.RequestContextHolder
-import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.gorm.testing.DomainIntTest
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
-import yakworks.security.tenant.UserRequest
 
 /**
  * Proof of concept.

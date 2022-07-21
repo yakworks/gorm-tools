@@ -1,15 +1,13 @@
 package restify
 
-import gorm.tools.async.AsyncService
 import gorm.tools.repository.RepoUtil
 import gorm.tools.rest.controller.RestRepoApiController
 import grails.gorm.transactions.Rollback
-import yakworks.grails.resource.AppResourceLoader
 import grails.testing.mixin.integration.Integration
-import spock.lang.Specification
-import yakworks.commons.io.FileUtil
+import yakworks.commons.io.ZipUtils
 import yakworks.commons.util.BuildSupport
-import yakworks.gorm.testing.http.RestIntegrationTest
+import yakworks.gorm.testing.http.RestIntTest
+import yakworks.grails.resource.AppResourceLoader
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.job.SyncJob
@@ -17,7 +15,7 @@ import yakworks.rally.orgs.model.Contact
 
 @Rollback
 @Integration
-class BulkCsvSpec  extends Specification implements RestIntegrationTest {
+class BulkCsvSpec  extends RestIntTest {
 
     RestRepoApiController<Contact> controller
     AppResourceLoader appResourceLoader
@@ -34,7 +32,7 @@ class BulkCsvSpec  extends Specification implements RestIntegrationTest {
         File contactCsv =  new File(BuildSupport.gradleRootProjectDir, "examples/resources/csv/contact.csv")
         assert contactCsv.exists()
 
-        File zip = FileUtil.zip("test.zip", appResourceLoader.rootLocation, contactCsv)
+        File zip = ZipUtils.zip("test.zip", appResourceLoader.rootPath.toFile(), contactCsv)
 
         expect:
         zip.exists()

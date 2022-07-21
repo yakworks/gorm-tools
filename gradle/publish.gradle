@@ -1,0 +1,17 @@
+apply plugin: 'java-library'
+// gpg signing required by nexus/sonatype
+apply plugin: 'signing'
+afterEvaluate {
+  if(!isSnapshot) {
+    signing {
+      required { gradle.taskGraph.hasTask("publish") }
+      useGpgCmd()
+      sign publishing.publications.javaLibrary
+    }
+  }
+}
+// this turns off the plain suffix as in xxx-plain.jar that appeared in spring boot 2.5
+// https://docs.spring.io/spring-boot/docs/current/gradle-plugin/reference/htmlsingle/#packaging-executable.and-plain-archives
+tasks.named("jar") {
+  archiveClassifier = ''
+}

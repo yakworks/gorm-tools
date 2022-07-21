@@ -8,6 +8,7 @@ import grails.gorm.transactions.Rollback
 import grails.plugin.springsecurity.rest.token.storage.TokenStorageService
 import grails.testing.mixin.integration.Integration
 import org.junit.Assume
+import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.security.rest.token.PostgresTokenStorageService
 
@@ -19,7 +20,7 @@ class PostgresTokenStorageSpec extends Specification implements DataIntegrationT
     AppUserDetailsService userDetailsService
     DbDialectService dbDialectService
 
-    // @IgnoreIf({ env['DBMS']=='mysql' })
+    @Ignore
     def "store and load token sanity check"() {
         Assume.assumeTrue(dbDialectService.isPostgres())
 

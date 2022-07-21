@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <include resource="org/springframework/boot/logging/logback/base.xml" />
+  <!--  tunrs logback self loggin off -->
+  <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+  <!--  EASIEST FOR TESTING TO CONFIG WHEN NEEDED IN application.yml-->
+</configuration>

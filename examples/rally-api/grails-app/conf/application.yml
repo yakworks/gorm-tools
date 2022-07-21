@@ -17,6 +17,7 @@ spring:
   groovy:
     template:
       check-template-location: false
+
 server:
   port: 8081
 #  servlet:

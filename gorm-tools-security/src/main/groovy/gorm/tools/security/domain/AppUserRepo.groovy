@@ -4,9 +4,7 @@
 */
 package gorm.tools.security.domain
 
-import javax.annotation.Nullable
-import javax.inject.Inject
-
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.password.PasswordEncoder
 
 import gorm.tools.databinding.BindAction
@@ -25,7 +23,7 @@ import grails.gorm.transactions.Transactional
 @GrailsCompileStatic
 class AppUserRepo implements GormRepo<AppUser> {
     /** dependency injection for the password encoder */
-    @Inject @Nullable
+    @Autowired
     PasswordEncoder passwordEncoder
     // SecService secService
 
@@ -122,7 +120,7 @@ class AppUserRepo implements GormRepo<AppUser> {
             // otherwise convert value to long and assume it s list of ids
             (it instanceof Map) ? it['id'] as Long : it as Long
         }
-        List<Long> existingRoles = SecRoleUser.getByUser(userId)*.role.id
+        List<Long> existingRoles = SecRoleUser.getByUser(userId).collect{ it.role.getId() }
 
         List<Long> deleting
         List<Long> addition

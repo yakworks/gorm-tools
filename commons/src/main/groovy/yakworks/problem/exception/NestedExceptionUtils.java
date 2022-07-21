@@ -16,7 +16,7 @@
 
 package yakworks.problem.exception;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Helper class for implementing exception classes which are capable of

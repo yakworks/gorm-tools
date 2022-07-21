@@ -1,8 +1,9 @@
 # check for build/shipkit and clone if not there, this should come first
 SHIPKIT_DIR = build/shipkit
-$(shell [ ! -e $(SHIPKIT_DIR) ] && git clone -b v1.0.46 https://github.com/yakworks/shipkit.git $(SHIPKIT_DIR) >/dev/null 2>&1)
+$(shell [ ! -e $(SHIPKIT_DIR) ] && git clone -b v2.0.8 https://github.com/yakworks/shipkit.git $(SHIPKIT_DIR) >/dev/null 2>&1)
 # Shipkit.make first, which does all the lifting to create makefile.env for the BUILD_VARS
 include $(SHIPKIT_DIR)/Shipkit.make
+include $(SHIPKIT_DIR)/makefiles/circle.make
 include $(SHIPKIT_DIR)/makefiles/vault.make
 include $(SHIPKIT_DIR)/makefiles/spring-common.make
 include $(SHIPKIT_DIR)/makefiles/ship-gh-pages.make
@@ -11,7 +12,8 @@ include $(SHIPKIT_DIR)/makefiles/ship-gh-pages.make
 ## Run spotlessApply and normal check
 check:
 	# $(gradlew) spotlessApply
-	$(gradlew) check --max-workers=3
+	# $(gradlew) check --max-workers=3
+	$(gradlew) check
 
 # should run vault.decrypt before this,
 # sets up github, kubernetes and docker login
@@ -38,7 +40,7 @@ publish:
 	fi
 
 
-ifdef RELEASABLE_BRANCH_OR_DRY_RUN
+ifdef PUBLISHABLE_BRANCH_OR_DRY_RUN
 
 # removed  ship.docker kube.deploy for now
  ship.release: build publish
@@ -55,9 +57,9 @@ ifdef RELEASABLE_BRANCH_OR_DRY_RUN
 else
 
  ship.release:
-	$(logr.done) "not on a RELEASABLE_BRANCH, nothing to do"
+	$(logr.done) "not on a PUBLISHABLE_BRANCH, nothing to do"
 
-endif # end RELEASABLE_BRANCH
+endif # end PUBLISHABLE_BRANCH_OR_DRY_RUN
 
 # ---- Docmark -------
 
@@ -76,8 +78,8 @@ api-check-login:
 	curl -H "Content-Type: application/json" -X POST -d '{"username":"admin","password":"!@#Foo"}' \
 		http://localhost:8080/api/login
 
-## gets token from curl and used that for sanity check
-api-check-with-token:
+# gets token from curl and used that for sanity check
+test.api-check-with-token:
 	curl_call="curl --silent -H 'Content-Type: application/json' -X POST \
 		-d '{\"username\":\"admin\",\"password\":\"!@#Foo\"}' \
 		http://localhost:$(PORT)/api/login"
@@ -99,12 +101,12 @@ endif
 
 ## shows gorm-tools:dependencies --configuration runtime
 gradle.dependencies:
-	# ./gradlew gorm-tools:dependencies --configuration compileClasspath runtimeClasspath
+	 ./gradlew gorm-tools:dependencies --configuration compileClasspath
 	# ./gradlew rally-api:dependencies --configuration compileClasspath
-	./gradlew rally-security:dependencies --configuration compileClasspath
+	#./gradlew rally-security:dependencies --configuration compileClasspath
 
 ## runs the benchmark tests
-run-benchmarks:
+test.benchmarks:
 	$(gradlew) benchmarks:assemble
 	cd examples/benchmarks
 	java -server -Xmx3g -XX:MaxMetaspaceSize=256m \
@@ -182,3 +184,13 @@ oapi.shell:
 	  -p 4567:4567 \
 	  yakworks/builder:node14 /bin/bash
 
+BIN_BASH=/bin/bash
+DOCKER_CIRCLE=yakworks/circle:jdk11
+# for testing set up .env or export both GITHUB_TOKEN and the base64 enocded GPG_KEY from lastpass.
+docker.circle.shell:
+	docker run -it --rm \
+	-e GITHUB_TOKEN \
+	-e GPG_KEY \
+	-v ~/.gradle_docker:/home/circleci/.gradle \
+	-v `pwd`:/home/circleci/project \
+	$(DOCKER_CIRCLE) $(BIN_BASH)

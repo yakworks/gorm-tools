@@ -33,9 +33,9 @@ dependencies {
 
   // testCompile "io.micronaut:micronaut-http-client"
   //for rest api testing
-  testCompile "com.squareup.okhttp3:okhttp:$vOkhttp"
+  testImplementation "com.squareup.okhttp3:okhttp:$vOkhttp"
   //okhttp3 needs this
-  testCompile "org.jetbrains.kotlin:kotlin-stdlib:$vKotlin"
+  testImplementation "org.jetbrains.kotlin:kotlin-stdlib:$vKotlin"
 }
 
 bootRun {

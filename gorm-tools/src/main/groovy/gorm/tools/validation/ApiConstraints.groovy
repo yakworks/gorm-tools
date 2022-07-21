@@ -80,6 +80,8 @@ class ApiConstraints {
         if(delegateBuilder instanceof MappingConfigurationBuilder){
             isMappingBuilder = true //else assume its a ConstrainedPropertyBuilder
         } else if(delegateBuilder instanceof ConstrainedPropertyBuilder){
+            //groovy 3.0.11 hack, the `this` is not working in traits and passing wrong class so grab it from the builder
+            // targetClass = delegateBuilder.@targetClass
             constraintRegistry = delegateBuilder.@constraintRegistry
             assert constraintRegistry
         }

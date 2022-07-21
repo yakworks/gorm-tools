@@ -6,10 +6,10 @@ dependencies {
   compileOnly project(":gorm-tools")
   compileOnly project(":gorm-tools-security")
 
-  compile "org.grails:grails-plugin-controllers"
+  implementation "org.grails:grails-plugin-controllers"
   //used for bundled Test traits
-  compile "org.grails:grails-gorm-testing-support"
-  compile "org.grails.plugins:build-test-data:$vBuildTestData"
+  implementation "org.grails:grails-gorm-testing-support"
+  implementation "io.github.longwa:build-test-data:$vBuildTestData"
 
   //used for json parsing but require it to be added to project that uses this
   compileOnly("org.grails.plugins:views-json:$vViews") {

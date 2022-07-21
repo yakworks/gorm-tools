@@ -4,12 +4,10 @@
 */
 package yakworks.rally.activity
 
-import javax.annotation.Nullable
-import javax.inject.Inject
-
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
@@ -37,19 +35,19 @@ import yakworks.rally.orgs.model.Org
 @CompileStatic
 class ActivityBulk {
 
-    @Inject @Nullable
+    @Autowired(required = false)
     ActivityRepo activityRepo
 
-    @Inject @Nullable
+    @Autowired(required = false)
     ActivityLinkRepo activityLinkRepo
 
-    @Inject @Nullable
+    @Autowired(required = false)
     AttachmentRepo attachmentRepo
 
-    @Inject @Nullable
+    @Autowired(required = false)
     SecService secService
 
-    @Inject @Nullable
+    @Autowired(required = false)
     ProblemHandler problemHandler
 
     List<String> toOneAssociations = ['note', 'task']
@@ -126,8 +124,8 @@ class ActivityBulk {
             String entityName = target.getClass().getSimpleName()
             Org org = (entityName == "ArTran" ? target['customer']['org'] : target['org']) as Org //possible candidates, ArTran,Customer,CustAccount,Payment
             Activity activity
-            if (createdActivities[org.id] && entityName != "Payment") {
-                activity = createdActivities[org.id]
+            if (createdActivities[org.getId()] && entityName != "Payment") {
+                activity = createdActivities[org.getId()]
             } else {
                 List copiedAttachments = attachments
                 //Here !=0 = for first payment use the original attachments and for all rest of the payments copy it.
@@ -136,7 +134,7 @@ class ActivityBulk {
                     copiedAttachments = attachments.collect { attachmentRepo.copy(it as Attachment)}
                 }
                 activity = createActivity(activityData.name.toString(), org, (Map) activityData.task, copiedAttachments, entityName, source)
-                createdActivities[org.id as Long] = activity
+                createdActivities[org.getId() as Long] = activity
             }
 
             Long linkedId = target['id'] as Long

@@ -14,6 +14,7 @@ import gorm.tools.hibernate.criteria.CreateCriteriaSupport
 import gorm.tools.model.NameNum
 import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
+import grails.gorm.hibernate.annotation.ManagedEntity
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 
@@ -23,6 +24,7 @@ import yakworks.commons.transform.IdEqualsHashCode
 @AuditStamp
 @IdEqualsHashCode
 @Entity
+// @ManagedEntity //see ManagedEntitySinkSpec
 @GrailsCompileStatic
 class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRepo>, CreateCriteriaSupport {
 
@@ -79,8 +81,8 @@ class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRep
 
     static mapping = {
         //id generator:'assigned'
-        ext column: 'extId' //, cascade: 'none'
-        thing column: 'thingId'
+        ext column: 'extId', lazy: true
+        thing column: 'thingId', lazy: true
         status enumType: 'identity'
     }
 

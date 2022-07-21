@@ -4,10 +4,9 @@
 */
 package yakworks.problem
 
-import javax.annotation.Nullable
-
 import groovy.transform.CompileStatic
 
+import jakarta.annotation.Nullable
 import yakworks.i18n.MsgKey
 import yakworks.i18n.MsgKeyDecorator
 

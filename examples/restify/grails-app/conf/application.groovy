@@ -1,5 +1,4 @@
 import grails.util.Environment
-import yakworks.commons.util.BuildSupport
 
 grails {
     gorm.failOnError = true
@@ -13,27 +12,8 @@ grails {
     }
 }
 
-List restConfigs = ["classpath:restapi-config.yml"]
-// rally rest configs
-["contact.yml", "org.yml", "role.yml", "roleUser.yml", "user.yml"].each { fname ->
-    restConfigs.add "classpath:restapi/$fname"
-}
-
-grails.config.locations = restConfigs
-
-//grails.plugin.fields.disableLookupCache = true
-//grails.converters.domain.include.version = true
-
-if(Environment.getCurrent() == Environment.TEST || Environment.getCurrent() == Environment.DEVELOPMENT){
-    grails.plugin.springsecurity.rest.active = false
-    grails.plugin.springsecurity.securityConfigType = "InterceptUrlMap"
-    grails.plugin.springsecurity.interceptUrlMap = [
-        // all accesible anoymously by default
-        [pattern: '/**', access: ['IS_AUTHENTICATED_ANONYMOUSLY']]
-    ]
-}
-else {
-    //PRODUCTION
+if(Environment.getCurrent() == Environment.PRODUCTION){
+//PRODUCTION
 
     // Added by the Spring Security Core plugin:
     grails.plugin.springsecurity.securityConfigType = "InterceptUrlMap"
@@ -62,24 +42,4 @@ else {
     // grails.plugin.springsecurity.rest.token.validation.useBearerToken = false
     // grails.plugin.springsecurity.rest.token.validation.headerName = 'X-Auth-Token'
     // grails.plugin.springsecurity.rest.token.storage.jwt.secret = ''
-}
-
-
-String projectRoot = BuildSupport.gradleRootProjectDir
-app {
-    resources {
-        currentTenant = {
-            return [num: 'virgin', id: 2]
-        }
-        rootLocation = { args ->
-            File root = new File("${projectRoot}/examples/resources")
-            return root.canonicalPath
-        }
-        tempDir = {
-            File file = new File("./build/rootLocation/tempDir")
-            if (!file.exists()) file.mkdirs()
-            return file.canonicalPath
-        }
-        attachments.location = 'attachments'
-    }
 }

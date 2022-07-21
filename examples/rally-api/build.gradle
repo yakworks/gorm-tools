@@ -1,7 +1,7 @@
-apply plugin:"groovy"
-//apply plugin:"war"
+apply plugin:"war"
 apply plugin:"org.grails.grails-web"
 apply plugin:"org.grails.plugins.views-json"
+apply from: "${rootProject.projectDir}/gradle/test-integration.gradle"
 
 repositories {
   maven { url "https://build.shibboleth.net/nexus/content/repositories/releases/" } //for pac4j deps
@@ -13,51 +13,47 @@ repositories {
 dependencies {
   console "org.grails:grails-console"
   profile "org.grails.profiles:rest-api"
-  compile("org.springframework.boot:spring-boot-starter-actuator"){ exclude module: 'micrometer-core' }
+  implementation("org.springframework.boot:spring-boot-starter-actuator"){ exclude module: 'micrometer-core' }
 
-  compile "org.grails:grails-plugin-i18n"
-  compile "org.grails:grails-plugin-rest"
-  compile "org.grails:grails-plugin-url-mappings"
-  compile "org.grails:grails-plugin-codecs"
-  compile "org.grails:grails-plugin-interceptors"
-  compile "org.grails:grails-web-boot"
-  compile "org.grails:grails-web-url-mappings"
-  compile "org.grails.plugins:async"
+  implementation "org.grails:grails-plugin-i18n"
+  implementation "org.grails:grails-plugin-rest"
+  implementation "org.grails:grails-plugin-url-mappings"
+  implementation "org.grails:grails-plugin-codecs"
+  implementation "org.grails:grails-plugin-interceptors"
+  implementation "org.grails:grails-web-boot"
+  implementation "org.grails:grails-web-url-mappings"
+  implementation "org.grails.plugins:async"
 
-  compile "org.grails.plugins:views-json:$vViews"
-  compile "org.grails.plugins:views-json-templates:$vViews"
+  implementation "org.grails.plugins:views-json:$vViews"
+  implementation "org.grails.plugins:views-json-templates:$vViews"
 
-  compile "org.grails.plugins:hibernate5:$vGormHibernate"
-  compile "org.hibernate:hibernate-core:$vHibernate"
+  implementation "org.grails.plugins:hibernate5:$vGormHibernate"
+  implementation "org.hibernate:hibernate-core:$vHibernate"
   // compile "org.hibernate:hibernate-ehcache:$vHibernate"
 
-  compile project(":gorm-tools-security")
-  compile project(":gorm-tools-rest")
-  compile project(":rally-domain")
-  compile project(":rally-security")
+  implementation project(":gorm-tools-security")
+  implementation project(":gorm-tools-rest")
+  implementation project(":rally-domain")
+  implementation project(":rally-security")
 
   //Hazelcast
-  runtime "com.hazelcast:hazelcast-hibernate53:$vHazelcastHib"
-  runtime "com.hazelcast:hazelcast:$vHazelcast"
-  runtime "com.hazelcast:hazelcast-spring:$vHazelcast"
+  runtimeOnly "com.hazelcast:hazelcast-hibernate53:$vHazelcastHib"
+  runtimeOnly "com.hazelcast:hazelcast:$vHazelcast"
+  runtimeOnly "com.hazelcast:hazelcast-spring:$vHazelcast"
   //compatible micrometer
   // compile "io.micrometer:micrometer-core:1.5.0"
 
   //??wtf
-  compile "commons-lang:commons-lang:2.6"
-  runtime "org.grails.plugins:external-config:$vExternalConfig"
+  implementation "commons-lang:commons-lang:2.6"
 
-  // dk.glasius not working, load twice
-  // runtimeOnly "dk.glasius:external-config:$vExternalConfig"
-  runtime "org.grails.plugins:external-config:$vExternalConfig"
   runtimeOnly "com.h2database:h2:$vH2"
   runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"
   runtimeOnly "com.zaxxer:HikariCP:$vHikari"
 
   //for rest api testing
-  testCompile "com.squareup.okhttp3:okhttp:$vOkhttp"
+  testImplementation "com.squareup.okhttp3:okhttp:$vOkhttp"
   //okhttp3 needs this
-  testCompile "org.jetbrains.kotlin:kotlin-stdlib:$vKotlin"
+  testImplementation "org.jetbrains.kotlin:kotlin-stdlib:$vKotlin"
 }
 
 bootRun {
@@ -78,10 +74,4 @@ integrationTest.doFirst {
   //fix hazel cast Not supported: "http://javax.xml.XMLConstants/property/accessExternalDTD"
   // FIXME the pac4j dependency adds some XML lib that is screwing this up
   systemProperty 'hazelcast.ignoreXxeProtectionFailures', true
-}
-
-integrationTest {
-  testlogger {
-    showPassed false
-  }
 }

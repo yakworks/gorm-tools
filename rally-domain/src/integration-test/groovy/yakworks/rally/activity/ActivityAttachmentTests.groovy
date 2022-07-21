@@ -1,33 +1,30 @@
 package yakworks.rally.activity
 
+import java.nio.file.Path
+
 import gorm.tools.repository.PersistArgs
 import grails.gorm.transactions.Rollback
-import yakworks.grails.resource.AppResourceLoader
 import grails.testing.mixin.integration.Integration
-import org.apache.commons.io.FileUtils
-import org.springframework.jdbc.core.JdbcTemplate
 import spock.lang.Specification
 import yakworks.gorm.testing.DomainIntTest
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.repo.ActivityRepo
+import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
-import yakworks.rally.attachment.repo.AttachmentRepo
 
 @Integration
 @Rollback
 class ActivityAttachmentTests extends Specification implements DomainIntTest {
     ActivityRepo activityRepo
-    AppResourceLoader appResourceLoader
-    JdbcTemplate jdbcTemplate
-    AttachmentRepo attachmentRepo
+    AttachmentSupport attachmentSupport
 
     static Map getNoteParams() {
         return [org: [id: 9], note: [body: 'Todays test note']]
     }
 
     Map getTestAttachment(String filename) {
-        File tmpFile = appResourceLoader.createTempFile(filename, "test text".getBytes())
-        String tempFileName = appResourceLoader.getRelativeTempPath(tmpFile)
+        Path tmpFile2 = attachmentSupport.createTempFile(filename, "test text".getBytes())
+        String tempFileName = tmpFile2.getFileName().toString()
 
         return [tempFileName: tempFileName, originalFileName: filename]
     }
@@ -105,7 +102,7 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
         !activity.task
 
         cleanup:
-        FileUtils.deleteDirectory(appResourceLoader.getLocation("attachments.location"))
+        attachmentSupport.rimrafAttachmentsDirectory()
     }
 
     void "update note with attachments"() {
@@ -133,7 +130,7 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
         'foo.pdf' == attachment.name
 
         cleanup:
-        FileUtils.deleteDirectory(appResourceLoader.getLocation("attachments.location"))
+        attachmentSupport.rimrafAttachmentsDirectory()
     }
 
 

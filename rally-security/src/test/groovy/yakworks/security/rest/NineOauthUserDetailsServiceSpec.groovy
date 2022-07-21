@@ -6,6 +6,7 @@ import gorm.tools.security.domain.SecRoleUser
 import gorm.tools.testing.unit.DataRepoTest
 import grails.plugin.springsecurity.rest.oauth.OauthUser
 import grails.testing.services.ServiceUnitTest
+import org.springframework.security.crypto.password.NoOpPasswordEncoder
 import yakworks.security.rest.NineOauthUserDetailsService
 import org.grails.spring.beans.factory.InstanceFactoryBean
 import org.pac4j.core.profile.CommonProfile
@@ -19,6 +20,7 @@ class NineOauthUserDetailsServiceSpec extends Specification implements DataRepoT
         defineBeans({
             preAuthenticationChecks(InstanceFactoryBean, Mock(UserDetailsChecker), UserDetailsChecker)
             userDetailsService(InstanceFactoryBean, Mock(UserDetailsService), UserDetailsService)
+            passwordEncoder(NoOpPasswordEncoder)
         })
         mockDomains(AppUser, SecRole, SecRoleUser)
     }

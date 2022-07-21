@@ -37,7 +37,7 @@ class EventLogHelper {
     EventLogHelper(String component, Map jobParams, Boolean isPrimaryJob = false) {
         this(component, component, jobParams as String, isPrimaryJob)
         if (jobParams?.jobName) {
-            this.jobName = (jobParams.jobName) as String
+            this.jobName = (jobParams['jobName']) as String
         }
     }
 
@@ -51,7 +51,7 @@ class EventLogHelper {
     EventLogHelper(String component, String jobName, Map jobParams, Boolean isPrimaryJob = false) {
         this(component, jobName as String, jobParams as String, isPrimaryJob)
         if (!jobName && (jobParams?.jobName)) {
-            this.jobName = (jobParams.jobName) as String
+            this.jobName = (jobParams['jobName']) as String
         }
     }
 

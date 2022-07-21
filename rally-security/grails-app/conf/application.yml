@@ -1,0 +1,46 @@
+
+logging:
+  level:
+    root: WARN
+    org.springframework: WARN
+    org.hibernate.orm.deprecation: OFF # turns off deprecation notices
+
+hibernate:
+  format_sql: false
+  schema_management_tool: 'gorm.tools.hibernate.schema.CustomSchemaManagementTool'
+  naming_strategy: 'org.hibernate.cfg.DefaultNamingStrategy'
+  show_sql: false
+  cache:
+    use_second_level_cache: false
+  jdbc:
+    time_zone: 'UTC'
+#  dialect: 'org.hibernate.dialect.H2Dialect'
+
+dataSource:
+  type: com.zaxxer.hikari.HikariDataSource
+  pooled: true
+  jmxExport: true
+  driverClassName: org.h2.Driver
+  username: sa
+  password:
+  dbCreate: create-drop
+  url: jdbc:h2:mem:testDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+
+# config for testing and dev. can be referenced in dependent plugins and apps using config location
+# keeps security active but sets everything IS_AUTHENTICATED_ANONYMOUSLY
+grails:
+  profile: plugin
+  plugin:
+    springsecurity:
+      active: true
+      rest:
+        active: true
+        token:
+          storage:
+            useJwt: false
+            jwt:
+              useSignedJwt: false
+      shiro:
+        active: true
+      securityConfigType: InterceptUrlMap
+      interceptUrlMap: [ { pattern: '/**', access: ['IS_AUTHENTICATED_ANONYMOUSLY'] } ]

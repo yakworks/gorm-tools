@@ -5,13 +5,12 @@
 package yakworks.rally.activity.repo
 
 import java.time.LocalDateTime
-import javax.annotation.Nullable
-import javax.inject.Inject
 import javax.persistence.criteria.JoinType
 
 import groovy.transform.CompileStatic
 
 import org.apache.commons.lang3.StringUtils
+import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
@@ -50,16 +49,16 @@ import static yakworks.rally.activity.model.Activity.VisibleTo
 @CompileStatic
 class ActivityRepo extends LongIdGormRepo<Activity> {
 
-    @Inject @Nullable
+    @Autowired(required = false)
     ActivityLinkRepo activityLinkRepo
 
-    @Inject @Nullable
+    @Autowired(required = false)
     AttachmentRepo attachmentRepo
 
-    @Inject @Nullable
+    @Autowired(required = false)
     SecService secService
 
-    @Inject @Nullable
+    @Autowired(required = false)
     ProblemHandler problemHandler
 
     List<String> toOneAssociations = ['note', 'task']
@@ -290,7 +289,7 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
 
     @ReadOnly
     boolean hasActivityWithAttachments(Persistable<Long> linkedEntity, Activity.Kind kind = null) {
-        def actLinkExists = getActivityLinkCriteria(linkedEntity.id, linkedEntity.class.simpleName)
+        def actLinkExists = getActivityLinkCriteria(linkedEntity.getId(), linkedEntity.class.simpleName)
 
         def laQuery = Activity.query {
             setAlias 'activity_'

@@ -1,0 +1,22 @@
+---
+
+hibernate:
+  format_sql: false
+  schema_management_tool: 'gorm.tools.hibernate.schema.CustomSchemaManagementTool'
+  naming_strategy: 'org.hibernate.cfg.DefaultNamingStrategy'
+  dialect: 'gorm.tools.hibernate.ExtendedH2Dialect'
+  show_sql: false
+  cache:
+    use_second_level_cache: false
+  jdbc:
+    time_zone: 'UTC'
+
+dataSource:
+  pooled: true
+  jmxExport: true
+  driverClassName: org.h2.Driver
+  username: sa
+  password:
+  type: com.zaxxer.hikari.HikariDataSource
+  dbCreate: create-drop
+  url: jdbc:h2:mem:devDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE

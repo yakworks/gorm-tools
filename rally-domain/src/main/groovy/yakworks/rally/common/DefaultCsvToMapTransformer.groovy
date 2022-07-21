@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 
 import gorm.tools.csv.CSVPathKeyMapReader
 import gorm.tools.csv.CsvToMapTransformer
-import yakworks.commons.io.FileUtil
+import yakworks.commons.io.ZipUtils
 import yakworks.commons.lang.Validate
 import yakworks.rally.attachment.model.Attachment
 
@@ -51,7 +51,7 @@ class DefaultCsvToMapTransformer implements CsvToMapTransformer {
         File zip = zipR.file
         Validate.notNull(zip)
 
-        InputStream dataIn = FileUtil.getZipEntryInputStream(zip, dataFileName)
+        InputStream dataIn = ZipUtils.getZipEntryInputStream(zip, dataFileName)
         Validate.notNull(dataIn, "$dataFileName not found in zip")
         return processRows(dataIn, delim)
     }

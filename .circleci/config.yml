@@ -1,44 +1,74 @@
 # circleCI build file
 version: 2.1
+commands:
+  restore_gradle_cache:
+    description: "Common pattern for gradle cache"
+    steps:
+      - run: make gradle.cache-key-file
+      - restore_cache:
+          key: gradle-{{ checksum "cache-key.tmp" }}
+      - restore_cache:
+          key: gradlew-75-{{ checksum "gradlew" }}
+
+  restore_build_cache:
+    description: "combines version.props with day date to use as the key"
+    steps:
+      # combines version.props with today to use as the key
+      - run: make circle.day-version-cache-key-file
+      - restore_cache:
+          key: build-{{ checksum "day-version-cache-key.tmp" }}
+
+  save_gradle_cache:
+    description: "saves gradle caches"
+    steps:
+      - save_cache:
+          paths: ["~/.gradle/wrapper"]
+          key: gradlew-75-{{ checksum "gradlew" }}
+      - save_cache:
+          paths: [ "~/.gradle/caches" ]
+          key: gradle-{{ checksum "cache-key.tmp" }}
+
+  save_build_cache:
+    description: "saves build cache"
+    steps:
+      - save_cache:
+          paths: [
+            ".gradle", ".build-cache", "./commons/build",
+            "./gorm-test-domain/build", "./gorm-test-support/build", "./gorm-tools/build",
+            "./gorm-tools-csv/build", "./gorm-tools-rest/build", "./gorm-tools-security/build",
+            "./rally-domain/build", "./rally-security/build"
+          ]
+          key: build-{{ checksum "day-version-cache-key.tmp" }}
+# ---------------------------------------------------------------------------
 jobs:
   build:
     docker:
-      - image: yakworks/builder:jdk8
+      - image: yakworks/builder:jdk11
     resource_class: 'large'
 
     steps:
       - checkout
-
-      - run: make cache-key-file
-      - restore_cache: &gradle-cache-restore
-          key: gradle-{{ checksum "cache-key.tmp" }}
-
-      - run: make gradle.resolve-dependencies
-
-      - save_cache:
-          paths: [ "~/.m2", "~/.gradle" ]
-          key: gradle-{{ checksum "cache-key.tmp" }}
-
-      - run: make compile
+      - restore_gradle_cache
+      - restore_build_cache
 
       - run:
-          name: ✔︎ -- Test
-          command: make check
+          name: ✔︎ -- Tests
+          command: ./gradlew check --max-workers=3 --no-daemon
+
+      - save_gradle_cache
 
       # merge test results to store in circle
       - run:
           name: ✔︎ -- Merge Test Results
           when: always
-          command: make merge-test-results
+          command: make gradle.merge-test-results
 
       - store_test_results:
           path: build/test-results/
-      - store_artifacts:
-          path: build/reports/
-          destination: /
-      - save_cache:
-          paths: [ ".gradle", "./build", "./commons/build", "./gorm-tools/build", "./gorm-tools-rest/build", "./gorm-tools-security/build", "./rally-domain/build"]
-          key: build-{{ .Branch }}-{{ .Revision }}
+#      - store_artifacts:
+#          path: build/reports/
+#          destination: /
+      - save_build_cache
 
   ship-gh-pages:
     docker:
@@ -46,28 +76,19 @@ jobs:
 
     steps:
       - checkout
-      - restore_cache: &build-cache-restore
-          key: build-{{ .Branch }}-{{ .Revision }}
-
       # download vault and decrypts
       - run: BOT_SIGN_COMMITS=false make git.config-bot-user # configs the bot user for git
       - run: BOT_SIGN_COMMITS=false make ship.gh-pages
 
   ship-it:
     docker:
-      - image: yakworks/builder:jdk8
-    resource_class: 'medium+'
+      - image: yakworks/builder:jdk11
+    resource_class: 'large'
 
     steps:
       - checkout
-      - run: make cache-key-file
-      - restore_cache: *gradle-cache-restore
-      - restore_cache:
-          key: build-{{ .Branch }}-{{ .Revision }}
-
-      # setup the docker
-#      - setup_remote_docker
-#      - run: apk add docker
+      - restore_gradle_cache
+      - restore_build_cache
 
       # download vault and decrypts
       - run: make vault.decrypt

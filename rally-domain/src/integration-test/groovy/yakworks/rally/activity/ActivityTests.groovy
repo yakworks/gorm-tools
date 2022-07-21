@@ -1,15 +1,17 @@
 package yakworks.rally.activity
 
+import java.nio.file.Files
+
 import grails.gorm.transactions.Rollback
-import yakworks.grails.resource.AppResourceLoader
 import grails.testing.mixin.integration.Integration
-import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.gorm.testing.DomainIntTest
+import yakworks.grails.resource.AppResourceLoader
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.repo.ActivityRepo
+import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.repo.AttachmentRepo
@@ -23,8 +25,8 @@ import static yakworks.rally.activity.model.Activity.VisibleTo
 @Rollback
 class ActivityTests extends Specification implements DomainIntTest {
     ActivityRepo activityRepo
-    AppResourceLoader appResourceLoader
     AttachmentRepo attachmentRepo
+    AttachmentSupport attachmentSupport
 
     static Map getNoteParams() {
         return [org: [id: 205], note: [body: 'Todays test note']]
@@ -79,18 +81,17 @@ class ActivityTests extends Specification implements DomainIntTest {
         when:
         Map params = [id: 22, note: [body: 'Test updated Note body']]
         Activity activity = Activity.get(22)
-        File startFile = new File(appResourceLoader.rootLocation, "freemarker/grails_logo.jpg")
-        byte[] bytes = FileUtils.readFileToByteArray(startFile)
-        File tmpFile = appResourceLoader.createTempFile('grails_logo.jpg', bytes)
-        String tempFileName = appResourceLoader.getRelativeTempPath(tmpFile)
-        Attachment attachment = attachmentRepo.create([name: tempFileName, bytes: bytes])
-        String attachmentLocation = attachment.location
+
+        def fileName = 'hello.txt'
+        Attachment attachment = attachmentRepo.create([name: fileName, bytes: "test text".getBytes()])
         activity.addAttachment(attachment)
         activity.persist()
         flush()
 
         then:
         activity.attachments.size() == 1
+
+        Files.exists(attachmentSupport.getFile(attachmentLocation))
 
         when: "we flag it for delete"
         flushAndClear()
@@ -105,7 +106,7 @@ class ActivityTests extends Specification implements DomainIntTest {
         then:
         updateAct
         updateAct.attachments.size() == 0
-        !appResourceLoader.getFile(attachmentLocation).exists()
+        Files.notExists(attachmentSupport.getFile(attachmentLocation))
 
         when:
         flushAndClear()

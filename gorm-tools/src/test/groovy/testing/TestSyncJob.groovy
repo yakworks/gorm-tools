@@ -33,5 +33,7 @@ class TestSyncJob implements SyncJobEntity<TestSyncJob>, GormRepoEntity<TestSync
 
     static mapping = {
         state column: 'state', enumType: 'identity'
+        payloadBytes sqlType: 'BLOB'
+        dataBytes sqlType: 'BLOB'
     }
 }

@@ -72,8 +72,8 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
      */
     void validateCreate(P main, R related){
         //by default check that ids are set when creating, no proxys as they just caue problems in this context
-        Validate.notNull(main.id, "main entity.id can't be null: %s", mainClass )
-        Validate.notNull(related.id, "related entity.id can't be null: %s", relatedClass)
+        Validate.notNull(main.getId(), "main entity.id can't be null: %s", mainClass )
+        Validate.notNull(related.getId(), "related entity.id can't be null: %s", relatedClass)
     }
 
     /**
@@ -158,7 +158,7 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
      * for example calling this and passing in Contacts will return the list of tags
      */
     List<R> listRelated(P main) {
-        queryFor(main).list().collect {it[relatedPropName] } as List<R>
+        queryFor(main).list().collect {it[getRelatedPropName()] as R } as List<R>
     }
 
     MangoDetachedCriteria<X> queryFor(Persistable entity){

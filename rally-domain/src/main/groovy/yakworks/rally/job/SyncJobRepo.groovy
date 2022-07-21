@@ -6,8 +6,8 @@ package yakworks.rally.job
 
 import groovy.transform.CompileStatic
 
-import org.apache.commons.io.IOUtils
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.util.FileCopyUtils
 
 import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepository
@@ -39,7 +39,7 @@ class SyncJobRepo extends LongIdGormRepo<SyncJob> {
     byte[] getData(SyncJob job){
         if(job.dataId){
             def istream = attachmentRepo.get(job.dataId).inputStream
-            return IOUtils.toByteArray(istream)
+            return FileCopyUtils.copyToByteArray(istream)
         } else {
             return job.dataBytes
         }

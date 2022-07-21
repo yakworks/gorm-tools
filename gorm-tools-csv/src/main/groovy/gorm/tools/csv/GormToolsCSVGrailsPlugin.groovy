@@ -15,7 +15,6 @@ class GormToolsCSVGrailsPlugin extends Plugin {
 
     Closure doWithSpring() { { ->
 
-
     } }
 
 }

@@ -38,7 +38,7 @@ class SecUserPermission implements RepoEntity<SecUserPermission>, Serializable  
     @Override
     boolean equals(Object other) {
         if (other instanceof SecUserPermission) {
-            other.userId == user?.id && other.permission == permission
+            other.userId == user?.getId() && other.permission == permission
         }
     }
 
@@ -46,7 +46,7 @@ class SecUserPermission implements RepoEntity<SecUserPermission>, Serializable  
     int hashCode() {
         int hashCode = HashCodeHelper.initHash()
         if (user) {
-            hashCode = HashCodeHelper.updateHash(hashCode, user.id)
+            hashCode = HashCodeHelper.updateHash(hashCode, user.getId())
         }
         if (permission) {
             hashCode = HashCodeHelper.updateHash(hashCode, permission)

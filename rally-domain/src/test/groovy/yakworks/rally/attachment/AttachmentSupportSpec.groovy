@@ -4,13 +4,13 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
-import org.apache.commons.io.FileUtils
+import groovy.transform.CompileDynamic
 
-import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
-import yakworks.grails.resource.AppResourceLoader
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport
+import yakworks.gorm.testing.SecurityTest
+import yakworks.grails.resource.AppResourceLoader
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
@@ -20,25 +20,19 @@ import yakworks.rally.attachment.model.AttachmentLink
 class AttachmentSupportSpec extends Specification implements DataRepoTest, SecurityTest {
 
     AttachmentSupport attachmentSupport
-    AppResourceLoader appResourceLoader
 
+    @CompileDynamic
     def setupSpec() {
         defineBeans({
-            // grailsUrlMappingsHolder(UrlMappingsHolderFactoryBean)
-            // grailsLinkGenerator(DefaultLinkGenerator, "http://localhost:8080")
-            appResourceLoader(AppResourceLoader) {
-                grailsApplication = grailsApplication
-            }
+            appResourceLoader(AppResourceLoader)
             attachmentSupport(AttachmentSupport)
         })
         mockDomains(Attachment, AttachmentLink, Activity, ActivityNote, ActivityLink)
     }
 
     def setup() {
-        FileUtils.deleteDirectory(appResourceLoader.getLocation(AttachmentSupport.ATTACHMENTS_LOCATION_KEY))
-        //make sure dir is clean before each test
-        // Path rootPath = appResourceLoader.getLocation(locationKey).toPath()
-        // Files.deleteIfExists(rootPath)
+        //make sure its clear
+        attachmentSupport.rimrafAttachmentsDirectory()
     }
 
     // gets a file from example/resources

@@ -14,10 +14,20 @@ spring:
     template:
       check-template-location: false
 
+logging:
+  level:
+    root: WARN
+    org.springframework: WARN
+    org.hibernate.orm.deprecation: OFF # turns off deprecation notices
+    # uncomment to turn on sql logging
+#    org.hibernate.stat: DEBUG
+#    org.hibernate.SQL: DEBUG
+
 hibernate:
   format_sql: false
   schema_management_tool: 'gorm.tools.hibernate.schema.CustomSchemaManagementTool'
   naming_strategy: 'org.hibernate.cfg.DefaultNamingStrategy'
+  dialect: 'gorm.tools.hibernate.ExtendedH2Dialect'
   show_sql: false
   cache:
     use_second_level_cache: false

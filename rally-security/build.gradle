@@ -1,4 +1,5 @@
 apply plugin: "yakworks.grails-plugin"
+apply from: "${rootProject.projectDir}/gradle/test-integration.gradle"
 
 repositories {
   maven { url "https://build.shibboleth.net/nexus/content/repositories/releases/" } //for pac4j deps
@@ -24,7 +25,10 @@ dependencies {
   api("org.pac4j:pac4j-saml:3.8.3"){
     // fix hazel cast Not supported: "http://javax.xml.XMLConstants/property/accessExternalDTD"
     exclude module: 'xalan'
+    exclude module: 'org.hibernate'
   }
+  // this is here beacause the org.opensaml:opensaml-storage-impl in pac4j deps depends on it
+  api("org.hibernate:hibernate-entitymanager:$vHibernate")
 
   ['aspectj', 'core', 'spring', 'web'].each {
     api "org.apache.shiro:shiro-$it:$vShiro"
@@ -44,10 +48,9 @@ dependencies {
   implementation "org.grails:grails-web-boot"
   implementation "org.grails:grails-plugin-services"
 
-  testRuntime "org.grails.plugins:external-config:$vExternalConfig"
-  testRuntime "com.h2database:h2:$vH2"
-  testRuntime "javax.xml.bind:jaxb-api:2.3.1"
-  testRuntime "com.zaxxer:HikariCP:$vHikari"
+  testRuntimeOnly "com.h2database:h2:$vH2"
+  testRuntimeOnly "javax.xml.bind:jaxb-api:2.3.1"
+  testRuntimeOnly "com.zaxxer:HikariCP:$vHikari"
 
 }
 
@@ -64,19 +67,7 @@ bootRun {
 }
 
 //BootStrap fires for some reason in 4.x so exclude it
-jar {
-  exclude('yakworks/security/BootStrap.class')
-  exclude('yakworks/security/BootStrap$*.class')
-}
-
-integrationTest {
-  testlogger {
-    showPassed false
-    showExceptions true
-    showStandardStreams = true //shows the printlns in console
-    showPassed false
-    showSkipped true
-    showFailed true
-    showSummary true
-  }
-}
+// jar {
+//   exclude('yakworks/security/BootStrap.class')
+//   exclude('yakworks/security/BootStrap$*.class')
+// }

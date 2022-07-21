@@ -3,16 +3,21 @@ package restify
 import gorm.tools.rest.controller.RestRepoApiController
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import grails.util.GrailsWebMockUtil
 import spock.lang.Specification
 import yakworks.commons.map.Maps
+import yakworks.gorm.testing.http.MockRestRequest
+import yakworks.gorm.testing.http.MockRestResponse
+import yakworks.gorm.testing.http.RestIntTest
 import yakworks.gorm.testing.http.RestIntegrationTest
 import yakworks.rally.orgs.model.Contact
 
 @Rollback
 @Integration
-class ContactControllerTests extends Specification implements RestIntegrationTest {
+class ContactControllerTests extends RestIntTest {
 
     RestRepoApiController<Contact> controller
+    // String controllerName = 'ContactController'
 
     void setup() {
         controllerName = 'ContactController'

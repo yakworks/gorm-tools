@@ -8,7 +8,10 @@ import javax.persistence.Transient
 
 import groovy.transform.CompileStatic
 
+import org.grails.datastore.gorm.GormEntity
 import org.springframework.lang.Nullable
+
+import gorm.tools.utils.GormMetaUtils
 
 /**
  * An opinionated trait implementation of Spring Data's Persistable for Long id and version property
@@ -39,4 +42,9 @@ trait Persistable<ID> { //implements IPersistable<Long>, Ident<Long> {
         // if its not flushed so check if its attached into the session
         return getId() == null || (getVersion() == null && !isAttached())
     }
+
+    ID identity() {
+        (ID)GormMetaUtils.getId(this as GormEntity)
+    }
+
 }

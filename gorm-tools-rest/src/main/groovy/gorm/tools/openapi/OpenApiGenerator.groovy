@@ -17,11 +17,11 @@ import org.yaml.snakeyaml.Yaml
 import gorm.tools.rest.ast.RestApiAstUtils
 import gorm.tools.support.ConfigAware
 import gorm.tools.utils.GormMetaUtils
-import yakworks.commons.io.FileSystemUtils
-import yakworks.commons.io.FileUtil
+import yakworks.commons.io.PathTools
 import yakworks.commons.lang.NameUtils
 import yakworks.commons.map.Maps
 import yakworks.commons.util.BuildSupport
+import yakworks.commons.util.StringUtils
 
 import static gorm.tools.openapi.ApiSchemaEntity.CruType
 
@@ -45,7 +45,7 @@ class OpenApiGenerator implements ConfigAware {
         def buildDest = makeBuildDirs()
         def srcPath = getApiSrcPath()
 
-        FileSystemUtils.copyRecursively(srcPath, buildDest)
+        PathTools.copyRecursively(srcPath, buildDest)
 
         generateModels()
         //do all but autocash
@@ -215,8 +215,8 @@ class OpenApiGenerator implements ConfigAware {
 
     void processTplFile(Map restConfig, String srcPath, String outputPath, Map model){
         Path tplFile = getApiSrcPath().resolve(srcPath)
-        String ymlTpl = FileUtil.readFileToString(tplFile.toFile())
-        ymlTpl = FileUtil.parseStringAsGString(ymlTpl, model)
+        String ymlTpl = tplFile.getText()
+        ymlTpl = StringUtils.parseStringAsGString(ymlTpl, model)
         //check for existing override file
 
         //parse the yaml
@@ -246,8 +246,8 @@ class OpenApiGenerator implements ConfigAware {
      */
     public <T> T parseAndLoadYaml(String srcTplYamlPath, Map model){
         Path tplFile = getApiSrcPath().resolve(srcTplYamlPath)
-        String ymlTpl = FileUtil.readFileToString(tplFile.toFile())
-        ymlTpl = FileUtil.parseStringAsGString(ymlTpl, model)
+        String ymlTpl = tplFile.getText()
+        ymlTpl = StringUtils.parseStringAsGString(ymlTpl, model)
         //parse the yaml
         return new Yaml().load(ymlTpl)
     }

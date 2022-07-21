@@ -56,7 +56,6 @@ trait RestIntegrationTest extends DataIntegrationTest {
         MockRestResponse response = new MockRestResponse()
         GrailsWebMockUtil.bindMockWebRequest(ctx, request, response)
         currentRequestAttributes.setControllerName(controllerName)
-
     }
 
     @CompileDynamic

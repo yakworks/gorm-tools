@@ -1,20 +1,18 @@
-package yakworks.rally.activity
+package yakworks.rally.attachment
 
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
-import org.apache.commons.io.FileUtils
-import org.springframework.mock.web.MockMultipartFile
-
 import gorm.tools.problem.ValidationProblem
-import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
-import yakworks.grails.resource.AppResourceLoader
+import org.springframework.mock.web.MockMultipartFile
+import spock.lang.IgnoreRest
 import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport
-import yakworks.rally.attachment.AttachmentSupport
+import yakworks.gorm.testing.SecurityTest
+import yakworks.grails.resource.AppResourceLoader
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.model.FileData
@@ -24,22 +22,19 @@ import yakworks.rally.tag.model.TagLink
 
 class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest {
 
-    @Shared
-    AppResourceLoader appResourceLoader
-    AttachmentRepo attachmentRepo
+    @Shared AttachmentRepo attachmentRepo
+    @Shared AttachmentSupport attachmentSupport
 
     def setupSpec() {
         defineBeans {
-            appResourceLoader(AppResourceLoader) {
-                grailsApplication = grailsApplication
-            }
+            appResourceLoader(AppResourceLoader)
             attachmentSupport(AttachmentSupport)
         }
         mockDomains(Attachment, AttachmentLink, FileData, Tag, TagLink)
     }
 
     void cleanupSpec() {
-        FileUtils.deleteDirectory(appResourceLoader.getLocation("attachments.location"))
+        attachmentSupport.rimrafAttachmentsDirectory()
     }
 
     // gets a file from example/resources
@@ -49,7 +44,7 @@ class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest
 
     Path createTempFile(String sourceFile){
         byte[] data = Files.readAllBytes(getFile(sourceFile))
-        appResourceLoader.createTempFile(sourceFile, data).toPath()
+        attachmentSupport.createTempFile(sourceFile, data)
     }
 
     void "create with byte data"() {
@@ -159,7 +154,7 @@ class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest
 
         when:
         Attachment attachment = attachments[0]
-        File attachedFile = appResourceLoader.getFile(attachment.location)
+        File attachedFile = attachmentSupport.getResource(attachment).file
 
         then:
         attachment.location != null
@@ -194,14 +189,14 @@ class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest
         byte[] bytes = Files.readAllBytes(getFile('grails_logo.jpg'))
         MockMultipartFile file = new MockMultipartFile("file", "grails_logo.jpg", "image/jpeg", bytes);
         Attachment entity = attachmentRepo.create(file, [:]);
-        File attachedFile = appResourceLoader.getFile(entity.location)
+        File attachedFile = attachmentSupport.getResource(entity).file
 
         then:
         entity
         'jpg' == entity.extension
         "image/jpeg" == entity.mimeType
 
-        entity.location == appResourceLoader.getRelativePath('attachments.location', attachedFile)
+        entity.location == attachmentSupport.getRelativePath(attachedFile)
 
         cleanup:
         attachmentRepo.remove(entity)

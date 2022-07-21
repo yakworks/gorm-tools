@@ -30,7 +30,7 @@ class AttachmentRepoSpec extends Specification implements DomainIntTest {
     @Ignore //FIXME need to flush this out
     def "bulkCreate test"() {
         setup:
-        File origFile = new File(appResourceLoader.rootLocation, "freemarker/grails_logo.jpg")
+        File origFile = appResourceLoader.rootPath.resolve("freemarker/grails_logo.jpg").toFile()
         byte[] data = FileUtils.readFileToByteArray(origFile)
         File tmpFile = appResourceLoader.createTempFile('grails_logo.jpg', data)
         tmpFile.deleteOnExit()
@@ -56,7 +56,7 @@ class AttachmentRepoSpec extends Specification implements DomainIntTest {
         attachment.location != null
 
         when:
-        File attachedFile = appResourceLoader.getFile(attachment.location)
+        File attachedFile = attachmentSupport.getResource(attachment).file
 
         then:
         attachedFile.exists()
@@ -91,7 +91,7 @@ class AttachmentRepoSpec extends Specification implements DomainIntTest {
         'txt' == attachment.extension
 
         cleanup:
-        File attachedFile = appResourceLoader.getFile(attachment.location)
+        File attachedFile = attachmentSupport.getResource(attachment).file
         attachedFile?.delete()
     }
 
@@ -150,7 +150,7 @@ class AttachmentRepoSpec extends Specification implements DomainIntTest {
         copy.extension != null
 
         when:
-        File file = appResourceLoader.getFile(copy.location)
+        File file = attachmentSupport.getResource(copy).file
         println copy.id
         println file.absolutePath
 

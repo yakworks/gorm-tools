@@ -13,19 +13,9 @@ grails {
     }
 }
 
-List restConfigs = ["classpath:restapi-config.yml"]
-
-// rally rest configs
-[
-   "org.yml", "orgTypeSetup.yml", "tag.yml", "user.yml", "contact.yml",
-    "role.yml", "roleUser.yml", "syncJob.yml", "activity.yml"
-].each { fname ->
-    restConfigs.add "classpath:restapi/rally/$fname"
-}
-
 // securityConfig << "classpath:security/security-config.groovy"
 
-grails.config.locations = restConfigs
+grails.config.locations = ["classpath:restapi-config.yml", "classpath*:restapi/rally/*.yml"]
 
 //grails.plugin.fields.disableLookupCache = true
 //grails.converters.domain.include.version = true
@@ -87,18 +77,8 @@ else {
 String projectRoot = BuildSupport.gradleRootProjectDir
 app {
     resources {
-        currentTenant = {
-            return [num: 'virgin', id: 2]
-        }
-        rootLocation = { args ->
-            File root = new File("${projectRoot}/examples/resources")
-            return root.canonicalPath
-        }
-        tempDir = {
-            File file = new File("./build/rootLocation/tempDir")
-            if (!file.exists()) file.mkdirs()
-            return file.canonicalPath
-        }
+        rootLocation = "${projectRoot}/examples/resources"
+        tempDir = "./build/rootLocation/tempDir"
         attachments.location = 'attachments'
     }
 }

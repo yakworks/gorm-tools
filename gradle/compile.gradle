@@ -1,0 +1,19 @@
+plugins.withId('java') {
+  sourceCompatibility = "$javaCompatibility"
+  targetCompatibility = "$javaCompatibility"
+  tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+  }
+}
+
+plugins.withId('groovy') {
+  tasks.withType(GroovyCompile) {
+    // options.debug = true
+    configure(groovyOptions) {
+      // verbose = true
+      // sets the path to sys properties so we can use it find grails-app/conf during AST
+      forkOptions.jvmArgs = ['-Xmx1524m', '-Dgradle.projectDir=' + project.projectDir.absolutePath]
+      // '--illegal-access=permit', '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+    }
+  }
+}

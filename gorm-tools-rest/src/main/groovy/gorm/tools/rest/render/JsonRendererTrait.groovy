@@ -29,7 +29,7 @@ import yakworks.i18n.icu.ICUMessageSource
 @CompileStatic
 trait JsonRendererTrait<T> implements Renderer<T>, JsonEngineTrait {
 
-    MimeType[] mimeTypes = [MimeType.JSON, MimeType.TEXT_JSON] as MimeType[]
+    // MimeType[] mimeTypes = [MimeType.JSON, MimeType.TEXT_JSON] as MimeType[]
     String encoding = 'UTF-8'
 
     @Autowired
@@ -47,6 +47,11 @@ trait JsonRendererTrait<T> implements Renderer<T>, JsonEngineTrait {
     Class<T> getTargetType() {
         if (!targetType) this.targetType = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), JsonRendererTrait)
         return targetType
+    }
+
+    @Override
+    MimeType[] getMimeTypes(){
+        [MimeType.JSON, MimeType.TEXT_JSON] as MimeType[]
     }
 
     /**

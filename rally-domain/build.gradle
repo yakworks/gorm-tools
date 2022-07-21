@@ -1,5 +1,7 @@
 apply plugin: "yakworks.grails-plugin"
 
+apply from: "${rootProject.projectDir}/gradle/test-integration.gradle"
+
 //shared resources to pick up the Gorm defaults from application.groovy, as well as simple logback
 sourceSets.test.resources.srcDirs += [project(':gorm-test-support').sourceSets.main.resources]
 
@@ -12,9 +14,12 @@ dependencies {
   api project(":gorm-tools-security")
   api project(":gorm-tools-csv")
   api "org.yakworks:grails-kit:$vYakGrailsKit"
+  api "org.yakworks:grails-external-config:$vYakGrailsKit"
+  //api "dk.glasius:external-config:$vExternalConfig"
+  api 'jakarta.annotation:jakarta.annotation-api:2.1.0'
 
   // for the mock and seed data
-  compileOnly("org.grails.plugins:build-test-data:$vBuildTestData"){
+  compileOnly("io.github.longwa:build-test-data:$vBuildTestData"){
     exclude group:"org.grails", module: "grails-gorm-testing-support"
   }
 
@@ -26,12 +31,9 @@ dependencies {
   implementation "org.grails:grails-web-boot"
   implementation "org.grails:grails-plugin-services"
 
-  runtime "org.grails.plugins:external-config:$vExternalConfig"
-
-  testRuntime "org.grails.plugins:external-config:$vExternalConfig"
-  testRuntime "com.h2database:h2:$vH2"
-  testRuntime "javax.xml.bind:jaxb-api:2.3.1"
-  testRuntime "com.zaxxer:HikariCP:$vHikari"
+  testRuntimeOnly "com.h2database:h2:$vH2"
+  testRuntimeOnly "javax.xml.bind:jaxb-api:2.3.1"
+  testRuntimeOnly "com.zaxxer:HikariCP:$vHikari"
 
 }
 
@@ -41,17 +43,20 @@ bootRun {
     '-Dspring.output.ansi.enabled=always',
     '-noverify',
     '-XX:TieredStopAtLevel=1',
-    '-Xmx1024m')
+    '-Xmx1024m',
+    '--illegal-access=permit', '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED'
+  )
+
   sourceResources sourceSets.main
   String springProfilesActive = 'spring.profiles.active'
   systemProperty springProfilesActive, System.getProperty(springProfilesActive)
 }
 
 //BootStrap fires for some reason in 4.x so exclude it
-jar {
-  exclude('yakworks/rally/BootStrap.class')
-  exclude('yakworks/rally/BootStrap$*.class')
-}
+// jar {
+//   exclude('yakworks/rally/BootStrap.class')
+//   exclude('yakworks/rally/BootStrap$*.class')
+// }
 
 // sourceSets.main.resources.srcDirs += "src/main/groovy"
 
@@ -68,17 +73,7 @@ jar {
 //   }
 // }
 
-integrationTest {
-  testlogger {
-    showPassed false
-    showExceptions true
-    showStandardStreams = true //shows the printlns in console
-    showPassed false
-    showSkipped true
-    showFailed true
-    showSummary true
-  }
-}
+
 
 tasks.register("verifyNoSnapshots") {
   group = "verification"

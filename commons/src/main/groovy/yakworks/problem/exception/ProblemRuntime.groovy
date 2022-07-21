@@ -4,10 +4,9 @@
 */
 package yakworks.problem.exception
 
-import javax.annotation.Nullable
-
 import groovy.transform.CompileStatic
 
+import jakarta.annotation.Nullable
 import yakworks.problem.ProblemTrait
 import yakworks.problem.ProblemUtils
 

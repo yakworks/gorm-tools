@@ -7,21 +7,26 @@ package yakworks.rally.orgs.model
 import gorm.tools.audit.AuditStamp
 import gorm.tools.hibernate.criteria.CreateCriteriaSupport
 import gorm.tools.model.NameNum
-import gorm.tools.repository.model.GormRepoEntity
+import gorm.tools.repository.RepoLookup
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
-import grails.gorm.hibernate.annotation.ManagedEntity
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.orgs.repo.OrgRepo
 import yakworks.rally.tag.model.HasTags
 import yakworks.rally.tag.model.Tag
 
+/**
+ * Org is base for all organizations.
+ * NOTE: like other areas GormRepoEntity errors with stackoverflow on compile
+ */
 @Entity
 @AuditStamp
 @IdEqualsHashCode
-// @ManagedEntity
 @GrailsCompileStatic
-class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCriteriaSupport, Serializable {
+class Org implements NameNum, RepoEntity<Org>, HasTags, CreateCriteriaSupport, Serializable {
+
+    static List<String> toOneAssociations = ['flex', 'info', 'calc', 'member']
 
     String  comments
     Long    companyId
@@ -48,7 +53,7 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCrite
         num: [d: 'Unique alpha-numeric identifier for this organization', example: 'SPX-321'],
         name: [d: 'The full name for this organization', example: 'SpaceX Corp.'],
         type:[ d: 'The type of org', example: 'Customer',
-             nullable: false, bindable: false],
+               nullable: false, bindable: false],
         comments:[ d: 'A user visible comment', example: 'Lorem ipsum'],
         companyId:[ d: 'Company id this org belongs to', example: 2],
         inactive:[ d: 'indicator for an Org that is no longer active'],
@@ -56,18 +61,18 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCrite
         flex:[ d: 'User flex fields', nullable: true],
         info:[ d: 'Info such as phone and website for an organization'],
         contact:[ d: 'The default or key Contact for this organization',
-             bindable: false, oapi:[read: true, create: ['$ref'], update: ['id']]
+                  bindable: false, oapi:[read: true, create: ['$ref'], update: ['id']]
         ],
         source:[ description: 'Originator source info, used when this is sourced externally',
-             bindable: false, oapi:[read: true, create: ['source', 'sourceType', 'sourceId']]
+                 bindable: false, oapi:[read: true, create: ['source', 'sourceType', 'sourceId']]
         ],
         location:[ description: 'The primary organization address info',
-             bindable: false, oapi:[read: true, edit: ['$ref']]
+                   bindable: false, oapi:[read: true, edit: ['$ref']]
         ],
         calc:[ description: 'Calculated fields',
-             bindable: false, editable: false],
+               bindable: false, editable: false],
         member:[ description: 'Dimension hierarchy fields',
-             bindable: false, oapi:[read: true, edit: ['$ref']]
+                 bindable: false, oapi:[read: true, edit: ['$ref']]
         ],
         locations: [d: "List of locations", validate: false, required: false ]
     ]
@@ -86,6 +91,8 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCrite
         member column: 'memberId'
         // formulaz insertable: false, updateable: false , column:'id', lazy: true
     }
+
+    static OrgRepo getRepo() { RepoLookup.findRepo(this) as OrgRepo }
 
     //gorm event
     def beforeInsert() {

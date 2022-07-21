@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: cimg/openjdk:11.0
+      - image: yakworks/circle:jdk11
     resource_class: 'xlarge'
 
     steps:
@@ -62,7 +62,7 @@ jobs:
 
   ship-it:
     docker:
-      - image: yakworks/builder:jdk11
+      - image: yakworks/circle:jdk11
     resource_class: 'medium+'
 
     steps:

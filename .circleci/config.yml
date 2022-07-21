@@ -12,8 +12,8 @@ jobs:
       - run: &gradle-cache-key make gradle.cache-key-file
       - restore_cache: &gradle-cache-restore
           key: gradle-{{ checksum "cache-key.tmp" }}
-      - restore_cache: &gradle-wrapper-cache-restore
-          key: gradle-wrapper75-{{ checksum "gradlew" }}
+      - restore_cache: &gradlew-75-cache-restore
+          key: gradlew-75-{{ checksum "gradlew" }}
       - restore_cache: &build-cache-restore
           key: build-{{ checksum "version.properties" }}
 
@@ -21,7 +21,7 @@ jobs:
 
       - save_cache:
           paths: ["~/.gradle/wrapper"]
-          key: gradle-wrapper75-{{ checksum "gradlew" }}
+          key: gradlew-75-{{ checksum "gradlew" }}
       - save_cache:
           paths: [ "~/.gradle/caches" ]
           key: gradle-{{ checksum "cache-key.tmp" }}
@@ -68,7 +68,7 @@ jobs:
     steps:
       - checkout
       - run: *gradle-cache-key
-      - restore_cache: *gradle-wrapper-cache-restore
+      - restore_cache: *gradlew-75-cache-restore
       - restore_cache: *gradle-cache-restore
       - restore_cache: *build-cache-restore
 

@@ -7,7 +7,7 @@ executors:
     environment:
       # Configure the JVM and Gradle to if getting OOM errors
       # _JAVA_OPTIONS: "-Xmx1524m"
-      GRADLE_OPTS: "-Dorg.gradle.caching=true -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=4 -Dorg.gradle.console=plain"
+      GRADLE_OPTS: "-Xmx3g -Dorg.gradle.caching=true -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=4 -Dorg.gradle.console=plain"
     docker:
       - image: yakworks/bullseye:jdk11
 

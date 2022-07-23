@@ -9,7 +9,7 @@ executors:
       # _JAVA_OPTIONS: "-Xmx1524m"
       GRADLE_OPTS: "-Xmx3g -Dorg.gradle.caching=true -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=4 -Dorg.gradle.console=plain"
     docker:
-      - image: yakworks/bullseye:jdk11
+      - image: yakworks/builder:jdk11
 
 commands:
   restore_gradle_cache:

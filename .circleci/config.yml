@@ -1,5 +1,16 @@
 # circleCI build file
 version: 2.1
+
+executors:
+  builder-large:
+    resource_class: 'large'
+    environment:
+      # Configure the JVM and Gradle to if getting OOM errors
+      # _JAVA_OPTIONS: "-Xmx1524m"
+      GRADLE_OPTS: "-Dorg.gradle.caching=true -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=4 -Dorg.gradle.console=plain"
+    docker:
+      - image: yakworks/bullseye:jdk11
+
 commands:
   restore_gradle_cache:
     description: "Common pattern for gradle cache"
@@ -16,7 +27,7 @@ commands:
       # combines version.props with today to use as the key
       - run: make circle.day-version-cache-key-file
       - restore_cache:
-          key: build-{{ checksum "day-version-cache-key.tmp" }}
+          key: build-{{ .Branch }}-{{ checksum "day-version-cache-key.tmp" }}
 
   save_gradle_cache:
     description: "saves gradle caches"
@@ -38,13 +49,11 @@ commands:
             "./gorm-tools-csv/build", "./gorm-tools-rest/build", "./gorm-tools-security/build",
             "./rally-domain/build", "./rally-security/build"
           ]
-          key: build-{{ checksum "day-version-cache-key.tmp" }}
+          key: build-{{ .Branch }}-{{ checksum "day-version-cache-key.tmp" }}
 # ---------------------------------------------------------------------------
 jobs:
   build:
-    docker:
-      - image: yakworks/builder:jdk11
-    resource_class: 'large'
+    executor: builder-large
 
     steps:
       - checkout
@@ -53,7 +62,7 @@ jobs:
 
       - run:
           name: ✔︎ -- Tests
-          command: ./gradlew check --max-workers=3 --no-daemon
+          command: ./gradlew check
 
       - save_gradle_cache
 
@@ -81,10 +90,7 @@ jobs:
       - run: BOT_SIGN_COMMITS=false make ship.gh-pages
 
   ship-it:
-    docker:
-      - image: yakworks/builder:jdk11
-    resource_class: 'large'
-
+    executor: builder-large
     steps:
       - checkout
       - restore_gradle_cache

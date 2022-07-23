@@ -3,11 +3,11 @@ version: 2.1
 
 executors:
   builder-large:
-    resource_class: 'large'
+    resource_class: 'xlarge'
     environment:
       # Configure the JVM and Gradle to if getting OOM errors
       # _JAVA_OPTIONS: "-Xmx1524m"
-      GRADLE_OPTS: "-Dorg.gradle.caching=true -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=4 -Dorg.gradle.console=plain"
+      GRADLE_OPTS: "-Dorg.gradle.caching=true -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=5 -Dorg.gradle.console=plain"
     docker:
       - image: yakworks/builder:jdk11
 
@@ -62,7 +62,7 @@ jobs:
 
       - run:
           name: ✔︎ -- Tests
-          command: ./gradlew check --no-daemon
+          command: ./gradlew check
 
       - save_gradle_cache
 

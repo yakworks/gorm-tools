@@ -58,7 +58,8 @@ class IncludesConfig implements ConfigAware {
      * @return the include map
      */
     Map getIncludes(String entityClassName){
-        Class entityClass = ClassUtils.loadClass(entityClassName)
+        ClassLoader classLoader = getClass().getClassLoader()
+        Class entityClass = classLoader.loadClass(entityClassName)
         return getIncludes(entityClass)
     }
 

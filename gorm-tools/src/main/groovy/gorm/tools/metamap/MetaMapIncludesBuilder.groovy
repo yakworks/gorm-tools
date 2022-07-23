@@ -59,7 +59,8 @@ class MetaMapIncludesBuilder {
             entityClassName = persistentEntity.javaClass.name
             properties = GormMetaUtils.getPersistentProperties(persistentEntity)
         }
-        this.entityClass = ClassUtils.loadClass(entityClassName)
+        ClassLoader classLoader = getClass().getClassLoader()
+        this.entityClass = classLoader.loadClass(entityClassName)
         this.metaMapIncludes = new MetaMapIncludes(entityClassName)
     }
 
@@ -205,7 +206,8 @@ class MetaMapIncludesBuilder {
             // if no class then it wasn't a gorm association or gorm prop didn't have type
             // so try by getting value through meta reflection
             else {
-                Class entityClass = ClassUtils.loadClass(entityClassName)
+                ClassLoader classLoader = getClass().getClassLoader()
+                Class entityClass = classLoader.loadClass(entityClassName)
                 Class returnType = PropertyTools.getPropertyReturnType(entityClass, prop)
                 //if returnType is null at this point then the prop is bad or does not exist.
                 //we allow bad props and just continue.

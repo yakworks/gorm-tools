@@ -28,8 +28,9 @@ class ParallelStreamTools implements ParallelTools, ConfigAware {
     /** setup defaults for poolSize and batchSize if config isn't present. batchSize set to 100 if not config found*/
     @PostConstruct
     void init() {
-        // if (poolSize == 0) poolSize = 4 // Runtime.getRuntime().availableProcessors()
-        forkJoinPool = new ForkJoinPool(asyncService.poolSize)
+        ClassLoaderThreadFactory factory = new ClassLoaderThreadFactory()
+        // if (poolSize == 0) poolSize = 4 //  Math.min(32767, Runtime.getRuntime().availableProcessors()),
+        forkJoinPool = new ForkJoinPool(asyncService.poolSize, factory, null, false)
     }
 
     @Override

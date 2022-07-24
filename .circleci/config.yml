@@ -173,9 +173,9 @@ workflows:
       - gorm-tools:
           context: bot-context #context with shared ENV vars
           requires: [ build ]
-      # - rally-domain:
-      #     context: bot-context #context with shared ENV vars
-      #     requires: [ build ]
+      - rally:
+          context: bot-context #context with shared ENV vars
+          requires: [ build ]
       - commons:
           context: bot-context #context with shared ENV vars
           requires: [ build ]
@@ -188,5 +188,5 @@ workflows:
           filters: { branches: { only: [ master, /release\/.*/, dev ] } }
       - ship-it:
           context: bot-context
-          requires: [build]
+          requires: [build, gorm-tools, rally, commons, examples]
           filters: { branches: { only: [ master, /release\/.*/, dev ] } }

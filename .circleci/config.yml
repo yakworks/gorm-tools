@@ -50,6 +50,14 @@ commands:
             "./rally-domain/build", "./rally-security/build"
           ]
           key: build-{{ .Branch }}-{{ checksum "day-version-cache-key.tmp" }}
+
+  save_workspace:
+    description: "saves workspace"
+    steps:
+      - persist_to_workspace:
+          root: .
+          paths: [ ".gradle", ".build-cache", "*/build" ]
+
 # ---------------------------------------------------------------------------
 jobs:
   build:
@@ -79,6 +87,28 @@ jobs:
 #          path: build/reports/
 #          destination: /
       - save_build_cache
+
+  gorm-tools:
+    executor: builder-large
+    steps:
+      - checkout
+      - restore_gradle_cache
+      - attach_workspace:
+          at: .
+      - run:
+          name: ✔︎ -- Tests
+          command: ./gradlew gorm-tools:check gorm-tools-rest:check gorm-tools-security:check --parallel
+
+  rally-domain:
+    executor: builder-large
+    steps:
+      - checkout
+      - restore_gradle_cache
+      - attach_workspace:
+          at: .
+      - run:
+          name: ✔︎ -- Tests
+          command: ./gradlew rally-domain:check
 
   ship-gh-pages:
     docker:

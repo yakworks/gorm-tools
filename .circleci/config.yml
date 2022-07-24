@@ -74,6 +74,7 @@ jobs:
           # command: ./gradlew classes -x restify:classes -x rally-api:classes -x benchmarks:classes
 
       - save_gradle_cache
+      - save_workspace
 
       # merge test results to store in circle
       - run:

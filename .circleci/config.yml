@@ -171,6 +171,12 @@ workflows:
       - rally-domain:
           context: bot-context #context with shared ENV vars
           requires: [ build ]
+      - commons:
+          context: bot-context #context with shared ENV vars
+          requires: [ build ]
+      - examples:
+          context: bot-context #context with shared ENV vars
+          requires: [ build ]
       - ship-gh-pages:
           context: bot-context
           requires: [ build ]

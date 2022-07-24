@@ -114,35 +114,6 @@ class AsyncService implements ConfigAware  {
     }
 
     /**
-     * calls wrapSessionOrTransaction setting passItem to true
-     */
-    // Closure wrapClosure(AsyncConfig asyncArgs, Closure closure){
-    //     wrapClosure(asyncArgs, true, closure)
-    // }
-    /**
-     * checks args for session or trx and wraps the closure if needed
-     */
-    /**
-     * checks args for session or trx and wraps the closure if needed
-     *
-     * @param asyncArgs the args that decide if its a trx or session
-     * @param passItem it true then resulting closure will accept an item arg so it can be used to pass to an each
-     * @param closure the closure to wrap
-     * @return the wrapped closure
-     */
-    // Closure wrapClosure(AsyncConfig asyncArgs, boolean passItem, Closure closure){
-    //     Closure wrappedClosure = closure
-    //     if(asyncArgs.transactional){
-    //         verifyDatastore(asyncArgs)
-    //         wrappedClosure = passItem ? wrapTrx(asyncArgs.datastore, closure) : wrapClosureTrx(asyncArgs.datastore, closure)
-    //     } else if(asyncArgs.session){
-    //         verifyDatastore(asyncArgs)
-    //         wrappedClosure = passItem ? wrapSession(asyncArgs.datastore, closure) : wrapClosureSession(asyncArgs.datastore, closure)
-    //     }
-    //     wrappedClosure
-    // }
-
-    /**
      * if args doesn't have a datastore then it grabs the default one from the trxService
      */
     void verifyDatastore(AsyncConfig asyncArgs){

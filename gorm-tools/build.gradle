@@ -38,3 +38,7 @@ dependencies {
   // testImplementation "com.vladmihalcea:hibernate-types-52:$vHibTypes"
   //
 }
+
+test {
+  maxParallelForks = 4
+}

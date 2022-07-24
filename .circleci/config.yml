@@ -11,7 +11,7 @@ executors:
   builder-medium:
     resource_class: 'medium'
     environment:
-      GRADLE_OPTS: "-Dorg.gradle.caching=true -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=4 -Dorg.gradle.console=plain"
+      GRADLE_OPTS: "-Dorg.gradle.caching=true -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dorg.gradle.console=plain"
     docker:
       - image: yakworks/builder:jdk11
 

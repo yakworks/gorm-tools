@@ -68,15 +68,12 @@ jobs:
       - restore_gradle_cache
       - restore_build_cache
 
+      # - run:
+      #     name: ✔︎ -- check
+      #     command: ./gradlew check -x restify:check -x testify:check -x benchmarks:check -x rally-api:check
       - run:
           name: ✔︎ -- assemble
-          # command: ./gradlew classes
-          command: ./gradlew assemble
-          # command: ./gradlew classes -x restify:classes -x rally-api:classes -x benchmarks:classes
-      - run:
-          name: ✔︎ -- check
-          # command: ./gradlew classes
-          command: ./gradlew check
+          command: ./gradlew assemble -x restify:assemble -x testify:assemble -x benchmarks:assemble -x rally-api:assemble
 
       - save_gradle_cache
       - save_workspace
@@ -113,19 +110,19 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: ✔︎ -- Tests
-          command: ./gradlew gorm-tools:check gorm-tools-csv:check gorm-tools-rest:check gorm-tools-security:check --parallel
+          name: ✔︎ -- check
+          command: ./gradlew check -x restify:check -x testify:check -x benchmarks:check -x rally-api:check
 
-  rally-domain:
-    executor: builder-large
-    steps:
-      - checkout
-      - restore_gradle_cache
-      - attach_workspace:
-          at: .
-      - run:
-          name: ✔︎ -- Tests
-          command: ./gradlew rally-domain:check rally-security:check --parallel
+  # rally-domain:
+  #   executor: builder-large
+  #   steps:
+  #     - checkout
+  #     - restore_gradle_cache
+  #     - attach_workspace:
+  #         at: .
+  #     - run:
+  #         name: ✔︎ -- Tests
+  #         command: ./gradlew rally-domain:check rally-security:check --parallel
 
   examples:
     executor: builder-large
@@ -135,8 +132,8 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: ✔︎ -- Tests
-          command: ./gradlew rally-api:check testify:check restify:check --parallel
+          name: ✔︎ -- check
+          command: ./gradlew rally-api:check testify:check restify:check -x benchmarks:check --parallel
 
   ship-gh-pages:
     docker:
@@ -153,7 +150,8 @@ jobs:
     steps:
       - checkout
       - restore_gradle_cache
-      - restore_build_cache
+      - attach_workspace:
+          at: .
 
       # download vault and decrypts
       - run: make vault.decrypt
@@ -173,9 +171,9 @@ workflows:
       - gorm-tools:
           context: bot-context #context with shared ENV vars
           requires: [ build ]
-      - rally-domain:
-          context: bot-context #context with shared ENV vars
-          requires: [ build ]
+      # - rally-domain:
+      #     context: bot-context #context with shared ENV vars
+      #     requires: [ build ]
       - commons:
           context: bot-context #context with shared ENV vars
           requires: [ build ]

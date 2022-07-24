@@ -5,8 +5,6 @@ executors:
   builder-large:
     resource_class: 'large'
     environment:
-      # Configure the JVM and Gradle to if getting OOM errors
-      # _JAVA_OPTIONS: "-Xmx1524m"
       GRADLE_OPTS: "-Dorg.gradle.caching=true -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=4 -Dorg.gradle.console=plain"
     docker:
       - image: yakworks/builder:jdk11
@@ -62,33 +60,17 @@ commands:
 jobs:
   build:
     executor: builder-large
-
     steps:
       - checkout
       - restore_gradle_cache
       - restore_build_cache
 
-      # - run:
-      #     name: ✔︎ -- check
-      #     command: ./gradlew check -x restify:check -x testify:check -x benchmarks:check -x rally-api:check
       - run:
           name: ✔︎ -- assemble
           command: ./gradlew assemble -x restify:assemble -x testify:assemble -x benchmarks:assemble -x rally-api:assemble
 
       - save_gradle_cache
       - save_workspace
-
-      # merge test results to store in circle
-      - run:
-          name: ✔︎ -- Merge Test Results
-          when: always
-          command: make gradle.merge-test-results
-
-      - store_test_results:
-          path: build/test-results/
-#      - store_artifacts:
-#          path: build/reports/
-#          destination: /
       - save_build_cache
 
   commons:
@@ -101,6 +83,7 @@ jobs:
       - run:
           name: ✔︎ -- Tests
           command: ./gradlew commons:check
+      - store_test_results: { path: commons/build/test-results/ }
 
   gorm-tools:
     executor: builder-large
@@ -115,6 +98,9 @@ jobs:
             ./gradlew check -x rally-domain:check -x rally-security:check \
             -x restify:check -x testify:check -x benchmarks:check -x rally-api:check
 
+      - run: make gradle.merge-test-results
+      - store_test_results: { path: build/test-results/ }
+
   rally:
     executor: builder-large
     steps:
@@ -122,9 +108,10 @@ jobs:
       - restore_gradle_cache
       - attach_workspace:
           at: .
-      - run:
-          name: ✔︎ -- check
-          command: ./gradlew rally-domain:check rally-security:check --parallel
+
+      - run: ./gradlew rally-domain:check rally-security:check --parallel
+      - run: make gradle.merge-test-results
+      - store_test_results: { path: build/test-results/ }
 
   examples:
     executor: builder-large
@@ -133,9 +120,9 @@ jobs:
       - restore_gradle_cache
       - attach_workspace:
           at: .
-      - run:
-          name: ✔︎ -- check
-          command: ./gradlew rally-api:check testify:check restify:check -x benchmarks:check --parallel
+      - run: ./gradlew rally-api:check testify:check restify:check -x benchmarks:check --parallel
+      - run: make gradle.merge-test-results
+      - store_test_results: { path: build/test-results/ }
 
   ship-gh-pages:
     docker:

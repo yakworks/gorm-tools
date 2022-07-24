@@ -142,6 +142,10 @@ workflows:
     jobs:
       - build:
           context: bot-context #context with shared ENV vars
+      - gorm-tools:
+          context: bot-context #context with shared ENV vars
+      - rally-domain:
+          context: bot-context #context with shared ENV vars
       - ship-gh-pages:
           context: bot-context
           requires: [ build ]

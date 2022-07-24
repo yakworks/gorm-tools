@@ -3,6 +3,9 @@ api:
   defaultPackage: yakworks.rally.api
   namespaces: {rally: 'Core / Rally'}
   paths:
+    kitchen:
+      entityClass: yakworks.gorm.testing.model.KitchenSink
+
     rally:
       activity:
         entityClass: yakworks.rally.activity.model.Activity

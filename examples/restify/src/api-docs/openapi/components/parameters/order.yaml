@@ -1,9 +1,0 @@
-name: order
-in: query
-schema:
-  type: string
-  enum: [asc, desc]
-description: >
-  Sort order:
-    * `asc` - Ascending, from A to Z
-    * `desc` - Descending, from Z to A

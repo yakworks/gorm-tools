@@ -1,4 +1,0 @@
-description: String field max 50
-type: string
-maxLength: 50
-example: Abc123

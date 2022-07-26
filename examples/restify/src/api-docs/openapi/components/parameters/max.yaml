@@ -1,5 +1,0 @@
-name: max
-in: query
-description: number of items to show per page, defaults to 20
-schema:
-  type: integer

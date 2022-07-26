@@ -1,5 +1,0 @@
-name: sort
-in: query
-description: the field name to sort on, use the **q** param for multi sorts
-schema:
-  type: string

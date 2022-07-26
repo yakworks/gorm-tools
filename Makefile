@@ -119,8 +119,8 @@ test.benchmarks:
 #		-XX:+ScavengeBeforeFullGC -XX:+CMSScavengeBeforeRemark \
 #		-XX:SurvivorRatio=8 \
 
-## start the restify example jar
-start.restify: # start.db
+# start the restify example jar
+start.rally-api: # start.db
 	${gradlew} restify:assemble
 	cd examples/restify
 	java -server -Xmx2g -jar build/libs/restify.jar
@@ -152,17 +152,17 @@ oapi.docs-push:
 	git -C $(API_DOCS_BUILD_DIR) push -q $(GITHUB_URL) $(API_DOCS_BRANCH) || true
 	$(logr.done)
 
-## starts the eleventy server for the api docs, assumes the oapi.generate-api-yaml has been generated already into the dist
+# starts the eleventy server for the api docs, assumes the oapi.generate-api-yaml has been generated already into the dist
 oapi.start:
 	cd api-docs && npm run start
 
-## Runs the test that generates the api.yml from the domains.
+# Runs the test that generates the api.yml from the domains.
 oapi.generate-api-yaml:
 	# HACK, rm test-results to force a run if only editing yaml
 	rm -rf examples/restify/build/test-results
 	${gradlew} restify:integrationTest --tests *OpenapiGeneratorSpec*
 
-## generates api yaml with grails test and runs oapi.start
+# generates api yaml with grails test and runs oapi.start
 oapi.generate-start: oapi.generate-api-yaml oapi.start
 
 oapi.bundle:
@@ -177,20 +177,23 @@ oapi.build: oapi.generate-api-yaml oapi.bundle
 # cd api-docs
 # npm install   # ONLY ONCE PER DOCKER! If you have a docker from last time, don't reinstall npm
 # npm run start
-## Now you're in a docker shell for running oapi
+BIN_BASH=/bin/bash
+DOCKER_SHELL=yakworks/bullseye:dev
+
+# open shell for oapi
 oapi.shell:
 	docker run --name oapi-shell -it --rm \
-	  -v `pwd`:/project:delegated  \
+	  -v "$$PWD":/root/project:delegated  \
 	  -p 4567:4567 \
-	  yakworks/builder:node14 /bin/bash
+	  $(DOCKER_SHELL) $(BIN_BASH)
 
-BIN_BASH=/bin/bash
-DOCKER_CIRCLE=yakworks/circle:jdk11
 # for testing set up .env or export both GITHUB_TOKEN and the base64 enocded GPG_KEY from lastpass.
 docker.circle.shell:
+	docker volume create gradle_cache
 	docker run -it --rm \
 	-e GITHUB_TOKEN \
 	-e GPG_KEY \
-	-v ~/.gradle_docker:/home/circleci/.gradle \
-	-v `pwd`:/home/circleci/project \
-	$(DOCKER_CIRCLE) $(BIN_BASH)
+	-v gradle_cache:/root/.gradle \
+	-v "$$PWD":/root/project \
+	$(DOCKER_SHELL) $(BIN_BASH)
+	#	-v ~/.gradle_docker:/root/.gradle \

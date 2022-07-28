@@ -87,8 +87,8 @@ class ProblemHandler {
                 return DataProblemCodes.UniqueConstraint.ofCause(e)
             } else {
                 //For now turn to warn in case we want to turn it off.
-                String rootMessage = e.rootCause.getMessage()
-                String msgInfo = "\n class: ${e.class} \n message: ${e.message} \n rootMessage: ${rootMessage} ]"
+                String rootMessage = e.rootCause?.getMessage()
+                String msgInfo = "===  message: ${e.message} \n === rootMessage: ${rootMessage} "
 
                 log.error("MAYBE UNEXPECTED? Data Access Exception ${msgInfo}", e)
                 return DataProblem.ofCause(e)

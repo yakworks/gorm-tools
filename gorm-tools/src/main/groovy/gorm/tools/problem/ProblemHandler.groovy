@@ -82,12 +82,15 @@ class ProblemHandler {
             //We use this all over to double as a validation error, Validate.notNull for example.
             return Problem.ofCode('error.illegalArgument').status(status400).detail(e.message)
         } else if (e instanceof DataAccessException) {
-            //Not all will get translated in the repo as some get thrown after flush
-            log.error("UNEXPECTED Data Access Exception ${e.message}", e)
-            // Root of the hierarchy of data access exceptions
+            //if its an unique index problem then 90% of time its validation issue and expected.
             if (isUniqueIndexViolation((DataAccessException) e)) {
                 return DataProblemCodes.UniqueConstraint.ofCause(e)
             } else {
+                //For now turn to warn in case we want to turn it off.
+                String rootMessage = e.rootCause.getMessage()
+                String msgInfo = "\n class: ${e.class} \n message: ${e.message} \n rootMessage: ${rootMessage} ]"
+
+                log.error("MAYBE UNEXPECTED? Data Access Exception ${msgInfo}", e)
                 return DataProblem.ofCause(e)
             }
         } else {

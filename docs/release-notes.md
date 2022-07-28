@@ -1,3 +1,9 @@
+### v7.0.8-v.77
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.76...v7.0.8-v.77)
+- Fix unexpected logging (#547) [link](https://github.com/yakworks/gorm-tools/commit/bfa277ebec67e749d153a166035659235b1ea62d)
+- dont log dup keys (#546) [link](https://github.com/yakworks/gorm-tools/commit/9ab4a05023ccb2adcb1dc1eb03a24af65d4c8d56)
+
 ### v7.0.8-v.76
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.75...v7.0.8-v.76)

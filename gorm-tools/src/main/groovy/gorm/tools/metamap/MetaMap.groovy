@@ -7,7 +7,6 @@ package gorm.tools.metamap
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEntity
-import org.grails.datastore.mapping.model.config.GormProperties
 
 import gorm.tools.utils.GormMetaUtils
 import yakworks.commons.lang.Validate
@@ -40,7 +39,7 @@ class MetaMap extends AbstractMap<String, Object> implements Cloneable {
     //GormProperties.IDENTITY, GormProperties.VERSION,
     private static List<String> EXCLUDES = [
         'class', 'constraints', 'hasMany', 'mapping', 'properties',
-        'domainClass', 'dirty', GormProperties.ERRORS, 'dirtyPropertyNames']
+        'domainClass', 'dirty', 'errors', 'dirtyPropertyNames']
 
     private Set<String> _includes = []
     private Map _includeProps = [:] as Map<String, MetaMapIncludes>

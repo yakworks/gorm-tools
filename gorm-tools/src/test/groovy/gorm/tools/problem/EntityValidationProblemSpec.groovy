@@ -7,7 +7,7 @@ package gorm.tools.problem
 
 import spock.lang.Specification
 import testing.Cust
-import yakworks.i18n.MsgKey
+import yakworks.message.MsgKey
 
 class EntityValidationProblemSpec extends Specification {
 

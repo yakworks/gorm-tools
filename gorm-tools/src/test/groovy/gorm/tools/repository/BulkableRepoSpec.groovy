@@ -24,7 +24,7 @@ import yakworks.gorm.testing.model.KitchenSink
 import yakworks.gorm.testing.model.KitchenSinkRepo
 import yakworks.gorm.testing.model.SinkExt
 
-import static yakworks.commons.json.JsonEngine.parseJson
+import static yakworks.json.groovy.JsonEngine.parseJson
 
 class BulkableRepoSpec extends GormToolsHibernateSpec {
 

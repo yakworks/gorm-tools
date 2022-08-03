@@ -16,7 +16,7 @@ import gorm.tools.security.domain.SecPasswordHistory
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 import yakworks.api.Result
-import yakworks.i18n.MsgKey
+import yakworks.message.MsgKey
 import yakworks.problem.Problem
 
 @CompileStatic

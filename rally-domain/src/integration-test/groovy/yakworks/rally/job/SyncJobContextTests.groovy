@@ -10,12 +10,12 @@ import groovy.json.JsonSlurper
 import spock.lang.Specification
 import yakworks.api.ApiResults
 import yakworks.api.Result
-import yakworks.commons.json.JsonEngine
+import yakworks.json.groovy.JsonEngine
 import yakworks.gorm.testing.DomainIntTest
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Org
 
-import static yakworks.commons.json.JsonEngine.parseJson
+import static yakworks.json.groovy.JsonEngine.parseJson
 
 @Integration
 @Rollback

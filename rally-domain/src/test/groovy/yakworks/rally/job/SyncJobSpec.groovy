@@ -7,7 +7,7 @@ package yakworks.rally.job
 import gorm.tools.model.SourceType
 import gorm.tools.testing.unit.DataRepoTest
 import spock.lang.Specification
-import yakworks.commons.json.JsonEngine
+import yakworks.json.groovy.JsonEngine
 import yakworks.gorm.testing.SecurityTest
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment

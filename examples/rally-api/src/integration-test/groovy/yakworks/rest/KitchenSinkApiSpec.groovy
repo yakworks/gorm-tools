@@ -7,7 +7,7 @@ import grails.testing.mixin.integration.Integration
 import okhttp3.Response
 import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.commons.json.JsonEngine
+import yakworks.json.groovy.JsonEngine
 
 @Integration
 class KitchenSinkApiSpec extends Specification implements OkHttpRestTrait {

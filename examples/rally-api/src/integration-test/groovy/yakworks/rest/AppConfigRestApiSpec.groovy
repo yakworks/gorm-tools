@@ -6,7 +6,7 @@ import gorm.tools.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
 import spock.lang.Specification
-import yakworks.commons.json.JsonEngine
+import yakworks.json.groovy.JsonEngine
 
 // import grails.gorm.transactions.Rollback
 

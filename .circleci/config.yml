@@ -166,5 +166,5 @@ workflows:
           filters: { branches: { only: [ master, /release\/.*/, dev ] } }
       - ship-it:
           context: bot-context
-          requires: [build, gorm-tools, rally, commons, examples]
+          requires: [build, gorm-tools, rally, examples]
           filters: { branches: { only: [ master, /release\/.*/, dev ] } }

@@ -12,7 +12,7 @@ import groovy.transform.CompileStatic
 
 import org.grails.plugins.testing.GrailsMockHttpServletRequest
 
-import yakworks.commons.json.JsonEngineTrait
+import yakworks.json.groovy.JsonEngineTrait
 
 /**
  * A custom mock HTTP servlet request that provides the extra properties

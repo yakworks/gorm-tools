@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
 
-import yakworks.commons.json.HttpJsonParserTrait
+import yakworks.json.groovy.HttpJsonParserTrait
 
 /**
  * methods to parse the request body json

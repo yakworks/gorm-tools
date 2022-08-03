@@ -10,7 +10,7 @@ import groovy.util.logging.Slf4j
 import org.springframework.cache.annotation.Cacheable
 
 import gorm.tools.beans.AppCtx
-import yakworks.commons.json.JsonEngine
+import yakworks.json.groovy.JsonEngine
 
 /**
  * EntityMapService contains a set of helpers, which will create the EntityMap and Lists

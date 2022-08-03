@@ -5,10 +5,12 @@ apply plugin: "yakworks.grails-plugin"
 dependencies {
   console "org.grails:grails-console"
 
-  api project(":commons")
+  // api project(":commons")
   // TODO use this standard for json converters
   // api "jakarta.json.bind:jakarta.json.bind-api:2.0.0"
-  api "org.yakworks:grails-icu4j:$vYakworksICU4J"
+  api "org.yakworks:grails-icu4j:$vYakICU4J"
+  api "org.yakworks:groovy-commons:$vYakCommons"
+  api "org.yakworks:groovy-json:$vYakCommons"
 
   // see https://github.com/f4b6a3/uuid-creator
   api "com.github.f4b6a3:uuid-creator:$vUuidCreator"

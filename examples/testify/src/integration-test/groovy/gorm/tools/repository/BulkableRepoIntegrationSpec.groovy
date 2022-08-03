@@ -22,7 +22,7 @@ import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.repo.OrgRepo
 
-import static yakworks.commons.json.JsonEngine.parseJson
+import static yakworks.json.groovy.JsonEngine.parseJson
 
 @Integration
 @Rollback

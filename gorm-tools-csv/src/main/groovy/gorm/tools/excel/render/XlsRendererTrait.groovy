@@ -17,8 +17,8 @@ import grails.rest.render.RenderContext
 import grails.rest.render.Renderer
 import grails.util.GrailsWebUtil
 import grails.web.mime.MimeType
-import yakworks.i18n.MsgKey
 import yakworks.i18n.icu.ICUMessageSource
+import yakworks.message.MsgKey
 
 /**
  * CSV writer

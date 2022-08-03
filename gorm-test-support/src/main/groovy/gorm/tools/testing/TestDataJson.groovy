@@ -14,7 +14,7 @@ import org.grails.datastore.mapping.model.types.Association
 import gorm.tools.metamap.MetaMapEntityService
 import grails.buildtestdata.builders.DataBuilderContext
 import grails.buildtestdata.builders.PersistentEntityDataBuilder
-import yakworks.commons.json.JsonEngine
+import yakworks.json.groovy.JsonEngine
 
 /**
  * static build methods to wrap {@link RepoTestData} and Jsonify's statics for the json-views.

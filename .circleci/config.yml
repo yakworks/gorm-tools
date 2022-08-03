@@ -48,7 +48,7 @@ commands:
     steps:
       - save_cache:
           paths: [
-            ".gradle", ".build-cache", "./commons/build",
+            ".gradle", ".build-cache",
             "./gorm-test-domain/build", "./gorm-test-support/build", "./gorm-tools/build",
             "./gorm-tools-csv/build", "./gorm-tools-rest/build", "./gorm-tools-security/build",
             "./rally-domain/build", "./rally-security/build"
@@ -78,18 +78,6 @@ jobs:
       - save_gradle_cache
       - save_workspace
       - save_build_cache
-
-  commons:
-    executor: builder-medium
-    steps:
-      - checkout
-      - restore_gradle_cache
-      - attach_workspace:
-          at: .
-      - run:
-          name: ✔︎ -- Tests
-          command: ./gradlew commons:check
-      - store_test_results: { path: commons/build/test-results/ }
 
   gorm-tools:
     executor: builder-large
@@ -169,9 +157,6 @@ workflows:
       - rally:
           context: bot-context #context with shared ENV vars
           requires: [ build ]
-      - commons:
-          context: bot-context #context with shared ENV vars
-          requires: [ build ]
       - examples:
           context: bot-context #context with shared ENV vars
           requires: [ build ]
@@ -181,5 +166,5 @@ workflows:
           filters: { branches: { only: [ master, /release\/.*/, dev ] } }
       - ship-it:
           context: bot-context
-          requires: [build, gorm-tools, rally, commons, examples]
+          requires: [build, gorm-tools, rally, examples]
           filters: { branches: { only: [ master, /release\/.*/, dev ] } }

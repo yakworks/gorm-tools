@@ -8,7 +8,7 @@ import groovy.transform.CompileStatic
 
 import org.grails.plugins.testing.GrailsMockHttpServletResponse
 
-import yakworks.commons.json.JsonEngineTrait
+import yakworks.json.groovy.JsonEngineTrait
 
 @CompileStatic
 class MockRestResponse extends GrailsMockHttpServletResponse implements JsonEngineTrait {

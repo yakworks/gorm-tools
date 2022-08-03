@@ -9,7 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 
 import spock.lang.IgnoreRest
 import spock.lang.Specification
-import yakworks.commons.json.JsonEngine
+import yakworks.json.groovy.JsonEngine
 
 @Integration
 class RestErrorsSpec extends Specification implements OkHttpRestTrait {

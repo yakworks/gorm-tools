@@ -13,7 +13,7 @@ import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 
-import static yakworks.commons.json.JsonEngine.parseJson
+import static yakworks.json.groovy.JsonEngine.parseJson
 
 @Integration
 @Rollback

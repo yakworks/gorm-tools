@@ -1,14 +1,11 @@
 package yakworks.rally.orgs.members
 
-import gorm.tools.problem.ValidationProblem
 import org.springframework.validation.Errors
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import spock.lang.IgnoreRest
 import yakworks.gorm.testing.DomainIntTest
-import yakworks.problem.ProblemException
-import yakworks.problem.data.DataProblemException
+import yakworks.api.problem.data.DataProblemException
 import yakworks.rally.orgs.OrgDimensionService
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgMember

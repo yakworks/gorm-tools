@@ -11,10 +11,10 @@ import org.springframework.validation.ObjectError
 
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
-import yakworks.problem.ProblemException
-import yakworks.problem.ProblemUtils
-import yakworks.problem.data.DataProblemException
-import yakworks.problem.data.DataProblemTrait
+import yakworks.api.problem.ProblemUtils
+import yakworks.api.problem.ThrowableProblem
+import yakworks.api.problem.data.DataProblemException
+import yakworks.api.problem.data.DataProblemTrait
 
 /**
  * an extension of the default ValidationException so you can pass the entity and the message source
@@ -23,7 +23,7 @@ import yakworks.problem.data.DataProblemTrait
  * @since 6.1
  */
 @CompileStatic
-class ValidationProblem implements DataProblemTrait<ValidationProblem>  {
+class ValidationProblem implements DataProblemTrait<ValidationProblem> {
 
     public static String DEFAULT_CODE ='validation.problem'
     public static String DEFAULT_TITLE ='Validation Error(s)'
@@ -49,12 +49,19 @@ class ValidationProblem implements DataProblemTrait<ValidationProblem>  {
     }
 
     @Override
-    ProblemException toException(){
+    ThrowableProblem toException(){
         return getCause() ? new ValidationProblem.Exception(getCause()).problem(this) : new ValidationProblem.Exception().problem(this)
     }
 
     static ValidationProblem of(Object entity, Throwable cause) {
-        return ValidationProblem.ofCause(cause).entity(entity);
+        return ValidationProblem.of(cause).entity(entity);
+    }
+
+    /**
+     * helper to create using entity for payload.
+     */
+    static ValidationProblem ofEntity(Object entity) {
+        return new ValidationProblem().entity(entity);
     }
 
     static class Exception extends DataProblemException {

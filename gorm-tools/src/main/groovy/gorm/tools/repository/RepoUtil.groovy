@@ -4,7 +4,6 @@
 */
 package gorm.tools.repository
 
-
 import groovy.transform.CompileStatic
 
 import org.springframework.dao.OptimisticLockingFailureException
@@ -12,10 +11,9 @@ import org.springframework.dao.OptimisticLockingFailureException
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.transaction.TrxService
-import yakworks.problem.data.DataProblem
-import yakworks.problem.data.DataProblemCodes
-import yakworks.problem.data.NotFoundProblem
-import yakworks.problem.exception.ProblemRuntime
+import yakworks.api.problem.data.DataProblem
+import yakworks.api.problem.data.DataProblemCodes
+import yakworks.api.problem.data.NotFoundProblem
 
 /**
  * A bunch of statics to support the repositories.

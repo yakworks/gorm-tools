@@ -28,6 +28,7 @@ import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp
 import yakworks.api.ApiResults
 import yakworks.api.Result
+import yakworks.api.problem.Problem
 import yakworks.commons.map.Maps
 
 /**
@@ -183,7 +184,7 @@ trait BulkableRepo<D> {
                 //make sure args has its own copy as GormRepo add data to it and makes changes
                 PersistArgs args = jobContext.args.getPersistArgs()
                 Map entityMapData = createOrUpdate(jobContext, isCreate, transactionPerItem, itemData, args)
-                results << Result.of(entityMapData).status(isCreate ? 201 : 200)
+                results << Result.OK().payload(entityMapData).status(isCreate ? 201 : 200)
             } catch(Exception e) {
                 // if trx by item then collect the exceptions, otherwise throw so it can rollback
                 if(transactionPerItem){

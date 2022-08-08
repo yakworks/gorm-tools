@@ -16,8 +16,8 @@ import gorm.tools.security.domain.SecPasswordHistory
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 import yakworks.api.Result
+import yakworks.api.problem.Problem
 import yakworks.message.MsgKey
-import yakworks.problem.Problem
 
 @CompileStatic
 class PasswordValidator {
@@ -77,7 +77,7 @@ class PasswordValidator {
         }
 
         if(problemKeys){
-            return Problem.ofCode('security.validation.password.error').addErrors(problemKeys)
+            return Problem.of('security.validation.password.error').addViolations(problemKeys)
         } else {
             return  Result.OK()
         }

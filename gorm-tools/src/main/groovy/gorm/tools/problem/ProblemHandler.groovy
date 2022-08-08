@@ -17,15 +17,15 @@ import org.springframework.validation.ObjectError
 import gorm.tools.repository.errors.EmptyErrors
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
+import yakworks.api.problem.GenericProblem
+import yakworks.api.problem.Problem
+import yakworks.api.problem.ThrowableProblem
+import yakworks.api.problem.UnexpectedProblem
+import yakworks.api.problem.Violation
+import yakworks.api.problem.ViolationFieldError
+import yakworks.api.problem.data.DataProblem
+import yakworks.api.problem.data.DataProblemCodes
 import yakworks.i18n.icu.ICUMessageSource
-import yakworks.problem.Problem
-import yakworks.problem.ProblemException
-import yakworks.problem.ProblemTrait
-import yakworks.problem.UnexpectedProblem
-import yakworks.problem.Violation
-import yakworks.problem.ViolationFieldError
-import yakworks.problem.data.DataProblem
-import yakworks.problem.data.DataProblemCodes
 
 /**
  * Service to prepare ApiError / ApiValidationError for given a given exception
@@ -39,7 +39,7 @@ class ProblemHandler {
 
     @Autowired ICUMessageSource messageSource
 
-    ProblemTrait<?> handleException(Class entityClass, Throwable e) {
+    GenericProblem handleException(Class entityClass, Throwable e) {
         handleException(e, entityClass.simpleName)
     }
 
@@ -54,7 +54,7 @@ class ProblemHandler {
      * @param Exception e
      * @return ApiError
      */
-    ProblemTrait<?> handleException(Throwable e, String simpleName = null) {
+    GenericProblem handleException(Throwable e, String simpleName = null) {
         // default error status code is 422
         ApiStatus status400 = HttpStatus.BAD_REQUEST
         ApiStatus status404 = HttpStatus.NOT_FOUND
@@ -69,50 +69,50 @@ class ProblemHandler {
             valProblem.violations(transateErrorsToViolations(valProblem.errors))
             return valProblem
         }
-        else if (e instanceof ProblemTrait) {
-            return (ProblemTrait) e
+        else if (e instanceof GenericProblem) {
+            return (GenericProblem) e
         }
-        else if (e instanceof ProblemException) {
-            return (ProblemTrait) e.problem
+        else if (e instanceof ThrowableProblem) {
+            return (GenericProblem) e.problem
         }
         else if (e instanceof grails.validation.ValidationException
             || e instanceof org.grails.datastore.mapping.validation.ValidationException) {
             return buildFromErrorException(e, simpleName)
         } else if (e instanceof IllegalArgumentException) {
             //We use this all over to double as a validation error, Validate.notNull for example.
-            return Problem.ofCode('error.illegalArgument').status(status400).detail(e.message)
+            return Problem.of('error.illegalArgument').status(status400).detail(e.message)
         } else if (e instanceof DataAccessException) {
             //if its an unique index problem then 90% of time its validation issue and expected.
             if (isUniqueIndexViolation((DataAccessException) e)) {
-                return DataProblemCodes.UniqueConstraint.ofCause(e)
+                return DataProblemCodes.UniqueConstraint.of(e)
             } else {
                 //For now turn to warn in case we want to turn it off.
                 String rootMessage = e.rootCause?.getMessage()
                 String msgInfo = "===  message: ${e.message} \n === rootMessage: ${rootMessage} "
 
                 log.error("MAYBE UNEXPECTED? Data Access Exception ${msgInfo}", e)
-                return DataProblem.ofCause(e)
+                return DataProblem.of(e)
             }
         } else {
             return handleUnexpected(e)
         }
     }
 
-    ProblemTrait<?> handleUnexpected(Throwable e){
+    GenericProblem handleUnexpected(Throwable e){
         log.error("UNEXPECTED Internal Server Error ${e.message}", e)
-        if (e instanceof ProblemTrait) {
-            return (ProblemTrait) e
+        if (e instanceof GenericProblem) {
+            return (GenericProblem) e
         }
-        else if (e instanceof ProblemException) {
-            return (ProblemTrait) e.problem
+        else if (e instanceof ThrowableProblem) {
+            return (GenericProblem) e.problem
         } else {
-            return UnexpectedProblem.ofCause(e).detail(e.message)
+            return new UnexpectedProblem().cause(e).detail(e.message)
         }
     }
 
     ValidationProblem buildFromErrorException(Throwable valEx, String entityName = null) {
         Errors ers = valEx['errors'] as Errors
-        def valProb = ValidationProblem.ofCause(valEx).errors(ers)
+        def valProb = ValidationProblem.of(valEx).errors(ers)
         if(entityName) valProb.name(entityName)
         return valProb.violations(transateErrorsToViolations(ers))
     }

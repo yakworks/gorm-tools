@@ -125,7 +125,7 @@ class SyncJobContext {
         if(!currentResults.ok) ok.set(false)
         boolean curOk = ok.get()
 
-        int processedSize = processedCount.addAndGet(currentResults.size())
+        int processedSize = processedCount.addAndGet(currentResults.list.size())
         DecimalFormat decFmt = new DecimalFormat("0.0")
         BigDecimal endTime = (System.currentTimeMillis() - startTimeMillis) / 1000
         String timing = "${decFmt.format(endTime)}s"
@@ -218,7 +218,7 @@ class SyncJobContext {
         MsgService msgService = syncJobService.messageSource
         List<Map> ret = []
         boolean ok = true
-        for (Result r : apiResults) {
+        for (Result r : apiResults.list) {
             def map = [ok: r.ok, status: r.status.code, data: r.payload] as Map<String, Object>
             //do the failed
             if (r instanceof ProblemTrait) {

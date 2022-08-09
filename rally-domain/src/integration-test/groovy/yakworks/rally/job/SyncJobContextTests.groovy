@@ -53,7 +53,7 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         SyncJobContext jobContext = createJob()
 
         when:
-        def apiRes = ApiResults.of("foo")
+        def apiRes = ApiResults.ofPayload("foo")
         jobContext.updateJob(apiRes, [id:jobContext.jobId , errorBytes: JsonEngine.toJson(apiRes).bytes ])
 
         then:
@@ -71,7 +71,7 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         Long time = System.currentTimeMillis()
         ApiResults apiRes = ApiResults.OK()
         (1..20).each {
-            apiRes << Result.of([id:it, num:"num-$it", name: "name-$it"])
+            apiRes << Result.OK().payload([id:it, num:"num-$it", name: "name-$it"])
         }
 
         jobContext.updateJobResults(apiRes, time)
@@ -127,7 +127,7 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         }
 
         when:
-        def apiRes = ApiResults.of("foo").title("gogogo")
+        def apiRes = ApiResults.ofPayload("foo").title("gogogo")
         jobContext.transformResults(apiRes)
 
         then:

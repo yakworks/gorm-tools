@@ -8,7 +8,9 @@ dependencies {
   // api project(":commons")
   // TODO use this standard for json converters
   // api "jakarta.json.bind:jakarta.json.bind-api:2.0.0"
+
   api "org.yakworks:grails-icu4j:$vYakICU4J"
+  api "org.yakworks:api-messages:$vYakCommons"
   api "org.yakworks:groovy-commons:$vYakCommons"
   api "org.yakworks:groovy-json:$vYakCommons"
 

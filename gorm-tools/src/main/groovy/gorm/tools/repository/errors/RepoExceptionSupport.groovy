@@ -11,9 +11,9 @@ import org.springframework.dao.OptimisticLockingFailureException
 
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.problem.ValidationProblem
-import yakworks.problem.ProblemTrait
-import yakworks.problem.data.DataProblem
-import yakworks.problem.data.DataProblemCodes
+import yakworks.api.problem.ProblemTrait
+import yakworks.api.problem.data.DataProblem
+import yakworks.api.problem.data.DataProblemCodes
 
 /**
  * Handler and translator for exceptions thrown by the Repository
@@ -61,10 +61,10 @@ class RepoExceptionSupport {
         else if (ex instanceof DataAccessException) {
             // Root of the hierarchy of data access exceptions
             if(ProblemHandler.isUniqueIndexViolation(ex)){
-                return DataProblemCodes.UniqueConstraint.ofCause(ex)
+                return DataProblemCodes.UniqueConstraint.of(ex)
                     .entity(entity).toException()
             } else {
-                return DataProblem.ofCause(ex).entity(entity).toException()
+                return DataProblem.of(ex).entity(entity).toException()
             }
         }
         return ex

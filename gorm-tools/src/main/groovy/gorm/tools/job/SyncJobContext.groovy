@@ -22,12 +22,12 @@ import gorm.tools.repository.model.IdGeneratorRepo
 import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.api.ResultUtils
+import yakworks.api.problem.ProblemTrait
 import yakworks.commons.io.IOUtils
 import yakworks.commons.lang.Validate
 import yakworks.json.groovy.JsonEngine
 import yakworks.json.groovy.JsonStreaming
 import yakworks.message.spi.MsgService
-import yakworks.problem.ProblemTrait
 
 @SuppressWarnings('Println')
 @Builder(builderStrategy= SimpleStrategy, prefix="")

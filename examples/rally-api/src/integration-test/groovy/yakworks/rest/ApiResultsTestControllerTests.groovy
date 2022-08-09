@@ -15,7 +15,7 @@ class ApiResultsTestControllerTests extends RestIntTest{
         controllerName = 'ApiResultsTestController'
     }
 
-    void "get"() {
+    void "test get"() {
         when:
         controller.get()
         Map body = response.bodyToMap()
@@ -23,7 +23,7 @@ class ApiResultsTestControllerTests extends RestIntTest{
         then:
         body.ok == true
         body.status == 207
-        response.status == 200
+        response.status == 207
 
     }
 

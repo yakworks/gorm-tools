@@ -4,8 +4,8 @@ import gorm.tools.testing.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import yakworks.problem.data.DataProblemException
-import yakworks.problem.data.DataProblemCodes
+import yakworks.api.problem.data.DataProblemException
+import yakworks.api.problem.data.DataProblemCodes
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.repo.OrgSourceRepo
 

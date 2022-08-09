@@ -12,10 +12,10 @@ import grails.persistence.Entity
 import spock.lang.Specification
 import testing.Cust
 import yakworks.i18n.icu.ICUMessageSource
-import yakworks.problem.data.DataProblem
-import yakworks.problem.data.DataProblemException
-import yakworks.problem.data.DataProblemCodes
-import yakworks.problem.data.NotFoundProblem
+import yakworks.api.problem.data.DataProblem
+import yakworks.api.problem.data.DataProblemException
+import yakworks.api.problem.data.DataProblemCodes
+import yakworks.api.problem.data.NotFoundProblem
 
 class RepoUtilsSpec extends Specification implements DataRepoTest {
 

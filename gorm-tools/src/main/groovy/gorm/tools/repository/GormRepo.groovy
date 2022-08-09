@@ -32,8 +32,8 @@ import gorm.tools.repository.model.PersistableRepoEntity
 import gorm.tools.transaction.TrxStaticApi
 import grails.core.support.proxy.ProxyHandler
 import grails.validation.ValidationException
+import yakworks.api.problem.data.NotFoundProblem
 import yakworks.commons.lang.ClassUtils
-import yakworks.problem.data.NotFoundProblem
 
 /**
  * A trait that turns a class into a Repository
@@ -170,7 +170,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
         if(args.validate != false){
             boolean valid = gormValidationApi().validate entity
             if(!valid && args.failOnError){
-                def ex = ValidationProblem.of(entity).errors(((GormEntity)entity).errors).toException()
+                def ex = ValidationProblem.ofEntity(entity).errors(((GormEntity)entity).errors).toException()
                 // println ex
                 throw ex
             }

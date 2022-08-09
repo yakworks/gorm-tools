@@ -13,7 +13,6 @@ import gorm.tools.rest.RestApiFromConfig
 import gorm.tools.rest.appinfo.AppInfoBuilder
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
-import yakworks.rest.renderer.ApiResultsRenderer
 
 // the component scan here does not seem to be the same as the packageNames and is needed to pick up the
 // the services marked with @Component
@@ -57,8 +56,6 @@ class Application extends GrailsAutoConfiguration {
         //     apiBuild = 'api-docs/dist/openapi'
         //     namespaceList = ['rally']
         // }
-
-        apiResultsRenderer(ApiResultsRenderer)
         openApiGenerator(OpenApiGenerator) { bean ->
             bean.lazyInit = true
             apiSrc = 'api-docs/openapi'

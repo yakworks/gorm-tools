@@ -115,6 +115,17 @@ trait SecService<D> {
     }
 
     /**
+     * returns first section of email before @
+     * @return the username
+     */
+    String getDisplayName(Serializable uid) {
+        D usr = getUser(uid)
+        if(!usr) return null
+        String email = usr['email']
+        return email.substring(0, email.indexOf("@"))
+    }
+
+    /**
      * get the user entity for the id
      * @param uid the user id
      * @return the user entity

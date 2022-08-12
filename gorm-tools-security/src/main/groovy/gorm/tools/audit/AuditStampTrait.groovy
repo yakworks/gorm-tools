@@ -35,6 +35,16 @@ trait AuditStampTrait {
         SecUtils.getUsername(getCreatedBy())
     }
 
+    @Transient
+    String getEditedByDisplayName() {
+        SecUtils.getDisplayName(getEditedBy())
+    }
+
+    @Transient
+    String getCreatedByDisplayName() {
+        SecUtils.getDisplayName(getCreatedBy())
+    }
+
     @CompileDynamic
     static AuditStampTraitConstraints(Object delegate) {
         def c = {

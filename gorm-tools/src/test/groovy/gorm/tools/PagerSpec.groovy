@@ -5,8 +5,9 @@
 package gorm.tools
 
 import gorm.tools.metamap.MetaMapList
-import gorm.tools.metamap.MetaMapEntityService
 import gorm.tools.beans.Pager
+import gorm.tools.metamap.services.MetaMapIncludesService
+import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import testing.Address
 import testing.AddyNested
@@ -51,9 +52,11 @@ class PagerSpec extends GormToolsHibernateSpec {
     def "test setupData with fields"() {
         setup:
         Pager pager = new Pager()
-        def metaMapEntityService = new MetaMapEntityService()
+        MetaMapService metaMapService = new MetaMapService(
+            metaMapIncludesService: new MetaMapIncludesService()
+        )
         def dlist = Cust.list(max: pager.max, offset: pager.offset)
-        MetaMapList entityMapList = metaMapEntityService.createMetaMapList(dlist, ["*"])
+        MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, ["*"])
 
         when:
         pager.setEntityMapList(entityMapList)

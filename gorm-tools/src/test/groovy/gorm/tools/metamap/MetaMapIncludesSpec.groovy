@@ -35,4 +35,58 @@ class MetaMapIncludesSpec extends Specification implements DataRepoTest {
         then:
         mmi1 == mmi2
     }
+
+    void "test toBasicMap"(){
+        when:
+        //simple
+        def includes = ['id', 'num', 'name', 'ext.thing.name', ]
+        MetaMapIncludes mmi = MetaMapIncludesBuilder.build(KitchenSink, includes)
+        Map basicMap = mmi.toMap()
+
+        then:
+        basicMap.size() == 4
+        basicMap.keySet() == ['id', 'num', 'name', 'ext'] as Set
+        basicMap.ext.size() == 1
+        basicMap.ext.keySet() == ['thing'] as Set
+        basicMap.ext.thing.size() == 1
+        basicMap.ext.thing.keySet() == ['name'] as Set
+    }
+
+    void "test flatten"(){
+        when:
+        //simple
+        def includes = ['id', 'num', 'amount', 'ext.thing.name']
+        def expectedIncludes = includes
+        MetaMapIncludes mmi = MetaMapIncludesBuilder.build(KitchenSink, includes)
+        def flatMap = mmi.flatten()
+
+        then:
+        //in this case it should equal the passes in includes
+        flatMap.keySet() == expectedIncludes as Set
+        flatMap['id'] instanceof MetaProp
+        flatMap['id'].type == Long
+    }
+
+    void "test flattenProps"(){
+        when:
+        //simple
+        def includes = ['id', 'num', 'name', 'ext.thing.name']
+        def expectedIncludes = includes
+        MetaMapIncludes mmi = MetaMapIncludesBuilder.build(KitchenSink, includes)
+        Set props = mmi.flattenProps()
+
+        then:
+        //in this case it should equal the passes in includes
+        props == expectedIncludes as Set
+
+        when:
+        //simple
+        includes = ['id', 'thing.$*']
+        expectedIncludes = ['id', 'thing.id', 'thing.name']
+        props = MetaMapIncludesBuilder.build(KitchenSink, includes).flattenProps()
+
+        then:
+        props == expectedIncludes as Set
+    }
+
 }

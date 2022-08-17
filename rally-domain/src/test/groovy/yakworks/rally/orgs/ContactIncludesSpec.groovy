@@ -5,7 +5,7 @@
 package yakworks.rally.orgs
 
 import gorm.tools.metamap.MetaMapIncludesBuilder
-import gorm.tools.metamap.MetaMapEntityService
+import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.testing.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.gorm.testing.SecurityTest
@@ -17,7 +17,7 @@ import yakworks.rally.testing.MockData
 
 class ContactIncludesSpec extends Specification implements DataRepoTest, SecurityTest {
 
-    MetaMapEntityService metaMapEntityService
+    MetaMapService metaMapService
 
     void setupSpec() {
         mockDomains Org, Contact, ContactPhone, ContactEmail
@@ -28,7 +28,7 @@ class ContactIncludesSpec extends Specification implements DataRepoTest, Securit
         def res = MetaMapIncludesBuilder.build(Contact, ['*'])
 
         then:
-        res.rootClassName == 'yakworks.rally.orgs.model.Contact'
+        res.className == 'yakworks.rally.orgs.model.Contact'
         // res.fields == ['name'] as Set
     }
 
@@ -38,7 +38,7 @@ class ContactIncludesSpec extends Specification implements DataRepoTest, Securit
         Map dta = [firstName: "bill", emails:emails]
         Contact contact = MockData.contact(dta)
 
-        def result = metaMapEntityService.createMetaMap(contact, ['id', 'emails.$*'])
+        def result = metaMapService.createMetaMap(contact, ['id', 'emails.$*'])
 
         then:
         result == [id:1, emails:[[id:1, address:'test@9ci.com', kind:'work']]]

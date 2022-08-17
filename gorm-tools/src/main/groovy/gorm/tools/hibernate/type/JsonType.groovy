@@ -13,7 +13,6 @@ import org.hibernate.type.descriptor.sql.SqlTypeDescriptor
 import org.hibernate.usertype.ParameterizedType
 
 import com.vladmihalcea.hibernate.type.json.internal.JsonTypeDescriptor
-import yakworks.commons.lang.ClassUtils
 
 /**
  * Overrides so we can access set using the gorm mapping

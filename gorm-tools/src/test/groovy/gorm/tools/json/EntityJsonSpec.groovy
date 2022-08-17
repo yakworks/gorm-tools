@@ -4,12 +4,14 @@
 */
 package gorm.tools.json
 
+import gorm.tools.metamap.MetaMap
+import gorm.tools.metamap.MetaMapList
+import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.testing.RepoTestData
 
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-import gorm.tools.metamap.MetaMapEntityService
 import gorm.tools.repository.model.RepoEntity
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.compiler.GrailsCompileStatic
@@ -21,13 +23,14 @@ import testing.Cust
 import testing.CustExt
 import testing.CustType
 import testing.AddyNested
+import yakworks.json.groovy.JsonEngine
 
 import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson
 
 class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
 
-    MetaMapEntityService metaMapEntityService
+    MetaMapService metaMapService
 
     void setupSpec(){
         //these won't automatically get picked up as thet are not required.
@@ -35,11 +38,28 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
         //defineBeans(new JsonViewGrailsPlugin())
     }
 
+    /**
+     * Calls createEntityMap and then passed to JsonEngine to generate json string
+     *
+     * @param entity the entity to wrap in a map
+     * @param includes the fields list to include. ex ['*', 'foo.bar', 'foo.id']
+     * @return the json string
+     */
+    String toJson(Object entity, List<String> includes = [], List<String> excludes = []){
+        MetaMap emap = metaMapService.createMetaMap(entity, includes, excludes)
+        return JsonEngine.toJson(emap)
+    }
+
+    String toJson(List entityList, List<String> includes = [], List<String> excludes = []){
+        MetaMapList elist = metaMapService.createMetaMapList(entityList, includes, excludes)
+        return JsonEngine.toJson(elist)
+    }
+
     void "test Org json stock"() {
         when:
         def excludes = ['version']
         def org = build()
-        def res = metaMapEntityService.toJson(org, ['*', 'type'], excludes)
+        def res = toJson(org, ['*', 'type'], excludes)
 
         then:
         assertThatJson(res).isEqualTo('''
@@ -60,26 +80,26 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
         when: "no includes"
         def excludes = ['version']
         def jdom = RepoTestData.build(JsonifyDom)
-        def res = metaMapEntityService.toJson(jdom, null, excludes)
+        def res = toJson(jdom, null, excludes)
 
         then: 'should not include the ext because its null'
         assertThatJson(res).isEqualTo('{"id":1,"localDate":"2018-01-25","isActive":false,"date":"2018-01-26T01:36:02Z","name":"name","amount":0}')
 
         when: "ext association is mocked up in data"
         jdom = RepoTestData.build(JsonifyDom, includes: ['ext'])
-        res = metaMapEntityService.toJson(jdom, ['*', 'ext'], excludes)
+        res = toJson(jdom, ['*', 'ext'], excludes)
 
         then: 'the default will be just the ext.id'
         assertThatJson(res).isEqualTo('{"id":2,"localDate":"2018-01-25","ext":{"id":1},"isActive":false,"date":"2018-01-26T01:36:02Z","name":"name","amount":0}')
 
         when: "ext association is in includes with \$stamp"
-        res = metaMapEntityService.toJson(jdom, ['id', 'name', 'ext.$stamp'], excludes)
+        res = toJson(jdom, ['id', 'name', 'ext.$stamp'], excludes)
 
         then: 'ext fields should be shown'
         assertThatJson(res).isEqualTo('{"id":2,"name":"name","ext":{"id":1,"nameExt":"nameExt"}}')
 
         when: "ext association is in includes and \$* should use stamp"
-        res = metaMapEntityService.toJson(jdom, ['id', 'name', 'ext.$*'], excludes)
+        res = toJson(jdom, ['id', 'name', 'ext.$*'], excludes)
 
         then: 'ext fields should be shown'
         assertThatJson(res).isEqualTo('{"id":2,"name":"name","ext":{"id":1,"nameExt":"nameExt"}}')
@@ -89,7 +109,7 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
     void "currency converter should work"() {
         when:
         def jdom = RepoTestData.build(JsonifyDom, currency: Currency.getInstance('USD'))
-        def res = metaMapEntityService.toJson(jdom, ['id', 'currency'])
+        def res = toJson(jdom, ['id', 'currency'])
 
         then:
         res == '{"id":1,"currency":"USD"}'
@@ -101,7 +121,7 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
         def jdom = RepoTestData.build(JsonifyDom, includes: ['ext'])
         def args = [includes: ['id', 'ext.nameExt', 'company'], deep: true]
         String incTrans = 'company'
-        def res = metaMapEntityService.toJson(jdom, ['id', 'ext.nameExt', 'company'])
+        def res = toJson(jdom, ['id', 'ext.nameExt', 'company'])
 
         then: "comapny is a transient and should be rendered"
 
@@ -114,7 +134,7 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
         def org = build()
         def org2 = build()
         def orgList = [org, org2]
-        def result = metaMapEntityService.toJson(orgList, ['name'])
+        def result = toJson(orgList, ['name'])
 
         then:
         result == '[{"name":"name"},{"name":"name"}]'
@@ -125,7 +145,7 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
         when:
         def org = build(includes: '*')
         //FIXME it should automtically exclude the ext.org since its the other side of the association
-        def result =  metaMapEntityService.toJson(org, [excludes:['ext.org']])
+        def result =  toJson(org, [excludes:['ext.org']])
 
         def expected = '''{
             id:1, name:'name', ext:[id:1, text1:'text1'],
@@ -140,7 +160,7 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
     void "test json includes ext.*"() {
         when:
         def org = build(includes: '*')
-        def result = metaMapEntityService.toJson(org, ["name", 'ext.*'])
+        def result = toJson(org, ["name", 'ext.*'])
 
         then:
         assertThatJson(result).isEqualTo('{"ext":{"id":1,"version":0,"text1":"text1","org":{"id":1}},"name":"name"}')

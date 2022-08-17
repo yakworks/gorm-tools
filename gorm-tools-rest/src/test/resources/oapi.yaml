@@ -22,6 +22,7 @@ info:
 externalDocs:
   description: 9ci Documentation
   url: 'https://9ci.com/documentation/2.0/'
+paths: {}
 components:
   schemas:
     Tag:

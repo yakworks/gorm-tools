@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus
 
 import grails.rest.render.RenderContext
 import yakworks.api.ApiResults
-import yakworks.api.ResultUtils
 
 /**
  * Concrete so we can set the HttpStatus.MULTI_STATUS

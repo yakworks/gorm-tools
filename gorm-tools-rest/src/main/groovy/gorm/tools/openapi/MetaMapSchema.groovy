@@ -42,12 +42,12 @@ class MetaMapSchema implements Serializable {
     MetaMapSchema build(MetaMapIncludes metaMapIncludes) {
         Schema rootSchema = oapiSupport.getSchema(metaMapIncludes.shortClassName)
         if(!rootSchema) return this
-        this.rootClassName = metaMapIncludes.rootClassName
+        this.rootClassName = metaMapIncludes.className
         this.schema = rootSchema
-        def mmiProps = metaMapIncludes.props
+        def mmiProps = metaMapIncludes.propsMap
         for (String key in mmiProps.keySet()) {
-            MetaMapIncludes nestedIncs = mmiProps[key]
-            if(nestedIncs) {
+            def nestedIncs = mmiProps[key]
+            if(nestedIncs instanceof MetaMapIncludes) {
                 this.props[key] = MetaMapSchema.of(nestedIncs).props
             } else {
                 this.props[key] = rootSchema.properties[key]
@@ -79,7 +79,7 @@ class MetaMapSchema implements Serializable {
     }
 
     /**
-     * Filters the props to only the ones that are association and have a nested includes
+     * flatten schema map
      */
     Map<String, Map> flatten(){
         Map flatMap = MapFlattener.flattenMap(props) as Map<String, Schema>

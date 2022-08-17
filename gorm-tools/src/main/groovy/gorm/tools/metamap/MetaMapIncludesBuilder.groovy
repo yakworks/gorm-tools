@@ -17,7 +17,6 @@ import org.grails.datastore.mapping.model.types.ToMany
 import gorm.tools.api.IncludesConfig
 import gorm.tools.utils.GormMetaUtils
 import grails.gorm.validation.ConstrainedProperty
-import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.PropertyTools
 
 /**
@@ -37,7 +36,7 @@ class MetaMapIncludesBuilder {
     String entityClassName
     Class entityClass
     PersistentEntity persistentEntity
-    List<PersistentProperty> properties = []
+    List<PersistentProperty> persistentProperties = []
     MetaMapIncludes metaMapIncludes
 
     MetaMapIncludesBuilder(String entityClassName, List<String> includes){
@@ -57,7 +56,7 @@ class MetaMapIncludesBuilder {
         if(this.persistentEntity){
             //in case the short name was passed in make sure its full class name
             entityClassName = persistentEntity.javaClass.name
-            properties = GormMetaUtils.getPersistentProperties(persistentEntity)
+            persistentProperties = GormMetaUtils.getPersistentProperties(persistentEntity)
         }
         ClassLoader classLoader = getClass().getClassLoader()
         this.entityClass = classLoader.loadClass(entityClassName)
@@ -106,12 +105,13 @@ class MetaMapIncludesBuilder {
             if (!nestedPropName) {
                 if (field == '*') {
                     // * only works if it has properties
-                    if(properties){
-                        List<String> props = properties.findAll {
+                    if(persistentProperties){
+                        List props = persistentProperties.findAll {
                             !(it instanceof ToMany)
-                        }*.name
-                        props.each {
-                            metaMapIncludes.props[it] = null
+                        }
+
+                        props.each { p ->
+                            metaMapIncludes.propsMap[p.name] = MetaProp.of(p.name, p.type)
                         }
                         // metaMapIncludes.fields.addAll(props)
                     }
@@ -128,20 +128,21 @@ class MetaMapIncludesBuilder {
                 }
                 //just a normal prop but make sure it exists
                 else {
-                    if(propertyExists(field)){
-                        metaMapIncludes.props[field] = null
-                        // metaMapIncludes.fields.add(field)
+                    MetaProp propm = getPropMeta(field)
+                    if(propm){
+                        metaMapIncludes.propsMap[field] = propm
                     }
                     // TODO should add check for transient?
                 }
-            } else {
+            }
+            else { // its a nestedProp
+
                 //we are sure its exists at this point as we alread checked above
-                metaMapIncludes.props[nestedPropName] = null
-                // metaMapIncludes.fields.add(nestedPropName)
+                metaMapIncludes.propsMap[nestedPropName] = null
 
                 //set it up if it has not been yet
                 if (!nestedProps[nestedPropName]) {
-                    PersistentProperty pp = properties.find { it.name == nestedPropName }
+                    PersistentProperty pp = persistentProperties.find { it.name == nestedPropName }
                     String nestedClass
                     // check if its association
                     if (pp instanceof Association) {
@@ -154,8 +155,7 @@ class MetaMapIncludesBuilder {
                 }
                 //if prop is foo.bar.baz then this get the bar.baz part
                 String propPath = field.substring(nestedIndex + 1)
-                //if its * on nested then assume that means stamp
-                // if(propPath == '*') propPath = '$stamp'
+
                 // if its a $* then thats a hard override that we want *
                 if(propPath == '$*') propPath = '$stamp'
 
@@ -167,7 +167,7 @@ class MetaMapIncludesBuilder {
         Set blacklist = getBlacklist(persistentEntity) + (this.excludes as Set)
 
         //only if it has rootProps
-        if (metaMapIncludes.props) {
+        if (metaMapIncludes.propsMap) {
             if(blacklist) metaMapIncludes.addBlacklist(blacklist)
             //if it has nestedProps then go recursive
             if(nestedProps){
@@ -179,6 +179,18 @@ class MetaMapIncludesBuilder {
         }
     }
 
+    /** PropMeta from propName depending on whether its a persistentEntity or normal bean */
+    MetaProp getPropMeta(String propName){
+        def perProp = persistentEntity?.getPropertyByName(propName)
+        if (perProp){
+            return MetaProp.of(perProp.name, perProp.type)
+        } else {
+            def mprop = PropertyTools.getMetaBeanProp(entityClass, propName)
+            if(mprop) return new MetaProp(mprop)
+        }
+        return null
+    }
+
     boolean propertyExists(String propName){
         if (persistentEntity && persistentEntity.getPropertyByName(propName)){
             return true
@@ -186,6 +198,7 @@ class MetaMapIncludesBuilder {
             def prop = PropertyTools.getMetaBeanProp(entityClass, propName)
             if(prop) return true
         }
+        return false
     }
 
     //will recursivily call build and add to the metaMapIncludes
@@ -218,19 +231,19 @@ class MetaMapIncludesBuilder {
                 else if(Collection.isAssignableFrom(returnType)){
                     String genClass = PropertyTools.findGenericForCollection(entityClass, prop)
                     if(genClass) {
-                        nestedIncludes = build(genClass, incProps)
+                        nestedIncludes = MetaMapIncludesBuilder.build(genClass, incProps)
                     }
                     //TODO shouldn't we do at leas na object here? should not matter
                 } else {
-                    nestedIncludes = build(returnType.name, incProps)
+                    nestedIncludes = MetaMapIncludesBuilder.build(returnType.name, incProps)
                 }
             }
-            //if it got valid nestedIncludes and its notalready setup
+            //if it got valid nestedIncludes and its not already setup
             if(nestedIncludes && !nestedIncludesMap[prop]) nestedIncludesMap[prop] = nestedIncludes
         }
 
         if(nestedIncludesMap) {
-            metaMapIncludes.props.putAll(nestedIncludesMap)
+            metaMapIncludes.propsMap.putAll(nestedIncludesMap)
         }
 
         return metaMapIncludes

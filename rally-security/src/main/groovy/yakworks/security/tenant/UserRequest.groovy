@@ -4,12 +4,11 @@
 */
 package yakworks.security.tenant
 
-
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 
-import gorm.tools.metamap.MetaMapEntityService
+import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.services.SecService
 import yakworks.rally.orgs.model.Org
@@ -25,7 +24,7 @@ import yakworks.rally.orgs.model.OrgType
 class UserRequest {
 
     @Autowired SecService<AppUser> secService
-    @Autowired MetaMapEntityService metaMapEntityService
+    @Autowired MetaMapService metaMapService
 
     AppUser user
 
@@ -65,7 +64,7 @@ class UserRequest {
      * Gets user fields to send to client about their login
      */
     Map getUserMap(List incs) {
-        Map userMap = metaMapEntityService.createMetaMap(secService.user, incs).clone() as Map
+        Map userMap = metaMapService.createMetaMap(secService.user, incs).clone() as Map
         if (isCustomer()) userMap.put('isCustomer', true)
         return userMap
     }

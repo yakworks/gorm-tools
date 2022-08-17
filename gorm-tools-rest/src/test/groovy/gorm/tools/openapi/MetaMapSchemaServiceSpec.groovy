@@ -4,7 +4,8 @@
 */
 package gorm.tools.openapi
 
-import gorm.tools.metamap.MetaMapEntityService
+import gorm.tools.metamap.services.MetaMapIncludesService
+import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.testing.unit.DataRepoTest
 import spock.lang.Shared
 import spock.lang.Specification
@@ -19,12 +20,11 @@ class MetaMapSchemaServiceSpec extends Specification implements DataRepoTest {
 
     @Shared
     def metaMapSchemaService = new MetaMapSchemaService()
-    // def metaMapEntityService = new MetaMapEntityService()
 
     void setupSpec() {
         //mockDomain Person
         mockDomains Org, OrgFlex, Location
-        metaMapSchemaService.metaMapEntityService = new MetaMapEntityService()
+        metaMapSchemaService.metaMapIncludesService = new MetaMapIncludesService()
     }
 
     void "test buildIncludesMap simple"(){

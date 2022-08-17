@@ -8,8 +8,8 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import gorm.tools.metamap.MetaMapEntityService
 import gorm.tools.metamap.MetaMapList
+import gorm.tools.metamap.services.MetaMapService
 
 /**
  * a holder object for paged data, used mostly in the rest and views
@@ -168,7 +168,7 @@ class Pager {
      */
     @Deprecated //use setupList
     Pager setupData(List dlist, List includes = null) {
-        MetaMapList entityMapList = AppCtx.get('metaMapEntityService', MetaMapEntityService).createMetaMapList(dlist, includes)
+        MetaMapList entityMapList = AppCtx.get('metaMapService', MetaMapService).createMetaMapList(dlist, includes)
         setEntityMapList(entityMapList)
         return this
     }

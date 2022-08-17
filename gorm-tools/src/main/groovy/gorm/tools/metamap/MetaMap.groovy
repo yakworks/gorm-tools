@@ -14,7 +14,7 @@ import yakworks.commons.map.Maps
 import yakworks.commons.model.IdEnum
 
 /**
- * A map implementation that wraps an objects and
+ * A map implementation that wraps an object tree and
  * reads properties from a gorm entity based on list of includes/excludes
  * Its used primarily for specifying a sql like select list and the feeding this into a json generator
  *
@@ -42,7 +42,7 @@ class MetaMap extends AbstractMap<String, Object> implements Cloneable {
         'domainClass', 'dirty', 'errors', 'dirtyPropertyNames']
 
     private Set<String> _includes = []
-    private Map _includeProps = [:] as Map<String, MetaMapIncludes>
+    // private Map _includeProps = [:] as Map<String, MetaMapIncludes>
     private MetaMapIncludes metaMapIncludes
 
     private Map<String, Object> shadowMap = [:]
@@ -67,16 +67,16 @@ class MetaMap extends AbstractMap<String, Object> implements Cloneable {
      * @param entity The object to inspect
      * @param entity The object to inspect
      */
-    MetaMap(Object entity, MetaMapIncludes includeMap) {
+    MetaMap(Object entity, MetaMapIncludes metaMapIncludes) {
         this(entity)
-        initialise(includeMap)
+        initialise(metaMapIncludes)
     }
 
-    private void initialise(MetaMapIncludes includeMap) {
-        if(includeMap){
-            metaMapIncludes = includeMap
-            _includes = includeMap.props.keySet()
-            _includeProps = includeMap.props
+    private void initialise(MetaMapIncludes metaMapIncludes) {
+        if(metaMapIncludes){
+            this.metaMapIncludes = metaMapIncludes
+            _includes = metaMapIncludes.propsMap.keySet()
+            // _includeProps = includeMap.propsMap
         }
     }
 
@@ -167,7 +167,7 @@ class MetaMap extends AbstractMap<String, Object> implements Cloneable {
         Map nestesIncludes = getNestedIncludes()
         MetaMapIncludes mapIncludes = nestesIncludes[prop]
         // if its an enum and doesnt have any include field specifed (which it normally should not)
-        if( val.class.isEnum() && !(mapIncludes?.props)) {
+        if( val.class.isEnum() && !(mapIncludes?.propsMap)) {
             if(val instanceof IdEnum){
                 // convert Enums to string or id,name object if its IdEnum
                 Map<String, Object> idEnumMap = [id: (val as IdEnum).id, name: (val as Enum).name()]

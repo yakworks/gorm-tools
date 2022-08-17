@@ -22,7 +22,8 @@ import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.jdbc.DbDialectService
 import gorm.tools.mango.DefaultMangoQuery
 import gorm.tools.mango.MangoBuilder
-import gorm.tools.metamap.MetaMapEntityService
+import gorm.tools.metamap.services.MetaMapIncludesService
+import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.RepoUtil
@@ -78,7 +79,8 @@ class GormToolsBeanConfig {
         mangoBuilder(MangoBuilder, lazy())
 
         entityMapBinder(EntityMapBinder, lazy())
-        metaMapEntityService(MetaMapEntityService, lazy())
+        metaMapIncludesService(MetaMapIncludesService, lazy())
+        metaMapService(MetaMapService, lazy())
 
         repoEventPublisher(RepoEventPublisher)
 

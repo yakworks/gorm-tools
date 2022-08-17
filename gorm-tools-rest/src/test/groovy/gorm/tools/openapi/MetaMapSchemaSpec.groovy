@@ -12,7 +12,6 @@ import io.swagger.v3.oas.models.media.IntegerSchema
 import io.swagger.v3.oas.models.media.NumberSchema
 import io.swagger.v3.oas.models.media.StringSchema
 import spock.lang.Specification
-import yakworks.commons.map.MapFlattener
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgFlex
@@ -29,22 +28,22 @@ class MetaMapSchemaSpec extends Specification implements DataRepoTest {
         def res = MetaMapIncludesBuilder.build("Org", ['name'])
 
         then:
-        res.rootClassName == 'yakworks.rally.orgs.model.Org'
+        res.className == 'yakworks.rally.orgs.model.Org'
         res.shortClassName == 'Org'
-        res.props.keySet() == ['name'] as Set
+        res.propsMap.keySet() == ['name'] as Set
 
         when: "check on collections"
         res = MetaMapIncludesBuilder.build(Org, ['name', 'locations.city'])
 
         then:
-        res.rootClassName.contains('Org') // [className: 'Bookz', props: ['name']]
-        res.props.keySet() == ['name', 'locations'] as Set
+        res.className.contains('Org') // [className: 'Bookz', props: ['name']]
+        res.propsMap.keySet() == ['name', 'locations'] as Set
         res.nestedIncludes.size() == 1
 
         def itemsIncs = res.nestedIncludes['locations']
-        itemsIncs.rootClassName == 'yakworks.rally.orgs.model.Location'
+        itemsIncs.className == 'yakworks.rally.orgs.model.Location'
         itemsIncs.shortClassName == 'Location'
-        itemsIncs.props.keySet() == ['city'] as Set
+        itemsIncs.propsMap.keySet() == ['city'] as Set
 
     }
 
@@ -58,7 +57,7 @@ class MetaMapSchemaSpec extends Specification implements DataRepoTest {
         //sanity check
         mmSchema.shortRootClassName == 'Org'
         mmSchema.rootClassPropName == 'org'
-        mmIncs.props.keySet() == ['id', 'num', 'name'] as Set
+        mmIncs.propsMap.keySet() == ['id', 'num', 'name'] as Set
 
         mmSchema.props.keySet() == ['id', 'num', 'name'] as Set
 
@@ -85,7 +84,7 @@ class MetaMapSchemaSpec extends Specification implements DataRepoTest {
         mmSchema
         //sanity check
         mmIncs.shortClassName == 'Org'
-        mmIncs.props.keySet() == ['id', 'name', 'flex'] as Set
+        mmIncs.propsMap.keySet() == ['id', 'name', 'flex'] as Set
 
         mmSchema.props.keySet() == ['id', 'name', 'flex'] as Set
 

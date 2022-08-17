@@ -11,7 +11,8 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.mapping.model.EmbeddedPersistentEntity
 import org.grails.datastore.mapping.model.types.Association
 
-import gorm.tools.metamap.MetaMapEntityService
+import gorm.tools.metamap.services.MetaMapIncludesService
+import gorm.tools.metamap.services.MetaMapService
 import grails.buildtestdata.builders.DataBuilderContext
 import grails.buildtestdata.builders.PersistentEntityDataBuilder
 import yakworks.json.groovy.JsonEngine
@@ -43,8 +44,10 @@ class TestDataJson {
         Object obj = RepoTestData.build(parsedArgs.args, entityClass, parsedArgs.data)
         def incs = getFieldsToBuild(entityClass, parsedArgs.args['includes'], parsedArgs.data)
         //println res.jsonArgs['includes']
-        MetaMapEntityService metaMapEntityService = new MetaMapEntityService()
-        def emap = metaMapEntityService.createMetaMap(obj, incs)
+        MetaMapService metaMapService = new MetaMapService(
+            metaMapIncludesService: new MetaMapIncludesService()
+        )
+        def emap = metaMapService.createMetaMap(obj, incs)
         return JsonEngine.toJson(emap)
     }
 

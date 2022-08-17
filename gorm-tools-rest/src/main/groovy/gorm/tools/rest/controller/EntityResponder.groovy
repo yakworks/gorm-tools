@@ -15,8 +15,8 @@ import gorm.tools.beans.Pager
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.metamap.MetaMap
-import gorm.tools.metamap.MetaMapEntityService
 import gorm.tools.metamap.MetaMapList
+import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
 import grails.web.api.WebAttributes
@@ -35,7 +35,7 @@ class EntityResponder<D> {
     IncludesConfig includesConfig
 
     @Autowired(required = false)
-    MetaMapEntityService metaMapEntityService
+    MetaMapService metaMapService
 
     Class<D> entityClass
     String logicalName
@@ -45,10 +45,10 @@ class EntityResponder<D> {
         this.entityClass = entityClass
     }
 
-    EntityResponder(Class<D> entityClass, IncludesConfig includesConfig, MetaMapEntityService metaMapEntityService){
+    EntityResponder(Class<D> entityClass, IncludesConfig includesConfig, MetaMapService metaMapService){
         this.entityClass = entityClass
         this.includesConfig = includesConfig
-        this.metaMapEntityService = metaMapEntityService
+        this.metaMapService = metaMapService
     }
 
     public static <D> EntityResponder<D> of(Class<D> entityClass){
@@ -82,7 +82,7 @@ class EntityResponder<D> {
     MetaMap createEntityMap(Object instance, Map params){
         flushIfSession() //in testing need to flush before generating entitymap
         List<String> incs = findIncludes(params)
-        MetaMap emap = metaMapEntityService.createMetaMap(instance, incs)
+        MetaMap emap = metaMapService.createMetaMap(instance, incs)
         return emap
     }
 
@@ -90,7 +90,7 @@ class EntityResponder<D> {
         Pager pager = new Pager(params)
         List dlist = query(pager, params)
         List<String> incs = findIncludes(params, includesKeys)
-        MetaMapList entityMapList = metaMapEntityService.createMetaMapList(dlist, incs)
+        MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)
         return pager.setEntityMapList(entityMapList)
     }
 

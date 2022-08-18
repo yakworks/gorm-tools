@@ -18,6 +18,8 @@ import gorm.tools.api.IncludesConfig
 import gorm.tools.utils.GormMetaUtils
 import grails.gorm.validation.ConstrainedProperty
 import yakworks.commons.lang.PropertyTools
+import yakworks.meta.MetaMapIncludes
+import yakworks.meta.MetaProp
 
 /**
  * Builder to create MetaMapIncludes from a sql select like list against an entity

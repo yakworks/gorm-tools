@@ -4,8 +4,8 @@
 */
 package gorm.tools.metamap.services
 
-import gorm.tools.metamap.MetaMap
-import gorm.tools.metamap.MetaMapList
+import yakworks.meta.MetaMap
+import yakworks.meta.MetaMapList
 import gorm.tools.testing.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.gorm.testing.model.Enummy

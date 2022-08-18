@@ -9,8 +9,8 @@ import groovy.util.logging.Slf4j
 
 import org.springframework.cache.annotation.Cacheable
 
-import gorm.tools.metamap.MetaMapIncludes
 import gorm.tools.metamap.MetaMapIncludesBuilder
+import yakworks.meta.MetaMapIncludes
 
 /**
  * MetaMapIncludesService Spring service for building MetaMapIncludes

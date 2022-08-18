@@ -4,7 +4,7 @@
 */
 package gorm.tools
 
-import gorm.tools.metamap.MetaMapList
+import yakworks.meta.MetaMapList
 import gorm.tools.beans.Pager
 import gorm.tools.metamap.services.MetaMapIncludesService
 import gorm.tools.metamap.services.MetaMapService

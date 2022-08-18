@@ -10,9 +10,8 @@ import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
 
-import gorm.tools.beans.AppCtx
-import gorm.tools.metamap.MetaMapIncludes
 import gorm.tools.metamap.services.MetaMapIncludesService
+import yakworks.meta.MetaMapIncludes
 
 /**
  * Service to generate the MetaMapSchema from a MetaMapIncludes thats cached.

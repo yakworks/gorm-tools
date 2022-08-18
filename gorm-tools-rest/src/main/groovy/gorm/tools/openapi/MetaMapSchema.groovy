@@ -8,10 +8,10 @@ import groovy.transform.CompileStatic
 import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Slf4j
 
-import gorm.tools.metamap.MetaMapIncludes
 import io.swagger.v3.oas.models.media.Schema
 import yakworks.commons.lang.NameUtils
 import yakworks.commons.map.MapFlattener
+import yakworks.meta.MetaMapIncludes
 
 /**
  * Includes tree for root entity and nested association properties

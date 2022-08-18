@@ -4,8 +4,8 @@
 */
 package gorm.tools.json
 
-import gorm.tools.metamap.MetaMap
-import gorm.tools.metamap.MetaMapList
+import yakworks.meta.MetaMap
+import yakworks.meta.MetaMapList
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.testing.RepoTestData
 
@@ -17,7 +17,6 @@ import gorm.tools.testing.unit.DomainRepoTest
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import spock.lang.Ignore
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 import testing.Address
 import testing.Cust

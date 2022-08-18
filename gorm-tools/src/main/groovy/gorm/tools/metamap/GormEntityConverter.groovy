@@ -9,6 +9,7 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 
 import gorm.tools.utils.GormMetaUtils
+import yakworks.meta.MetaMap
 
 /**
  * MetaMap.Converter default to just show id for the gormEntity if nothing is specified.
@@ -18,8 +19,8 @@ import gorm.tools.utils.GormMetaUtils
 class GormEntityConverter implements MetaMap.Converter {
 
     @Override
-    boolean handles(Class<?> type) {
-        GormEntity.isAssignableFrom(type)
+    boolean handles(Object value) {
+        GormEntity.isAssignableFrom(value.class)
     }
 
     @Override

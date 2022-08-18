@@ -2,11 +2,9 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.metamap
+package yakworks.meta
 
 import groovy.transform.CompileStatic
-
-import org.grails.datastore.gorm.GormEntity
 
 import yakworks.commons.lang.Validate
 import yakworks.commons.map.Maps
@@ -191,16 +189,9 @@ class MetaMap extends AbstractMap<String, Object> implements Cloneable {
         else if(val instanceof Map && !(val instanceof MetaMap)) {
             val = new MetaMap(val)
         }
-        else if(val instanceof Collection && !(val instanceof MetaMapList)) {
-            //check what first item is, we only do this if its a GormEntity
-            List valList = val as List
-            if(valList.size() !=0 && valList[0] instanceof GormEntity){
-                val = new MetaMapList(valList, MetaMapIncludes.of(['id']))
-            }
-        }
-        // if it has converters then use them.
-        else if(converters){
-            Converter converter = findConverter(val.class)
+        // if it has converters then use them. if its already a MetaMap or MetaMapList then it does not need converting.
+        else if(converters && !(val instanceof MetaMap) && !(val instanceof MetaMapList)){
+            Converter converter = findConverter(val)
             if (converter != null) {
                 val = converter.convert(val, prop)
             }
@@ -219,9 +210,9 @@ class MetaMap extends AbstractMap<String, Object> implements Cloneable {
      * @return first converter that can handle the given type; else {@code null}
      *         if no compatible converters are found for the given type.
      */
-    protected Converter findConverter(Class<?> type) {
+    protected Converter findConverter(Object val) {
         for (Converter c : converters) {
-            if (c.handles(type)) {
+            if (c.handles(val)) {
                 return c
             }
         }
@@ -439,11 +430,11 @@ class MetaMap extends AbstractMap<String, Object> implements Cloneable {
          * Returns {@code true} if this converter can handle conversions
          * of the given type.
          *
-         * @param type the type of the object to convert
+         * @param value the object to convert
          * @return {@code true} if this converter can successfully convert values of
          *      the given type, else {@code false}
          */
-        boolean handles(Class<?> type);
+        boolean handles(Object value);
 
         /**
          * Converts a given object.

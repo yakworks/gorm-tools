@@ -2,11 +2,13 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.metamap
+package yakworks.meta
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import grails.gorm.PagedResultList
+import org.grails.datastore.mapping.reflect.ClassUtils
+
 import yakworks.commons.map.Maps
 import yakworks.commons.model.TotalCount
 
@@ -33,12 +35,12 @@ class MetaMapList extends AbstractList<MetaMap> implements TotalCount  {
     }
 
     @Override
+    @CompileDynamic //not a performance hit
     int getTotalCount() {
-        if(resultList instanceof PagedResultList) {
-            return (resultList as PagedResultList).getTotalCount()
-        } else if(resultList instanceof TotalCount) {
-            return ((TotalCount)resultList).totalCount
-        } else {
+        if(ClassUtils.isPresent('grails.gorm.PagedResultList') || resultList instanceof TotalCount) {
+            return resultList.totalCount
+        }
+        else {
             return resultList.size()
         }
     }

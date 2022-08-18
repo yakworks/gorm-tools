@@ -21,7 +21,6 @@ import gorm.tools.databinding.PathKeyMap
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobService
-import gorm.tools.metamap.MetaMap
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.PersistArgs
@@ -29,6 +28,7 @@ import gorm.tools.repository.model.DataOp
 import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.commons.map.Maps
+import yakworks.meta.MetaMap
 
 /**
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>

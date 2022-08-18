@@ -12,6 +12,7 @@ import yakworks.gorm.testing.model.KitchenSink
 import yakworks.gorm.testing.model.SinkExt
 import yakworks.gorm.testing.model.SinkItem
 import yakworks.gorm.testing.model.Thing
+import yakworks.meta.MetaMapIncludes
 
 class MetaMapIncludesBuilderSpec extends Specification implements DataRepoTest {
 

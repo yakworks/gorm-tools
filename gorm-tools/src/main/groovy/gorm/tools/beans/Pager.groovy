@@ -8,8 +8,8 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import gorm.tools.metamap.MetaMapList
 import gorm.tools.metamap.services.MetaMapService
+import yakworks.meta.MetaMapList
 
 /**
  * a holder object for paged data, used mostly in the rest and views

@@ -4,7 +4,7 @@
 */
 package gorm.tools.openapi
 
-import gorm.tools.metamap.MetaMapIncludes
+import yakworks.meta.MetaMapIncludes
 import gorm.tools.metamap.MetaMapIncludesBuilder
 import gorm.tools.testing.unit.DataRepoTest
 import io.swagger.v3.oas.models.media.DateTimeSchema

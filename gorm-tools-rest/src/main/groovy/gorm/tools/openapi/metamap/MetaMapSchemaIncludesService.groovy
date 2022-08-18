@@ -9,13 +9,12 @@ import groovy.util.logging.Slf4j
 
 import org.springframework.cache.annotation.Cacheable
 
-import gorm.tools.metamap.MetaMapIncludes
 import gorm.tools.metamap.MetaMapIncludesBuilder
-import gorm.tools.metamap.MetaProp
 import gorm.tools.metamap.services.MetaMapIncludesService
-import gorm.tools.openapi.MetaMapSchema
 import gorm.tools.openapi.OapiSupport
 import io.swagger.v3.oas.models.media.Schema
+import yakworks.meta.MetaMapIncludes
+import yakworks.meta.MetaProp
 
 /**
  * Overrides the MetaMapIncludesService to add the schema props on MetaMapIncludes

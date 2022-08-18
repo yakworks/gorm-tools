@@ -9,9 +9,9 @@ import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
 
-import gorm.tools.metamap.MetaMap
-import gorm.tools.metamap.MetaMapIncludes
-import gorm.tools.metamap.MetaMapList
+import yakworks.meta.MetaMap
+import yakworks.meta.MetaMapIncludes
+import yakworks.meta.MetaMapList
 
 /**
  * MetaMapService contains a set of helpers, which will create the EntityMap and Lists

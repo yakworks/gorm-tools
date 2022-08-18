@@ -14,13 +14,13 @@ import gorm.tools.beans.AppCtx
 import gorm.tools.beans.Pager
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.api.QueryMangoEntityApi
-import gorm.tools.metamap.MetaMap
-import gorm.tools.metamap.MetaMapList
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
 import grails.web.api.WebAttributes
 import yakworks.commons.map.Maps
+import yakworks.meta.MetaMap
+import yakworks.meta.MetaMapList
 
 /**
  * Helpers for a Restfull api type controller.

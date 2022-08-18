@@ -12,6 +12,8 @@ import yakworks.gorm.testing.model.KitchenSink
 import yakworks.gorm.testing.model.SinkExt
 import yakworks.gorm.testing.model.SinkItem
 import yakworks.gorm.testing.model.Thing
+import yakworks.meta.MetaMapIncludes
+import yakworks.meta.MetaProp
 
 class MetaMapIncludesSpec extends Specification implements DataRepoTest {
 
@@ -64,7 +66,7 @@ class MetaMapIncludesSpec extends Specification implements DataRepoTest {
         //in this case it should equal the passes in includes
         flatMap.keySet() == expectedIncludes as Set
         flatMap['id'] instanceof MetaProp
-        flatMap['id'].type == Long
+        flatMap['id'].classType == Long
     }
 
     void "test flattenProps"(){

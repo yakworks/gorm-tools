@@ -24,11 +24,21 @@ class MetaMapIncludes implements Serializable {
     Map<String, Object> propsMap
 
     Set<String> excludeFields
-    //used for openApi to add the schema into it.
+    //used for openApi to add a Schema reference
     Object schema
+    //if any special converters then can be set here and the MetaMap will get them
+    public static Set<MetaMap.Converter> CONVERTERS = [] as Set<MetaMap.Converter>
+
+    static {
+        ServiceLoader<MetaMap.Converter> loader = ServiceLoader.load(MetaMap.Converter)
+        for (MetaMap.Converter converter : loader) {
+            CONVERTERS.add(converter)
+        }
+    }
 
     MetaMapIncludes(){
         propsMap = [:] as Map<String, Object>
+        //loadConverters()
     }
 
     MetaMapIncludes(String rootClassName){
@@ -43,6 +53,13 @@ class MetaMapIncludes implements Serializable {
         return mmi
     }
 
+    // void loadConverters(){
+    //     ServiceLoader<MetaMap.Converter> loader = ServiceLoader.load(MetaMap.Converter)
+    //     for (MetaMap.Converter converter : loader) {
+    //         converters.add(converter)
+    //     }
+    // }
+
     /**
      * Filters the props to only the ones that are association and have a nested includes
      */
@@ -51,14 +68,14 @@ class MetaMapIncludes implements Serializable {
     }
 
     /**
-     * Filters the props to only the ones that dont have nested includes, basict types.
+     * Filters the props to only the ones that dont have nested includes, basic types.
      */
     Set<String> getBasicIncludes(){
-        return propsMap.findAll { ! it.value instanceof MetaMapIncludes }.keySet() as Set<String>
+        return propsMap.findAll{ !(it.value instanceof MetaMapIncludes) }.keySet() as Set<String>
     }
 
     /**
-     * gets the class name with out prefix sowe can lookup the openapi schema
+     * gets the class name with out prefix so can lookup the openapi schema
      */
     String getShortClassName(){
         return NameUtils.getShortName(className)

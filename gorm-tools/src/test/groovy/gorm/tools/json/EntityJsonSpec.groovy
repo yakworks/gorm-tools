@@ -17,6 +17,7 @@ import gorm.tools.testing.unit.DomainRepoTest
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import spock.lang.Ignore
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import testing.Address
 import testing.Cust
@@ -53,6 +54,15 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
     String toJson(List entityList, List<String> includes = [], List<String> excludes = []){
         MetaMapList elist = metaMapService.createMetaMapList(entityList, includes, excludes)
         return JsonEngine.toJson(elist)
+    }
+
+    void "test Org json stock"() {
+        when:
+        def custType = build(CustType)
+        def res = JsonEngine.toJson(custType)
+
+        then:
+        res == '{"id":1,"name":"name","version":0}'
     }
 
     void "test Org json stock"() {

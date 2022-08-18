@@ -10,8 +10,6 @@ import javax.annotation.PostConstruct
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.support.ConfigAware
-
 /**
  * Java 8 parallel streams implementation of the ParallelTools trait
  * to be used for colating/slicing a list into "batches" to then asynchronously process with Transactions
@@ -21,11 +19,11 @@ import gorm.tools.support.ConfigAware
  * @since 7.0.8
  */
 @CompileStatic
-class ParallelStreamTools implements ParallelTools, ConfigAware {
+class ParallelStreamTools implements ParallelTools {
 
     ForkJoinPool forkJoinPool
 
-    /** setup defaults for poolSize and batchSize if config isn't present. batchSize set to 100 if not config found*/
+    /** setup defaults for poolSize and batchSize from asyncService*/
     @PostConstruct
     void init() {
         ClassLoaderThreadFactory factory = new ClassLoaderThreadFactory()

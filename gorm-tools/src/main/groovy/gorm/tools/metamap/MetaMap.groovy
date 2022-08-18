@@ -8,7 +8,6 @@ import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEntity
 
-import gorm.tools.utils.GormMetaUtils
 import yakworks.commons.lang.Validate
 import yakworks.commons.map.Maps
 import yakworks.commons.model.IdEnum
@@ -47,6 +46,8 @@ class MetaMap extends AbstractMap<String, Object> implements Cloneable {
 
     private Map<String, Object> shadowMap = [:]
 
+    Set<Converter> converters = [] as Set<Converter>
+
     /**
      * Constructs a new {@code EntityMap} that operates on the specified bean. The given entity
      * cant be null
@@ -77,6 +78,7 @@ class MetaMap extends AbstractMap<String, Object> implements Cloneable {
             this.metaMapIncludes = metaMapIncludes
             _includes = metaMapIncludes.propsMap.keySet()
             // _includeProps = includeMap.propsMap
+            this.converters = MetaMapIncludes.CONVERTERS
         }
     }
 
@@ -196,11 +198,36 @@ class MetaMap extends AbstractMap<String, Object> implements Cloneable {
                 val = new MetaMapList(valList, MetaMapIncludes.of(['id']))
             }
         }
-        else if(val instanceof GormEntity) {
-            val = GormMetaUtils.getIdMap(val)
+        // if it has converters then use them.
+        else if(converters){
+            Converter converter = findConverter(val.class)
+            if (converter != null) {
+                val = converter.convert(val, prop)
+            }
         }
         return val
     }
+
+
+    /**
+     * Finds a converter that can handle the given type.  The first converter
+     * that reports it can handle the type is returned, based on the order in
+     * which the converters were specified.  A {@code null} value will be returned
+     * if no suitable converter can be found for the given type.
+     *
+     * @param type that this converter can handle
+     * @return first converter that can handle the given type; else {@code null}
+     *         if no compatible converters are found for the given type.
+     */
+    protected Converter findConverter(Class<?> type) {
+        for (Converter c : converters) {
+            if (c.handles(type)) {
+                return c
+            }
+        }
+        return null
+    }
+
 
     /**
      * put will not set keys on the wrapped object but allows to add extra props and overrides
@@ -399,5 +426,33 @@ class MetaMap extends AbstractMap<String, Object> implements Cloneable {
             super.setValue(newValue);
             return oldValue;
         }
+    }
+
+    /**
+     * Handles converting a given type.
+     *
+     * @since 2.5.0
+     */
+    interface Converter {
+
+        /**
+         * Returns {@code true} if this converter can handle conversions
+         * of the given type.
+         *
+         * @param type the type of the object to convert
+         * @return {@code true} if this converter can successfully convert values of
+         *      the given type, else {@code false}
+         */
+        boolean handles(Class<?> type);
+
+        /**
+         * Converts a given object.
+         *
+         * @param value the object to convert
+         * @param key the key name for the value, may be {@code null}
+         * @return the converted object
+         */
+        Object convert(Object value, String key);
+
     }
 }

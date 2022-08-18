@@ -15,13 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.yaml.snakeyaml.Yaml
 
 import gorm.tools.rest.ast.RestApiAstUtils
-import gorm.tools.support.ConfigAware
 import gorm.tools.utils.GormMetaUtils
 import yakworks.commons.io.PathTools
 import yakworks.commons.lang.NameUtils
 import yakworks.commons.map.Maps
 import yakworks.commons.util.BuildSupport
 import yakworks.commons.util.StringUtils
+import yakworks.grails.support.ConfigAware
 
 import static gorm.tools.openapi.ApiSchemaEntity.CruType
 

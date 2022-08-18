@@ -31,22 +31,10 @@ class MetaMapSchemaService {
         oapiSupport = OapiSupport.instance()
     }
 
-    //static cheater to get the bean, use sparingly if at all
-    static MetaMapSchemaService bean(){
-        AppCtx.get('metaMapSchemaService', this)
-    }
-
-    /**
-     * get the MetaMapSchema using the MetaMapIncludes
-     */
-    MetaMapSchema getSchema(MetaMapIncludes mmi) {
-        return MetaMapSchema.of(mmi)
-    }
-
     @Cacheable('MetaMapSchema')
     MetaMapSchema getSchema(String entityClassName, List<String> includes, List<String> excludes = []) {
         MetaMapIncludes mmIncs = metaMapIncludesService.getMetaMapIncludes(entityClassName, includes, excludes)
-        MetaMapSchema mmSchema = getSchema(mmIncs)
+        MetaMapSchema mmSchema = MetaMapSchema.of(mmIncs) // getSchema(mmIncs)
         return mmSchema
     }
 

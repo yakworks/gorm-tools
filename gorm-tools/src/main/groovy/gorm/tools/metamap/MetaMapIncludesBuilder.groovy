@@ -42,15 +42,41 @@ class MetaMapIncludesBuilder {
     List<PersistentProperty> persistentProperties = []
     MetaMapIncludes metaMapIncludes
 
+
+    MetaMapIncludesBuilder(Class clazz){
+        this.entityClass = clazz
+        this.entityClassName = clazz.name
+        init()
+    }
+
     MetaMapIncludesBuilder(String entityClassName, List<String> includes){
         this.entityClassName = entityClassName
         this.includes = includes ?: ['*'] as List<String>
         init()
     }
 
+    MetaMapIncludesBuilder includes(List<String> includes) {
+        this.includes = includes ?: ['*'] as List<String>
+        return this
+    }
+
     MetaMapIncludesBuilder excludes(List<String> val) {
         if(val != null) this.excludes = val
         return this
+    }
+
+    static MetaMapIncludesBuilder of(Class entityClass){
+        return new MetaMapIncludesBuilder(entityClass)
+    }
+
+    static MetaMapIncludes build(Class clazz, List<String> includes){
+        return MetaMapIncludesBuilder.of(clazz).includes(includes).build()
+    }
+
+    static MetaMapIncludes build(String entityClassName, List<String> includes, List<String> excludes = []){
+        def mmib = new MetaMapIncludesBuilder(entityClassName, includes)
+        if(excludes) mmib.excludes(excludes)
+        return mmib.build()
     }
 
     void init(){
@@ -61,23 +87,12 @@ class MetaMapIncludesBuilder {
             entityClassName = persistentEntity.javaClass.name
             persistentProperties = GormMetaUtils.getPersistentProperties(persistentEntity)
         }
-        ClassLoader classLoader = getClass().getClassLoader()
-        this.entityClass = classLoader.loadClass(entityClassName)
-        this.metaMapIncludes = new MetaMapIncludes(entityClassName)
-    }
 
-    static MetaMapIncludes build(Class entityClass, List<String> includes){
-        build(entityClass.name, includes, [])
-    }
-
-    // static MetaMapIncludes build(String entityClassName, List<String> includes){
-    //     new MetaMapIncludesBuilder(entityClassName, includes).build()
-    // }
-
-    static MetaMapIncludes build(String entityClassName, List<String> includes, List<String> excludes = []){
-        def mmib = new MetaMapIncludesBuilder(entityClassName, includes)
-        if(excludes) mmib.excludes(excludes)
-        return mmib.build()
+        if(!entityClass && entityClassName) {
+            ClassLoader classLoader = getClass().getClassLoader()
+            this.entityClass = classLoader.loadClass(entityClassName)
+        }
+        this.metaMapIncludes = new MetaMapIncludes(entityClass)
     }
 
     /**
@@ -88,8 +103,6 @@ class MetaMapIncludesBuilder {
      * @return the EntityMapIncludes object that can be passed to EntityMap
      */
     MetaMapIncludes build() {
-
-        Set<String> rootProps = [] as Set<String>
         Map<String, Object> nestedProps = [:]
 
         for (String field : includes) {
@@ -140,21 +153,20 @@ class MetaMapIncludesBuilder {
             }
             else { // its a nestedProp
 
-                //we are sure its exists at this point as we alread checked above
-                metaMapIncludes.propsMap[nestedPropName] = null
-
                 //set it up if it has not been yet
                 if (!nestedProps[nestedPropName]) {
                     PersistentProperty pp = persistentProperties.find { it.name == nestedPropName }
-                    String nestedClass
+                    Class nestedClass
                     // check if its association
                     if (pp instanceof Association) {
-                        nestedClass = (pp as Association)?.getAssociatedEntity()?.name
+                        nestedClass = (pp as Association)?.getAssociatedEntity()
                     } else {
-                        nestedClass = pp?.type?.name
+                        nestedClass = pp?.type
                     }
-                    Map<String, Object> initMap = ['className': nestedClass, 'props': [] as Set]
+                    Map<String, Object> initMap = ['className': nestedClass?.name, 'props': [] as Set]
                     nestedProps[nestedPropName] = initMap
+                    //add a placeholder in the map to keep order
+                    metaMapIncludes.propsMap[nestedPropName] = new MetaProp(nestedPropName, nestedClass)
                 }
                 //if prop is foo.bar.baz then this get the bar.baz part
                 String propPath = field.substring(nestedIndex + 1)

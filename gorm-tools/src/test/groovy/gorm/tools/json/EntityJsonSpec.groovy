@@ -129,7 +129,7 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
         when:
         def jdom = RepoTestData.build(JsonifyDom, includes: ['ext'])
         def args = [includes: ['id', 'ext.nameExt', 'company'], deep: true]
-        String incTrans = 'company'
+
         def res = toJson(jdom, ['id', 'ext.nameExt', 'company'])
 
         then: "comapny is a transient and should be rendered"

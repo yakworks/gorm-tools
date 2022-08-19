@@ -24,8 +24,8 @@ class MetaMapIncludesSpec extends Specification implements DataRepoTest {
 
     void "test equals"() {
         when:
-        def mmi1 = new MetaMapIncludes("Foo")
-        def mmi2 = new MetaMapIncludes("Foo")
+        def mmi1 = new MetaMapIncludes(KitchenSink)
+        def mmi2 = new MetaMapIncludes(KitchenSink)
 
         then:
         mmi1 == mmi2
@@ -41,7 +41,7 @@ class MetaMapIncludesSpec extends Specification implements DataRepoTest {
     void "test toBasicMap"(){
         when:
         //simple
-        def includes = ['id', 'num', 'name', 'ext.thing.name', ]
+        def includes = ['id', 'num', 'name', 'ext.thing.name' ]
         MetaMapIncludes mmi = MetaMapIncludesBuilder.build(KitchenSink, includes)
         Map basicMap = mmi.toMap()
 

@@ -93,18 +93,15 @@ class MetaEntitySchemaServiceSpec extends Specification implements DataRepoTest 
         date1Schema.format == "date-time"
     }
 
-    @Ignore //FIXME
-    void "MetaMapSchema flatten method"(){
+    void "flattenSchema"(){
         when:
-        MetaEntity mmIncs = MetaGormEntityBuilder.build("Org", ['id', 'name', 'flex.date1', 'flex.text1', 'flex.num1'])
-        MetaMapSchema mmSchema = MetaMapSchema.of(mmIncs)
-        Map flatMap = mmSchema.flatten()
+        MetaEntity ment = metaEntitySchemaService.getMetaEntity(Org.name, ['id', 'name', 'flex.date1', 'flex.text1', 'flex.num1'], [])
+        Map flatMap = ment.flattenSchema()
 
         then:
         flatMap
-        mmSchema.props.keySet() == ['id', 'name', 'flex'] as Set
+        ment.metaProps.keySet() == ['id', 'name', 'flex'] as Set
 
-        def idSchemaDef = flatMap['id']
         Map idSchema = flatMap['id']
         idSchema.type == 'integer'
         idSchema.format == 'int64'

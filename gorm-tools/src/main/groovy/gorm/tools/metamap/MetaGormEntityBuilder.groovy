@@ -226,10 +226,10 @@ class MetaGormEntityBuilder {
             Map initMap = entry.value as Map
             List incProps = initMap['props'] as List
             String assocClass = initMap['className'] as String
-            MetaEntity nestedIncludes
+            MetaEntity metaEntityProps
 
             if(assocClass) {
-                nestedIncludes = build(assocClass, incProps)
+                metaEntityProps = build(assocClass, incProps)
             }
             // if no class then it wasn't a gorm association or gorm prop didn't have type
             // so try by getting value through meta reflection
@@ -246,15 +246,15 @@ class MetaGormEntityBuilder {
                 else if(Collection.isAssignableFrom(returnType)){
                     String genClass = PropertyTools.findGenericForCollection(entityClass, prop)
                     if(genClass) {
-                        nestedIncludes = MetaGormEntityBuilder.build(genClass, incProps)
+                        metaEntityProps = MetaGormEntityBuilder.build(genClass, incProps)
                     }
                     //TODO shouldn't we do at leas na object here? should not matter
                 } else {
-                    nestedIncludes = MetaGormEntityBuilder.build(returnType.name, incProps)
+                    metaEntityProps = MetaGormEntityBuilder.build(returnType.name, incProps)
                 }
             }
-            //if it got valid nestedIncludes and its not already setup
-            if(nestedIncludes && !nestedIncludesMap[prop]) nestedIncludesMap[prop] = nestedIncludes
+            //if it got valid metaEntityProps and its not already setup
+            if(metaEntityProps && !nestedIncludesMap[prop]) nestedIncludesMap[prop] = metaEntityProps
         }
 
         if(nestedIncludesMap) {

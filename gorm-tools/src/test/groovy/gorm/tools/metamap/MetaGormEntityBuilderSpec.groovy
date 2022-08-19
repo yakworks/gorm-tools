@@ -68,9 +68,9 @@ class MetaGormEntityBuilderSpec extends Specification implements DataRepoTest {
         then:
         res.className.contains('KitchenSink') // [className: 'Bookz', props: ['name']]
         res.metaProps.keySet() == ['name', 'items'] as Set
-        res.nestedIncludes.size() == 1
+        res.metaEntityProps.size() == 1
 
-        def itemsIncs = res.nestedIncludes['items']
+        def itemsIncs = res.metaEntityProps['items']
         itemsIncs.className == 'yakworks.gorm.testing.model.SinkItem'
         itemsIncs.shortClassName == 'SinkItem'
         itemsIncs.metaProps.keySet() == ['id', 'name'] as Set
@@ -87,9 +87,9 @@ class MetaGormEntityBuilderSpec extends Specification implements DataRepoTest {
         emapIncs.className == KitchenSink.name // [className: 'Bookz', props: ['name']]
         emapIncs.shortClassName == 'KitchenSink'
         emapIncs.metaProps.keySet() == ['id', 'ext'] as Set
-        emapIncs.nestedIncludes.size() == 1
+        emapIncs.metaEntityProps.size() == 1
 
-        def extIncs = emapIncs.nestedIncludes['ext']
+        def extIncs = emapIncs.metaEntityProps['ext']
         extIncs.className == SinkExt.name
         extIncs.shortClassName == 'SinkExt'
         extIncs.metaProps.keySet() == ['id', 'name'] as Set
@@ -105,7 +105,7 @@ class MetaGormEntityBuilderSpec extends Specification implements DataRepoTest {
         emapIncs.className == Enummy.name // [className: 'Bookz', props: ['name']]
         emapIncs.metaProps.keySet() == ['testEnum'] as Set
         // shouln not end up with a nested
-        emapIncs.nestedIncludes.isEmpty()
+        emapIncs.metaEntityProps.isEmpty()
 
     }
 
@@ -118,9 +118,9 @@ class MetaGormEntityBuilderSpec extends Specification implements DataRepoTest {
         then:
         emapIncs.className == KitchenSink.name // [className: 'Bookz', props: ['name']]
         emapIncs.metaProps.keySet() == ['id', 'num', 'ext'] as Set
-        emapIncs.nestedIncludes.size() == 1
+        emapIncs.metaEntityProps.size() == 1
 
-        def extIncs = emapIncs.nestedIncludes['ext']
+        def extIncs = emapIncs.metaEntityProps['ext']
         extIncs.className == SinkExt.name
         extIncs.metaProps.keySet() == ['id', 'kitchenParent', 'thing', 'version', 'textMax', 'name', 'kitchenSink'] as Set
 
@@ -136,8 +136,8 @@ class MetaGormEntityBuilderSpec extends Specification implements DataRepoTest {
         emapIncs.className == KitchenSink.name // [className: 'Bookz', props: ['name']]
         //ext will still get added and end up giving the id
         emapIncs.metaProps.keySet() == ['id', 'ext'] as Set
-        //and no nestedIncludes should get set
-        emapIncs.nestedIncludes.isEmpty()
+        //and no metaEntityProps should get set
+        emapIncs.metaEntityProps.isEmpty()
     }
 
     void "build nested in nested"(){
@@ -149,13 +149,13 @@ class MetaGormEntityBuilderSpec extends Specification implements DataRepoTest {
 
         then:
         emapIncs.metaProps.keySet() == ['id', 'ext'] as Set
-        emapIncs.nestedIncludes.size() == 1
+        emapIncs.metaEntityProps.size() == 1
         //will have nested includes
-        def extIncs = emapIncs.nestedIncludes['ext']
+        def extIncs = emapIncs.metaEntityProps['ext']
         extIncs.className == SinkExt.name
         extIncs.metaProps.keySet() == ['id', 'thing'] as Set
 
-        def thingLevel = extIncs.nestedIncludes['thing']
+        def thingLevel = extIncs.metaEntityProps['thing']
         thingLevel.metaProps.keySet() == ['id'] as Set
     }
 
@@ -168,13 +168,13 @@ class MetaGormEntityBuilderSpec extends Specification implements DataRepoTest {
 
         then:
         emapIncs.metaProps.keySet() == ['id', 'ext'] as Set
-        emapIncs.nestedIncludes.size() == 1
+        emapIncs.metaEntityProps.size() == 1
         //will have nested includes
-        def extIncs = emapIncs.nestedIncludes['ext']
+        def extIncs = emapIncs.metaEntityProps['ext']
         extIncs.className == SinkExt.name
         extIncs.metaProps.keySet() == ['id', 'name', 'thing'] as Set
 
-        def thingLevel = extIncs.nestedIncludes['thing']
+        def thingLevel = extIncs.metaEntityProps['thing']
         thingLevel.metaProps.keySet() == ['id', 'name'] as Set
     }
 

@@ -35,9 +35,9 @@ class MetaMapSchema implements Serializable {
         this.oapiSupport = OapiSupport.instance()
     }
 
-    static MetaMapSchema of(MetaEntity mmi){
+    static MetaMapSchema of(MetaEntity mentity){
         def metaMapSchema = new MetaMapSchema()
-        metaMapSchema.build(mmi)
+        metaMapSchema.build(mentity)
     }
 
     MetaMapSchema build(MetaEntity metaEntity) {
@@ -102,7 +102,5 @@ class MetaMapSchema implements Serializable {
         }
         return map
     }
-
-
 
 }

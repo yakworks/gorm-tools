@@ -9,8 +9,8 @@ import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
 
+import yakworks.meta.MetaEntity
 import yakworks.meta.MetaMap
-import yakworks.meta.MetaMapIncludes
 import yakworks.meta.MetaMapList
 
 /**
@@ -21,7 +21,7 @@ import yakworks.meta.MetaMapList
 @CompileStatic
 class MetaMapService {
 
-    @Autowired MetaMapIncludesService metaMapIncludesService
+    @Autowired MetaEntityService metaEntityService
 
     /**
      * Wrap entity/object in MetaMap
@@ -31,7 +31,7 @@ class MetaMapService {
      * @return the EntityMap object
      */
     MetaMap createMetaMap(Object entity, List<String> includes = [], List<String> excludes = []) {
-        MetaMapIncludes includesMap = metaMapIncludesService.getMetaMapIncludes(entity.class.name, includes, excludes)
+        MetaEntity includesMap = metaEntityService.getMetaEntity(entity.class.name, includes, excludes)
         return new MetaMap(entity, includesMap)
     }
 
@@ -46,7 +46,7 @@ class MetaMapService {
         if(entityList) {
             //use first item to get the class
             Class entityClass = entityList[0].class.name
-            MetaMapIncludes includesMap = metaMapIncludesService.getMetaMapIncludes(entityClass.name, includes, excludes)
+            MetaEntity includesMap = metaEntityService.getMetaEntity(entityClass.name, includes, excludes)
             return new MetaMapList(entityList, includesMap)
         }
         // return empty list

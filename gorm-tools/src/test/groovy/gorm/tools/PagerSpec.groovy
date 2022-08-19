@@ -4,9 +4,10 @@
 */
 package gorm.tools
 
+
 import yakworks.meta.MetaMapList
 import gorm.tools.beans.Pager
-import gorm.tools.metamap.services.MetaMapIncludesService
+import gorm.tools.metamap.services.MetaEntityService
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import testing.Address
@@ -53,7 +54,7 @@ class PagerSpec extends GormToolsHibernateSpec {
         setup:
         Pager pager = new Pager()
         MetaMapService metaMapService = new MetaMapService(
-            metaMapIncludesService: new MetaMapIncludesService()
+            metaEntityService: new MetaEntityService()
         )
         def dlist = Cust.list(max: pager.max, offset: pager.offset)
         MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, ["*"])

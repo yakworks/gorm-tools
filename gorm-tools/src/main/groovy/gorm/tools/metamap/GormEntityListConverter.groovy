@@ -9,8 +9,8 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 
 import gorm.tools.utils.GormMetaUtils
+import yakworks.meta.MetaEntity
 import yakworks.meta.MetaMap
-import yakworks.meta.MetaMapIncludes
 import yakworks.meta.MetaMapList
 
 /**
@@ -33,7 +33,7 @@ class GormEntityListConverter implements MetaMap.Converter {
     @Override
     Object convert(Object value, String key) {
         def valList = value as List
-        def val = new MetaMapList(valList, MetaMapIncludes.of(['id']))
+        def val = new MetaMapList(valList, MetaEntity.of(['id']))
         return val
     }
 

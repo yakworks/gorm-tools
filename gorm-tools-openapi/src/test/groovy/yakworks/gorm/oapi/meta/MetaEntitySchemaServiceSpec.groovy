@@ -4,7 +4,7 @@
 */
 package yakworks.gorm.oapi.meta
 
-import gorm.tools.metamap.MetaMapIncludesBuilder
+import gorm.tools.metamap.MetaGormEntityBuilder
 import gorm.tools.testing.unit.DataRepoTest
 import io.swagger.v3.oas.models.media.DateTimeSchema
 import io.swagger.v3.oas.models.media.IntegerSchema
@@ -13,7 +13,7 @@ import io.swagger.v3.oas.models.media.StringSchema
 import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
-import yakworks.meta.MetaMapIncludes
+import yakworks.meta.MetaEntity
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgFlex
@@ -21,10 +21,10 @@ import yakworks.rally.orgs.model.OrgFlex
 /**
  * sanity check test for service, which is just a wrapper so cacheable works
  */
-class MetaMapSchemaIncludesServiceSpec extends Specification implements DataRepoTest {
+class MetaEntitySchemaServiceSpec extends Specification implements DataRepoTest {
 
     @Shared
-    def metaMapSchemaIncludesService = new MetaMapSchemaIncludesService()
+    def metaEntitySchemaService = new MetaEntitySchemaService()
 
     void setupSpec() {
         //mockDomain Person
@@ -33,8 +33,8 @@ class MetaMapSchemaIncludesServiceSpec extends Specification implements DataRepo
 
     void "test buildIncludesMap simple"(){
         when:
-        // MetaMapIncludes mmIncs = MetaMapIncludesBuilder.build("Org", ['id', 'num', 'name'])
-        MetaMapIncludes mmi = metaMapSchemaIncludesService.getMetaMapIncludes(Org.name, ['id', 'num', 'name'], [])
+        // MetaEntity mmIncs = MetaGormEntityBuilder.build("Org", ['id', 'num', 'name'])
+        MetaEntity mmi = metaEntitySchemaService.getMetaEntity(Org.name, ['id', 'num', 'name'], [])
 
         then:
         mmi
@@ -42,46 +42,46 @@ class MetaMapSchemaIncludesServiceSpec extends Specification implements DataRepo
         mmi.className == 'yakworks.rally.orgs.model.Org'
         mmi.shortClassName == 'Org'
         mmi.schema
-        mmi.propsMap.keySet() == ['id', 'num', 'name'] as Set
+        mmi.metaProps.keySet() == ['id', 'num', 'name'] as Set
 
-        mmi.propsMap.id.schema
-        mmi.propsMap.num.schema
-        mmi.propsMap.name.schema
+        mmi.metaProps.id.schema
+        mmi.metaProps.num.schema
+        mmi.metaProps.name.schema
 
-        IntegerSchema idSchema = mmi.propsMap['id'].schema
+        IntegerSchema idSchema = mmi.metaProps['id'].schema
         idSchema.type == 'integer'
         idSchema.format == 'int64'
         idSchema.readOnly
 
-        StringSchema numSchema = mmi.propsMap['num'].schema
+        StringSchema numSchema = mmi.metaProps['num'].schema
         numSchema.type == 'string'
         numSchema.maxLength == 50
 
-        StringSchema nameSchema = mmi.propsMap['name'].schema
+        StringSchema nameSchema = mmi.metaProps['name'].schema
         nameSchema.type == 'string'
         nameSchema.maxLength == 100
     }
 
     void "test buildIncludesMap associations"(){
         when:
-        MetaMapIncludes mmi = metaMapSchemaIncludesService.getMetaMapIncludes(Org.name, ['id', 'name', 'flex.date1', 'flex.text1', 'flex.num1'], [])
+        MetaEntity mmi = metaEntitySchemaService.getMetaEntity(Org.name, ['id', 'name', 'flex.date1', 'flex.text1', 'flex.num1'], [])
 
         then:
         mmi
         //sanity check
         mmi.shortClassName == 'Org'
-        mmi.propsMap.keySet() == ['id', 'name', 'flex'] as Set
+        mmi.metaProps.keySet() == ['id', 'name', 'flex'] as Set
 
-        IntegerSchema idSchema = mmi.propsMap['id'].schema
+        IntegerSchema idSchema = mmi.metaProps['id'].schema
         idSchema.type == 'integer'
         idSchema.format == 'int64'
         idSchema.readOnly
 
-        StringSchema nameSchema = mmi.propsMap['name'].schema
+        StringSchema nameSchema = mmi.metaProps['name'].schema
         nameSchema.type == 'string'
         nameSchema.maxLength == 100
 
-        def flexPropsMap = mmi.propsMap['flex'].propsMap
+        def flexPropsMap = mmi.metaProps['flex'].metaProps
         NumberSchema num1Schema = flexPropsMap['num1'].schema
         num1Schema.type == 'number'
 
@@ -96,7 +96,7 @@ class MetaMapSchemaIncludesServiceSpec extends Specification implements DataRepo
     @Ignore //FIXME
     void "MetaMapSchema flatten method"(){
         when:
-        MetaMapIncludes mmIncs = MetaMapIncludesBuilder.build("Org", ['id', 'name', 'flex.date1', 'flex.text1', 'flex.num1'])
+        MetaEntity mmIncs = MetaGormEntityBuilder.build("Org", ['id', 'name', 'flex.date1', 'flex.text1', 'flex.num1'])
         MetaMapSchema mmSchema = MetaMapSchema.of(mmIncs)
         Map flatMap = mmSchema.flatten()
 

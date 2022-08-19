@@ -12,7 +12,7 @@ import io.swagger.v3.oas.models.media.Schema
 import yakworks.commons.lang.NameUtils
 import yakworks.commons.map.MapFlattener
 import yakworks.gorm.oapi.OapiSupport
-import yakworks.meta.MetaMapIncludes
+import yakworks.meta.MetaEntity
 
 /**
  * Includes tree for root entity and nested association properties
@@ -35,20 +35,20 @@ class MetaMapSchema implements Serializable {
         this.oapiSupport = OapiSupport.instance()
     }
 
-    static MetaMapSchema of(MetaMapIncludes mmi){
+    static MetaMapSchema of(MetaEntity mmi){
         def metaMapSchema = new MetaMapSchema()
         metaMapSchema.build(mmi)
     }
 
-    MetaMapSchema build(MetaMapIncludes metaMapIncludes) {
-        Schema rootSchema = oapiSupport.getSchema(metaMapIncludes.shortClassName)
+    MetaMapSchema build(MetaEntity metaEntity) {
+        Schema rootSchema = oapiSupport.getSchema(metaEntity.shortClassName)
         if(!rootSchema) return this
-        this.rootClassName = metaMapIncludes.className
+        this.rootClassName = metaEntity.className
         this.schema = rootSchema
-        def mmiProps = metaMapIncludes.propsMap
+        def mmiProps = metaEntity.metaProps
         for (String key in mmiProps.keySet()) {
             def nestedIncs = mmiProps[key]
-            if(nestedIncs instanceof MetaMapIncludes) {
+            if(nestedIncs instanceof MetaEntity) {
                 this.props[key] = MetaMapSchema.of(nestedIncs).props
             } else {
                 this.props[key] = rootSchema.properties[key]

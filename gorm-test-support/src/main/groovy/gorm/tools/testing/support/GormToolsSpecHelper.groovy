@@ -23,7 +23,7 @@ import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.mango.DefaultMangoQuery
 import gorm.tools.mango.MangoBuilder
-import gorm.tools.metamap.services.MetaMapIncludesService
+import gorm.tools.metamap.services.MetaEntityService
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.DefaultGormRepo
@@ -102,7 +102,7 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         parallelTools(ParallelStreamTools)
         asyncService(AsyncService)
         includesConfig(IncludesConfig)
-        metaMapIncludesService(MetaMapIncludesService)
+        metaEntityService(MetaEntityService)
         metaMapService(MetaMapService)
         problemHandler(ProblemHandler)
         messageSource(GrailsICUMessageSource)

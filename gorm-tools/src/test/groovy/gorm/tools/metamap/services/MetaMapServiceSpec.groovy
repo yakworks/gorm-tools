@@ -19,7 +19,7 @@ import yakworks.gorm.testing.model.Thing
 class MetaMapServiceSpec extends Specification implements DataRepoTest {
 
     MetaMapService metaMapService = new MetaMapService(
-        metaMapIncludesService: new MetaMapIncludesService()
+        metaEntityService: new MetaEntityService()
     )
 
     void setupSpec() {

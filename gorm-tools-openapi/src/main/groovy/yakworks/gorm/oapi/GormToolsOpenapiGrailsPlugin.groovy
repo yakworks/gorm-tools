@@ -5,7 +5,7 @@
 package yakworks.gorm.oapi
 
 import grails.plugins.Plugin
-import yakworks.gorm.oapi.meta.MetaMapSchemaIncludesService
+import yakworks.gorm.oapi.meta.MetaEntitySchemaService
 
 @SuppressWarnings(['Indentation'])
 class GormToolsOpenapiGrailsPlugin extends Plugin {
@@ -24,8 +24,8 @@ class GormToolsOpenapiGrailsPlugin extends Plugin {
             namespaceList = ['rally']
         }
 
-        //overrides the metaMapIncludesService
-        metaMapIncludesService(MetaMapSchemaIncludesService)
+        //overrides the metaEntityService
+        metaEntityService(MetaEntitySchemaService)
 
     } }
 }

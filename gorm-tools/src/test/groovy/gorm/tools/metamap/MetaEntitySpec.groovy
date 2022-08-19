@@ -12,10 +12,10 @@ import yakworks.gorm.testing.model.KitchenSink
 import yakworks.gorm.testing.model.SinkExt
 import yakworks.gorm.testing.model.SinkItem
 import yakworks.gorm.testing.model.Thing
-import yakworks.meta.MetaMapIncludes
+import yakworks.meta.MetaEntity
 import yakworks.meta.MetaProp
 
-class MetaMapIncludesSpec extends Specification implements DataRepoTest {
+class MetaEntitySpec extends Specification implements DataRepoTest {
 
     void setupSpec() {
         //mockDomain Person
@@ -24,15 +24,15 @@ class MetaMapIncludesSpec extends Specification implements DataRepoTest {
 
     void "test equals"() {
         when:
-        def mmi1 = new MetaMapIncludes(KitchenSink)
-        def mmi2 = new MetaMapIncludes(KitchenSink)
+        def mmi1 = new MetaEntity(KitchenSink)
+        def mmi2 = new MetaEntity(KitchenSink)
 
         then:
         mmi1 == mmi2
 
         when:
-        mmi1 = MetaMapIncludesBuilder.build(KitchenSink, ['name', 'items.$*'])
-        mmi2 = MetaMapIncludesBuilder.build(KitchenSink, ['name', 'items.$*'])
+        mmi1 = MetaGormEntityBuilder.build(KitchenSink, ['name', 'items.$*'])
+        mmi2 = MetaGormEntityBuilder.build(KitchenSink, ['name', 'items.$*'])
 
         then:
         mmi1 == mmi2
@@ -42,7 +42,7 @@ class MetaMapIncludesSpec extends Specification implements DataRepoTest {
         when:
         //simple
         def includes = ['id', 'num', 'name', 'ext.thing.name' ]
-        MetaMapIncludes mmi = MetaMapIncludesBuilder.build(KitchenSink, includes)
+        MetaEntity mmi = MetaGormEntityBuilder.build(KitchenSink, includes)
         Map basicMap = mmi.toMap()
 
         then:
@@ -59,7 +59,7 @@ class MetaMapIncludesSpec extends Specification implements DataRepoTest {
         //simple
         def includes = ['id', 'num', 'amount', 'ext.thing.name']
         def expectedIncludes = includes
-        MetaMapIncludes mmi = MetaMapIncludesBuilder.build(KitchenSink, includes)
+        MetaEntity mmi = MetaGormEntityBuilder.build(KitchenSink, includes)
         def flatMap = mmi.flatten()
 
         then:
@@ -74,7 +74,7 @@ class MetaMapIncludesSpec extends Specification implements DataRepoTest {
         //simple
         def includes = ['id', 'num', 'name', 'ext.thing.name']
         def expectedIncludes = includes
-        MetaMapIncludes mmi = MetaMapIncludesBuilder.build(KitchenSink, includes)
+        MetaEntity mmi = MetaGormEntityBuilder.build(KitchenSink, includes)
         Set props = mmi.flattenProps()
 
         then:
@@ -85,7 +85,7 @@ class MetaMapIncludesSpec extends Specification implements DataRepoTest {
         //simple
         includes = ['id', 'thing.$*']
         expectedIncludes = ['id', 'thing.id', 'thing.name']
-        props = MetaMapIncludesBuilder.build(KitchenSink, includes).flattenProps()
+        props = MetaGormEntityBuilder.build(KitchenSink, includes).flattenProps()
 
         then:
         props == expectedIncludes as Set

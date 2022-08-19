@@ -15,8 +15,8 @@ class OpenapiGeneratorSpec extends Specification {
 
     def "sanity check generate"() {
         expect:
-        openApiGenerator.generate()
         openApiGenerator.getApiSrcPath("api.yaml").exists()
+        openApiGenerator.generate()
         openApiGenerator.getApiBuildPath("api.yaml").exists()
     }
 

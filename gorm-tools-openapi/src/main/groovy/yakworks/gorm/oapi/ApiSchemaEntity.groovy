@@ -26,6 +26,7 @@ import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.NameUtils
 import yakworks.commons.lang.PropertyTools
 import yakworks.commons.map.Maps
+import yakworks.openapi.OapiUtils
 
 /**
  * Entity holder for schema based on CRUType
@@ -179,7 +180,7 @@ class ApiSchemaEntity {
         Map idVerMap = [:]
         PersistentProperty idProp = perEntity.getIdentity()
         if(idProp){
-            Map idJsonType = getJsonType(idProp.type)
+            Map idJsonType = OapiUtils.getJsonType(idProp.type)
             idJsonType.putAll([
                 description: 'unique id',
                 example: 954,
@@ -406,7 +407,7 @@ class ApiSchemaEntity {
 
     void basicType(Map propMap, DefaultConstrainedProperty constrainedProp){
         //type
-        Map typeFormat = getJsonType(constrainedProp.propertyType)
+        Map typeFormat = OapiUtils.getJsonType(constrainedProp.propertyType)
         propMap.type = typeFormat.type
 
         //format
@@ -442,54 +443,6 @@ class ApiSchemaEntity {
         def genericReturnType = gen.cachedMethod.genericReturnType as ParameterizedType
         def actualTypeArguments = genericReturnType.actualTypeArguments
         actualTypeArguments ? actualTypeArguments[0] : null
-    }
-
-    /* see http://epoberezkin.github.io/ajv/#formats */
-    /* We are adding 'money' and 'date' as formats too
-     * big decimal defaults to money
-     */
-    @CompileDynamic
-    Map<String,Object> getJsonType(Class propertyType) {
-        Map typeFormat = [type: 'string'] as Map<String,Object>
-        switch (propertyType) {
-            case [Boolean, Byte]:
-                typeFormat.type = 'boolean'
-                break
-            case [Integer, Short]:
-                typeFormat.type = 'integer'
-                break
-            case [Long]:
-                typeFormat.type = 'integer'
-                typeFormat.format = 'int64'
-                break
-            case [Double, Float]:
-                typeFormat.type = 'number'
-                break
-            case [BigDecimal]:
-                typeFormat.type = 'number'
-                //defaults to money
-                typeFormat.format = 'money'
-                break
-            case [LocalDate]:
-                typeFormat.type = 'string'
-                //date. verified to be a date of the format YYYY-MM-DD
-                typeFormat.format = 'date'
-                break
-            case [Date, LocalDateTime]:
-                //date-time. verified to be a valid date and time in the format YYYY-MM-DDThh:mm:ssZ
-                typeFormat.type = 'string'
-                typeFormat.format = 'date-time'
-                break
-            case [String]:
-                typeFormat.type = 'string'
-                break
-            case { it.isEnum() }:
-                typeFormat.type = 'string'
-                typeFormat.enum = propertyType.values()*.name() as String[]
-
-        }
-        //TODO what about types like Byte etc..?
-        return typeFormat
     }
 
     //copied from FormFieldsTagLib in the Fields plugin

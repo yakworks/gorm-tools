@@ -13,7 +13,7 @@ import groovy.transform.builder.SimpleStrategy
 import io.swagger.v3.oas.models.media.Schema
 
 /**
- * A view over top of the open api schema.
+ * A "view" over top of the open api schema.
  */
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @MapConstructor

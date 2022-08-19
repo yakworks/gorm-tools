@@ -2,7 +2,7 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.openapi
+package yakworks.gorm.oapi.meta
 
 import groovy.transform.CompileStatic
 import groovy.transform.EqualsAndHashCode
@@ -11,6 +11,7 @@ import groovy.util.logging.Slf4j
 import io.swagger.v3.oas.models.media.Schema
 import yakworks.commons.lang.NameUtils
 import yakworks.commons.map.MapFlattener
+import yakworks.gorm.oapi.OapiSupport
 import yakworks.meta.MetaMapIncludes
 
 /**

@@ -2,7 +2,7 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.openapi
+package yakworks.gorm.oapi
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -14,7 +14,6 @@ import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.yaml.snakeyaml.Yaml
 
-import gorm.tools.rest.ast.RestApiAstUtils
 import gorm.tools.utils.GormMetaUtils
 import yakworks.commons.io.PathTools
 import yakworks.commons.lang.NameUtils
@@ -22,8 +21,9 @@ import yakworks.commons.map.Maps
 import yakworks.commons.util.BuildSupport
 import yakworks.commons.util.StringUtils
 import yakworks.grails.support.ConfigAware
+import yakworks.yaml.YamlUtils
 
-import static gorm.tools.openapi.ApiSchemaEntity.CruType
+import static ApiSchemaEntity.CruType
 
 /**
  * Generates domains to schema
@@ -105,7 +105,7 @@ class OpenApiGenerator implements ConfigAware {
             else { //normal not namespaced or may have slash like 'foo/bar' as key
                 String pathName = entry.key
                 Map pathCfg = (Map)entry.value
-                Map pathParts = RestApiAstUtils.splitPath(pathName, pathCfg)
+                Map pathParts = splitPath(pathName, pathCfg)
                 String endpoint = pathParts.name
                 String namespace = pathParts.namespace
                 if(namespace && namespaceList && !namespaceList.contains(namespace)) continue
@@ -289,5 +289,21 @@ class OpenApiGenerator implements ConfigAware {
         return path
     }
 
+    static Map splitPath(String resourceName, Map ctrlConfig){
+        Map pathParts = [name: resourceName, namespace: '']
+        if (resourceName.contains("/")) {
+            List parts = resourceName.split("[/]") as List
+            String name = parts.last()
+            pathParts['name'] = name
+            final int nestedIndex = resourceName.lastIndexOf('/')
+            String namespace = resourceName.substring(0, nestedIndex)
+            pathParts['namespace'] = namespace
+            return pathParts
+        } else {
+            pathParts['name'] = resourceName
+            if(ctrlConfig['namespace']) pathParts['namespace'] = ctrlConfig['namespace'] as String
+        }
+        return pathParts
+    }
 
 }

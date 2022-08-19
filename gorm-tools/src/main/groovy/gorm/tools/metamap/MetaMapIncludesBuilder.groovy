@@ -6,6 +6,7 @@ package gorm.tools.metamap
 
 import java.util.concurrent.ConcurrentHashMap
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
@@ -251,6 +252,7 @@ class MetaMapIncludesBuilder {
         return metaMapIncludes
     }
 
+    @CompileDynamic
     static Set<String> getBlacklist(PersistentEntity entity){
         if(!entity) return [] as Set<String>
         String clazz = entity.name

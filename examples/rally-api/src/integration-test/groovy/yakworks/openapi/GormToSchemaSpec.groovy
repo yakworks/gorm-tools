@@ -1,7 +1,7 @@
 package yakworks.openapi
 
-import gorm.tools.openapi.ApiSchemaEntity
-import gorm.tools.openapi.GormToSchema
+import yakworks.gorm.oapi.ApiSchemaEntity
+import yakworks.gorm.oapi.GormToSchema
 import gorm.tools.security.domain.SecRoleUser
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration

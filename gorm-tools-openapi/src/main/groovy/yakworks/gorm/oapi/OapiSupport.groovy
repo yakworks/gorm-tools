@@ -2,7 +2,7 @@
 * Copyright 2022 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.openapi
+package yakworks.gorm.oapi
 
 import java.nio.file.Paths
 
@@ -45,12 +45,12 @@ class OapiSupport {
         return _oapiSupport
     }
 
-    Schema getSchema(String name){
-        openAPI.getComponents().schemas[name]
+    boolean hasSchema(){
+        return openAPI
     }
 
-    Schema getSchemaProps(String name){
-        openAPI.getComponents().schemas[name]
+    Schema getSchema(String name){
+        return openAPI ?  openAPI.getComponents().schemas[name] : null
     }
 
     Schema getSchemaForPath(Schema entitySchema, String propKey){
@@ -86,7 +86,7 @@ class OapiSupport {
 
         config.each{ Map entry ->
             String key = entry['key']
-            def props = getSchemaProps(key)
+            def props = getSchema(key)
         }
     }
 

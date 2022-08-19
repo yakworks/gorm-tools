@@ -1,4 +1,4 @@
-package gorm.tools.openapi
+package yakworks.gorm.oapi
 
 
 import io.swagger.v3.oas.models.media.IntegerSchema

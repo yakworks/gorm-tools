@@ -2,7 +2,7 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.openapi
+package yakworks.gorm.oapi
 
 import groovy.transform.CompileStatic
 
@@ -10,7 +10,7 @@ import org.grails.datastore.mapping.model.PersistentEntity
 
 import gorm.tools.utils.GormMetaUtils
 
-import static gorm.tools.openapi.ApiSchemaEntity.CruType
+import static ApiSchemaEntity.CruType
 
 /**
  * Generates the domain part

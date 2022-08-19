@@ -21,6 +21,14 @@ import yakworks.meta.MetaMapIncludes
 class MetaMapIncludesService {
 
     /**
+     * convenience util for getMetaMapIncludes
+     * @see #getMetaMapIncludes(String, List, List)
+     */
+    MetaMapIncludes getMetaMapIncludes(Class clazz, List<String> includes, List<String> excludes) {
+        return getMetaMapIncludes(clazz.name, includes, excludes)
+    }
+
+    /**
      * wrapper around MetaMapIncludesBuilder.build that checks cache first
      *
      * @param entityClassName the entity to wrap in a map

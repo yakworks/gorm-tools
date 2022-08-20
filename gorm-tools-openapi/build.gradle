@@ -1,0 +1,11 @@
+apply plugin: "yakworks.grails-plugin"
+
+dependencies {
+  api project(":gorm-tools")
+
+  // ** for the openApi parsing **
+  api "io.swagger.parser.v3:swagger-parser-v3:$vSwagger"
+
+  //tests use the rally domains for the MetaMaps
+  testImplementation project(":rally-domain")
+}

@@ -12,9 +12,6 @@ import org.grails.datastore.gorm.validation.constraints.registry.DefaultConstrai
 
 import gorm.tools.csv.render.CSVPagerRenderer
 import gorm.tools.excel.render.XlsxPagerRenderer
-import gorm.tools.openapi.GormToSchema
-import gorm.tools.openapi.MetaMapSchemaService
-import gorm.tools.openapi.OpenApiGenerator
 import gorm.tools.rest.mapping.RepoApiMappingsService
 import gorm.tools.rest.render.ApiResultsRenderer
 import gorm.tools.rest.render.JsonGeneratorRenderer
@@ -30,7 +27,7 @@ import yakworks.commons.lang.NameUtils
 @SuppressWarnings(['UnnecessarySelfAssignment', 'Println', 'EmptyMethod', 'Indentation'])
 class GormToolsRestGrailsPlugin extends Plugin {
 
-    def loadAfter = ['gorm-tools']
+    def loadAfter = ['gorm-tools-openapi']
     //make sure we load before controllers as might be creating rest controllers
     def loadBefore = ['controllers']
     def pluginExcludes = ["**/init/**"]
@@ -52,44 +49,7 @@ class GormToolsRestGrailsPlugin extends Plugin {
         csvPagerRenderer(CSVPagerRenderer)
         xlsxPagerRenderer(XlsxPagerRenderer)
 
-        gormToSchema(GormToSchema) { bean ->
-            bean.lazyInit = true
-        }
-
-        openApiGenerator(OpenApiGenerator) { bean ->
-            bean.lazyInit = true
-            apiSrc = 'src/api-docs'
-            apiBuild = 'build/api-docs'
-            namespaceList = ['rally']
-        }
-
-        metaMapSchemaService(MetaMapSchemaService)
-
-        //restApiControllersFromConfig(application)
     } }
-
-    void doWithDynamicMethods() {
-        // TODO Implement registering dynamic methods to classes (optional)
-    }
-
-    void doWithApplicationContext() {
-        // TODO Implement post initialization spring config (optional)
-    }
-
-    void onChange(Map<String, Object> event) {
-        // TODO Implement code that is executed when any artefact that this plugin is
-        // watching is modified and reloaded. The event contains: event.source,
-        // event.application, event.manager, event.ctx, and event.plugin.
-    }
-
-    void onConfigChange(Map<String, Object> event) {
-        // TODO Implement code that is executed when the project configuration changes.
-        // The event is the same as for 'onChange'.
-    }
-
-    void onShutdown(Map<String, Object> event) {
-        // TODO Implement code that is executed when the application shuts down (optional)
-    }
 
     //old
     void controllersFromDomainAnnotation(){

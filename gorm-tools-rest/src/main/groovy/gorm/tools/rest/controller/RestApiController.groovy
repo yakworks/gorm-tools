@@ -16,7 +16,6 @@ import grails.artefact.controller.support.ResponseRenderer
 import grails.util.GrailsNameUtils
 import grails.web.api.ServletAttributes
 import yakworks.api.problem.Problem
-import yakworks.api.problem.ProblemTrait
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.NameUtils
 

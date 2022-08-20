@@ -17,9 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.transaction.TransactionStatus
 
-import gorm.tools.support.ConfigAware
 import gorm.tools.transaction.TrxService
 import grails.persistence.support.PersistenceContextInterceptor
+import yakworks.grails.support.ConfigAware
 
 /**
  * Support service for aysnc to wrap session, transaction, etc...

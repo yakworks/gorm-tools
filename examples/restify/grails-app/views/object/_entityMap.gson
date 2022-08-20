@@ -1,4 +1,4 @@
-import gorm.tools.metamap.MetaMap
+import yakworks.meta.MetaMap
 
 model {
     MetaMap entityMap

@@ -7,8 +7,8 @@ package gorm.tools.rest
 import groovy.transform.CompileDynamic
 import groovy.util.logging.Slf4j
 
-import gorm.tools.openapi.GormToSchema
 import grails.converters.JSON
+import yakworks.gorm.oapi.GormToSchema
 
 @CompileDynamic
 @Slf4j

@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 
 import gorm.tools.security.domain.AppUserToken
-import gorm.tools.support.ConfigAware
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.rest.token.storage.TokenNotFoundException
 import grails.plugin.springsecurity.rest.token.storage.TokenStorageService
@@ -26,7 +25,7 @@ import grails.plugin.springsecurity.rest.token.storage.TokenStorageService
  */
 @Slf4j
 @CompileStatic
-class GormTokenStorageService implements TokenStorageService, ConfigAware {
+class GormTokenStorageService implements TokenStorageService {
 
     @Autowired UserDetailsService userDetailsService
 
@@ -39,11 +38,6 @@ class GormTokenStorageService implements TokenStorageService, ConfigAware {
 
         throw new TokenNotFoundException("Token ${tokenValue} not found")
     }
-
-    // String getConfigVal(String subkey, String defaultVal){
-    //     String key = "grails.plugin.springsecurity.rest.$subkey"
-    //     config.getProperty(key, String, defaultVal)
-    // }
 
     @Transactional
     void storeToken(String tokenValue, UserDetails principal) {

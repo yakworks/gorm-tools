@@ -21,7 +21,6 @@ import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.DataOp
 import grails.web.Action
 import yakworks.api.problem.Problem
-import yakworks.api.problem.ProblemTrait
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.MULTI_STATUS

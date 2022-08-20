@@ -21,15 +21,14 @@ import gorm.tools.databinding.PathKeyMap
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobService
-import gorm.tools.metamap.MetaMap
-import gorm.tools.metamap.MetaMapEntityService
+import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp
 import yakworks.api.ApiResults
 import yakworks.api.Result
-import yakworks.api.problem.Problem
 import yakworks.commons.map.Maps
+import yakworks.meta.MetaMap
 
 /**
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>
@@ -51,7 +50,7 @@ trait BulkableRepo<D> {
     AsyncService asyncService
 
     @Autowired
-    MetaMapEntityService metaMapEntityService
+    MetaMapService metaMapService
 
     @Autowired
     ProblemHandler problemHandler
@@ -236,11 +235,11 @@ trait BulkableRepo<D> {
     }
 
     /**
-     * uses metaMapEntityService to create the map for the includes in the jobContext.args
+     * uses metaMapService to create the map for the includes in the jobContext.args
      * Will return a clone to ensure that all properties are called and its a clean, unwrapped map
      */
     Map createMetaMap(D entityInstance, SyncJobContext jobContext){
-        MetaMap entityMapData = metaMapEntityService.createMetaMap(entityInstance, jobContext.args.includes)
+        MetaMap entityMapData = metaMapService.createMetaMap(entityInstance, jobContext.args.includes)
         return (Map)entityMapData.clone()
     }
 

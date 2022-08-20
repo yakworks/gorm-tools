@@ -22,6 +22,7 @@ import gorm.tools.repository.model.IdGeneratorRepo
 import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.api.ResultUtils
+import yakworks.api.problem.Problem
 import yakworks.api.problem.ProblemTrait
 import yakworks.commons.io.IOUtils
 import yakworks.commons.lang.Validate
@@ -221,7 +222,7 @@ class SyncJobContext {
         for (Result r : apiResults.list) {
             def map = [ok: r.ok, status: r.status.code, data: r.payload] as Map<String, Object>
             //do the failed
-            if (r instanceof ProblemTrait) {
+            if (r instanceof Problem) {
                 map.putAll([
                     code: r.code,
                     title: ResultUtils.getMessage(msgService, r),

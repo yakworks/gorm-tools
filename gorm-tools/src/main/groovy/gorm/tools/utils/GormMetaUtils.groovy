@@ -4,6 +4,8 @@
 */
 package gorm.tools.utils
 
+import java.lang.reflect.Modifier
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
@@ -30,6 +32,11 @@ import yakworks.commons.lang.NameUtils
  */
 @CompileStatic
 class GormMetaUtils {
+
+    // list of props to exclude in isExcluded used for getProperties
+    private static List<String> PROPERTY_EXCLUDES = [
+        "properties", "dirty", "newOrDirty", "new"
+    ]
 
     /**
      * Returns a persistent entity using the class.
@@ -220,6 +227,38 @@ class GormMetaUtils {
         Serializable idVal = getId(instance)
         String idName = persistentEntity.identity.name
         return  [(idName): idVal]
+    }
+
+    /**
+     * Get the entity properties for a GormEntity. Filters out the utility props using isExcludedProperty
+     */
+    static List<MetaProperty> getMetaProperties(Class<?> entityClass) {
+        List<MetaProperty> metaProps = entityClass.metaClass.properties
+        List<MetaProperty> filteredProps = metaProps.findAll { MetaProperty mp ->
+            !isExcludedProperty(mp)
+        }
+        return filteredProps
+    }
+
+    /**
+     * default get properties for gorm entity class
+     */
+    static Map<String, Object> getProperties(GormEntity instance) {
+        Map<String, Object> props = [:]
+        for (MetaProperty mp : getMetaProperties(instance.class)) {
+            props[mp.name] = mp.getProperty(instance)
+        }
+        return props
+    }
+
+    /**
+     * used for getProperties to exclude the utility properties that are on a GormEntity.
+     */
+    static boolean isExcludedProperty(MetaProperty mp) {
+        return Modifier.isStatic(mp.getModifiers()) ||
+            PROPERTY_EXCLUDES.contains(mp.getName()) ||
+            org.grails.datastore.mapping.reflect.NameUtils.isConfigurational(mp.getName()) ||
+            (mp instanceof MetaBeanProperty) && (((MetaBeanProperty) mp).getGetter()) == null
     }
 
 }

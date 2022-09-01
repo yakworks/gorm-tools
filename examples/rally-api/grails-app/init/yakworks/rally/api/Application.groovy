@@ -12,10 +12,11 @@ import gorm.tools.rest.RestApiFromConfig
 import gorm.tools.rest.appinfo.AppInfoBuilder
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
+import yakworks.gorm.oapi.OpenApiGenerator
 
 // the component scan here does not seem to be the same as the packageNames and is needed to pick up the
 // the services marked with @Component
-@ComponentScan(['yakworks.security', 'gorm.tools.security', 'yakworks.rally'])
+@ComponentScan(['yakworks.security', 'gorm.tools.security', 'yakworks.rally', 'yakworks.gorm.testing.model'])
 @RestApiFromConfig
 @EnableCaching
 // @EnableAutoConfiguration(exclude = [HazelcastAutoConfiguration]) // in order to avoid autoconfiguring an extra Hazelcast instance
@@ -36,7 +37,7 @@ class Application extends GrailsAutoConfiguration {
      */
     @Override
     Collection<String> packageNames() {
-        super.packageNames() + ['yakworks.rally', 'gorm.tools.security']
+        super.packageNames() + ['yakworks.rally', 'gorm.tools.security', 'yakworks.gorm.testing.model']
     }
 
     @Bean
@@ -55,6 +56,12 @@ class Application extends GrailsAutoConfiguration {
         //     apiBuild = 'api-docs/dist/openapi'
         //     namespaceList = ['rally']
         // }
+        openApiGenerator(OpenApiGenerator) { bean ->
+            bean.lazyInit = true
+            apiSrc = 'api-docs/openapi'
+            apiBuild = 'api-docs/dist/openapi'
+            namespaceList = ['rally']
+        }
 
         //hack to make sure hazel get setup before the one that is setup for hibernates L2 cache as that one
         //is configured to join the name of the one setup in spring.

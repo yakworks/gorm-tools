@@ -1,7 +1,0 @@
-name: q
-in: query
-description: the string to search for or mango query json, see docs for details on mango format
-schema:
-  anyOf:
-  - type: string
-  - type: object

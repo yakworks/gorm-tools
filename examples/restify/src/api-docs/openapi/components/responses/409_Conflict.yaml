@@ -1,5 +1,0 @@
-description: Conflict. Entity may have been changed and has a new version
-content:
-  application/json:
-    schema:
-      $ref: ../schemas/errors/Error.yaml

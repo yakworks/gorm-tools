@@ -8,7 +8,7 @@ import gorm.tools.model.SourceType
 import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Specification
 import testing.*
-import yakworks.commons.json.JsonEngine
+import yakworks.json.groovy.JsonEngine
 
 class SyncJobImplSpec extends Specification  implements DomainRepoTest<TestSyncJob> {
 

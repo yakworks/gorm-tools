@@ -4,6 +4,7 @@
 */
 package gorm.tools.utils
 
+
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.model.PersistentProperty
@@ -13,6 +14,7 @@ import org.grails.datastore.mapping.model.types.Identity
 import yakworks.commons.lang.Transform
 
 /**
+ * MOSTLY LEGACY
  * GormUtils provides a set of static helpers for working with domain classes.
  * It allows to copy domain instances, to copy separate properties of an object, etc.
  *

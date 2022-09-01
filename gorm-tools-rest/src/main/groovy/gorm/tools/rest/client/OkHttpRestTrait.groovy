@@ -14,7 +14,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.Response
-import yakworks.commons.json.JsonEngine
+import yakworks.json.groovy.JsonEngine
 
 /**
  * Trait with helper methods to wrap OKHttps HttpClient for rest api testing

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 
 import grails.core.GrailsApplication
 
-import static yakworks.commons.json.JsonEngine.parseJson
+import static yakworks.json.groovy.JsonEngine.parseJson
 
 @Component
 @CompileStatic

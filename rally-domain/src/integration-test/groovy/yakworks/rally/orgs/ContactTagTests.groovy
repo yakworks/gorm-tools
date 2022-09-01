@@ -4,9 +4,9 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.gorm.testing.DomainIntTest
-import yakworks.problem.data.DataProblem
-import yakworks.problem.data.DataProblemCodes
-import yakworks.problem.data.DataProblemException
+import yakworks.api.problem.data.DataProblem
+import yakworks.api.problem.data.DataProblemCodes
+import yakworks.api.problem.data.DataProblemException
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail

@@ -36,6 +36,10 @@ class SecUtils {
         return getSecService().getUsername(userId)
     }
 
+    static String getDisplayName(Serializable userId) {
+        return getSecService().getDisplayName(userId)
+    }
+
     /**
      * gets the currently logged in username
      */

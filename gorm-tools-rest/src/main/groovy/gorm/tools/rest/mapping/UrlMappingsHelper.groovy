@@ -66,8 +66,8 @@ class UrlMappingsHelper {
                 rootResource = rootResource
             }
 
-            println delegate
-        // }
+            // println delegate
+
     } }
 
     static Closure getBulkMapping(String namespace, String ctrl) { { ->

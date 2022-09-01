@@ -10,12 +10,12 @@ import groovy.json.JsonSlurper
 import spock.lang.Specification
 import yakworks.api.ApiResults
 import yakworks.api.Result
-import yakworks.commons.json.JsonEngine
+import yakworks.json.groovy.JsonEngine
 import yakworks.gorm.testing.DomainIntTest
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Org
 
-import static yakworks.commons.json.JsonEngine.parseJson
+import static yakworks.json.groovy.JsonEngine.parseJson
 
 @Integration
 @Rollback
@@ -53,7 +53,7 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         SyncJobContext jobContext = createJob()
 
         when:
-        def apiRes = ApiResults.of("foo")
+        def apiRes = ApiResults.ofPayload("foo")
         jobContext.updateJob(apiRes, [id:jobContext.jobId , errorBytes: JsonEngine.toJson(apiRes).bytes ])
 
         then:
@@ -71,7 +71,7 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         Long time = System.currentTimeMillis()
         ApiResults apiRes = ApiResults.OK()
         (1..20).each {
-            apiRes << Result.of([id:it, num:"num-$it", name: "name-$it"])
+            apiRes << Result.OK().payload([id:it, num:"num-$it", name: "name-$it"])
         }
 
         jobContext.updateJobResults(apiRes, time)
@@ -127,7 +127,7 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         }
 
         when:
-        def apiRes = ApiResults.of("foo").title("gogogo")
+        def apiRes = ApiResults.ofPayload("foo").title("gogogo")
         jobContext.transformResults(apiRes)
 
         then:

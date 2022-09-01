@@ -14,6 +14,7 @@ import yakworks.rally.orgs.model.OrgInfo
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
+import yakworks.rally.testing.RallySeedData
 
 class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
     //Automatically runs the basic crud tests

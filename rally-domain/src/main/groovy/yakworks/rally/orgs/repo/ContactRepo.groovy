@@ -21,8 +21,8 @@ import gorm.tools.security.domain.AppUser
 import gorm.tools.utils.GormUtils
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
+import yakworks.api.problem.data.DataProblemCodes
 import yakworks.commons.map.Maps
-import yakworks.problem.data.DataProblemCodes
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail

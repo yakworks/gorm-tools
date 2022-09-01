@@ -7,7 +7,7 @@ package gorm.tools.problem
 
 import spock.lang.Specification
 import testing.Cust
-import yakworks.i18n.MsgKey
+import yakworks.message.MsgKey
 
 class EntityValidationProblemSpec extends Specification {
 
@@ -24,7 +24,7 @@ class EntityValidationProblemSpec extends Specification {
     void "test cause"() {
         when:
         def rte = new RuntimeException("bad stuff")
-        def e = ValidationProblem.ofCause(rte)
+        def e = ValidationProblem.of(rte)
         def ve =  e.toException()
 
         then:
@@ -35,7 +35,7 @@ class EntityValidationProblemSpec extends Specification {
     void "test msgKey and entity"() {
         when:
         def cust = new Cust()
-        def e =  ValidationProblem.ofCode('password.mismatch')
+        def e =  ValidationProblem.of('password.mismatch')
             .detail("The passwords you entered do not match")
             .entity(cust)
         def ve =  e.toException()

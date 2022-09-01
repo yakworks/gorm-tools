@@ -11,7 +11,7 @@ import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
-import yakworks.commons.json.JsonEngine
+import yakworks.json.groovy.JsonEngine
 
 @GormRepository
 @CompileStatic

@@ -22,12 +22,13 @@ import gorm.tools.repository.model.IdGeneratorRepo
 import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.api.ResultUtils
+import yakworks.api.problem.Problem
+import yakworks.api.problem.ProblemTrait
 import yakworks.commons.io.IOUtils
-import yakworks.commons.json.JsonEngine
-import yakworks.commons.json.JsonStreaming
 import yakworks.commons.lang.Validate
-import yakworks.i18n.MsgService
-import yakworks.problem.ProblemTrait
+import yakworks.json.groovy.JsonEngine
+import yakworks.json.groovy.JsonStreaming
+import yakworks.message.spi.MsgService
 
 @SuppressWarnings('Println')
 @Builder(builderStrategy= SimpleStrategy, prefix="")
@@ -125,7 +126,7 @@ class SyncJobContext {
         if(!currentResults.ok) ok.set(false)
         boolean curOk = ok.get()
 
-        int processedSize = processedCount.addAndGet(currentResults.size())
+        int processedSize = processedCount.addAndGet(currentResults.list.size())
         DecimalFormat decFmt = new DecimalFormat("0.0")
         BigDecimal endTime = (System.currentTimeMillis() - startTimeMillis) / 1000
         String timing = "${decFmt.format(endTime)}s"
@@ -218,10 +219,10 @@ class SyncJobContext {
         MsgService msgService = syncJobService.messageSource
         List<Map> ret = []
         boolean ok = true
-        for (Result r : apiResults) {
+        for (Result r : apiResults.list) {
             def map = [ok: r.ok, status: r.status.code, data: r.payload] as Map<String, Object>
             //do the failed
-            if (r instanceof ProblemTrait) {
+            if (r instanceof Problem) {
                 map.putAll([
                     code: r.code,
                     title: ResultUtils.getMessage(msgService, r),

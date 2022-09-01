@@ -14,7 +14,7 @@ info:
 
 spring:
 #  profiles:
-#    active: local
+#    active: dev
 #  config:
 #    additional-location:
 

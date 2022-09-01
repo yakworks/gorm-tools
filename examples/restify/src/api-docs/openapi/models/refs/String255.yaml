@@ -1,4 +1,0 @@
-description: String field
-type: string
-maxLength: 255
-example: A longer descriptive string

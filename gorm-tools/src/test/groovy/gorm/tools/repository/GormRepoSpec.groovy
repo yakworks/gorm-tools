@@ -20,10 +20,10 @@ import testing.CustRepo
 import yakworks.gorm.testing.model.KitchenSink
 import yakworks.gorm.testing.model.SinkExt
 import yakworks.gorm.testing.model.SinkItem
-import yakworks.problem.data.DataProblem
-import yakworks.problem.data.DataProblemException
-import yakworks.problem.data.DataProblemCodes
-import yakworks.problem.data.NotFoundProblem
+import yakworks.api.problem.data.DataProblem
+import yakworks.api.problem.data.DataProblemException
+import yakworks.api.problem.data.DataProblemCodes
+import yakworks.api.problem.data.NotFoundProblem
 
 //import static grails.buildtestdata.TestData.build
 

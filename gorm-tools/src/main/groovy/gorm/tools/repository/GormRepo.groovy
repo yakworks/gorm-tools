@@ -32,8 +32,8 @@ import gorm.tools.repository.model.PersistableRepoEntity
 import gorm.tools.transaction.TrxStaticApi
 import grails.core.support.proxy.ProxyHandler
 import grails.validation.ValidationException
+import yakworks.api.problem.data.NotFoundProblem
 import yakworks.commons.lang.ClassUtils
-import yakworks.problem.data.NotFoundProblem
 
 /**
  * A trait that turns a class into a Repository
@@ -80,10 +80,9 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * @throws DataAccessException if a validation or DataAccessException error happens
      */
     D persist(D entity, PersistArgs args = PersistArgs.new()) {
-        entityTrx {
-            doPersist(entity, args)
+        withTrx {
+            return doPersist(entity, args)
         }
-        return entity
     }
 
     D persist(D entity, Map args) {
@@ -171,7 +170,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
         if(args.validate != false){
             boolean valid = gormValidationApi().validate entity
             if(!valid && args.failOnError){
-                def ex = ValidationProblem.of(entity).errors(((GormEntity)entity).errors).toException()
+                def ex = ValidationProblem.ofEntity(entity).errors(((GormEntity)entity).errors).toException()
                 // println ex
                 throw ex
             }
@@ -184,8 +183,8 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * Transactional wrap for {@link #doCreate}
      */
     D create(Map data, PersistArgs args = PersistArgs.new()) {
-        entityTrx {
-            doCreate(data, args)
+        withTrx {
+            return doCreate(data, args)
         }
     }
 
@@ -221,11 +220,9 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * Transactional wrap for {@link #doUpdate}
      */
     D update(Map data, PersistArgs args = PersistArgs.new()) {
-        D ent
-        entityTrx {
-            ent = doUpdate(data, args)
+        withTrx {
+            return doUpdate(data, args)
         }
-        return ent
     }
 
     D update(Map data, Map args) {
@@ -425,7 +422,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * @return the retrieved entity
      */
     D getWithTrx(Serializable id) {
-        entityTrx {
+        withTrx {
             return (D)gormStaticApi().get(id)
         }
     }
@@ -593,13 +590,8 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * like withTransaction this creates one if none is present or joins an existing transaction if one is already present.
      *
      * @param callable The closure to call
-     * @return The entity that was run in the closure
+     * @return The entity that was run in the closure or the generic on the closure if otherwise
      */
-    D entityTrx(Closure<D> callable) {
-        def trxAttr = new CustomizableRollbackTransactionAttribute()
-        gormStaticApi().withTransaction(trxAttr, callable)
-    }
-
     public <T> T withTrx(Closure<T> callable) {
         def trxAttr = new CustomizableRollbackTransactionAttribute()
         gormStaticApi().withTransaction(trxAttr, callable)

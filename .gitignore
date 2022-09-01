@@ -158,3 +158,4 @@ Session.vim
 .DS_Store
 api-docs/dist
 api-docs/node_modules
+.build-cache

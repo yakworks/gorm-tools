@@ -1,5 +1,0 @@
-name: page
-in: query
-description: page number of list to retrieve
-schema:
-  type: integer

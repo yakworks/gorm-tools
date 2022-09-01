@@ -19,7 +19,7 @@ class SyncjobEventListener {
     void onBulk(SyncJobFinishedEvent<Org> event) {
         assert event.entityClass.isAssignableFrom(Org) //verify, tht listener is called for only org events based on generic
         if(event.context.args.op != DataOp.add) return
-        event.context.results.each {
+        event.context.results.list.each {
             if (it instanceof OkResult) {
                 Long id = it.payload.id as Long
                 if (id != null) {

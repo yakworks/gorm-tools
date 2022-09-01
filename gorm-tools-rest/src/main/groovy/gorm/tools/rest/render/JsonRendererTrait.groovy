@@ -17,8 +17,8 @@ import grails.rest.render.RenderContext
 import grails.rest.render.Renderer
 import grails.util.GrailsWebUtil
 import grails.web.mime.MimeType
-import yakworks.commons.json.JsonEngineTrait
 import yakworks.i18n.icu.ICUMessageSource
+import yakworks.json.groovy.JsonEngineTrait
 
 /**
  * Json Renderer that uses the default groovy2.5 jsonGenerator

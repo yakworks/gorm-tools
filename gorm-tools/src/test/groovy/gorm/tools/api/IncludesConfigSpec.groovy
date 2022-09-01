@@ -4,7 +4,6 @@
 */
 package gorm.tools.api
 
-import gorm.tools.metamap.MetaMap
 import gorm.tools.testing.unit.DataRepoTest
 import spock.lang.Shared
 import spock.lang.Specification

@@ -1,15 +1,11 @@
 package gorm.tools.openapi
 
-import java.nio.file.Paths
 
 import io.swagger.v3.oas.models.media.IntegerSchema
-import io.swagger.v3.oas.models.media.NumberSchema
-import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.media.StringSchema
-import io.swagger.v3.parser.core.models.ParseOptions
 import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.commons.util.BuildSupport
+import yakworks.gorm.oapi.SchemaView
 
 class SchemaViewSpec extends Specification {
 

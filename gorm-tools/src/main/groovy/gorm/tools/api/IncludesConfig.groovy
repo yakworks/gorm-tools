@@ -11,9 +11,9 @@ import groovy.transform.CompileStatic
 import org.springframework.cache.annotation.Cacheable
 
 import gorm.tools.beans.AppCtx
-import gorm.tools.support.ConfigAware
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.map.Maps
+import yakworks.grails.support.ConfigAware
 
 /**
  * Helper to lookup includes for map or list based api, usually a json and rest based api.
@@ -58,7 +58,8 @@ class IncludesConfig implements ConfigAware {
      * @return the include map
      */
     Map getIncludes(String entityClassName){
-        Class entityClass = ClassUtils.loadClass(entityClassName)
+        ClassLoader classLoader = getClass().getClassLoader()
+        Class entityClass = classLoader.loadClass(entityClassName)
         return getIncludes(entityClass)
     }
 

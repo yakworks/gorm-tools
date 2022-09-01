@@ -7,12 +7,13 @@ package gorm.tools.rest.render
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
+import org.springframework.http.HttpStatus
+
 import grails.rest.render.RenderContext
 import yakworks.api.ApiResults
-import yakworks.api.ResultUtils
 
 /**
- * Renderer for paged list data
+ * Concrete so we can set the HttpStatus.MULTI_STATUS
  *
  * @author Joshua Burnett (@basejump)
  * @since 7.0.8
@@ -24,12 +25,8 @@ class ApiResultsRenderer implements JsonRendererTrait<ApiResults>{
     @CompileDynamic
     void render(ApiResults results, RenderContext context) {
         setContentType(context)
-        jsonBuilder(context).call {
-            ok results.ok
-            status results.status.code
-            code results.getCode()
-            title ResultUtils.getMessage(msgService, results)
-        }
+        context.status = HttpStatus.MULTI_STATUS
+        jsonBuilder(context).call(results.asMap())
     }
 
 }

@@ -1,4 +1,0 @@
-description: String field max 50
-type: string
-maxLength: 4000
-example: A long comment or description

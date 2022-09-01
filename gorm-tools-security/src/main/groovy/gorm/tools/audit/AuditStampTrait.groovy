@@ -35,11 +35,14 @@ trait AuditStampTrait {
         SecUtils.getUsername(getCreatedBy())
     }
 
+    //TODO copy/paste code from getCreatedByName, we should refactor it
+    /** comes from username - first section of email, if email is a username*/
     @Transient
     String getEditedByDisplayName() {
         SecUtils.getDisplayName(getEditedBy())
     }
 
+    /** comes from username - first section of email, if email is a username*/
     @Transient
     String getCreatedByDisplayName() {
         SecUtils.getDisplayName(getCreatedBy())

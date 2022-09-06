@@ -14,8 +14,9 @@ import yakworks.meta.MetaMap
 import yakworks.meta.MetaMapList
 
 /**
- * MetaMapService contains a set of helpers, which will create the EntityMap and Lists
- * from Gorm Domains
+ * MetaMapService contains a set of helpers, which will create the MetaMap and Lists from Gorm Domains.
+ * The flow is to create a MetaEntity first (which is the meta data about the entity, what to include, titles, etc..)
+ * and then uses that to instantiate the MetaMap or MetaList
  */
 @Slf4j
 @CompileStatic
@@ -31,8 +32,8 @@ class MetaMapService {
      * @return the EntityMap object
      */
     MetaMap createMetaMap(Object entity, List<String> includes = [], List<String> excludes = []) {
-        MetaEntity includesMap = metaEntityService.getMetaEntity(entity.class.name, includes, excludes)
-        return new MetaMap(entity, includesMap)
+        MetaEntity metaEntity = metaEntityService.getMetaEntity(entity.class.name, includes, excludes)
+        return new MetaMap(entity, metaEntity)
     }
 
     /**
@@ -46,8 +47,8 @@ class MetaMapService {
         if(entityList) {
             //use first item to get the class
             Class entityClass = entityList[0].class.name
-            MetaEntity includesMap = metaEntityService.getMetaEntity(entityClass.name, includes, excludes)
-            return new MetaMapList(entityList, includesMap)
+            MetaEntity metaEntity = metaEntityService.getMetaEntity(entityClass.name, includes, excludes)
+            return new MetaMapList(entityList, metaEntity)
         }
         // return empty list
         return new MetaMapList([])

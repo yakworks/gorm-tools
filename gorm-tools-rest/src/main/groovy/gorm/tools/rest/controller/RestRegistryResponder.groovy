@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse
 import groovy.transform.CompileStatic
 import groovy.transform.Generated
 
+import gorm.tools.utils.BenchmarkHelper
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.grails.plugins.web.rest.render.ServletRenderContext
 import org.grails.web.servlet.mvc.GrailsWebRequest
@@ -66,6 +67,7 @@ trait RestRegistryResponder {
     }
 
     void internalRegistryRender(Object value, Map args=[:]) {
+        // BenchmarkHelper.startTime()
         Integer statusCode
         if (args.status) {
             final statusValue = args.status
@@ -128,6 +130,8 @@ trait RestRegistryResponder {
         if(statusCode != null) context.status = HttpStatus.valueOf(statusCode)
 
         renderer.render(value, context)
+
+        // BenchmarkHelper.printEndTimeMsg("${renderer.class} render")
 
         if(context.wasWrittenTo() && !response.isCommitted()) {
             response.flushBuffer()

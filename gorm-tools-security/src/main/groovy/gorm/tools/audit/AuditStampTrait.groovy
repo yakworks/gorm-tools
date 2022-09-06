@@ -11,6 +11,7 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import gorm.tools.security.SecUtils
+import yakworks.security.model.UserTrait
 
 /**
  * flags a domain entity as stampable for events
@@ -26,26 +27,14 @@ trait AuditStampTrait {
     Long editedBy
 
     @Transient
-    String getEditedByName() {
-        SecUtils.getUsername(getEditedBy())
-    }
-
-    @Transient
-    String getCreatedByName() {
-        SecUtils.getUsername(getCreatedBy())
-    }
-
-    //TODO copy/paste code from getCreatedByName, we should refactor it
-    /** comes from username - first section of email, if email is a username*/
-    @Transient
-    String getEditedByDisplayName() {
-        SecUtils.getDisplayName(getEditedBy())
+    UserTrait getEditedByUser() {
+        SecUtils.getUser(getEditedBy())
     }
 
     /** comes from username - first section of email, if email is a username*/
     @Transient
-    String getCreatedByDisplayName() {
-        SecUtils.getDisplayName(getCreatedBy())
+    UserTrait getCreatedByUser() {
+        SecUtils.getUser(getCreatedBy())
     }
 
     @CompileDynamic

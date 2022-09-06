@@ -29,7 +29,6 @@ class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, Secu
         args.email = genRandomEmail()
         args.name = "test-user-${System.currentTimeMillis()}"
         args.username = "some_login_123"
-        args.email = genRandomEmail()
         args
     }
 
@@ -130,15 +129,63 @@ class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, Secu
 
     }
 
-    def "user name"() {
+    def "test username"() {
         when:
         Map data = buildMap([:])
-        data << [password:'secretStuff', repassword:'secretStuff']
+        data << [username:'jimmy', password:'secretStuff', repassword:'secretStuff']
         AppUser user = AppUser.create(data)
         flush()
 
         then:
-        user.name.startsWith "test"
+        user.username == "jimmy"
+        user.name.startsWith("test")
+
+    }
+
+    def "test displayName"() {
+        when:
+        Map data = buildMap([:])
+        data << [username:'jimmy', password:'secretStuff', repassword:'secretStuff']
+        AppUser user = AppUser.create(data)
+        flush()
+
+        then:
+        user.displayName == "jimmy"
+
+        when:
+        data = [ email: 'jimmy@foo.com']
+        AppUser user2 = AppUser.create(data)
+        flush()
+
+        then:
+        user2.displayName == "jimmy"
+    }
+
+    def "test defaults"() {
+        when: "only email is passed in"
+        Map data = [ email: 'jimmy@foo.com' ]
+        AppUser user = AppUser.create(data)
+        flush()
+
+        then:
+        user.email == 'jimmy@foo.com'
+        user.name == 'jimmy'
+        //username default to?
+        user.username == 'jimmy'
+        user.displayName == 'jimmy'
+
+        when: "only email and username"
+        data = [ username: 'sally', email: 'jimmy@foo.com' ]
+        user = AppUser.create(data)
+        flush()
+
+        then:
+        user.email == 'jimmy@foo.com'
+        user.name == 'sally'
+        //username default to?
+        user.username == 'sally'
+        user.displayName == 'sally'
+
     }
 
     // def "statics test"() {

@@ -6,11 +6,15 @@ package gorm.tools.security
 
 import groovy.transform.CompileStatic
 
+import org.grails.datastore.gorm.GormEnhancer
+
 import gorm.tools.beans.AppCtx
 import gorm.tools.security.services.SecService
+import yakworks.security.model.UserTrait
 
 /**
- * a wrapper around SecService with statics for areas that can't get bean injected such as in an Entity
+ * a wrapper around SecService with statics for areas that can't get a bean injected such as in an Entity
+ * DON'T USE THIS if injecting a SecService is an option
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.1.12
@@ -22,6 +26,10 @@ class SecUtils {
 
     private SecUtils() {
         // statics only
+    }
+
+    static UserTrait getUser(Serializable uid) {
+        return getSecService().getUser(uid)
     }
 
     static String getUserFullName(Serializable userId) {
@@ -36,9 +44,9 @@ class SecUtils {
         return getSecService().getUsername(userId)
     }
 
-    static String getDisplayName(Serializable userId) {
-        return getSecService().getDisplayName(userId)
-    }
+    // static String getDisplayName(Serializable userId) {
+    //     return getSecService().getDisplayName(userId)
+    // }
 
     /**
      * gets the currently logged in username

@@ -9,7 +9,7 @@ import spock.lang.Specification
 class AuditStampAnnSpec extends Specification implements DomainRepoTest<StampedEntity>, SecurityTest {
 
     void setupSpec(){
-        mockDomains(StampedNoConstraintsClosure)
+        mockDomains(StampedNoConstraintsClosure, AppUser)
     }
 
     void "did it get the audit stamp fields"() {
@@ -106,9 +106,11 @@ class AuditStampAnnSpec extends Specification implements DomainRepoTest<StampedE
     def "test update"(){
         when:
         Long id = StampedEntity.create([name:"Wyatt Oil"]).id
+        new AppUser(id:1, name: "admin", username:"admin", email:"admin@9ci.com", password: "test").persist(flush: true)
         flushAndClear()
 
         then:
+        AppUser.get(1)
         def o = StampedEntity.get(id)
         o.name == "Wyatt Oil"
         o.createdDate
@@ -116,7 +118,10 @@ class AuditStampAnnSpec extends Specification implements DomainRepoTest<StampedE
         o.editedDate
         o.editedBy == 1
         o.createdDate == o.editedDate
-        // o.createdByName == 'admin'
+        o.createdByUser.username == 'admin'
+        o.editedByUser.username == 'admin'
+        o.createdByUser.displayName == 'admin'
+        o.editedByUser.displayName == 'admin'
         // o.editedByName == 'admin'
 
         when: 'its edited then edited should be updated'

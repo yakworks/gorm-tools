@@ -8,7 +8,6 @@ import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEntity
 
-import gorm.tools.utils.GormMetaUtils
 import yakworks.meta.MetaEntity
 import yakworks.meta.MetaMap
 import yakworks.meta.MetaMapList

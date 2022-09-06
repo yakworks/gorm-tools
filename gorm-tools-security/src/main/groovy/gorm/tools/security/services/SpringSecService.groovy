@@ -4,8 +4,6 @@
 */
 package gorm.tools.security.services
 
-import javax.servlet.http.HttpSession
-
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
@@ -27,12 +25,13 @@ import gorm.tools.security.domain.SecRole
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.userdetails.GrailsUser
+import yakworks.security.model.UserTrait
 
 /**
  * Spring implementation of the generic base SecService
  */
 @CompileStatic
-class SpringSecService<D> implements SecService<D>{
+class SpringSecService<D extends UserTrait> implements SecService<D>{
 
     @Autowired(required = false) //required = false so this bean works in case security. active is false
     SpringSecurityService springSecurityService

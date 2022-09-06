@@ -159,7 +159,8 @@ class ApiSchemaEntity {
 
             Class returnType = constrainedProp.propertyType
             if(Collection.isAssignableFrom(returnType)){
-                Class genClass = findGenericClassForCollection(entityClass, propName)
+                Class genClass =(Class) PropertyTools.findGenericTypeForCollection(entityClass, propName)
+                // Class genClass = findGenericClassForCollection(entityClass, propName)
                 //println "  ${propName} collection of type ${genClass.simpleName}"
                 Map propsToAdd = setupAssociationObject(type, apiProp, genClass.simpleName, constrainedProp, null)
                 apiProp['type'] = 'array'
@@ -434,15 +435,6 @@ class ApiSchemaEntity {
     @CompileDynamic
     Mapping getMapping(PersistentEntity pe) {
         return GormMetaUtils.getMappingContext().mappingFactory?.entityToMapping?.get(pe)
-    }
-
-    @CompileDynamic
-    static Class findGenericClassForCollection(Class entityClass, String prop){
-        MetaBeanProperty metaProp = PropertyTools.getMetaBeanProp(entityClass, prop)
-        CachedMethod gen = metaProp.getter as CachedMethod
-        def genericReturnType = gen.cachedMethod.genericReturnType as ParameterizedType
-        def actualTypeArguments = genericReturnType.actualTypeArguments
-        actualTypeArguments ? actualTypeArguments[0] : null
     }
 
     //copied from FormFieldsTagLib in the Fields plugin

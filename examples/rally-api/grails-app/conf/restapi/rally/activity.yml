@@ -3,4 +3,4 @@ api:
     rally:
       activity:
         includes:
-          get: ['*', note.body, note.contentType, createdByName]
+          get: ['*', note.body, note.contentType, createdByUser.username]

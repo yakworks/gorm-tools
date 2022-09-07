@@ -9,6 +9,7 @@ import java.time.LocalDateTime
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.utils.BenchmarkHelper
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.FillPatternType
 import org.apache.poi.ss.usermodel.IndexedColors
@@ -21,6 +22,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import com.opencsv.CSVWriter
 import yakworks.commons.lang.DateUtil
+import yakworks.commons.lang.PropertyTools
 import yakworks.commons.map.MapFlattener
 
 @SuppressWarnings(['NestedBlockDepth'])
@@ -45,6 +47,7 @@ class XlsxMapWriter {
 
     void writeXlsx(List<Map> dataList){
         //flatten
+        BenchmarkHelper.startTime()
         Map<String, Object> firstRow = dataList[0] as Map<String, Object>
         Map flatRow = flattenMap(firstRow)
         headers = flatRow.keySet()
@@ -61,9 +64,9 @@ class XlsxMapWriter {
                     }
                 }
                 dataList.eachWithIndex{ rowData, int i->
-                    //get all the values for the masterHeaders keys
-                    def flatData = flattenMap(rowData as Map)
-                    def vals = headers.collect{ flatData[it]}
+                    // get all the values for the masterHeaders keys
+                    // def flatData = flattenMap(rowData as Map)
+                    def vals = headers.collect{ PropertyTools.getProperty(rowData, it) }
 
                     row {
                         vals.each { dta ->
@@ -87,6 +90,7 @@ class XlsxMapWriter {
                 }
             }
         }
+        BenchmarkHelper.printEndTimeMsg("excel generate took")
     }
 
     Map flattenMap(Map map){

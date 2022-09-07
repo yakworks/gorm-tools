@@ -10,12 +10,13 @@ import org.grails.datastore.gorm.GormEnhancer
 import org.springframework.core.GenericTypeResolver
 
 import gorm.tools.security.domain.AppUser
+import yakworks.security.model.UserTrait
 
 /**
  * common generic helpers for security, implement with generics D for the domain entity and I for the id type
  */
 @CompileStatic
-trait SecService<D> {
+trait SecService<D extends UserTrait> {
 
     /**
      * The java class for the Gorm domain (persistence entity) that is the user
@@ -118,12 +119,12 @@ trait SecService<D> {
      * returns first section of email before @
      * @return the username
      */
-    String getDisplayName(Serializable uid) {
-        D usr = getUser(uid)
-        if(!usr) return null
-        String email = usr['email']
-        return email.substring(0, email.indexOf("@"))
-    }
+    // String getDisplayName(Serializable uid) {
+    //     D usr = getUser(uid)
+    //     if(!usr) return null
+    //     String email = usr['email']
+    //     return email.substring(0, email.indexOf("@"))
+    // }
 
     /**
      * get the user entity for the id

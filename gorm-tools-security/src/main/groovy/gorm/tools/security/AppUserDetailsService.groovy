@@ -4,7 +4,7 @@
 */
 package gorm.tools.security
 
-
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,13 +15,18 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.services.AppUserService
-import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.userdetails.GrailsUser
 import grails.plugin.springsecurity.userdetails.GrailsUserDetailsService
 
+/**
+ * Default Gorm-Tools implementation of GrailsUserDetailsService that uses AppUser to load users and roles
+ * We dont use the default GormUserDetailsService from Grails Spring Security.
+ * This uses the AppUserService and creates baseline for the various OAuth and Ldap.
+ * @see grails.plugin.springsecurity.userdetails.GormUserDetailsService
+ */
 @Slf4j
-@GrailsCompileStatic
+@CompileStatic
 class AppUserDetailsService implements GrailsUserDetailsService {
 
     @Autowired
@@ -44,13 +49,13 @@ class AppUserDetailsService implements GrailsUserDetailsService {
         if (loadRoles) {
             authorities = user.roles.collect { new SimpleGrantedAuthority(it.code) }
         }
+        // password is required so make sure its filled even if its pauth or ldap
         String password = user.passwordHash ?: "N/A"
 
         new GrailsUser(user.username, password,
             user.enabled, true, !mustChange, true,
             authorities as Collection<GrantedAuthority>,
             user.id)
-
 
     }
 

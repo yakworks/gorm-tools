@@ -6,6 +6,7 @@ package gorm.tools.security.domain
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.validation.Errors
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.problem.ValidationProblem
@@ -16,6 +17,7 @@ import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
+import gorm.tools.validation.Rejector
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 
@@ -58,6 +60,17 @@ class AppUserRepo implements GormRepo<AppUser> {
         SecRoleUser.removeAll(user)
     }
 
+    @RepoListener
+    void beforeValidate(AppUser user, Errors errors) {
+        //if its new then set defaults
+        if(user.isNew()) {
+            //TODO should username be set to email if thats all thats passed?
+            if(!user.username) user.username = parseName(user.email)
+            //name defaults
+            if(!user.name) user.name = parseName(user.username)
+        }
+    }
+
     /**
      * before persist, do the password encoding
      */
@@ -66,7 +79,6 @@ class AppUserRepo implements GormRepo<AppUser> {
         if(user.password) {
             user.passwordHash = encodePassword(user.password)
         }
-        if(!user.name) user.name = user.username
     }
 
     /**
@@ -96,6 +108,17 @@ class AppUserRepo implements GormRepo<AppUser> {
         if(!newPassword?.trim()) return
         isSamePass(newPassword, repassword, user)
         user.password = newPassword
+    }
+
+    /**
+     * returns the name part of email. so jim@foo.com will return jim. if no @ then just returns whats passed in
+     */
+    String parseName(String name) {
+        if(name.indexOf("@") != -1){
+            return name.substring(0, name.indexOf("@"))
+        } else {
+            return name
+        }
     }
 
     String encodePassword(String pass) {

@@ -12,7 +12,6 @@ import org.springframework.dao.OptimisticLockingFailureException
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.problem.ValidationProblem
 import yakworks.api.problem.Problem
-import yakworks.api.problem.ProblemTrait
 import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemCodes
 

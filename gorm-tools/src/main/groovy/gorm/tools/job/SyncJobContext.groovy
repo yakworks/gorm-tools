@@ -23,7 +23,6 @@ import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.api.ResultUtils
 import yakworks.api.problem.Problem
-import yakworks.api.problem.ProblemTrait
 import yakworks.commons.io.IOUtils
 import yakworks.commons.lang.Validate
 import yakworks.json.groovy.JsonEngine

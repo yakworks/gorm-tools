@@ -79,7 +79,7 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
         flex column: 'flexId'
         location column: 'locationId'
         user column: 'userId'
-        //temp mapping until column change
+        //FIXME temp mapping until column change
         altName column: 'entityName'
 
         flex cascade: "all"

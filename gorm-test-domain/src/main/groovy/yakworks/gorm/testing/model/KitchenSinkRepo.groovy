@@ -11,19 +11,36 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
+import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.validation.Rejector
 import grails.gorm.transactions.Transactional
+import net.datafaker.Faker
 import yakworks.commons.lang.IsoDateUtil
 
+@SuppressWarnings(['InsecureRandom', 'PropertyName'])
 @GormRepository
 @CompileStatic
 class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
 
+    //used for testing and cleanupSpec since gorm spock nulls out appCtx and cant get to it in there.
+    static KitchenSinkRepo INSTANCE
+    static KitchenSinkRepo getINSTANCE(){
+        if(!INSTANCE) INSTANCE = RepoLookup.findRepo(KitchenSink) as KitchenSinkRepo
+        return INSTANCE
+    }
+
+    Faker _faker
+
     List<String> toOneAssociations = [ 'ext' ]
+
+    Faker faker(){
+        if(!_faker) _faker = new Faker(new Random(0))
+        return _faker
+    }
 
     @RepoListener
     void beforeValidate(KitchenSink o) {
@@ -82,21 +99,32 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
         ent['editedDate'] = LocalDateTime.now()
     }
 
-    KitchenSink build(Long id){
-        def loc = new Thing(id: id, name: "Thing$id").persist()
-        def data = generateData(id)
-        data.putAll([id: id, thing: [id: id] ])
+    KitchenSink build(Long id, boolean flushIt = true){
+        new Thing(id: id, name: "Thing$id").persist()
+        Map data = generateData(id) as Map<String, Object>
+        data.putAll([
+            id: id,
+            thing: [id: id],
+            sinkItems: [[name: "red"], [name: "blue"]]
+        ])
         def ks = KitchenSink.create(data, bindId: true)
-        new SinkItem(kitchenSink: ks, name: "red").persist(flush:true)
-        new SinkItem(kitchenSink: ks, name: "blue").persist(flush:true)
+
+        // flush()
+        // new SinkItem(kitchenSink: ks, name: "red").persist()
+        // new SinkItem(kitchenSink: ks, name: "blue").persist()
+        if(flushIt) flush()
         return ks
     }
 
     Map generateData(Long id, Map extraData = [:]) {
+
+        String name = faker().food().ingredient()
+        String name2 = (id % 2) ? "$name-$id" + id : null
+
         Map data = [
             num: "$id",
-            name: "Sink$id",
-            name2: (id % 2) ? "SinkName2-$id" + id : null,
+            name: name,
+            name2: name2,
             kind: ((id % 2) ? KitchenSink.Kind.VENDOR : KitchenSink.Kind.CLIENT) as String,
             status: ( (id % 2) ? SinkStatus.Inactive : SinkStatus.Active ) as String,
             inactive: (id % 2 == 0),
@@ -113,6 +141,7 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
     }
 
     List<Map> generateDataList(int numRecords, Map extraData = [:]) {
+        _faker = new Faker(new Random(0))
         List<Map> list = []
         (1..numRecords).each { int index ->
             list << generateData(index, extraData)
@@ -121,9 +150,10 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
     }
 
     void createKitchenSinks(int count){
+        _faker = new Faker(new Random(0))
         KitchenSink.withTransaction {
             (1..2).each { id ->
-                def ks = KitchenSink.build(id)
+                def ks = build(id)
                 ks.kind = KitchenSink.Kind.PARENT
                 ks.persist()
             }
@@ -135,7 +165,7 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
 
             KitchenSink.withTransaction {
                 for(Integer oid: ids){
-                    KitchenSink.build(oid)
+                    build(oid, false)
                 }
                 KitchenSink.repo.flushAndClear()
             }

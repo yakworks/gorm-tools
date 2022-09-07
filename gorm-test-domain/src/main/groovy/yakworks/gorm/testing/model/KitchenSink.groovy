@@ -14,7 +14,6 @@ import gorm.tools.hibernate.criteria.CreateCriteriaSupport
 import gorm.tools.model.NameNum
 import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
-import grails.gorm.hibernate.annotation.ManagedEntity
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 
@@ -27,6 +26,11 @@ import yakworks.commons.transform.IdEqualsHashCode
 // @ManagedEntity //see ManagedEntitySinkSpec
 @GrailsCompileStatic
 class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRepo>, CreateCriteriaSupport {
+    //<- ext belong to KitchenSink
+    // since ext also has an KitchenSink property (kitchenParent) it will confused
+    // example of how to explcitly force the "belongsTo"  with the mappedBy
+    static mappedBy = [ext: "kitchenSink"]
+    static hasMany = [stringList: String]
 
     //strings
     String name2
@@ -50,11 +54,6 @@ class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRep
     Thing thing //belongs to whatever
 
     SinkExt ext
-    //<- ext belong to KitchenSink
-    // since ext also has an KitchenSink property (kitchenParent) it will confused
-    // example of how to explcitly force the "belongsTo"  with the mappedBy
-    static mappedBy = [ext: "kitchenSink"]
-
 
     //used for event testing
     String event
@@ -72,7 +71,7 @@ class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRep
 
     Map bazMap
     List<String> stringList
-    static hasMany = [stringList: String]
+
 
     //bug in grailsCompileStatic requires this on internal enums
     //also, internal enums must always come before the static constraints or it doesn't get set
@@ -93,6 +92,10 @@ class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRep
         sinkLink: [ bindable: true ],
         items: [validate: false]
     ]
+
+    static KitchenSinkRepo getRepo() {
+        KitchenSinkRepo.INSTANCE
+    }
 
     List<SinkItem> getItems(){
         SinkItem.listByKitchenSink(this)
@@ -125,11 +128,19 @@ class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRep
     //     return ks
     // }
 
-    static KitchenSink build(Long id){
-        return getRepo().build(id)
+    static KitchenSink build(Long id, boolean flushIt = true){
+        return getRepo().build(id, flushIt)
     }
 
     static List<Map> generateDataList(int numRecords, Map extraData = [:]) {
         return getRepo().generateDataList(numRecords, extraData)
+    }
+
+    static void truncate() {
+        getRepo().deleteAll()
+    }
+
+    static void createKitchenSinks(int i) {
+        getRepo().createKitchenSinks(i)
     }
 }

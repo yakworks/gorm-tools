@@ -27,7 +27,9 @@ class Enummy {
 }
 
 @CompileStatic
-enum TestEnum {FOO, BAR}
+enum TestEnum {
+    FOO, BAR
+}
 
 @CompileStatic
 enum TestEnumIdent implements IdEnum<TestEnumIdent,Long> {

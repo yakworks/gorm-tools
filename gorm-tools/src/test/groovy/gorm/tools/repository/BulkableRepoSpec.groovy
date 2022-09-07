@@ -89,10 +89,10 @@ class BulkableRepoSpec extends GormToolsHibernateSpec {
         payload != null
         payload instanceof List
         payload.size() == 300
-        payload[0].name == "Sink1"
+        payload[0].name == "Blue Cheese"
         payload[0].ext.name == "SinkExt1"
         //sanity check
-        payload[19].name == "Sink20"
+        payload[19].name == "Chilli Pepper"
 
         when: "verify job.data (job results)"
         def dataString = job.dataToString()

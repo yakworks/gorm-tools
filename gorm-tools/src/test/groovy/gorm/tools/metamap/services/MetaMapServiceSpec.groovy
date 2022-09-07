@@ -4,6 +4,11 @@
 */
 package gorm.tools.metamap.services
 
+import gorm.tools.async.AsyncService
+import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import gorm.tools.utils.BenchmarkHelper
+import spock.lang.Shared
+import yakworks.gorm.testing.model.KitchenSinkRepo
 import yakworks.meta.MetaMap
 import yakworks.meta.MetaMapList
 import gorm.tools.testing.unit.DataRepoTest
@@ -16,20 +21,26 @@ import yakworks.gorm.testing.model.TestEnum
 import yakworks.gorm.testing.model.TestEnumIdent
 import yakworks.gorm.testing.model.Thing
 
-class MetaMapServiceSpec extends Specification implements DataRepoTest {
-
+class MetaMapServiceSpec extends GormToolsHibernateSpec {
     MetaMapService metaMapService = new MetaMapService(
         metaEntityService: new MetaEntityService()
     )
 
+    List<Class> getDomainClasses() { [KitchenSink, SinkItem, SinkExt, Thing, Enummy] }
+
+    // @Transactional
     void setupSpec() {
-        //mockDomain Person
-        mockDomains KitchenSink, SinkExt, SinkItem, Thing, Enummy
+        KitchenSink.createKitchenSinks(10)
+    }
+
+    void cleanupSpec() {
+        KitchenSink.truncate()
     }
 
     void "createEntityMap with includes"() {
         when: 'sanity check'
-        MetaMap emap = metaMapService.createMetaMap(KitchenSink.build(1), ['id', 'num', 'ext.id'])
+        KitchenSink.get(1)
+        MetaMap emap = metaMapService.createMetaMap(KitchenSink.get(1), ['id', 'num', 'ext.id'])
 
         then:
         3 == emap.size()
@@ -38,7 +49,7 @@ class MetaMapServiceSpec extends Specification implements DataRepoTest {
 
     void "test null assoc"() {
         when:
-        def ks = KitchenSink.build(1)
+        def ks = KitchenSink.get(1)
         def result = metaMapService.createMetaMap(ks, ['id', 'sinkLink.thing.name'])
 
         then:
@@ -48,29 +59,30 @@ class MetaMapServiceSpec extends Specification implements DataRepoTest {
 
     void "createEntityMap dingus on KitchenSink"() {
         setup:
-        def ks = KitchenSink.build(1)
+        def ks = KitchenSink.get(1)
+
         expect:
         result == metaMapService.createMetaMap(ks, fields) //BeanPathTools.buildMapFromPaths(book, fields)
 
         where:
         fields                        | result
-        ['num', 'name']               | [num: '1', name: 'Sink1']
-        ['name', 'simplePogo.foo']    | [name: 'Sink1', simplePogo: [ foo: 'fly']]
-        ['name', 'items.name']        | [ name: 'Sink1', items: [[ name: 'red'], [ name: 'blue']] ]
+        ['num', 'name']               | [num: '1', name: 'Blue Cheese']
+        ['name', 'simplePogo.foo']    | [name: 'Blue Cheese', simplePogo: [ foo: 'fly']]
+        ['name', 'items.name']        | [ name: 'Blue Cheese', items: [[ name: 'red'], [ name: 'blue']] ]
     }
 
     void "createEntityMap enums on kitchenSink"() {
         when:
-        def ks = KitchenSink.build(1)
+        def ks = KitchenSink.get(1)
         def result = metaMapService.createMetaMap(ks, ['num', 'kind', 'status', 'thing.name'])
 
         then:
-        result == [num: '1', kind: 'VENDOR', status:[id:2, name:'Inactive'], thing: [name: 'Thing1']]
+        result == [num: '1', kind: 'PARENT', status:[id:2, name:'Inactive'], thing: [name: 'Thing1']]
     }
 
     void "works with space in field and its null"() {
         when: 'a field has spaces'
-        def ks = KitchenSink.build(1)
+        def ks = KitchenSink.get(1)
         def result = metaMapService.createMetaMap(ks, ['num', '  simplePogo.foo'])
 
         then: 'its should trim them and still work'
@@ -126,7 +138,7 @@ class MetaMapServiceSpec extends Specification implements DataRepoTest {
 
     void "association tests"() {
         setup:
-        def ks = KitchenSink.build(1)
+        def ks = KitchenSink.get(1)
         ks.sinkLink = ks
         ks.stringList = ['red', 'blue', 'green']
 
@@ -145,7 +157,7 @@ class MetaMapServiceSpec extends Specification implements DataRepoTest {
 
     void "non association list should be wrapped too"() {
         when:
-        def ks = KitchenSink.build(1)
+        def ks = KitchenSink.get(1)
         def emap = metaMapService.createMetaMap(ks, ['id', 'items'])
 
         then:
@@ -162,7 +174,7 @@ class MetaMapServiceSpec extends Specification implements DataRepoTest {
 
     void "with named includes key"() {
         when:
-        def ks = KitchenSink.build(1)
+        def ks = KitchenSink.get(1)
         ks.ext.thing = new Thing(id: 99, name: "Thing99").persist()
 
         def emap = metaMapService.createMetaMap(ks, ['id', 'ext.$getCustom'])

@@ -25,6 +25,6 @@ class SinkItem implements NamedEntity, RepoEntity<SinkItem>{
     ]
 
     static List<SinkItem> listByKitchenSink(KitchenSink sink){
-        SinkItem.where { KitchenSink == sink }.list()
+        SinkItem.where { kitchenSink == sink }.list()
     }
 }

@@ -3,5 +3,5 @@ apply plugin: "yakworks.grails-plugin"
 dependencies {
   api project(":gorm-tools")
   api project(":gorm-tools-security")
-
+  api 'net.datafaker:datafaker:1.5.0'
 }

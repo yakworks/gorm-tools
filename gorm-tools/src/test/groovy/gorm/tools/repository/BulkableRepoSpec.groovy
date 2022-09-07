@@ -92,7 +92,7 @@ class BulkableRepoSpec extends GormToolsHibernateSpec {
         payload[0].name == "Blue Cheese"
         payload[0].ext.name == "SinkExt1"
         //sanity check
-        payload[19].name == "Chilli Pepper"
+        payload[9].name == "Oranges"
 
         when: "verify job.data (job results)"
         def dataString = job.dataToString()
@@ -110,14 +110,16 @@ class BulkableRepoSpec extends GormToolsHibernateSpec {
         and: "verify includes"
         results[0].data.size() == 3 //id, project name, nested name
         //results[0].data.id == 1
-        results[0].data.name == "Sink1"
+        results[0].data.name == "Blue Cheese"
         results[0].data.ext.name == "SinkExt1"
 
         and: "Verify database records"
+        def bcks = KitchenSink.findByName("Blue Cheese")
+        bcks
+        bcks.ext.name == "SinkExt1"
+
         KitchenSink.count() == 300
-        KitchenSink.findByName("Sink1") != null
-        KitchenSink.findByName("Sink1").ext.name == "SinkExt1"
-        KitchenSink.findByName("Sink20") != null
+        KitchenSink.findByName("Oranges")
     }
 
     void "test bulk update"() {

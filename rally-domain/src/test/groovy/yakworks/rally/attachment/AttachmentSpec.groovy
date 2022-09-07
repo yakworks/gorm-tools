@@ -33,7 +33,7 @@ class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest
         mockDomains(Attachment, AttachmentLink, FileData, Tag, TagLink)
     }
 
-    void cleanupSpec() {
+    def cleanupSpec() {
         attachmentSupport.rimrafAttachmentsDirectory()
     }
 

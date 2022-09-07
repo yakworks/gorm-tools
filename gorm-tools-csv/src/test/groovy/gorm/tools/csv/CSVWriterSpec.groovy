@@ -7,14 +7,12 @@ import gorm.tools.csv.render.CSVMapWriter
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import gorm.tools.utils.BenchmarkHelper
-import grails.gorm.transactions.Transactional
-import yakworks.gorm.testing.model.KitchenSeedData
 import yakworks.gorm.testing.model.KitchenSink
 import yakworks.gorm.testing.model.SinkItem
 import yakworks.meta.MetaMapList
 
 class CSVWriterSpec extends GormToolsHibernateSpec {
-
+    static int SINK_COUNT = 5000
     private Writer writer = new StringWriter()
 
     MetaMapService metaMapService
@@ -24,7 +22,7 @@ class CSVWriterSpec extends GormToolsHibernateSpec {
     // @Transactional
     void setupSpec() {
         BenchmarkHelper.startTime()
-        KitchenSeedData.createKitchenSinks(1000)
+        KitchenSink.repo.createKitchenSinks(SINK_COUNT)
         BenchmarkHelper.printEndTimeMsg("KitchenSeedData.createKitchenSinks")
     }
 
@@ -35,8 +33,8 @@ class CSVWriterSpec extends GormToolsHibernateSpec {
 
     void "sanity check"() {
         expect:
-        1000 == KitchenSink.count()
-        1000 == KitchenSink.list().size()
+        SINK_COUNT == KitchenSink.count()
+        SINK_COUNT == KitchenSink.list().size()
         metaMapService
         // 1000 == sinkList.size()
     }
@@ -44,13 +42,14 @@ class CSVWriterSpec extends GormToolsHibernateSpec {
     void "time CSVMapWriter"() {
         when:
         BenchmarkHelper.startTime()
+        // MetaMapList mapList = metaMapService.createMetaMapList(KitchenSink.list(), ['*', 'ext.*', 'thing.*', 'simplePogo.*'])
         MetaMapList mapList = metaMapService.createMetaMapList(KitchenSink.list(), ['*'])
         def csvMapWriter = CSVMapWriter.of(writer)
         csvMapWriter.writeCsv(mapList)
 
         then:
-        1000 == mapList.size()
-        BenchmarkHelper.printEndTimeMsg("CSVMapWriter for 1000 items")
+        SINK_COUNT == mapList.size()
+        BenchmarkHelper.printEndTimeMsg("CSVMapWriter for $SINK_COUNT items")
     }
 
     //copied  from rest EntityResponder
@@ -61,20 +60,5 @@ class CSVWriterSpec extends GormToolsHibernateSpec {
         MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)
         return pager.setEntityMapList(entityMapList)
     }
-
-    // Closure doWithDomains() { { ->
-    //     syncJobService(TestSyncJobService)
-    // }}
-    //
-    // void "writer test"() {
-    //     when:
-    //
-    //     def csvMapWriter = CSVMapWriter.of(writer)
-    //     csvMapWriter.writeCsv()
-    //
-    //     then:
-    //     1000 == KitchenSink.count()
-    //     // 1000 == sinkList.size()
-    // }
 
 }

@@ -11,31 +11,7 @@ import groovy.transform.CompileStatic
 class KitchenSeedData {
 
     static void createKitchenSinks(int count){
-        KitchenSink.withTransaction {
-            (1..2).each { id ->
-                def ks = KitchenSink.build(id)
-                ks.kind = KitchenSink.Kind.PARENT
-                ks.persist()
-            }
-        }
-
-        List<List<Integer>> idSlices = (3..count).collate(100)
-
-        for(List<Integer> ids: idSlices){
-
-            KitchenSink.withTransaction {
-                for(Integer oid: ids){
-                    KitchenSink.build(oid)
-                }
-                KitchenSink.repo.flushAndClear()
-            }
-        }
-
-
-
-        // (3..count).each { id ->
-        //     def ks = KitchenSink.build(id)
-        // }
+        KitchenSink.repo.createKitchenSinks(count)
     }
 
 }

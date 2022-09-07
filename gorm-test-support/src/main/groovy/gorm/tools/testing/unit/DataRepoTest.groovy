@@ -6,6 +6,9 @@ package gorm.tools.testing.unit
 
 import groovy.transform.CompileStatic
 
+import org.junit.AfterClass
+
+import gorm.tools.beans.AppCtx
 import gorm.tools.testing.support.ExternalConfigAwareSpec
 import gorm.tools.testing.support.GormToolsSpecHelper
 import grails.testing.spring.AutowiredTest
@@ -25,6 +28,11 @@ trait DataRepoTest implements GormToolsSpecHelper, RepoBuildDataTest, AutowiredT
         mockDomainsBuildDataTest(domainClassesToMock)
         defineRepoBeans(domainClassesToMock)
         setupValidatorRegistry()
+    }
+
+    @AfterClass
+    def cleanupAppCtx() {
+        AppCtx.setApplicationContext(null)
     }
 
     //called from RepoBuildDataTest as it setups and mocks the domains

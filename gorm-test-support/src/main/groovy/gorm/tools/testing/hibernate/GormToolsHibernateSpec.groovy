@@ -41,7 +41,8 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
     void setupSpec() {
         RepoLookup.USE_CACHE = false
         //for some reason holder get scrambled so make sure it has the grailsApplication from this test
-        AppCtx.setGrailsApplication(grailsApplication)
+        AppCtx.setGrailsApplication(getGrailsApplication())
+        AppCtx.setApplicationContext(getApplicationContext())
 
         if (!ctx.containsBean("dataSource"))
             ctx.beanFactory.registerSingleton("dataSource", hibernateDatastore.getDataSource())
@@ -92,6 +93,10 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
         RepoValidatorRegistry.init(hibernateDatastore, ctx.getBean('messageSource'))
         //put here so we can use trait to setup security when needed
         doAfterDomains()
+    }
+
+    void cleanupSpec() {
+        AppCtx.setApplicationContext(null)
     }
 
     /** consistency with other areas of grails and other unit tests */

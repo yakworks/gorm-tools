@@ -15,9 +15,6 @@ dependencies {
   // for the org.grails.web.util.WebUtils
   // compileOnly "org.grails:grails-web-common"
 
-  testImplementation project(":gorm-test-support")
-  testImplementation "org.grails:grails-gorm-testing-support"
-  testImplementation "io.github.longwa:build-test-data:$vBuildTestData"
 }
 
 // configurations.api {

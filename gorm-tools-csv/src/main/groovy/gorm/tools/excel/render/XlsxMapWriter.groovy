@@ -9,7 +9,6 @@ import java.time.LocalDateTime
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.utils.BenchmarkHelper
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.FillPatternType
 import org.apache.poi.ss.usermodel.IndexedColors
@@ -21,6 +20,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 
 import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import com.opencsv.CSVWriter
+import gorm.tools.utils.BenchmarkHelper
 import yakworks.commons.lang.DateUtil
 import yakworks.commons.lang.PropertyTools
 import yakworks.commons.map.MapFlattener

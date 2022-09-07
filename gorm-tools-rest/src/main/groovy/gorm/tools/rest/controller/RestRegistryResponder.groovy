@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse
 import groovy.transform.CompileStatic
 import groovy.transform.Generated
 
-import gorm.tools.utils.BenchmarkHelper
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.grails.plugins.web.rest.render.ServletRenderContext
 import org.grails.web.servlet.mvc.GrailsWebRequest
@@ -17,6 +16,7 @@ import org.grails.web.util.GrailsApplicationAttributes
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 
+import gorm.tools.utils.BenchmarkHelper
 import grails.artefact.Controller
 import grails.core.support.proxy.ProxyHandler
 import grails.rest.render.Renderer

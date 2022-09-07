@@ -119,4 +119,31 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
         }
         return list
     }
+
+    void createKitchenSinks(int count){
+        KitchenSink.withTransaction {
+            (1..2).each { id ->
+                def ks = KitchenSink.build(id)
+                ks.kind = KitchenSink.Kind.PARENT
+                ks.persist()
+            }
+        }
+
+        List<List<Integer>> idSlices = (3..count).collate(100)
+
+        for(List<Integer> ids: idSlices){
+
+            KitchenSink.withTransaction {
+                for(Integer oid: ids){
+                    KitchenSink.build(oid)
+                }
+                KitchenSink.repo.flushAndClear()
+            }
+        }
+    }
+
+    @Transactional
+    void deleteAll(){
+        KitchenSink.deleteAll()
+    }
 }

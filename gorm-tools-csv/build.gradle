@@ -20,7 +20,4 @@ dependencies {
   compileOnly project(":gorm-tools")
 
   testImplementation project(":gorm-test-domain")
-  testImplementation project(":gorm-test-support")
-  testImplementation "org.grails:grails-gorm-testing-support"
-  testImplementation "io.github.longwa:build-test-data:$vBuildTestData"
 }

@@ -1,7 +1,11 @@
+/*
+* Copyright 2022 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
+* You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+*/
 package gorm.tools.utils
 
-import javax.servlet.http.HttpServletRequest
 import java.text.DecimalFormat
+import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
 

@@ -26,8 +26,8 @@ import yakworks.i18n.icu.ICUMessageSource
 @CompileStatic
 class AppCtx {
 
-    private static GrailsApplication cachedGrailsApplication
-    //private static ApplicationContext cachedApplicationContext
+    public static GrailsApplication cachedGrailsApplication
+    public static ApplicationContext SPRING_CTX
 
     /**
      * @return the GrailsApplication
@@ -47,13 +47,20 @@ class AppCtx {
     }
 
     /**
+     * Used in tests to assign the spring applicationContext
+     */
+    static void setApplicationContext(ApplicationContext actx) {
+        SPRING_CTX = actx
+    }
+
+    /**
      * @return the spring ApplicationContext
      */
     static ApplicationContext getCtx() {
-//        if (!cachedApplicationContext) {
-//            cachedApplicationContext = Holders.applicationContext
-//        }
-        return Holders.findApplicationContext()
+       if (!SPRING_CTX) {
+           SPRING_CTX = Holders.findApplicationContext()
+       }
+        return SPRING_CTX
     }
 
     /**

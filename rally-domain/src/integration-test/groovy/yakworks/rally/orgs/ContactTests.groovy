@@ -112,24 +112,48 @@ class ContactTests extends Specification implements DomainIntTest {
         ex.code == DataProblemCodes.ReferenceKey.code
     }
 
+    void "test set contact as primary contact"() {
+        setup:
+        Org contactOrg = Org.get(50)
+        Contact contact = contactOrg.contact
+
+        expect:
+        contact != null
+        contact.isPrimary
+
+        when:
+        contactOrg.contact = null
+        contactOrg.persist()
+
+        then:
+        contact.isPrimary == false
+
+
+        when:
+        contact.repo.update(id:contact.id, isPrimary:true)
+
+        then:
+        contact.isPrimary == true
+    }
+
     void "test create Contact with org lookup by orgSource"() {
         setup:
         Org org = Org.of("foo", "bar", OrgType.Customer)
         Org.repo.createSource(org)
         org.persist(flush: true)
 
-        Map params = [firstName:'Peter', email:'abc@walmart.com']
+        Map params = [firstName:'Peter', email:'abc@walmart.com', isPrimary:"true"]
         params.org = [source: [sourceId: 'foo', orgType: OrgType.Customer.name()]]
 
 
         when:
         def entity = Contact.create(params)
         flushAndClear()
-        def contact = Contact.get(entity.id)
+        Contact contact = Contact.get(entity.id)
 
         then:
         contact.org.num == "foo"
-
+        contact.isPrimary == true
     }
 
 }

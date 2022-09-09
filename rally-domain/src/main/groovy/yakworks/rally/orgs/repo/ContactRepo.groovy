@@ -105,6 +105,14 @@ class ContactRepo extends LongIdGormRepo<Contact> {
     void afterPersist(Contact contact, AfterPersistEvent e) {
         if (contact.location?.isDirty()) contact.location.persist()
         syncChangesToUser(contact)
+        boolean isPrimary = Maps.boolean(e.data, 'isPrimary',  false)
+        //contact is not already primary contact
+
+        if(isPrimary && !contact.isPrimary) {
+            Org contactOrg = Org.get(contact.orgId)
+            contactOrg.contact = contact
+            contactOrg.persist()
+        }
     }
 
     /**

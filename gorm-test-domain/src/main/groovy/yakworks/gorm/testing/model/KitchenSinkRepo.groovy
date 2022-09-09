@@ -108,10 +108,6 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
             sinkItems: [[name: "red"], [name: "blue"]]
         ])
         def ks = KitchenSink.create(data, bindId: true)
-
-        // flush()
-        // new SinkItem(kitchenSink: ks, name: "red").persist()
-        // new SinkItem(kitchenSink: ks, name: "blue").persist()
         if(flushIt) flush()
         return ks
     }

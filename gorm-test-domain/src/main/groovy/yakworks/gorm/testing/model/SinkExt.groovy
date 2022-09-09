@@ -15,7 +15,7 @@ import yakworks.commons.transform.IdEqualsHashCode
 @Entity
 @GrailsCompileStatic
 class SinkExt implements NamedEntity, RepoEntity<SinkExt>{
-    static belongsTo = [kitchenSink: KitchenSink]
+    static belongsTo = [KitchenSink]
 
     KitchenSink kitchenParent
     String name
@@ -24,7 +24,6 @@ class SinkExt implements NamedEntity, RepoEntity<SinkExt>{
 
     static mapping = {
         id generator: 'assigned'
-        kitchenSink insertable: false, updateable: false , column:'id'
         kitchenParent column: 'kitchenParentId'
     }
 
@@ -33,4 +32,7 @@ class SinkExt implements NamedEntity, RepoEntity<SinkExt>{
         name nullable: false
         textMax maxSize: 2, nullable: true
     }
+
+    void setKitchenSink(KitchenSink val){ id = val.id}
+
 }

@@ -31,11 +31,12 @@ class KitchenSinkRepoSpec extends GormToolsHibernateSpec {
         SINK_COUNT == KitchenSink.list().size()
     }
 
-    void "items check"() {
+    void "sanity check fields"() {
         when:
         def ks = KitchenSink.get(1)
 
         then:
         2 == ks.items.size()
+        ks.ext.id == ks.id
     }
 }

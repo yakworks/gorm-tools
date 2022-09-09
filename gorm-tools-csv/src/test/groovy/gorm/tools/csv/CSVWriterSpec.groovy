@@ -42,8 +42,8 @@ class CSVWriterSpec extends GormToolsHibernateSpec {
     void "time CSVMapWriter"() {
         when:
         BenchmarkHelper.startTime()
-        // MetaMapList mapList = metaMapService.createMetaMapList(KitchenSink.list(), ['*', 'ext.*', 'thing.*', 'simplePogo.*'])
-        MetaMapList mapList = metaMapService.createMetaMapList(KitchenSink.list(), ['*'])
+        MetaMapList mapList = metaMapService.createMetaMapList(KitchenSink.list(), ['*', 'ext.*', 'thing.*', 'simplePogo.*'])
+        // MetaMapList mapList = metaMapService.createMetaMapList(KitchenSink.list(), ['*'])
         def csvMapWriter = CSVMapWriter.of(writer)
         csvMapWriter.writeCsv(mapList)
 

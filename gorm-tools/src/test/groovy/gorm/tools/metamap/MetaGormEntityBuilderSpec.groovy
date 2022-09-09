@@ -122,7 +122,7 @@ class MetaGormEntityBuilderSpec extends Specification implements DataRepoTest {
 
         def extIncs = emapIncs.metaEntityProps['ext']
         extIncs.className == SinkExt.name
-        extIncs.metaProps.keySet() == ['id', 'kitchenParent', 'thing', 'version', 'textMax', 'name', 'kitchenSink'] as Set
+        extIncs.metaProps.keySet() == ['id', 'kitchenParent', 'thing', 'version', 'textMax', 'name'] as Set
 
     }
 

@@ -30,7 +30,12 @@ class CSVMapWriter {
     void writeHeaders(Map<String, Object> firstItem){
         //filter out the key that has the detail
         headers = firstItem.keySet()
-        writeNext(csvWriter, headers)
+        println "headers: $headers"
+        writeHeaders(headers)
+    }
+
+    void writeHeaders(Set<String> headerKeys){
+        writeNext(csvWriter, headerKeys)
     }
 
     void writeCsv(List<Map> dataList){
@@ -51,12 +56,16 @@ class CSVMapWriter {
         }
     }
 
-    Map flattenMap(Map map){
+    static Map flattenMap(Map map){
         MapFlattener.of(map).convertObjectToString(true).flatten()
     }
 
     void writeLine(Map data){
-        def vals = headers.collect{ data[it] as String}
+        def vals = headers.collect{ data[it] as String }
+        writeCollection(vals)
+    }
+
+    void writeCollection(Collection vals){
         writeNext(csvWriter, vals)
     }
 

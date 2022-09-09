@@ -82,9 +82,6 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         }
         // we do primary location and contact here before persist so we persist org only once with contactId it is created
         if(data.location) createOrUpdatePrimaryLocation(org, data.location as Map)
-        // do contact, support keyContact for legacy and Customers
-        def contactData = data.contact ?: data.keyContact
-        if(contactData) createOrUpdatePrimaryContact(org, contactData as Map)
     }
 
     /**
@@ -97,6 +94,9 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         if(data.locations) persistManyList(org, Location.repo, data.locations as List<Map>)
         if(data.contacts) persistManyList(org, Contact.repo, data.contacts as List<Map>)
         if(data.tags) orgTagRepo.addOrRemove((Persistable)org, data.tags)
+        // do contact, support keyContact for legacy and Customers - do after org is persisted, because primary contact needs an org.
+        def contactData = data.contact ?: data.keyContact
+        if(contactData) createOrUpdatePrimaryContact(org, contactData as Map)
     }
 
     @Override

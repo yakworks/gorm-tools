@@ -10,8 +10,6 @@ import org.grails.core.artefact.ControllerArtefactHandler
 import org.grails.core.artefact.DomainClassArtefactHandler
 import org.grails.datastore.gorm.validation.constraints.registry.DefaultConstraintRegistry
 
-import gorm.tools.csv.render.CSVPagerRenderer
-import gorm.tools.excel.render.XlsxPagerRenderer
 import gorm.tools.rest.mapping.RepoApiMappingsService
 import gorm.tools.rest.render.ApiResultsRenderer
 import gorm.tools.rest.render.JsonGeneratorRenderer
@@ -23,6 +21,8 @@ import grails.core.GrailsClass
 import grails.core.GrailsControllerClass
 import grails.plugins.Plugin
 import yakworks.commons.lang.NameUtils
+import yakworks.gorm.etl.csv.render.CSVPagerRenderer
+import yakworks.gorm.etl.excel.XlsxPagerRenderer
 
 @SuppressWarnings(['UnnecessarySelfAssignment', 'Println', 'EmptyMethod', 'Indentation'])
 class GormToolsRestGrailsPlugin extends Plugin {

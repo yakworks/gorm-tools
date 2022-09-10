@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import gorm.tools.api.IncludesConfig
 import gorm.tools.api.IncludesKey
 import gorm.tools.beans.AppCtx
-import gorm.tools.csv.CsvToMapTransformer
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
@@ -23,6 +22,7 @@ import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.DataOp
 import grails.util.TypeConvertingMap
 import grails.web.servlet.mvc.GrailsParameterMap
+import yakworks.gorm.etl.csv.CsvToMapTransformer
 
 /**
  * This is the CRUD controller for entities

@@ -8,7 +8,7 @@ dependencies {
   implementation "org.grails:grails-plugin-interceptors"
 
   api project(":gorm-tools")
-  api project(":gorm-tools-csv")
+  api project(":gorm-tools-etl")
   api project(":gorm-tools-openapi")
 
   // for OkHttpRestTrait test helpers

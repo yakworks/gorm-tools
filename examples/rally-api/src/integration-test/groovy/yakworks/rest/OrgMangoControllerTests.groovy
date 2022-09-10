@@ -78,4 +78,19 @@ class OrgMangoControllerTests extends RestIntTest {
 
     }
 
+    void "list xlsx"() {
+        // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
+        when:
+        controller.params << [
+            projections:'calc.totalDue:"sum",type:"group"',
+            sort:'calc_totalDue_sum:asc',
+            format:'xlsx'
+        ]
+        controller.list()
+
+        then:
+        response.status == 200
+        response.header("Content-Type").contains("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    }
+
 }

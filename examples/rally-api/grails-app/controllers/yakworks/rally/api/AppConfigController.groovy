@@ -4,7 +4,7 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.api.IncludesConfig
 import yakworks.commons.map.Maps
-import yakworks.gorm.rest.controller.RestApiController
+import yakworks.rest.gorm.controller.RestApiController
 
 @CompileStatic
 class AppConfigController implements RestApiController {

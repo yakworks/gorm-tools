@@ -2,7 +2,7 @@ package yakworks.rest
 
 import org.springframework.http.HttpStatus
 
-import yakworks.gorm.rest.client.OkHttpRestTrait
+import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
 import spock.lang.Specification

@@ -1,6 +1,6 @@
 package yakworks.rest
 
-import yakworks.gorm.rest.controller.RestRepoApiController
+import yakworks.rest.gorm.controller.RestRepoApiController
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import yakworks.commons.map.Maps

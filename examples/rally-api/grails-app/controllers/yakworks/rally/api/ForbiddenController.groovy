@@ -4,7 +4,7 @@ package yakworks.rally.api
 import groovy.transform.CompileStatic
 
 import yakworks.api.problem.Problem
-import yakworks.gorm.rest.controller.RestApiController
+import yakworks.rest.gorm.controller.RestApiController
 
 /**
  * 403 forbidden responder

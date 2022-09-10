@@ -1,7 +1,7 @@
 package gorm.tools.security
 
 
-import yakworks.gorm.testing.integration.DataIntegrationTest
+import yakworks.testing.gorm.integration.DataIntegrationTest
 import gorm.tools.security.services.AppUserService
 import grails.plugin.springsecurity.userdetails.GrailsUser
 import grails.testing.mixin.integration.Integration

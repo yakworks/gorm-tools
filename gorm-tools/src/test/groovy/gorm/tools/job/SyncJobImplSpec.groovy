@@ -5,7 +5,7 @@
 package gorm.tools.job
 
 import gorm.tools.model.SourceType
-import yakworks.gorm.testing.unit.DomainRepoTest
+import yakworks.testing.gorm.unit.DomainRepoTest
 import spock.lang.Specification
 import testing.*
 import yakworks.json.groovy.JsonEngine

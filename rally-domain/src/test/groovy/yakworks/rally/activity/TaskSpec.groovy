@@ -1,11 +1,11 @@
 package yakworks.rally.activity
 
 import gorm.tools.security.domain.AppUser
-import yakworks.gorm.testing.unit.DataRepoTest
-import yakworks.gorm.testing.RepoTestData
+import yakworks.testing.gorm.unit.DataRepoTest
+import yakworks.testing.gorm.RepoTestData
 import yakworks.grails.resource.AppResourceLoader
 import spock.lang.Specification
-import yakworks.gorm.testing.SecurityTest
+import yakworks.testing.gorm.SecurityTest
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink

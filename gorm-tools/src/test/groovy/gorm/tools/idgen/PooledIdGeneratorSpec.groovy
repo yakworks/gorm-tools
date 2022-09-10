@@ -5,8 +5,8 @@
 package gorm.tools.idgen
 
 import gorm.tools.async.ParallelStreamTools
-import yakworks.gorm.testing.support.MockJdbcIdGenerator
-import yakworks.gorm.testing.unit.DataRepoTest
+import yakworks.testing.gorm.support.MockJdbcIdGenerator
+import yakworks.testing.gorm.unit.DataRepoTest
 // import groovyx.gpars.GParsPool
 import spock.lang.Shared
 import spock.lang.Specification

@@ -5,7 +5,7 @@
 package yakworks.gorm.oapi.meta
 
 
-import yakworks.gorm.testing.unit.DataRepoTest
+import yakworks.testing.gorm.unit.DataRepoTest
 import io.swagger.v3.oas.models.media.DateTimeSchema
 import io.swagger.v3.oas.models.media.IntegerSchema
 import io.swagger.v3.oas.models.media.NumberSchema

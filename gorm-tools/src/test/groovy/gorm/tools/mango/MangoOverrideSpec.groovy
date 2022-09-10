@@ -13,7 +13,7 @@ import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.model.RepoEntity
-import yakworks.gorm.testing.unit.DataRepoTest
+import yakworks.testing.gorm.unit.DataRepoTest
 import grails.persistence.Entity
 import spock.lang.Specification
 

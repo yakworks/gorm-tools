@@ -7,8 +7,8 @@ package gorm.tools.repository
 import gorm.tools.databinding.BindAction
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.model.RepoEntity
-import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
-import yakworks.gorm.testing.RepoTestData
+import yakworks.testing.gorm.GormToolsHibernateSpec
+import yakworks.testing.gorm.RepoTestData
 import grails.artefact.Artefact
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -17,9 +17,9 @@ import testing.AddyNested
 import testing.Cust
 import testing.CustExt
 import testing.CustRepo
-import yakworks.gorm.testing.model.KitchenSink
-import yakworks.gorm.testing.model.SinkExt
-import yakworks.gorm.testing.model.SinkItem
+import yakworks.testing.gorm.model.KitchenSink
+import yakworks.testing.gorm.model.SinkExt
+import yakworks.testing.gorm.model.SinkItem
 import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemException
 import yakworks.api.problem.data.DataProblemCodes

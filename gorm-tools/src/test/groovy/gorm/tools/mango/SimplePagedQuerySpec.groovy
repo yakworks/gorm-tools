@@ -5,12 +5,12 @@
 package gorm.tools.mango
 
 import gorm.tools.mango.jpql.SimplePagedQuery
-import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
+import yakworks.testing.gorm.GormToolsHibernateSpec
 import grails.testing.spring.AutowiredTest
 import spock.lang.Shared
-import yakworks.gorm.testing.model.KitchenSink
-import yakworks.gorm.testing.model.KitchenSinkRepo
-import yakworks.gorm.testing.model.SinkItem
+import yakworks.testing.gorm.model.KitchenSink
+import yakworks.testing.gorm.model.KitchenSinkRepo
+import yakworks.testing.gorm.model.SinkItem
 
 class SimplePagedQuerySpec extends GormToolsHibernateSpec implements AutowiredTest {
 

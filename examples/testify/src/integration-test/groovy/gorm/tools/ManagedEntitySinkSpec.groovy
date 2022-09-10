@@ -1,11 +1,11 @@
 package gorm.tools
 
 
-import yakworks.gorm.testing.integration.DataIntegrationTest
+import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import yakworks.gorm.testing.model.KitchenSink
+import yakworks.testing.gorm.model.KitchenSink
 
 @Integration
 @Rollback

@@ -6,8 +6,8 @@ package gorm.tools.repository
 
 
 import gorm.tools.repository.model.UuidGormRepo
-import yakworks.gorm.testing.RepoTestData
-import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
+import yakworks.testing.gorm.RepoTestData
+import yakworks.testing.gorm.GormToolsHibernateSpec
 import testing.UuidSample
 
 class UuidRepoSpec extends GormToolsHibernateSpec {

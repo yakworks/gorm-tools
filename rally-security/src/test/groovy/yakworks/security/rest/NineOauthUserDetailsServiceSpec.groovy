@@ -3,7 +3,7 @@ package yakworks.security.rest
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
 import gorm.tools.security.domain.SecRoleUser
-import yakworks.gorm.testing.unit.DataRepoTest
+import yakworks.testing.gorm.unit.DataRepoTest
 import grails.plugin.springsecurity.rest.oauth.OauthUser
 import grails.testing.services.ServiceUnitTest
 import org.springframework.security.crypto.password.NoOpPasswordEncoder

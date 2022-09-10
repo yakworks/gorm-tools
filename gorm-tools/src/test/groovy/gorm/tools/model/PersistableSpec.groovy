@@ -2,7 +2,7 @@ package gorm.tools.model
 
 import groovy.transform.CompileStatic
 
-import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
+import yakworks.testing.gorm.GormToolsHibernateSpec
 import testing.Cust
 
 class PersistableSpec extends GormToolsHibernateSpec {

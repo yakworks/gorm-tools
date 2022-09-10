@@ -2,13 +2,13 @@ package yakworks.rally.common
 
 import java.nio.file.Files
 
-import yakworks.gorm.testing.unit.DataRepoTest
+import yakworks.testing.gorm.unit.DataRepoTest
 import yakworks.commons.io.ZipUtils
 import yakworks.grails.resource.AppResourceLoader
 import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport
-import yakworks.gorm.testing.SecurityTest
+import yakworks.testing.gorm.SecurityTest
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink

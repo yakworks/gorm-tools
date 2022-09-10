@@ -1,7 +1,7 @@
 package yakworks.testify
 
-import yakworks.gorm.testing.model.KitchenSink
 import yakworks.rally.testing.RallySeedData
+import yakworks.testing.gorm.model.KitchenSink
 
 class BootStrap {
 

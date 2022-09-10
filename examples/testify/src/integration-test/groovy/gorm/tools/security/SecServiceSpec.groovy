@@ -3,8 +3,8 @@ package gorm.tools.security
 
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
-import yakworks.gorm.testing.SecuritySpecHelper
-import yakworks.gorm.testing.integration.DataIntegrationTest
+import yakworks.testing.gorm.SecuritySpecHelper
+import yakworks.testing.gorm.integration.DataIntegrationTest
 import gorm.tools.security.services.SecService
 import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback

@@ -3,11 +3,11 @@ package yakworks.rally
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
 import gorm.tools.security.domain.SecRoleUser
-import yakworks.gorm.testing.TestDataJson
-import yakworks.gorm.testing.unit.DataRepoTest
+import yakworks.testing.gorm.TestDataJson
+import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.commons.map.Maps
-import yakworks.gorm.testing.SecurityTest
+import yakworks.testing.gorm.SecurityTest
 import yakworks.rally.listeners.RallyEventListener
 
 class RallyEventListenerSpec extends Specification implements DataRepoTest, SecurityTest {

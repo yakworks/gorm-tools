@@ -4,7 +4,7 @@ import yakworks.gorm.rest.controller.RestRepoApiController
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import yakworks.commons.map.Maps
-import yakworks.gorm.testing.http.RestIntTest
+import yakworks.testing.http.RestIntTest
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
 

@@ -3,7 +3,7 @@ package yakworks.rally.eventlog
 
 import java.time.LocalDateTime
 
-import yakworks.gorm.testing.unit.DomainRepoTest
+import yakworks.testing.gorm.unit.DomainRepoTest
 import spock.lang.Specification
 
 class EventLogSpec extends Specification implements DomainRepoTest<EventLog>{

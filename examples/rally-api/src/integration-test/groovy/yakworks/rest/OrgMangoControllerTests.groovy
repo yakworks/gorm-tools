@@ -1,10 +1,10 @@
 package yakworks.rest
 
-import yakworks.gorm.rest.controller.RestRepoApiController
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import yakworks.gorm.testing.http.RestIntTest
+import yakworks.gorm.rest.controller.RestRepoApiController
 import yakworks.rally.orgs.model.Org
+import yakworks.testing.http.RestIntTest
 
 @Rollback
 @Integration

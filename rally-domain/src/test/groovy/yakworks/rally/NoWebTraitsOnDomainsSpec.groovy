@@ -2,7 +2,7 @@ package yakworks.rally
 
 import org.springframework.util.ReflectionUtils
 
-import yakworks.gorm.testing.unit.DomainRepoTest
+import yakworks.testing.gorm.unit.DomainRepoTest
 import grails.artefact.DomainClass
 import grails.web.databinding.WebDataBinding
 import spock.lang.Specification

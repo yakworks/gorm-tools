@@ -5,8 +5,8 @@ import org.apache.commons.lang3.RandomStringUtils
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
 import gorm.tools.security.domain.SecRoleUser
-import yakworks.gorm.testing.SecurityTest
-import yakworks.gorm.testing.unit.DataRepoTest
+import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 
 class SecRoleSpec extends Specification implements DataRepoTest, SecurityTest {

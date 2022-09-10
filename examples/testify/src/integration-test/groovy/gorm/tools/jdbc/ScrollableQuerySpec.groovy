@@ -4,7 +4,7 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import org.springframework.jdbc.core.ColumnMapRowMapper
 import spock.lang.Specification
-import yakworks.gorm.testing.integration.DataIntegrationTest
+import yakworks.testing.gorm.integration.DataIntegrationTest
 
 import javax.sql.DataSource
 

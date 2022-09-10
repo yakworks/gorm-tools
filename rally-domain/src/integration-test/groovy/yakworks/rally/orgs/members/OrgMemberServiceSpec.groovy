@@ -3,7 +3,7 @@ package yakworks.rally.orgs.members
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import yakworks.gorm.testing.DomainIntTest
+import yakworks.testing.gorm.DomainIntTest
 import yakworks.rally.orgs.OrgDimensionService
 import yakworks.rally.orgs.OrgMemberService
 import yakworks.rally.orgs.model.Org

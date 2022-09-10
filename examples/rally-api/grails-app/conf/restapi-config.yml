@@ -4,7 +4,7 @@ api:
   namespaces: {rally: 'Core / Rally'}
   paths:
     kitchen:
-      entityClass: yakworks.gorm.testing.model.KitchenSink
+      entityClass: yakworks.testing.gorm.model.KitchenSink
 
     rally:
       activity:

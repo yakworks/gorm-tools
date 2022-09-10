@@ -1,9 +1,9 @@
 package yakworks.rally.activity
 
-import yakworks.gorm.testing.unit.DomainRepoTest
+import yakworks.testing.gorm.unit.DomainRepoTest
 import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.gorm.testing.SecurityTest
+import yakworks.testing.gorm.SecurityTest
 import yakworks.rally.activity.model.*
 import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.orgs.model.Org

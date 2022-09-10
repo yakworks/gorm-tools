@@ -2,10 +2,10 @@ package yakworks.rally.orgs
 
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.security.domain.AppUser
-import yakworks.gorm.testing.RepoTestData
-import yakworks.gorm.testing.SecurityTest
-import yakworks.gorm.testing.TestDataJson
-import yakworks.gorm.testing.unit.DomainRepoTest
+import yakworks.testing.gorm.RepoTestData
+import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.TestDataJson
+import yakworks.testing.gorm.unit.DomainRepoTest
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail

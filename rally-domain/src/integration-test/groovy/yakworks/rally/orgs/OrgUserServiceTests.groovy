@@ -5,13 +5,8 @@ import gorm.tools.async.AsyncService
 import grails.gorm.transactions.Rollback
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.testing.mixin.integration.Integration
-import org.springframework.security.core.context.SecurityContextHolder
 import spock.lang.Specification
-import yakworks.commons.lang.EnumUtils
-import yakworks.gorm.testing.DomainIntTest
-import yakworks.rally.orgs.OrgDimensionService
-import yakworks.rally.orgs.model.Org
-import yakworks.rally.orgs.model.OrgType
+import yakworks.testing.gorm.DomainIntTest
 
 @Integration
 @Rollback

@@ -4,9 +4,9 @@
 */
 package gorm.tools.validation
 
-import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
+import yakworks.testing.gorm.GormToolsHibernateSpec
 import org.springframework.beans.factory.annotation.Autowired
-import yakworks.gorm.testing.model.ValidationEntity
+import yakworks.testing.gorm.model.ValidationEntity
 import yakworks.i18n.icu.GrailsICUMessageSource
 import yakworks.i18n.icu.ICUMessageSource
 

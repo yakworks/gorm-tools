@@ -4,8 +4,8 @@ import java.nio.file.Path
 
 import yakworks.commons.lang.IsoDateUtil
 import gorm.tools.repository.model.RepoEntity
-import yakworks.gorm.testing.SecurityTest
-import yakworks.gorm.testing.unit.DomainRepoTest
+import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.DomainRepoTest
 import grails.persistence.Entity
 import yakworks.grails.resource.AppResourceLoader
 

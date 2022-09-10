@@ -95,11 +95,11 @@ If you used the script to create the domains then the tests will already be in p
 ```groovy
 package testing
 
-import yakworks.gorm.testing.hibernate.AutoHibernateSpec
+import yakworks.testing.gorm.hibernate.AutoHibernateSpec
 import spock.lang.Specification
 
 class ProjectSpec extends AutoHibernateSpec<Project> {
-    /** automatically runs tests on persist(), create(), update(), delete().*/
+  /** automatically runs tests on persist(), create(), update(), delete().*/
 }
 ```
 

@@ -9,7 +9,7 @@ import grails.testing.mixin.integration.Integration
 import org.springframework.security.crypto.password.PasswordEncoder
 import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.gorm.testing.DomainIntTest
+import yakworks.testing.gorm.DomainIntTest
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType

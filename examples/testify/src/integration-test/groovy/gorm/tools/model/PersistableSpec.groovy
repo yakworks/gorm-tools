@@ -1,6 +1,6 @@
 package gorm.tools.model
 
-import yakworks.gorm.testing.integration.DataIntegrationTest
+import yakworks.testing.gorm.integration.DataIntegrationTest
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Org
 

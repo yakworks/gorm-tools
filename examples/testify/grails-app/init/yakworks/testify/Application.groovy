@@ -6,7 +6,7 @@ import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
 import grails.plugins.metadata.PluginSource
 
-@ComponentScan(['yakworks.testify', 'gorm.tools.audit', 'yakworks.rally', 'yakworks.gorm.testing.model'])
+@ComponentScan(['yakworks.testify', 'gorm.tools.audit', 'yakworks.rally', 'yakworks.testing.gorm.model'])
 @PluginSource
 class Application extends GrailsAutoConfiguration {
 
@@ -26,7 +26,7 @@ class Application extends GrailsAutoConfiguration {
      */
     @Override
     Collection<String> packageNames() {
-        super.packageNames() + ['gorm.tools.security', 'yakworks.rally', 'yakworks.gorm.testing.model']
+        super.packageNames() + ['gorm.tools.security', 'yakworks.rally', 'yakworks.testing.gorm.model']
     }
 
 }

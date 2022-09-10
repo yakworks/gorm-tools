@@ -3,7 +3,7 @@ package yakworks.rally.orgs
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import yakworks.gorm.testing.DomainIntTest
+import yakworks.testing.gorm.DomainIntTest
 import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.api.problem.data.DataProblemException

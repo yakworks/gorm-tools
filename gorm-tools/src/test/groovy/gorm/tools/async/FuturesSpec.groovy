@@ -7,7 +7,7 @@ package gorm.tools.async
 import java.util.concurrent.CompletableFuture
 import java.util.function.Supplier
 
-import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
+import yakworks.testing.gorm.GormToolsHibernateSpec
 import grails.testing.spring.AutowiredTest
 
 class FuturesSpec extends GormToolsHibernateSpec implements AutowiredTest  {

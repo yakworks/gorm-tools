@@ -5,9 +5,9 @@
 package gorm.tools.databinding
 
 
-import yakworks.gorm.testing.unit.DataRepoTest
+import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
-import yakworks.gorm.testing.model.KitchenSink
+import yakworks.testing.gorm.model.KitchenSink
 
 class PathKeyMapEntityMapBinderSpec extends Specification implements DataRepoTest {
     EntityMapBinder binder

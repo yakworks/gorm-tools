@@ -8,11 +8,11 @@ import groovy.transform.CompileStatic
 import yakworks.gorm.etl.csv.render.CSVMapWriter
 import yakworks.gorm.etl.excel.ExcelBuilder
 import gorm.tools.metamap.services.MetaMapService
-import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
+import yakworks.testing.gorm.GormToolsHibernateSpec
 import gorm.tools.utils.BenchmarkHelper
 import yakworks.commons.util.BuildSupport
-import yakworks.gorm.testing.model.KitchenSink
-import yakworks.gorm.testing.model.SinkItem
+import yakworks.testing.gorm.model.KitchenSink
+import yakworks.testing.gorm.model.SinkItem
 import yakworks.json.groovy.JsonEngineTrait
 import yakworks.meta.MetaMapList
 

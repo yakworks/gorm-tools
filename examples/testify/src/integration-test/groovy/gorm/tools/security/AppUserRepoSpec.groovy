@@ -5,8 +5,8 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import gorm.tools.security.domain.SecRoleUser
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.AppUserRepo
-import yakworks.gorm.testing.SecuritySpecHelper
-import yakworks.gorm.testing.integration.DataIntegrationTest
+import yakworks.testing.gorm.SecuritySpecHelper
+import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
 import spock.lang.Specification

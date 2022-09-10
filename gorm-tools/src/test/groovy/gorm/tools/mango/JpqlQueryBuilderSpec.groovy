@@ -1,11 +1,11 @@
 package gorm.tools.mango
 
 import gorm.tools.mango.jpql.JpqlQueryBuilder
-import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
+import yakworks.testing.gorm.GormToolsHibernateSpec
 import grails.gorm.DetachedCriteria
 import grails.testing.spring.AutowiredTest
 import org.springframework.dao.InvalidDataAccessResourceUsageException
-import yakworks.gorm.testing.model.KitchenSink
+import yakworks.testing.gorm.model.KitchenSink
 
 /**
  * Test for JPA builder
@@ -32,7 +32,7 @@ class JpqlQueryBuilderSpec extends GormToolsHibernateSpec implements AutowiredTe
 
         then:"The query is valid"
         queryInfo.query == strip('''\
-        UPDATE yakworks.gorm.testing.model.KitchenSink kitchenSink SET kitchenSink.name=:p1
+        UPDATE yakworks.testing.gorm.model.KitchenSink kitchenSink SET kitchenSink.name=:p1
         WHERE (kitchenSink.amount=:p2 AND lower(kitchenSink.name) like lower(:p3))
         ''')
     }
@@ -51,7 +51,7 @@ class JpqlQueryBuilderSpec extends GormToolsHibernateSpec implements AutowiredTe
         def queryInfo = builder.buildUpdate(name:"SinkUp")
 
         then:"The query is valid"
-        queryInfo.query == 'UPDATE yakworks.gorm.testing.model.KitchenSink kitchenSink SET kitchenSink.name=:p1 WHERE (kitchenSink.amount NOT IN (SELECT kitchenSink1.amount as amount FROM yakworks.gorm.testing.model.KitchenSink kitchenSink1 WHERE kitchenSink1.name=:p2))'
+        queryInfo.query == 'UPDATE yakworks.testing.gorm.model.KitchenSink kitchenSink SET kitchenSink.name=:p1 WHERE (kitchenSink.amount NOT IN (SELECT kitchenSink1.amount as amount FROM yakworks.testing.gorm.model.KitchenSink kitchenSink1 WHERE kitchenSink1.name=:p2))'
         queryInfo.parameters == ["SinkUp", "Simpson"]
 
     }
@@ -88,7 +88,7 @@ class JpqlQueryBuilderSpec extends GormToolsHibernateSpec implements AutowiredTe
 
         then:"The query is valid"
         queryInfo.query != null
-        queryInfo.query == 'UPDATE yakworks.gorm.testing.model.KitchenSink kitchenSink SET kitchenSink.amount=:p1, kitchenSink.name=:p2 WHERE (kitchenSink.name=:p3)'
+        queryInfo.query == 'UPDATE yakworks.testing.gorm.model.KitchenSink kitchenSink SET kitchenSink.amount=:p1, kitchenSink.name=:p2 WHERE (kitchenSink.name=:p3)'
         queryInfo.parameters == [30,"SinkUp", "Sink1"]
     }
 
@@ -104,7 +104,7 @@ class JpqlQueryBuilderSpec extends GormToolsHibernateSpec implements AutowiredTe
 
         then:"The query is valid"
         queryInfo.query != null
-        queryInfo.query == 'UPDATE yakworks.gorm.testing.model.KitchenSink kitchenSink SET kitchenSink.amount=:p1, kitchenSink.name=:p2 WHERE (kitchenSink.name=:p3)'
+        queryInfo.query == 'UPDATE yakworks.testing.gorm.model.KitchenSink kitchenSink SET kitchenSink.amount=:p1, kitchenSink.name=:p2 WHERE (kitchenSink.name=:p3)'
         queryInfo.parameters == [30.0,"SinkUp", "Bob"]
     }
 
@@ -120,7 +120,7 @@ class JpqlQueryBuilderSpec extends GormToolsHibernateSpec implements AutowiredTe
 
         then:"The query is valid"
         queryInfo.query != null
-        queryInfo.query == 'UPDATE yakworks.gorm.testing.model.KitchenSink kitchenSink SET kitchenSink.amount=:p1 WHERE (kitchenSink.name=:p2)'
+        queryInfo.query == 'UPDATE yakworks.testing.gorm.model.KitchenSink kitchenSink SET kitchenSink.amount=:p1 WHERE (kitchenSink.name=:p2)'
         queryInfo.parameters == [30, "Bob"]
     }
 
@@ -136,7 +136,7 @@ class JpqlQueryBuilderSpec extends GormToolsHibernateSpec implements AutowiredTe
 
         then:"The query is valid"
         queryInfo.query != null
-        queryInfo.query == 'DELETE yakworks.gorm.testing.model.KitchenSink kitchenSink WHERE (kitchenSink.name=:p1)'
+        queryInfo.query == 'DELETE yakworks.testing.gorm.model.KitchenSink kitchenSink WHERE (kitchenSink.name=:p1)'
         queryInfo.parameters == ["Bob"]
     }
 
@@ -153,7 +153,7 @@ class JpqlQueryBuilderSpec extends GormToolsHibernateSpec implements AutowiredTe
 
         then:"The query is valid"
         query != null
-        query == 'SELECT DISTINCT kitchenSink FROM yakworks.gorm.testing.model.KitchenSink AS kitchenSink WHERE (kitchenSink.name=:p1)'
+        query == 'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE (kitchenSink.name=:p1)'
     }
 
     void "Test build simple select"() {
@@ -168,7 +168,7 @@ class JpqlQueryBuilderSpec extends GormToolsHibernateSpec implements AutowiredTe
 
         then:"The query is valid"
         query != null
-        query == 'SELECT DISTINCT kitchenSink FROM yakworks.gorm.testing.model.KitchenSink AS kitchenSink WHERE (kitchenSink.name=:p1)'
+        query == 'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE (kitchenSink.name=:p1)'
     }
 
     void "Test build select with or"() {
@@ -186,7 +186,7 @@ class JpqlQueryBuilderSpec extends GormToolsHibernateSpec implements AutowiredTe
 
         then:"The query is valid"
         queryInfo.query!= null
-        queryInfo.query == 'SELECT DISTINCT kitchenSink FROM yakworks.gorm.testing.model.KitchenSink AS kitchenSink WHERE ((kitchenSink.name=:p1 OR kitchenSink.name=:p2))'
+        queryInfo.query == 'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE ((kitchenSink.name=:p1 OR kitchenSink.name=:p2))'
         queryInfo.parameters == ['Bob', 'Fred']
 
     }
@@ -201,7 +201,7 @@ class JpqlQueryBuilderSpec extends GormToolsHibernateSpec implements AutowiredTe
 
         then: "The query is valid"
         queryInfo.query!=null
-        queryInfo.query == 'DELETE yakworks.gorm.testing.model.KitchenSink kitchenSink'
+        queryInfo.query == 'DELETE yakworks.testing.gorm.model.KitchenSink kitchenSink'
         queryInfo.parameters == []
     }
 
@@ -216,7 +216,7 @@ class JpqlQueryBuilderSpec extends GormToolsHibernateSpec implements AutowiredTe
 
         then: "The query is valid"
         queryInfo.query!=null
-        queryInfo.query == 'SELECT DISTINCT kitchenSink FROM yakworks.gorm.testing.model.KitchenSink AS kitchenSink'
+        queryInfo.query == 'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink'
         queryInfo.parameters == []
     }
 
@@ -230,7 +230,7 @@ class JpqlQueryBuilderSpec extends GormToolsHibernateSpec implements AutowiredTe
 
         then: "The query is valid"
         queryInfo.query!=null
-        queryInfo.query == 'UPDATE yakworks.gorm.testing.model.KitchenSink kitchenSink SET kitchenSink.name=:p1'
+        queryInfo.query == 'UPDATE yakworks.testing.gorm.model.KitchenSink kitchenSink SET kitchenSink.name=:p1'
         queryInfo.parameters == ["SinkUp"]
     }
 

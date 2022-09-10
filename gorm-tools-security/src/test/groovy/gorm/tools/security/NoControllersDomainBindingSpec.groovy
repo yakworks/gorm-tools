@@ -4,7 +4,7 @@ import org.springframework.util.ReflectionUtils
 
 import gorm.tools.audit.StampedEntity
 import gorm.tools.security.domain.AppUser
-import yakworks.gorm.testing.unit.DomainRepoTest
+import yakworks.testing.gorm.unit.DomainRepoTest
 import grails.artefact.DomainClass
 import grails.web.databinding.WebDataBinding
 import spock.lang.Specification

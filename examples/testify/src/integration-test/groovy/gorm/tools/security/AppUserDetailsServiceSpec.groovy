@@ -5,7 +5,7 @@ import gorm.tools.security.services.AppUserService
 import java.time.LocalDateTime
 
 import gorm.tools.security.domain.AppUser
-import yakworks.gorm.testing.integration.DataIntegrationTest
+import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.plugin.springsecurity.userdetails.GrailsUser
 import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback

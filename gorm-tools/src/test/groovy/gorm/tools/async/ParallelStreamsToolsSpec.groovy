@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import org.springframework.context.ApplicationContext
 
-import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
+import yakworks.testing.gorm.GormToolsHibernateSpec
 import grails.testing.spring.AutowiredTest
 import testing.CustType
 

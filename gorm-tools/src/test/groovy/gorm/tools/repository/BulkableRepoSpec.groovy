@@ -3,7 +3,7 @@ package gorm.tools.repository
 import gorm.tools.databinding.PathKeyMap
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.problem.ValidationProblem
-import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
+import yakworks.testing.gorm.GormToolsHibernateSpec
 import org.springframework.http.HttpStatus
 
 import gorm.tools.async.AsyncService
@@ -12,9 +12,9 @@ import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.model.DataOp
 import testing.TestSyncJob
 import testing.TestSyncJobService
-import yakworks.gorm.testing.model.KitchenSink
-import yakworks.gorm.testing.model.KitchenSinkRepo
-import yakworks.gorm.testing.model.SinkExt
+import yakworks.testing.gorm.model.KitchenSink
+import yakworks.testing.gorm.model.KitchenSinkRepo
+import yakworks.testing.gorm.model.SinkExt
 
 import static yakworks.json.groovy.JsonEngine.parseJson
 

@@ -5,9 +5,9 @@
 package gorm.tools.repository
 
 import gorm.tools.repository.model.IdGeneratorRepo
-import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
-import yakworks.gorm.testing.model.Thing
-import yakworks.gorm.testing.model.ThingRepo
+import yakworks.testing.gorm.GormToolsHibernateSpec
+import yakworks.testing.gorm.model.Thing
+import yakworks.testing.gorm.model.ThingRepo
 
 class IdGenRepoSpec extends GormToolsHibernateSpec {
 

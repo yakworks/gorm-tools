@@ -5,16 +5,16 @@
 package gorm.tools.metamap.services
 
 
-import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
+import yakworks.testing.gorm.GormToolsHibernateSpec
 import yakworks.meta.MetaMap
 import yakworks.meta.MetaMapList
-import yakworks.gorm.testing.model.Enummy
-import yakworks.gorm.testing.model.KitchenSink
-import yakworks.gorm.testing.model.SinkExt
-import yakworks.gorm.testing.model.SinkItem
-import yakworks.gorm.testing.model.TestEnum
-import yakworks.gorm.testing.model.TestEnumIdent
-import yakworks.gorm.testing.model.Thing
+import yakworks.testing.gorm.model.Enummy
+import yakworks.testing.gorm.model.KitchenSink
+import yakworks.testing.gorm.model.SinkExt
+import yakworks.testing.gorm.model.SinkItem
+import yakworks.testing.gorm.model.TestEnum
+import yakworks.testing.gorm.model.TestEnumIdent
+import yakworks.testing.gorm.model.Thing
 
 class MetaMapServiceSpec extends GormToolsHibernateSpec {
     MetaMapService metaMapService = new MetaMapService(

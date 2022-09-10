@@ -2,14 +2,14 @@ package yakworks.testify
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.problem.ValidationProblem
-import yakworks.gorm.testing.SecuritySpecHelper
-import yakworks.gorm.testing.integration.DataIntegrationTest
+import yakworks.testing.gorm.SecuritySpecHelper
+import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import yakworks.gorm.testing.model.Thing
-import yakworks.gorm.testing.model.KitchenSink
-import yakworks.gorm.testing.model.SinkExt
+import yakworks.testing.gorm.model.Thing
+import yakworks.testing.gorm.model.KitchenSink
+import yakworks.testing.gorm.model.SinkExt
 
 @Integration
 @Rollback

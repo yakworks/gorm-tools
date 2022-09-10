@@ -8,7 +8,7 @@ import groovy.transform.CompileStatic
 
 import yakworks.commons.lang.IsoDateUtil
 import gorm.tools.repository.model.RepoEntity
-import yakworks.gorm.testing.unit.DataRepoTest
+import yakworks.testing.gorm.unit.DataRepoTest
 import yakworks.commons.model.IdEnum
 import grails.databinding.converters.ValueConverter
 import grails.persistence.Entity
@@ -17,7 +17,7 @@ import org.grails.databinding.converters.DateConversionHelper
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 
 import spock.lang.Specification
-import yakworks.gorm.testing.model.KitchenSink
+import yakworks.testing.gorm.model.KitchenSink
 
 import java.time.LocalDate
 import java.time.LocalDateTime

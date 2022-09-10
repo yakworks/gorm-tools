@@ -22,7 +22,7 @@ dependencies {
   implementation project(":gorm-tools")
   implementation project(":gorm-tools-security")
   implementation project(":rally-domain")
-  implementation project(":gorm-tools-rest")
+  implementation project(":gorm-rest")
 
   implementation "com.opencsv:opencsv:$vOpenCsv"
 

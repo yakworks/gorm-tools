@@ -9,9 +9,6 @@ dependencies {
 
   implementation "org.grails:grails-plugin-domain-class"
 
-  // api project(":gorm-tools")
-  // api project(":gorm-tools-security")
-  // api project(":gorm-tools-etl")
   api project(":rally-domain")
   api project(":gorm-test-domain")
   api "org.yakworks:grails-kit:$vYakGrailsKit"

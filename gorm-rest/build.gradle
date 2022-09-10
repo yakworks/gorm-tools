@@ -8,8 +8,8 @@ dependencies {
   implementation "org.grails:grails-plugin-interceptors"
 
   api project(":gorm-tools")
-  api project(":gorm-tools-etl")
-  api project(":gorm-tools-openapi")
+  api project(":gorm-etl")
+  api project(":gorm-openapi")
 
   // for OkHttpRestTrait test helpers
   compileOnly "com.squareup.okhttp3:okhttp:$vOkhttp"

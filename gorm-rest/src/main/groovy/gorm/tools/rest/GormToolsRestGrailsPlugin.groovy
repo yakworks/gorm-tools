@@ -27,7 +27,7 @@ import yakworks.gorm.etl.excel.XlsxPagerRenderer
 @SuppressWarnings(['UnnecessarySelfAssignment', 'Println', 'EmptyMethod', 'Indentation'])
 class GormToolsRestGrailsPlugin extends Plugin {
 
-    def loadAfter = ['gorm-tools-openapi']
+    def loadAfter = ['gorm-openapi']
     //make sure we load before controllers as might be creating rest controllers
     def loadBefore = ['controllers']
     def pluginExcludes = ["**/init/**"]

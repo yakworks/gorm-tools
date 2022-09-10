@@ -12,7 +12,7 @@ dependencies {
 
   api project(":gorm-tools")
   api project(":gorm-tools-security")
-  api project(":gorm-tools-etl")
+  api project(":gorm-etl")
   api "org.yakworks:grails-kit:$vYakGrailsKit"
   api "org.yakworks:grails-external-config:$vYakGrailsKit"
   //api "dk.glasius:external-config:$vExternalConfig"

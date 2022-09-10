@@ -25,7 +25,7 @@ dependencies {
 
   implementation project(":testify")
   implementation project(":gorm-tools-security")
-  implementation project(":gorm-tools-rest")
+  implementation project(":gorm-rest")
 
   //??wtf
   implementation "commons-lang:commons-lang:2.6"

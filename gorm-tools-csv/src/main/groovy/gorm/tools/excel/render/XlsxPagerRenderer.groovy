@@ -26,7 +26,7 @@ class XlsxPagerRenderer implements XlsRendererTrait<Pager> {
     void render(Pager pager, RenderContext context) {
         setContentType(context)
         setContentDisposition(context)
-        xlsxWriter(context).writeXlsx(pager.data)
+        excelBuilder(context).write(pager.data)
     }
 
     //TODO should we set the file name?

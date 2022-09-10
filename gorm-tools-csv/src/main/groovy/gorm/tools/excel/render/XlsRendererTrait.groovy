@@ -51,11 +51,9 @@ trait XlsRendererTrait<T> implements Renderer<T> {
         return targetType
     }
 
-    XlsxMapWriter xlsxWriter(RenderContext context) {
-        //throw away the writer and use outputStream
-        // context.writer
+    ExcelBuilder excelBuilder(RenderContext context) {
         def servletContext = (ServletRenderContext) context
-        return XlsxMapWriter.of(servletContext.webRequest.response.outputStream)
+        return ExcelBuilder.of(servletContext.webRequest.response.outputStream).build()
     }
 
     void setContentType(RenderContext context){

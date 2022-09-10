@@ -1,30 +1,27 @@
-package gorm.tools.csv
+package gorm.tools
 
 import java.nio.file.Path
 
+import groovy.json.StreamingJsonBuilder
 import groovy.transform.CompileStatic
 
-import gorm.tools.beans.Pager
 import gorm.tools.csv.render.CSVMapWriter
+import gorm.tools.excel.render.ExcelBuilder
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import gorm.tools.utils.BenchmarkHelper
-import org.apache.commons.beanutils.PropertyUtils
-import org.springframework.boot.context.properties.source.MapConfigurationPropertySource
-import spock.lang.Shared
 import yakworks.commons.lang.PropertyTools
 import yakworks.commons.util.BuildSupport
 import yakworks.gorm.testing.model.KitchenSink
 import yakworks.gorm.testing.model.SinkItem
-import yakworks.meta.MetaMap
+import yakworks.json.groovy.JsonEngineTrait
 import yakworks.meta.MetaMapList
 
 /**
  * flushing out changes for performance
  */
-class CSVWriterBenchmarkSpec extends GormToolsHibernateSpec {
+class ExportBenchmarkSpecs extends GormToolsHibernateSpec implements JsonEngineTrait  {
     static int SINK_COUNT = 5000
-    @Shared Writer writer = new StringWriter()
 
     MetaMapService metaMapService
 
@@ -50,22 +47,60 @@ class CSVWriterBenchmarkSpec extends GormToolsHibernateSpec {
         // 1000 == sinkList.size()
     }
 
-    void "time CSVMapWriter"() {
+    //baseline for json to compare, CSV should not take more time
+    void "json time"() {
         when:
+        Writer jsonWriter = new StringWriter()
         MetaMapList mapList = metaMapService.createMetaMapList(KitchenSink.list(), ['*', 'thing.*', 'ext.*', 'simplePogo.foo']) // 'thing.id', 'simplePogo.foo'
         // MetaMapList mapList = metaMapService.createMetaMapList(KitchenSink.list(), ['*'])
         BenchmarkHelper.startTime()
-        writeCsv(mapList)
+        writeJson(jsonWriter, mapList)
+
+        then:
+        SINK_COUNT == mapList.size()
+        BenchmarkHelper.printEndTimeMsg("writeJson for $SINK_COUNT items")
+        writerToFile(jsonWriter, 'testing.json')
+        // println writer.toString()
+    }
+
+
+    void "time CSVMapWriter"() {
+        when:
+        Writer writer = new StringWriter()
+        MetaMapList mapList = metaMapService.createMetaMapList(KitchenSink.list(), ['*', 'thing.*', 'ext.*', 'simplePogo.foo']) // 'thing.id', 'simplePogo.foo'
+        // MetaMapList mapList = metaMapService.createMetaMapList(KitchenSink.list(), ['*'])
+        BenchmarkHelper.startTime()
+        writeCsv(writer, mapList)
 
         then:
         SINK_COUNT == mapList.size()
         BenchmarkHelper.printEndTimeMsg("CSVMapWriter for $SINK_COUNT items")
-
+        writerToFile(writer, 'testing.csv')
         // println writer.toString()
     }
 
+
+    void "time writeXlsx"() {
+        when:
+        Writer writer = new StringWriter()
+        MetaMapList mapList = metaMapService.createMetaMapList(KitchenSink.list(), ['*', 'thing.*', 'ext.*', 'simplePogo.foo']) // 'thing.id', 'simplePogo.foo'
+        long stime = BenchmarkHelper.startTime()
+        writeXlsx(mapList)
+
+        then:
+        SINK_COUNT == mapList.size()
+        BenchmarkHelper.printEndTimeMsg("writeXlsx for $SINK_COUNT items", stime)
+    }
+
     @CompileStatic
-    void writeCsv(MetaMapList mapList){
+    void writeJson(Writer writer, MetaMapList mapList){
+        // Writer swriter = new StringWriter()
+        def sjb = new StreamingJsonBuilder(writer, jsonGenerator)
+        sjb.call(mapList)
+    }
+
+    @CompileStatic
+    void writeCsv(Writer writer, MetaMapList mapList){
         def csvMapWriter = CSVMapWriter.of(writer)
         // csvMapWriter.writeCsv(dataList)
         // Map<String, Object> firstRow = dataList[0] as Map<String, Object>
@@ -88,16 +123,33 @@ class CSVWriterBenchmarkSpec extends GormToolsHibernateSpec {
             }
         }
 
-        Path prjPath = BuildSupport.gradleProjectPath.resolve("build/testing.csv")
-        prjPath.setText(writer.toString())
+    }
 
+    @CompileStatic
+    void writeXlsx(MetaMapList mapList){
+        Path prjPath = BuildSupport.gradleProjectPath.resolve("build/testing.xlsx")
+        prjPath.withOutputStream { os ->
+            def eb = ExcelBuilder.of(os).build()
+            eb.write(mapList as List<Map>)
+            eb.writeAndClose()
+        }
+        //nullOutputStream basicaly discards all bytes, useful to make sure only the excel part is getting benchmarked
+        // def xlsxWriter = XlsxListWriter.of(OutputStream.nullOutputStream())
+        // xlsxWriter.writeXlsxNew(mapList as List<Map>)
+    }
+
+    @CompileStatic
+    Path writerToFile(Writer writer, String filename) {
+        Path prjPath = BuildSupport.gradleProjectPath.resolve("build/$filename")
+        prjPath.setText(writer.toString())
+        return prjPath
     }
 
     @CompileStatic
     List collectVals(Map map, Set<String> headers) {
         List vals = headers.collect {
-            PropertyUtils.getProperty(map, it)
-            // PropertyTools.getProperty(map, it)
+            // PropertyUtils.getProperty(map, it)
+            PropertyTools.getProperty(map, it)
         }
         return vals
     }

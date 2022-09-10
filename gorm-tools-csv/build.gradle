@@ -14,6 +14,8 @@ dependencies {
   //see http://spreadsheet.dsl.builders/ and https://guides.grails.org/grails-file-download-excel/guide/index.html
   api "builders.dsl:spreadsheet-builder-poi:$vExcelBuilder"
   api "builders.dsl:spreadsheet-builder-groovy:$vExcelBuilder"
+  api "org.apache.poi:poi-ooxml:$vPoi"
+
   // compileOnly "org.apache.poi:poi:$vPoi"
   // compileOnly "org.apache.poi:poi-ooxml:$vPoi"
 

@@ -1,8 +1,5 @@
 package gorm.tools.csv
 
-import java.text.DecimalFormat
-
-import gorm.tools.beans.Pager
 import gorm.tools.csv.render.CSVMapWriter
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
@@ -53,12 +50,12 @@ class CSVWriterSpec extends GormToolsHibernateSpec {
     }
 
     //copied  from rest EntityResponder
-    Pager pagedQuery(Map params, List<String> includesKeys) {
-        Pager pager = new Pager(params)
-        List dlist = query(pager, params)
-        List<String> incs = findIncludes(params, includesKeys)
-        MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)
-        return pager.setEntityMapList(entityMapList)
-    }
+    // Pager pagedQuery(Map params, List<String> includesKeys) {
+    //     Pager pager = new Pager(params)
+    //     List dlist = query(pager, params)
+    //     List<String> incs = findIncludes(params, includesKeys)
+    //     MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)
+    //     return pager.setEntityMapList(entityMapList)
+    // }
 
 }

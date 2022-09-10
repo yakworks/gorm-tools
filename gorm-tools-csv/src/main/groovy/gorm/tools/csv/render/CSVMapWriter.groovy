@@ -30,7 +30,7 @@ class CSVMapWriter {
     void writeHeaders(Map<String, Object> firstItem){
         //filter out the key that has the detail
         headers = firstItem.keySet()
-        println "headers: $headers"
+        // println "headers: $headers"
         writeHeaders(headers)
     }
 

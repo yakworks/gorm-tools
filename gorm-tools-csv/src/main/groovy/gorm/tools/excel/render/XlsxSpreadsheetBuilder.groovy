@@ -9,50 +9,49 @@ import java.time.LocalDateTime
 
 import groovy.transform.CompileStatic
 
-import org.apache.poi.ss.usermodel.Cell
-import org.apache.poi.ss.usermodel.FillPatternType
-import org.apache.poi.ss.usermodel.IndexedColors
-import org.apache.poi.ss.usermodel.Workbook
-import org.apache.poi.xssf.usermodel.XSSFCellStyle
-import org.apache.poi.xssf.usermodel.XSSFRow
-import org.apache.poi.xssf.usermodel.XSSFSheet
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.apache.poi.ss.usermodel.CellStyle
 
+import builders.dsl.spreadsheet.builder.api.SpreadsheetBuilder
 import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder
-import com.opencsv.CSVWriter
-import gorm.tools.utils.BenchmarkHelper
 import yakworks.commons.lang.DateUtil
 import yakworks.commons.lang.PropertyTools
 import yakworks.commons.map.MapFlattener
 
+/**
+ * POC to use th4e groovy SpreadSheet builded that wraps poi.
+ * Works well but is almost twice as slow, might be because the styles
+ */
 @SuppressWarnings(['NestedBlockDepth'])
 @CompileStatic
-class XlsxMapWriter {
-    CSVWriter csvWriter
+class XlsxSpreadsheetBuilder {
+
     Set<String> headers
     OutputStream outputStream
     public static final String SHEET_NAME = "data"
 
-    XlsxMapWriter(OutputStream outstream){
+    CellStyle moneyStyle
+    CellStyle localDateStyle
+    CellStyle dateTimeStyle
+
+    XlsxSpreadsheetBuilder(OutputStream outstream){
         this.outputStream = outstream
     }
 
-    static XlsxMapWriter of(OutputStream outstream){
-        return new XlsxMapWriter(outstream)
+    static XlsxSpreadsheetBuilder of(OutputStream outstream){
+        return new XlsxSpreadsheetBuilder(outstream)
     }
-
-    // void flush(){
-    //     csvWriter.flush()
-    // }
 
     void writeXlsx(List<Map> dataList){
         //flatten
-        BenchmarkHelper.startTime()
+        // BenchmarkHelper.startTime()
         Map<String, Object> firstRow = dataList[0] as Map<String, Object>
         Map flatRow = flattenMap(firstRow)
         headers = flatRow.keySet()
 
-        PoiSpreadsheetBuilder.create(outputStream).build {
+        SpreadsheetBuilder sb = PoiSpreadsheetBuilder.create(outputStream)
+        // def psb = new PoiSpreadsheetBuilder(new XSSFWorkbook(), out)
+        // assert sb.workbook
+        sb.build {
             apply BookExcelStylesheet
             sheet(SHEET_NAME) { s ->
                 row {
@@ -67,7 +66,6 @@ class XlsxMapWriter {
                     // get all the values for the masterHeaders keys
                     // def flatData = flattenMap(rowData as Map)
                     def vals = headers.collect{ PropertyTools.getProperty(rowData, it) }
-
                     row {
                         vals.each { dta ->
                             cell {
@@ -90,41 +88,11 @@ class XlsxMapWriter {
                 }
             }
         }
-        BenchmarkHelper.printEndTimeMsg("excel generate took")
+        // BenchmarkHelper.printEndTimeMsg("excel generate took")
     }
 
     Map flattenMap(Map map){
         MapFlattener.of(map).convertObjectToString(false).flatten()
     }
-
-    /**
-     * WIP example of directly using poi instead of builder
-     */
-    void writeHeadersPoi(Map<String, Object> firstItem){
-        headers = firstItem.keySet()
-        Workbook workbook = new XSSFWorkbook()
-
-        XSSFSheet sheet = workbook.createSheet("Data")
-        sheet.setColumnWidth(0, 6000)
-        sheet.setColumnWidth(1, 4000)
-
-        XSSFRow header = sheet.createRow(0)
-
-        XSSFCellStyle headerStyle = workbook.createCellStyle()
-        headerStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex())
-        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND)
-
-        // XSSFFont font = ((XSSFWorkbook) workbook).createFont()
-        // font.setFontName("Arial");
-        // font.setFontHeightInPoints((short) 16);
-        // font.setBold(true);
-        // headerStyle.setFont(font);
-        headers.each { it ->
-            Cell headerCell = header.createCell(0)
-            headerCell.setCellValue(it)
-            headerCell.setCellStyle(headerStyle)
-        }
-    }
-
 
 }

@@ -1,6 +1,6 @@
 package yakworks.rest
 
-import gorm.tools.rest.controller.RestRepoApiController
+import yakworks.gorm.rest.controller.RestRepoApiController
 import grails.testing.mixin.integration.Integration
 import org.apache.commons.lang3.StringUtils
 import yakworks.gorm.testing.http.RestIntTest

@@ -6,8 +6,8 @@ package gorm.tools.rest
 
 import groovy.transform.CompileDynamic
 
-import gorm.tools.rest.appinfo.AppInfoBuilder
 import grails.converters.JSON
+import yakworks.gorm.rest.appinfo.AppInfoBuilder
 
 //see http://plugins.grails.org/plugin/grails/spring-security-appinfo
 // for app that shows app-info

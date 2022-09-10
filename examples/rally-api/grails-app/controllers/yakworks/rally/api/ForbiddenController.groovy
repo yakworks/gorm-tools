@@ -3,8 +3,8 @@ package yakworks.rally.api
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.rest.controller.RestApiController
 import yakworks.api.problem.Problem
+import yakworks.gorm.rest.controller.RestApiController
 
 /**
  * 403 forbidden responder

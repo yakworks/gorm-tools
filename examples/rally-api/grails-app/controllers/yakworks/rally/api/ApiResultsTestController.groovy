@@ -6,8 +6,8 @@ package yakworks.rally.api
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.rest.controller.RestRepoApiController
 import yakworks.api.ApiResults
+import yakworks.gorm.rest.controller.RestRepoApiController
 import yakworks.rally.orgs.model.Org
 
 @CompileStatic

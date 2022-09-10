@@ -6,9 +6,9 @@ package restify
 
 import org.springframework.context.annotation.ComponentScan
 
-import gorm.tools.rest.RestApiFromConfig
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
+import yakworks.gorm.rest.RestApiFromConfig
 
 // the component scan here does not seem to be the same as the packageNames and is needed to pick up the
 // the services marked with @Component

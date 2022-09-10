@@ -6,7 +6,7 @@ package gorm.tools.rest
 
 import groovy.transform.CompileDynamic
 
-import gorm.tools.rest.mapping.RepoApiMappingsService
+import yakworks.gorm.rest.mapping.RepoApiMappingsService
 
 @CompileDynamic
 class UrlMappings {

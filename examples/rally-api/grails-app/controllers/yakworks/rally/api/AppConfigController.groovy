@@ -3,8 +3,8 @@ package yakworks.rally.api
 import groovy.transform.CompileStatic
 
 import gorm.tools.api.IncludesConfig
-import gorm.tools.rest.controller.RestApiController
 import yakworks.commons.map.Maps
+import yakworks.gorm.rest.controller.RestApiController
 
 @CompileStatic
 class AppConfigController implements RestApiController {

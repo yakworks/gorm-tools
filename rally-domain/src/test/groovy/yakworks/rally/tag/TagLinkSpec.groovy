@@ -1,8 +1,7 @@
 package yakworks.rally.tag
 
 import yakworks.gorm.testing.SecurityTest
-import gorm.tools.testing.unit.DomainRepoTest
-import spock.lang.Ignore
+import yakworks.gorm.testing.unit.DomainRepoTest
 import spock.lang.Specification
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.tag.model.Tag

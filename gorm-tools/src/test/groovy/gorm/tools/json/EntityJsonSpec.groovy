@@ -7,13 +7,13 @@ package gorm.tools.json
 import yakworks.meta.MetaMap
 import yakworks.meta.MetaMapList
 import gorm.tools.metamap.services.MetaMapService
-import gorm.tools.testing.RepoTestData
+import yakworks.gorm.testing.RepoTestData
 
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 import gorm.tools.repository.model.RepoEntity
-import gorm.tools.testing.unit.DomainRepoTest
+import yakworks.gorm.testing.unit.DomainRepoTest
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import spock.lang.Ignore

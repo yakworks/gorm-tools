@@ -9,7 +9,7 @@ import org.springframework.dao.DataRetrievalFailureException
 
 import gorm.tools.model.SourceType
 import gorm.tools.problem.ValidationProblem
-import gorm.tools.testing.TestDataJson
+import yakworks.gorm.testing.TestDataJson
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification

@@ -3,14 +3,13 @@ package yakworks.security.rest.token
 
 import gorm.tools.jdbc.DbDialectService
 import gorm.tools.security.AppUserDetailsService
-import gorm.tools.testing.integration.DataIntegrationTest
+import yakworks.gorm.testing.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.plugin.springsecurity.rest.token.storage.TokenStorageService
 import grails.testing.mixin.integration.Integration
 import org.junit.Assume
 import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.security.rest.token.PostgresTokenStorageService
 
 @Integration
 @Rollback

@@ -4,13 +4,12 @@
 */
 package yakworks.gorm.oapi.meta
 
-import gorm.tools.metamap.MetaGormEntityBuilder
-import gorm.tools.testing.unit.DataRepoTest
+
+import yakworks.gorm.testing.unit.DataRepoTest
 import io.swagger.v3.oas.models.media.DateTimeSchema
 import io.swagger.v3.oas.models.media.IntegerSchema
 import io.swagger.v3.oas.models.media.NumberSchema
 import io.swagger.v3.oas.models.media.StringSchema
-import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.meta.MetaEntity

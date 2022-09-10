@@ -1,9 +1,9 @@
 package yakworks.rally.eventlog
 
-import java.time.LocalDate
+
 import java.time.LocalDateTime
 
-import gorm.tools.testing.unit.DomainRepoTest
+import yakworks.gorm.testing.unit.DomainRepoTest
 import spock.lang.Specification
 
 class EventLogSpec extends Specification implements DomainRepoTest<EventLog>{

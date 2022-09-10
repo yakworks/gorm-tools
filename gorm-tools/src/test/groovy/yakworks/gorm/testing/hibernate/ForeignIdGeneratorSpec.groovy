@@ -2,7 +2,7 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.testing.hibernate
+package yakworks.gorm.testing.hibernate
 
 import gorm.tools.repository.model.RepoEntity
 import gorm.tools.problem.ValidationProblem
@@ -58,7 +58,7 @@ class ForeignIdGeneratorSpec extends GormToolsHibernateSpec  {
         def e = thrown(ValidationProblem.Exception)
         def problem = e.problem
         problem.entity == master
-        problem.errors.objectName == "gorm.tools.testing.hibernate.FidMaster"
+        problem.errors.objectName == "yakworks.gorm.testing.hibernate.FidMaster"
         problem.errors.allErrors.size() == 1
         def fe = problem.errors.getFieldError("child.name")
         fe.code == 'NotNull'

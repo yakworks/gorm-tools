@@ -7,7 +7,7 @@ package yakworks.rally.orgs
 
 import gorm.tools.metamap.MetaGormEntityBuilder
 import gorm.tools.metamap.services.MetaMapService
-import gorm.tools.testing.unit.DataRepoTest
+import yakworks.gorm.testing.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.gorm.testing.SecurityTest
 import yakworks.rally.orgs.model.Contact

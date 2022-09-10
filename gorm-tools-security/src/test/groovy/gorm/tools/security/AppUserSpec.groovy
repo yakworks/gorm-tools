@@ -8,8 +8,7 @@ import gorm.tools.security.domain.SecRole
 import gorm.tools.security.domain.SecRoleUser
 import gorm.tools.utils.GormMetaUtils
 import yakworks.gorm.testing.SecurityTest
-import gorm.tools.testing.TestDataJson
-import gorm.tools.testing.unit.DomainRepoTest
+import yakworks.gorm.testing.unit.DomainRepoTest
 import spock.lang.Specification
 
 class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, SecurityTest {

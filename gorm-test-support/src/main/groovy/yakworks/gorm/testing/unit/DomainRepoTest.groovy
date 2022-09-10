@@ -2,14 +2,14 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.testing.unit
+package yakworks.gorm.testing.unit
 
 import groovy.transform.CompileDynamic
 
 import org.springframework.core.GenericTypeResolver
 
-import gorm.tools.testing.RepoTestData
-import gorm.tools.testing.TestDataJson
+import yakworks.gorm.testing.RepoTestData
+import yakworks.gorm.testing.TestDataJson
 
 /**
  * Should works as a drop in replacement for the Grails Testing Support's

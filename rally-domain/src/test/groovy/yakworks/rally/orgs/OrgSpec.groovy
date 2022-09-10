@@ -1,9 +1,9 @@
 package yakworks.rally.orgs
 
-import spock.lang.IgnoreRest
+
 import yakworks.gorm.testing.SecurityTest
-import gorm.tools.testing.TestDataJson
-import gorm.tools.testing.unit.DataRepoTest
+import yakworks.gorm.testing.TestDataJson
+import yakworks.gorm.testing.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
@@ -14,7 +14,6 @@ import yakworks.rally.orgs.model.OrgInfo
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
-import yakworks.rally.testing.RallySeedData
 
 class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
     //Automatically runs the basic crud tests

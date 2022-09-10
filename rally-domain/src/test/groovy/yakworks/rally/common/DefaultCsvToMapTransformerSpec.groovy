@@ -2,7 +2,7 @@ package yakworks.rally.common
 
 import java.nio.file.Files
 
-import gorm.tools.testing.unit.DataRepoTest
+import yakworks.gorm.testing.unit.DataRepoTest
 import yakworks.commons.io.ZipUtils
 import yakworks.grails.resource.AppResourceLoader
 import spock.lang.Shared

@@ -1,8 +1,8 @@
 package yakworks.rally.orgs
 
 import yakworks.gorm.testing.SecurityTest
-import gorm.tools.testing.TestDataJson
-import gorm.tools.testing.unit.DomainRepoTest
+import yakworks.gorm.testing.TestDataJson
+import yakworks.gorm.testing.unit.DomainRepoTest
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location

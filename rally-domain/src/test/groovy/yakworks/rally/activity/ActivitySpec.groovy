@@ -1,7 +1,7 @@
 package yakworks.rally.activity
 
 import gorm.tools.model.Persistable
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Ignore
 import spock.lang.Shared

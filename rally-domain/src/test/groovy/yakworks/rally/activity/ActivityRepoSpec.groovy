@@ -1,6 +1,6 @@
 package yakworks.rally.activity
 
-import gorm.tools.testing.unit.DomainRepoTest
+import yakworks.gorm.testing.unit.DomainRepoTest
 import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.gorm.testing.SecurityTest

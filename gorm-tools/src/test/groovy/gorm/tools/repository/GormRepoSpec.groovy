@@ -7,8 +7,8 @@ package gorm.tools.repository
 import gorm.tools.databinding.BindAction
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.model.RepoEntity
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
-import gorm.tools.testing.RepoTestData
+import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
+import yakworks.gorm.testing.RepoTestData
 import grails.artefact.Artefact
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity

@@ -4,7 +4,7 @@
 */
 package gorm.tools.hibernate.criteria
 
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
 
 class GormHibernateCriteriaBuilderSpec extends GormToolsHibernateSpec { //c DataTest {//implements DataTest{
 

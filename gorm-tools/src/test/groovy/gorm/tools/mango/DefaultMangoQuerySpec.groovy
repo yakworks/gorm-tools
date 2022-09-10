@@ -4,7 +4,7 @@
 */
 package gorm.tools.mango
 
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
 import grails.testing.spring.AutowiredTest
 import testing.Address
 import testing.AddyNested

@@ -1,8 +1,8 @@
 package yakworks.rally.activity
 
 import gorm.tools.security.domain.AppUser
-import gorm.tools.testing.unit.DataRepoTest
-import gorm.tools.testing.RepoTestData
+import yakworks.gorm.testing.unit.DataRepoTest
+import yakworks.gorm.testing.RepoTestData
 import yakworks.grails.resource.AppResourceLoader
 import spock.lang.Specification
 import yakworks.gorm.testing.SecurityTest

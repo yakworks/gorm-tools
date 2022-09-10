@@ -3,23 +3,15 @@ package gorm.tools.repository
 import gorm.tools.databinding.PathKeyMap
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.problem.ValidationProblem
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
 import org.springframework.http.HttpStatus
 
 import gorm.tools.async.AsyncService
-import gorm.tools.async.ParallelTools
 import gorm.tools.job.SyncJobState
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.model.DataOp
-import gorm.tools.testing.unit.DataRepoTest
-import spock.lang.IgnoreRest
-import spock.lang.Specification
-import testing.Address
-import testing.AddyNested
-import testing.Cust
 import testing.TestSyncJob
 import testing.TestSyncJobService
-import yakworks.gorm.testing.SecurityTest
 import yakworks.gorm.testing.model.KitchenSink
 import yakworks.gorm.testing.model.KitchenSinkRepo
 import yakworks.gorm.testing.model.SinkExt

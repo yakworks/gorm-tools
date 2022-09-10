@@ -2,7 +2,7 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.testing.hibernate
+package yakworks.gorm.testing.hibernate
 
 import groovy.transform.CompileDynamic
 
@@ -17,13 +17,13 @@ import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.model.UuidGormRepo
-import gorm.tools.testing.support.ExternalConfigLoader
-import gorm.tools.testing.support.GormToolsSpecHelper
-import gorm.tools.testing.support.MockJdbcIdGenerator
 import gorm.tools.validation.RepoValidatorRegistry
 import grails.buildtestdata.TestDataBuilder
 import grails.test.hibernate.HibernateSpec
 import grails.testing.spring.AutowiredTest
+import yakworks.gorm.testing.support.ExternalConfigLoader
+import yakworks.gorm.testing.support.GormToolsSpecHelper
+import yakworks.gorm.testing.support.MockJdbcIdGenerator
 import yakworks.i18n.icu.GrailsICUMessageSource
 
 /**

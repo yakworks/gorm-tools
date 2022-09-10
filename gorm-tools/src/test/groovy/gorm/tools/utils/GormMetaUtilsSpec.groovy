@@ -4,7 +4,7 @@
 */
 package gorm.tools.utils
 
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
 import testing.Cust
 import testing.CustType
 

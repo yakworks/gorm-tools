@@ -2,15 +2,15 @@
 * Copyright 2022 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.testing.unit
+package yakworks.gorm.testing.unit
 
 import groovy.transform.CompileStatic
 
 import org.junit.AfterClass
 import org.junit.Before
 
-import gorm.tools.testing.RepoTestData
 import grails.buildtestdata.TestDataConfigurationHolder
+import yakworks.gorm.testing.RepoTestData
 
 /**
  * Integration tests, any class really, can implement this trait to add build-test-data functionality
@@ -20,7 +20,7 @@ import grails.buildtestdata.TestDataConfigurationHolder
 trait RepoTestDataBuilder {
     private static boolean hasCustomTestDataConfig = false
 
-    /** calls {@link gorm.tools.testing.RepoTestData#build} */
+    /** calls {@link RepoTestData#build} */
     public <T> T build(Map args = [:], Class<T> clazz) {
         def o = RepoTestData.build(args, clazz)
 

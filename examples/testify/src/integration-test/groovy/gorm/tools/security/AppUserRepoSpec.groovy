@@ -6,7 +6,7 @@ import gorm.tools.security.domain.SecRoleUser
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.AppUserRepo
 import yakworks.gorm.testing.SecuritySpecHelper
-import gorm.tools.testing.integration.DataIntegrationTest
+import yakworks.gorm.testing.integration.DataIntegrationTest
 import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
 import spock.lang.Specification

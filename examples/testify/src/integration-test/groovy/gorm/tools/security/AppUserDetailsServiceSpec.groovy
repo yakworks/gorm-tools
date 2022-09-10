@@ -5,11 +5,10 @@ import gorm.tools.security.services.AppUserService
 import java.time.LocalDateTime
 
 import gorm.tools.security.domain.AppUser
-import gorm.tools.testing.integration.DataIntegrationTest
+import yakworks.gorm.testing.integration.DataIntegrationTest
 import grails.plugin.springsecurity.userdetails.GrailsUser
 import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
-import spock.lang.Ignore
 import spock.lang.Specification
 
 @Integration

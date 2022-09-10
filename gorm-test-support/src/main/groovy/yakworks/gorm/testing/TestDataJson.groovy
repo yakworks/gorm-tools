@@ -2,7 +2,7 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.testing
+package yakworks.gorm.testing
 
 import groovy.json.JsonSlurper
 import groovy.transform.CompileDynamic
@@ -21,7 +21,7 @@ import yakworks.json.groovy.JsonEngine
  * static build methods to wrap {@link RepoTestData} and Jsonify's statics for the json-views.
  * These helpers enable the easy generation of test data in Map form to test methods like the
  * repo's create and update.
- * Note: when using this in unit test the {@link gorm.tools.testing.support.JsonViewSpecSetup} should
+ * Note: when using this in unit test the {@link yakworks.gorm.testing.support.JsonViewSpecSetup} should
  * be used to make sure the proper view-tools beans are setup. This is alrady taken care of if using
  * one of the main DataRepoTest or DomainRepoTest traits
  *

@@ -9,7 +9,7 @@ import groovy.transform.CompileStatic
 import org.springframework.cache.CacheManager
 
 import gorm.tools.beans.AppCtx
-import gorm.tools.testing.integration.DataIntegrationTest
+import yakworks.gorm.testing.integration.DataIntegrationTest
 
 /**
  * core integration test trait that consolodated the traits

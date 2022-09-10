@@ -17,11 +17,11 @@ import org.springframework.web.context.WebApplicationContext
 import org.springframework.web.context.request.RequestContextHolder
 
 import gorm.tools.beans.AppCtx
-import gorm.tools.testing.integration.DataIntegrationTest
 import gorm.tools.transaction.TrxService
 import grails.core.GrailsApplication
 import grails.util.GrailsMetaClassUtils
 import grails.util.GrailsWebMockUtil
+import yakworks.gorm.testing.integration.DataIntegrationTest
 
 /**
  * Contains helpers for integration tests for controllers. Can be chained with some custom helper traits with the

@@ -6,7 +6,7 @@ import java.nio.file.Paths
 
 import groovy.transform.CompileDynamic
 
-import gorm.tools.testing.unit.DataRepoTest
+import yakworks.gorm.testing.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport
 import yakworks.gorm.testing.SecurityTest

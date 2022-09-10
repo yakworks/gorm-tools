@@ -3,11 +3,10 @@ package yakworks.security.rest
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
 import gorm.tools.security.domain.SecRoleUser
-import gorm.tools.testing.unit.DataRepoTest
+import yakworks.gorm.testing.unit.DataRepoTest
 import grails.plugin.springsecurity.rest.oauth.OauthUser
 import grails.testing.services.ServiceUnitTest
 import org.springframework.security.crypto.password.NoOpPasswordEncoder
-import yakworks.security.rest.NineOauthUserDetailsService
 import org.grails.spring.beans.factory.InstanceFactoryBean
 import org.pac4j.core.profile.CommonProfile
 import org.springframework.security.core.userdetails.UserDetailsChecker

@@ -5,7 +5,7 @@
 package gorm.tools.metamap
 
 
-import gorm.tools.testing.unit.DataRepoTest
+import yakworks.gorm.testing.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.gorm.testing.model.Enummy
 import yakworks.gorm.testing.model.KitchenSink

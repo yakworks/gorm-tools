@@ -4,7 +4,7 @@
 */
 package gorm.tools.hibernate.criteria
 
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
 import grails.persistence.Entity
 
 class CriteriaUtilsSpec extends GormToolsHibernateSpec {

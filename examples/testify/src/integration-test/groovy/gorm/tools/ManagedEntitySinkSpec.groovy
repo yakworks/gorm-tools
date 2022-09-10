@@ -1,16 +1,11 @@
 package gorm.tools
 
 
-import gorm.tools.testing.integration.DataIntegrationTest
+import yakworks.gorm.testing.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
-import org.hibernate.Hibernate
-import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.gorm.testing.model.KitchenSink
-import yakworks.rally.orgs.model.Org
-import yakworks.rally.orgs.model.OrgType
 
 @Integration
 @Rollback

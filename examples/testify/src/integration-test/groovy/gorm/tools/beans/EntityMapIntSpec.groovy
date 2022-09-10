@@ -3,7 +3,7 @@ package gorm.tools.beans
 
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.security.domain.AppUser
-import gorm.tools.testing.integration.DataIntegrationTest
+import yakworks.gorm.testing.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore

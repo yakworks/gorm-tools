@@ -3,7 +3,7 @@ package gorm.tools.problem
 
 import org.springframework.context.MessageSource
 
-import gorm.tools.testing.unit.GormAppUnitTest
+import yakworks.gorm.testing.unit.GormAppUnitTest
 import spock.lang.Specification
 import yakworks.i18n.icu.DefaultICUMessageSource
 

@@ -397,7 +397,7 @@ See example bellow:
 
 ```groovy
 
-import gorm.tools.testing.hibernate.AutoHibernateSpec
+import yakworks.gorm.testing.hibernate.AutoHibernateSpec
 import testing.Project
 
 class ProjectSpec extends AutoHibernateSpec<Project> {

@@ -3,7 +3,7 @@ package gorm.tools.audit
 import gorm.tools.security.domain.AppUser
 import gorm.tools.utils.GormMetaUtils
 import yakworks.gorm.testing.SecurityTest
-import gorm.tools.testing.unit.DomainRepoTest
+import yakworks.gorm.testing.unit.DomainRepoTest
 import spock.lang.Specification
 
 class AuditStampAnnSpec extends Specification implements DomainRepoTest<StampedEntity>, SecurityTest {

@@ -1,7 +1,7 @@
 package gorm.tools.mango
 
 import gorm.tools.mango.jpql.JpqlQueryBuilder
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
 import grails.gorm.DetachedCriteria
 import grails.testing.spring.AutowiredTest
 import org.springframework.dao.InvalidDataAccessResourceUsageException

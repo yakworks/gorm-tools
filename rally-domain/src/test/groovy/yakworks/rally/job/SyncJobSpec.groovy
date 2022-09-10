@@ -5,7 +5,7 @@
 package yakworks.rally.job
 
 import gorm.tools.model.SourceType
-import gorm.tools.testing.unit.DataRepoTest
+import yakworks.gorm.testing.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.json.groovy.JsonEngine
 import yakworks.gorm.testing.SecurityTest

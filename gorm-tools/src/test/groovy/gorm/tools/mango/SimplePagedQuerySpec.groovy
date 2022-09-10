@@ -5,7 +5,7 @@
 package gorm.tools.mango
 
 import gorm.tools.mango.jpql.SimplePagedQuery
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
 import grails.testing.spring.AutowiredTest
 import spock.lang.Shared
 import yakworks.gorm.testing.model.KitchenSink

@@ -1,10 +1,8 @@
 package gorm.tools.mango
 
 import gorm.tools.mango.jpql.JpqlQueryBuilder
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
 import grails.testing.spring.AutowiredTest
-import spock.lang.Ignore
-import spock.lang.IgnoreRest
 import yakworks.gorm.testing.model.KitchenSink
 
 /**

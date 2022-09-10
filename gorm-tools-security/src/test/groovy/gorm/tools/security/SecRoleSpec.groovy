@@ -6,7 +6,7 @@ import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
 import gorm.tools.security.domain.SecRoleUser
 import yakworks.gorm.testing.SecurityTest
-import gorm.tools.testing.unit.DataRepoTest
+import yakworks.gorm.testing.unit.DataRepoTest
 import spock.lang.Specification
 
 class SecRoleSpec extends Specification implements DataRepoTest, SecurityTest {

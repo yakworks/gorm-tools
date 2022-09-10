@@ -8,7 +8,7 @@ import org.hibernate.QueryException
 
 import java.time.LocalDate
 
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
 import testing.Address
 import testing.AddyNested
 import testing.Cust

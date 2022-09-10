@@ -3,8 +3,8 @@ package yakworks.rally
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
 import gorm.tools.security.domain.SecRoleUser
-import gorm.tools.testing.TestDataJson
-import gorm.tools.testing.unit.DataRepoTest
+import yakworks.gorm.testing.TestDataJson
+import yakworks.gorm.testing.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.commons.map.Maps
 import yakworks.gorm.testing.SecurityTest

@@ -2,7 +2,7 @@ package yakworks.gorm.etl.csv
 
 import yakworks.gorm.etl.csv.render.CSVMapWriter
 import gorm.tools.metamap.services.MetaMapService
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
 import gorm.tools.utils.BenchmarkHelper
 import yakworks.gorm.testing.model.KitchenSink
 import yakworks.gorm.testing.model.SinkItem

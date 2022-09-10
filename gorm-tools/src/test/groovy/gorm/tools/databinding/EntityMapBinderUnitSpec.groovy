@@ -5,10 +5,10 @@
 package gorm.tools.databinding
 
 import groovy.transform.CompileStatic
-import spock.lang.IgnoreRest
+
 import yakworks.commons.lang.IsoDateUtil
 import gorm.tools.repository.model.RepoEntity
-import gorm.tools.testing.unit.DataRepoTest
+import yakworks.gorm.testing.unit.DataRepoTest
 import yakworks.commons.model.IdEnum
 import grails.databinding.converters.ValueConverter
 import grails.persistence.Entity

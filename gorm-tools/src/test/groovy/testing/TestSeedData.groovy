@@ -1,6 +1,6 @@
 package testing
 
-import gorm.tools.testing.RepoTestData
+import yakworks.gorm.testing.RepoTestData
 
 import java.time.LocalDate
 

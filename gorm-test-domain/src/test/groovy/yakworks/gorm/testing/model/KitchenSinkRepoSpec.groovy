@@ -1,7 +1,7 @@
 package yakworks.gorm.testing.model
 
 import gorm.tools.async.AsyncService
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import yakworks.gorm.testing.hibernate.GormToolsHibernateSpec
 import gorm.tools.utils.BenchmarkHelper
 import spock.lang.Shared
 

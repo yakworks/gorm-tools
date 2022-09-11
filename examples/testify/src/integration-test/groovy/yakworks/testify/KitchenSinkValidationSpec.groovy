@@ -1,7 +1,10 @@
 package yakworks.testify
 
-import gorm.tools.beans.AppCtx
+import yakworks.spring.AppCtx
 import gorm.tools.problem.ValidationProblem
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.ApplicationContext
+import org.springframework.web.context.WebApplicationContext
 import yakworks.testing.gorm.SecuritySpecHelper
 import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
@@ -19,7 +22,7 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
         when:
         Long id = KitchenSink.create([num:'123', name:"Wyatt Oil"]).id
         flushAndClear()
-        String[] beans = AppCtx.ctx.getBeanDefinitionNames()
+        String[] beans = ctx.getBeanDefinitionNames()
         for (String bean : beans) {
             println(bean)
         }

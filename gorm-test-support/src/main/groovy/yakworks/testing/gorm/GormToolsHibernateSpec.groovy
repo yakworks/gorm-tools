@@ -10,7 +10,6 @@ import org.grails.datastore.mapping.core.AbstractDatastore
 import org.grails.orm.hibernate.HibernateDatastore
 import org.grails.plugin.hibernate.support.HibernatePersistenceContextInterceptor
 
-import gorm.tools.beans.AppCtx
 import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.RepoLookup
@@ -21,7 +20,9 @@ import gorm.tools.validation.RepoValidatorRegistry
 import grails.buildtestdata.TestDataBuilder
 import grails.test.hibernate.HibernateSpec
 import grails.testing.spring.AutowiredTest
+import yakworks.grails.GrailsHolder
 import yakworks.i18n.icu.GrailsICUMessageSource
+import yakworks.spring.AppCtx
 import yakworks.testing.gorm.support.ExternalConfigLoader
 import yakworks.testing.gorm.support.GormToolsSpecHelper
 import yakworks.testing.gorm.support.MockJdbcIdGenerator
@@ -41,7 +42,7 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
     void setupSpec() {
         RepoLookup.USE_CACHE = false
         //for some reason holder get scrambled so make sure it has the grailsApplication from this test
-        AppCtx.setGrailsApplication(getGrailsApplication())
+        GrailsHolder.setGrailsApplication(getGrailsApplication())
         AppCtx.setApplicationContext(getApplicationContext())
 
         if (!ctx.containsBean("dataSource"))

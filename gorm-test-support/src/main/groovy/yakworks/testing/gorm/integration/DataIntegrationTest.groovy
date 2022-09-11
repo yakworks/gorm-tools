@@ -10,14 +10,16 @@ import org.grails.datastore.mapping.core.AbstractDatastore
 import org.grails.datastore.mapping.core.Session
 import org.grails.orm.hibernate.HibernateDatastore
 import org.junit.After
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.web.context.WebApplicationContext
 
-import gorm.tools.beans.AppCtx
 import gorm.tools.jdbc.DbDialectService
 import gorm.tools.transaction.TrxStaticApi
 import grails.build.support.MetaClassRegistryCleaner
 import grails.buildtestdata.TestDataBuilder
 import grails.config.Config
+import grails.util.Holders
 
 /**
  * Contains helpers for integration tests. Can be chained with some custom helper traits with the application-specific
@@ -32,9 +34,10 @@ trait DataIntegrationTest implements TestDataBuilder {
     JdbcTemplate jdbcTemplate
     DbDialectService dbDialectService
     HibernateDatastore hibernateDatastore
+    @Autowired WebApplicationContext ctx
 
     Config getConfig(){
-        AppCtx.config
+        Holders.config
     }
 
     /**

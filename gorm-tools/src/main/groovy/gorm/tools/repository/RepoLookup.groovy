@@ -8,10 +8,10 @@ import java.util.concurrent.ConcurrentHashMap
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.beans.AppCtx
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import grails.util.Environment
 import yakworks.commons.lang.NameUtils
+import yakworks.spring.AppCtx
 
 /**
  * Cache and finders to make looking up Repo faster.

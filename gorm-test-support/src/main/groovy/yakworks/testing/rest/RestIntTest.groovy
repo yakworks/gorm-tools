@@ -15,12 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.context.WebApplicationContext
 import org.springframework.web.context.request.RequestContextHolder
 
-import gorm.tools.beans.AppCtx
 import gorm.tools.transaction.TrxService
 import grails.core.GrailsApplication
 import grails.util.GrailsMetaClassUtils
 import grails.util.GrailsWebMockUtil
 import spock.lang.Specification
+import yakworks.spring.AppCtx
 import yakworks.testing.gorm.integration.DataIntegrationTest
 
 /**
@@ -38,8 +38,8 @@ class RestIntTest extends Specification implements DataIntegrationTest {
     /**
      * A web application context instance which is used for mocking the controller.
      */
-    @Autowired
-    WebApplicationContext ctx
+    // @Autowired
+    // WebApplicationContext ctx
 
     @Autowired
     GrailsApplication grailsApplication

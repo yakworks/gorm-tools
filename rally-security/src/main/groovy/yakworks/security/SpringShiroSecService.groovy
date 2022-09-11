@@ -18,12 +18,12 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.WebAttributes
 import org.springframework.web.context.request.RequestContextHolder
 
-import gorm.tools.beans.AppCtx
 import gorm.tools.security.services.SpringSecService
 import grails.plugin.springsecurity.SpringSecurityUtils
 import yakworks.grails.web.GrailsWebEnvironment
 import yakworks.security.shiro.ShiroUtils
 import yakworks.security.shiro.SpringSecurityRealm
+import yakworks.spring.AppCtx
 
 /**
  * We married shiro and spring security, this does some of the custom wrapping

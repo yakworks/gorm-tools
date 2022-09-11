@@ -2,9 +2,9 @@ package gpbench
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.beans.AppCtx
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.userdetails.GrailsUser
+import yakworks.spring.AppCtx
 
 @CompileStatic
 class SecUtil {

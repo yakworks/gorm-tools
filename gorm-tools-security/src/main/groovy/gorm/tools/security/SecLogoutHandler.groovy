@@ -12,8 +12,8 @@ import groovy.transform.CompileStatic
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler
 
-import gorm.tools.beans.AppCtx
 import gorm.tools.security.services.AppUserService
+import yakworks.spring.AppCtx
 
 /**
  * Tracks user logout

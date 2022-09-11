@@ -49,7 +49,7 @@ class AppUser implements UserTrait<Long>, AuditStampTrait, RepoEntity<AppUser>, 
 
     static mapping = {
         // cache "nonstrict-read-write"
-        table 'Users' // AppCtx.config.getProperty('gorm.tools.security.user.table', 'Users')
+        table 'Users'
         // table Holders.config.getProperty('gorm.tools.security.user.table', 'Users')
         passwordHash column: "`password`"
     }

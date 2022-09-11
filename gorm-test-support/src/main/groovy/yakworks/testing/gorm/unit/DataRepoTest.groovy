@@ -8,8 +8,8 @@ import groovy.transform.CompileStatic
 
 import org.junit.AfterClass
 
-import gorm.tools.beans.AppCtx
 import grails.testing.spring.AutowiredTest
+import yakworks.spring.AppCtx
 import yakworks.testing.gorm.support.ExternalConfigAwareSpec
 import yakworks.testing.gorm.support.GormToolsSpecHelper
 

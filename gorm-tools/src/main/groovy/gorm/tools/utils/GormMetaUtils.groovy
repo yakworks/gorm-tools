@@ -16,12 +16,12 @@ import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.orm.hibernate.cfg.Mapping
 import org.springframework.validation.Validator
 
-import gorm.tools.beans.AppCtx
 import gorm.tools.validation.ApiConstraints
 import grails.gorm.validation.ConstrainedEntity
 import grails.gorm.validation.ConstrainedProperty
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.NameUtils
+import yakworks.spring.AppCtx
 
 /**
  * A bunch of helper and lookup/finder statics for dealing with domain classes and PersistentEntity.

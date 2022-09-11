@@ -6,9 +6,9 @@ package gorm.tools.security
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.beans.AppCtx
 import gorm.tools.security.services.SecService
 import yakworks.security.model.UserTrait
+import yakworks.spring.AppCtx
 
 /**
  * a wrapper around SecService with statics for areas that can't get a bean injected such as in an Entity

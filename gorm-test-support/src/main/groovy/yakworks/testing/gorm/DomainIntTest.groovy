@@ -8,7 +8,7 @@ import groovy.transform.CompileStatic
 
 import org.springframework.cache.CacheManager
 
-import gorm.tools.beans.AppCtx
+import yakworks.spring.AppCtx
 import yakworks.testing.gorm.integration.DataIntegrationTest
 
 /**

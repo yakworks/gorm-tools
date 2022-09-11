@@ -57,9 +57,9 @@ class AppCtx {
      * @return the spring ApplicationContext
      */
     static ApplicationContext getCtx() {
-       if (!SPRING_CTX) {
-           SPRING_CTX = Holders.findApplicationContext()
-       }
+        if (!SPRING_CTX) {
+            SPRING_CTX = Holders.findApplicationContext()
+        }
         return SPRING_CTX
     }
 
@@ -73,9 +73,9 @@ class AppCtx {
     /**
      * @return the merged configs from application.yml, application.groovy, etc...
      */
-    static ICUMessageSource getMsgService() {
-        get('messageSource', ICUMessageSource)
-    }
+    // static ICUMessageSource getMsgService() {
+    //     get('messageSource', ICUMessageSource)
+    // }
 
     /**
      * call the ApplicationContext.getBean
@@ -106,11 +106,10 @@ class AppCtx {
 
     /**
      * Publish events using spring appCtx.
-     * grails 4.x uses MicronautApplicationEventPublisher - which internally forwards all published events to micronaut
-     * which expects listeners to implement  io.micronaut.context.event.ApplicationEventListener.
+     * we do this because grails 4.x uses MicronautApplicationEventPublisher - which internally forwards all published events to micronaut
+     * which expects listeners to implement  io.micronaut.context.event.ApplicationEventListener, we dont want this.
      */
     static void publishEvent(Object event){
-        //we use the grails.mainContext here because the appCtx scrambles during tests and gets lost
         ((ApplicationEventPublisher)getCtx()).publishEvent(event)
     }
 

@@ -8,12 +8,12 @@ import groovy.transform.CompileStatic
 
 import org.springframework.dao.OptimisticLockingFailureException
 
-import gorm.tools.beans.AppCtx
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.transaction.TrxService
 import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.api.problem.data.NotFoundProblem
+import yakworks.grails.GrailsHolder
 
 /**
  * A bunch of statics to support the repositories.
@@ -28,7 +28,7 @@ import yakworks.api.problem.data.NotFoundProblem
 class RepoUtil {
 
     static List<Class> getRepoClasses(){
-        AppCtx.grails.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz
+        GrailsHolder.grailsApplication.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz
     }
 
     static String getRepoBeanName(Class domainClass) {

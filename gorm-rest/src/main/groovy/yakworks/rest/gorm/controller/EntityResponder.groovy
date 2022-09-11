@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 
 import gorm.tools.api.IncludesConfig
-import gorm.tools.beans.AppCtx
 import gorm.tools.beans.Pager
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.api.QueryMangoEntityApi
@@ -21,6 +20,7 @@ import grails.web.api.WebAttributes
 import yakworks.commons.map.Maps
 import yakworks.meta.MetaMap
 import yakworks.meta.MetaMapList
+import yakworks.spring.AppCtx
 
 /**
  * Helpers for a Restfull api type controller.

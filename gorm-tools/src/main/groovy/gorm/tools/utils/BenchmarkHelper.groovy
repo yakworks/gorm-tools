@@ -5,7 +5,6 @@
 package gorm.tools.utils
 
 import java.text.DecimalFormat
-import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
 

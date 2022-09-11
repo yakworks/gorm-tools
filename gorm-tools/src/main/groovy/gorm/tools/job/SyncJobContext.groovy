@@ -17,7 +17,6 @@ import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 import groovy.util.logging.Slf4j
 
-import gorm.tools.beans.AppCtx
 import gorm.tools.repository.model.IdGeneratorRepo
 import yakworks.api.ApiResults
 import yakworks.api.Result
@@ -28,6 +27,7 @@ import yakworks.commons.lang.Validate
 import yakworks.json.groovy.JsonEngine
 import yakworks.json.groovy.JsonStreaming
 import yakworks.message.spi.MsgService
+import yakworks.spring.AppCtx
 
 @SuppressWarnings('Println')
 @Builder(builderStrategy= SimpleStrategy, prefix="")

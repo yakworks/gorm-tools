@@ -18,7 +18,6 @@ import org.springframework.validation.Validator
 import gorm.tools.api.IncludesConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelStreamTools
-import gorm.tools.beans.AppCtx
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.mango.DefaultMangoQuery
@@ -39,7 +38,9 @@ import gorm.tools.transaction.TrxService
 import gorm.tools.validation.RepoEntityValidator
 import grails.persistence.support.NullPersistentContextInterceptor
 import grails.spring.BeanBuilder
+import yakworks.grails.GrailsHolder
 import yakworks.i18n.icu.GrailsICUMessageSource
+import yakworks.spring.AppCtx
 
 /**
  * Helper utils for mocking spring beans needed to test repository's and domains.
@@ -122,7 +123,8 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
     void defineRepoBeans(Class<?>... domainClassesToMock){
         RepoLookup.USE_CACHE = false
         //for some reason holder get scrambled so make sure it has the gapp we are using
-        AppCtx.setGrailsApplication(grailsApplication)
+        GrailsHolder.setGrailsApplication(grailsApplication)
+        AppCtx.setApplicationContext(getApplicationContext())
 
         Closure beanClos = {
             Collection<PersistentEntity> entities = datastore.mappingContext.persistentEntities

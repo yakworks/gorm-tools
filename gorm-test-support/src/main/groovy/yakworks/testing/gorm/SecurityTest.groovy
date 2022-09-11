@@ -8,10 +8,10 @@ import groovy.transform.CompileDynamic
 
 import org.springframework.security.crypto.password.NoOpPasswordEncoder
 
-import gorm.tools.audit.AuditStampBeforeValidateListener
-import gorm.tools.audit.AuditStampPersistenceEventListener
-import gorm.tools.audit.AuditStampSupport
-import gorm.tools.security.domain.AppUser
+import yakworks.security.audit.AuditStampBeforeValidateListener
+import yakworks.security.audit.AuditStampPersistenceEventListener
+import yakworks.security.audit.AuditStampSupport
+import yakworks.security.gorm.model.AppUser
 
 /**
  * adds mock spring beans for passwordEncoder, and secService and

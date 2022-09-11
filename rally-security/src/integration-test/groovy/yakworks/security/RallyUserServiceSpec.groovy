@@ -1,9 +1,8 @@
 package yakworks.security
 
-import gorm.tools.security.domain.AppUser
-import gorm.tools.security.domain.SecRole
-import gorm.tools.security.domain.SecRoleUser
-import gorm.tools.security.services.SecService
+import yakworks.security.gorm.model.AppUser
+import yakworks.security.gorm.model.SecRole
+import yakworks.security.gorm.model.SecRoleUser
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import org.springframework.security.crypto.password.PasswordEncoder

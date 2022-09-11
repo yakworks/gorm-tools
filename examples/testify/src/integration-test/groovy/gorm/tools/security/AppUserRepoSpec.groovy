@@ -2,9 +2,9 @@ package gorm.tools.security
 
 import org.springframework.security.crypto.password.PasswordEncoder
 
-import gorm.tools.security.domain.SecRoleUser
-import gorm.tools.security.domain.AppUser
-import gorm.tools.security.domain.AppUserRepo
+import yakworks.security.gorm.model.SecRoleUser
+import yakworks.security.gorm.model.AppUser
+import yakworks.security.gorm.model.AppUserRepo
 import yakworks.testing.gorm.SecuritySpecHelper
 import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.testing.mixin.integration.Integration

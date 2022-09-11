@@ -7,11 +7,11 @@ package yakworks.rally.tag.model
 
 import groovy.transform.EqualsAndHashCode
 
-import gorm.tools.audit.AuditStamp
 import gorm.tools.model.NameCodeDescription
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import yakworks.security.audit.AuditStamp
 
 @AuditStamp
 @Entity

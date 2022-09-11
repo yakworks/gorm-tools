@@ -6,7 +6,6 @@ package yakworks.rally.activity.model
 
 import groovy.transform.CompileDynamic
 
-import gorm.tools.audit.AuditStampTrait
 import gorm.tools.model.NamedEntity
 import gorm.tools.model.SourceTrait
 import gorm.tools.repository.model.GormRepoEntity
@@ -19,6 +18,7 @@ import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Taggable
+import yakworks.security.audit.AuditStampTrait
 
 @Entity
 @IdEqualsHashCode

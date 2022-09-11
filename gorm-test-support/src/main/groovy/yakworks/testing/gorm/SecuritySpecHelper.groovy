@@ -12,11 +12,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContextHolder
 
-import gorm.tools.security.domain.AppUser
-import gorm.tools.security.services.SecService
 import gorm.tools.transaction.WithTrx
-import grails.plugin.springsecurity.userdetails.GrailsUser
 import grails.testing.spock.OnceBefore
+import yakworks.security.SecService
+import yakworks.security.gorm.model.AppUser
+import yakworks.security.spring.SpringSecUser
 
 @CompileDynamic
 trait SecuritySpecHelper implements WithTrx{
@@ -36,8 +36,8 @@ trait SecuritySpecHelper implements WithTrx{
         roles = roles.collect { it}
         List authorities = AuthorityUtils.createAuthorityList(roles)
 
-        GrailsUser grailsUser = new GrailsUser(user.username, user.passwordHash, user.enabled, true, !user.passwordExpired, true, authorities, user.id)
-        SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(grailsUser, user.passwordHash, authorities)
+        SpringSecUser secUser = new SpringSecUser(user.username, user.passwordHash, user.enabled, true, !user.passwordExpired, true, authorities, user.id)
+        SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(secUser, user.passwordHash, authorities)
     }
 
  }

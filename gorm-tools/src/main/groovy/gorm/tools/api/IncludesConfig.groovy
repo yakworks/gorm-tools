@@ -152,8 +152,8 @@ class IncludesConfig implements ConfigAware {
     /**
      * setup pathKeys for entityClass
      * this scans the api.paths base for entityClassName and store the pathKey with namespace.
-     * when it finds  api.paths.security.user.entityClass: gorm.tools.security.domain.AppUser
-     * it will store ['gorm.tools.security.domain.AppUser': 'api.paths.security.user'] for faster lookup
+     * when it finds  api.paths.security.user.entityClass: yakworks.security.domain.AppUser
+     * it will store ['yakworks.security.domain.AppUser': 'api.paths.security.user'] for faster lookup
      */
     void setupEntityClassPathKeys() {
         Properties cfgProps = config.toProperties()

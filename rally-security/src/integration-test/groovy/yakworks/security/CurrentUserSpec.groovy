@@ -1,7 +1,7 @@
 package yakworks.security
 
 
-import gorm.tools.security.domain.AppUser
+import yakworks.security.gorm.model.AppUser
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import org.springframework.beans.factory.annotation.Autowired

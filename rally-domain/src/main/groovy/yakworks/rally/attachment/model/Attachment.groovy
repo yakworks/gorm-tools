@@ -8,12 +8,9 @@ import java.nio.charset.Charset
 
 import groovy.transform.CompileDynamic
 
-import org.apache.commons.io.IOUtils
 import org.springframework.core.io.Resource
 import org.springframework.util.FileCopyUtils
 
-import gorm.tools.audit.AuditStamp
-import gorm.tools.audit.AuditStampTrait
 import gorm.tools.model.NameDescription
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.RepoEntity
@@ -22,6 +19,8 @@ import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.tag.model.Taggable
+import yakworks.security.audit.AuditStamp
+import yakworks.security.audit.AuditStampTrait
 
 /**
  * Attachments refer to an externally created file, which could be a letter template, an image, text document or anything else.

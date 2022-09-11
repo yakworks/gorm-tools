@@ -4,11 +4,11 @@
 */
 package yakworks.rally.job
 
-import gorm.tools.audit.AuditStamp
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.RepoLookup
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.annotation.Entity
+import yakworks.security.audit.AuditStamp
 
 /**
  * An instance created right away when "any job" in 9ci is called.

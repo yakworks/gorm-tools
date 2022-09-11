@@ -1,6 +1,6 @@
 package yakworks.rally.activity
 
-import gorm.tools.security.domain.AppUser
+import yakworks.security.gorm.model.AppUser
 import yakworks.testing.gorm.unit.DataRepoTest
 import yakworks.testing.gorm.RepoTestData
 import yakworks.spring.AppResourceLoader

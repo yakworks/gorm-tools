@@ -10,8 +10,8 @@ import groovy.transform.CompileStatic
 
 import org.springframework.context.ApplicationListener
 
-import gorm.tools.audit.AuditStampTrait
 import gorm.tools.repository.events.BeforePersistEvent
+import yakworks.security.audit.AuditStampTrait
 
 @CompileStatic
 class TestingAuditStampListener implements ApplicationListener<BeforePersistEvent> {

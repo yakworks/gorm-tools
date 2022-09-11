@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.event.EventListener
 
 import gorm.tools.repository.events.BeforePersistEvent
-import gorm.tools.security.domain.AppUser
-import gorm.tools.security.services.SecService
 import jakarta.annotation.Nullable
 import yakworks.rally.orgs.model.Company
+import yakworks.security.SecService
+import yakworks.security.gorm.model.AppUser
 
 /**
  * temp in place to assign defualt orgId to user as Company default (2)

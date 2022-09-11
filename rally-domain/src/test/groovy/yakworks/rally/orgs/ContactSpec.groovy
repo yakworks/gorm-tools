@@ -1,7 +1,7 @@
 package yakworks.rally.orgs
 
 import gorm.tools.problem.ValidationProblem
-import gorm.tools.security.domain.AppUser
+import yakworks.security.gorm.model.AppUser
 import yakworks.testing.gorm.RepoTestData
 import yakworks.testing.gorm.SecurityTest
 import yakworks.testing.gorm.TestDataJson

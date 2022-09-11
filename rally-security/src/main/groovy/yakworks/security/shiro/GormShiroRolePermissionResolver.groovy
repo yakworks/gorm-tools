@@ -10,7 +10,7 @@ import org.apache.shiro.authz.Permission
 import org.apache.shiro.authz.permission.RolePermissionResolver
 import org.apache.shiro.authz.permission.WildcardPermission
 
-import gorm.tools.security.domain.SecRolePermission
+import yakworks.security.gorm.model.SecRolePermission
 
 @CompileStatic
 class GormShiroRolePermissionResolver implements RolePermissionResolver {

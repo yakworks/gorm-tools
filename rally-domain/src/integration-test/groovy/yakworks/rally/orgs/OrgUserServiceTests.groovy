@@ -3,7 +3,6 @@ package yakworks.rally.orgs
 import gorm.tools.async.AsyncConfig
 import gorm.tools.async.AsyncService
 import grails.gorm.transactions.Rollback
-import grails.plugin.springsecurity.SpringSecurityService
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.testing.gorm.DomainIntTest
@@ -14,7 +13,6 @@ class OrgUserServiceTests extends Specification implements DomainIntTest {
 
     UserOrgService userOrgService
     AsyncService asyncService
-    SpringSecurityService springSecurityService
 
     def "sanity check"() {
         expect:

@@ -4,8 +4,8 @@
 */
 package yakworks.security.shiro
 
-import gorm.tools.security.domain.SecUserPermission
 import grails.compiler.GrailsCompileStatic
+import yakworks.security.gorm.model.SecUserPermission
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>

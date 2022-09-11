@@ -30,7 +30,7 @@ class Application extends GrailsAutoConfiguration {
      */
     @Override
     Collection<String> packageNames() {
-        super.packageNames() + ['gorm.tools.security', 'yakworks.rally']
+        super.packageNames() + ['yakworks.security', 'yakworks.rally']
     }
 
 }

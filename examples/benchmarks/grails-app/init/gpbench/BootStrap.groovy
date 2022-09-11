@@ -8,7 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import gpbench.services.CityFatInsertBenchmarks
 import gpbench.services.DataSetup
 import grails.core.GrailsApplication
-import grails.plugin.springsecurity.userdetails.GrailsUser
+import yakworks.security.spring.SpringSecUser
 
 class BootStrap {
 
@@ -40,8 +40,7 @@ class BootStrap {
         //makes sure that each spawned thread has the access to the logged in user
         // SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL)
 
-        GrailsUser grailsUser = new GrailsUser("test", "test", true,
-            true, false, true, AuthorityUtils.createAuthorityList('ADMIN'), 1 as Long)
+        SpringSecUser grailsUser = new SpringSecUser("test", "test", AuthorityUtils.createAuthorityList('ADMIN'), 1 as Long)
         SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(grailsUser, "test", AuthorityUtils.createAuthorityList('ADMIN'))
     }
 

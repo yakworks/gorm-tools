@@ -2,7 +2,7 @@ package gorm.tools.beans
 
 
 import gorm.tools.metamap.services.MetaMapService
-import gorm.tools.security.domain.AppUser
+import yakworks.security.gorm.model.AppUser
 import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration

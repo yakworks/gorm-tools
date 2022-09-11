@@ -37,7 +37,7 @@ if(Environment.getCurrent() == Environment.PRODUCTION){
     grails.plugin.springsecurity.rest.token.storage.jwt.useSignedJwt = false
 
     grails.plugin.springsecurity.rest.token.storage.useGorm = true
-    grails.plugin.springsecurity.rest.token.storage.gorm.tokenDomainClassName = 'gorm.tools.security.domain.AppUserToken'
+    grails.plugin.springsecurity.rest.token.storage.gorm.tokenDomainClassName = 'yakworks.security.gorm.model.AppUserToken'
 
     // grails.plugin.springsecurity.rest.token.validation.useBearerToken = false
     // grails.plugin.springsecurity.rest.token.validation.headerName = 'X-Auth-Token'

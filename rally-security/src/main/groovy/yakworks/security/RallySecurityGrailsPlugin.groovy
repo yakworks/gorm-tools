@@ -11,15 +11,14 @@ import org.apache.shiro.spring.LifecycleBeanPostProcessor
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler
 import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler
 
-import gorm.tools.security.domain.AppUser
 import grails.plugin.springsecurity.SecurityFilterPosition
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugins.Plugin
 import grails.util.Environment
+import yakworks.security.gorm.model.AppUser
 import yakworks.security.rest.NineOauthUserDetailsService
 import yakworks.security.rest.RestAuthenticationProvider
 import yakworks.security.rest.RestAuthenticationSuccessHandler

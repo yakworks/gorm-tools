@@ -12,7 +12,7 @@ import yakworks.rest.gorm.RestApiFromConfig
 
 // the component scan here does not seem to be the same as the packageNames and is needed to pick up the
 // the services marked with @Component
-@ComponentScan(['restify', 'yakworks.testify', 'gorm.tools.security', 'yakworks.rally', 'yakworks.testing.gorm.model'])
+@ComponentScan(['restify', 'yakworks.testify', 'yakworks.security', 'yakworks.rally', 'yakworks.testing.gorm.model'])
 @RestApiFromConfig
 class Application extends GrailsAutoConfiguration {
     static void main(String[] args) {
@@ -31,7 +31,7 @@ class Application extends GrailsAutoConfiguration {
      */
     @Override
     Collection<String> packageNames() {
-        super.packageNames() + ['yakworks.rally', 'yakworks.testify', 'gorm.tools.security', 'yakworks.testing.gorm.model']
+        super.packageNames() + ['yakworks.rally', 'yakworks.testify', 'yakworks.security', 'yakworks.testing.gorm.model']
     }
 
 }

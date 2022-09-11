@@ -8,12 +8,12 @@ import java.time.LocalDateTime
 
 import groovy.transform.CompileDynamic
 
-import gorm.tools.security.domain.AppUser
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
+import yakworks.security.gorm.model.AppUser
 
 @CompileDynamic //ok for testing
 class MockData {

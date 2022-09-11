@@ -6,8 +6,8 @@ package yakworks.testing.gorm
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.security.domain.SecRole
-import gorm.tools.security.services.SecService
+import yakworks.security.SecService
+import yakworks.security.gorm.model.SecRole
 
 /**
  * Spring implementation of the generic base SecService

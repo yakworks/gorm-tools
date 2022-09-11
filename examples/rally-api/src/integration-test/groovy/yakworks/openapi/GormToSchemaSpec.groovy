@@ -2,7 +2,7 @@ package yakworks.openapi
 
 import yakworks.openapi.gorm.ApiSchemaEntity
 import yakworks.openapi.gorm.GormToSchema
-import gorm.tools.security.domain.SecRoleUser
+import yakworks.security.gorm.model.SecRoleUser
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import org.springframework.beans.factory.annotation.Autowired

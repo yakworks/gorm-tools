@@ -4,10 +4,10 @@
 */
 package yakworks.rally.orgs.model
 
-import gorm.tools.audit.AuditStamp
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import yakworks.security.audit.AuditStamp
 
 @Entity
 @AuditStamp

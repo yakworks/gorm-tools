@@ -1,8 +1,8 @@
 package yakworks.rally
 
-import gorm.tools.security.domain.AppUser
-import gorm.tools.security.domain.SecRole
-import gorm.tools.security.domain.SecRoleUser
+import yakworks.security.gorm.model.AppUser
+import yakworks.security.gorm.model.SecRole
+import yakworks.security.gorm.model.SecRoleUser
 import yakworks.testing.gorm.TestDataJson
 import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification

@@ -1,8 +1,8 @@
 package yakworks.security.rest
 
-import gorm.tools.security.domain.AppUser
-import gorm.tools.security.domain.SecRole
-import gorm.tools.security.domain.SecRoleUser
+import yakworks.security.gorm.model.AppUser
+import yakworks.security.gorm.model.SecRole
+import yakworks.security.gorm.model.SecRoleUser
 import yakworks.testing.gorm.unit.DataRepoTest
 import grails.plugin.springsecurity.rest.oauth.OauthUser
 import grails.testing.services.ServiceUnitTest

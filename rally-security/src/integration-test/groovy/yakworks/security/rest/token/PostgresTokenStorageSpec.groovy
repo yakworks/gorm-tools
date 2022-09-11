@@ -2,7 +2,7 @@ package yakworks.security.rest.token
 
 
 import gorm.tools.jdbc.DbDialectService
-import gorm.tools.security.AppUserDetailsService
+import yakworks.security.spring.AppUserDetailsService
 import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.plugin.springsecurity.rest.token.storage.TokenStorageService

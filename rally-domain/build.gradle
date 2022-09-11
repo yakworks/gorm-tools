@@ -13,8 +13,8 @@ dependencies {
   api project(":gorm-tools")
   api project(":gorm-security")
   api project(":gorm-etl")
-  api "org.yakworks:grails-kit:$vYakGrailsKit"
-  api "org.yakworks:grails-external-config:$vYakGrailsKit"
+  api "org.yakworks:grails-kit:$vSpringGrailsKit"
+  api "org.yakworks:grails-external-config:$vSpringGrailsKit"
   //api "dk.glasius:external-config:$vExternalConfig"
   api 'jakarta.annotation:jakarta.annotation-api:2.1.0'
 

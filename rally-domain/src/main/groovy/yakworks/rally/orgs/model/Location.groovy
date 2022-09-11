@@ -6,12 +6,12 @@ package yakworks.rally.orgs.model
 
 import groovy.transform.CompileDynamic
 
-import gorm.tools.audit.AuditStamp
 import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.orgs.repo.LocationRepo
+import yakworks.security.audit.AuditStamp
 
 @Entity
 @AuditStamp

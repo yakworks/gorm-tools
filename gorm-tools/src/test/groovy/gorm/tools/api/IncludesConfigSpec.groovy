@@ -4,14 +4,14 @@
 */
 package gorm.tools.api
 
-import gorm.tools.testing.unit.DataRepoTest
+import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Shared
 import spock.lang.Specification
-import yakworks.gorm.testing.model.Enummy
-import yakworks.gorm.testing.model.KitchenSink
-import yakworks.gorm.testing.model.SinkExt
-import yakworks.gorm.testing.model.SinkItem
-import yakworks.gorm.testing.model.Thing
+import yakworks.testing.gorm.model.Enummy
+import yakworks.testing.gorm.model.KitchenSink
+import yakworks.testing.gorm.model.SinkExt
+import yakworks.testing.gorm.model.SinkItem
+import yakworks.testing.gorm.model.Thing
 
 class IncludesConfigSpec extends Specification  implements DataRepoTest  {
 
@@ -37,8 +37,8 @@ class IncludesConfigSpec extends Specification  implements DataRepoTest  {
     void 'getIncludes by entity name'() {
 
         when:
-        List<String> incs = includesConfig.getIncludesByKey('yakworks.gorm.testing.model.KitchenSink', 'stamp')
-        List<String> incsNotFound = includesConfig.getIncludesByKey('yakworks.gorm.testing.model.KitchenSink', 'a-bad-key')
+        List<String> incs = includesConfig.getIncludesByKey('yakworks.testing.gorm.model.KitchenSink', 'stamp')
+        List<String> incsNotFound = includesConfig.getIncludesByKey('yakworks.testing.gorm.model.KitchenSink', 'a-bad-key')
 
         then:
         3 == incs.size()

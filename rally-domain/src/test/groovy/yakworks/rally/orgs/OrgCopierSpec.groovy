@@ -1,8 +1,8 @@
 package yakworks.rally.orgs
 
-import gorm.tools.testing.RepoTestData
-import yakworks.gorm.testing.SecurityTest
-import gorm.tools.testing.unit.DataRepoTest
+import yakworks.testing.gorm.RepoTestData
+import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.rally.activity.ActivityCopier
 import yakworks.rally.activity.model.Activity

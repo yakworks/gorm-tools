@@ -9,12 +9,9 @@ dependencies {
 
   implementation "org.grails:grails-plugin-domain-class"
 
-  // api project(":gorm-tools")
-  // api project(":gorm-tools-security")
-  // api project(":gorm-tools-csv")
   api project(":rally-domain")
   api project(":gorm-test-domain")
-  api "org.yakworks:grails-kit:$vYakGrailsKit"
+  api "org.yakworks:grails-kit:$vSpringGrailsKit"
 
   // runtime "org.glassfish.web:el-impl:2.1.2-b03"
   runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"

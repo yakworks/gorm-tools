@@ -6,8 +6,8 @@ package yakworks.rally.api
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.rest.controller.RestRepoApiController
 import yakworks.rally.orgs.model.Location
+import yakworks.rest.gorm.controller.RestRepoApiController
 
 import static org.springframework.http.HttpStatus.CREATED
 

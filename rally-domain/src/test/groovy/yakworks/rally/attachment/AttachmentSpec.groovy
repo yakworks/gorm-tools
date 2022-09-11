@@ -5,14 +5,13 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 import gorm.tools.problem.ValidationProblem
-import gorm.tools.testing.unit.DataRepoTest
+import yakworks.testing.gorm.unit.DataRepoTest
 import org.springframework.mock.web.MockMultipartFile
-import spock.lang.IgnoreRest
 import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport
-import yakworks.gorm.testing.SecurityTest
-import yakworks.grails.resource.AppResourceLoader
+import yakworks.testing.gorm.SecurityTest
+import yakworks.spring.AppResourceLoader
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.model.FileData
@@ -33,7 +32,7 @@ class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest
         mockDomains(Attachment, AttachmentLink, FileData, Tag, TagLink)
     }
 
-    void cleanupSpec() {
+    def cleanupSpec() {
         attachmentSupport.rimrafAttachmentsDirectory()
     }
 

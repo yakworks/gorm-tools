@@ -12,13 +12,12 @@ import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Value
 
-import gorm.tools.security.domain.AppUser
-import gorm.tools.security.domain.SecRoleUser
-import gorm.tools.security.services.SecService
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.ReadOnly
 import grails.gorm.transactions.Transactional
 import yakworks.rally.orgs.model.Contact
+import yakworks.security.gorm.model.AppUser
+import yakworks.security.gorm.model.SecRoleUser
 
 // import grails.plugin.freemarker.FreeMarkerViewService
 

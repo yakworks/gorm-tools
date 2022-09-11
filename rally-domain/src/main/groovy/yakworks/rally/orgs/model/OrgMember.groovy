@@ -4,12 +4,12 @@
 */
 package yakworks.rally.orgs.model
 
-import gorm.tools.audit.AuditStamp
 import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.orgs.repo.OrgMemberRepo
+import yakworks.security.audit.AuditStamp
 
 @Entity @AuditStamp
 @IdEqualsHashCode

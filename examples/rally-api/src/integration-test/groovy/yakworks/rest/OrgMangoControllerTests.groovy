@@ -1,17 +1,10 @@
 package yakworks.rest
 
-import gorm.tools.rest.controller.RestRepoApiController
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import spock.lang.Ignore
-import spock.lang.IgnoreRest
-import spock.lang.Specification
-import yakworks.commons.map.Maps
-import yakworks.gorm.testing.http.RestIntTest
-import yakworks.gorm.testing.http.RestIntegrationTest
+import yakworks.rest.gorm.controller.RestRepoApiController
 import yakworks.rally.orgs.model.Org
-import yakworks.rally.orgs.model.OrgType
-import yakworks.rally.tag.model.Tag
+import yakworks.testing.rest.RestIntTest
 
 @Rollback
 @Integration
@@ -76,6 +69,21 @@ class OrgMangoControllerTests extends RestIntTest {
         response.header("Content-Type").contains("text/csv")
 
 
+    }
+
+    void "list xlsx"() {
+        // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
+        when:
+        controller.params << [
+            projections:'calc.totalDue:"sum",type:"group"',
+            sort:'calc_totalDue_sum:asc',
+            format:'xlsx'
+        ]
+        controller.list()
+
+        then:
+        response.status == 200
+        response.header("Content-Type").contains("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     }
 
 }

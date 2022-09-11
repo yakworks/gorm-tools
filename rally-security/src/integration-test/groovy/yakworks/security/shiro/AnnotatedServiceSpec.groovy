@@ -1,29 +1,21 @@
 package yakworks.security.shiro
 
-import gorm.tools.security.domain.AppUser
-import gorm.tools.security.domain.SecRole
-import gorm.tools.security.domain.SecRoleUser
-import gorm.tools.security.services.SecService
+import yakworks.security.gorm.model.AppUser
+import yakworks.security.gorm.model.SecRole
+import yakworks.security.gorm.model.SecRoleUser
+import yakworks.security.SecService
 import grails.gorm.transactions.Rollback
 import grails.gorm.transactions.Transactional
-import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.testing.mixin.integration.Integration
-import spock.lang.IgnoreRest
-import yakworks.security.Roles
-import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authz.UnauthenticatedException
 import org.apache.shiro.authz.UnauthorizedException
 import org.apache.shiro.realm.Realm
 import org.apache.shiro.util.ThreadContext
 import org.apache.shiro.web.mgt.WebSecurityManager
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.mock.web.MockHttpServletRequest
-import org.springframework.mock.web.MockHttpServletResponse
-import org.springframework.security.core.context.SecurityContextHolder
-import spock.lang.Ignore
 import spock.lang.Specification
-import gorm.tools.security.domain.SecRolePermission
-import gorm.tools.security.domain.SecUserPermission
+import yakworks.security.gorm.model.SecRolePermission
+import yakworks.security.gorm.model.SecUserPermission
 
 @Integration
 @Rollback
@@ -31,7 +23,7 @@ class AnnotatedServiceSpec extends Specification {
 
     WebSecurityManager shiroSecurityManager
     Realm springSecurityRealm
-    SecService<AppUser> secService
+    SecService secService
     @Autowired TestService testService
 
 

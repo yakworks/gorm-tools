@@ -49,8 +49,22 @@ repositories {
   mavenCentral()
 }
 ...
-compile "org.yakworks:gorm-tools:7.0.8-v.33"
+implementation "org.yakworks:gorm-tools:7.3.23"
 ``` 
+## Libs
+
+- `org.yakworks:gorm-tools` - main plugin for the base gorm-tools extensions
+- `org.yakworks:gorm-security` - implementations of the domains for security, audit stamp traits and events. 
+- `org.yakworks:gorm-rest` - foundation and ASTs for automated rest api from gorm domains
+- `org.yakworks:gorm-openapi` - gorm swagger and json schema foundation. 
+- `org.yakworks:gorm-etl` - Extract, Transform, Load for creating Excel and CSV
+- `org.yakworks:rally-domain` - Opinionated CRM like models that serve as foundation for our business apps. Also used for examples and testing.
+- `org.yakworks:rally-security` - Extra security models and shiro to spring-security adapter for fine grained ACL
+
+** Testing Libs
+- `org.yakworks:gorm-test-support` - Testing framework for gorm domains
+- `org.yakworks:gorm-test-domain` - common domain model used for tests. KitchenSink is commonly used in tests
+
 
 ## Groovy 3, Grails 5 and Gorm 7.3
 

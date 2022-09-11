@@ -5,10 +5,9 @@ import grails.core.support.proxy.ProxyHandler
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import org.hibernate.Hibernate
 
-import gorm.tools.testing.integration.DataIntegrationTest
+import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Org
 

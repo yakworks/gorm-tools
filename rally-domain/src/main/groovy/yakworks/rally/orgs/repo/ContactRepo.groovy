@@ -17,7 +17,6 @@ import gorm.tools.repository.events.AfterPersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
-import gorm.tools.security.domain.AppUser
 import gorm.tools.utils.GormUtils
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
@@ -32,6 +31,7 @@ import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.TagLink
+import yakworks.security.gorm.model.AppUser
 
 @GormRepository
 @CompileStatic

@@ -4,9 +4,9 @@
 */
 package gorm.tools.hibernate.json
 
-import gorm.tools.repository.GormRepo
-import gorm.tools.testing.RepoTestData
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+
+import yakworks.testing.gorm.RepoTestData
+import yakworks.testing.gorm.GormToolsHibernateSpec
 
 class JpaEntSpec extends GormToolsHibernateSpec {
 

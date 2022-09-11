@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 
-import gorm.tools.security.domain.AppUserToken
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.rest.token.storage.TokenNotFoundException
 import grails.plugin.springsecurity.rest.token.storage.TokenStorageService
+import yakworks.security.gorm.model.AppUserToken
 
 /**
  * GORM implementation for token storage. It will look for tokens on the DB using a domain class that will contain the

@@ -1,4 +1,4 @@
-import yakworks.gorm.oapi.OpenApiGenerator
+import yakworks.openapi.gorm.OpenApiGenerator
 
 // Place your Spring DSL code here
 beans = {

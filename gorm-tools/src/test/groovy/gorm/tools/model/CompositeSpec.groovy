@@ -1,6 +1,6 @@
 package gorm.tools.model
 
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import yakworks.testing.gorm.GormToolsHibernateSpec
 import testing.CompositeNoVersion
 
 class CompositeSpec extends GormToolsHibernateSpec {

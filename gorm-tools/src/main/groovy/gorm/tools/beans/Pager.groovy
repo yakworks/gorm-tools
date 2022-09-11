@@ -10,6 +10,7 @@ import groovy.util.logging.Slf4j
 
 import gorm.tools.metamap.services.MetaMapService
 import yakworks.meta.MetaMapList
+import yakworks.spring.AppCtx
 
 /**
  * a holder object for paged data, used mostly in the rest and views

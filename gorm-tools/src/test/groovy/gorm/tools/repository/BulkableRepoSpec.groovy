@@ -1,28 +1,20 @@
 package gorm.tools.repository
 
-import gorm.tools.databinding.PathKeyMap
+import yakworks.commons.map.PathKeyMap
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.problem.ValidationProblem
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import yakworks.testing.gorm.GormToolsHibernateSpec
 import org.springframework.http.HttpStatus
 
 import gorm.tools.async.AsyncService
-import gorm.tools.async.ParallelTools
 import gorm.tools.job.SyncJobState
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.model.DataOp
-import gorm.tools.testing.unit.DataRepoTest
-import spock.lang.IgnoreRest
-import spock.lang.Specification
-import testing.Address
-import testing.AddyNested
-import testing.Cust
 import testing.TestSyncJob
 import testing.TestSyncJobService
-import yakworks.gorm.testing.SecurityTest
-import yakworks.gorm.testing.model.KitchenSink
-import yakworks.gorm.testing.model.KitchenSinkRepo
-import yakworks.gorm.testing.model.SinkExt
+import yakworks.testing.gorm.model.KitchenSink
+import yakworks.testing.gorm.model.KitchenSinkRepo
+import yakworks.testing.gorm.model.SinkExt
 
 import static yakworks.json.groovy.JsonEngine.parseJson
 
@@ -89,10 +81,10 @@ class BulkableRepoSpec extends GormToolsHibernateSpec {
         payload != null
         payload instanceof List
         payload.size() == 300
-        payload[0].name == "Sink1"
+        payload[0].name == "Blue Cheese"
         payload[0].ext.name == "SinkExt1"
         //sanity check
-        payload[19].name == "Sink20"
+        payload[9].name == "Oranges"
 
         when: "verify job.data (job results)"
         def dataString = job.dataToString()
@@ -110,14 +102,16 @@ class BulkableRepoSpec extends GormToolsHibernateSpec {
         and: "verify includes"
         results[0].data.size() == 3 //id, project name, nested name
         //results[0].data.id == 1
-        results[0].data.name == "Sink1"
+        results[0].data.name == "Blue Cheese"
         results[0].data.ext.name == "SinkExt1"
 
         and: "Verify database records"
+        def bcks = KitchenSink.findByName("Blue Cheese")
+        bcks
+        bcks.ext.name == "SinkExt1"
+
         KitchenSink.count() == 300
-        KitchenSink.findByName("Sink1") != null
-        KitchenSink.findByName("Sink1").ext.name == "SinkExt1"
-        KitchenSink.findByName("Sink20") != null
+        KitchenSink.findByName("Oranges")
     }
 
     void "test bulk update"() {

@@ -9,7 +9,7 @@ import yakworks.meta.MetaMapList
 import gorm.tools.beans.Pager
 import gorm.tools.metamap.services.MetaEntityService
 import gorm.tools.metamap.services.MetaMapService
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import yakworks.testing.gorm.GormToolsHibernateSpec
 import testing.Address
 import testing.AddyNested
 import testing.Cust

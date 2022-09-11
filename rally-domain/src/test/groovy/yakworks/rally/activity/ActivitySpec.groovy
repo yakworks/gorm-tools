@@ -1,12 +1,12 @@
 package yakworks.rally.activity
 
 import gorm.tools.model.Persistable
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import yakworks.testing.gorm.GormToolsHibernateSpec
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Ignore
 import spock.lang.Shared
-import yakworks.gorm.testing.SecurityTest
-import yakworks.grails.resource.AppResourceLoader
+import yakworks.testing.gorm.SecurityTest
+import yakworks.spring.AppResourceLoader
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink

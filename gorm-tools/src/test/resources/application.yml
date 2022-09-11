@@ -36,6 +36,6 @@ api:
   paths:
     security:
       sinkExt:
-        entityClass: 'yakworks.gorm.testing.model.SinkExt'
+        entityClass: 'yakworks.testing.gorm.model.SinkExt'
         includes:
           getCustom: ['id', 'name', 'thing.$stamp' ]

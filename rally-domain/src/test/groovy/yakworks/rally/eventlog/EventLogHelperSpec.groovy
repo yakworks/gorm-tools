@@ -1,7 +1,7 @@
 package yakworks.rally.eventlog
 
-import gorm.tools.repository.RepoUtil
-import gorm.tools.testing.unit.DomainRepoTest
+
+import yakworks.testing.gorm.unit.DomainRepoTest
 import spock.lang.Specification
 
 class EventLogHelperSpec extends Specification implements DomainRepoTest<EventLog> {

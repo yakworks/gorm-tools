@@ -48,10 +48,6 @@ dependencies {
   implementation "org.grails:grails-web-boot"
   implementation "org.grails:grails-plugin-services"
 
-  testRuntimeOnly "com.h2database:h2:$vH2"
-  testRuntimeOnly "javax.xml.bind:jaxb-api:2.3.1"
-  testRuntimeOnly "com.zaxxer:HikariCP:$vHikari"
-
 }
 
 bootRun {

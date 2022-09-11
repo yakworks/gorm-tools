@@ -4,13 +4,11 @@
 */
 package gorm.tools.repository
 
-import gorm.tools.repository.model.IdGeneratorRepo
+
 import gorm.tools.repository.model.UuidGormRepo
-import gorm.tools.testing.RepoTestData
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import yakworks.testing.gorm.RepoTestData
+import yakworks.testing.gorm.GormToolsHibernateSpec
 import testing.UuidSample
-import yakworks.gorm.testing.model.Thing
-import yakworks.gorm.testing.model.ThingRepo
 
 class UuidRepoSpec extends GormToolsHibernateSpec {
 

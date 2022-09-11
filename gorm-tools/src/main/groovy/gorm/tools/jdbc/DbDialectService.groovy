@@ -12,7 +12,7 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.mapping.reflect.ClassUtils
 import org.springframework.jdbc.core.JdbcTemplate
 
-import gorm.tools.beans.AppCtx
+import yakworks.grails.GrailsHolder
 
 /**
  * Utility class to help create generic code and SQL that can work across supported databases.
@@ -37,7 +37,7 @@ class DbDialectService {
         int result = UNKNOWN
         // just to make the stuff below easier to read.
         if (!dialectName) {
-            dialectName = AppCtx.config.getProperty('hibernate.dialect')
+            dialectName = GrailsHolder.config.getProperty('hibernate.dialect')
         }
 
         //fallback to H2 just like how Datasources plugin does. if H2 is present in classpath

@@ -9,10 +9,9 @@ import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.metamap.services.MetaMapService
-import gorm.tools.security.domain.AppUser
-import gorm.tools.security.services.SecService
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
+import yakworks.security.gorm.model.AppUser
 
 @CompileStatic
 class CurrentUser {

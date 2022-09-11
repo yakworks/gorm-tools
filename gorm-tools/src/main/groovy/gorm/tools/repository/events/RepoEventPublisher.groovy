@@ -13,11 +13,11 @@ import groovy.transform.CompileStatic
 import org.springframework.util.ReflectionUtils
 import org.springframework.validation.Errors
 
-import gorm.tools.beans.AppCtx
 import gorm.tools.databinding.BindAction
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.RepoUtil
+import yakworks.spring.AppCtx
 
 /**
  * Invokes "event methods" on Repository artifacts as well as publish spring events for @EventListeners

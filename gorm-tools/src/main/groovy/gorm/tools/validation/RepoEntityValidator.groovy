@@ -24,7 +24,6 @@ import org.springframework.validation.BindingResult
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 
-import gorm.tools.beans.AppCtx
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.PersistableRepoEntity
@@ -32,6 +31,7 @@ import grails.gorm.validation.ConstrainedProperty
 import grails.gorm.validation.Constraint
 import grails.gorm.validation.PersistentEntityValidator
 import yakworks.commons.lang.ClassUtils
+import yakworks.spring.AppCtx
 
 /**
  * Overrides the PersistentEntityValidator to address a few things

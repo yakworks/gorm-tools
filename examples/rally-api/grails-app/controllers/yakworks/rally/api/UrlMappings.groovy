@@ -4,8 +4,7 @@
 */
 package yakworks.rally.api
 
-import gorm.tools.rest.mapping.RepoApiMappingsService
-import gorm.tools.rest.mapping.UrlMappingsHelper
+import yakworks.rest.gorm.mapping.RepoApiMappingsService
 
 class UrlMappings {
 

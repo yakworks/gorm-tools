@@ -20,7 +20,6 @@ import org.springframework.transaction.TransactionDefinition
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.databinding.PathKeyMap
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.model.Lookupable
 import gorm.tools.model.Persistable
@@ -34,6 +33,7 @@ import grails.core.support.proxy.ProxyHandler
 import grails.validation.ValidationException
 import yakworks.api.problem.data.NotFoundProblem
 import yakworks.commons.lang.ClassUtils
+import yakworks.commons.map.PathKeyMap
 
 /**
  * A trait that turns a class into a Repository

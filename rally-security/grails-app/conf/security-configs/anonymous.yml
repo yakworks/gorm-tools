@@ -28,7 +28,7 @@ grails:
 #grails.plugin.springsecurity.interceptUrlMap = [[pattern: '/**', access: ['IS_AUTHENTICATED_ANONYMOUSLY']]]
 #
 #//shiro
-#grails.plugin.springsecurity.shiro.permissionDomainClassName = 'gorm.tools.security.domain.SecUserPermission'
-#grails.plugin.springsecurity.shiro.rolePermissionDomainClassName = 'gorm.tools.security.domain.SecRolePermission'
+#grails.plugin.springsecurity.shiro.permissionDomainClassName = 'yakworks.security.gorm.model.SecUserPermission'
+#grails.plugin.springsecurity.shiro.rolePermissionDomainClassName = 'yakworks.security.gorm.model.SecRolePermission'
 #grails.plugin.springsecurity.useSecurityEventListener = true
 

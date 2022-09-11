@@ -5,11 +5,10 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 
 import org.grails.datastore.mapping.multitenancy.exceptions.TenantNotFoundException
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.context.SecurityContextHolder
 import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.gorm.testing.DomainIntTest
+import yakworks.testing.gorm.DomainIntTest
 // import yakworks.security.tenant.UserTenantResolver
 
 @Ignore //WIP

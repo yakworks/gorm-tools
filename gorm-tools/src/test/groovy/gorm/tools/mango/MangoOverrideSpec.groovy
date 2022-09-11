@@ -5,7 +5,6 @@
 package gorm.tools.mango
 
 import gorm.tools.beans.Pager
-import grails.gorm.DetachedCriteria
 
 import javax.inject.Inject
 
@@ -14,7 +13,7 @@ import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.model.RepoEntity
-import gorm.tools.testing.unit.DataRepoTest
+import yakworks.testing.gorm.unit.DataRepoTest
 import grails.persistence.Entity
 import spock.lang.Specification
 

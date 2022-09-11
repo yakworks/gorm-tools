@@ -11,10 +11,10 @@ import org.springframework.context.annotation.Lazy
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 
-import gorm.tools.csv.CSVPathKeyMapReader
-import gorm.tools.csv.CsvToMapTransformer
 import yakworks.commons.io.ZipUtils
 import yakworks.commons.lang.Validate
+import yakworks.etl.csv.CSVPathKeyMapReader
+import yakworks.etl.csv.CsvToMapTransformer
 import yakworks.rally.attachment.model.Attachment
 
 /**

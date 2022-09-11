@@ -13,7 +13,7 @@ import groovy.transform.CompileStatic
 import org.springframework.jdbc.core.ColumnMapRowMapper
 import org.springframework.jdbc.support.JdbcUtils
 
-import gorm.tools.databinding.PathKeyMap
+import yakworks.commons.map.PathKeyMap
 
 /**
  * Row mapper which allows to convert data from a given ResultSet instance

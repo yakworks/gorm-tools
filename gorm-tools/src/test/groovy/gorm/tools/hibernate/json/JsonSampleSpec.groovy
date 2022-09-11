@@ -5,9 +5,8 @@
 package gorm.tools.hibernate.json
 
 import gorm.tools.repository.GormRepo
-import gorm.tools.testing.RepoTestData
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
-import testing.UuidSample
+import yakworks.testing.gorm.RepoTestData
+import yakworks.testing.gorm.GormToolsHibernateSpec
 
 class JsonSampleSpec extends GormToolsHibernateSpec {
 

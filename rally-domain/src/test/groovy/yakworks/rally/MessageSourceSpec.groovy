@@ -1,11 +1,9 @@
 package yakworks.rally
 
-import org.grails.testing.GrailsUnitTest
 
-import gorm.tools.testing.support.GormToolsSpecHelper
+import yakworks.testing.gorm.support.GormToolsSpecHelper
 import grails.testing.spring.AutowiredTest
 import spock.lang.Specification
-import yakworks.i18n.icu.GrailsICUMessageSource
 import yakworks.i18n.icu.ICUMessageSource
 
 /**

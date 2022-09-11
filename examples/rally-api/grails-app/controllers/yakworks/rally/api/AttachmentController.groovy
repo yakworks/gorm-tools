@@ -6,8 +6,8 @@ package yakworks.rally.api
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.rest.controller.RestRepoApiController
 import yakworks.rally.attachment.model.Attachment
+import yakworks.rest.gorm.controller.RestRepoApiController
 
 @CompileStatic
 class AttachmentController implements RestRepoApiController<Attachment> {

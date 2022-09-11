@@ -2,7 +2,7 @@ package yakworks
 
 import org.springframework.beans.factory.annotation.Autowired
 
-import yakworks.gorm.oapi.OpenApiGenerator
+import yakworks.openapi.gorm.OpenApiGenerator
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification

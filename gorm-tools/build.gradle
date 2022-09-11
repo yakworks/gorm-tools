@@ -9,11 +9,11 @@ dependencies {
   // TODO use this standard for json converters
   // api "jakarta.json.bind:jakarta.json.bind-api:2.0.0"
 
-  api "org.yakworks:grails-kit:$vYakGrailsKit"
+  api "org.yakworks:grails-kit:$vSpringGrailsKit"
 
   api "org.yakworks:grails-icu4j:$vYakICU4J"
-  api "org.yakworks:api-messages:$vYakCommons"
-  api "org.yakworks:groovy-commons:$vYakCommons"
+  api "org.yakworks:api-messages:$vGroovyCommons"
+  api "org.yakworks:groovy-commons:$vGroovyCommons"
 
   // see https://github.com/f4b6a3/uuid-creator
   api "com.github.f4b6a3:uuid-creator:$vUuidCreator"
@@ -38,7 +38,7 @@ dependencies {
 
   testImplementation "org.slf4j:slf4j-simple:${vSlf4j}"
   testImplementation project(":gorm-test-domain")
-  testImplementation project(":gorm-tools-security")
+  testImplementation project(":gorm-security")
   //
   // testImplementation "com.vladmihalcea:hibernate-types-52:$vHibTypes"
   //

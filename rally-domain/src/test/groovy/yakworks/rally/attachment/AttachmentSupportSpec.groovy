@@ -6,11 +6,11 @@ import java.nio.file.Paths
 
 import groovy.transform.CompileDynamic
 
-import gorm.tools.testing.unit.DataRepoTest
+import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport
-import yakworks.gorm.testing.SecurityTest
-import yakworks.grails.resource.AppResourceLoader
+import yakworks.testing.gorm.SecurityTest
+import yakworks.spring.AppResourceLoader
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote

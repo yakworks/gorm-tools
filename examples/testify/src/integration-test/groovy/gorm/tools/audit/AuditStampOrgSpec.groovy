@@ -1,7 +1,7 @@
 package gorm.tools.audit
 
-import yakworks.gorm.testing.SecuritySpecHelper
-import gorm.tools.testing.integration.DataIntegrationTest
+import yakworks.testing.gorm.SecuritySpecHelper
+import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
 import spock.lang.Specification

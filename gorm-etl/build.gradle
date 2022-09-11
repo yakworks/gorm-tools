@@ -1,0 +1,26 @@
+apply plugin: "yakworks.grails-plugin"
+
+//shared resources to pick up the Gorm defaults from application.groovy, as well as simple logback
+sourceSets.test.resources.srcDirs += [project(':gorm-test-support').sourceSets.main.resources]
+
+dependencies {
+  console "org.grails:grails-console"
+
+  compileOnly "org.grails:grails-plugin-rest"
+
+  // compileOnly "org.grails:grails-plugin-rest"
+  api "com.opencsv:opencsv:$vOpenCsv"
+
+  //see http://spreadsheet.dsl.builders/ and https://guides.grails.org/grails-file-download-excel/guide/index.html
+  implementation "builders.dsl:spreadsheet-builder-poi:$vExcelBuilder"
+  implementation "builders.dsl:spreadsheet-builder-groovy:$vExcelBuilder"
+
+  api "org.apache.poi:poi-ooxml:$vPoi"
+
+  // compileOnly "org.apache.poi:poi:$vPoi"
+  // compileOnly "org.apache.poi:poi-ooxml:$vPoi"
+
+  compileOnly project(":gorm-tools")
+
+  testImplementation project(":gorm-test-domain")
+}

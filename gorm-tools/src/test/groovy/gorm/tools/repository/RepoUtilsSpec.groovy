@@ -7,7 +7,7 @@ package gorm.tools.repository
 import org.springframework.util.ReflectionUtils
 
 import gorm.tools.repository.errors.EmptyErrors
-import gorm.tools.testing.unit.DataRepoTest
+import yakworks.testing.gorm.unit.DataRepoTest
 import grails.persistence.Entity
 import spock.lang.Specification
 import testing.Cust

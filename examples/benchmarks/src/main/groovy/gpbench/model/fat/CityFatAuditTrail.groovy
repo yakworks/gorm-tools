@@ -1,12 +1,12 @@
 package gpbench.model.fat
 
-import gorm.tools.audit.AuditStamp
 import gorm.tools.repository.model.RepoEntity
 import gpbench.model.Country
 import gpbench.model.Region
 import gpbench.model.traits.CityTraitFatWithAssoc
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import yakworks.security.audit.AuditStamp
 
 /**
  * Event methods exist in the repository

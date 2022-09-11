@@ -13,8 +13,8 @@ import org.hibernate.id.IdentifierGenerator
 import org.hibernate.service.ServiceRegistry
 import org.hibernate.type.Type
 
-import gorm.tools.beans.AppCtx
 import gorm.tools.idgen.IdGenerator
+import yakworks.spring.AppCtx
 
 /**
  * A hibernate IdentifierGenerator that uses a Spring Bean ("idGenerator" is default) to get the id's.

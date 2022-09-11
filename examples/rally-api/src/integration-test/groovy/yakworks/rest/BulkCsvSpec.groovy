@@ -1,13 +1,13 @@
 package yakworks.rest
 
 import gorm.tools.repository.RepoUtil
-import gorm.tools.rest.controller.RestRepoApiController
+import yakworks.rest.gorm.controller.RestRepoApiController
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import yakworks.commons.io.ZipUtils
 import yakworks.commons.util.BuildSupport
-import yakworks.gorm.testing.http.RestIntTest
-import yakworks.grails.resource.AppResourceLoader
+import yakworks.testing.rest.RestIntTest
+import yakworks.spring.AppResourceLoader
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.job.SyncJob

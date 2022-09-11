@@ -1,9 +1,9 @@
 package yakworks.rest
 
-import gorm.tools.rest.controller.RestRepoApiController
+import yakworks.rest.gorm.controller.RestRepoApiController
 import grails.testing.mixin.integration.Integration
 import org.apache.commons.lang3.StringUtils
-import yakworks.gorm.testing.http.RestIntTest
+import yakworks.testing.rest.RestIntTest
 import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Org
 

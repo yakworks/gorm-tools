@@ -4,7 +4,7 @@ import java.nio.file.Files
 
 import yakworks.testing.gorm.unit.DataRepoTest
 import yakworks.commons.io.ZipUtils
-import yakworks.grails.resource.AppResourceLoader
+import yakworks.spring.AppResourceLoader
 import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport

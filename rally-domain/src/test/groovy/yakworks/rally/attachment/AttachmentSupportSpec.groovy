@@ -10,7 +10,7 @@ import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport
 import yakworks.testing.gorm.SecurityTest
-import yakworks.grails.resource.AppResourceLoader
+import yakworks.spring.AppResourceLoader
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote

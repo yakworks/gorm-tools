@@ -11,7 +11,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport
 import yakworks.testing.gorm.SecurityTest
-import yakworks.grails.resource.AppResourceLoader
+import yakworks.spring.AppResourceLoader
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.model.FileData

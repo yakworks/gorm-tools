@@ -7,7 +7,7 @@ import gorm.tools.repository.model.RepoEntity
 import yakworks.testing.gorm.SecurityTest
 import yakworks.testing.gorm.unit.DomainRepoTest
 import grails.persistence.Entity
-import yakworks.grails.resource.AppResourceLoader
+import yakworks.spring.AppResourceLoader
 
 import org.apache.commons.io.FileUtils
 

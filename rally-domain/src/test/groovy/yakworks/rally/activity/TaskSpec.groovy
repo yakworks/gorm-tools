@@ -3,7 +3,7 @@ package yakworks.rally.activity
 import gorm.tools.security.domain.AppUser
 import yakworks.testing.gorm.unit.DataRepoTest
 import yakworks.testing.gorm.RepoTestData
-import yakworks.grails.resource.AppResourceLoader
+import yakworks.spring.AppResourceLoader
 import spock.lang.Specification
 import yakworks.testing.gorm.SecurityTest
 import yakworks.rally.activity.model.Activity

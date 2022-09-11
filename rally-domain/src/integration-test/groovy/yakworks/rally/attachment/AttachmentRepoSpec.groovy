@@ -5,7 +5,7 @@ import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 
 import grails.gorm.transactions.Rollback
-import yakworks.grails.resource.AppResourceLoader
+import yakworks.spring.AppResourceLoader
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
 import spock.lang.Specification

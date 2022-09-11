@@ -6,7 +6,7 @@ import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Ignore
 import spock.lang.Shared
 import yakworks.testing.gorm.SecurityTest
-import yakworks.grails.resource.AppResourceLoader
+import yakworks.spring.AppResourceLoader
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink

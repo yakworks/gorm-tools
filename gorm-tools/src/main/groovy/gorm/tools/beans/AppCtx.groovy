@@ -111,7 +111,7 @@ class AppCtx {
      */
     static void publishEvent(Object event){
         //we use the grails.mainContext here because the appCtx scrambles during tests and gets lost
-        ((ApplicationEventPublisher)getGrails().mainContext).publishEvent(event)
+        ((ApplicationEventPublisher)getCtx()).publishEvent(event)
     }
 
     /**

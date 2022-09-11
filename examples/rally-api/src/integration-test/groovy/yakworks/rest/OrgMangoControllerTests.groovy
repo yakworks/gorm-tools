@@ -4,7 +4,7 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import yakworks.rest.gorm.controller.RestRepoApiController
 import yakworks.rally.orgs.model.Org
-import yakworks.testing.http.RestIntTest
+import yakworks.testing.rest.RestIntTest
 
 @Rollback
 @Integration

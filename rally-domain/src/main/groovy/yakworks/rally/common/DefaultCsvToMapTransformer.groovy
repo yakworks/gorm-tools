@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service
 
 import yakworks.commons.io.ZipUtils
 import yakworks.commons.lang.Validate
-import yakworks.gorm.etl.csv.CSVPathKeyMapReader
-import yakworks.gorm.etl.csv.CsvToMapTransformer
+import yakworks.etl.csv.CSVPathKeyMapReader
+import yakworks.etl.csv.CsvToMapTransformer
 import yakworks.rally.attachment.model.Attachment
 
 /**

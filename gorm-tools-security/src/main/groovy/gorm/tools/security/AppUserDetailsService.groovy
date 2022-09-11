@@ -21,7 +21,7 @@ import grails.plugin.springsecurity.userdetails.GrailsUserDetailsService
 
 /**
  * Default Gorm-Tools implementation of GrailsUserDetailsService that uses AppUser to load users and roles
- * We dont use the default GormUserDetailsService from Grails Spring Security.
+ * We dont use the default GormUserDetailsService from Grails Spring Security because we need more flexibility for oauth and ldap.
  * This uses the AppUserService and creates baseline for the various OAuth and Ldap.
  * @see grails.plugin.springsecurity.userdetails.GormUserDetailsService
  */

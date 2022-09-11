@@ -1,12 +1,12 @@
-package yakworks.gorm.etl
+package yakworks.etl
 
 import java.nio.file.Path
 
 import groovy.json.StreamingJsonBuilder
 import groovy.transform.CompileStatic
 
-import yakworks.gorm.etl.csv.render.CSVMapWriter
-import yakworks.gorm.etl.excel.ExcelBuilder
+import yakworks.etl.csv.CSVMapWriter
+import yakworks.etl.excel.ExcelBuilder
 import gorm.tools.metamap.services.MetaMapService
 import yakworks.testing.gorm.GormToolsHibernateSpec
 import gorm.tools.utils.BenchmarkHelper

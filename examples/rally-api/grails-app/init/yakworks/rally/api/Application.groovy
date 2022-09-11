@@ -11,8 +11,8 @@ import org.springframework.context.annotation.ComponentScan
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
 import yakworks.openapi.gorm.OpenApiGenerator
-import yakworks.rest.grails.AppInfoBuilder
 import yakworks.rest.gorm.RestApiFromConfig
+import yakworks.rest.grails.AppInfoBuilder
 
 // the component scan here does not seem to be the same as the packageNames and is needed to pick up the
 // the services marked with @Component

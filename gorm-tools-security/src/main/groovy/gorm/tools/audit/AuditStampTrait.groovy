@@ -7,7 +7,6 @@ package gorm.tools.audit
 import java.time.LocalDateTime
 import javax.persistence.Transient
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import gorm.tools.security.SecUtils
@@ -35,22 +34,6 @@ trait AuditStampTrait {
     @Transient
     UserTrait getCreatedByUser() {
         SecUtils.getUser(getCreatedBy())
-    }
-
-    @CompileDynamic
-    static AuditStampTraitConstraints(Object delegate) {
-        def c = {
-            createdDate description: "created date/time",
-                        nullable: false, editable: false, bindable: false
-            createdBy   description: "created by user id",
-                        nullable: false, editable: false, bindable: false
-            editedDate  description: "last edit date/time",
-                        nullable: false, editable: false, bindable: false
-            editedBy    description: "edited by user id",
-                        nullable: false, editable: false, bindable: false
-        }
-        c.delegate = delegate
-        c()
     }
 
     static constraintsMap = [

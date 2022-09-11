@@ -2,7 +2,7 @@
 * Copyright 2006-2016 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.security.spring
+package yakworks.security.springsec
 
 import groovy.transform.CompileStatic
 
@@ -10,16 +10,26 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.User
 
 /**
- * Extends the default Spring Security User class (which implements the UserDetails interface) to contain the id
- * We dont use the Gorm domain and instead create this, think of it as a DTO or serializable value object for a Spring Sec User.
+ * Grails security has a GrailsUser that it uses by default, this replaces it to remove confusion.
+ * NOTES:
+ *  - Extends the default Spring Security User class (which implements the UserDetails interface)
+ *  - adds the id (the default implementation will set to the AppUser.id)
+ *  - We dont use the AppUser gorm domain and instead create this with the data from AppUser instance
+ *  - think of it as a DTO or serializable value object for a Spring Security User, this is whats stored in the context for the logged in user
+ *
  * @see org.springframework.security.core.userdetails.User
  */
+@SuppressWarnings(['ParameterCount'])
 @CompileStatic
 class SecUser extends User {
 
     private static final long serialVersionUID = 1
 
+    /** the database id from the stored User */
     final Serializable id
+
+    /** the organization ID */
+    Long orgId
 
     /**
      * Constructor.
@@ -41,6 +51,12 @@ class SecUser extends User {
             Collection<GrantedAuthority> authorities, Serializable id) {
         super(username, password, enabled, accountNonExpired, credentialsNonExpired,
             accountNonLocked, authorities)
+        this.id = id
+
+    }
+
+    SecUser(String username, String password, Collection<? extends GrantedAuthority> authorities, Serializable id) {
+        super(username, password, true, true, true, true, authorities)
         this.id = id
     }
 }

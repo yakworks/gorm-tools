@@ -22,7 +22,7 @@ import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.DataOp
 import grails.util.TypeConvertingMap
 import grails.web.servlet.mvc.GrailsParameterMap
-import yakworks.gorm.etl.csv.CsvToMapTransformer
+import yakworks.etl.csv.CsvToMapTransformer
 
 /**
  * This is the CRUD controller for entities

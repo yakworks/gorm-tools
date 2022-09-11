@@ -95,7 +95,6 @@ class AppUser implements UserTrait<Long>, AuditStampTrait, RepoEntity<AppUser>, 
     /**
      * Implements the displayName for short handle. currently returns username or first part of email if username contains @
      * FIXME displayName should be stored in db so it can be changed. can default to whats happening below to parse out first part of email.
-     * @param uid
      * @return the display name
      */
     //

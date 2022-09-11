@@ -1,6 +1,6 @@
 package gorm.tools.repository
 
-import gorm.tools.databinding.PathKeyMap
+import yakworks.commons.map.PathKeyMap
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.problem.ValidationProblem
 import yakworks.testing.gorm.GormToolsHibernateSpec

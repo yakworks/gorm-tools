@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Qualifier
 import gorm.tools.async.AsyncConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
-import gorm.tools.databinding.PathKeyMap
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobService
@@ -28,6 +27,7 @@ import gorm.tools.repository.model.DataOp
 import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.commons.map.Maps
+import yakworks.commons.map.PathKeyMap
 import yakworks.meta.MetaMap
 
 /**

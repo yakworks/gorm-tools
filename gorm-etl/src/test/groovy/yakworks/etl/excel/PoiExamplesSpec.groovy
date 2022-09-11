@@ -1,4 +1,4 @@
-package yakworks.gorm.etl.excel
+package yakworks.etl.excel
 
 import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import spock.lang.Specification

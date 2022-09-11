@@ -2,16 +2,15 @@
 * Copyright 2021 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.gorm.etl.csv
+package yakworks.etl.csv
 
 import groovy.transform.CompileStatic
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
 import com.opencsv.CSVReaderHeaderAware
-import gorm.tools.databinding.PathKeyMap
 import yakworks.commons.map.Maps
-
+import yakworks.commons.map.PathKeyMap
 /**
  * Overrides the CSVReaderHeaderAware to read csv rows into the PathKeyMap
  * which can then be used for the EntityMapBinder

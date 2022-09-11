@@ -5,7 +5,6 @@
 package yakworks.security.model
 
 import groovy.transform.CompileStatic
-import groovy.transform.EqualsAndHashCode
 
 import gorm.tools.model.NameCode
 import gorm.tools.model.NamedEntity

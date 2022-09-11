@@ -15,8 +15,8 @@ import grails.core.GrailsClass
 import grails.core.GrailsControllerClass
 import grails.plugins.Plugin
 import yakworks.commons.lang.NameUtils
-import yakworks.gorm.etl.csv.render.CSVPagerRenderer
-import yakworks.gorm.etl.excel.XlsxPagerRenderer
+import yakworks.etl.render.CSVPagerRenderer
+import yakworks.etl.render.XlsxPagerRenderer
 import yakworks.rest.gorm.RestApi
 import yakworks.rest.gorm.mapping.RepoApiMappingsService
 import yakworks.rest.gorm.render.ApiResultsRenderer

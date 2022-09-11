@@ -17,7 +17,6 @@ import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
-import gorm.tools.validation.Rejector
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 

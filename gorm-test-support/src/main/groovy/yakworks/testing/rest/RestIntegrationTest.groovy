@@ -2,7 +2,7 @@
 * Copyright 2021 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.testing.http
+package yakworks.testing.rest
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -11,6 +11,7 @@ import org.codehaus.groovy.runtime.HandleMetaClass
 import org.grails.core.artefact.ControllerArtefactHandler
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.junit.After
+import org.junit.Before
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.context.WebApplicationContext
 import org.springframework.web.context.request.RequestContextHolder
@@ -20,7 +21,6 @@ import gorm.tools.transaction.TrxService
 import grails.core.GrailsApplication
 import grails.util.GrailsMetaClassUtils
 import grails.util.GrailsWebMockUtil
-import spock.lang.Specification
 import yakworks.testing.gorm.integration.DataIntegrationTest
 
 /**
@@ -28,7 +28,7 @@ import yakworks.testing.gorm.integration.DataIntegrationTest
  * application-specific initialization logic.
  */
 @CompileStatic //ok for testing
-class RestIntTest extends Specification implements DataIntegrationTest {
+trait RestIntegrationTest extends DataIntegrationTest {
 
     // Object controller
     String controllerName
@@ -47,13 +47,15 @@ class RestIntTest extends Specification implements DataIntegrationTest {
     @Autowired
     TrxService trxService
 
-
-    void setup() {
+    /**
+     * Sets up mock request/response pair and performs a dynamic call to the 'specificSetup' method on the test class.
+     */
+    @Before
+    void controllerIntegrationSetup() {
         MockRestRequest request = new MockRestRequest(ctx.servletContext)
         MockRestResponse response = new MockRestResponse()
         GrailsWebMockUtil.bindMockWebRequest(ctx, request, response)
         currentRequestAttributes.setControllerName(controllerName)
-        // setControllerName(this.getControllerName())
     }
 
     @CompileDynamic

@@ -6,8 +6,6 @@ package gorm.tools.security
 
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.gorm.GormEnhancer
-
 import gorm.tools.beans.AppCtx
 import gorm.tools.security.services.SecService
 import yakworks.security.model.UserTrait

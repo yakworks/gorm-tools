@@ -1,6 +1,6 @@
-package yakworks.gorm.etl.csv
+package yakworks.etl.csv
 
-import yakworks.gorm.etl.csv.render.CSVMapWriter
+
 import gorm.tools.metamap.services.MetaMapService
 import yakworks.testing.gorm.GormToolsHibernateSpec
 import gorm.tools.utils.BenchmarkHelper

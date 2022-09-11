@@ -2,7 +2,7 @@ rootProject.name = 'gorm-tools-root'
 //the releasable plugins
 include 'gorm-tools'
 // findProject(':plugin').name = 'gorm-tools' // the name that will be published
-include 'gorm-tools-security'
+include 'gorm-security'
 include 'gorm-rest'
 include 'gorm-openapi'
 include 'gorm-etl'
@@ -11,7 +11,7 @@ include 'rally-security'
 // include 'commons'
 include 'gorm-test-support'
 include 'gorm-test-domain'
-//findProject(':security').name = 'gorm-tools-security' // the name that will be published
+//findProject(':security').name = 'gorm-security' // the name that will be published
 
 // tests will be included in main runs but not deploy tasks and doc tasks
 include "examples/testify"

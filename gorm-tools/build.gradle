@@ -38,7 +38,7 @@ dependencies {
 
   testImplementation "org.slf4j:slf4j-simple:${vSlf4j}"
   testImplementation project(":gorm-test-domain")
-  testImplementation project(":gorm-tools-security")
+  testImplementation project(":gorm-security")
   //
   // testImplementation "com.vladmihalcea:hibernate-types-52:$vHibTypes"
   //

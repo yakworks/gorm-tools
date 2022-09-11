@@ -54,7 +54,7 @@ implementation "org.yakworks:gorm-tools:7.3.23"
 ## Libs
 
 - `org.yakworks:gorm-tools` - main plugin for the base gorm-tools extensions
-- `org.yakworks:gorm-tools-security` - implementations of the domains for security, audit stamp traits and events. 
+- `org.yakworks:gorm-security` - implementations of the domains for security, audit stamp traits and events. 
 - `org.yakworks:gorm-rest` - foundation and ASTs for automated rest api from gorm domains
 - `org.yakworks:gorm-openapi` - gorm swagger and json schema foundation. 
 - `org.yakworks:gorm-etl` - Extract, Transform, Load for creating Excel and CSV

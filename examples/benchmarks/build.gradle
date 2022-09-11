@@ -20,7 +20,7 @@ dependencies {
   profile "org.grails.profiles:rest-api"
 
   implementation project(":gorm-tools")
-  implementation project(":gorm-tools-security")
+  implementation project(":gorm-security")
   implementation project(":rally-domain")
   implementation project(":gorm-rest")
 

@@ -11,7 +11,7 @@ dependencies {
   profile "org.grails.profiles:rest-api"
 
   api project(":gorm-tools")
-  api project(":gorm-tools-security")
+  api project(":gorm-security")
   api project(":gorm-etl")
   api "org.yakworks:grails-kit:$vYakGrailsKit"
   api "org.yakworks:grails-external-config:$vYakGrailsKit"

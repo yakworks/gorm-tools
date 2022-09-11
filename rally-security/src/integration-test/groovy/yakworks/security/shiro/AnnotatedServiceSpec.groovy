@@ -23,7 +23,7 @@ class AnnotatedServiceSpec extends Specification {
 
     WebSecurityManager shiroSecurityManager
     Realm springSecurityRealm
-    SecService<AppUser> secService
+    SecService secService
     @Autowired TestService testService
 
 

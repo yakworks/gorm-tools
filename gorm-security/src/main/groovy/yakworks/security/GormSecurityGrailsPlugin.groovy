@@ -22,7 +22,7 @@ import yakworks.security.spring.listeners.SecLoginHandler
 import yakworks.security.spring.listeners.SecLogoutHandler
 
 @SuppressWarnings(['Indentation'])
-class GormToolsSecurityGrailsPlugin extends Plugin {
+class GormSecurityGrailsPlugin extends Plugin {
 
     def loadAfter = ['spring-security-core', 'spring-security-ldap', 'spring-security-rest', 'gorm-tools', 'datasource']
     def pluginExcludes = ["**/init/**"]

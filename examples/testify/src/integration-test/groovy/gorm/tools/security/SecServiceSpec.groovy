@@ -1,6 +1,5 @@
 package gorm.tools.security
 
-
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
 import yakworks.testing.gorm.SecuritySpecHelper

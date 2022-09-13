@@ -142,7 +142,7 @@ class ExcelBuilder {
      *
      * @param dataList a List of Maps or a MetaMapList
      */
-    void write(Collection<Map> dataList){
+    void writeData(Collection<Map> dataList){
         // BenchmarkHelper.startTime()
         createHeader(dataList)
 
@@ -272,9 +272,16 @@ class ExcelBuilder {
     }
 
     /**
+     * write workbook to output stream
+     */
+    void writeOut() {
+        workbook.write(outputStream)
+    }
+
+    /**
      * userful for testing to write out and close stream
      */
-    void writeAndClose() {
+    void writeOutAndClose() {
         try {
             workbook.write(outputStream);
         } catch (IOException e) {

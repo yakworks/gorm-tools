@@ -18,7 +18,7 @@ import yakworks.rest.grails.AppInfoBuilder
 // the services marked with @Component
 @ComponentScan(['yakworks.security', 'yakworks.security', 'yakworks.rally', 'yakworks.testing.gorm.model'])
 @RestApiFromConfig
-@EnableCaching
+// @EnableCaching
 // @EnableAutoConfiguration(exclude = [HazelcastAutoConfiguration]) // in order to avoid autoconfiguring an extra Hazelcast instance
 class Application extends GrailsAutoConfiguration {
     static void main(String[] args) {

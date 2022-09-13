@@ -110,8 +110,8 @@ class ExportBenchmarkSpecs extends GormToolsHibernateSpec implements JsonEngineT
         Path prjPath = BuildSupport.gradleProjectPath.resolve("build/testing.xlsx")
         prjPath.withOutputStream { os ->
             def eb = ExcelBuilder.of(os).build()
-            eb.write(mapList as List<Map>)
-            eb.writeAndClose()
+            eb.writeData(mapList as List<Map>)
+            eb.writeOutAndClose()
         }
     }
 

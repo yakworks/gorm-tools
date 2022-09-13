@@ -84,9 +84,10 @@ class ExportBenchmarkSpecs extends GormToolsHibernateSpec implements JsonEngineT
         // Writer writer = new StringWriter()
         MetaMapList mapList = metaMapService.createMetaMapList(KitchenSink.list(), ['*', 'thing.*', 'ext.*', 'simplePogo.foo']) // 'thing.id', 'simplePogo.foo'
         long stime = BenchmarkHelper.startTime()
-        writeXlsx(mapList)
+        ExcelBuilder eb = writeXlsx(mapList)
 
         then:
+        eb.includes.size() == eb.headers.size()
         SINK_COUNT == mapList.size()
         BenchmarkHelper.printEndTimeMsg("writeXlsx for $SINK_COUNT items", stime)
     }
@@ -106,13 +107,16 @@ class ExportBenchmarkSpecs extends GormToolsHibernateSpec implements JsonEngineT
     }
 
     @CompileStatic
-    void writeXlsx(MetaMapList mapList){
+    ExcelBuilder writeXlsx(MetaMapList mapList){
         Path prjPath = BuildSupport.gradleProjectPath.resolve("build/testing.xlsx")
+        ExcelBuilder eb
         prjPath.withOutputStream { os ->
-            def eb = ExcelBuilder.of(os).build()
-            eb.writeData(mapList as List<Map>)
-            eb.writeOutAndClose()
+            eb = ExcelBuilder.of(os)
+                .build()
+                .writeData(mapList as List<Map>)
+                .writeOutAndClose()
         }
+        return eb
     }
 
     @CompileStatic

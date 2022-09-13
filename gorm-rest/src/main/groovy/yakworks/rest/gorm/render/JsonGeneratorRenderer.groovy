@@ -7,7 +7,7 @@ package yakworks.rest.gorm.render
 import groovy.transform.CompileStatic
 
 /**
- * Json Renderer that uses the default groovy2.5 jsonGenerator
+ * Json Renderer that uses the default groovy2.5 jsonGenerator and will be constructed to render for any type.
  *
  * @author Joshua Burnett (@basejump)
  * @since 7.0.8

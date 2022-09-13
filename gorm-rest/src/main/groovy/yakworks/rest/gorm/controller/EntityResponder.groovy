@@ -91,7 +91,7 @@ class EntityResponder<D> {
         List dlist = query(pager, params)
         List<String> incs = findIncludes(params, includesKeys)
         MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)
-        return pager.setEntityMapList(entityMapList)
+        return pager.setMetaMapList(entityMapList)
     }
 
     List<D> query(Pager pager, Map parms) {

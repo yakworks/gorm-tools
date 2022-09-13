@@ -7,6 +7,7 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import groovy.json.JsonException
 import groovy.json.JsonSlurper
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.api.ApiResults
 import yakworks.api.Result
@@ -38,14 +39,28 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         JsonException ex = thrown()
     }
 
-    def "test create job"() {
+    void "test create job and save payload to file"() {
+        when:
+        List payload = [1,2,3,4]
+        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source')
+        syncJobArgs.entityClass = Org
+        syncJobArgs.savePayload = true
+        syncJobArgs.savePayloadAsFile = true
+        SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, payload)
+
+        then:
+        noExceptionThrown()
+        jobContext.jobId
+        SyncJob.get(jobContext.jobId)
+    }
+
+    void "test create job"() {
         when:
         SyncJobContext jobContext = createJob()
 
         then:
         jobContext.jobId
         SyncJob.get(jobContext.jobId)
-
     }
 
     def "test update job"() {

@@ -10,6 +10,7 @@ import groovy.transform.CompileStatic
 import org.apache.commons.beanutils.PropertyUtils
 
 import com.opencsv.CSVWriter
+import yakworks.commons.lang.PropertyTools
 import yakworks.commons.map.MapFlattener
 import yakworks.meta.MetaMapList
 
@@ -67,8 +68,8 @@ class CSVMapWriter {
 
     List collectVals(Map map, Set<String> headers) {
         List vals = headers.collect {
-            PropertyUtils.getProperty(map, it)
-            // PropertyTools.getProperty(map, it)
+            //PropertyUtils.getProperty(map, it)
+            PropertyTools.getProperty(map, it)
         }
         return vals
     }

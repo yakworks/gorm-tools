@@ -221,16 +221,16 @@ class MetaGormEntityBuilder {
     MetaEntity buildNested(Map<String, Object> nestedProps){
 
         // now we cycle through the nested props and recursively call this again for each associations includes
-        Map<String, MetaEntity> nestedIncludesMap = [:]
+        Map<String, MetaEntity> metaEntityMetaProps = [:]
         for (entry in nestedProps.entrySet()) {
             String prop = entry.key as String //the nested property name
             Map initMap = entry.value as Map
             List incProps = initMap['props'] as List
             String assocClass = initMap['className'] as String
-            MetaEntity metaEntityProps
+            MetaEntity nestedMetaEntity
 
             if(assocClass) {
-                metaEntityProps = build(assocClass, incProps)
+                nestedMetaEntity = build(assocClass, incProps)
             }
             // if no class then it wasn't a gorm association or gorm prop didn't have type
             // so try by getting value through meta reflection
@@ -247,19 +247,19 @@ class MetaGormEntityBuilder {
                 else if(Collection.isAssignableFrom(returnType)){
                     String genClass = PropertyTools.findGenericForCollection(entityClass, prop)
                     if(genClass) {
-                        metaEntityProps = MetaGormEntityBuilder.build(genClass, incProps)
+                        nestedMetaEntity = MetaGormEntityBuilder.build(genClass, incProps)
                     }
                     //TODO shouldn't we do at leas na object here? should not matter
                 } else {
-                    metaEntityProps = MetaGormEntityBuilder.build(returnType.name, incProps)
+                    nestedMetaEntity = MetaGormEntityBuilder.build(returnType.name, incProps)
                 }
             }
             //if it got valid metaEntityProps and its not already setup
-            if(metaEntityProps && !nestedIncludesMap[prop]) nestedIncludesMap[prop] = metaEntityProps
+            if(nestedMetaEntity && !metaEntityMetaProps[prop]) metaEntityMetaProps[prop] = nestedMetaEntity
         }
 
-        if(nestedIncludesMap) {
-            metaEntity.metaProps.putAll(nestedIncludesMap)
+        if(metaEntityMetaProps) {
+            metaEntity.metaProps.putAll(metaEntityMetaProps)
         }
 
         return metaEntity

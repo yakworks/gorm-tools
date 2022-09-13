@@ -11,6 +11,8 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 import groovy.transform.CompileStatic
+import groovy.transform.builder.Builder
+import groovy.transform.builder.SimpleStrategy
 
 import org.apache.poi.ss.usermodel.BorderStyle
 import org.apache.poi.ss.usermodel.BuiltinFormats
@@ -33,17 +35,43 @@ import yakworks.commons.map.MapFlattener
 import yakworks.meta.MetaMapList
 import yakworks.meta.MetaProp
 
+@Builder(builderStrategy= SimpleStrategy, prefix="", includes=['includes', 'headerType', 'headers', 'outputStream'])
 @SuppressWarnings(['NestedBlockDepth'])
 @CompileStatic
 class ExcelBuilder {
     public static final String SHEET_NAME = "data"
     public static final DefaultIndexedColorMap INDEXED_COLOR_MAP = new DefaultIndexedColorMap()
 
+    /** the property keys for the data, can be dot notations, such as 'id', 'num', 'org.name' etc.. */
+    Set<String> includes
+
+    /**
+     * use the key specified to look in the restconfig, should be a pointer to a list/array of column configs with key and label
+     * will use the column config found to build the includes and headers
+     */
+    String configKey
+
+    /**
+     * header options
+     * - null or false : means dont show header
+     * - includes : use the includes path keys for the header
+     * - labels : will build the labels from config or the nameUtils
+     * - columns : uses the key specified to look up in config for the entity. grid
+     */
+    String headerType = 'labels'
+
+    /**
+     * header labels, index should match the includes. if specified will use it regardless of header setting
+     * if headerType=keys then this will match whats in includes
+     * if headerType=labels then will inteligently build this from
+     */
+    Set<String> headers
+
     XSSFWorkbook workbook
     XSSFSheet sheet
     CreationHelper createHelper
 
-    Set<String> headerKeys
+    /** the stream to write to */
     OutputStream outputStream
 
     XSSFCellStyle styleHeader
@@ -120,7 +148,7 @@ class ExcelBuilder {
 
         int rowIdx = 1 //start at 1 as row 0 is header
         dataList.eachWithIndex{ Map rowData, int i ->
-            List vals = headerKeys.collect{ PropertyTools.getProperty(rowData, it) }
+            List vals = includes.collect{ PropertyTools.getProperty(rowData, it) }
             Row row = createRow(rowIdx + i, vals)
         }
     }
@@ -131,17 +159,17 @@ class ExcelBuilder {
      */
     void createHeader(Collection<Map> dataList){
         if(dataList instanceof MetaMapList && dataList.metaEntity){
-            //flattent o get the titles
+            //flatten to get the titles
             Map<String, MetaProp> metaProps = dataList.metaEntity.flatten()
             //set keys for collecting values
-            headerKeys = dataList.metaEntity.flattenProps()
-            List<String> headerTitles = metaProps.values().collect{ it.title }
-            writeHeader(headerTitles)
+            if(!includes) includes = metaProps.keySet()
+            if(!headers) headers = metaProps.values().collect{ it.title } as Set<String>
+            writeHeader(headers)
         } else {
             Map<String, Object> firstRow = dataList[0] as Map<String, Object>
             Map flatRow = MapFlattener.of(firstRow).convertObjectToString(false).flatten()
-            headerKeys = flatRow.keySet()
-            writeHeader(headerKeys)
+            if(!includes) includes = flatRow.keySet()
+            writeHeader(includes)
         }
     }
 

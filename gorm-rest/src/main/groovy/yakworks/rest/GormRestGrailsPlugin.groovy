@@ -15,15 +15,15 @@ import grails.core.GrailsClass
 import grails.core.GrailsControllerClass
 import grails.plugins.Plugin
 import yakworks.commons.lang.NameUtils
-import yakworks.etl.render.CSVPagerRenderer
-import yakworks.etl.render.XlsxPagerRenderer
 import yakworks.rest.gorm.RestApi
 import yakworks.rest.gorm.mapping.RepoApiMappingsService
 import yakworks.rest.gorm.render.ApiResultsRenderer
+import yakworks.rest.gorm.render.CSVPagerRenderer
 import yakworks.rest.gorm.render.JsonGeneratorRenderer
 import yakworks.rest.gorm.render.PagerRenderer
 import yakworks.rest.gorm.render.ProblemRenderer
 import yakworks.rest.gorm.render.SyncJobRenderer
+import yakworks.rest.gorm.render.XlsxPagerRenderer
 
 @SuppressWarnings(['UnnecessarySelfAssignment', 'Println', 'EmptyMethod', 'Indentation'])
 class GormRestGrailsPlugin extends Plugin {
@@ -46,6 +46,7 @@ class GormRestGrailsPlugin extends Plugin {
         problemRenderer(ProblemRenderer)
         pagerRenderer(PagerRenderer)
         syncJobRenderer(SyncJobRenderer)
+
 
         csvPagerRenderer(CSVPagerRenderer)
         xlsxPagerRenderer(XlsxPagerRenderer)

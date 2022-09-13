@@ -4,7 +4,6 @@
 */
 package yakworks.rest.gorm.render
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.springframework.http.HttpStatus
@@ -22,7 +21,6 @@ import yakworks.api.ApiResults
 class ApiResultsRenderer implements JsonRendererTrait<ApiResults>{
 
     @Override
-    @CompileDynamic
     void render(ApiResults results, RenderContext context) {
         setContentType(context)
         context.status = HttpStatus.MULTI_STATUS

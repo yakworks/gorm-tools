@@ -2,15 +2,17 @@
 * Copyright 2013 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.etl.render
+package yakworks.rest.gorm.render
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.plugins.web.rest.render.ServletRenderContext
 
 import gorm.tools.beans.Pager
 import grails.rest.render.RenderContext
+import yakworks.etl.excel.ExcelBuilder
+import yakworks.etl.excel.ExcelBuilderSupport
+import yakworks.meta.MetaMapList
 
 /**
  * Rederer for paged list data
@@ -22,14 +24,25 @@ import grails.rest.render.RenderContext
 class XlsxPagerRenderer implements XlsRendererTrait<Pager> {
 
     @Override
-    @CompileDynamic
     void render(Pager pager, RenderContext context) {
         setContentType(context)
         setContentDisposition(context)
-        excelBuilder(context).write(pager.data)
+        ExcelBuilder eb = excelBuilder(context)
+
+        def dataList = pager.data
+
+        Map params = getParams(context)
+        //for future use
+        // String headers = params['headers']
+        // String includesKey = params['includesKey']
+        //if includes or includesKey was passed then dont use whats in the grid config
+        if(dataList instanceof MetaMapList && !params['includes'] && !params['includesKey']){
+            //look in config and match whats there if not specified
+            ExcelBuilderSupport.useIncludesConfig(eb, includesConfig, dataList)
+        }
+        eb.write(dataList)
     }
 
-    //TODO should we set the file name?
     void setContentDisposition(RenderContext context){
         def servletCtx = (ServletRenderContext)context
         def name = context.getControllerName()

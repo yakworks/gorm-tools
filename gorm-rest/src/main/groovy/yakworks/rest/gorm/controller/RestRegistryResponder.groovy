@@ -21,6 +21,7 @@ import grails.core.support.proxy.ProxyHandler
 import grails.rest.render.Renderer
 import grails.rest.render.RendererRegistry
 import grails.web.mime.MimeType
+import grails.web.servlet.mvc.GrailsParameterMap
 
 /**
  * Grails RestResponder but without the magic stuff that keeps having errors picked up
@@ -33,6 +34,9 @@ trait RestRegistryResponder {
 
     private RendererRegistry rendererRegistry
     private ProxyHandler proxyHandler
+
+    //will get implemented by normal controller and WebAttributes
+    abstract GrailsParameterMap getParams()
 
     @Generated
     @Autowired(required = false)
@@ -88,7 +92,7 @@ trait RestRegistryResponder {
         MimeType[] mimeTypes = getResponseFormat(response)
 
         RendererRegistry registry = rendererRegistry
-        if (registry == null) throw new IllegalArgumentException("Houston we have a problem")
+        if (registry == null) throw new IllegalArgumentException("Houston we have a problem, no rendererRegistry")
 
         Renderer renderer = null
 
@@ -124,6 +128,8 @@ trait RestRegistryResponder {
                 throw new IllegalArgumentException("Houston we have a problem, renderer can't be found for fallback json format and ${value.class}")
         }
 
+        //put params into arguments so we can access them from a Renderer
+        args.params = getParams()
 
         final ServletRenderContext context = new ServletRenderContext(webRequest, args)
         if(statusCode != null) context.status = HttpStatus.valueOf(statusCode)

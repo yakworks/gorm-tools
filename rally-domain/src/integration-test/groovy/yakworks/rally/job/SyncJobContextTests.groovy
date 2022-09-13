@@ -122,7 +122,7 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         SyncJobContext jobContext = createJob()
         String transformResultsClosureWasCalled
 
-        jobContext.transformResultsClosure = {apiResults ->
+        jobContext.transformResultsClosure = { apiResults ->
             transformResultsClosureWasCalled = apiResults.title
         }
 

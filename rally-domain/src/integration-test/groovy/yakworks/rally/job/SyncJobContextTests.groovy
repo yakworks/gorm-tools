@@ -7,7 +7,6 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import groovy.json.JsonException
 import groovy.json.JsonSlurper
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.api.ApiResults
 import yakworks.api.Result

@@ -24,8 +24,11 @@ class PrintSpringProfile implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
+        println "info.app.name: ${environment.getProperty('info.app.name')}"
         println "Active profiles: ${environment.getActiveProfiles()}"
+        println "Grails Env: ${grails.util.Environment.current}"
         println "foo.message: ${message}"
+        println "testify.message: ${environment.getProperty('testify.message')}"
         println "pprop: ${pprop}"
     }
 }

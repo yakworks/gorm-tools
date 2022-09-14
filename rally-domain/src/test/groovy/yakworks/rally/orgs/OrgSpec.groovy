@@ -16,17 +16,14 @@ import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
 
 class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
-    //Automatically runs the basic crud tests
 
-    def setupSpec() {
-        defineBeans {
-            //scriptExecutorService(ScriptExecutorService)
-            orgDimensionService(OrgDimensionService)
-            orgMemberService(OrgMemberService)
-        }
-        mockDomains(
-            OrgTag, Location, Contact, Org, OrgSource, OrgFlex, OrgCalc, OrgInfo
-        )
+    Closure doWithDomains() { { ->
+        orgDimensionService(OrgDimensionService)
+        orgMemberService(OrgMemberService)
+    }}
+
+    void setupSpec() {
+        mockDomains(Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo)
     }
 
     void "sanity check build"() {

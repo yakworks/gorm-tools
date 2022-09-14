@@ -13,6 +13,12 @@ logging:
 #    org.hibernate.stat: DEBUG
 #    org.hibernate.SQL: DEBUG
 
+app:
+  resources:
+    rootLocation: "./build/rootLocation"
+    tempDir: "./build/rootLocation/tempDir"
+    attachments.location: 'attachments'
+
 hibernate:
   format_sql: false
   schema_management_tool: 'gorm.tools.hibernate.schema.CustomSchemaManagementTool'

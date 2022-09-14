@@ -41,23 +41,10 @@ dataSource:
   driverClassName: org.h2.Driver
   username: sa
   password:
+  dbCreate: create-drop
+  url: jdbc:h2:mem:devDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
   properties:
     # By default sql server has default isolation read commited, mysql has repeatable read
     # This sets default isolation to TRANSACTION_READ_COMMITTED. so its consistent
     defaultTransactionIsolation: 2 # Connection.TRANSACTION_READ_COMMITTED
     transactionIsolation: TRANSACTION_READ_COMMITTED #Hikari needs this
-
-environments:
-  development:
-    dataSource:
-      dbCreate: create-drop
-      url: jdbc:h2:mem:devDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
-  test:
-    dataSource:
-      dbCreate: create-drop
-      url: jdbc:h2:mem:testDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
-  production:
-    dataSource:
-      dbCreate: none
-      url: jdbc:h2:./prodDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
-

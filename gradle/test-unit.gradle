@@ -2,6 +2,7 @@
 
 tasks.withType(Test) {
   useJUnitPlatform()
+  systemProperty "spring.profiles.active", "test"
   //so that we can use in config and share resources/rootlocation across projects for testing
   systemProperty "gradle.rootProjectDir", rootProject.projectDir.absolutePath
   systemProperty "gradle.projectDir", project.projectDir.absolutePath

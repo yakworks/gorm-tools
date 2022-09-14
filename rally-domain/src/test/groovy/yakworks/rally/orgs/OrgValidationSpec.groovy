@@ -1,5 +1,9 @@
 package yakworks.rally.orgs
 
+import yakworks.rally.attachment.AttachmentSupport
+import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.job.DefaultSyncJobService
+import yakworks.rally.job.SyncJob
 import yakworks.testing.gorm.SecurityTest
 import yakworks.testing.gorm.unit.DomainRepoTest
 import spock.lang.Specification
@@ -14,16 +18,13 @@ import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
 
 class OrgValidationSpec extends Specification implements DomainRepoTest<Org>, SecurityTest {
-    //Automatically runs the basic crud tests
 
-    def setupSpec(){
-        defineBeans{
-            orgDimensionService(OrgDimensionService)
-        }
-        mockDomains(
-            //events need these repos to be setup
-            OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo
-        )
+    Closure doWithDomains() { { ->
+        orgDimensionService(OrgDimensionService)
+    }}
+
+    void setupSpec() {
+        mockDomains(OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo)
     }
 
     void "sanity check validation"() {

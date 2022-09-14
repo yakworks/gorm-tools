@@ -1,12 +1,13 @@
-# FOR TESTING ONLY, reminder that nothing here get published with jar
-grails:
-  profile: plugin
+---
+
+# spring.config.import: classpath:./datasource.yml
 
 logging:
   level:
     root: DEBUG
     org.springframework: WARN
     org.hibernate.orm.deprecation: OFF # turns off deprecation notices
+
 
 hibernate:
   format_sql: false

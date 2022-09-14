@@ -3,10 +3,13 @@ package yakworks.rally.eventlog
 
 import java.time.LocalDateTime
 
+import gorm.tools.ConfigDefaults
 import yakworks.testing.gorm.unit.DomainRepoTest
 import spock.lang.Specification
 
 class EventLogSpec extends Specification implements DomainRepoTest<EventLog>{
+    EventLogger eventLogger
+
     //auto runs DomainRepoCrudSpec tests
     static final MESSAGE = 'EventLoggerTests'
     static final exText = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."+
@@ -29,15 +32,17 @@ class EventLogSpec extends Specification implements DomainRepoTest<EventLog>{
         defineBeans({
             eventLogger(EventLogger)
         })
+        assert config
     }
 
+    @Override
     Closure doWithConfig() {
-        { config ->
-            config.nine.eventLog.purgeDays = 2
+        { cfg ->
+            gormConfigDefaults(cfg)
+            cfg.nine.eventLog.purgeDays = 2
         }
     }
 
-    EventLogger eventLogger
     void testError_Exception() {
 
         when:

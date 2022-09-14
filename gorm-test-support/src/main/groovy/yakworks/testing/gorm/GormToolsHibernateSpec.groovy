@@ -5,11 +5,13 @@
 package yakworks.testing.gorm
 
 import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.core.AbstractDatastore
 import org.grails.orm.hibernate.HibernateDatastore
 import org.grails.plugin.hibernate.support.HibernatePersistenceContextInterceptor
 
+import gorm.tools.ConfigDefaults
 import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.RepoLookup
@@ -103,6 +105,22 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
     /** consistency with other areas of grails and other unit tests */
     AbstractDatastore getDatastore() {
         hibernateDatastore
+    }
+
+    @Override
+    @CompileStatic
+    Map getConfiguration() {
+        Map cfg = ConfigDefaults.getConfigMap(false)
+        def clos = doWithConfig()
+        if (clos) {
+            clos.call(cfg)
+        }
+        return cfg
+    }
+
+    //keeps it consistent with GormUnitTest, difference here is that the closure is passed a map and not the Config
+    Closure doWithConfig() {
+        null
     }
 
 }

@@ -7,6 +7,7 @@ package yakworks.rest.gorm.render
 import groovy.transform.CompileStatic
 
 import org.grails.plugins.web.rest.render.ServletRenderContext
+import org.springframework.http.HttpStatus
 
 import gorm.tools.beans.Pager
 import grails.rest.render.RenderContext
@@ -25,6 +26,7 @@ class XlsxPagerRenderer implements XlsRendererTrait<Pager> {
 
     @Override
     void render(Pager pager, RenderContext context) {
+
         setContentType(context)
         setContentDisposition(context)
         ExcelBuilder eb = excelBuilder(context)
@@ -40,7 +42,9 @@ class XlsxPagerRenderer implements XlsRendererTrait<Pager> {
             //look in config and match whats there if not specified
             ExcelBuilderSupport.useIncludesConfig(eb, includesConfig, dataList)
         }
-        eb.write(dataList)
+        eb.writeData(dataList)
+        eb.writeOut()
+        context.setStatus(HttpStatus.OK)
     }
 
     void setContentDisposition(RenderContext context){

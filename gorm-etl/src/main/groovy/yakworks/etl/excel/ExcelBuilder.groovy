@@ -35,6 +35,11 @@ import yakworks.commons.map.MapFlattener
 import yakworks.meta.MetaMapList
 import yakworks.meta.MetaProp
 
+/**
+ * Builder to wrap POI and use our intelligent defaults.
+ * Has support for the MetaEntity and MetaListMap for building and getting headers and types.
+ * NOT THREAD SAFE, should have one instance of this for a thread.
+ */
 @Builder(builderStrategy= SimpleStrategy, prefix="", includes=['includes', 'headerType', 'headers', 'outputStream'])
 @SuppressWarnings(['NestedBlockDepth'])
 @CompileStatic
@@ -43,7 +48,7 @@ class ExcelBuilder {
     public static final DefaultIndexedColorMap INDEXED_COLOR_MAP = new DefaultIndexedColorMap()
 
     /** the property keys for the data, can be dot notations, such as 'id', 'num', 'org.name' etc.. */
-    Set<String> includes
+    List<String> includes
 
     /**
      * use the key specified to look in the restconfig, should be a pointer to a list/array of column configs with key and label
@@ -65,7 +70,7 @@ class ExcelBuilder {
      * if headerType=keys then this will match whats in includes
      * if headerType=labels then will inteligently build this from
      */
-    Set<String> headers
+    List<String> headers
 
     XSSFWorkbook workbook
     XSSFSheet sheet
@@ -142,7 +147,7 @@ class ExcelBuilder {
      *
      * @param dataList a List of Maps or a MetaMapList
      */
-    void write(Collection<Map> dataList){
+    ExcelBuilder writeData(Collection<Map> dataList){
         // BenchmarkHelper.startTime()
         createHeader(dataList)
 
@@ -151,26 +156,28 @@ class ExcelBuilder {
             List vals = includes.collect{ PropertyTools.getProperty(rowData, it) }
             Row row = createRow(rowIdx + i, vals)
         }
+        return this
     }
 
     /**
      * If dataList is a MetaMapList then it will use its metaEntity to get the headers.
      * otherwise it creates the header using the the data in the first item of collection.
      */
-    void createHeader(Collection<Map> dataList){
+    ExcelBuilder createHeader(Collection<Map> dataList){
         if(dataList instanceof MetaMapList && dataList.metaEntity){
             //flatten to get the titles
             Map<String, MetaProp> metaProps = dataList.metaEntity.flatten()
             //set keys for collecting values
-            if(!includes) includes = metaProps.keySet()
-            if(!headers) headers = metaProps.values().collect{ it.title } as Set<String>
+            if(!includes) includes = metaProps.keySet() as List<String>
+            if(!headers) headers = metaProps.values().collect{ it.title }
             writeHeader(headers)
         } else {
             Map<String, Object> firstRow = dataList[0] as Map<String, Object>
             Map flatRow = MapFlattener.of(firstRow).convertObjectToString(false).flatten()
-            if(!includes) includes = flatRow.keySet()
+            if(!includes) includes = flatRow.keySet().toList()
             writeHeader(includes)
         }
+        return this
     }
 
     /**
@@ -254,6 +261,12 @@ class ExcelBuilder {
             return cell
         }
 
+        // XXX hack for IdEnum that turns to Map with id,name
+        if (value instanceof Map && value.containsKey('name')) {
+            cell.setCellValue(value['name'].toString())
+            return cell
+        }
+
         cell.setCellValue(value.toString())
         return cell
     }
@@ -261,7 +274,7 @@ class ExcelBuilder {
     /**
      * Write out header row at index 0 using the header style.
      */
-    void writeHeader(Collection<String> titles) {
+    ExcelBuilder writeHeader(Collection<String> titles) {
         XSSFRow header = sheet.createRow(0)
 
         titles.eachWithIndex{ String title, int i ->
@@ -269,12 +282,21 @@ class ExcelBuilder {
             headerCell.setCellValue(title)
             headerCell.setCellStyle(styleHeader)
         }
+        return this
+    }
+
+    /**
+     * write workbook to output stream
+     */
+    ExcelBuilder writeOut() {
+        workbook.write(outputStream)
+        return this
     }
 
     /**
      * userful for testing to write out and close stream
      */
-    void writeAndClose() {
+    ExcelBuilder writeOutAndClose() {
         try {
             workbook.write(outputStream);
         } catch (IOException e) {
@@ -288,6 +310,7 @@ class ExcelBuilder {
                 }
             }
         }
+        return this
     }
 
     /**

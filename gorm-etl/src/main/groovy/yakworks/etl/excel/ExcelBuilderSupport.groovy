@@ -15,25 +15,25 @@ import yakworks.meta.MetaMapList
 import yakworks.meta.MetaProp
 
 /**
- * Extra support for excel such us using whats in the config to setup the props and headers/
+ * Extra support for excel such us using whats in the config to setup the props and headers
  */
 @CompileStatic
 class ExcelBuilderSupport {
 
     /**
-     * kind of a hack until we clean up the new config. defaults to using whats in gridOptions.colModel
+     * kind of a HACK until we clean up the new config. defaults to using whats in gridOptions.colModel
      */
     static ExcelBuilder useIncludesConfig(ExcelBuilder eb, IncludesConfig includesConfig, MetaMapList dataList){
         if(dataList.metaEntity){
             //flatten to get the titles
             Map<String, MetaProp> metaProps = dataList.metaEntity.flatten()
-            eb.includes = metaProps.keySet()
+            eb.includes = metaProps.keySet().toList()
             def pcfg = includesConfig.findConfigByEntityClass(dataList.metaEntity.className)
             pcfg = Maps.removePropertyListKeys(pcfg)
             Map colMap = columnLabels(pcfg)
             if (colMap) {
                 //set the keys from the config
-                eb.includes = colMap.keySet()
+                eb.includes = colMap.keySet().toList()
                 //update to title to whats in col config.
                 metaProps.each { String key, MetaProp mp ->
                     String label = colMap[key]
@@ -42,7 +42,7 @@ class ExcelBuilderSupport {
                 eb.headers = eb.includes.collect{
                     MetaProp mp = metaProps[it]
                     mp ? mp.title : LabelUtils.getNaturalTitle(it)
-                } as Set<String>
+                }
             }
             // eb.headerTitles = metaProps.values().collect{ it.title } as Set<String>
         }

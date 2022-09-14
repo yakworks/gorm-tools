@@ -36,6 +36,25 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         book['name']
     }
 
+    void "test csv"() {
+        when:
+        Response resp = get("${path}?format=csv")
+        // Map body = bodyToMap(resp)
+
+        then:
+        resp.code() == HttpStatus.OK.value()
+
+    }
+
+    void "test xlsx"() {
+        when:
+        Response resp = get("${path}?format=xlsx")
+
+        then:
+        resp.code() == HttpStatus.OK.value()
+
+    }
+
     void "test qSearch"() {
         when:
         Response resp = get("$path?q=org2")

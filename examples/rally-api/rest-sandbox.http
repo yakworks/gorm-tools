@@ -36,13 +36,18 @@ Authorization: Bearer {{login.access_token}}
 }}
 
 ### Org
-# @no-cookie-jar
+# @ref login
 GET {{base_url}}/rally/org
 Authorization: {{Authorization}}
 
-### Org
+### Org get first
 # @no-cookie-jar
-GET {{base_url}}/rally/org
+GET {{base_url}}/rally/org/1
+Authorization: {{Authorization}}
+
+### Org xlsx
+# @no-cookie-jar
+GET {{base_url}}/rally/org?format=xlsx
 Authorization: {{Authorization}}
 
 
@@ -53,7 +58,7 @@ Authorization: {{Authorization}}
 ### Org/contact list
 # @ref login
 GET {{base_url}}/rally/org/1/contact.csv
-Authorization: Bearer {{login.access_token}}
+Authorization: {{Authorization}}
 
 ### Org/contact get
 # @ref login

@@ -1,7 +1,5 @@
-grails:
-  profile: plugin
-  codegen:
-    defaultPackage: taskify.domains.plugin
+spring.config.import: classpath:./gorm/tools/datasource-test.yml
+
 info:
   app:
     name: '@info.app.name@'
@@ -23,41 +21,14 @@ logging:
 #    org.hibernate.stat: DEBUG
 #    org.hibernate.SQL: DEBUG
 
-hibernate:
-  format_sql: false
-  schema_management_tool: 'gorm.tools.hibernate.schema.CustomSchemaManagementTool'
-  naming_strategy: 'org.hibernate.cfg.DefaultNamingStrategy'
-  dialect: 'gorm.tools.hibernate.ExtendedH2Dialect'
-  show_sql: false
-  cache:
-    use_second_level_cache: false
-  jdbc:
-    time_zone: 'UTC'
-
 dataSource:
-  type: com.zaxxer.hikari.HikariDataSource
-  pooled: true
-  jmxExport: true
-  driverClassName: org.h2.Driver
-  username: sa
-  password:
   properties:
     # By default sql server has default isolation read commited, mysql has repeatable read
     # This sets default isolation to TRANSACTION_READ_COMMITTED. so its consistent
     defaultTransactionIsolation: 2 # Connection.TRANSACTION_READ_COMMITTED
     transactionIsolation: TRANSACTION_READ_COMMITTED #Hikari needs this
 
-environments:
-  development:
-    dataSource:
-      dbCreate: create-drop
-      url: jdbc:h2:mem:devDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
-  test:
-    dataSource:
-      dbCreate: create-drop
-      url: jdbc:h2:mem:testDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
-  production:
-    dataSource:
-      dbCreate: none
-      url: jdbc:h2:./prodDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
-
+app:
+  resources:
+    rootLocation: "${gradle.rootProjectDir}/examples/resources"
+    tempDir: "./build/rootLocation/tempDir"

@@ -1,7 +1,7 @@
 apply plugin: "yakworks.grails-plugin"
 
 //shared resources to pick up the Gorm defaults from application.groovy, as well as simple logback
-sourceSets.test.resources.srcDirs += [project(':gorm-test-support').sourceSets.main.resources]
+// sourceSets.test.resources.srcDirs += [project(':gorm-test-support').sourceSets.main.resources]
 
 dependencies {
   console "org.grails:grails-console"

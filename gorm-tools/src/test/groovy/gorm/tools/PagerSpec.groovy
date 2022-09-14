@@ -4,7 +4,8 @@
 */
 package gorm.tools
 
-
+import org.springframework.beans.factory.annotation.Autowired
+import yakworks.i18n.icu.ICUMessageSource
 import yakworks.meta.MetaMapList
 import gorm.tools.beans.Pager
 import gorm.tools.metamap.services.MetaEntityService
@@ -17,12 +18,21 @@ import testing.TestSeedData
 
 class PagerSpec extends GormToolsHibernateSpec {
 
+    @Autowired
+    ICUMessageSource msgService
+
+
     List<Class> getDomainClasses() { [Cust, Address, AddyNested] }
 
     void setupSpec() {
         Cust.withTransaction {
             TestSeedData.buildCustomers(50)
         }
+    }
+
+    def "sanity check"() {
+        expect:
+        msgService
     }
 
     def "test default values"() {

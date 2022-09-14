@@ -1,2 +1,2 @@
 foo:
-  message: from test
+  message: from application-test.yml

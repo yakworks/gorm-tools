@@ -1,6 +1,4 @@
----
-
-# spring.config.import: classpath:./datasource.yml
+spring.config.import: classpath:./gorm/tools/datasource-test.yml
 
 logging:
   level:
@@ -8,30 +6,8 @@ logging:
     org.springframework: WARN
     org.hibernate.orm.deprecation: OFF # turns off deprecation notices
 
-
-hibernate:
-  format_sql: false
-  show_sql: false
-  schema_management_tool: 'gorm.tools.hibernate.schema.CustomSchemaManagementTool'
-  naming_strategy: 'org.hibernate.cfg.DefaultNamingStrategy'
-  dialect: 'gorm.tools.hibernate.ExtendedH2Dialect'
-  cache:
-    queries: false
-    use_second_level_cache: false
-    use_query_cache: false
-  jdbc:
-    time_zone: 'UTC'
-
-dataSource:
-  type: com.zaxxer.hikari.HikariDataSource
-  pooled: true
-  driverClassName: org.h2.Driver
-  username: sa
-  password:
-  dbCreate: create-drop
-  url: jdbc:h2:mem:testDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
-
 ---
+
 # add some api configs for testing
 api:
   paths:

@@ -6,13 +6,12 @@ package gorm.tools.mango
 
 import gorm.tools.mango.jpql.SimplePagedQuery
 import yakworks.testing.gorm.GormToolsHibernateSpec
-import grails.testing.spring.AutowiredTest
 import spock.lang.Shared
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.testing.gorm.model.SinkItem
 
-class SimplePagedQuerySpec extends GormToolsHibernateSpec implements AutowiredTest {
+class SimplePagedQuerySpec extends GormToolsHibernateSpec {
 
     DefaultMangoQuery mangoQuery
     @Shared KitchenSinkRepo kitchenSinkRepo
@@ -26,6 +25,7 @@ class SimplePagedQuerySpec extends GormToolsHibernateSpec implements AutowiredTe
 
     void cleanupSpec() {
         kitchenSinkRepo.deleteAll()
+        // AppCtx.setApplicationContext(null)
     }
 
     void "sanity check"() {

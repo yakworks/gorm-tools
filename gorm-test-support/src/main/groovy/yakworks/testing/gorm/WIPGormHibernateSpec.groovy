@@ -13,51 +13,47 @@ import org.grails.orm.hibernate.HibernateDatastore
 import org.grails.plugin.hibernate.support.HibernatePersistenceContextInterceptor
 import org.hibernate.Session
 import org.hibernate.SessionFactory
+import org.junit.After
+import org.junit.AfterClass
+import org.junit.Before
+import org.springframework.boot.env.PropertySourceLoader
 import org.springframework.core.env.PropertyResolver
+import org.springframework.core.env.PropertySource
+import org.springframework.core.io.Resource
+import org.springframework.core.io.ResourceLoader
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute
 
 import gorm.tools.ConfigDefaults
-import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.RepoLookup
-import gorm.tools.repository.RepoUtil
-import gorm.tools.repository.artefact.RepositoryArtefactHandler
-import gorm.tools.repository.model.UuidGormRepo
 import gorm.tools.validation.RepoValidatorRegistry
 import grails.buildtestdata.TestDataBuilder
 import grails.config.Config
 import grails.testing.spring.AutowiredTest
 import spock.lang.AutoCleanup
 import spock.lang.Shared
-import spock.lang.Specification
 import yakworks.grails.GrailsHolder
 import yakworks.spring.AppCtx
 import yakworks.testing.gorm.support.GormToolsSpecHelper
 
 /**
- * Can be a drop in replacement for the HibernateSpec. Makes sure repositories are setup for the domains
- * and incorporates the TestDataBuilder from build-test-data plugin methods and adds in JsonViewSpecSetup
- * so that it possible to build json and map test data
- *
- * @author Joshua Burnett (@basejump)
- * @since 6.1
+ * WORk IN PROGRESS REPLACEMENT FOR GormToolsHibernateSpec
  */
-@SuppressWarnings(['Indentation'])
+@SuppressWarnings(['UnnecessarySelfAssignment', 'Println', 'EmptyMethod', 'Indentation', 'UnusedPrivateMethod', 'InvertedIfElse'])
 @CompileStatic
-abstract class GormToolsHibernateSpec extends Specification implements AutowiredTest, TestDataBuilder, GormToolsSpecHelper {
+trait WIPGormHibernateSpec implements AutowiredTest, TestDataBuilder, GormToolsSpecHelper {
 
     @Shared @AutoCleanup HibernateDatastore hibernateDatastore
     @Shared PlatformTransactionManager transactionManager
 
-    //@OnceBefore
     @CompileDynamic
-    void setupSpec() {
+    void init() {
         //from original HibernateSpec
         doHibernateDatastore()
 
         RepoLookup.USE_CACHE = false
-        //for some reason holders get scrambled so make sure it has the grailsApplication from this test
+        //for some reason holder get scrambled so make sure it has the grailsApplication from this test
         GrailsHolder.setGrailsApplication(getGrailsApplication())
         AppCtx.setApplicationContext(getApplicationContext())
 
@@ -88,26 +84,26 @@ abstract class GormToolsHibernateSpec extends Specification implements Autowired
         doAfterDomains()
     }
 
-    @CompileDynamic
-    Closure hibernateBeans(){ { ->
-        persistenceInterceptor(HibernatePersistenceContextInterceptor){
-            hibernateDatastore = (HibernateDatastore)hibernateDatastore
-        }
-
-        for(Class domainClass in datastore.mappingContext.persistentEntities*.javaClass){
-            Class repoClass = findRepoClass(domainClass)
-            grailsApplication.addArtefact(RepositoryArtefactHandler.TYPE, repoClass)
-            String repoName = RepoUtil.getRepoBeanName(domainClass)
-            if (repoClass == DefaultGormRepo || repoClass == UuidGormRepo) {
-                "$repoName"(repoClass, domainClass)
-            } else {
-                "$repoName"(repoClass)
-            }
-        }
-    }}
-
     void doHibernateDatastore(){
-        Config cfg = getConfig()
+        def cfg = getConfig()
+
+        // List<PropertySourceLoader> propertySourceLoaders = SpringFactoriesLoader.loadFactories(PropertySourceLoader.class, getClass().getClassLoader())
+        // ResourceLoader resourceLoader = new DefaultResourceLoader()
+        // MutablePropertySources propertySources = new MutablePropertySources()
+        // PropertySourceLoader ymlLoader = propertySourceLoaders.find { it.getFileExtensions().toList().contains("yml") }
+        // if (ymlLoader) {
+        //     load(resourceLoader, ymlLoader, "application.yml").each {
+        //         propertySources.addLast(it)
+        //     }
+        // }
+        // PropertySourceLoader groovyLoader = propertySourceLoaders.find { it.getFileExtensions().toList().contains("groovy") }
+        // if (groovyLoader) {
+        //     load(resourceLoader, groovyLoader, "application.groovy").each {
+        //         propertySources.addLast(it)
+        //     }
+        // }
+        // propertySources.addFirst(new MapPropertySource("defaults", getConfiguration()))
+        // Config config = new PropertySourcesConfig(propertySources)
 
         List<Class> domainClasses = getDomainClasses()
         String packageName = getPackageToScan(config)
@@ -121,24 +117,27 @@ abstract class GormToolsHibernateSpec extends Specification implements Autowired
         transactionManager = hibernateDatastore.getTransactionManager()
     }
 
+    @AfterClass
+    static void cleanupAppCtx() {
+        AppCtx.setApplicationContext(null)
+    }
+
     /**
      * The transaction status
      */
     TransactionStatus transactionStatus
 
-    void cleanupSpec() {
-        AppCtx.setApplicationContext(null)
+    @Before
+    void initTran() {
+        transactionStatus = transactionManager?.getTransaction(new DefaultTransactionAttribute())
     }
 
-    void setup() {
-        transactionStatus = transactionManager.getTransaction(new DefaultTransactionAttribute())
-    }
-
-    void cleanup() {
+    @After
+    void rollback() {
         if (isRollback()) {
-            transactionManager.rollback(transactionStatus)
+            transactionManager?.rollback(transactionStatus)
         } else {
-            transactionManager.commit(transactionStatus)
+            transactionManager?.commit(transactionStatus)
         }
     }
 
@@ -178,11 +177,37 @@ abstract class GormToolsHibernateSpec extends Specification implements Autowired
         config.getProperty('grails.codegen.defaultPackage', getClass().package.name)
     }
 
+    private List<PropertySource> load(ResourceLoader resourceLoader, PropertySourceLoader loader, String filename) {
+        if (canLoadFileExtension(loader, filename)) {
+            Resource appYml = resourceLoader.getResource(filename)
+            return loader.load(appYml.getDescription(), appYml) as List<PropertySource>
+        } else {
+            return Collections.emptyList()
+        }
+    }
+
+    private boolean canLoadFileExtension(PropertySourceLoader loader, String name) {
+        return Arrays
+            .stream(loader.fileExtensions)
+            .map { String extension -> extension.toLowerCase() }
+            .anyMatch { String extension -> name.toLowerCase().endsWith(extension) }
+    }
+
     /** consistency with other areas of grails and other unit tests */
     AbstractDatastore getDatastore() {
         hibernateDatastore
     }
 
+    // @CompileStatic
+    // Map getConfiguration() {
+    //     Map cfg = ConfigDefaults.getConfigMap(false)
+    //     def clos = doWithConfig()
+    //     if (clos) {
+    //         clos.call(cfg)
+    //     }
+    //     return cfg
+    // }
+    //
     @Override
     @CompileDynamic
     Closure doWithConfig() {

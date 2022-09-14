@@ -11,10 +11,8 @@ import org.grails.config.PropertySourcesConfig
 import org.junit.AfterClass
 
 import gorm.tools.ConfigDefaults
-import grails.config.Config
 import grails.testing.spring.AutowiredTest
 import yakworks.spring.AppCtx
-import yakworks.testing.gorm.support.ExternalConfigAwareSpec
 import yakworks.testing.gorm.support.GormToolsSpecHelper
 
 /**
@@ -35,7 +33,7 @@ trait DataRepoTest implements GormToolsSpecHelper, RepoBuildDataTest, AutowiredT
     }
 
     @AfterClass
-    def cleanupAppCtx() {
+    static void cleanupAppCtx() {
         AppCtx.setApplicationContext(null)
     }
 

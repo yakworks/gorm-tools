@@ -68,14 +68,13 @@ implementation "org.yakworks:gorm-tools:7.3.23"
 
 ## Groovy 3, Grails 5 and Gorm 7.3
 
-Versioning will track the `gorm.version` for example gorm-tools 7.3.20, 7.3.21, etc will be compiled against gorm.version 7.3.2.
-
+Versioning will track the `gorm.version` for example gorm-tools 7.3.20, 7.3.21, etc will be compiled against gorm.version 7.3.2, 7.3.31 -> gorm.version 7.3.3 etc...
 
 
 ## Purpose 
 
 Gorm-tools allows your Grails/Gorm project to start with a design of best practices that they can customize along the way. 
-This brings an opinionated starting point to a Grails/Gorm project but without being locked in.
+This brings an opinionated SpringBoot based starting point to a Grails/Gorm project but without being locked in.
 Developers are free to easily customize, replace and disable these patterns when their opinions differ.
 
 ## Overview

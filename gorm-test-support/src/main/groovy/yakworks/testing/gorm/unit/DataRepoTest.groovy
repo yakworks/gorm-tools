@@ -4,13 +4,15 @@
 */
 package yakworks.testing.gorm.unit
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
+import org.grails.config.PropertySourcesConfig
 import org.junit.AfterClass
 
+import gorm.tools.ConfigDefaults
 import grails.testing.spring.AutowiredTest
 import yakworks.spring.AppCtx
-import yakworks.testing.gorm.support.ExternalConfigAwareSpec
 import yakworks.testing.gorm.support.GormToolsSpecHelper
 
 /**
@@ -22,7 +24,7 @@ import yakworks.testing.gorm.support.GormToolsSpecHelper
  * @since 6.1
  */
 @CompileStatic
-trait DataRepoTest implements GormToolsSpecHelper, RepoBuildDataTest, AutowiredTest, ExternalConfigAwareSpec  {
+trait DataRepoTest implements GormToolsSpecHelper, RepoBuildDataTest, AutowiredTest { //, ExternalConfigAwareSpec  {
 
     void mockDomains(Class<?>... domainClassesToMock) {
         mockDomainsBuildDataTest(domainClassesToMock)
@@ -31,7 +33,7 @@ trait DataRepoTest implements GormToolsSpecHelper, RepoBuildDataTest, AutowiredT
     }
 
     @AfterClass
-    def cleanupAppCtx() {
+    static void cleanupAppCtx() {
         AppCtx.setApplicationContext(null)
     }
 
@@ -41,4 +43,16 @@ trait DataRepoTest implements GormToolsSpecHelper, RepoBuildDataTest, AutowiredT
     //     //mockRepositories(entityClasses)
     // }
 
+    @Override
+    @CompileDynamic
+    Closure doWithConfig() {
+        { config ->
+            gormConfigDefaults(config)
+        }
+    }
+
+    PropertySourcesConfig gormConfigDefaults(PropertySourcesConfig config){
+        config.putAll(ConfigDefaults.getConfigMap(false))
+        return config
+    }
 }

@@ -1,8 +1,4 @@
-# FOR TESTING ONLY, reminder that nothing here get published with jar
-grails:
-  profile: plugin
-#  config:
-#    locations: ["classpath:foo"]
+spring.config.import: classpath:./gorm/tools/datasource-test.yml
 
 logging:
   level:

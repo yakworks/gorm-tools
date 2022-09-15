@@ -106,10 +106,10 @@ class ContactRepo extends LongIdGormRepo<Contact> {
         if (contact.location?.isDirty()) contact.location.persist()
         syncChangesToUser(contact)
         boolean isPrimary = Maps.boolean(e.data, 'isPrimary',  false)
-        //contact is not already primary contact
-
-        if(isPrimary && !contact.isPrimary) {
-            Org contactOrg = Org.get(contact.orgId)
+        //contact is not a primary contact.
+        // Should not get here and hit db twice from saving org because setting contact on org is in beforePersist and we chck if it's the same.
+        Org contactOrg = Org.get(contact.orgId)
+        if(isPrimary && !contact.isPrimary && contactOrg.contact!=contact) {
             contactOrg.contact = contact
             contactOrg.persist()
         }

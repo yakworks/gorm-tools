@@ -134,6 +134,16 @@ class ContactTests extends Specification implements DomainIntTest {
 
         then:
         contact.isPrimary == true
+
+        when:
+        Map params = [firstName:'Peter', email:'abc@walmart.com', isPrimary:true, org:Org.get(50)]
+        def entity = Contact.create(params)
+        flushAndClear()
+        Contact newContact = Contact.get(entity.id)
+
+        then:
+        newContact.org == Org.get(50)
+        newContact.isPrimary == true
     }
 
     void "test create Contact with org lookup by orgSource"() {
@@ -142,7 +152,7 @@ class ContactTests extends Specification implements DomainIntTest {
         Org.repo.createSource(org)
         org.persist(flush: true)
 
-        Map params = [firstName:'Peter', email:'abc@walmart.com', isPrimary:"true"]
+        Map params = [firstName:'Peter', email:'abc@walmart.com', isPrimary:true]
         params.org = [source: [sourceId: 'foo', orgType: OrgType.Customer.name()]]
 
 

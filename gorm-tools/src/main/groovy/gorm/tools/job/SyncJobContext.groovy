@@ -92,7 +92,7 @@ class SyncJobContext {
 
         if(args.savePayload){
             if (payload && args.savePayloadAsFile) {
-                data.payloadId = writePayloadFile(payload as Collection<Map>)
+                data.payloadId = writePayloadFile(payload as Collection)
             }
             else {
                 String res = JsonEngine.toJson(payload)
@@ -236,7 +236,7 @@ class SyncJobContext {
         return ret
     }
 
-    Long writePayloadFile(Collection<Map> payload){
+    Long writePayloadFile(Collection payload){
         String filename = "SyncJobPayload_${jobId}_.json"
         Path path = syncJobService.createTempFile(filename)
         JsonStreaming.streamToFile(payload, path)

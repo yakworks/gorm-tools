@@ -21,7 +21,7 @@ import grails.util.Holders
 import grails.validation.DeferredBindingActions
 
 /**
- * replacement of the GrailUnitTest to build a GrailsApplication with a Spring Boot AnnotationConfigApplicationContext
+ * replacement of the GrailUnitTest in order to build a GrailsApplication with a Spring Boot AnnotationConfigApplicationContext
  */
 @SuppressWarnings(['AssignmentToStaticFieldFromInstanceMethod', ''])
 @CompileStatic

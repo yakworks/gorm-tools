@@ -22,26 +22,7 @@ import yakworks.security.gorm.model.AppUser
 @CompileDynamic
 trait SecurityTest {
 
-    //called from RepoBuildDataTest as it setups and mocks the domains
-    // void onMockDomains(Class<?>... entityClasses) {
-        // do these beans first so that they can get injected into the repos
-        // defineBeans {
-        //     passwordEncoder(NoOpPasswordEncoder)
-        //     secService(TestingSecService, AppUser)
-        // }
-        // now mock the domains
-        // super.onMockDomains(entityClasses)
-        // do these after so they can cache the domains created
-        // defineBeans {
-        //     auditStampBeforeValidateListener(AuditStampBeforeValidateListener)
-        //     auditStampPersistenceEventListener(AuditStampPersistenceEventListener)
-        //     auditStampSupport(AuditStampSupport)
-        // }
-        // add the listener to the SimpleMapDatastore
-        // datastore.applicationEventPublisher.addApplicationListener(ctx.getBean("auditStampPersistenceEventListener"))
-    // }
-
-    Closure doWithGormSecurity() {
+    Closure doWithSecurityBeans() {
         { ->
             passwordEncoder(NoOpPasswordEncoder)
             secService(TestingSecService, AppUser)
@@ -51,7 +32,7 @@ trait SecurityTest {
         }
     }
 
-    void doAfterDomains() {
+    void doAfterGormBeans() {
         datastore.applicationEventPublisher.addApplicationListener(ctx.getBean("auditStampPersistenceEventListener"))
     }
 

@@ -63,8 +63,8 @@ trait BaseRepoEntityUnitTest {
         applicationContext.getBean('transactionManager', PlatformTransactionManager)
     }
 
-    Closure commonBeans(){
-        return getRepoTestUtils().commonBeans()
+    Closure commonGormBeans(){
+        return getRepoTestUtils().commonGormBeans()
     }
 
     //not relevant unless its in a hibernate spec
@@ -73,11 +73,11 @@ trait BaseRepoEntityUnitTest {
     }
 
     /**
-     * see commonBeans, sets up beans for common services for binders, mango, idegen, parralelTools and msgService
+     * see commonGormBeans, sets up beans for common services for binders, mango, idegen, parralelTools and msgService
      */
-    void defineCommonBeans(){
+    void defineCommonGormBeans(){
         if(!_hasCommonBeansSetup){
-            defineBeans(commonBeans())
+            defineBeans(commonGormBeans())
             _hasCommonBeansSetup = true
         }
     }
@@ -88,7 +88,7 @@ trait BaseRepoEntityUnitTest {
 
         Closure beanClos = gtu.repoBeansClosure(domainClassesToMock)
 
-        def beanClosures = [commonBeans(), beanClos, hibernateBeans(), doWithGormBeans(), doWithGormSecurity()]
+        def beanClosures = [commonGormBeans(), beanClos, hibernateBeans(), doWithGormBeans(), doWithSecurityBeans()]
         getRepoTestUtils().defineBeansMany(beanClosures)
 
         // rescan needed after the beans are added
@@ -99,7 +99,7 @@ trait BaseRepoEntityUnitTest {
         RepoValidatorRegistry.init(getDatastore(), ctx.getBean('messageSource', MessageSource))
 
         //put here so we can use trait to setup security when needed
-        doAfterDomains()
+        doAfterGormBeans()
     }
 
     /**
@@ -148,7 +148,10 @@ trait BaseRepoEntityUnitTest {
     }
 
     /**
+     * doWithSpring is what to implement if beans are needed when it first creates the AppContext
      * override this to add beans during appContext init with the domains and repos
+     * note: Often times strange things can happen if the implementation is not marked with @CompileDynamic when using @CompileStatic at class
+     * @return the bean builder closure.
      */
     Closure doWithGormBeans() {
         null
@@ -156,16 +159,18 @@ trait BaseRepoEntityUnitTest {
 
     /**
      * override this to be run after the doWithGormBeans along with the defaults have been added to the AppContext
+     * @return the bean builder closure.
      */
-    void doAfterDomains() {
+    void doAfterGormBeans() {
         null
     }
 
     /**
      * override this to add beans that are needed for security setups.
      * just bean definitions that are added along with whats in doWithGormBeans
+     * @return the bean builder closure.
      */
-    Closure doWithGormSecurity() {
+    Closure doWithSecurityBeans() {
         null
     }
 
@@ -174,7 +179,7 @@ trait BaseRepoEntityUnitTest {
      * override this to modify config but dont forget to add in the gormConfigDefaults if doing so.
      */
     @Override //in the GrailUnitTest
-    @CompileDynamic //closure has weird delgate if its not CompileDynamic
+    @CompileDynamic //closure might have a weird delegate if this is not marked with CompileDynamic
     Closure doWithConfig() {
         { cfg ->
             gormConfigDefaults((PropertySourcesConfig)cfg)

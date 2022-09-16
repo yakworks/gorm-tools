@@ -11,7 +11,7 @@ class ProblemHandlerSpec extends Specification implements DataRepoTest {
     ProblemHandler problemHandler
 
     void setupSpec() {
-        defineCommonBeans()
+        defineCommonGormBeans()
     }
 
     void "sanity check"(){

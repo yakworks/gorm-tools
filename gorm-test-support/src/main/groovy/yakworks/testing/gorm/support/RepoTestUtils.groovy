@@ -44,7 +44,7 @@ import yakworks.spring.AppCtx
  * if using alone and not as part of DataRepoTest or DomainRepoTest then
  *
     void setupSpec() {
-        defineCommonBeans()
+        defineCommonGormBeans()
     }
  *
  * @author Joshua Burnett (@basejump)
@@ -82,7 +82,7 @@ class RepoTestUtils {
     }
 
     @CompileDynamic
-    Closure commonBeans(){ { ->
+    Closure commonGormBeans(){ { ->
         // xmlns([context:"http://www.springframework.org/schema/context"])
         // context.'component-scan'('base-package': 'gorm.tools.settings')
 

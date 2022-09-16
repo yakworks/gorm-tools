@@ -13,7 +13,7 @@ class MessageSourceSpec extends Specification implements DataRepoTest {
     ICUMessageSource messageSource
 
     void setupSpec() {
-        defineCommonBeans()
+        defineCommonGormBeans()
     }
 
     void "messageSource lookup"(){

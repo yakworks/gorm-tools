@@ -24,7 +24,7 @@ class ExportBenchmarkSpecs extends GormToolsHibernateSpec implements JsonEngineT
 
     MetaMapService metaMapService
 
-    List<Class> getDomainClasses() { [KitchenSink, SinkItem] }
+    static List<Class> entityClasses = [KitchenSink, SinkItem]
 
     // @Transactional
     void setupSpec() {

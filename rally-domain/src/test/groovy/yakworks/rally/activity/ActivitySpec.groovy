@@ -26,13 +26,13 @@ import yakworks.rally.testing.MockData
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 
 class ActivitySpec extends GormToolsHibernateSpec implements SecurityTest { //implements SecuritySpecUnitTestHelper{
-    //Sanity checks and auto runs DomainRepoCrudSpec tests
+    static entityClasses = [
+        AttachmentLink, ActivityLink, Activity, TaskType, Org, OrgTag,
+        Tag, TagLink, Attachment, ActivityNote, Contact, ActivityContact
+    ]
 
     ActivityRepo activityRepo
     @Shared Long orgId
-
-    List<Class> getDomainClasses() { [AttachmentLink, ActivityLink, Activity, TaskType, Org, OrgTag,
-                                      Tag, TagLink, Attachment, ActivityNote, Contact, ActivityContact] }
 
     Closure doWithDomains() { { ->
         appResourceLoader(AppResourceLoader)

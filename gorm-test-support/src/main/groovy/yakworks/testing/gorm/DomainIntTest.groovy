@@ -12,7 +12,7 @@ import yakworks.spring.AppCtx
 import yakworks.testing.gorm.integration.DataIntegrationTest
 
 /**
- * core integration test trait that consolodated the traits
+ * core integration test trait that consolodated the traits to include security.
  */
 @CompileStatic
 trait DomainIntTest implements DataIntegrationTest, SecuritySpecHelper {

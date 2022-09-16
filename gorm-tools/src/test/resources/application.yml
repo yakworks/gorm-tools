@@ -6,7 +6,12 @@ logging:
     org.springframework: WARN
     org.hibernate.orm.deprecation: OFF # turns off deprecation notices
 
+gorm:
+  tools:
+    async:
+      poolSize: 2
 ---
+
 
 # add some api configs for testing
 api:

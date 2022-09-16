@@ -12,7 +12,7 @@ import yakworks.testing.gorm.model.ThingRepo
 class IdGenRepoSpec extends GormToolsHibernateSpec {
 
     //test the thing
-    List<Class> getDomainClasses() { [Thing] }
+    static List entityClasses = [Thing]
 
     def "assert proper repos are setup"() {
         expect:

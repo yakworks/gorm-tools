@@ -29,7 +29,7 @@ import yakworks.api.problem.data.NotFoundProblem
 
 class GormRepoSpec extends GormToolsHibernateSpec {
 
-    List<Class> getDomainClasses() { [Cust, CustExt, TestTrxRollback, KitchenSink, SinkExt, SinkItem] }
+    static entityClasses = [Cust, CustExt, TestTrxRollback, KitchenSink, SinkExt, SinkItem]
 
     def "assert proper repos are setup"() {
         expect:

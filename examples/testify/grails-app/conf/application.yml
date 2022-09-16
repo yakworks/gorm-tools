@@ -32,3 +32,9 @@ app:
   resources:
     rootLocation: "${gradle.rootProjectDir}/examples/resources"
     tempDir: "./build/rootLocation/tempDir"
+
+gorm:
+  tools:
+    async:
+      poolSize: 2
+      foo: bar

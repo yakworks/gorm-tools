@@ -2,13 +2,12 @@ package gorm.tools.mango
 
 import gorm.tools.mango.jpql.JpqlQueryBuilder
 import yakworks.testing.gorm.GormToolsHibernateSpec
-import grails.testing.spring.AutowiredTest
 import yakworks.testing.gorm.model.KitchenSink
 
 /**
  * Test for JPA builder
  */
-class JpqlQueryBuilderSelectSpec extends GormToolsHibernateSpec implements AutowiredTest{
+class JpqlQueryBuilderSelectSpec extends GormToolsHibernateSpec {
 
     List<Class> getDomainClasses() { [KitchenSink] }
 

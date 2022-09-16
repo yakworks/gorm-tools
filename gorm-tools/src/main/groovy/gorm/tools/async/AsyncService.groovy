@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.transaction.TransactionStatus
 
+import gorm.tools.settings.AsyncProperties
 import gorm.tools.transaction.TrxService
 import grails.persistence.support.PersistenceContextInterceptor
 import yakworks.grails.support.ConfigAware
@@ -53,9 +54,13 @@ class AsyncService implements ConfigAware  {
     @Autowired
     TrxService trxService
 
+    @Autowired(required = false)
+    AsyncProperties asyncProperties
+
     /** setup defaults for poolSize and batchSize if config isn't present. batchSize set to 100 if not config found*/
     @PostConstruct
     void init() {
+        // assert asyncProperties
         //if batchSize is 0 then hibernate may not bbe installed and hibernate.jdbc.batch_size is not set. force it to 100
         Integer batchSize = config.getProperty('hibernate.jdbc.batch_size', Integer)
         sliceSize = batchSize ?: sliceSize

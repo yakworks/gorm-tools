@@ -16,13 +16,13 @@ import yakworks.meta.MetaMapList
 import yakworks.testing.gorm.GormToolsHibernateSpec
 
 class SanityCheckSpec extends GormToolsHibernateSpec {
+    static entityClasses = [Cust]
 
     @Autowired ApplicationContext applicationCtx
     @Autowired ICUMessageSource msgService
     @Autowired Environment environment
 
     //something needs to be specifeid
-    List<Class> getDomainClasses() { [Cust] }
 
     def "sanity check standard beans"() {
         expect:

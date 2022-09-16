@@ -4,14 +4,13 @@
 */
 package gorm.tools.mango
 
-import yakworks.testing.gorm.GormToolsHibernateSpec
-import grails.testing.spring.AutowiredTest
 import testing.Address
 import testing.AddyNested
 import testing.Cust
 import testing.TestSeedData
+import yakworks.testing.gorm.GormToolsHibernateSpec
 
-class DefaultMangoQuerySpec extends GormToolsHibernateSpec implements AutowiredTest {
+class DefaultMangoQuerySpec extends GormToolsHibernateSpec {
 
     DefaultMangoQuery mangoQuery
 

@@ -10,6 +10,7 @@ import org.springframework.core.GenericTypeResolver
 
 import yakworks.testing.gorm.RepoTestData
 import yakworks.testing.gorm.TestDataJson
+import yakworks.testing.gorm.support.RepoBuildDataTest
 
 /**
  * Should works as a drop in replacement for the Grails Testing Support's

@@ -23,7 +23,7 @@ class BulkableRepoSpec extends GormToolsHibernateSpec {
     AsyncService asyncService
     KitchenSinkRepo kitchenSinkRepo
 
-    List<Class> getDomainClasses() { [KitchenSink, SinkExt, TestSyncJob] }
+    static List<Class> entityClasses = [KitchenSink, SinkExt, TestSyncJob]
 
     Closure doWithDomains() { { ->
         syncJobService(TestSyncJobService)

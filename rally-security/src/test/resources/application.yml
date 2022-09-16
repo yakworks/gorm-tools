@@ -1,9 +1,4 @@
-spring.config.import: classpath:./gorm/tools/datasource-test.yml
-
-grails:
-  profile: plugin
-  config:
-    locations: ["classpath:security-configs/anonymous.yml"]
+spring.config.import: classpath:./gorm/tools/datasource-test.yml, classpath:security-configs/anonymous.yml
 
 logging:
   level:

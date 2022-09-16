@@ -7,33 +7,29 @@ package yakworks.testing.gorm
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import org.grails.config.PropertySourcesConfig
 import org.grails.datastore.mapping.core.AbstractDatastore
 import org.grails.orm.hibernate.HibernateDatastore
 import org.grails.plugin.hibernate.support.HibernatePersistenceContextInterceptor
 import org.hibernate.Session
 import org.hibernate.SessionFactory
+import org.junit.BeforeClass
+import org.springframework.context.annotation.AnnotationConfigRegistry
 import org.springframework.core.env.PropertyResolver
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute
 
-import gorm.tools.ConfigDefaults
-import gorm.tools.repository.DefaultGormRepo
-import gorm.tools.repository.RepoLookup
-import gorm.tools.repository.RepoUtil
-import gorm.tools.repository.artefact.RepositoryArtefactHandler
-import gorm.tools.repository.model.UuidGormRepo
-import gorm.tools.validation.RepoValidatorRegistry
 import grails.buildtestdata.TestDataBuilder
 import grails.config.Config
 import grails.testing.spring.AutowiredTest
 import spock.lang.AutoCleanup
 import spock.lang.Shared
 import spock.lang.Specification
-import yakworks.grails.GrailsHolder
+import yakworks.commons.lang.PropertyTools
 import yakworks.spring.AppCtx
-import yakworks.testing.gorm.support.GormToolsSpecHelper
+import yakworks.testing.gorm.support.BaseRepoEntityUnitTest
+import yakworks.testing.grails.BasicConfiguration
+import yakworks.testing.grails.GrailsAppUnitTest
 
 /**
  * Can be a drop in replacement for the HibernateSpec. Makes sure repositories are setup for the domains
@@ -45,22 +41,69 @@ import yakworks.testing.gorm.support.GormToolsSpecHelper
  */
 @SuppressWarnings(['Indentation'])
 @CompileStatic
-abstract class GormToolsHibernateSpec extends Specification implements AutowiredTest, TestDataBuilder, GormToolsSpecHelper {
+abstract class GormToolsHibernateSpec extends Specification implements AutowiredTest, GrailsAppUnitTest, BaseRepoEntityUnitTest, TestDataBuilder {
+    //trait order above is important, GormToolsSpecHelper should come last as it overrides methods in GrailsAppUnitTest
 
     @Shared @AutoCleanup HibernateDatastore hibernateDatastore
     @Shared PlatformTransactionManager transactionManager
+    /** The transaction status, setup before each test */
+    TransactionStatus transactionStatus
 
-    //@OnceBefore
+    /**
+     * Override this in test to tell what domainclasses is should mock up. Its not abstract to force it since the option exists to package scan
+     */
+    // List<Class> getDomainClasses() { [] }
+
+    @BeforeClass
+    void setupHibernate() {
+        //setup the ConfigurationProperties beans
+        def cfgRegistry = (AnnotationConfigRegistry)ctx
+        cfgRegistry.register(BasicConfiguration)
+
+        //Sets up the HibernateDatastore, reads the getDomainClasses and sets up whats returned there.
+        initDatastore()
+        //register some of the HibernateDatastore props as beans in the ctx.
+        registerHibernateBeans()
+
+        //read what was setup as persistentEntities in datastore , see initDatastore for how it reads from getDomainClasses
+        List domClasses = datastore.mappingContext.persistentEntities*.javaClass
+        defineRepoBeans(domClasses as Class<?>[])
+    }
+
+    @Override
     @CompileDynamic
-    void setupSpec() {
-        //from original HibernateSpec
-        doHibernateDatastore()
+    Closure hibernateBeans(){ { ->
+        persistenceInterceptor(HibernatePersistenceContextInterceptor){
+            hibernateDatastore = (HibernateDatastore)hibernateDatastore
+        }
+    }}
 
-        RepoLookup.USE_CACHE = false
-        //for some reason holders get scrambled so make sure it has the grailsApplication from this test
-        GrailsHolder.setGrailsApplication(getGrailsApplication())
-        AppCtx.setApplicationContext(getApplicationContext())
+    /**
+     * looks for either domainClasses or entityClasses property on the test. can be either a static or a getter.
+     */
+    @CompileDynamic
+    List<Class> findEntityClasses(){
+        def persistentClasses = (PropertyTools.getOrNull(this, 'domainClasses')?:PropertyTools.getOrNull(this, 'entityClasses')) as List<Class>
+        return persistentClasses
+    }
 
+    /**
+     * Sets up the HibernateDatastore, reads the getDomainClasses and sets up whats returned there.
+     */
+    void initDatastore(){
+        List persistentClasses = findEntityClasses()
+
+        if (persistentClasses) {
+            hibernateDatastore = new HibernateDatastore((PropertyResolver) config, persistentClasses as Class[])
+        } else {
+            String packageName = getPackageToScan(config)
+            Package packageToScan = Package.getPackage(packageName) ?: getClass().getPackage()
+            hibernateDatastore = new HibernateDatastore((PropertyResolver) config, packageToScan)
+        }
+        transactionManager = hibernateDatastore.getTransactionManager()
+    }
+
+    void registerHibernateBeans(){
         if (!ctx.containsBean("dataSource"))
             ctx.beanFactory.registerSingleton("dataSource", hibernateDatastore.getDataSource())
         if (!ctx.containsBean("grailsDomainClassMappingContext"))
@@ -70,61 +113,7 @@ abstract class GormToolsHibernateSpec extends Specification implements Autowired
             pci.hibernateDatastore = (HibernateDatastore)hibernateDatastore
             ctx.beanFactory.registerSingleton("persistenceInterceptor", pci)
         }
-
-        def beanClosures = [commonBeans(), hibernateBeans()]
-        def doWithDomainsClosure = doWithDomains()
-        if(doWithDomainsClosure) beanClosures.add(doWithDomainsClosure)
-
-        //put here so we can use trait to setup security when needed
-        def doWithSecurityClosure = doWithSecurity()
-        if(doWithSecurityClosure) beanClosures.add(doWithSecurityClosure)
-
-        defineBeansMany(beanClosures)
-        // rescan needed after the beans are added
-        ctx.getBean('repoEventPublisher').scanAndCacheEventsMethods()
-        // doWithSpringAfter()
-        RepoValidatorRegistry.init(hibernateDatastore, ctx.getBean('messageSource'))
-        //put here so we can use trait to setup security when needed
-        doAfterDomains()
     }
-
-    @CompileDynamic
-    Closure hibernateBeans(){ { ->
-        persistenceInterceptor(HibernatePersistenceContextInterceptor){
-            hibernateDatastore = (HibernateDatastore)hibernateDatastore
-        }
-
-        for(Class domainClass in datastore.mappingContext.persistentEntities*.javaClass){
-            Class repoClass = findRepoClass(domainClass)
-            grailsApplication.addArtefact(RepositoryArtefactHandler.TYPE, repoClass)
-            String repoName = RepoUtil.getRepoBeanName(domainClass)
-            if (repoClass == DefaultGormRepo || repoClass == UuidGormRepo) {
-                "$repoName"(repoClass, domainClass)
-            } else {
-                "$repoName"(repoClass)
-            }
-        }
-    }}
-
-    void doHibernateDatastore(){
-        Config cfg = getConfig()
-
-        List<Class> domainClasses = getDomainClasses()
-        String packageName = getPackageToScan(config)
-
-        if (!domainClasses) {
-            Package packageToScan = Package.getPackage(packageName) ?: getClass().getPackage()
-            hibernateDatastore = new HibernateDatastore((PropertyResolver) config, packageToScan)
-        } else {
-            hibernateDatastore = new HibernateDatastore((PropertyResolver) config, domainClasses as Class[])
-        }
-        transactionManager = hibernateDatastore.getTransactionManager()
-    }
-
-    /**
-     * The transaction status
-     */
-    TransactionStatus transactionStatus
 
     void cleanupSpec() {
         AppCtx.setApplicationContext(null)
@@ -164,11 +153,6 @@ abstract class GormToolsHibernateSpec extends Specification implements Autowired
     }
 
     /**
-     * @return The domain classes
-     */
-    List<Class> getDomainClasses() { [] }
-
-    /**
      * Obtains the default package to scan
      *
      * @param config The configuration
@@ -181,19 +165,6 @@ abstract class GormToolsHibernateSpec extends Specification implements Autowired
     /** consistency with other areas of grails and other unit tests */
     AbstractDatastore getDatastore() {
         hibernateDatastore
-    }
-
-    @Override
-    @CompileDynamic
-    Closure doWithConfig() {
-        { config ->
-            gormConfigDefaults(config)
-        }
-    }
-
-    PropertySourcesConfig gormConfigDefaults(PropertySourcesConfig config){
-        config.putAll(ConfigDefaults.getConfigMap(false))
-        return config
     }
 
 }

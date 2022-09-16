@@ -17,12 +17,10 @@ import testing.Cust
 import testing.TestSeedData
 
 class PagerSpec extends GormToolsHibernateSpec {
+    static entityClasses = [Cust, Address, AddyNested]
 
     @Autowired
     ICUMessageSource msgService
-
-
-    List<Class> getDomainClasses() { [Cust, Address, AddyNested] }
 
     void setupSpec() {
         Cust.withTransaction {

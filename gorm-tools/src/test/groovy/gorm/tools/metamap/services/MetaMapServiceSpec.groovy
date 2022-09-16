@@ -21,7 +21,7 @@ class MetaMapServiceSpec extends GormToolsHibernateSpec {
         metaEntityService: new MetaEntityService()
     )
 
-    List<Class> getDomainClasses() { [KitchenSink, SinkItem, SinkExt, Thing, Enummy] }
+    static List<Class> entityClasses =[KitchenSink, SinkItem, SinkExt, Thing, Enummy]
 
     // @Transactional
     void setupSpec() {

@@ -7,14 +7,12 @@ package gorm.tools.async
 import java.util.concurrent.atomic.AtomicInteger
 
 import org.springframework.context.ApplicationContext
-
-import yakworks.testing.gorm.GormToolsHibernateSpec
-import grails.testing.spring.AutowiredTest
 import spock.lang.Ignore
 import testing.CustType
+import yakworks.testing.gorm.GormToolsHibernateSpec
 
 @Ignore // not used right now.
-class GparsParallelToolsSpec extends GormToolsHibernateSpec implements AutowiredTest {
+class GparsParallelToolsSpec extends GormToolsHibernateSpec {
 
     // GparsParallelTools parallelTools
 

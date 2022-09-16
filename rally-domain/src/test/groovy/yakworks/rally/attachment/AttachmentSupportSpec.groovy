@@ -6,6 +6,7 @@ import java.nio.file.Paths
 
 import groovy.transform.CompileDynamic
 
+import yakworks.testing.gorm.GormToolsHibernateSpec
 import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport
@@ -17,18 +18,16 @@ import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 
-class AttachmentSupportSpec extends Specification implements DataRepoTest, SecurityTest {
+class AttachmentSupportSpec extends GormToolsHibernateSpec implements SecurityTest {
 
     AttachmentSupport attachmentSupport
 
-    @CompileDynamic
-    def setupSpec() {
-        defineBeans({
-            appResourceLoader(AppResourceLoader)
-            attachmentSupport(AttachmentSupport)
-        })
-        mockDomains(Attachment, AttachmentLink, Activity, ActivityNote, ActivityLink)
-    }
+    static List<Class> entityClasses = [Attachment, AttachmentLink, Activity, ActivityNote, ActivityLink]
+
+    Closure doWithDomains(){ { ->
+        appResourceLoader(AppResourceLoader)
+        attachmentSupport(AttachmentSupport)
+    }}
 
     def setup() {
         //make sure its clear

@@ -11,7 +11,7 @@ class KitchenSinkRepoSpec extends GormToolsHibernateSpec {
     AsyncService asyncService
     @Shared KitchenSinkRepo kitchenSinkRepo
 
-    List<Class> getDomainClasses() { [KitchenSink, SinkItem, SinkExt] }
+    static entityClasses = [KitchenSink, SinkItem, SinkExt]
 
     // @Transactional
     void setupSpec() {

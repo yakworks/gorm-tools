@@ -5,6 +5,10 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 import gorm.tools.problem.ValidationProblem
+import yakworks.rally.activity.model.Activity
+import yakworks.rally.activity.model.ActivityLink
+import yakworks.rally.activity.model.ActivityNote
+import yakworks.testing.gorm.GormToolsHibernateSpec
 import yakworks.testing.gorm.unit.DataRepoTest
 import org.springframework.mock.web.MockMultipartFile
 import spock.lang.Shared
@@ -19,18 +23,17 @@ import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
 
-class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest {
+class AttachmentSpec extends GormToolsHibernateSpec implements SecurityTest {
 
     @Shared AttachmentRepo attachmentRepo
     @Shared AttachmentSupport attachmentSupport
 
-    def setupSpec() {
-        defineBeans {
-            appResourceLoader(AppResourceLoader)
-            attachmentSupport(AttachmentSupport)
-        }
-        mockDomains(Attachment, AttachmentLink, FileData, Tag, TagLink)
-    }
+    static List<Class> entityClasses =[Attachment, AttachmentLink, FileData, Tag, TagLink]
+
+    Closure doWithDomains(){ { ->
+        appResourceLoader(AppResourceLoader)
+        attachmentSupport(AttachmentSupport)
+    }}
 
     def cleanupSpec() {
         attachmentSupport.rimrafAttachmentsDirectory()

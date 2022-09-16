@@ -14,7 +14,7 @@ class CSVWriterSpec extends GormToolsHibernateSpec {
 
     MetaMapService metaMapService
 
-    List<Class> getDomainClasses() { [KitchenSink, SinkItem] }
+    static List entityClasses = [KitchenSink, SinkItem]
 
     // @Transactional
     void setupSpec() {

@@ -1,21 +1,22 @@
 package yakworks.rally.eventlog
 
-
-import yakworks.testing.gorm.unit.DomainRepoTest
+import spock.lang.Ignore
 import spock.lang.Specification
+import yakworks.testing.gorm.GormToolsHibernateSpec
+import yakworks.testing.gorm.unit.DataRepoTest
 
-class EventLogHelperSpec extends Specification implements DomainRepoTest<EventLog> {
+@Ignore
+class EventLogHelperSpec extends GormToolsHibernateSpec {
 
     static final String JOB_NAME  = 'EventLogHelperTests'
     static final String COMPONENT = 'service/method'
     static final String APP_NAME  = 'rally-domain'
 
-    void setupSpec() {
-        defineBeans {
-            eventLogger(EventLogger)
-            mockDomains(EventLog)
-        }
-    }
+    List<Class> getDomainClasses() { [EventLog] }
+
+    Closure doWithDomains() { { ->
+        eventLogger(EventLogger)
+    }}
 
     void testSetup_full_map() {
         given:
@@ -144,8 +145,7 @@ class EventLogHelperSpec extends Specification implements DomainRepoTest<EventLo
     void testEventLoggerDebugFinish_noMessage() {
         given:
         EventLogHelper elh = new EventLogHelper(COMPONENT)
-        //jdbcTemplate.update("truncate table EventLog")
-        flushAndClear()
+
         String result = elh.debugFinish()
         flushAndClear()
         def list = EventLog.list()
@@ -190,9 +190,10 @@ class EventLogHelperSpec extends Specification implements DomainRepoTest<EventLo
 
     void testEventLoggerDebugStart() {
         given:
-        EventLogHelper elh = new EventLogHelper(COMPONENT, JOB_NAME, 'a, 42')
-        //jdbcTemplate.update("truncate table EventLog")
+        EventLog.deleteAll()
         flushAndClear()
+        EventLog.list().size() == 0
+        EventLogHelper elh = new EventLogHelper(COMPONENT, JOB_NAME, 'a, 42')
         elh.debugStart()
         flushAndClear()
         def list = EventLog.list()

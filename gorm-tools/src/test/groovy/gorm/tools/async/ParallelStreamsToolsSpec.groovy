@@ -6,19 +6,20 @@ package gorm.tools.async
 
 import java.util.concurrent.atomic.AtomicInteger
 
+import gorm.tools.settings.AsyncProperties
 import org.springframework.context.ApplicationContext
-
-import yakworks.testing.gorm.GormToolsHibernateSpec
-import grails.testing.spring.AutowiredTest
 import testing.CustType
+import yakworks.testing.gorm.GormToolsHibernateSpec
 
-class ParallelStreamsToolsSpec extends GormToolsHibernateSpec implements AutowiredTest {
+class ParallelStreamsToolsSpec extends GormToolsHibernateSpec {
 
     ParallelStreamTools parallelTools
+    AsyncProperties asyncProperties
 
     List<Class> getDomainClasses() { [CustType] }
 
     void setup() {
+        // assert asyncProperties.foo == 'bar'
         //parallelTools = ctx.getBean("parallelTools")
         parallelTools.asyncService.asyncEnabled = true
     }

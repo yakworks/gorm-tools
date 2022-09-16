@@ -127,8 +127,8 @@ class ActivityBulkSpec extends Specification implements DomainRepoTest<Activity>
         Customer c1 = Customer.create(name: "test-1", num: "test-1", org: org).persist()
         Customer c2 = Customer.create(name: "test-2", num: "test-2", org: org).persist()
 
-        TaskType todo = TaskType.build([id:1, code: "TODO"]).persist()
-        TaskStatus open = TaskStatus.build([id:0, code: "Open"]).persist()
+        TaskType todo = build(TaskType, [id:1, code: "TODO"]).persist()
+        TaskStatus open = build(TaskStatus, [id:0, code: "Open"]).persist()
 
         expect:
         Customer.get(1) != null

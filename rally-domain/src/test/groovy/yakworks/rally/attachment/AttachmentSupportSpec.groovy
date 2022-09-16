@@ -6,6 +6,7 @@ import java.nio.file.Paths
 
 import groovy.transform.CompileDynamic
 
+import org.springframework.beans.factory.annotation.Autowired
 import yakworks.testing.gorm.GormToolsHibernateSpec
 import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
@@ -17,10 +18,11 @@ import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class AttachmentSupportSpec extends GormToolsHibernateSpec implements SecurityTest {
+class AttachmentSupportSpec extends Specification implements GormHibernateTest, SecurityTest {
 
-    AttachmentSupport attachmentSupport
+    @Autowired AttachmentSupport attachmentSupport
 
     static List<Class> entityClasses = [Attachment, AttachmentLink, Activity, ActivityNote, ActivityLink]
 

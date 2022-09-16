@@ -7,16 +7,17 @@ package gorm.tools.async
 import java.util.concurrent.atomic.AtomicInteger
 
 import gorm.tools.settings.AsyncProperties
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
+import spock.lang.Specification
 import testing.CustType
-import yakworks.testing.gorm.GormToolsHibernateSpec
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class ParallelStreamsToolsSpec extends GormToolsHibernateSpec {
+class ParallelStreamsToolsSpec extends Specification implements GormHibernateTest {
+    static List entityClasses = [CustType]
 
-    ParallelStreamTools parallelTools
-    AsyncProperties asyncProperties
-
-    List<Class> getDomainClasses() { [CustType] }
+    @Autowired ParallelTools parallelTools
+    @Autowired AsyncProperties asyncProperties
 
     void setup() {
         // assert asyncProperties.foo == 'bar'

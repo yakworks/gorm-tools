@@ -5,10 +5,11 @@
 package gorm.tools.hibernate.json
 
 import gorm.tools.repository.GormRepo
+import spock.lang.Specification
 import yakworks.testing.gorm.RepoTestData
-import yakworks.testing.gorm.GormToolsHibernateSpec
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class JsonSampleSpec extends GormToolsHibernateSpec {
+class JsonSampleSpec extends Specification implements GormHibernateTest  {
 
     //test the thing
     List<Class> getDomainClasses() { [JsonSample] }

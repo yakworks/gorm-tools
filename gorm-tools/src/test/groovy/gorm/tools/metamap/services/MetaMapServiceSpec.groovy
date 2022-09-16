@@ -4,8 +4,7 @@
 */
 package gorm.tools.metamap.services
 
-
-import yakworks.testing.gorm.GormToolsHibernateSpec
+import spock.lang.Specification
 import yakworks.meta.MetaMap
 import yakworks.meta.MetaMapList
 import yakworks.testing.gorm.model.Enummy
@@ -15,8 +14,9 @@ import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.model.TestEnum
 import yakworks.testing.gorm.model.TestEnumIdent
 import yakworks.testing.gorm.model.Thing
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class MetaMapServiceSpec extends GormToolsHibernateSpec {
+class MetaMapServiceSpec extends Specification implements GormHibernateTest  {
     MetaMapService metaMapService = new MetaMapService(
         metaEntityService: new MetaEntityService()
     )

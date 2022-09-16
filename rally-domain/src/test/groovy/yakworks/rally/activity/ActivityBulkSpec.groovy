@@ -2,16 +2,11 @@ package yakworks.rally.domain
 
 import java.nio.file.Path
 
-import yakworks.commons.lang.IsoDateUtil
 import gorm.tools.repository.model.RepoEntity
-import yakworks.testing.gorm.SecurityTest
-import yakworks.testing.gorm.unit.DomainRepoTest
 import grails.persistence.Entity
-import yakworks.spring.AppResourceLoader
-
 import org.apache.commons.io.FileUtils
-
 import spock.lang.Specification
+import yakworks.commons.lang.IsoDateUtil
 import yakworks.commons.util.BuildSupport
 import yakworks.rally.activity.ActivityBulk
 import yakworks.rally.activity.model.Activity
@@ -28,25 +23,27 @@ import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
+import yakworks.spring.AppResourceLoader
+import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.DataRepoTest
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 
-class ActivityBulkSpec extends Specification implements DomainRepoTest<Activity>, SecurityTest  {
+class ActivityBulkSpec extends Specification implements DataRepoTest, SecurityTest  {
+    static List entityClasses = [
+        Customer, Activity, ActivityNote, ActivityLink, Org, OrgTag, Location, Payment,
+        AttachmentLink, Attachment, Task, TaskType, TaskStatus
+    ]
 
     ActivityRepo activityRepo
     ActivityBulk activityBulk
     AttachmentSupport attachmentSupport
 
-    def setupSpec() {
-        defineBeans {
-            appResourceLoader(AppResourceLoader)
-            attachmentSupport(AttachmentSupport)
-            activityBulk(ActivityBulk)
-        }
-        mockDomains(Customer, Activity, ActivityNote, ActivityLink,
-            Org, OrgTag, Location, Payment, AttachmentLink, Attachment, Task, TaskType, TaskStatus
-        )
-    }
+    Closure doWithDomains() { { ->
+        appResourceLoader(AppResourceLoader)
+        attachmentSupport(AttachmentSupport)
+        activityBulk(ActivityBulk)
+    }}
 
     def "test massupdate - with notes "() {
         setup:

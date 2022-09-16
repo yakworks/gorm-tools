@@ -21,23 +21,22 @@ import yakworks.rally.orgs.model.Org
 import yakworks.rally.testing.MockData
 
 class TaskSpec extends Specification implements DataRepoTest, SecurityTest { //implements SecuritySpecUnitTestHelper{
-    //Sanity checks and auto runs DomainRepoCrudSpec tests
+    static List<Class> entityClasses = [
+        AttachmentLink, ActivityLink, Activity, Task, TaskType, TaskStatus,
+        Org, AppUser, ActivityNote, Contact, ActivityContact
+    ]
 
-    void setupSpec(){
-        defineBeans{
-            appResourceLoader(AppResourceLoader)
-            attachmentSupport(AttachmentSupport)
-        }
-        mockDomains(AttachmentLink, ActivityLink, Activity, Task, TaskType, TaskStatus,
-            Org, AppUser, ActivityNote, Contact, ActivityContact)
-    }
+    ActivityRepo activityRepo
+
+    Closure doWithDomains() { { ->
+        appResourceLoader(AppResourceLoader)
+        attachmentSupport(AttachmentSupport)
+    }}
 
     void setup(){
         TaskType todo = RepoTestData.build(TaskType, [id:1, name: "Todo"]) //.persist()
         TaskStatus open = RepoTestData.build(TaskStatus, [id:0, name: "Open"]) //.persist()
     }
-
-    ActivityRepo activityRepo
 
     Map getActTaskData(Long orgId){
         return [

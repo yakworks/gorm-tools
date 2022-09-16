@@ -4,18 +4,16 @@
 */
 package gorm.tools
 
-import gorm.tools.beans.Pager
-import gorm.tools.metamap.services.MetaEntityService
-import gorm.tools.metamap.services.MetaMapService
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import org.springframework.core.env.Environment
+import spock.lang.Specification
 import testing.Cust
 import yakworks.i18n.icu.ICUMessageSource
-import yakworks.meta.MetaMapList
-import yakworks.testing.gorm.GormToolsHibernateSpec
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class SanityCheckSpec extends GormToolsHibernateSpec {
+class SanityCheckSpec extends Specification implements GormHibernateTest {
     static entityClasses = [Cust]
 
     @Autowired ApplicationContext applicationCtx

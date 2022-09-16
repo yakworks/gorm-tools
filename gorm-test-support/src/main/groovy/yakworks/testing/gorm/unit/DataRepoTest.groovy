@@ -10,6 +10,7 @@ import groovy.transform.CompileStatic
 import org.junit.AfterClass
 
 import grails.testing.spring.AutowiredTest
+import yakworks.commons.lang.PropertyTools
 import yakworks.spring.AppCtx
 import yakworks.testing.gorm.support.BaseRepoEntityUnitTest
 import yakworks.testing.gorm.support.RepoBuildDataTest
@@ -38,6 +39,12 @@ trait DataRepoTest implements RepoBuildDataTest, AutowiredTest, GrailsAppUnitTes
     @AfterClass
     static void cleanupAppCtx() {
         AppCtx.setApplicationContext(null)
+    }
+
+    @Override
+    Class<?>[] getDomainClassesToMock() {
+        def persistentClasses = (PropertyTools.getOrNull(this, 'domainClasses')?:PropertyTools.getOrNull(this, 'entityClasses')) as List<Class>
+        return (persistentClasses?:[]) as Class<?>[]
     }
 
 }

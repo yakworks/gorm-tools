@@ -4,19 +4,20 @@
 */
 package gorm.tools
 
-import org.springframework.beans.factory.annotation.Autowired
-import yakworks.i18n.icu.ICUMessageSource
-import yakworks.meta.MetaMapList
 import gorm.tools.beans.Pager
 import gorm.tools.metamap.services.MetaEntityService
 import gorm.tools.metamap.services.MetaMapService
-import yakworks.testing.gorm.GormToolsHibernateSpec
+import org.springframework.beans.factory.annotation.Autowired
+import spock.lang.Specification
 import testing.Address
 import testing.AddyNested
 import testing.Cust
 import testing.TestSeedData
+import yakworks.i18n.icu.ICUMessageSource
+import yakworks.meta.MetaMapList
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class PagerSpec extends GormToolsHibernateSpec {
+class PagerSpec extends Specification implements GormHibernateTest{
     static entityClasses = [Cust, Address, AddyNested]
 
     @Autowired

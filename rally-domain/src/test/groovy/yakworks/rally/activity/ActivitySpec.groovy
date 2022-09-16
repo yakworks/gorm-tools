@@ -1,18 +1,15 @@
 package yakworks.rally.activity
 
 import gorm.tools.model.Persistable
-import yakworks.testing.gorm.GormToolsHibernateSpec
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Ignore
 import spock.lang.Shared
-import yakworks.testing.gorm.SecurityTest
-import yakworks.spring.AppResourceLoader
+import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.model.TaskType
-import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
@@ -22,16 +19,18 @@ import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
 import yakworks.rally.testing.MockData
+import yakworks.spring.AppResourceLoader
+import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.GormHibernateTest
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 
-class ActivitySpec extends GormToolsHibernateSpec implements SecurityTest { //implements SecuritySpecUnitTestHelper{
+class ActivitySpec extends Specification implements GormHibernateTest, SecurityTest {
     static entityClasses = [
         AttachmentLink, ActivityLink, Activity, TaskType, Org, OrgTag,
         Tag, TagLink, Attachment, ActivityNote, Contact, ActivityContact
     ]
 
-    ActivityRepo activityRepo
     @Shared Long orgId
 
     Closure doWithDomains() { { ->

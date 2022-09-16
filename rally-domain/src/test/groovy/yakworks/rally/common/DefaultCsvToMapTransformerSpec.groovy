@@ -2,31 +2,29 @@ package yakworks.rally.common
 
 import java.nio.file.Files
 
-import yakworks.testing.gorm.unit.DataRepoTest
-import yakworks.commons.io.ZipUtils
-import yakworks.spring.AppResourceLoader
 import spock.lang.Shared
 import spock.lang.Specification
+import yakworks.commons.io.ZipUtils
 import yakworks.commons.util.BuildSupport
-import yakworks.testing.gorm.SecurityTest
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.model.FileData
+import yakworks.spring.AppResourceLoader
+import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.DataRepoTest
 
 class DefaultCsvToMapTransformerSpec extends Specification implements DataRepoTest, SecurityTest {
+    static List entityClasses = [ Attachment, AttachmentLink, FileData ]
 
     @Shared
     DefaultCsvToMapTransformer csvToMapTransformer
 
-    def setupSpec() {
-        defineBeans {
-            appResourceLoader(AppResourceLoader)
-            attachmentSupport(AttachmentSupport)
-            csvToMapTransformer(DefaultCsvToMapTransformer)
-        }
-        mockDomains(Attachment, AttachmentLink, FileData)
-    }
+    Closure doWithDomains() { { ->
+        appResourceLoader(AppResourceLoader)
+        attachmentSupport(AttachmentSupport)
+        csvToMapTransformer(DefaultCsvToMapTransformer)
+    }}
 
     void "sanity checks"() {
         expect:

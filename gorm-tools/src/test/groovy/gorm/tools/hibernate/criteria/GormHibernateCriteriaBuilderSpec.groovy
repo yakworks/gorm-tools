@@ -4,20 +4,18 @@
 */
 package gorm.tools.hibernate.criteria
 
-import yakworks.testing.gorm.GormToolsHibernateSpec
+import spock.lang.Specification
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class GormHibernateCriteriaBuilderSpec extends GormToolsHibernateSpec { //c DataTest {//implements DataTest{
+class GormHibernateCriteriaBuilderSpec extends Specification implements GormHibernateTest {
 
-//    void setupSpec() {
-//        mockDomain Test
-//    }
-
-    List<Class> getDomainClasses() { [Test] }
+    static List entityClasses = [Test]
 
     private GormHibernateCriteriaBuilder builder
 
     void setup() {
-        builder = new GormHibernateCriteriaBuilder(Test.class, sessionFactory)
+        assert sessionFactory
+        builder = new GormHibernateCriteriaBuilder(Test, sessionFactory)
     }
 
     void "test order"() {

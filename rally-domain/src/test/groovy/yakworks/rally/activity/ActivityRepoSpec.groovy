@@ -1,21 +1,20 @@
 package yakworks.rally.activity
 
-import yakworks.rally.orgs.model.OrgType
-import yakworks.testing.gorm.GormToolsHibernateSpec
-import yakworks.testing.gorm.unit.DomainRepoTest
-import spock.lang.Ignore
+import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
-import yakworks.testing.gorm.SecurityTest
-import yakworks.rally.activity.model.*
+import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
+import yakworks.rally.orgs.model.OrgType
+import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class ActivityRepoSpec extends GormToolsHibernateSpec implements SecurityTest {
+class ActivityRepoSpec extends Specification implements GormHibernateTest, SecurityTest {
 
     static entityClasses = [Activity, Org, OrgSource]
 
-    ActivityRepo activityRepo
+    @Autowired ActivityRepo activityRepo
 
     void "test create activity lookup org by num"() {
         when:

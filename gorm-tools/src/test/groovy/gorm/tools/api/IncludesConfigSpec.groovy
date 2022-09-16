@@ -14,14 +14,14 @@ import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.model.Thing
 
 class IncludesConfigSpec extends Specification  implements DataRepoTest  {
-
+    static List entityClasses = [KitchenSink, SinkExt, SinkItem, Thing, Enummy]
     @Shared
     def includesConfig = new IncludesConfig()
 
-    void setupSpec() {
-        //mockDomain Person
-        mockDomains KitchenSink, SinkExt, SinkItem, Thing, Enummy
-    }
+    // void setupSpec() {
+    //     //mockDomain Person
+    //     mockDomains KitchenSink, SinkExt, SinkItem, Thing, Enummy
+    // }
 
     void 'getIncludes for key'() {
 

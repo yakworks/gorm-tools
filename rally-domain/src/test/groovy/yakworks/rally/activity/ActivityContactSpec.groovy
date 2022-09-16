@@ -2,6 +2,7 @@ package yakworks.rally.activity
 
 import gorm.tools.repository.model.CriteriaRemover
 import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.DataRepoTest
 import yakworks.testing.gorm.unit.DomainRepoTest
 import grails.gorm.DetachedCriteria
 import spock.lang.Shared
@@ -14,13 +15,14 @@ import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
 
-class ActivityContactSpec extends Specification implements DomainRepoTest<ActivityContact>, SecurityTest {
+class ActivityContactSpec extends Specification implements DataRepoTest, SecurityTest {
+    static List entityClasses = [Activity, ActivityContact, ActivityNote, Contact, Org, Tag]
 
     @Shared
     ActivityContactRepo repo
 
     void setupSpec() {
-        mockDomains(Activity, ActivityNote, Contact, Org, Tag)
+        //setup remover
         repo = ActivityContact.repo
         repo.criteriaRemover = new CriteriaRemover(){
             void deleteAll(DetachedCriteria crit) {

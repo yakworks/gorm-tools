@@ -22,6 +22,7 @@ import gorm.tools.validation.RepoEntityValidator
 import gorm.tools.validation.RepoValidatorRegistry
 import grails.config.Config
 import grails.core.GrailsApplication
+import yakworks.commons.lang.PropertyTools
 
 /**
  * Base trait for mocking spring beans needed to test repository's and domain entities.
@@ -58,7 +59,9 @@ trait BaseRepoEntityUnitTest {
     abstract GrailsApplication getGrailsApplication()
 
     //---- implemented in the datastore tests (hibernate or simple)---
-    abstract AbstractDatastore getDatastore()
+    AbstractDatastore getDatastore() {
+        applicationContext.getBean(AbstractDatastore)
+    }
 
     /** conveinince shortcut for applicationContext */
     ConfigurableApplicationContext getCtx() {
@@ -117,6 +120,23 @@ trait BaseRepoEntityUnitTest {
     //     def res = binder.bind("spring.main.web-application-type", Bindable.of(WebApplicationType.class))
     //         .orElseGet(this::deduceWebApplicationType)
     // }
+
+    /**
+     * looks for either domainClasses or entityClasses property on the test. can be either a static or a getter.
+     */
+    @CompileDynamic
+    List<Class> findEntityClasses(){
+        def persistentClasses = (PropertyTools.getOrNull(this, 'domainClasses')?:PropertyTools.getOrNull(this, 'entityClasses')) as List<Class>
+        return persistentClasses
+    }
+
+    /**
+     * replace method in DataTest, this is called from the gorm-testing's spock events classes, DataTestSetupSpecInterceptor
+     */
+    Class<?>[] getDomainClassesToMock() {
+        def persistentClasses = findEntityClasses()
+        return (persistentClasses?:[]) as Class<?>[]
+    }
 
     @CompileDynamic
     void setupValidatorRegistry(){

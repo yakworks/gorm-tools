@@ -4,15 +4,16 @@
 */
 package yakworks.testing.gorm.hibernate
 
-import gorm.tools.repository.model.RepoEntity
 import gorm.tools.problem.ValidationProblem
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-import yakworks.testing.gorm.GormToolsHibernateSpec
+import spock.lang.Specification
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class ForeignIdGeneratorSpec extends GormToolsHibernateSpec  {
+class ForeignIdGeneratorSpec extends Specification implements GormHibernateTest {
 
-    List<Class> getDomainClasses() { [FidMaster, FidChild] }
+    static List entityClasses = [FidMaster, FidChild]
 
     def "test create"() {
         when:

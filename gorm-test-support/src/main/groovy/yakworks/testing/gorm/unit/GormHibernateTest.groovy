@@ -2,29 +2,26 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.testing.gorm
+package yakworks.testing.gorm.unit
 
 
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.mapping.core.AbstractDatastore
 import org.grails.orm.hibernate.HibernateDatastore
 import org.grails.plugin.hibernate.support.HibernatePersistenceContextInterceptor
 import org.hibernate.Session
 import org.hibernate.SessionFactory
-import org.junit.BeforeClass
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import org.springframework.context.annotation.AnnotationConfigRegistry
 import org.springframework.core.env.PropertyResolver
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.TransactionStatus
-import org.springframework.transaction.interceptor.DefaultTransactionAttribute
 
 import grails.buildtestdata.TestDataBuilder
 import grails.config.Config
 import grails.testing.spring.AutowiredTest
+import spock.lang.AutoCleanup
 import spock.lang.Shared
-import spock.lang.Specification
-import yakworks.spring.AppCtx
 import yakworks.testing.gorm.support.BaseRepoEntityUnitTest
 import yakworks.testing.grails.BasicConfiguration
 import yakworks.testing.grails.GrailsAppUnitTest
@@ -36,25 +33,25 @@ import yakworks.testing.grails.GrailsAppUnitTest
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.1
- * @deprecated use GormHibernateTest instead
  */
-@Deprecated
 @SuppressWarnings(['Indentation'])
 @CompileStatic
-abstract class GormToolsHibernateSpec extends Specification implements AutowiredTest, GrailsAppUnitTest, BaseRepoEntityUnitTest, TestDataBuilder {
+trait GormHibernateTest implements AutowiredTest, GrailsAppUnitTest, BaseRepoEntityUnitTest, TestDataBuilder {
     //trait order above is important, GormToolsSpecHelper should come last as it overrides methods in GrailsAppUnitTest
 
-    private HibernateDatastore hibernateDatastore
+    @Shared @AutoCleanup HibernateDatastore hibernateDatastore
     @Shared PlatformTransactionManager transactionManager
     /** The transaction status, setup before each test */
     TransactionStatus transactionStatus
 
     /**
-     * Override this in test to tell what domainclasses is should mock up. Its not abstract to force it since the option exists to package scan
+     * make sure it returns nothing?
      */
-    // List<Class> getDomainClasses() { [] }
+    @Override
+    Class<?>[] getDomainClassesToMock() {
+        return [] as Class<?>[]
+    }
 
-    @BeforeClass
     void setupHibernate() {
         //setup the ConfigurationProperties beans
         def cfgRegistry = (AnnotationConfigRegistry)ctx
@@ -70,21 +67,14 @@ abstract class GormToolsHibernateSpec extends Specification implements Autowired
         defineRepoBeans(domClasses as Class<?>[])
     }
 
-    /**
-     * DataTestSetupSpecInterceptor calls this and we dont want it on this one, so make sure it returns nothing
-     */
-    @Override
-    Class<?>[] getDomainClassesToMock() {
-        return [] as Class<?>[]
-    }
-
     // @Override
     // @CompileDynamic
     // Closure hibernateBeans(){ { ->
     //     persistenceInterceptor(HibernatePersistenceContextInterceptor){
-    //         hibernateDatastore = (HibernateDatastore)hibernateDatastore
+    //         hibernateDatastore = ref("hibernateDatastore")
     //     }
     // }}
+
 
     /**
      * Sets up the HibernateDatastore, reads the getDomainClasses and sets up whats returned there.
@@ -100,9 +90,11 @@ abstract class GormToolsHibernateSpec extends Specification implements Autowired
             hibernateDatastore = new HibernateDatastore((PropertyResolver) config, packageToScan)
         }
         transactionManager = hibernateDatastore.getTransactionManager()
+        assert transactionManager
     }
 
     void registerHibernateBeans(){
+        ctx.beanFactory.registerSingleton("hibernateDatastore", hibernateDatastore)
         if (!ctx.containsBean("dataSource"))
             ctx.beanFactory.registerSingleton("dataSource", hibernateDatastore.getDataSource())
         if (!ctx.containsBean("grailsDomainClassMappingContext"))
@@ -115,27 +107,25 @@ abstract class GormToolsHibernateSpec extends Specification implements Autowired
         }
     }
 
-    void cleanupSpec() {
-        AppCtx.setApplicationContext(null)
-    }
-
-    void setup() {
-        transactionStatus = transactionManager.getTransaction(new DefaultTransactionAttribute())
-    }
-
-    void cleanup() {
-        if (isRollback()) {
-            transactionManager.rollback(transactionStatus)
-        } else {
-            transactionManager.commit(transactionStatus)
-        }
-    }
+    // @AfterClass
+    // void cleanupHibernateSpec() {
+    //     AppCtx.setApplicationContext(null)
+    // }
+    //
+    // @After
+    // void cleanupAfterTest() {
+    //     if (isRollback()) {
+    //         transactionManager.rollback(transactionStatus)
+    //     } else {
+    //         transactionManager.commit(transactionStatus)
+    //     }
+    // }
 
     /**
      * @return the current session factory
      */
     SessionFactory getSessionFactory() {
-        hibernateDatastore.getSessionFactory()
+        getDatastore().getSessionFactory()
     }
 
     /**
@@ -163,8 +153,14 @@ abstract class GormToolsHibernateSpec extends Specification implements Autowired
     }
 
     /** consistency with other areas of grails and other unit tests */
-    AbstractDatastore getDatastore() {
-        hibernateDatastore
+    @Override
+    HibernateDatastore getDatastore() {
+        applicationContext.getBean(HibernateDatastore)
+    }
+
+    void autowire() {
+        AutowireCapableBeanFactory beanFactory = applicationContext.autowireCapableBeanFactory
+        beanFactory.autowireBeanProperties this, AutowireCapableBeanFactory.AUTOWIRE_NO, false
     }
 
 }

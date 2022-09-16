@@ -5,6 +5,8 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 import gorm.tools.problem.ValidationProblem
+import org.spockframework.spring.EnableSharedInjection
+import org.springframework.beans.factory.annotation.Autowired
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
@@ -22,20 +24,20 @@ import yakworks.rally.attachment.model.FileData
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class AttachmentSpec extends GormToolsHibernateSpec implements SecurityTest {
+class AttachmentSpec extends Specification implements GormHibernateTest, SecurityTest {
+    static List<Class> entityClasses = [Attachment, AttachmentLink, FileData, Tag, TagLink]
 
-    @Shared AttachmentRepo attachmentRepo
-    @Shared AttachmentSupport attachmentSupport
-
-    static List<Class> entityClasses =[Attachment, AttachmentLink, FileData, Tag, TagLink]
+    @Autowired AttachmentRepo attachmentRepo
+    @Autowired AttachmentSupport attachmentSupport
 
     Closure doWithDomains(){ { ->
         appResourceLoader(AppResourceLoader)
         attachmentSupport(AttachmentSupport)
     }}
 
-    def cleanupSpec() {
+    def cleanup() {
         attachmentSupport.rimrafAttachmentsDirectory()
     }
 

@@ -17,7 +17,7 @@ import yakworks.rally.orgs.model.OrgType
 
 class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
 
-    Closure doWithDomains() { { ->
+    Closure doWithGormBeans() { { ->
         orgDimensionService(OrgDimensionService)
         orgMemberService(OrgMemberService)
     }}

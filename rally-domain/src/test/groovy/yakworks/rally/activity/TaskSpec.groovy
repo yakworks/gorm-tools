@@ -28,7 +28,7 @@ class TaskSpec extends Specification implements DataRepoTest, SecurityTest { //i
 
     ActivityRepo activityRepo
 
-    Closure doWithDomains() { { ->
+    Closure doWithGormBeans() { { ->
         appResourceLoader(AppResourceLoader)
         attachmentSupport(AttachmentSupport)
     }}

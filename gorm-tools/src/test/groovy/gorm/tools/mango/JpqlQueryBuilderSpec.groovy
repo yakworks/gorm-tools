@@ -3,15 +3,16 @@ package gorm.tools.mango
 import gorm.tools.mango.jpql.JpqlQueryBuilder
 import grails.gorm.DetachedCriteria
 import org.springframework.dao.InvalidDataAccessResourceUsageException
-import yakworks.testing.gorm.GormToolsHibernateSpec
+import spock.lang.Specification
 import yakworks.testing.gorm.model.KitchenSink
+import yakworks.testing.gorm.unit.GormHibernateTest
 
 /**
  * Test for JPA builder
  */
-class JpqlQueryBuilderSpec extends GormToolsHibernateSpec {
+class JpqlQueryBuilderSpec extends Specification implements GormHibernateTest  {
 
-    List<Class> getDomainClasses() { [KitchenSink] }
+    static List entityClasses = [KitchenSink]
 
     String strip(String val){
         val.stripIndent().replace('\n',' ').trim()

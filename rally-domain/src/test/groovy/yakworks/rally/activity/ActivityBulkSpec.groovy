@@ -39,7 +39,7 @@ class ActivityBulkSpec extends Specification implements DataRepoTest, SecurityTe
     ActivityBulk activityBulk
     AttachmentSupport attachmentSupport
 
-    Closure doWithDomains() { { ->
+    Closure doWithGormBeans() { { ->
         appResourceLoader(AppResourceLoader)
         attachmentSupport(AttachmentSupport)
         activityBulk(ActivityBulk)

@@ -1,17 +1,17 @@
 package yakworks.testing.gorm.model
 
 import gorm.tools.async.AsyncService
-import yakworks.testing.gorm.GormToolsHibernateSpec
 import gorm.tools.utils.BenchmarkHelper
-import spock.lang.Shared
+import org.springframework.beans.factory.annotation.Autowired
+import spock.lang.Specification
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class KitchenSinkRepoSpec extends GormToolsHibernateSpec {
+class KitchenSinkRepoSpec extends Specification implements GormHibernateTest  {
+    static entityClasses = [KitchenSink, SinkItem, SinkExt]
     static int SINK_COUNT = 5000
 
-    AsyncService asyncService
-    @Shared KitchenSinkRepo kitchenSinkRepo
-
-    static entityClasses = [KitchenSink, SinkItem, SinkExt]
+    @Autowired AsyncService asyncService
+    @Autowired KitchenSinkRepo kitchenSinkRepo
 
     // @Transactional
     void setupSpec() {

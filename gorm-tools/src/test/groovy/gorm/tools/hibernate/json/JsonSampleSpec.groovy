@@ -10,9 +10,7 @@ import yakworks.testing.gorm.RepoTestData
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class JsonSampleSpec extends Specification implements GormHibernateTest  {
-
-    //test the thing
-    List<Class> getDomainClasses() { [JsonSample] }
+    static List entityClasses =[JsonSample]
 
     def "assert proper repos are setup"() {
         expect:

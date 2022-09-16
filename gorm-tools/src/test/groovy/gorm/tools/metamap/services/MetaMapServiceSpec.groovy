@@ -17,11 +17,11 @@ import yakworks.testing.gorm.model.Thing
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class MetaMapServiceSpec extends Specification implements GormHibernateTest  {
+    static List<Class> entityClasses =[KitchenSink, SinkItem, SinkExt, Thing, Enummy]
+
     MetaMapService metaMapService = new MetaMapService(
         metaEntityService: new MetaEntityService()
     )
-
-    static List<Class> entityClasses =[KitchenSink, SinkItem, SinkExt, Thing, Enummy]
 
     // @Transactional
     void setupSpec() {
@@ -29,7 +29,7 @@ class MetaMapServiceSpec extends Specification implements GormHibernateTest  {
     }
 
     void cleanupSpec() {
-        KitchenSink.truncate()
+        KitchenSink.cleanup()
     }
 
     void "createEntityMap with includes"() {

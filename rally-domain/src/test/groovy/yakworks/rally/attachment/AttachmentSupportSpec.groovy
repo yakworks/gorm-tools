@@ -4,20 +4,16 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
-import groovy.transform.CompileDynamic
-
 import org.springframework.beans.factory.annotation.Autowired
-import yakworks.testing.gorm.GormToolsHibernateSpec
-import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport
-import yakworks.testing.gorm.SecurityTest
-import yakworks.spring.AppResourceLoader
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.spring.AppResourceLoader
+import yakworks.testing.gorm.SecurityTest
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class AttachmentSupportSpec extends Specification implements GormHibernateTest, SecurityTest {
@@ -26,7 +22,7 @@ class AttachmentSupportSpec extends Specification implements GormHibernateTest, 
 
     static List<Class> entityClasses = [Attachment, AttachmentLink, Activity, ActivityNote, ActivityLink]
 
-    Closure doWithDomains(){ { ->
+    Closure doWithGormBeans(){ { ->
         appResourceLoader(AppResourceLoader)
         attachmentSupport(AttachmentSupport)
     }}

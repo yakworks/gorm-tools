@@ -41,7 +41,7 @@ trait SecurityTest {
         // datastore.applicationEventPublisher.addApplicationListener(ctx.getBean("auditStampPersistenceEventListener"))
     // }
 
-    Closure doWithSecurity() {
+    Closure doWithGormSecurity() {
         { ->
             passwordEncoder(NoOpPasswordEncoder)
             secService(TestingSecService, AppUser)

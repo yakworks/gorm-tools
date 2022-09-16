@@ -9,8 +9,7 @@ import spock.lang.Specification
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class CriteriaUtilsSpec extends Specification implements GormHibernateTest{
-
-    List<Class> getDomainClasses() { [Test, Test2] }
+    static List entityClasses = [Test, Test2]
 
     def setup() {
         (1..3).each { index ->

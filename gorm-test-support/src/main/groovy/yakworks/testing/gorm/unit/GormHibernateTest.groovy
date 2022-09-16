@@ -57,12 +57,12 @@ trait GormHibernateTest implements AutowiredTest, GrailsAppUnitTest, BaseRepoEnt
         def cfgRegistry = (AnnotationConfigRegistry)ctx
         cfgRegistry.register(BasicConfiguration)
 
-        //Sets up the HibernateDatastore, reads the getDomainClasses and sets up whats returned there.
+        //Sets up the HibernateDatastore, reads the entityClasses static  and sets up whats returned there.
         initDatastore()
         //register some of the HibernateDatastore props as beans in the ctx.
         registerHibernateBeans()
 
-        //read what was setup as persistentEntities in datastore , see initDatastore for how it reads from getDomainClasses
+        //read what was setup as persistentEntities in datastore, usally drive by the entityClasses static
         List domClasses = datastore.mappingContext.persistentEntities*.javaClass
         defineRepoBeans(domClasses as Class<?>[])
     }
@@ -77,7 +77,7 @@ trait GormHibernateTest implements AutowiredTest, GrailsAppUnitTest, BaseRepoEnt
 
 
     /**
-     * Sets up the HibernateDatastore, reads the getDomainClasses and sets up whats returned there.
+     * Sets up the HibernateDatastore, reads the entityClasses and sets up whats returned there.
      */
     void initDatastore(){
         List persistentClasses = findEntityClasses()

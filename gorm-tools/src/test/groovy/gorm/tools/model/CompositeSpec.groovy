@@ -6,7 +6,7 @@ import yakworks.testing.gorm.unit.GormHibernateTest
 
 class CompositeSpec extends Specification implements GormHibernateTest {
 
-    List<Class> getDomainClasses() { [CompositeNoVersion] }
+    static List entityClasses = [CompositeNoVersion]
 
     void "CompositeNoVersion test"() {
         when:

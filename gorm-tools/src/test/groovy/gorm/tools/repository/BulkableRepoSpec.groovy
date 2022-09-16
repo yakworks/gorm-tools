@@ -1,37 +1,34 @@
 package gorm.tools.repository
 
-import yakworks.commons.map.PathKeyMap
-import gorm.tools.job.SyncJobArgs
-import gorm.tools.problem.ValidationProblem
-import yakworks.testing.gorm.GormToolsHibernateSpec
-import org.springframework.http.HttpStatus
-
 import gorm.tools.async.AsyncService
+import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobState
+import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.model.DataOp
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
+import spock.lang.Specification
 import testing.TestSyncJob
 import testing.TestSyncJobService
+import yakworks.commons.map.PathKeyMap
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.testing.gorm.model.SinkExt
+import yakworks.testing.gorm.unit.GormHibernateTest
 
 import static yakworks.json.groovy.JsonEngine.parseJson
 
-class BulkableRepoSpec extends GormToolsHibernateSpec {
+class BulkableRepoSpec extends Specification implements GormHibernateTest {
 
-    AsyncService asyncService
-    KitchenSinkRepo kitchenSinkRepo
+    @Autowired AsyncService asyncService
+    @Autowired KitchenSinkRepo kitchenSinkRepo
 
-    static List<Class> entityClasses = [KitchenSink, SinkExt, TestSyncJob]
+    static List entityClasses = [KitchenSink, SinkExt, TestSyncJob]
 
-    Closure doWithDomains() { { ->
+    Closure doWithGormBeans() { { ->
         syncJobService(TestSyncJobService)
     }}
-
-    // void setupSpec() {
-    //     mockDomains(KitchenSink, SinkExt, TestSyncJob)
-    // }
 
     SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
         return new SyncJobArgs(asyncEnabled: false, op: op, source: "test", sourceId: "test",

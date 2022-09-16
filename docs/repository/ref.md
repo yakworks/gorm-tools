@@ -370,8 +370,8 @@ Can be used to unit test with full hibernate support with inmemory database.
 ```groovy
 
 class CitySpec extends GormToolsHibernateSpec {
-   
-  List<Class> getDomainClasses() { [City] }
+
+  static List entityClasses = [City]
    
    void "test create"() {
      given:

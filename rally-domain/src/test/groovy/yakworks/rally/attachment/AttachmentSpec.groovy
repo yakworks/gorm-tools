@@ -5,25 +5,18 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 import gorm.tools.problem.ValidationProblem
-import org.spockframework.spring.EnableSharedInjection
 import org.springframework.beans.factory.annotation.Autowired
-import yakworks.rally.activity.model.Activity
-import yakworks.rally.activity.model.ActivityLink
-import yakworks.rally.activity.model.ActivityNote
-import yakworks.testing.gorm.GormToolsHibernateSpec
-import yakworks.testing.gorm.unit.DataRepoTest
 import org.springframework.mock.web.MockMultipartFile
-import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport
-import yakworks.testing.gorm.SecurityTest
-import yakworks.spring.AppResourceLoader
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.model.FileData
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
+import yakworks.spring.AppResourceLoader
+import yakworks.testing.gorm.SecurityTest
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class AttachmentSpec extends Specification implements GormHibernateTest, SecurityTest {
@@ -32,7 +25,7 @@ class AttachmentSpec extends Specification implements GormHibernateTest, Securit
     @Autowired AttachmentRepo attachmentRepo
     @Autowired AttachmentSupport attachmentSupport
 
-    Closure doWithDomains(){ { ->
+    Closure doWithGormBeans(){ { ->
         appResourceLoader(AppResourceLoader)
         attachmentSupport(AttachmentSupport)
     }}

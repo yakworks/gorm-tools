@@ -1,18 +1,19 @@
 package yakworks.etl.csv
 
-
 import gorm.tools.metamap.services.MetaMapService
-import yakworks.testing.gorm.GormToolsHibernateSpec
 import gorm.tools.utils.BenchmarkHelper
+import org.springframework.beans.factory.annotation.Autowired
+import spock.lang.Specification
+import yakworks.meta.MetaMapList
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.SinkItem
-import yakworks.meta.MetaMapList
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class CSVWriterSpec extends GormToolsHibernateSpec {
+class CSVWriterSpec extends Specification implements GormHibernateTest {
     static int SINK_COUNT = 5000
     private Writer writer = new StringWriter()
 
-    MetaMapService metaMapService
+    @Autowired MetaMapService metaMapService
 
     static List entityClasses = [KitchenSink, SinkItem]
 

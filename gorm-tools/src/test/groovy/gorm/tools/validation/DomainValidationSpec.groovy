@@ -4,23 +4,21 @@
 */
 package gorm.tools.validation
 
-import yakworks.testing.gorm.GormToolsHibernateSpec
 import org.springframework.beans.factory.annotation.Autowired
-import yakworks.testing.gorm.model.ValidationEntity
+import spock.lang.Specification
 import yakworks.i18n.icu.GrailsICUMessageSource
 import yakworks.i18n.icu.ICUMessageSource
+import yakworks.testing.gorm.model.ValidationEntity
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class DomainValidationSpec extends GormToolsHibernateSpec {
+class DomainValidationSpec extends Specification implements GormHibernateTest  {
 
     @Autowired
     ICUMessageSource msgService
 
-    // void setupSpec() {
-    //     mockDomains ValidationEntity
-    // }
-    List<Class> getDomainClasses() { [ValidationEntity] }
+    static List entityClasses = [ValidationEntity]
 
-    Closure doWithDomains() { { ->
+    Closure doWithGormBeans() { { ->
         messageSource(GrailsICUMessageSource){
             searchClasspath = true
             messageBundleLocations = "classpath*:*messages*.properties"

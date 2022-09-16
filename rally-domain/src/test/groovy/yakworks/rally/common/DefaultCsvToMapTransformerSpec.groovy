@@ -20,7 +20,7 @@ class DefaultCsvToMapTransformerSpec extends Specification implements DataRepoTe
     @Shared
     DefaultCsvToMapTransformer csvToMapTransformer
 
-    Closure doWithDomains() { { ->
+    Closure doWithGormBeans() { { ->
         appResourceLoader(AppResourceLoader)
         attachmentSupport(AttachmentSupport)
         csvToMapTransformer(DefaultCsvToMapTransformer)

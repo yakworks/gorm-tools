@@ -14,7 +14,7 @@ import yakworks.rally.attachment.model.Attachment
 
 class SyncJobSpec extends Specification implements DataRepoTest, SecurityTest {
 
-    Closure doWithDomains() { { ->
+    Closure doWithGormBeans() { { ->
         attachmentSupport(AttachmentSupport)
         syncJobService(DefaultSyncJobService)
     }}

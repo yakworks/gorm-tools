@@ -33,7 +33,7 @@ class ActivitySpec extends Specification implements GormHibernateTest, SecurityT
 
     @Shared Long orgId
 
-    Closure doWithDomains() { { ->
+    Closure doWithGormBeans() { { ->
         appResourceLoader(AppResourceLoader)
         attachmentSupport(AttachmentSupport)
     }}

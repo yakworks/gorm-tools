@@ -2,19 +2,19 @@ package yakworks.rally.eventlog
 
 import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.testing.gorm.GormToolsHibernateSpec
-import yakworks.testing.gorm.unit.DataRepoTest
+import yakworks.testing.gorm.unit.GormHibernateTest
 
 @Ignore
-class EventLogHelperSpec extends GormToolsHibernateSpec {
+class EventLogHelperSpec extends Specification implements GormHibernateTest  {
+    static List entityClasses = [EventLog]
 
     static final String JOB_NAME  = 'EventLogHelperTests'
     static final String COMPONENT = 'service/method'
     static final String APP_NAME  = 'rally-domain'
 
-    List<Class> getDomainClasses() { [EventLog] }
 
-    Closure doWithDomains() { { ->
+
+    Closure doWithGormBeans() { { ->
         eventLogger(EventLogger)
     }}
 

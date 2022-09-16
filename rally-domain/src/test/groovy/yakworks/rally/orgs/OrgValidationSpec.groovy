@@ -19,7 +19,7 @@ import yakworks.rally.orgs.model.OrgType
 
 class OrgValidationSpec extends Specification implements DomainRepoTest<Org>, SecurityTest {
 
-    Closure doWithDomains() { { ->
+    Closure doWithGormBeans() { { ->
         orgDimensionService(OrgDimensionService)
     }}
 

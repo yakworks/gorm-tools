@@ -5,11 +5,12 @@
 package gorm.tools.repository
 
 import gorm.tools.repository.model.IdGeneratorRepo
-import yakworks.testing.gorm.GormToolsHibernateSpec
+import spock.lang.Specification
 import yakworks.testing.gorm.model.Thing
 import yakworks.testing.gorm.model.ThingRepo
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class IdGenRepoSpec extends GormToolsHibernateSpec {
+class IdGenRepoSpec extends Specification implements GormHibernateTest {
 
     //test the thing
     static List entityClasses = [Thing]

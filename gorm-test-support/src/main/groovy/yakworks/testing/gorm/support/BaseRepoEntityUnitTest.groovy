@@ -44,15 +44,6 @@ trait BaseRepoEntityUnitTest {
         return _repoTestingUtils
     }
 
-    /**
-     * The domain classes,
-     * to be implemented in the unit test
-     */
-    // List<Class> getDomainClasses(){
-    //     return []
-    // }
-
-
     //---- from the GrailsUnitTest ---
     abstract Config getConfig()
     abstract ConfigurableApplicationContext getApplicationContext()
@@ -97,7 +88,7 @@ trait BaseRepoEntityUnitTest {
 
         Closure beanClos = gtu.repoBeansClosure(domainClassesToMock)
 
-        def beanClosures = [commonBeans(), beanClos, hibernateBeans(), doWithDomains(), doWithSecurity()]
+        def beanClosures = [commonBeans(), beanClos, hibernateBeans(), doWithGormBeans(), doWithGormSecurity()]
         getRepoTestUtils().defineBeansMany(beanClosures)
 
         // rescan needed after the beans are added
@@ -111,16 +102,6 @@ trait BaseRepoEntityUnitTest {
         doAfterDomains()
     }
 
-
-    // void doBinderConfigProps(){
-    //     getApplicationContext()
-    //     ConfigurationPropertySource source = new MapConfigurationPropertySource(
-    //         TestPropertySourceUtils.convertInlinedPropertiesToMap(configuration.getPropertySourceProperties()))
-    //     Binder binder = new Binder(source);
-    //     def res = binder.bind("spring.main.web-application-type", Bindable.of(WebApplicationType.class))
-    //         .orElseGet(this::deduceWebApplicationType)
-    // }
-
     /**
      * looks for either domainClasses or entityClasses property on the test. can be either a static or a getter.
      */
@@ -133,6 +114,7 @@ trait BaseRepoEntityUnitTest {
     /**
      * replace method in DataTest, this is called from the gorm-testing's spock events classes, DataTestSetupSpecInterceptor
      */
+    @Override //in the DataTest
     Class<?>[] getDomainClassesToMock() {
         def persistentClasses = findEntityClasses()
         return (persistentClasses?:[]) as Class<?>[]
@@ -168,27 +150,30 @@ trait BaseRepoEntityUnitTest {
     /**
      * override this to add beans during appContext init with the domains and repos
      */
-    Closure doWithDomains() {
+    Closure doWithGormBeans() {
         null
     }
 
     /**
-     * override this to add beans during appContext init with the domains and repos
+     * override this to be run after the doWithGormBeans along with the defaults have been added to the AppContext
      */
     void doAfterDomains() {
         null
     }
 
     /**
-     * override this to add beans that are needed for security setups
+     * override this to add beans that are needed for security setups.
+     * just bean definitions that are added along with whats in doWithGormBeans
      */
-    Closure doWithSecurity() {
+    Closure doWithGormSecurity() {
         null
     }
 
     /**
-     * override this to modify config
+     * doWithConfig is called early on the first setup of the AppCtx in the GrailsAppUnitTest.
+     * override this to modify config but dont forget to add in the gormConfigDefaults if doing so.
      */
+    @Override //in the GrailUnitTest
     @CompileDynamic //closure has weird delgate if its not CompileDynamic
     Closure doWithConfig() {
         { cfg ->
@@ -196,6 +181,9 @@ trait BaseRepoEntityUnitTest {
         }
     }
 
+    /**
+     * helper to make it easy to add the ConfigDefaults if overriding, can also completely eliminate it too.
+     */
     PropertySourcesConfig gormConfigDefaults(PropertySourcesConfig config){
         config.putAll(ConfigDefaults.getConfigMap(false))
         return config

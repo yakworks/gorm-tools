@@ -33,6 +33,12 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
         return INSTANCE
     }
 
+    // for unit tests, truncates data and close
+    static void cleanup(){
+        INSTANCE?.deleteAll()
+        INSTANCE = null
+    }
+
     Faker _faker
 
     List<String> toOneAssociations = [ 'ext' ]

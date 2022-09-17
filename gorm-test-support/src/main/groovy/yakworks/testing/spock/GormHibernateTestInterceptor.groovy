@@ -2,12 +2,14 @@
 * Copyright 2022 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.testing.gorm.spock
+package yakworks.testing.spock
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.spockframework.runtime.extension.AbstractMethodInterceptor
 import org.spockframework.runtime.extension.IMethodInvocation
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute
 
 import yakworks.spring.AppCtx
@@ -29,9 +31,9 @@ class GormHibernateTestInterceptor extends AbstractMethodInterceptor {
 
     @Override
     void interceptSetupMethod(IMethodInvocation invocation) throws Throwable {
+        // autowire(invocation.instance)
         def testInstance =  invocation.sharedInstance as GormHibernateTest
         testInstance.transactionStatus = testInstance.getTransactionManager().getTransaction(new DefaultTransactionAttribute())
-        testInstance.autowire()
         invocation.proceed()
     }
 
@@ -46,10 +48,16 @@ class GormHibernateTestInterceptor extends AbstractMethodInterceptor {
         invocation.proceed()
     }
 
-    @Override
-    void interceptCleanupSpecMethod(IMethodInvocation invocation) throws Throwable {
-        AppCtx.setApplicationContext(null)
-        invocation.proceed()
-    }
+    // @Override
+    // void interceptCleanupSpecMethod(IMethodInvocation invocation) throws Throwable {
+    //     AppCtx.setApplicationContext(null)
+    //     invocation.proceed()
+    // }
+
+    // @CompileDynamic
+    // void autowire(testInstance) {
+    //     AutowireCapableBeanFactory beanFactory = testInstance.applicationContext.autowireCapableBeanFactory
+    //     beanFactory.autowireBean testInstance
+    // }
 
 }

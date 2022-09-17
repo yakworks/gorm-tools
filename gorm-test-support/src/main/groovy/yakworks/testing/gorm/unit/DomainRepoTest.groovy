@@ -21,6 +21,7 @@ import yakworks.testing.gorm.support.RepoBuildDataTest
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
+@Deprecated
 @CompileDynamic
 trait DomainRepoTest<D> implements RepoBuildDataTest, DataRepoTest {
     //order on the above Traits is important as both have mockDomains and we want the one in DataRepoTest to be called

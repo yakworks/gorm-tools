@@ -1,8 +1,6 @@
 package yakworks.rally.orgs
 
 import gorm.tools.utils.GormMetaUtils
-import yakworks.testing.gorm.SecurityTest
-import yakworks.testing.gorm.unit.DomainRepoTest
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
@@ -12,24 +10,20 @@ import yakworks.rally.orgs.model.OrgFlex
 import yakworks.rally.orgs.model.OrgInfo
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
+import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.DataRepoTest
 
-class OrgConstraintsSpec extends Specification implements DomainRepoTest<Org>, SecurityTest {
-    //Automatically runs the basic crud tests
+class OrgConstraintsSpec extends Specification implements DataRepoTest, SecurityTest {
+    static List entityClasses = [Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo]
 
-    def setupSpec(){
-        defineBeans{
-            //scriptExecutorService(ScriptExecutorService)
-            orgDimensionService(OrgDimensionService)
-        }
-        mockDomains(
-            //events need these repos to be setup
-            OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo
-        )
-    }
+    Closure doWithGormBeans(){{ ->
+        orgDimensionService(OrgDimensionService)
+    }}
+
 
     void "sanity check build"() {
         when:
-        def org = build()
+        def org = build(Org)
 
         then:
         org.id
@@ -37,7 +31,7 @@ class OrgConstraintsSpec extends Specification implements DomainRepoTest<Org>, S
 
     void "did it get the audit stamp fields"() {
         when:
-        def org = build()
+        def org = build(Org)
 
         Map orgProps = GormMetaUtils.findConstrainedProperties(Org)
 
@@ -63,7 +57,7 @@ class OrgConstraintsSpec extends Specification implements DomainRepoTest<Org>, S
 
     void "make sure name overrides happened"() {
         when:
-        def org = build()
+        def org = build(Org)
         Map orgProps = GormMetaUtils.findConstrainedProperties(Org)
 
         then:

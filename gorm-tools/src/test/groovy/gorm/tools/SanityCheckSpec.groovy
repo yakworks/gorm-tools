@@ -17,14 +17,13 @@ class SanityCheckSpec extends Specification implements GormHibernateTest {
     static entityClasses = [Cust]
 
     @Autowired ApplicationContext applicationCtx
-    @Autowired ICUMessageSource msgService
     @Autowired Environment environment
 
     //something needs to be specifeid
 
     def "sanity check standard beans"() {
         expect:
-        msgService
+        messageSource
         environment
         println "Active profiles: ${environment.getActiveProfiles()}"
         println "Grails Env: ${grails.util.Environment.current}"

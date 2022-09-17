@@ -1,20 +1,18 @@
 package yakworks.security.audit
 
-import yakworks.security.gorm.model.AppUser
 import gorm.tools.utils.GormMetaUtils
-import yakworks.testing.gorm.SecurityTest
-import yakworks.testing.gorm.unit.DomainRepoTest
 import spock.lang.Specification
+import yakworks.security.gorm.model.AppUser
+import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.DataRepoTest
 
-class AuditStampAnnSpec extends Specification implements DomainRepoTest<StampedEntity>, SecurityTest {
+class AuditStampAnnSpec extends Specification implements DataRepoTest, SecurityTest {
+    static List entityClasses = [StampedEntity, StampedNoConstraintsClosure, AppUser]
 
-    void setupSpec(){
-        mockDomains(StampedNoConstraintsClosure, AppUser)
-    }
 
     void "did it get the audit stamp fields"() {
         when:
-        def con = build()
+        def con = build(StampedEntity)
         con.validate()
 
         // def conProps = StampedEntity.constrainedProperties

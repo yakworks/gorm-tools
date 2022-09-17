@@ -14,7 +14,9 @@ import org.springframework.core.env.ConfigurableEnvironment
 
 /**
  * Copied in from grails-testing-support Created by jameskleeh on 5/31/17.
- * override to use AnnotationConfigApplicationContext
+ * Adds the following,
+ * - override to use AnnotationConfigApplicationContext
+ * -
  */
 @CompileStatic
 class GrailsAppBuilder extends GrailsApplicationBuilder {
@@ -23,12 +25,16 @@ class GrailsAppBuilder extends GrailsApplicationBuilder {
     protected ConfigurableApplicationContext createMainContext(Object servletContext) {
         ConfigurableApplicationContext context = new AnnotationConfigApplicationContext()
 
-        context.register(BasicConfiguration)
+        // context.register(BasicConfiguration)
+
         ClassLoader applicationClassLoader = this.class.classLoader
         ConfigurableEnvironment configuredEnvironment = context.getEnvironment()
 
         ConfigurableBeanFactory beanFactory = context.getBeanFactory()
         prepareContext(context, beanFactory)
+
+        context.register(BasicConfiguration)
+
         context.refresh()
         context.registerShutdownHook()
         context

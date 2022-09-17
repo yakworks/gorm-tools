@@ -4,7 +4,6 @@
 */
 package yakworks.testing.gorm.unit
 
-
 import groovy.transform.CompileStatic
 
 import org.grails.orm.hibernate.HibernateDatastore
@@ -12,18 +11,15 @@ import org.grails.plugin.hibernate.support.HibernatePersistenceContextIntercepto
 import org.hibernate.Session
 import org.hibernate.SessionFactory
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
-import org.springframework.context.annotation.AnnotationConfigRegistry
 import org.springframework.core.env.PropertyResolver
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.TransactionStatus
 
-import grails.buildtestdata.TestDataBuilder
 import grails.config.Config
-import grails.testing.spring.AutowiredTest
 import spock.lang.AutoCleanup
 import spock.lang.Shared
 import yakworks.testing.gorm.support.BaseRepoEntityUnitTest
-import yakworks.testing.grails.BasicConfiguration
+import yakworks.testing.gorm.support.RepoTestDataBuilder
 import yakworks.testing.grails.GrailsAppUnitTest
 
 /**
@@ -36,7 +32,7 @@ import yakworks.testing.grails.GrailsAppUnitTest
  */
 @SuppressWarnings(['Indentation'])
 @CompileStatic
-trait GormHibernateTest implements AutowiredTest, GrailsAppUnitTest, BaseRepoEntityUnitTest, TestDataBuilder {
+trait GormHibernateTest implements GrailsAppUnitTest, BaseRepoEntityUnitTest, RepoTestDataBuilder {
     //trait order above is important, GormToolsSpecHelper should come last as it overrides methods in GrailsAppUnitTest
 
     @Shared @AutoCleanup HibernateDatastore hibernateDatastore
@@ -54,8 +50,8 @@ trait GormHibernateTest implements AutowiredTest, GrailsAppUnitTest, BaseRepoEnt
 
     void setupHibernate() {
         //setup the ConfigurationProperties beans
-        def cfgRegistry = (AnnotationConfigRegistry)ctx
-        cfgRegistry.register(BasicConfiguration)
+        // def cfgRegistry = (AnnotationConfigRegistry)ctx
+        // cfgRegistry.register(BasicConfiguration)
 
         //Sets up the HibernateDatastore, reads the entityClasses static  and sets up whats returned there.
         initDatastore()

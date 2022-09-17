@@ -2,6 +2,7 @@ package yakworks.rally.common
 
 import java.nio.file.Files
 
+import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.commons.io.ZipUtils
@@ -17,8 +18,7 @@ import yakworks.testing.gorm.unit.DataRepoTest
 class DefaultCsvToMapTransformerSpec extends Specification implements DataRepoTest, SecurityTest {
     static List entityClasses = [ Attachment, AttachmentLink, FileData ]
 
-    @Shared
-    DefaultCsvToMapTransformer csvToMapTransformer
+    @Autowired DefaultCsvToMapTransformer csvToMapTransformer
 
     Closure doWithGormBeans() { { ->
         appResourceLoader(AppResourceLoader)

@@ -1,11 +1,6 @@
 package yakworks.rally.orgs
 
 import gorm.tools.problem.ValidationProblem
-import yakworks.security.gorm.model.AppUser
-import yakworks.testing.gorm.RepoTestData
-import yakworks.testing.gorm.SecurityTest
-import yakworks.testing.gorm.TestDataJson
-import yakworks.testing.gorm.unit.DomainRepoTest
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail
@@ -16,22 +11,14 @@ import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.rally.testing.MockData
+import yakworks.security.gorm.model.AppUser
+import yakworks.testing.gorm.RepoTestData
+import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.TestDataJson
+import yakworks.testing.gorm.unit.DataRepoTest
 
-class ContactSpec extends Specification implements DomainRepoTest<Contact>, SecurityTest {
-
-    void setupSpec(){
-        mockDomains(AppUser, Org, OrgSource, OrgTypeSetup, Location, ContactPhone, ContactSource, ContactEmail)
-    }
-
-    @Override
-    Map buildMap(Map args) {
-        args.org = MockData.org()
-        TestDataJson.buildMap(args, Contact)
-    }
-
-    // Contact build(Map args) {
-    //     MockData.contact(args)
-    // }
+class ContactSpec extends Specification implements DataRepoTest, SecurityTest {
+    static List entityClasses = [ Contact, AppUser, Org, OrgSource, OrgTypeSetup, Location, ContactPhone, ContactSource, ContactEmail]
 
     Contact createContactWithUser(){
         Contact contact = MockData.contact([firstName: "John", lastName: 'Galt',  email: "al@9ci.io"])
@@ -42,6 +29,18 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
         user.persist()
         contact.user = user
         contact
+    }
+
+    Contact createEntity(Map args = [:]){
+        def orgId = build(Org).id
+        args.putAll([orgId: orgId])
+        def dta = buildMap(Contact, args)
+
+        def entity = Contact.create(dta)
+        //assert entity.properties == [foo:'foo']
+        flushAndClear()
+
+        return Contact.get(entity.id)
     }
 
     //show data table option 2
@@ -56,8 +55,8 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
 
     def testEquals() {
         when:
-        Contact contact1 = build([:])
-        Contact contact2 = build([:])
+        Contact contact1 = build(Contact)
+        Contact contact2 = build(Contact)
 
         then:
         !contact1.equals(contact2)
@@ -67,10 +66,10 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
 
     def testHashCode() {
         when:
-        Contact contact = build([:])
+        Contact contact = build(Contact)
         int contactHash = contact.hashCode()
 
-        def contact2 = build([:])
+        def contact2 = build(Contact)
         int contact2Hash = contact2.hashCode()
 
         then:
@@ -157,8 +156,10 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
 
     def testSave_With_StringTrimmerEditor() {
         when:
-        Map create = ['email': 'jbhasin@objectseek.com', firstName: 'DefContact', lastName: '  test']
-        Contact contact = createEntity(create)
+        def orgId = build(Org).id
+        Map dta = [orgId: orgId, 'email': 'jbhasin@objectseek.com', firstName: 'DefContact', lastName: '  test']
+        dta = buildMap(Contact, dta)
+        Contact contact = Contact.create(dta)
 
         then:
         'test' == contact.lastName
@@ -166,8 +167,9 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
 
     def testStringTrimmerEditor_forBlankSpaces(){
         when:
-        def create = ['email':'jbhasin@objectseek.com', firstName:'DefContact', lastName:'     ']
-        Contact contact = createEntity(create)
+        def orgId = build(Org).id
+        def create = [orgId: orgId, 'email':'jbhasin@objectseek.com', firstName:'DefContact', lastName:'     ']
+        Contact contact = Contact.create(buildMap(Contact, create))
 
         then:
         contact.lastName == null
@@ -175,7 +177,7 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
 
     def testAssignUserNameFromContactName_noUser() {
         when:
-        Contact contact = createEntity()
+        Contact contact = build(Contact)
         contact.name = "Hello World"
         contact.email = "foo@bar.com"
         Contact.repo.syncChangesToUser(contact) // call method
@@ -226,7 +228,7 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
         assert loc.contact.id == old.id
         assert old.locations.size() == 1
 
-        Contact copy = createEntity([org: old.org])
+        Contact copy = build(Contact, [org: old.org])
         Contact.repo.copy(old, copy)
 
         then:
@@ -245,9 +247,10 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
 
     def "test add and update locations"() {
         setup:
-        Map params = buildCreateMap([:])
+        def orgId = build(Org).id
+        def params = buildMap(Contact)
+        params.orgId = orgId
         params.locations = [[street1: "test street1"], [street1: "test street2"]]
-
 
         when: "adding location"
         def entity = Contact.create(params)

@@ -10,6 +10,7 @@ gorm:
   tools:
     async:
       poolSize: 2
+      foo: bar
 ---
 
 

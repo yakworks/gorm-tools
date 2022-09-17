@@ -21,13 +21,15 @@ import grails.util.Holders
 import grails.validation.DeferredBindingActions
 
 /**
- * replacement of the GrailUnitTest in order to build a GrailsApplication with a Spring Boot AnnotationConfigApplicationContext
+ * replacement of the GrailUnitTest and adds the following
+ * - in order to build a GrailsApplication with a Spring Boot AnnotationConfigApplicationContext
+ * - runs autowire for any annotations such as @Autowired, also runs any beanPostProcessing so @PostConstruct methods should get called too
  */
 @SuppressWarnings(['AssignmentToStaticFieldFromInstanceMethod', ''])
 @CompileStatic
 trait GrailsAppUnitTest extends GrailsUnitTest{
 
-    private static GrailsApplication _grailsApplication
+    private static GrailsApplication _grailsApp
     private static Object _servletContext
 
     /**
@@ -45,7 +47,7 @@ trait GrailsAppUnitTest extends GrailsUnitTest{
 
     @Override
     GrailsApplication getGrailsApplication() {
-        if (_grailsApplication == null) {
+        if (_grailsApp == null) {
             def builder = new GrailsAppBuilder(
                     doWithSpring: doWithSpring(),
                     doWithConfig: doWithConfig(),
@@ -53,10 +55,10 @@ trait GrailsAppUnitTest extends GrailsUnitTest{
                     loadExternalBeans: loadExternalBeans(),
                     localOverride: localOverride
             ).build()
-            _grailsApplication = builder.grailsApplication
+            _grailsApp = builder.grailsApplication
             _servletContext = builder.servletContext
         }
-        _grailsApplication
+        _grailsApp
     }
 
     @Override
@@ -73,9 +75,9 @@ trait GrailsAppUnitTest extends GrailsUnitTest{
 
     @Override
     void cleanupGrailsApplication() {
-        if (_grailsApplication != null) {
-            if (_grailsApplication instanceof DefaultGrailsApplication) {
-                ((DefaultGrailsApplication)_grailsApplication).clear()
+        if (_grailsApp != null) {
+            if (_grailsApp instanceof DefaultGrailsApplication) {
+                ((DefaultGrailsApplication)_grailsApp).clear()
             }
 
             ApplicationContext applicationContext = grailsApplication.getParentContext()
@@ -94,7 +96,7 @@ trait GrailsAppUnitTest extends GrailsUnitTest{
             ShutdownOperations.runOperations()
             DeferredBindingActions.clear()
 
-            this._grailsApplication = null
+            this._grailsApp = null
             cleanupPromiseFactory()
             Holders.clear()
         }

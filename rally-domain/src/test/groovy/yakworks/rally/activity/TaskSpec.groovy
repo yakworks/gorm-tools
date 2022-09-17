@@ -1,5 +1,6 @@
 package yakworks.rally.activity
 
+import org.springframework.beans.factory.annotation.Autowired
 import yakworks.security.gorm.model.AppUser
 import yakworks.testing.gorm.unit.DataRepoTest
 import yakworks.testing.gorm.RepoTestData
@@ -26,7 +27,7 @@ class TaskSpec extends Specification implements DataRepoTest, SecurityTest { //i
         Org, AppUser, ActivityNote, Contact, ActivityContact
     ]
 
-    ActivityRepo activityRepo
+    @Autowired ActivityRepo activityRepo
 
     Closure doWithGormBeans() { { ->
         appResourceLoader(AppResourceLoader)

@@ -20,7 +20,7 @@ class ParallelStreamsToolsSpec extends Specification implements GormHibernateTes
     @Autowired AsyncProperties asyncProperties
 
     void setup() {
-        // assert asyncProperties.foo == 'bar'
+        assert asyncProperties.foo == 'bar'
         //parallelTools = ctx.getBean("parallelTools")
         parallelTools.asyncService.asyncEnabled = true
     }

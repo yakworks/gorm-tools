@@ -10,8 +10,6 @@ import yakworks.testing.gorm.unit.DataRepoTest
  */
 class MessageSourceSpec extends Specification implements DataRepoTest {
 
-    ICUMessageSource messageSource
-
     void setupSpec() {
         defineCommonGormBeans()
     }

@@ -4,12 +4,10 @@
 */
 package yakworks.testing.gorm.unit
 
-
 import groovy.transform.CompileStatic
 
 import org.junit.AfterClass
 
-import grails.testing.spring.AutowiredTest
 import yakworks.commons.lang.PropertyTools
 import yakworks.spring.AppCtx
 import yakworks.testing.gorm.support.BaseRepoEntityUnitTest
@@ -25,7 +23,7 @@ import yakworks.testing.grails.GrailsAppUnitTest
  * @since 6.1
  */
 @CompileStatic
-trait DataRepoTest implements RepoBuildDataTest, AutowiredTest, GrailsAppUnitTest, BaseRepoEntityUnitTest { //, ExternalConfigAwareSpec  {
+trait DataRepoTest implements RepoBuildDataTest, GrailsAppUnitTest, BaseRepoEntityUnitTest { //, ExternalConfigAwareSpec  {
     //trait order above is important, GormToolsSpecHelper should come last as it overrides methods in GrailsAppUnitTest
 
     void mockDomains(Class<?>... domainClassesToMock) {

@@ -4,8 +4,8 @@
 */
 package gorm.tools.api
 
+import org.springframework.beans.factory.annotation.Autowired
 import yakworks.testing.gorm.unit.DataRepoTest
-import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.testing.gorm.model.Enummy
 import yakworks.testing.gorm.model.KitchenSink
@@ -15,8 +15,8 @@ import yakworks.testing.gorm.model.Thing
 
 class IncludesConfigSpec extends Specification  implements DataRepoTest  {
     static List entityClasses = [KitchenSink, SinkExt, SinkItem, Thing, Enummy]
-    @Shared
-    def includesConfig = new IncludesConfig()
+
+    @Autowired IncludesConfig includesConfig
 
     // void setupSpec() {
     //     //mockDomain Person

@@ -1,14 +1,15 @@
 package yakworks.rally.eventlog
 
-
 import java.time.LocalDateTime
 
-import gorm.tools.ConfigDefaults
-import yakworks.testing.gorm.unit.DomainRepoTest
+import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
+import yakworks.testing.gorm.unit.DataRepoTest
 
-class EventLogSpec extends Specification implements DomainRepoTest<EventLog>{
-    EventLogger eventLogger
+class EventLogSpec extends Specification implements DataRepoTest {
+    static List entityClasses = [EventLog]
+
+    @Autowired EventLogger eventLogger
 
     //auto runs DomainRepoCrudSpec tests
     static final MESSAGE = 'EventLoggerTests'

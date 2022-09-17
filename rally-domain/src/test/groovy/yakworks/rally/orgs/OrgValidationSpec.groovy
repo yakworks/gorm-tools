@@ -1,11 +1,5 @@
 package yakworks.rally.orgs
 
-import yakworks.rally.attachment.AttachmentSupport
-import yakworks.rally.attachment.model.Attachment
-import yakworks.rally.job.DefaultSyncJobService
-import yakworks.rally.job.SyncJob
-import yakworks.testing.gorm.SecurityTest
-import yakworks.testing.gorm.unit.DomainRepoTest
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
@@ -16,8 +10,11 @@ import yakworks.rally.orgs.model.OrgInfo
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
+import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.DataRepoTest
 
-class OrgValidationSpec extends Specification implements DomainRepoTest<Org>, SecurityTest {
+class OrgValidationSpec extends Specification implements DataRepoTest, SecurityTest {
+    static List entityClasses = [Org]
 
     Closure doWithGormBeans() { { ->
         orgDimensionService(OrgDimensionService)

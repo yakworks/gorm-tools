@@ -1,9 +1,6 @@
 package yakworks.rally.activity
 
 import gorm.tools.repository.model.CriteriaRemover
-import yakworks.testing.gorm.SecurityTest
-import yakworks.testing.gorm.unit.DataRepoTest
-import yakworks.testing.gorm.unit.DomainRepoTest
 import grails.gorm.DetachedCriteria
 import spock.lang.Shared
 import spock.lang.Specification
@@ -14,6 +11,8 @@ import yakworks.rally.activity.repo.ActivityContactRepo
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
+import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.DataRepoTest
 
 class ActivityContactSpec extends Specification implements DataRepoTest, SecurityTest {
     static List entityClasses = [Activity, ActivityContact, ActivityNote, Contact, Org, Tag]

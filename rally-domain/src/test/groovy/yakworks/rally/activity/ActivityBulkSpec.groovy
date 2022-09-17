@@ -5,6 +5,7 @@ import java.nio.file.Path
 import gorm.tools.repository.model.RepoEntity
 import grails.persistence.Entity
 import org.apache.commons.io.FileUtils
+import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
 import yakworks.commons.lang.IsoDateUtil
 import yakworks.commons.util.BuildSupport
@@ -35,9 +36,9 @@ class ActivityBulkSpec extends Specification implements DataRepoTest, SecurityTe
         AttachmentLink, Attachment, Task, TaskType, TaskStatus
     ]
 
-    ActivityRepo activityRepo
-    ActivityBulk activityBulk
-    AttachmentSupport attachmentSupport
+    @Autowired ActivityRepo activityRepo
+    @Autowired ActivityBulk activityBulk
+    @Autowired AttachmentSupport attachmentSupport
 
     Closure doWithGormBeans() { { ->
         appResourceLoader(AppResourceLoader)

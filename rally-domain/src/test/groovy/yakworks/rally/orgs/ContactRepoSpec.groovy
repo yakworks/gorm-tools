@@ -1,25 +1,22 @@
 package yakworks.rally.orgs
 
-import yakworks.testing.gorm.unit.DomainRepoTest
+import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
-import yakworks.testing.gorm.SecurityTest
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.repo.ContactRepo
+import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.DataRepoTest
 
-class ContactRepoSpec extends Specification implements DomainRepoTest<Contact>, SecurityTest {
-
-    ContactRepo contactRepo
-
-    def setupSpec() {
-        mockDomains(Org)
-    }
+class ContactRepoSpec extends Specification implements DataRepoTest, SecurityTest {
+    static List entityClasses = [Contact, Org]
+    @Autowired ContactRepo contactRepo
 
     void "test lookup by num"() {
         when:
         Org org = Org.of("foo", "bar", OrgType.Customer)
-        Contact contact = build(firstName: 'foo', num: 'foo', org:org)
+        Contact contact = build(Contact, firstName: 'foo', num: 'foo', org:org)
         contact.persist()
 
         then:

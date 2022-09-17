@@ -6,7 +6,6 @@ package yakworks.testing.gorm.support
 
 import groovy.transform.CompileDynamic
 
-import org.grails.testing.GrailsUnitTest
 import org.grails.web.mapping.DefaultLinkGenerator
 import org.grails.web.mapping.UrlMappingsHolderFactoryBean
 import org.springframework.web.servlet.i18n.SessionLocaleResolver

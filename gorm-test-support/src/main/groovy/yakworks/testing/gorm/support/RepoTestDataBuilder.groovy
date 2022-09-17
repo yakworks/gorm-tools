@@ -11,6 +11,7 @@ import org.junit.Before
 
 import grails.buildtestdata.TestDataConfigurationHolder
 import yakworks.testing.gorm.RepoTestData
+import yakworks.testing.gorm.TestDataJson
 
 /**
  * Integration tests, any class really, can implement this trait to add build-test-data functionality
@@ -34,6 +35,10 @@ trait RepoTestDataBuilder {
     /** calls {@link RepoTestData#build} */
     public <T> T build(Map args, Class<T> clazz, Map<String, Object> propValues) {
         RepoTestData.build(args, clazz, propValues)
+    }
+
+    Map buildMap(Class clazz, Map args = [:]) {
+        TestDataJson.buildMap(args, clazz)
     }
 
     /** calls {@link RepoTestData#build} with [find: true] passed to args*/

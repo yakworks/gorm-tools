@@ -11,7 +11,7 @@ import org.springframework.cache.CacheManager
 import yakworks.spring.AppCtx
 
 /**
- * core integration test trait that consolodated the traits to include security.
+ * core integration test trait that consolodates the traits to include security.
  */
 @CompileStatic
 trait DomainIntTest implements DataIntegrationTest, SecuritySpecHelper {

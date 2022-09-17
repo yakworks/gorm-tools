@@ -18,6 +18,10 @@ import yakworks.security.SecService
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.spring.SpringSecUser
 
+/**
+ * Integration support for the gorm-security plugin.
+ *
+ */
 @CompileDynamic
 trait SecuritySpecHelper implements WithTrx{
 

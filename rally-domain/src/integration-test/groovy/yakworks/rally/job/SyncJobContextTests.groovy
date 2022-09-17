@@ -11,7 +11,7 @@ import spock.lang.Specification
 import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.json.groovy.JsonEngine
-import yakworks.testing.gorm.DomainIntTest
+import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Org
 

@@ -9,7 +9,7 @@ import yakworks.spring.AppResourceLoader
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.testing.gorm.DomainIntTest
+import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.repo.AttachmentRepo
 

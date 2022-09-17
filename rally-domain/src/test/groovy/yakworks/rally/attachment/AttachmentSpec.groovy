@@ -5,34 +5,32 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 import gorm.tools.problem.ValidationProblem
-import yakworks.testing.gorm.unit.DataRepoTest
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.mock.web.MockMultipartFile
-import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport
-import yakworks.testing.gorm.SecurityTest
-import yakworks.spring.AppResourceLoader
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.model.FileData
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
+import yakworks.spring.AppResourceLoader
+import yakworks.testing.gorm.unit.SecurityTest
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest {
+class AttachmentSpec extends Specification implements GormHibernateTest, SecurityTest {
+    static List<Class> entityClasses = [Attachment, AttachmentLink, FileData, Tag, TagLink]
 
-    @Shared AttachmentRepo attachmentRepo
-    @Shared AttachmentSupport attachmentSupport
+    @Autowired AttachmentRepo attachmentRepo
+    @Autowired AttachmentSupport attachmentSupport
 
-    def setupSpec() {
-        defineBeans {
-            appResourceLoader(AppResourceLoader)
-            attachmentSupport(AttachmentSupport)
-        }
-        mockDomains(Attachment, AttachmentLink, FileData, Tag, TagLink)
-    }
+    Closure doWithGormBeans(){ { ->
+        appResourceLoader(AppResourceLoader)
+        attachmentSupport(AttachmentSupport)
+    }}
 
-    def cleanupSpec() {
+    def cleanup() {
         attachmentSupport.rimrafAttachmentsDirectory()
     }
 

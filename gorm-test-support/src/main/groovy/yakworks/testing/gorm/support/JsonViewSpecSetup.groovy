@@ -6,13 +6,13 @@ package yakworks.testing.gorm.support
 
 import groovy.transform.CompileDynamic
 
-import org.grails.testing.GrailsUnitTest
 import org.grails.web.mapping.DefaultLinkGenerator
 import org.grails.web.mapping.UrlMappingsHolderFactoryBean
 import org.springframework.web.servlet.i18n.SessionLocaleResolver
 
 import grails.plugin.json.view.JsonViewGrailsPlugin
 import grails.testing.spock.OnceBefore
+import yakworks.testing.grails.GrailsAppUnitTest
 
 /**
  * Does the setup to make sure beans for json-views are setup
@@ -21,7 +21,7 @@ import grails.testing.spock.OnceBefore
  * @since 6.1
  */
 @CompileDynamic
-trait JsonViewSpecSetup implements GrailsUnitTest {
+trait JsonViewSpecSetup implements GrailsAppUnitTest  {
 
     @OnceBefore
     void setupJsonViewBeans() {

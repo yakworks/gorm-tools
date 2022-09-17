@@ -5,37 +5,33 @@ import java.nio.file.Path
 import groovy.json.StreamingJsonBuilder
 import groovy.transform.CompileStatic
 
+import gorm.tools.metamap.services.MetaMapService
+import gorm.tools.utils.BenchmarkHelper
+import org.springframework.beans.factory.annotation.Autowired
+import spock.lang.Specification
+import yakworks.commons.util.BuildSupport
 import yakworks.etl.csv.CSVMapWriter
 import yakworks.etl.excel.ExcelBuilder
-import gorm.tools.metamap.services.MetaMapService
-import yakworks.testing.gorm.GormToolsHibernateSpec
-import gorm.tools.utils.BenchmarkHelper
-import yakworks.commons.util.BuildSupport
-import yakworks.testing.gorm.model.KitchenSink
-import yakworks.testing.gorm.model.SinkItem
 import yakworks.json.groovy.JsonEngineTrait
 import yakworks.meta.MetaMapList
+import yakworks.testing.gorm.model.KitchenSink
+import yakworks.testing.gorm.model.SinkItem
+import yakworks.testing.gorm.unit.GormHibernateTest
 
 /**
  * flushing out changes for performance
  */
-class ExportBenchmarkSpecs extends GormToolsHibernateSpec implements JsonEngineTrait  {
+class ExportBenchmarkSpecs extends Specification implements GormHibernateTest, JsonEngineTrait  {
+    static List<Class> entityClasses = [KitchenSink, SinkItem]
     static int SINK_COUNT = 5000
 
-    MetaMapService metaMapService
-
-    List<Class> getDomainClasses() { [KitchenSink, SinkItem] }
+    @Autowired MetaMapService metaMapService
 
     // @Transactional
     void setupSpec() {
         BenchmarkHelper.startTime()
         KitchenSink.repo.createKitchenSinks(SINK_COUNT)
         BenchmarkHelper.printEndTimeMsg("KitchenSeedData.createKitchenSinks")
-    }
-
-    // @Transactional
-    void cleanupSpec() {
-        // println writer.toString()
     }
 
     void "sanity check"() {

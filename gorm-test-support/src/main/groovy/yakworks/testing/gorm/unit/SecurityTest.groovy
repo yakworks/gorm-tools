@@ -2,7 +2,7 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.testing.gorm
+package yakworks.testing.gorm.unit
 
 import groovy.transform.CompileDynamic
 
@@ -12,8 +12,10 @@ import yakworks.security.audit.AuditStampBeforeValidateListener
 import yakworks.security.audit.AuditStampPersistenceEventListener
 import yakworks.security.audit.AuditStampSupport
 import yakworks.security.gorm.model.AppUser
+import yakworks.testing.gorm.TestingSecService
 
 /**
+ * Supports the gorm-security plugin.
  * adds mock spring beans for passwordEncoder, and secService and
  * AuditStampEventListener for created/edited fields. During and entity.create it converts test data to a map
  * and since the created/edited fields are not bindable they dont get set so needs a listener
@@ -22,26 +24,7 @@ import yakworks.security.gorm.model.AppUser
 @CompileDynamic
 trait SecurityTest {
 
-    //called from RepoBuildDataTest as it setups and mocks the domains
-    // void onMockDomains(Class<?>... entityClasses) {
-        // do these beans first so that they can get injected into the repos
-        // defineBeans {
-        //     passwordEncoder(NoOpPasswordEncoder)
-        //     secService(TestingSecService, AppUser)
-        // }
-        // now mock the domains
-        // super.onMockDomains(entityClasses)
-        // do these after so they can cache the domains created
-        // defineBeans {
-        //     auditStampBeforeValidateListener(AuditStampBeforeValidateListener)
-        //     auditStampPersistenceEventListener(AuditStampPersistenceEventListener)
-        //     auditStampSupport(AuditStampSupport)
-        // }
-        // add the listener to the SimpleMapDatastore
-        // datastore.applicationEventPublisher.addApplicationListener(ctx.getBean("auditStampPersistenceEventListener"))
-    // }
-
-    Closure doWithSecurity() {
+    Closure doWithSecurityBeans() {
         { ->
             passwordEncoder(NoOpPasswordEncoder)
             secService(TestingSecService, AppUser)
@@ -51,7 +34,7 @@ trait SecurityTest {
         }
     }
 
-    void doAfterDomains() {
+    void doAfterGormBeans() {
         datastore.applicationEventPublisher.addApplicationListener(ctx.getBean("auditStampPersistenceEventListener"))
     }
 

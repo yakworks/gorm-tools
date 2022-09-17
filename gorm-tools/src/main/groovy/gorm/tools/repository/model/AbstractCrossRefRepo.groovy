@@ -38,6 +38,7 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     Class<R> relatedClass
     List<String> propNames
 
+    /** the criteria remover can be customized, useful for replacing in tests */
     CriteriaRemover criteriaRemover
 
     protected AbstractCrossRefRepo(Class<P> mainClazz, Class<R> relatedClazz, List<String> propKeys){

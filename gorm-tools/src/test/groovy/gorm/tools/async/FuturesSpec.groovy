@@ -7,12 +7,13 @@ package gorm.tools.async
 import java.util.concurrent.CompletableFuture
 import java.util.function.Supplier
 
-import yakworks.testing.gorm.GormToolsHibernateSpec
-import grails.testing.spring.AutowiredTest
+import org.springframework.beans.factory.annotation.Autowired
+import spock.lang.Specification
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class FuturesSpec extends GormToolsHibernateSpec implements AutowiredTest  {
+class FuturesSpec extends Specification implements GormHibernateTest{
 
-    AsyncService asyncService
+    @Autowired AsyncService asyncService
 
     void "synchronous future example"() {
         when:

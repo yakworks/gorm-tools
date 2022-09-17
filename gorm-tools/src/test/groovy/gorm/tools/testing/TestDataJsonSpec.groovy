@@ -7,7 +7,7 @@ package gorm.tools.testing
 import yakworks.testing.gorm.TestDataJson
 import yakworks.testing.gorm.TestTools
 import yakworks.testing.gorm.unit.DataRepoTest
-import yakworks.testing.gorm.unit.RepoBuildDataTest
+import yakworks.testing.gorm.support.RepoBuildDataTest
 import spock.lang.Specification
 import testing.Cust
 import testing.CustType

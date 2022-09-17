@@ -4,33 +4,33 @@
 */
 package gorm.tools.json
 
-import yakworks.meta.MetaMap
-import yakworks.meta.MetaMapList
-import gorm.tools.metamap.services.MetaMapService
-import yakworks.testing.gorm.RepoTestData
-
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.repository.model.RepoEntity
-import yakworks.testing.gorm.unit.DomainRepoTest
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Ignore
 import spock.lang.Specification
 import testing.Address
+import testing.AddyNested
 import testing.Cust
 import testing.CustExt
 import testing.CustType
-import testing.AddyNested
 import yakworks.json.groovy.JsonEngine
+import yakworks.meta.MetaMap
+import yakworks.meta.MetaMapList
+import yakworks.testing.gorm.RepoTestData
+import yakworks.testing.gorm.unit.DataRepoTest
 
 import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson
 
-class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
-
-    MetaMapService metaMapService
+class EntityJsonSpec extends Specification implements DataRepoTest {
+    static List entityClasses = [Cust]
+    @Autowired MetaMapService metaMapService
 
     void setupSpec(){
         //these won't automatically get picked up as thet are not required.
@@ -67,7 +67,7 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
     void "test Org json stock"() {
         when:
         def excludes = ['version']
-        def org = build()
+        def org = build(Cust)
         def res = toJson(org, ['*', 'type'], excludes)
 
         then:
@@ -140,8 +140,8 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
 
     void "test list"() {
         when:
-        def org = build()
-        def org2 = build()
+        def org = build(Cust)
+        def org2 = build(Cust)
         def orgList = [org, org2]
         def result = toJson(orgList, ['name'])
 
@@ -168,7 +168,7 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
 
     void "test json includes ext.*"() {
         when:
-        def org = build(includes: '*')
+        def org = build(Cust, includes: '*')
         def result = toJson(org, ["name", 'ext.*'])
 
         then:

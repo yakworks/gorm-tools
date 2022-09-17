@@ -2,7 +2,7 @@ package gorm.tools.security
 
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
-import yakworks.testing.gorm.SecuritySpecHelper
+import yakworks.testing.gorm.integration.SecuritySpecHelper
 import yakworks.testing.gorm.integration.DataIntegrationTest
 import yakworks.security.SecService
 import grails.testing.mixin.integration.Integration

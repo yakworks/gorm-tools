@@ -1,16 +1,16 @@
 package gorm.tools.mango
 
 import gorm.tools.mango.jpql.JpqlQueryBuilder
-import yakworks.testing.gorm.GormToolsHibernateSpec
-import grails.testing.spring.AutowiredTest
+import spock.lang.Specification
 import yakworks.testing.gorm.model.KitchenSink
+import yakworks.testing.gorm.unit.GormHibernateTest
 
 /**
  * Test for JPA builder
  */
-class JpqlQueryBuilderSelectSpec extends GormToolsHibernateSpec implements AutowiredTest{
+class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateTest  {
 
-    List<Class> getDomainClasses() { [KitchenSink] }
+    static List entityClasses = [KitchenSink]
 
     String strip(String val){
         val.stripIndent().replace('\n',' ').trim()

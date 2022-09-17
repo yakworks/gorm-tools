@@ -1,13 +1,13 @@
 package yakworks.security
 
-import org.springframework.util.ReflectionUtils
-
-import yakworks.security.audit.StampedEntity
-import yakworks.security.gorm.model.AppUser
-import yakworks.testing.gorm.unit.DomainRepoTest
 import grails.artefact.DomainClass
 import grails.web.databinding.WebDataBinding
+import org.springframework.util.ReflectionUtils
 import spock.lang.Specification
+import yakworks.security.audit.StampedEntity
+import yakworks.security.gorm.model.AppUser
+import yakworks.testing.gorm.unit.SecurityTest
+import yakworks.testing.gorm.unit.GormHibernateTest
 
 /**
  * This will fail if the org.grails:grails-plugin-controllers is in compile dependency during compile of gorm domain
@@ -15,7 +15,8 @@ import spock.lang.Specification
  * we don't want it as it adds a map constructor that uses the slow Grails binder and ties domains to controllers
  * we want the default groovy map constructor or ability to use the Groovy @MapConstrutor AST transformation
  */
-class NoControllersDomainBindingSpec extends Specification implements DomainRepoTest<AppUser> {
+class NoControllersDomainBindingSpec extends Specification implements GormHibernateTest, SecurityTest {
+    static List entityClasses = [AppUser]
 
     void "check for instanceControllersDomainBindingApi"() {
         expect:

@@ -1,11 +1,12 @@
 package gorm.tools.model
 
-import yakworks.testing.gorm.GormToolsHibernateSpec
+import spock.lang.Specification
 import testing.CompositeNoVersion
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class CompositeSpec extends GormToolsHibernateSpec {
+class CompositeSpec extends Specification implements GormHibernateTest {
 
-    List<Class> getDomainClasses() { [CompositeNoVersion] }
+    static List entityClasses = [CompositeNoVersion]
 
     void "CompositeNoVersion test"() {
         when:

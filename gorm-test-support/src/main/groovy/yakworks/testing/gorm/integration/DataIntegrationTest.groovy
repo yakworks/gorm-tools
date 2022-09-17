@@ -17,9 +17,9 @@ import org.springframework.web.context.WebApplicationContext
 import gorm.tools.jdbc.DbDialectService
 import gorm.tools.transaction.TrxStaticApi
 import grails.build.support.MetaClassRegistryCleaner
-import grails.buildtestdata.TestDataBuilder
 import grails.config.Config
 import grails.util.Holders
+import yakworks.testing.gorm.support.RepoTestDataBuilder
 
 /**
  * Contains helpers for integration tests. Can be chained with some custom helper traits with the application-specific
@@ -29,7 +29,7 @@ import grails.util.Holders
  * @since 6.1
  */
 @CompileStatic
-trait DataIntegrationTest implements TestDataBuilder {
+trait DataIntegrationTest implements RepoTestDataBuilder {
 
     JdbcTemplate jdbcTemplate
     DbDialectService dbDialectService

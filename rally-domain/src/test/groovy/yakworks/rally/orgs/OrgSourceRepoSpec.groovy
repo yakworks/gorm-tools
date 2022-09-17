@@ -1,28 +1,14 @@
 package yakworks.rally.orgs
 
-import yakworks.testing.gorm.SecurityTest
-import yakworks.testing.gorm.unit.DomainRepoTest
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgType
+import yakworks.testing.gorm.unit.SecurityTest
+import yakworks.testing.gorm.unit.DataRepoTest
 
-class OrgSourceRepoSpec extends Specification implements DomainRepoTest<OrgSource>, SecurityTest {
-
-    def setupSpec() {
-        // defineBeans{
-        //     orgDimensionService(OrgDimensionService)
-        // }
-        mockDomains(Org)
-    }
-
-    void "CRUD tests"() {
-        expect:
-        // createEntity().id
-        persistEntity().id
-        updateEntity().version > 0
-        removeEntity()
-    }
+class OrgSourceRepoSpec extends Specification implements DataRepoTest, SecurityTest {
+    static List entityClasses = [Org, OrgSource]
 
     void testInsertOrgSources(){
         when:

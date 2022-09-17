@@ -1,14 +1,14 @@
 package yakworks.rally.tag
 
-import yakworks.testing.gorm.SecurityTest
-import yakworks.testing.gorm.unit.DomainRepoTest
 import spock.lang.Specification
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
+import yakworks.testing.gorm.unit.SecurityTest
+import yakworks.testing.gorm.unit.DataRepoTest
 
-class TagLinkSpec extends Specification implements DomainRepoTest<TagLink>, SecurityTest {
-
+class TagLinkSpec extends Specification implements DataRepoTest, SecurityTest {
+    static List entityClasses = [TagLink, Tag, Attachment]
     void setupSpec() {
         mockDomains Tag, Attachment
     }

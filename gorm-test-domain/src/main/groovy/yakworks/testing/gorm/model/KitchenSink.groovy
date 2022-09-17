@@ -140,6 +140,10 @@ class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRep
         getRepo().deleteAll()
     }
 
+    static void cleanup() {
+        KitchenSinkRepo.cleanup()
+    }
+
     static void createKitchenSinks(int i) {
         getRepo().createKitchenSinks(i)
     }

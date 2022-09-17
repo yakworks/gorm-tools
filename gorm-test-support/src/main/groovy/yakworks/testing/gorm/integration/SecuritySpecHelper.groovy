@@ -2,7 +2,7 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.testing.gorm
+package yakworks.testing.gorm.integration
 
 import groovy.transform.CompileDynamic
 
@@ -18,6 +18,10 @@ import yakworks.security.SecService
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.spring.SpringSecUser
 
+/**
+ * Integration support for the gorm-security plugin.
+ *
+ */
 @CompileDynamic
 trait SecuritySpecHelper implements WithTrx{
 

@@ -2,12 +2,13 @@ package gorm.tools.model
 
 import groovy.transform.CompileStatic
 
-import yakworks.testing.gorm.GormToolsHibernateSpec
+import spock.lang.Specification
 import testing.Cust
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class PersistableSpec extends GormToolsHibernateSpec {
+class PersistableSpec extends Specification implements GormHibernateTest {
 
-    List<Class> getDomainClasses() { [Cust] }
+    static List entityClasses =[Cust]
 
     @CompileStatic
     void nullOutID(Cust o){

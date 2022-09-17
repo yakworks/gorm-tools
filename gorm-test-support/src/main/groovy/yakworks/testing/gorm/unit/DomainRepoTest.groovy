@@ -10,6 +10,7 @@ import org.springframework.core.GenericTypeResolver
 
 import yakworks.testing.gorm.RepoTestData
 import yakworks.testing.gorm.TestDataJson
+import yakworks.testing.gorm.support.RepoBuildDataTest
 
 /**
  * Should works as a drop in replacement for the Grails Testing Support's
@@ -20,6 +21,7 @@ import yakworks.testing.gorm.TestDataJson
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
+@Deprecated
 @CompileDynamic
 trait DomainRepoTest<D> implements RepoBuildDataTest, DataRepoTest {
     //order on the above Traits is important as both have mockDomains and we want the one in DataRepoTest to be called

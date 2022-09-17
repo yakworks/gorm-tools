@@ -8,7 +8,7 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.testing.gorm.SecuritySpecHelper
+import yakworks.testing.gorm.integration.SecuritySpecHelper
 
 @Integration
 @Rollback

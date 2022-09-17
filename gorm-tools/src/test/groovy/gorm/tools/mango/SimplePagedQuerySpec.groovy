@@ -5,27 +5,20 @@
 package gorm.tools.mango
 
 import gorm.tools.mango.jpql.SimplePagedQuery
-import yakworks.testing.gorm.GormToolsHibernateSpec
-import spock.lang.Shared
+import spock.lang.Specification
 import yakworks.testing.gorm.model.KitchenSink
-import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.testing.gorm.model.SinkItem
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class SimplePagedQuerySpec extends GormToolsHibernateSpec {
-
-    DefaultMangoQuery mangoQuery
-    @Shared KitchenSinkRepo kitchenSinkRepo
-
-    List<Class> getDomainClasses() { [KitchenSink, SinkItem] }
+class SimplePagedQuerySpec extends Specification implements GormHibernateTest  {
+    static List entityClasses = [KitchenSink, SinkItem]
 
     void setupSpec() {
-        kitchenSinkRepo = KitchenSink.repo
-        kitchenSinkRepo.createKitchenSinks(10)
+        KitchenSink.createKitchenSinks(10)
     }
 
     void cleanupSpec() {
-        kitchenSinkRepo.deleteAll()
-        // AppCtx.setApplicationContext(null)
+        KitchenSink.cleanup()
     }
 
     void "sanity check"() {

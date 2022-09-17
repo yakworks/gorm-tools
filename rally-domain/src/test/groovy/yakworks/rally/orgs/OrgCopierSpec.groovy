@@ -2,7 +2,7 @@ package yakworks.rally.orgs
 
 import org.springframework.beans.factory.annotation.Autowired
 import yakworks.testing.gorm.RepoTestData
-import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.rally.activity.ActivityCopier

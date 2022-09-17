@@ -25,7 +25,7 @@ import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
 import yakworks.spring.AppResourceLoader
-import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.DataRepoTest
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds

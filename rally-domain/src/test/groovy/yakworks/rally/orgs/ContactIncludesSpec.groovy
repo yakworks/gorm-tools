@@ -10,7 +10,7 @@ import gorm.tools.metamap.services.MetaMapService
 import org.springframework.beans.factory.annotation.Autowired
 import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
-import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail
 import yakworks.rally.orgs.model.ContactPhone

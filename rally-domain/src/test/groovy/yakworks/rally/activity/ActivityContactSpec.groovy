@@ -11,7 +11,7 @@ import yakworks.rally.activity.repo.ActivityContactRepo
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
-import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.DataRepoTest
 
 class ActivityContactSpec extends Specification implements DataRepoTest, SecurityTest {

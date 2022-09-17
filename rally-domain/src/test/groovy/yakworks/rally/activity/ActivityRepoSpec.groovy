@@ -7,7 +7,7 @@ import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgType
-import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class ActivityRepoSpec extends Specification implements GormHibernateTest, SecurityTest {

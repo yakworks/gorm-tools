@@ -9,7 +9,7 @@ import org.hibernate.type.StandardBasicTypes
 import org.hibernate.type.Type
 import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.testing.gorm.DomainIntTest
+import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
 

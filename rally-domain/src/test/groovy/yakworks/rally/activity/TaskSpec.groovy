@@ -6,7 +6,7 @@ import yakworks.testing.gorm.unit.DataRepoTest
 import yakworks.testing.gorm.RepoTestData
 import yakworks.spring.AppResourceLoader
 import spock.lang.Specification
-import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink

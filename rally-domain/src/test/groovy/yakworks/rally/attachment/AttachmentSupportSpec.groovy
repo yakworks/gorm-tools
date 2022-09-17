@@ -13,7 +13,7 @@ import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.spring.AppResourceLoader
-import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class AttachmentSupportSpec extends Specification implements GormHibernateTest, SecurityTest {

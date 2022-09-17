@@ -6,7 +6,7 @@ import org.springframework.util.ReflectionUtils
 import spock.lang.Specification
 import yakworks.security.audit.StampedEntity
 import yakworks.security.gorm.model.AppUser
-import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 /**

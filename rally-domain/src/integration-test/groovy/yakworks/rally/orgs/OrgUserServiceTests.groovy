@@ -5,7 +5,7 @@ import gorm.tools.async.AsyncService
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import yakworks.testing.gorm.DomainIntTest
+import yakworks.testing.gorm.integration.DomainIntTest
 
 @Integration
 @Rollback

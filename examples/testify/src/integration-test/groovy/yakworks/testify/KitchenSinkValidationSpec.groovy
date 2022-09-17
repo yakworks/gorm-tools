@@ -1,11 +1,8 @@
 package yakworks.testify
 
-import yakworks.spring.AppCtx
+
 import gorm.tools.problem.ValidationProblem
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.ApplicationContext
-import org.springframework.web.context.WebApplicationContext
-import yakworks.testing.gorm.SecuritySpecHelper
+import yakworks.testing.gorm.integration.SecuritySpecHelper
 import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration

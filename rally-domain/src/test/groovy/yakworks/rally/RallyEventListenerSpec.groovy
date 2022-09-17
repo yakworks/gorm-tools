@@ -7,7 +7,7 @@ import yakworks.testing.gorm.TestDataJson
 import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.commons.map.Maps
-import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.rally.listeners.RallyEventListener
 
 class RallyEventListenerSpec extends Specification implements DataRepoTest, SecurityTest {

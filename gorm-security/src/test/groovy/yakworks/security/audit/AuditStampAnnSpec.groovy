@@ -3,7 +3,7 @@ package yakworks.security.audit
 import gorm.tools.utils.GormMetaUtils
 import spock.lang.Specification
 import yakworks.security.gorm.model.AppUser
-import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.DataRepoTest
 
 class AuditStampAnnSpec extends Specification implements DataRepoTest, SecurityTest {

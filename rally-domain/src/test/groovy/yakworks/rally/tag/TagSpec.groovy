@@ -2,7 +2,7 @@ package yakworks.rally.tag
 
 import spock.lang.Specification
 import yakworks.rally.tag.model.Tag
-import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.DataRepoTest
 
 class TagSpec extends Specification implements DataRepoTest, SecurityTest {

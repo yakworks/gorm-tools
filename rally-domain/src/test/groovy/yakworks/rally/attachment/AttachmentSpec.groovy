@@ -16,7 +16,7 @@ import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
 import yakworks.spring.AppResourceLoader
-import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class AttachmentSpec extends Specification implements GormHibernateTest, SecurityTest {

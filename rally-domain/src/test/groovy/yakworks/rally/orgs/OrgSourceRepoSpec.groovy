@@ -4,7 +4,7 @@ import spock.lang.Specification
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgType
-import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.DataRepoTest
 
 class OrgSourceRepoSpec extends Specification implements DataRepoTest, SecurityTest {

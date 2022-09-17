@@ -4,7 +4,7 @@ import org.springframework.validation.Errors
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import yakworks.testing.gorm.DomainIntTest
+import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.api.problem.data.DataProblemException
 import yakworks.rally.orgs.OrgDimensionService
 import yakworks.rally.orgs.model.Org

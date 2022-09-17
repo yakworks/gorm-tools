@@ -2,8 +2,7 @@ package yakworks.security.gorm
 
 import yakworks.security.gorm.model.AppUser
 import yakworks.api.problem.Problem
-import yakworks.security.gorm.PasswordValidator
-import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 

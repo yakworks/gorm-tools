@@ -4,7 +4,7 @@ import spock.lang.Specification
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
-import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.DataRepoTest
 
 class TagLinkSpec extends Specification implements DataRepoTest, SecurityTest {

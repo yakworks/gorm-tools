@@ -20,7 +20,7 @@ import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
 import yakworks.rally.testing.MockData
 import yakworks.spring.AppResourceLoader
-import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds

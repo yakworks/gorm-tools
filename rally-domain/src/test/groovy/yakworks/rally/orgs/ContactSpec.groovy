@@ -13,8 +13,7 @@ import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.rally.testing.MockData
 import yakworks.security.gorm.model.AppUser
 import yakworks.testing.gorm.RepoTestData
-import yakworks.testing.gorm.SecurityTest
-import yakworks.testing.gorm.TestDataJson
+import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.DataRepoTest
 
 class ContactSpec extends Specification implements DataRepoTest, SecurityTest {

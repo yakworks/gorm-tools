@@ -6,7 +6,7 @@ import grails.testing.mixin.integration.Integration
 import org.hibernate.criterion.Projections
 import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.testing.gorm.DomainIntTest
+import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 

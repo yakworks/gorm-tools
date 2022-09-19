@@ -8,11 +8,11 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import gorm.tools.jdbc.DbDialectService
 import org.grails.orm.hibernate.HibernateDatastore
 import org.springframework.context.MessageSource
 
 import gorm.tools.boot.GormToolsConfiguration
+import gorm.tools.jdbc.DbDialectService
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.validation.RepoValidatorRegistry
 import grails.core.ArtefactHandler

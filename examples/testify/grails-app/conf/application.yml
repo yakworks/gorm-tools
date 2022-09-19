@@ -40,4 +40,4 @@ gorm:
     async:
       poolSize: 2
     idGenerator:
-      startValue: 1000
+      startValue: 999

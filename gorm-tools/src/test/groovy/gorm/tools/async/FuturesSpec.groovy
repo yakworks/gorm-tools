@@ -7,12 +7,13 @@ package gorm.tools.async
 import java.util.concurrent.CompletableFuture
 import java.util.function.Supplier
 
-import yakworks.testing.gorm.GormToolsHibernateSpec
-import grails.testing.spring.AutowiredTest
+import org.springframework.beans.factory.annotation.Autowired
+import spock.lang.Specification
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class FuturesSpec extends GormToolsHibernateSpec implements AutowiredTest  {
+class FuturesSpec extends Specification implements GormHibernateTest{
 
-    AsyncService asyncService
+    @Autowired AsyncService asyncService
 
     void "synchronous future example"() {
         when:
@@ -20,7 +21,7 @@ class FuturesSpec extends GormToolsHibernateSpec implements AutowiredTest  {
 
         Supplier<String> supplierFunc = () -> { return 'foo' }
 
-        asyncService.supplyAsync(new AsyncConfig(enabled:false), supplierFunc).whenComplete{ String result, ex ->
+        asyncService.supplyAsync(new AsyncArgs(enabled:false), supplierFunc).whenComplete{ String result, ex ->
             assert result == 'foo'
             message = result
             println "whenComplete with $result"
@@ -37,7 +38,7 @@ class FuturesSpec extends GormToolsHibernateSpec implements AutowiredTest  {
 
         Supplier supplierFunc = () -> { throw new RuntimeException('some exception') }
 
-        asyncService.supplyAsync(new AsyncConfig(enabled:false), supplierFunc).whenComplete{ String result, ex ->
+        asyncService.supplyAsync(new AsyncArgs(enabled:false), supplierFunc).whenComplete{ String result, ex ->
             assert result == null
             assert ex.message == 'some exception'
             message = ex.message

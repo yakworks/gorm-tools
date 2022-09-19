@@ -5,21 +5,22 @@
 package gorm.tools.idgen
 
 import gorm.tools.async.ParallelStreamTools
-import yakworks.testing.gorm.support.MockJdbcIdGenerator
-import yakworks.testing.gorm.unit.DataRepoTest
-// import groovyx.gpars.GParsPool
+import gorm.tools.config.AsyncConfig
+import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Shared
 import spock.lang.Specification
 import testing.Cust
+import yakworks.testing.gorm.support.MockJdbcIdGenerator
 
-class PooledIdGeneratorSpec extends Specification implements DataRepoTest {
+// import groovyx.gpars.GParsPool
 
-    ParallelStreamTools parallelTools
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-    // @Shared
-    // MockJdbcIdGenerator jdbcIdGenerator
-    // @Shared
-    // PooledIdGenerator idGenerator
+class PooledIdGeneratorSpec extends Specification implements GormHibernateTest {
+    static List entityClasses = [Cust]
+
+    @Autowired ParallelStreamTools parallelTools
+    @Autowired AsyncConfig asyncConfig
 
     @Shared
     MockJdbcIdGenerator mockdbgen
@@ -27,29 +28,17 @@ class PooledIdGeneratorSpec extends Specification implements DataRepoTest {
     @Shared
     PooledIdGenerator batchgen
 
-    // List<Class> getDomainClasses() { [Org] }
-
     void setupSpec() {
-        mockDomains Cust
         mockdbgen = new MockJdbcIdGenerator()
         mockdbgen.table.put("table.id", 1)
         mockdbgen.table.put("table1.id", 99)
         batchgen = new PooledIdGenerator(mockdbgen)
-
         //
         // batchgen = idGenerator
         //mockdbgen.transactionManager = getTransactionManager()
         //batchgen.setBatchSize(5)
 
     }
-
-    // def setup() {
-    //     assert jdbcIdGenerator
-    //     jdbcIdGenerator.table.put("table.id", 1)
-    //     jdbcIdGenerator.table.put("table1.id", 99)
-    //     assert idGenerator
-    //     batchgen = idGenerator
-    // }
 
     void "test getNextId"() {
         setup:
@@ -86,7 +75,7 @@ class PooledIdGeneratorSpec extends Specification implements DataRepoTest {
         List ids = Collections.synchronizedList([])
 
         when:
-        parallelTools.asyncService.asyncEnabled = true
+        asyncConfig.enabled = true
         parallelTools.each(0..99) {
             ids.add(batchgen.getNextId("table2.id"))
         }

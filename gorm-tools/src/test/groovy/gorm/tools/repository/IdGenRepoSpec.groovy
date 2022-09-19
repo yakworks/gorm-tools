@@ -5,14 +5,15 @@
 package gorm.tools.repository
 
 import gorm.tools.repository.model.IdGeneratorRepo
-import yakworks.testing.gorm.GormToolsHibernateSpec
+import spock.lang.Specification
 import yakworks.testing.gorm.model.Thing
 import yakworks.testing.gorm.model.ThingRepo
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class IdGenRepoSpec extends GormToolsHibernateSpec {
+class IdGenRepoSpec extends Specification implements GormHibernateTest {
 
     //test the thing
-    List<Class> getDomainClasses() { [Thing] }
+    static List entityClasses = [Thing]
 
     def "assert proper repos are setup"() {
         expect:

@@ -1,30 +1,28 @@
 package yakworks.rally.activity
 
-import yakworks.testing.gorm.unit.DomainRepoTest
-import spock.lang.Ignore
+import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
-import yakworks.testing.gorm.SecurityTest
-import yakworks.rally.activity.model.*
+import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
+import yakworks.rally.orgs.model.OrgType
+import yakworks.testing.gorm.unit.SecurityTest
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class ActivityRepoSpec extends Specification implements DomainRepoTest<Activity>, SecurityTest {
+class ActivityRepoSpec extends Specification implements GormHibernateTest, SecurityTest {
 
-    def setupSpec() {
-        mockDomains(Org, OrgSource)
-    }
+    static entityClasses = [Activity, Org, OrgSource]
 
-    ActivityRepo activityRepo
+    @Autowired ActivityRepo activityRepo
 
-    @Ignore //FIXME String-based queries like [executeQuery] are currently not supported in this implementation of GORM. Use criteria instead.
-    void "test create activity lookup org by sourceId"() {
+    void "test create activity lookup org by num"() {
         when:
-        Org org = build(Org)
-        org.persist()
+        Org org = new Org(num: 'tsla', name: 'Tesla', type: OrgType.Customer).persist()
+        flush()
         Map params = [
             'name': "test",
-            'org': [sourceId: 'test']
+            'org': [num: 'tsla']
         ]
 
         activityRepo.create(params)

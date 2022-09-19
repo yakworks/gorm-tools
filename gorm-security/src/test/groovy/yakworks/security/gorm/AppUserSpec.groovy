@@ -1,28 +1,24 @@
 package yakworks.security.gorm
 
-import org.apache.commons.lang3.RandomStringUtils
-
 import gorm.tools.problem.ValidationProblem
+import gorm.tools.utils.GormMetaUtils
+import org.apache.commons.lang3.RandomStringUtils
+import spock.lang.Specification
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRoleUser
-import gorm.tools.utils.GormMetaUtils
-import yakworks.testing.gorm.SecurityTest
-import yakworks.testing.gorm.unit.DomainRepoTest
-import spock.lang.Specification
+import yakworks.testing.gorm.unit.SecurityTest
+import yakworks.testing.gorm.unit.DataRepoTest
 
-class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, SecurityTest {
-
-    void setupSpec() {
-        mockDomains AppUser, SecRole, SecRoleUser
-    }
+class AppUserSpec extends Specification implements DataRepoTest, SecurityTest {
+    static List entityClasses = [AppUser, SecRole, SecRoleUser]
 
     String genRandomEmail(){
         String ename = RandomStringUtils.randomAlphabetic(10)
         return "${ename}@baz.com"
     }
 
-    @Override
+    // @Override
     Map buildMap(Map args) {
         args.get('save', false)
         args.email = genRandomEmail()
@@ -30,32 +26,32 @@ class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, Secu
         args.username = "some_login_123"
         args
     }
-
-    @Override
-    AppUser createEntity(Map args){
-        //def entity = new AppUser()
-        args = buildMap(args)
-        args << [password:'secretStuff', repassword:'secretStuff']
-        def entity = AppUser.create(args)
-        //We have to add 'password' field manually, because it has the "bindable: false" constraint
-        entity.password = 'test_pass_123'
-        entity.persist(flush: true)
-
-        get(entity.id)
-    }
-
-    @Override
-    AppUser persistEntity(Map args){
-        args.get('save', false) //adds save:false if it doesn't exists
-        args['password'] = "test"
-        def entity = build(buildMap(args))
-        assert entity.persist(flush: true)
-        return get(entity.id)
-    }
+    //
+    // @Override
+    // AppUser createEntity(Map args){
+    //     //def entity = new AppUser()
+    //     args = buildMap(args)
+    //     args << [password:'secretStuff', repassword:'secretStuff']
+    //     def entity = AppUser.create(args)
+    //     //We have to add 'password' field manually, because it has the "bindable: false" constraint
+    //     entity.password = 'test_pass_123'
+    //     entity.persist(flush: true)
+    //
+    //     get(entity.id)
+    // }
+    //
+    // @Override
+    // AppUser persistEntity(Map args){
+    //     args.get('save', false) //adds save:false if it doesn't exists
+    //     args['password'] = "test"
+    //     def entity = build(buildMap(args))
+    //     assert entity.persist(flush: true)
+    //     return get(entity.id)
+    // }
 
     void "did it get the audit stamp fields"() {
         when:
-        def con = build()
+        def con = build(AppUser)
         con.validate()
 
         Map conProps = GormMetaUtils.findConstrainedProperties(AppUser)
@@ -82,7 +78,7 @@ class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, Secu
 
     void "simple persist"() {
         when:
-        def con = build()
+        def con = build(AppUser)
         con.persist(flush: true)
 
         then:
@@ -93,7 +89,7 @@ class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, Secu
 
     def "test update fail"() {
         when:
-        AppUser user = createEntity()
+        AppUser user = build(AppUser)
         Map params = [id: user.id, username: null]
         AppUser.update(params)
 

@@ -9,6 +9,7 @@ import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.event.EventListener
+import org.springframework.stereotype.Service
 
 import gorm.tools.repository.events.BeforePersistEvent
 import jakarta.annotation.Nullable
@@ -19,12 +20,13 @@ import yakworks.security.gorm.model.AppUser
 /**
  * temp in place to assign defualt orgId to user as Company default (2)
  */
+@Service
 @Slf4j
 @CompileStatic
 class RallyEventListener {
 
     @Autowired @Nullable
-    SecService<AppUser> secService
+    SecService secService
 
     /**
      * Assign user.org id to, logged in user's orgid if not null, or default orgid - 2
@@ -33,8 +35,8 @@ class RallyEventListener {
     void beforeUserPersist(BeforePersistEvent<AppUser> event) {
         AppUser user = event.entity
         if(user.orgId == null) {
-            if(secService.isLoggedIn() && secService.user?.orgId != null) {
-                user.orgId = secService.user.orgId
+            if(secService.isLoggedIn() && secService.getOrgId() != null) {
+                user.orgId = secService.getOrgId()
             } else {
                 user.orgId = Company.DEFAULT_COMPANY_ID
             }

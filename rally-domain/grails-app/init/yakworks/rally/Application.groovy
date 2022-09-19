@@ -10,7 +10,7 @@ import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
 import grails.plugins.metadata.PluginSource
 
-@ComponentScan(['gorm.tools.audit', 'yakworks.rally'])
+@ComponentScan(['yakworks.security', 'yakworks.rally'])
 @PluginSource
 class Application extends GrailsAutoConfiguration {
 

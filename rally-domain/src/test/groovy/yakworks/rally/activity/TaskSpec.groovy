@@ -1,11 +1,12 @@
 package yakworks.rally.activity
 
+import org.springframework.beans.factory.annotation.Autowired
 import yakworks.security.gorm.model.AppUser
 import yakworks.testing.gorm.unit.DataRepoTest
 import yakworks.testing.gorm.RepoTestData
 import yakworks.spring.AppResourceLoader
 import spock.lang.Specification
-import yakworks.testing.gorm.SecurityTest
+import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
@@ -21,23 +22,22 @@ import yakworks.rally.orgs.model.Org
 import yakworks.rally.testing.MockData
 
 class TaskSpec extends Specification implements DataRepoTest, SecurityTest { //implements SecuritySpecUnitTestHelper{
-    //Sanity checks and auto runs DomainRepoCrudSpec tests
+    static List<Class> entityClasses = [
+        AttachmentLink, ActivityLink, Activity, Task, TaskType, TaskStatus,
+        Org, AppUser, ActivityNote, Contact, ActivityContact
+    ]
 
-    void setupSpec(){
-        defineBeans{
-            appResourceLoader(AppResourceLoader)
-            attachmentSupport(AttachmentSupport)
-        }
-        mockDomains(AttachmentLink, ActivityLink, Activity, Task, TaskType, TaskStatus,
-            Org, AppUser, ActivityNote, Contact, ActivityContact)
-    }
+    @Autowired ActivityRepo activityRepo
+
+    Closure doWithGormBeans() { { ->
+        appResourceLoader(AppResourceLoader)
+        attachmentSupport(AttachmentSupport)
+    }}
 
     void setup(){
         TaskType todo = RepoTestData.build(TaskType, [id:1, name: "Todo"]) //.persist()
         TaskStatus open = RepoTestData.build(TaskStatus, [id:0, name: "Open"]) //.persist()
     }
-
-    ActivityRepo activityRepo
 
     Map getActTaskData(Long orgId){
         return [

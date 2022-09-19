@@ -6,21 +6,22 @@ package gorm.tools.async
 
 import java.util.concurrent.atomic.AtomicInteger
 
+import gorm.tools.config.AsyncConfig
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
-
-import yakworks.testing.gorm.GormToolsHibernateSpec
-import grails.testing.spring.AutowiredTest
+import spock.lang.Specification
 import testing.CustType
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class ParallelStreamsToolsSpec extends GormToolsHibernateSpec implements AutowiredTest {
+class ParallelStreamsToolsSpec extends Specification implements GormHibernateTest {
+    static List entityClasses = [CustType]
 
-    ParallelStreamTools parallelTools
-
-    List<Class> getDomainClasses() { [CustType] }
+    @Autowired ParallelTools parallelTools
+    @Autowired AsyncConfig asyncConfig
 
     void setup() {
         //parallelTools = ctx.getBean("parallelTools")
-        parallelTools.asyncService.asyncEnabled = true
+        asyncConfig.enabled = true
     }
 
     // void cleanup() {
@@ -89,7 +90,7 @@ class ParallelStreamsToolsSpec extends GormToolsHibernateSpec implements Autowir
 
         when:
         AtomicInteger count = new AtomicInteger(0)
-        def args = AsyncConfig.of(CustType.repo.datastore).sliceSize(10).enabled(false)
+        def args = AsyncArgs.of(CustType.repo.datastore).sliceSize(10).enabled(false)
 
         parallelTools.slicedEach(args, list) { Map record ->
             count.addAndGet(1)

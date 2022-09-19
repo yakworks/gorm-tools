@@ -4,8 +4,7 @@
 */
 package gorm.tools.metamap.services
 
-
-import yakworks.testing.gorm.GormToolsHibernateSpec
+import spock.lang.Specification
 import yakworks.meta.MetaMap
 import yakworks.meta.MetaMapList
 import yakworks.testing.gorm.model.Enummy
@@ -15,13 +14,14 @@ import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.model.TestEnum
 import yakworks.testing.gorm.model.TestEnumIdent
 import yakworks.testing.gorm.model.Thing
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class MetaMapServiceSpec extends GormToolsHibernateSpec {
+class MetaMapServiceSpec extends Specification implements GormHibernateTest  {
+    static List<Class> entityClasses =[KitchenSink, SinkItem, SinkExt, Thing, Enummy]
+
     MetaMapService metaMapService = new MetaMapService(
         metaEntityService: new MetaEntityService()
     )
-
-    List<Class> getDomainClasses() { [KitchenSink, SinkItem, SinkExt, Thing, Enummy] }
 
     // @Transactional
     void setupSpec() {
@@ -29,7 +29,7 @@ class MetaMapServiceSpec extends GormToolsHibernateSpec {
     }
 
     void cleanupSpec() {
-        KitchenSink.truncate()
+        KitchenSink.cleanup()
     }
 
     void "createEntityMap with includes"() {

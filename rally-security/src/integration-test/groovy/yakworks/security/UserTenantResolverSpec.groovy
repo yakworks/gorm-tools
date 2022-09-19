@@ -8,7 +8,7 @@ import org.grails.datastore.mapping.multitenancy.exceptions.TenantNotFoundExcept
 import org.springframework.security.core.context.SecurityContextHolder
 import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.testing.gorm.DomainIntTest
+import yakworks.testing.gorm.integration.DomainIntTest
 // import yakworks.security.tenant.UserTenantResolver
 
 @Ignore //WIP

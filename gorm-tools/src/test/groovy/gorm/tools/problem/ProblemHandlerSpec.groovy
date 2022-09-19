@@ -1,19 +1,18 @@
 package gorm.tools.problem
 
-
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSource
-
-import yakworks.testing.gorm.unit.GormAppUnitTest
 import spock.lang.Specification
 import yakworks.i18n.icu.DefaultICUMessageSource
+import yakworks.testing.gorm.unit.DataRepoTest
 
-class ProblemHandlerSpec extends Specification implements GormAppUnitTest {
+class ProblemHandlerSpec extends Specification implements DataRepoTest {
 
-    MessageSource messageSource
-    ProblemHandler problemHandler
+    // MessageSource messageSource
+    @Autowired ProblemHandler problemHandler
 
     void setupSpec() {
-        defineCommonBeans()
+        defineCommonGormBeans()
     }
 
     void "sanity check"(){

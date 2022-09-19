@@ -1,0 +1,5 @@
+foo:
+  message: from application-dev.yml in testify
+
+testify:
+  message: from application-dev.yml in testify

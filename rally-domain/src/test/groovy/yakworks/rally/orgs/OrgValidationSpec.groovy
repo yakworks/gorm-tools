@@ -1,7 +1,5 @@
 package yakworks.rally.orgs
 
-import yakworks.testing.gorm.SecurityTest
-import yakworks.testing.gorm.unit.DomainRepoTest
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
@@ -12,19 +10,12 @@ import yakworks.rally.orgs.model.OrgInfo
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
+import yakworks.testing.gorm.unit.SecurityTest
+import yakworks.testing.gorm.unit.DataRepoTest
 
-class OrgValidationSpec extends Specification implements DomainRepoTest<Org>, SecurityTest {
-    //Automatically runs the basic crud tests
-
-    def setupSpec(){
-        defineBeans{
-            orgDimensionService(OrgDimensionService)
-        }
-        mockDomains(
-            //events need these repos to be setup
-            OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo
-        )
-    }
+class OrgValidationSpec extends Specification implements DataRepoTest, SecurityTest {
+    static List entityClasses = [Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo]
+    static springBeans = [ orgDimensionService: OrgDimensionService ]
 
     void "sanity check validation"() {
         when:

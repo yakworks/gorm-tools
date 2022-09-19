@@ -4,31 +4,28 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
-import groovy.transform.CompileDynamic
-
-import yakworks.testing.gorm.unit.DataRepoTest
+import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport
-import yakworks.testing.gorm.SecurityTest
-import yakworks.spring.AppResourceLoader
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.spring.AppResourceLoader
+import yakworks.testing.gorm.unit.SecurityTest
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class AttachmentSupportSpec extends Specification implements DataRepoTest, SecurityTest {
+class AttachmentSupportSpec extends Specification implements GormHibernateTest, SecurityTest {
 
-    AttachmentSupport attachmentSupport
+    @Autowired AttachmentSupport attachmentSupport
 
-    @CompileDynamic
-    def setupSpec() {
-        defineBeans({
-            appResourceLoader(AppResourceLoader)
-            attachmentSupport(AttachmentSupport)
-        })
-        mockDomains(Attachment, AttachmentLink, Activity, ActivityNote, ActivityLink)
-    }
+    static List<Class> entityClasses = [Attachment, AttachmentLink, Activity, ActivityNote, ActivityLink]
+
+    Closure doWithGormBeans(){ { ->
+        appResourceLoader(AppResourceLoader)
+        attachmentSupport(AttachmentSupport)
+    }}
 
     def setup() {
         //make sure its clear

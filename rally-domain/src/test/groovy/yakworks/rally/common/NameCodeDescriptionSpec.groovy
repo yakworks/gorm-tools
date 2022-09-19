@@ -1,14 +1,15 @@
 package yakworks.rally.common
 
-import yakworks.testing.gorm.SecurityTest
-import yakworks.testing.gorm.unit.DomainRepoTest
 import spock.lang.Specification
 import yakworks.rally.tag.model.Tag
+import yakworks.testing.gorm.unit.SecurityTest
+import yakworks.testing.gorm.unit.DataRepoTest
 
 /**
  * uses Tag to test the trait
  */
-class NameCodeDescriptionSpec extends Specification  implements DomainRepoTest<Tag>, SecurityTest  {
+class NameCodeDescriptionSpec extends Specification  implements DataRepoTest, SecurityTest  {
+    static List entityClasses = [Tag]
 
     void "test populate name from code"() {
         when: 'no name, so take it from code'

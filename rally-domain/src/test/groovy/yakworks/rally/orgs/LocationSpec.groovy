@@ -1,36 +1,24 @@
 package yakworks.rally.orgs
 
-import yakworks.testing.gorm.SecurityTest
-import yakworks.testing.gorm.TestDataJson
-import yakworks.testing.gorm.unit.DomainRepoTest
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
+import yakworks.testing.gorm.unit.SecurityTest
+import yakworks.testing.gorm.TestDataJson
+import yakworks.testing.gorm.unit.DataRepoTest
 
-class LocationSpec extends Specification implements DomainRepoTest<Location>, SecurityTest {
+class LocationSpec extends Specification implements DataRepoTest, SecurityTest {
+    static List entityClasses = [Org, Contact, Location]
 
-    void setupSpec() {
-        mockDomains(Org, Contact)
-    }
-
-    @Override
     Map buildMap(Map args) {
         args.org = build(Org) //TODO figure out why this is not being saved in build-test-data
         TestDataJson.buildMap(args, entityClass)
     }
 
-    void "CRUD tests"() {
-        expect:
-        createEntity().id
-        persistEntity().id
-        updateEntity().version > 0
-        removeEntity()
-    }
-
     void "test addressHtml"() {
         setup:
-        Location location = build(city: 'Chicago', state: 'IL', country: 'US', save: false)
+        Location location = build(Location, city: 'Chicago', state: 'IL', country: 'US', save: false)
         location.street1 = street1
         location.street2 = street2
         location.zipCode = zipCode
@@ -47,7 +35,7 @@ class LocationSpec extends Specification implements DomainRepoTest<Location>, Se
 
     void "fail when no org"() {
         setup:
-        Location location = build(save: false)
+        Location location = build(Location, save: false)
         location.orgId = null
 
         when:

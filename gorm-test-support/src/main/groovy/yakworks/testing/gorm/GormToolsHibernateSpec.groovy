@@ -4,28 +4,30 @@
 */
 package yakworks.testing.gorm
 
-import groovy.transform.CompileDynamic
+
+import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.core.AbstractDatastore
 import org.grails.orm.hibernate.HibernateDatastore
 import org.grails.plugin.hibernate.support.HibernatePersistenceContextInterceptor
+import org.hibernate.Session
+import org.hibernate.SessionFactory
+import org.junit.BeforeClass
+import org.springframework.context.annotation.AnnotationConfigRegistry
+import org.springframework.core.env.PropertyResolver
+import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.TransactionStatus
+import org.springframework.transaction.interceptor.DefaultTransactionAttribute
 
-import gorm.tools.idgen.PooledIdGenerator
-import gorm.tools.repository.DefaultGormRepo
-import gorm.tools.repository.RepoLookup
-import gorm.tools.repository.RepoUtil
-import gorm.tools.repository.artefact.RepositoryArtefactHandler
-import gorm.tools.repository.model.UuidGormRepo
-import gorm.tools.validation.RepoValidatorRegistry
 import grails.buildtestdata.TestDataBuilder
-import grails.test.hibernate.HibernateSpec
+import grails.config.Config
 import grails.testing.spring.AutowiredTest
-import yakworks.grails.GrailsHolder
-import yakworks.i18n.icu.GrailsICUMessageSource
+import spock.lang.Shared
+import spock.lang.Specification
 import yakworks.spring.AppCtx
-import yakworks.testing.gorm.support.ExternalConfigLoader
-import yakworks.testing.gorm.support.GormToolsSpecHelper
-import yakworks.testing.gorm.support.MockJdbcIdGenerator
+import yakworks.testing.gorm.support.BaseRepoEntityUnitTest
+import yakworks.testing.grails.GrailsAppUnitTest
+import yakworks.testing.grails.TestConfiguration
 
 /**
  * Can be a drop in replacement for the HibernateSpec. Makes sure repositories are setup for the domains
@@ -34,70 +36,130 @@ import yakworks.testing.gorm.support.MockJdbcIdGenerator
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.1
+ * @deprecated use GormHibernateTest instead
  */
-@CompileDynamic
-abstract class GormToolsHibernateSpec extends HibernateSpec implements AutowiredTest, TestDataBuilder, GormToolsSpecHelper {
+@Deprecated
+@SuppressWarnings(['Indentation'])
+@CompileStatic
+abstract class GormToolsHibernateSpec extends Specification implements AutowiredTest, GrailsAppUnitTest, BaseRepoEntityUnitTest, TestDataBuilder {
+    //trait order above is important, GormToolsSpecHelper should come last as it overrides methods in GrailsAppUnitTest
 
-    //@OnceBefore
-    void setupSpec() {
-        RepoLookup.USE_CACHE = false
-        //for some reason holder get scrambled so make sure it has the grailsApplication from this test
-        GrailsHolder.setGrailsApplication(getGrailsApplication())
-        AppCtx.setApplicationContext(getApplicationContext())
+    private HibernateDatastore hibernateDatastore
+    @Shared PlatformTransactionManager transactionManager
+    /** The transaction status, setup before each test */
+    TransactionStatus transactionStatus
 
+    /**
+     * Override this in test to tell what domainclasses is should mock up. Its not abstract to force it since the option exists to package scan
+     */
+    // List<Class> getDomainClasses() { [] }
+
+    @BeforeClass
+    void setupHibernate() {
+        //setup the ConfigurationProperties beans
+        def cfgRegistry = (AnnotationConfigRegistry)ctx
+        cfgRegistry.register(TestConfiguration)
+
+        //Sets up the HibernateDatastore, reads the getDomainClasses and sets up whats returned there.
+        initDatastore()
+        //register some of the HibernateDatastore props as beans in the ctx.
+        registerHibernateBeans()
+
+        //read what was setup as persistentEntities in datastore , see initDatastore for how it reads from getDomainClasses
+        List domClasses = datastore.mappingContext.persistentEntities*.javaClass
+        defineRepoBeans(domClasses as Class<?>[])
+    }
+
+    /**
+     * DataTestSetupSpecInterceptor calls this and we dont want it on this one, so make sure it returns nothing
+     */
+    @Override
+    Class<?>[] getDomainClassesToMock() {
+        return [] as Class<?>[]
+    }
+
+    // @Override
+    // @CompileDynamic
+    // Closure hibernateBeans(){ { ->
+    //     persistenceInterceptor(HibernatePersistenceContextInterceptor){
+    //         hibernateDatastore = (HibernateDatastore)hibernateDatastore
+    //     }
+    // }}
+
+    /**
+     * Sets up the HibernateDatastore, reads the getDomainClasses and sets up whats returned there.
+     */
+    void initDatastore(){
+        List persistentClasses = findEntityClasses()
+
+        if (persistentClasses) {
+            hibernateDatastore = new HibernateDatastore((PropertyResolver) config, persistentClasses as Class[])
+        } else {
+            String packageName = getPackageToScan(config)
+            Package packageToScan = Package.getPackage(packageName) ?: getClass().getPackage()
+            hibernateDatastore = new HibernateDatastore((PropertyResolver) config, packageToScan)
+        }
+        transactionManager = hibernateDatastore.getTransactionManager()
+    }
+
+    void registerHibernateBeans(){
         if (!ctx.containsBean("dataSource"))
             ctx.beanFactory.registerSingleton("dataSource", hibernateDatastore.getDataSource())
         if (!ctx.containsBean("grailsDomainClassMappingContext"))
             ctx.beanFactory.registerSingleton("grailsDomainClassMappingContext", hibernateDatastore.getMappingContext())
         if (!ctx.containsBean("persistenceInterceptor")){
             def pci = new HibernatePersistenceContextInterceptor()
-            pci.hibernateDatastore = (HibernateDatastore)hibernateDatastore
+            pci.hibernateDatastore = hibernateDatastore
+            pci.sessionFactory = hibernateDatastore.sessionFactory
             ctx.beanFactory.registerSingleton("persistenceInterceptor", pci)
         }
-
-        // defineBeans(new GormToolsBeanConfig(ctx).getBeanDefinitions())
-
-        //finds and register repositories for all the persistentEntities that got setup
-        Closure beanClos = {
-            persistenceInterceptor(HibernatePersistenceContextInterceptor){
-                hibernateDatastore = (HibernateDatastore)hibernateDatastore
-            }
-            jdbcIdGenerator(MockJdbcIdGenerator)
-            idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"))
-            messageSource(GrailsICUMessageSource)
-            externalConfigLoader(ExternalConfigLoader)
-
-            for(Class domainClass in datastore.mappingContext.persistentEntities*.javaClass){
-                Class repoClass = findRepoClass(domainClass)
-                grailsApplication.addArtefact(RepositoryArtefactHandler.TYPE, repoClass)
-                String repoName = RepoUtil.getRepoBeanName(domainClass)
-                if (repoClass == DefaultGormRepo || repoClass == UuidGormRepo) {
-                    "$repoName"(repoClass, domainClass)
-                } else {
-                    "$repoName"(repoClass)
-                }
-            }
-        }
-
-        def beanClosures = [commonBeans(), beanClos]
-        def doWithDomainsClosure = doWithDomains()
-        if(doWithDomainsClosure) beanClosures.add(doWithDomainsClosure)
-
-        //put here so we can use trait to setup security when needed
-        def doWithSecurityClosure = doWithSecurity()
-        if(doWithSecurityClosure) beanClosures.add(doWithSecurityClosure)
-
-        defineBeansMany(beanClosures)
-        // rescan needed after the beans are added
-        ctx.getBean('repoEventPublisher').scanAndCacheEventsMethods()
-        // doWithSpringAfter()
-        RepoValidatorRegistry.init(hibernateDatastore, ctx.getBean('messageSource'))
-        //put here so we can use trait to setup security when needed
-        doAfterDomains()
     }
 
     void cleanupSpec() {
         AppCtx.setApplicationContext(null)
+    }
+
+    void setup() {
+        transactionStatus = transactionManager.getTransaction(new DefaultTransactionAttribute())
+    }
+
+    void cleanup() {
+        if (isRollback()) {
+            transactionManager.rollback(transactionStatus)
+        } else {
+            transactionManager.commit(transactionStatus)
+        }
+    }
+
+    /**
+     * @return the current session factory
+     */
+    SessionFactory getSessionFactory() {
+        hibernateDatastore.getSessionFactory()
+    }
+
+    /**
+     * @return the current Hibernate session
+     */
+    Session getHibernateSession() {
+        getSessionFactory().getCurrentSession()
+    }
+
+    /**
+     * Whether to rollback on each test (defaults to true)
+     */
+    boolean isRollback() {
+        return true
+    }
+
+    /**
+     * Obtains the default package to scan
+     *
+     * @param config The configuration
+     * @return The package to scan
+     */
+    String getPackageToScan(Config config) {
+        config.getProperty('grails.codegen.defaultPackage', getClass().package.name)
     }
 
     /** consistency with other areas of grails and other unit tests */

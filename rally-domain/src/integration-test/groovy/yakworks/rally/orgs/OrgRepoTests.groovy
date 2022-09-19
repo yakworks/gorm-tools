@@ -13,7 +13,7 @@ import yakworks.testing.gorm.TestDataJson
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import yakworks.testing.gorm.DomainIntTest
+import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.api.problem.data.DataProblemException
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.rally.orgs.model.Contact

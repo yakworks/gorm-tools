@@ -5,7 +5,7 @@ import grails.testing.mixin.integration.Integration
 import org.apache.commons.io.IOUtils
 import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.testing.gorm.DomainIntTest
+import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote

@@ -1,11 +1,11 @@
 package yakworks.rally.orgs
 
-import gorm.tools.async.AsyncConfig
+import gorm.tools.async.AsyncArgs
 import gorm.tools.async.AsyncService
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import yakworks.testing.gorm.DomainIntTest
+import yakworks.testing.gorm.integration.DomainIntTest
 
 @Integration
 @Rollback
@@ -22,7 +22,7 @@ class OrgUserServiceTests extends Specification implements DomainIntTest {
     def "user in thread"() {
         when:
         def syncOrg = false
-        def completableFuture = asyncService.runAsync(AsyncConfig.withSession()) {
+        def completableFuture = asyncService.runAsync(AsyncArgs.withSession()) {
             syncOrg = userOrgService.userOrg
         }
         completableFuture.join() //wait

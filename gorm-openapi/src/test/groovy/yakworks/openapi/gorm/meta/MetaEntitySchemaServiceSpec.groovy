@@ -4,7 +4,6 @@
 */
 package yakworks.openapi.gorm.meta
 
-
 import yakworks.testing.gorm.unit.DataRepoTest
 import io.swagger.v3.oas.models.media.DateTimeSchema
 import io.swagger.v3.oas.models.media.IntegerSchema
@@ -21,14 +20,10 @@ import yakworks.rally.orgs.model.OrgFlex
  * sanity check test for service, which is just a wrapper so cacheable works
  */
 class MetaEntitySchemaServiceSpec extends Specification implements DataRepoTest {
+    static entityClasses = [Org, OrgFlex, Location]
 
     @Shared
     def metaEntitySchemaService = new MetaEntitySchemaService()
-
-    void setupSpec() {
-        //mockDomain Person
-        mockDomains Org, OrgFlex, Location
-    }
 
     void "test buildIncludesMap simple"(){
         when:

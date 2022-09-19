@@ -28,18 +28,18 @@ class ParallelStreamTools implements ParallelTools {
     void init() {
         ClassLoaderThreadFactory factory = new ClassLoaderThreadFactory()
         // if (poolSize == 0) poolSize = 4 //  Math.min(32767, Runtime.getRuntime().availableProcessors()),
-        forkJoinPool = new ForkJoinPool(asyncService.poolSize, factory, null, false)
+        forkJoinPool = new ForkJoinPool(getAsyncConfig().poolSize, factory, null, false)
     }
 
     @Override
-    public <T> Collection<T> each(AsyncConfig args, Collection<T> collection, Closure closure){
-        boolean parEnabled = args.enabled != null ? args.enabled : asyncService.getAsyncEnabled()
+    public <T> Collection<T> each(AsyncArgs args, Collection<T> collection, Closure closure){
+        boolean parEnabled = args.enabled != null ? args.enabled : asyncConfig.enabled
         // println("ParallelStreamTools each asyncEnabled $parEnabled")
 
         Consumer<T> wrappedConsumer = asyncService.wrapConsumer(args, closure as Consumer<T>)
 
         if (parEnabled) {
-            int psize = args.poolSize ?: asyncService.getPoolSize()
+            int psize = args.poolSize ?: asyncConfig.poolSize
             forkJoinPool.submit {
                 collection.parallelStream().forEach(wrappedConsumer)
             }.join() //join makes it wait

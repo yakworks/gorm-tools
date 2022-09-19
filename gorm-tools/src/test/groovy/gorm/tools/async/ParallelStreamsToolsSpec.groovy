@@ -6,7 +6,7 @@ package gorm.tools.async
 
 import java.util.concurrent.atomic.AtomicInteger
 
-import gorm.tools.config.AsyncSettings
+import gorm.tools.config.AsyncConfig
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import spock.lang.Specification
@@ -17,10 +17,11 @@ class ParallelStreamsToolsSpec extends Specification implements GormHibernateTes
     static List entityClasses = [CustType]
 
     @Autowired ParallelTools parallelTools
+    @Autowired AsyncConfig asyncConfig
 
     void setup() {
         //parallelTools = ctx.getBean("parallelTools")
-        parallelTools.asyncService.asyncEnabled = true
+        asyncConfig.enabled = true
     }
 
     // void cleanup() {
@@ -89,7 +90,7 @@ class ParallelStreamsToolsSpec extends Specification implements GormHibernateTes
 
         when:
         AtomicInteger count = new AtomicInteger(0)
-        def args = AsyncConfig.of(CustType.repo.datastore).sliceSize(10).enabled(false)
+        def args = AsyncArgs.of(CustType.repo.datastore).sliceSize(10).enabled(false)
 
         parallelTools.slicedEach(args, list) { Map record ->
             count.addAndGet(1)

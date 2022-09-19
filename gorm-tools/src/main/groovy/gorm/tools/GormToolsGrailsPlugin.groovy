@@ -20,6 +20,7 @@ import grails.plugins.Plugin
 /**
  * @author Joshua Burnett (@basejump)
  */
+@SuppressWarnings(['Indentation'])
 @CompileStatic
 @Slf4j
 class GormToolsGrailsPlugin extends Plugin {

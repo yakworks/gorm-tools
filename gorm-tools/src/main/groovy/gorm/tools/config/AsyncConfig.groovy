@@ -18,22 +18,20 @@ import yakworks.spring.SpringEnvironment
 @ConfigurationProperties(prefix="gorm.tools.async")
 // @ConfigurationPropertiesScan
 @CompileStatic
-class AsyncSettings implements SpringEnvironment{
+class AsyncConfig implements SpringEnvironment{
 
     /**
      * The default slice or chunk size for collating. for example if this is 100 and you pass list of of 100
      * then it will slice it or collate it into a list with 10 of lists with 100 items each.
      * should default to the hibernate.jdbc.batch_size in the implementation. Usually best to set this around 100
      */
-    int sliceSize //= 100
+    int sliceSize = 100
 
     /** The list size to send to the collate that slices.*/
-    boolean asyncEnabled //= true
+    boolean enabled = true
 
     /** the pool size, defaults to 4 right now, parralel gets it own their own */
-    int poolSize //= 4
-
-    String foo
+    int poolSize = 4
 
     /** setup defaults for poolSize and batchSize if config isn't present. batchSize set to 100 if not config found*/
     @PostConstruct

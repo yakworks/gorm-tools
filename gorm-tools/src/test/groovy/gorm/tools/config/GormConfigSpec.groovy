@@ -10,13 +10,20 @@ import yakworks.testing.grails.GrailsAppUnitTest
  */
 class GormConfigSpec extends Specification implements GrailsAppUnitTest {
 
-    @Autowired AsyncSettings asyncConfig
+    @Autowired AsyncConfig asyncConfig
     @Autowired GormConfig gormConfig
+    @Autowired IdGeneratorConfig idGeneratorConfig
 
     def "sanity Check"() {
         expect:
         asyncConfig.poolSize == 2
+        asyncConfig.sliceSize == 50
+        gormConfig.async.poolSize == 2
+        gormConfig.async.sliceSize == 50
+
         gormConfig.hello == "world"
+
+        idGeneratorConfig.startValue == 1
         gormConfig.idGenerator.startValue == 1
     }
 

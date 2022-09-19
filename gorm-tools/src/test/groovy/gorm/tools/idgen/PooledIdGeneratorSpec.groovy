@@ -5,6 +5,7 @@
 package gorm.tools.idgen
 
 import gorm.tools.async.ParallelStreamTools
+import gorm.tools.config.AsyncConfig
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Shared
 import spock.lang.Specification
@@ -19,6 +20,7 @@ class PooledIdGeneratorSpec extends Specification implements GormHibernateTest {
     static List entityClasses = [Cust]
 
     @Autowired ParallelStreamTools parallelTools
+    @Autowired AsyncConfig asyncConfig
 
     @Shared
     MockJdbcIdGenerator mockdbgen
@@ -73,7 +75,7 @@ class PooledIdGeneratorSpec extends Specification implements GormHibernateTest {
         List ids = Collections.synchronizedList([])
 
         when:
-        parallelTools.asyncService.asyncEnabled = true
+        asyncConfig.enabled = true
         parallelTools.each(0..99) {
             ids.add(batchgen.getNextId("table2.id"))
         }

@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.support.TransactionSynchronizationManager
 
+import gorm.tools.config.AsyncConfig
 import yakworks.commons.lang.Validate
 
 /**
@@ -31,6 +32,9 @@ trait ParallelTools {
     final static Logger LOG = LoggerFactory.getLogger(ParallelTools)
 
     @Autowired
+    AsyncConfig asyncConfig
+
+    @Autowired
     AsyncService asyncService
 
     /**
@@ -44,11 +48,11 @@ trait ParallelTools {
      * @param asyncArgs the collection to iterate process
      * @param closure the closure to call for each item in collection, get the entry from the collection passed to it like norma groovy each
      */
-    abstract <T> Collection<T> each(AsyncConfig asyncArgs, Collection<T> collection, Closure closure)
+    abstract <T> Collection<T> each(AsyncArgs asyncArgs, Collection<T> collection, Closure closure)
 
 
     public <T> Collection<T> each(Collection<T> collection, Closure closure){
-        each(new AsyncConfig(), collection, closure)
+        each(new AsyncArgs(), collection, closure)
     }
 
     /**
@@ -59,9 +63,9 @@ trait ParallelTools {
      * @param data the items list to slice into chunks
      * @param sliceClosure the closure to call for each collated slice of data. will get passed the List for processing
      */
-    public <T> Collection<T> eachSlice(AsyncConfig asyncArgs, Collection<T> data,
+    public <T> Collection<T> eachSlice(AsyncArgs asyncArgs, Collection<T> data,
                                        @ClosureParams(SecondParam) Closure sliceClosure) {
-        Integer sliceSize = asyncArgs.sliceSize ?: getAsyncService().getSliceSize()
+        Integer sliceSize = asyncArgs.sliceSize ?: asyncConfig.sliceSize
 
         def slicedList = slice(data, sliceSize)
 
@@ -72,7 +76,7 @@ trait ParallelTools {
 
     public <T> Collection<T> eachSlice(Collection<T> data,
                                        @ClosureParams(SecondParam) Closure sliceClosure){
-        eachSlice(new AsyncConfig(), data,  sliceClosure)
+        eachSlice(new AsyncArgs(), data,  sliceClosure)
     }
 
     /**
@@ -86,7 +90,7 @@ trait ParallelTools {
      * @param list the list to process that will get sliced into batches via collate
      * @param itemClosure the closure to pass to eachParallel that gets passed each entry in the collection
      */
-    public <T> Collection<T> slicedEach(AsyncConfig asyncArgs, Collection<T> collection,
+    public <T> Collection<T> slicedEach(AsyncArgs asyncArgs, Collection<T> collection,
                                         @ClosureParams(SecondParam.FirstGenericType) Closure itemClosure) {
 
         getAsyncService().verifyDatastore(asyncArgs)
@@ -104,7 +108,7 @@ trait ParallelTools {
      * @return the (list of lists) containing the chunked list of items
      */
     public <T> List<List<T>> slice(Collection<T> items, Integer sliceSize = null) {
-        items.collate(sliceSize ?: getAsyncService().getSliceSize())
+        items.collate(sliceSize ?: asyncConfig.sliceSize)
     }
 
     /**
@@ -127,7 +131,7 @@ trait ParallelTools {
      * sliceClosure that uses default datastore from trxService
      */
     Closure sliceClosure(Closure itemClosure) {
-        Datastore dstore = asyncService.trxService.targetDatastore
+        Datastore dstore = getAsyncService().trxService.targetDatastore
         sliceClosure(dstore, itemClosure)
     }
 }

@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
-import gorm.tools.async.AsyncConfig
+import gorm.tools.async.AsyncArgs
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
 import gorm.tools.job.SyncJobArgs
@@ -92,7 +92,7 @@ trait BulkableRepo<D> {
      * @return Job id
      */
     Long bulk(Supplier supplierFunc, SyncJobContext jobContext ) {
-        def asyncArgs = new AsyncConfig(enabled: jobContext.args.promiseEnabled, session: true)
+        def asyncArgs = new AsyncArgs(enabled: jobContext.args.promiseEnabled, session: true)
         // This is the promise call. Will return immediately is syncJobArgs.promiseEnabled=true
         asyncService
             .supplyAsync(asyncArgs, supplierFunc)
@@ -110,7 +110,7 @@ trait BulkableRepo<D> {
     void doBulkParallel(List<Map> dataList, SyncJobContext jobContext){
         List<Collection<Map>> sliceErrors = Collections.synchronizedList([] as List<Collection<Map>> )
 
-        AsyncConfig pconfig = AsyncConfig.of(getDatastore())
+        AsyncArgs pconfig = AsyncArgs.of(getDatastore())
         pconfig.enabled = jobContext.args.asyncEnabled //same as above, ability to override through params
         // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
         parallelTools.eachSlice(pconfig, dataList) { dataSlice ->
@@ -132,7 +132,7 @@ trait BulkableRepo<D> {
         // if it has slice errors then try again but
         // this time run each item in the slice in its own transaction
         if(sliceErrors.size()) {
-            AsyncConfig asynArgsNoTrx = AsyncConfig.of(getDatastore())
+            AsyncArgs asynArgsNoTrx = AsyncArgs.of(getDatastore())
             asynArgsNoTrx.enabled = jobContext.args.asyncEnabled
             parallelTools.each(asynArgsNoTrx, sliceErrors) { dataSlice ->
                 try {

@@ -1,5 +1,7 @@
 spring.config.import: classpath:./gorm/tools/datasource-test.yml
 
+hibernate.jdbc.batch_size: 50
+
 logging:
   level:
     root: DEBUG

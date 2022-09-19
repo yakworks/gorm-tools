@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import gorm.tools.async.AsyncConfig
+import gorm.tools.async.AsyncArgs
 import gorm.tools.databinding.EntityMapBinder
 import gpbench.model.basic.CityBasic
 
@@ -27,7 +27,7 @@ class GparsBaseLineUpdateBenchmark<T> extends BaseUpdateBenchmark<T>{
         def sliceClosure = parallelTools.sliceClosure { Long id ->
             updateRow(id, citiesUpdated[at.incrementAndGet()])
         }
-        parallelTools.each(AsyncConfig.transactional(), cities, sliceClosure)
+        parallelTools.each(AsyncArgs.transactional(), cities, sliceClosure)
     }
 
 

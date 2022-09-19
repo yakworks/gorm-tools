@@ -70,6 +70,13 @@ trait SecService<D extends UserTrait> {
     }
 
     /**
+     * Gets the currently logged in user id
+     */
+    Long getOrgId(){
+        getUser().orgId
+    }
+
+    /**
      * gets the user id from username, hard wired to AppUser.getByUsername.
      * Used when User is something like OauthUser
      */

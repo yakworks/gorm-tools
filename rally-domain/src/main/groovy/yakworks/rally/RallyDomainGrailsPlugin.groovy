@@ -4,28 +4,26 @@
 */
 package yakworks.rally
 
-import grails.plugin.springsecurity.SpringSecurityUtils
-import yakworks.rally.listeners.RallyEventListener
-import yakworks.rally.orgs.UserOrgService
+import grails.plugins.Plugin
 
 @SuppressWarnings('Indentation')
-class RallyDomainGrailsPlugin extends grails.plugins.Plugin {
+class RallyDomainGrailsPlugin extends Plugin {
 
     def loadAfter = ['gorm-security']
 
     Closure doWithSpring() { {->
         //FIXME not sure this is needed, hack to get rest app working but not sure why its not picked up
         // as its already defined in gorm-security
-        def securityConf = SpringSecurityUtils.securityConfig
-        if (securityConf.active) {
-            userOrgService(UserOrgService)
-        }
+        // def securityConf = SpringSecurityUtils.securityConfig
+        // if (securityConf.active) {
+        //     userOrgService(UserOrgService)
+        // }
 
         //temp in place to assign defualt orgId to user as Company default (2)
-        rallyEventListener(RallyEventListener) { bean ->
-            bean.lazyInit = true
-            bean.autowire = true
-        }
+        // rallyEventListener(RallyEventListener) { bean ->
+        //     bean.lazyInit = true
+        //     bean.autowire = true
+        // }
 
         // orgCopier(OrgCopier, lazy())
         // orgDimensionService(OrgDimensionService, lazy())

@@ -1,8 +1,7 @@
 package yakworks.rally
 
-import java.time.LocalDate
 
-import gorm.tools.testing.integration.DataIntegrationTest
+import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil

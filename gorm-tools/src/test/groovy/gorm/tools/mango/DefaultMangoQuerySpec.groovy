@@ -4,18 +4,18 @@
 */
 package gorm.tools.mango
 
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
-import grails.testing.spring.AutowiredTest
+import org.springframework.beans.factory.annotation.Autowired
+import spock.lang.Specification
 import testing.Address
 import testing.AddyNested
 import testing.Cust
 import testing.TestSeedData
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class DefaultMangoQuerySpec extends GormToolsHibernateSpec implements AutowiredTest {
+class DefaultMangoQuerySpec extends Specification implements GormHibernateTest {
+    static List entityClasses = [Cust, Address, AddyNested]
 
-    DefaultMangoQuery mangoQuery
-
-    List<Class> getDomainClasses() { [Cust, Address, AddyNested] }
+    @Autowired DefaultMangoQuery mangoQuery
 
     void setupSpec() {
         Cust.withTransaction {

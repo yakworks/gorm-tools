@@ -15,10 +15,10 @@ import org.springframework.security.core.userdetails.UserDetailsChecker
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 
-import gorm.tools.security.domain.AppUser
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.rest.oauth.OauthUser
 import grails.plugin.springsecurity.rest.oauth.OauthUserDetailsService
+import yakworks.security.gorm.model.AppUser
 
 /**
  * Replace the DefaultOauthUserDetailsService

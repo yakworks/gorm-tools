@@ -6,7 +6,7 @@ repositories {
 }
 
 //shared resources to pick up the Gorm defaults from application.groovy, as well as simple logback
-sourceSets.test.resources.srcDirs += [project(':gorm-test-support').sourceSets.main.resources]
+// sourceSets.test.resources.srcDirs += [project(':gorm-test-support').sourceSets.main.resources]
 
 dependencies {
 
@@ -47,10 +47,6 @@ dependencies {
 
   implementation "org.grails:grails-web-boot"
   implementation "org.grails:grails-plugin-services"
-
-  testRuntimeOnly "com.h2database:h2:$vH2"
-  testRuntimeOnly "javax.xml.bind:jaxb-api:2.3.1"
-  testRuntimeOnly "com.zaxxer:HikariCP:$vHikari"
 
 }
 

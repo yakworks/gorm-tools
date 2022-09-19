@@ -2,7 +2,7 @@ package yakworks.rest
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import yakworks.gorm.testing.http.RestIntTest
+import yakworks.testing.rest.RestIntTest
 import yakworks.rally.api.ApiResultsTestController
 
 @Rollback

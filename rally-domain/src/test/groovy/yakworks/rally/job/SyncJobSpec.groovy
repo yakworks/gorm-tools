@@ -5,23 +5,19 @@
 package yakworks.rally.job
 
 import gorm.tools.model.SourceType
-import gorm.tools.testing.unit.DataRepoTest
+import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.json.groovy.JsonEngine
-import yakworks.gorm.testing.SecurityTest
+import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 
 class SyncJobSpec extends Specification implements DataRepoTest, SecurityTest {
-
-    Closure doWithDomains() { { ->
-        attachmentSupport(AttachmentSupport)
-        syncJobService(DefaultSyncJobService)
-    }}
-
-    void setupSpec() {
-        mockDomains(SyncJob, Attachment)
-    }
+    static entityClasses = [SyncJob, Attachment]
+    static springBeans = [
+        attachmentSupport:AttachmentSupport,
+        syncJobService:DefaultSyncJobService
+    ]
 
     SyncJob createJob(){
         return new SyncJob([sourceType: SourceType.ERP, sourceId: 'ar/org']).persist(flush:true)

@@ -1,8 +1,9 @@
 package yakworks.rally.orgs
 
-import gorm.tools.testing.RepoTestData
-import yakworks.gorm.testing.SecurityTest
-import gorm.tools.testing.unit.DataRepoTest
+import org.springframework.beans.factory.annotation.Autowired
+import yakworks.testing.gorm.RepoTestData
+import yakworks.testing.gorm.unit.SecurityTest
+import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.rally.activity.ActivityCopier
 import yakworks.rally.activity.model.Activity
@@ -24,23 +25,17 @@ import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgTypeSetup
 
 class OrgCopierSpec extends Specification implements DataRepoTest, SecurityTest {
+    static List entityClasses = [
+        Org, Contact, OrgFlex, OrgMember, OrgCalc, OrgSource, OrgTag, OrgInfo, OrgTypeSetup, Location, ContactPhone,
+        ContactEmail, ContactSource, ContactFlex, Activity, ActivityLink, AttachmentLink]
 
-    OrgCopier orgCopier
+    @Autowired OrgCopier orgCopier
 
-    def setupSpec(){
-        defineBeans {
-            orgDimensionService(OrgDimensionService)
-        }
-        mockDomains(
-            Org, Contact, OrgFlex, OrgMember, OrgCalc, OrgSource, OrgTag,
-            OrgInfo, OrgTypeSetup, Location, ContactPhone,
-            ContactEmail, ContactSource, ContactFlex, Activity, ActivityLink, AttachmentLink
-        )
-        defineBeans {
-            orgCopier(OrgCopier)
-            activityCopier(ActivityCopier)
-        }
-    }
+    Closure doWithGormBeans(){ { ->
+        orgDimensionService(OrgDimensionService)
+        orgCopier(OrgCopier)
+        activityCopier(ActivityCopier)
+    }}
 
     def "test copy"() {
         setup:

@@ -1,6 +1,15 @@
+spring:
+  profiles:
+    group:
+      development: dev
+      production: prod
+  config:
+    import: classpath:./datasource.yml, classpath:./testify-defaults.yml
+
 ---
+
 grails:
-  profile: rest-api
+  profile: foo
   codegen:
     defaultPackage: restify
   config:
@@ -13,11 +22,6 @@ info:
     grailsVersion: '@info.app.grailsVersion@'
 
 spring:
-#  profiles:
-#    active: dev
-#  config:
-#    additional-location:
-
   main:
     banner-mode: "off"
     lazy-initialization: true
@@ -32,14 +36,14 @@ endpoints:
     enabled: true
 
 foo:
-  message: from local
+  message: from default application.yml
 
 ---
 
 #foo:
 #  message: from base
 
-pprop: got ${foo.message}
+pprop: foo.message in main is ${foo.message}
 
 grails:
   mime:
@@ -78,30 +82,6 @@ grails:
 
 ---
 
-spring.config.import: classpath:./datasource.yml
-#hibernate:
-#  format_sql: false
-#  schema_management_tool: 'gorm.tools.hibernate.schema.CustomSchemaManagementTool'
-#  naming_strategy: 'org.hibernate.cfg.DefaultNamingStrategy'
-#  dialect: 'gorm.tools.hibernate.ExtendedH2Dialect'
-#  show_sql: false
-#  cache:
-#    use_second_level_cache: false
-#  jdbc:
-#    time_zone: 'UTC'
-#
-#dataSource:
-#  pooled: true
-#  jmxExport: true
-#  driverClassName: org.h2.Driver
-#  username: sa
-#  password:
-#  type: com.zaxxer.hikari.HikariDataSource
-#  dbCreate: create-drop
-#  url: jdbc:h2:mem:devDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
-
----
-
 grails:
  plugin:
    springsecurity:
@@ -119,3 +99,8 @@ app:
     rootLocation: "${gradle.rootProjectDir}/examples/resources"
     tempDir: "./build/rootLocation/tempDir"
     attachments.location: 'attachments'
+
+---
+#spring.config.activate.on-profile: dev
+#spring.config.import: classpath:testify-dev.yml
+

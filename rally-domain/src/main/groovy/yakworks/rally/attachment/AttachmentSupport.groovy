@@ -20,8 +20,8 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 
 import yakworks.commons.io.PathTools
-import yakworks.grails.resource.AppResourceLoader
 import yakworks.rally.attachment.model.Attachment
+import yakworks.spring.AppResourceLoader
 
 /**
  * Support for working with Attachment files, much of it calls out to AppResourceLoader and converts to nio2 Path objects

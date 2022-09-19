@@ -6,7 +6,7 @@ import gorm.tools.repository.PersistArgs
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import yakworks.gorm.testing.DomainIntTest
+import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.AttachmentSupport

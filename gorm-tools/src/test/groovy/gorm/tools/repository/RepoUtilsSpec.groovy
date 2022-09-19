@@ -4,22 +4,18 @@
 */
 package gorm.tools.repository
 
-import org.springframework.util.ReflectionUtils
-
 import gorm.tools.repository.errors.EmptyErrors
-import gorm.tools.testing.unit.DataRepoTest
 import grails.persistence.Entity
+import org.springframework.util.ReflectionUtils
 import spock.lang.Specification
 import testing.Cust
-import yakworks.i18n.icu.ICUMessageSource
 import yakworks.api.problem.data.DataProblem
-import yakworks.api.problem.data.DataProblemException
 import yakworks.api.problem.data.DataProblemCodes
+import yakworks.api.problem.data.DataProblemException
 import yakworks.api.problem.data.NotFoundProblem
+import yakworks.testing.gorm.unit.DataRepoTest
 
 class RepoUtilsSpec extends Specification implements DataRepoTest {
-
-    ICUMessageSource messageSource
 
     void setupSpec() {
         mockDomains MockDomain

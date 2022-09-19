@@ -11,10 +11,10 @@ import org.springframework.jdbc.core.JdbcTemplate
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import yakworks.gorm.testing.model.KitchenSink
-import yakworks.gorm.testing.model.KitchenSinkRepo
+import yakworks.testing.gorm.model.KitchenSink
+import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.rally.job.SyncJob
-import yakworks.gorm.testing.DomainIntTest
+import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgFlex

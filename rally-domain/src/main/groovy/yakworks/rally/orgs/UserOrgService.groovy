@@ -12,17 +12,18 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
-import gorm.tools.security.domain.AppUser
-import gorm.tools.security.services.SecService
 import yakworks.commons.lang.Validate
 import yakworks.rally.orgs.model.Org
+import yakworks.security.SecService
+import yakworks.security.UserTrait
+import yakworks.security.gorm.model.AppUser
 
 @Service @Lazy
 @Slf4j
 @CompileStatic
 class UserOrgService {
 
-    @Autowired(required=false) SecService<AppUser> secService
+    @Autowired(required=false) SecService secService
 
     /**
      * gets the org from contact for the currently logged in user
@@ -34,7 +35,7 @@ class UserOrgService {
     /**
      * gets the org for the passed in AppUser
      */
-    Org getUserOrg(AppUser appUser){
+    Org getUserOrg(UserTrait appUser){
         assert appUser
         Validate.notNull(appUser.orgId, "User.orgId is null for user ${appUser.id}:${appUser.username}")
         return Org.get(appUser.orgId)

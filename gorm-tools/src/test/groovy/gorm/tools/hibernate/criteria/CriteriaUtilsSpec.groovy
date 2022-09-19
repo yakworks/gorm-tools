@@ -4,12 +4,12 @@
 */
 package gorm.tools.hibernate.criteria
 
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import grails.persistence.Entity
+import spock.lang.Specification
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class CriteriaUtilsSpec extends GormToolsHibernateSpec {
-
-    List<Class> getDomainClasses() { [Test, Test2] }
+class CriteriaUtilsSpec extends Specification implements GormHibernateTest{
+    static List entityClasses = [Test, Test2]
 
     def setup() {
         (1..3).each { index ->

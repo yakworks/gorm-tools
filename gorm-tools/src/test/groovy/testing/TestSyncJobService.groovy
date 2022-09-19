@@ -1,16 +1,14 @@
 package testing
 
-import gorm.tools.job.SyncJobEntity
-import gorm.tools.job.SyncJobService
-import gorm.tools.job.SyncJobState
-import gorm.tools.repository.GormRepo
-import groovy.transform.CompileStatic
-import yakworks.api.ApiResults
-import yakworks.commons.util.BuildSupport
-
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+
+import groovy.transform.CompileStatic
+
+import gorm.tools.job.SyncJobService
+import gorm.tools.repository.GormRepo
+import yakworks.commons.util.BuildSupport
 
 @CompileStatic
 class TestSyncJobService implements SyncJobService<TestSyncJob> {

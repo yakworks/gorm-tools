@@ -4,14 +4,13 @@
 */
 package gorm.tools.hibernate.json
 
-import gorm.tools.repository.GormRepo
-import gorm.tools.testing.RepoTestData
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import spock.lang.Specification
+import yakworks.testing.gorm.RepoTestData
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class JpaEntSpec extends GormToolsHibernateSpec {
+class JpaEntSpec extends Specification implements GormHibernateTest {
 
-    //test the thing
-    List<Class> getDomainClasses() { [JpaEnt] }
+    static List entityClasses = [JpaEnt]
 
     // def "assert proper repos are setup"() {
     //     expect:

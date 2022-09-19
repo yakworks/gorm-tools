@@ -3,11 +3,10 @@ package yakworks.rest
 import grails.gorm.transactions.Rollback
 import org.springframework.http.HttpStatus
 
-import gorm.tools.rest.client.OkHttpRestTrait
+import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.HttpUrl
 import okhttp3.Response
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
@@ -35,6 +34,25 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         book.keySet().size() == 3 //should be the id and name and num
         book['id'] == 1
         book['name']
+    }
+
+    void "test csv"() {
+        when:
+        Response resp = get("${path}?format=csv")
+        // Map body = bodyToMap(resp)
+
+        then:
+        resp.code() == HttpStatus.OK.value()
+
+    }
+
+    void "test xlsx"() {
+        when:
+        Response resp = get("${path}?format=xlsx")
+
+        then:
+        resp.code() == HttpStatus.OK.value()
+
     }
 
     void "test qSearch"() {

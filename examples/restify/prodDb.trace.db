@@ -1,0 +1,3 @@
+2022-09-13 17:17:34 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "NEWOBJECTID" not found; SQL statement:
+Select NextId from NewObjectId where KeyName ='OrgSource.id' [42102-200]

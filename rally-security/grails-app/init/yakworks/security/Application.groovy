@@ -16,7 +16,7 @@ import grails.plugins.metadata.PluginSource
 @ComponentScan(['yakworks.rally', 'yakworks.security'])
 @PluginSource
 class Application extends GrailsAutoConfiguration { // implements ScanningAutoConfigTrait {
-    List commonScanPackages = [ 'gorm.tools.security', 'yakworks.rally']
+    List commonScanPackages = [ 'yakworks.security', 'yakworks.rally']
     static void main(String[] args) {
         GrailsApp.run(Application, args)
     }

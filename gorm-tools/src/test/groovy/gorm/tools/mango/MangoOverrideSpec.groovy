@@ -5,7 +5,6 @@
 package gorm.tools.mango
 
 import gorm.tools.beans.Pager
-import grails.gorm.DetachedCriteria
 
 import javax.inject.Inject
 
@@ -14,7 +13,7 @@ import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.model.RepoEntity
-import gorm.tools.testing.unit.DataRepoTest
+import yakworks.testing.gorm.unit.DataRepoTest
 import grails.persistence.Entity
 import spock.lang.Specification
 
@@ -22,18 +21,18 @@ class MangoOverrideSpec extends Specification implements DataRepoTest {
 
     void setupSpec() {
         defineBeans{ newMangoQuery(NewMangoQuery) }
-        mockDomain(City)
+        mockDomain(MangoThing)
     }
 
     void testMangoOverride() {
         setup:
         10.times {
-            City city = new City(id: it, name: "Name$it")
+            MangoThing city = new MangoThing(id: it, name: "Name$it")
             city.save(failOnError: true)
         }
 
         when:
-        List list = City.repo.queryList()
+        List list = MangoThing.repo.queryList()
         then:
         list.size() == 1
         list[0].id == 2
@@ -42,7 +41,7 @@ class MangoOverrideSpec extends Specification implements DataRepoTest {
 }
 
 @Entity
-class City implements RepoEntity<City> {
+class MangoThing implements RepoEntity<MangoThing> {
     String name
 }
 
@@ -75,7 +74,7 @@ class NewMangoQuery implements MangoQuery {
 }
 
 @GormRepository
-class CityRepo implements GormRepo<City> {
+class MangoThingRepo implements GormRepo<MangoThing> {
 
     @Inject
     NewMangoQuery newMangoQuery

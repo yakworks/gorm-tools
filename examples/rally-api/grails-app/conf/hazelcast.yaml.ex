@@ -13,5 +13,5 @@ hazelcast:
   map:
     default:
       time-to-live-seconds: 90
-    'gorm.tools.security.domain.SecRole':
+    'yakworks.security.gorm.model.SecRole':
       time-to-live-seconds: 30

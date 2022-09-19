@@ -31,12 +31,12 @@ dependencies {
   implementation "org.hibernate:hibernate-core:$vHibernate"
   // compile "org.hibernate:hibernate-ehcache:$vHibernate"
 
-  implementation project(":gorm-tools-rest")
+  implementation project(":gorm-rest")
   implementation project(":rally-domain")
   implementation project(":rally-security")
   implementation project(":gorm-test-domain")
 
-  implementation "org.yakworks:grails-kit:$vYakGrailsKit"
+  implementation "org.yakworks:grails-kit:$vSpringGrailsKit"
 
   //Hazelcast
   runtimeOnly "com.hazelcast:hazelcast-hibernate53:$vHazelcastHib"

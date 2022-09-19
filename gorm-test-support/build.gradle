@@ -4,12 +4,17 @@ dependencies {
   console "org.grails:grails-console"
 
   compileOnly project(":gorm-tools")
-  compileOnly project(":gorm-tools-security")
+  compileOnly project(":gorm-security")
 
   implementation "org.grails:grails-plugin-controllers"
+
   //used for bundled Test traits
-  implementation "org.grails:grails-gorm-testing-support"
-  implementation "io.github.longwa:build-test-data:$vBuildTestData"
+  api "org.grails:grails-gorm-testing-support:$vGrailsTesting"
+
+  api("io.github.longwa:build-test-data:$vBuildTestData"){
+    exclude group:"org.grails", module: "grails-gorm-testing-support"
+  }
+  api "org.spockframework:spock-junit4:$vSpock"
 
   //used for json parsing but require it to be added to project that uses this
   compileOnly("org.grails.plugins:views-json:$vViews") {

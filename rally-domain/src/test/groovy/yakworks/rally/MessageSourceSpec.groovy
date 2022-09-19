@@ -1,22 +1,17 @@
 package yakworks.rally
 
-import org.grails.testing.GrailsUnitTest
 
-import gorm.tools.testing.support.GormToolsSpecHelper
-import grails.testing.spring.AutowiredTest
 import spock.lang.Specification
-import yakworks.i18n.icu.GrailsICUMessageSource
 import yakworks.i18n.icu.ICUMessageSource
+import yakworks.testing.gorm.unit.DataRepoTest
 
 /**
  * sanity check that messages are picked up in plugins
  */
-class MessageSourceSpec extends Specification implements GormToolsSpecHelper, AutowiredTest {
-
-    ICUMessageSource messageSource
+class MessageSourceSpec extends Specification implements DataRepoTest {
 
     void setupSpec() {
-        defineCommonBeans()
+        defineCommonGormBeans()
     }
 
     void "messageSource lookup"(){

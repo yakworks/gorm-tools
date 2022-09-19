@@ -4,8 +4,7 @@
 */
 package yakworks.rally.api
 
-import gorm.tools.rest.mapping.RepoApiMappingsService
-import gorm.tools.rest.mapping.UrlMappingsHelper
+import yakworks.rest.gorm.mapping.RepoApiMappingsService
 
 class UrlMappings {
 
@@ -35,7 +34,7 @@ class UrlMappings {
         //     "/bar"(resources:"contact", namespace: 'rally')
         // }
         "/api/appConfig/$nspace/$id"(controller: 'appConfig', action: 'get')
-        "500"(view: '/error')
+        // "500"(view: '/error')
         //ShiroGrailsExceptionResolver is setup to map UnauthorizedException to this
         "/forbidden"(controller: "forbidden")
     }

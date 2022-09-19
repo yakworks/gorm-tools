@@ -1,8 +1,8 @@
 package yakworks.rally.tag
 
 
-import yakworks.gorm.testing.SecuritySpecHelper
-import gorm.tools.testing.integration.DataIntegrationTest
+import yakworks.testing.gorm.integration.SecuritySpecHelper
+import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification

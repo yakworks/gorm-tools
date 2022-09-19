@@ -5,13 +5,13 @@
 package gorm.tools.metamap
 
 
-import gorm.tools.testing.unit.DataRepoTest
+import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
-import yakworks.gorm.testing.model.Enummy
-import yakworks.gorm.testing.model.KitchenSink
-import yakworks.gorm.testing.model.SinkExt
-import yakworks.gorm.testing.model.SinkItem
-import yakworks.gorm.testing.model.Thing
+import yakworks.testing.gorm.model.Enummy
+import yakworks.testing.gorm.model.KitchenSink
+import yakworks.testing.gorm.model.SinkExt
+import yakworks.testing.gorm.model.SinkItem
+import yakworks.testing.gorm.model.Thing
 import yakworks.meta.MetaEntity
 import yakworks.meta.MetaProp
 

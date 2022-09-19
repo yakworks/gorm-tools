@@ -1,11 +1,10 @@
 package gorm.tools.security
 
-
-import gorm.tools.security.domain.AppUser
-import gorm.tools.security.domain.SecRole
-import yakworks.gorm.testing.SecuritySpecHelper
-import gorm.tools.testing.integration.DataIntegrationTest
-import gorm.tools.security.services.SecService
+import yakworks.security.gorm.model.AppUser
+import yakworks.security.gorm.model.SecRole
+import yakworks.testing.gorm.integration.SecuritySpecHelper
+import yakworks.testing.gorm.integration.DataIntegrationTest
+import yakworks.security.SecService
 import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
 import spock.lang.Specification

@@ -7,16 +7,16 @@ package gorm.tools.async
 import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 import java.util.function.Supplier
-import javax.annotation.PostConstruct
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.grails.datastore.mapping.core.Datastore
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.transaction.TransactionStatus
 
+import gorm.tools.config.AsyncConfig
+import gorm.tools.config.GormConfig
 import gorm.tools.transaction.TrxService
 import grails.persistence.support.PersistenceContextInterceptor
 import yakworks.grails.support.ConfigAware
@@ -31,21 +31,7 @@ import yakworks.grails.support.ConfigAware
 @CompileStatic
 class AsyncService implements ConfigAware  {
 
-    /**
-     * The default slice or chunk size for collating. for example if this is 100 and you pass list of of 100
-     * then it will slice it or collate it into a list with 10 of lists with 100 items each.
-     * should default to the hibernate.jdbc.batch_size in the implementation. Usually best to set this around 100
-     */
-    @Value('${gorm.tools.async.sliceSize:100}')
-    int sliceSize
-
-    /** The list size to send to the collate that slices.*/
-    @Value('${gorm.tools.async.enabled:true}')
-    boolean asyncEnabled
-
-    /** the pool size, defaults to 4 right now, parralel gets it own their own */
-    @Value('${gorm.tools.async.poolSize:4}')
-    int poolSize
+    @Autowired AsyncConfig asyncConfig
 
     @Autowired
     PersistenceContextInterceptor persistenceInterceptor
@@ -53,13 +39,8 @@ class AsyncService implements ConfigAware  {
     @Autowired
     TrxService trxService
 
-    /** setup defaults for poolSize and batchSize if config isn't present. batchSize set to 100 if not config found*/
-    @PostConstruct
-    void init() {
-        //if batchSize is 0 then hibernate may not bbe installed and hibernate.jdbc.batch_size is not set. force it to 100
-        Integer batchSize = config.getProperty('hibernate.jdbc.batch_size', Integer)
-        sliceSize = batchSize ?: sliceSize
-    }
+    @Autowired(required = false)
+    GormConfig gormConfig
 
     // static cheater to get the bean, use sparingly if at all
     // static AsyncService getBean(){
@@ -73,27 +54,27 @@ class AsyncService implements ConfigAware  {
      * @param runnable the runnable closure
      * @return the CompletableFuture
      */
-    CompletableFuture<Void> runAsync(AsyncConfig asyncConfig, Closure runnable){
-        return supplyAsync( asyncConfig, runnable as Supplier<Void>)
+    CompletableFuture<Void> runAsync(AsyncArgs asyncArgs, Closure runnable){
+        return supplyAsync( asyncArgs, runnable as Supplier<Void>)
     }
 
     /**
      * shortcut that proved a default AsyncConfig
      */
     public <T> CompletableFuture<T> supplyAsync(Supplier<T> supplier){
-        supplyAsync(new AsyncConfig(), supplier)
+        supplyAsync(new AsyncArgs(), supplier)
     }
 
     /**
      * Supplies a CompletableFuture and returns it, can be wrapped in session or trx if specified in asyncConfig
      *
-     * @param asyncConfig the config object that can have session or transactional set if it should be wrapped
+     * @param asynArgs the config object that can have session or transactional set if it should be wrapped
      * @param closure the runnable closure
      * @return the CompletableFuture
      */
-    public <T> CompletableFuture<T> supplyAsync(AsyncConfig asyncConfig, Supplier<T> supplier){
-        Supplier<T> wrappedSupplier = wrapSupplier(asyncConfig, supplier)
-        if(shouldAsync(asyncConfig)){
+    public <T> CompletableFuture<T> supplyAsync(AsyncArgs asynArgs, Supplier<T> supplier){
+        Supplier<T> wrappedSupplier = wrapSupplier(asynArgs, supplier)
+        if(shouldAsync(asynArgs)){
             return CompletableFuture.supplyAsync(wrappedSupplier)
         } else {
             CompletableFuture<T> syncFuture
@@ -109,14 +90,14 @@ class AsyncService implements ConfigAware  {
         }
     }
 
-    boolean shouldAsync(AsyncConfig asyncConfig){
-        return asyncConfig.enabled != null ? asyncConfig.enabled : getAsyncEnabled()
+    boolean shouldAsync(AsyncArgs asyncArgs){
+        return asyncArgs.enabled != null ? asyncArgs.enabled : asyncConfig.enabled
     }
 
     /**
      * if args doesn't have a datastore then it grabs the default one from the trxService
      */
-    void verifyDatastore(AsyncConfig asyncArgs){
+    void verifyDatastore(AsyncArgs asyncArgs){
         if(!asyncArgs.datastore){
             asyncArgs.datastore = trxService.getTargetDatastore()
         }
@@ -130,7 +111,7 @@ class AsyncService implements ConfigAware  {
      * @param closure the closure to wrap
      * @return the wrapped supplier
      */
-    public <T> Supplier<T> wrapSupplier(AsyncConfig asyncArgs, Supplier<T> supplier){
+    public <T> Supplier<T> wrapSupplier(AsyncArgs asyncArgs, Supplier<T> supplier){
         Supplier<T> wrappedSupplier
         if(asyncArgs.transactional){
             verifyDatastore(asyncArgs)
@@ -182,7 +163,7 @@ class AsyncService implements ConfigAware  {
     }
 
 
-    public <T> Consumer<T> wrapConsumer(AsyncConfig asyncArgs, Consumer<T> consumer){
+    public <T> Consumer<T> wrapConsumer(AsyncArgs asyncArgs, Consumer<T> consumer){
         Consumer<T> wrappedConsumer
 
         if(asyncArgs.transactional){

@@ -4,7 +4,6 @@
 */
 package yakworks.security
 
-import javax.servlet.http.HttpSession
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -16,14 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.WebAttributes
-import org.springframework.web.context.request.RequestContextHolder
 
-import gorm.tools.beans.AppCtx
-import gorm.tools.security.services.SpringSecService
 import grails.plugin.springsecurity.SpringSecurityUtils
 import yakworks.grails.web.GrailsWebEnvironment
 import yakworks.security.shiro.ShiroUtils
 import yakworks.security.shiro.SpringSecurityRealm
+import yakworks.security.spring.SpringSecService
+import yakworks.spring.AppCtx
 
 /**
  * We married shiro and spring security, this does some of the custom wrapping

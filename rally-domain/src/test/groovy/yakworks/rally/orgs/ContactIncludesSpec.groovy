@@ -7,9 +7,10 @@ package yakworks.rally.orgs
 
 import gorm.tools.metamap.MetaGormEntityBuilder
 import gorm.tools.metamap.services.MetaMapService
-import gorm.tools.testing.unit.DataRepoTest
+import org.springframework.beans.factory.annotation.Autowired
+import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
-import yakworks.gorm.testing.SecurityTest
+import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail
 import yakworks.rally.orgs.model.ContactPhone
@@ -17,12 +18,9 @@ import yakworks.rally.orgs.model.Org
 import yakworks.rally.testing.MockData
 
 class ContactIncludesSpec extends Specification implements DataRepoTest, SecurityTest {
+    static List entityClasses = [Org, Contact, ContactPhone, ContactEmail]
 
-    MetaMapService metaMapService
-
-    void setupSpec() {
-        mockDomains Org, Contact, ContactPhone, ContactEmail
-    }
+    @Autowired MetaMapService metaMapService
 
     void "EntityIncludesBuilder.build"(){
         when:

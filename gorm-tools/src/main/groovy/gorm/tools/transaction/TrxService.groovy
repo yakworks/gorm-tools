@@ -18,9 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.TransactionDefinition
 
-import gorm.tools.beans.AppCtx
 import gorm.tools.repository.RepoLookup
 import grails.gorm.transactions.GrailsTransactionTemplate
+import yakworks.spring.AppCtx
 
 /**
  * A generic way to wrap transaction with closures. Used in the WithTrx trait.

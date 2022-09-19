@@ -7,8 +7,7 @@ import grails.testing.mixin.integration.Integration
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.gorm.testing.DomainIntTest
-import yakworks.grails.resource.AppResourceLoader
+import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.AttachmentSupport

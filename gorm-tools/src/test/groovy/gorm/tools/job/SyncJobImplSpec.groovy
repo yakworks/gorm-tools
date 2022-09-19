@@ -5,12 +5,13 @@
 package gorm.tools.job
 
 import gorm.tools.model.SourceType
-import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Specification
-import testing.*
+import testing.TestSyncJob
 import yakworks.json.groovy.JsonEngine
+import yakworks.testing.gorm.unit.DataRepoTest
 
-class SyncJobImplSpec extends Specification  implements DomainRepoTest<TestSyncJob> {
+class SyncJobImplSpec extends Specification  implements DataRepoTest  {
+    static List entityClasses = [TestSyncJob]
 
     void "sanity check validation with String as data"() {
         expect:

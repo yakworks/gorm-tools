@@ -8,6 +8,7 @@ import groovy.transform.CompileDynamic
 
 import grails.compiler.GrailsCompileStatic
 import grails.util.Holders
+import yakworks.spring.AppCtx
 
 @GrailsCompileStatic
 class EventLogHelper {
@@ -20,7 +21,12 @@ class EventLogHelper {
     //SecService secService
     EventLogger eventLogger
 
-    String appName       // Name of the application
+    EventLogger getEventLogger(){
+        if(!this.eventLogger) this.eventLogger = AppCtx.get("eventLogger", EventLogger)
+        return this.eventLogger
+    }
+
+    // String appName       // Name of the application
     String component     // The service/method called
     Boolean isPrimaryJob  // True if the customer wants to hear about this job every day.
     String jobName       // The name of the master unit of work.
@@ -63,9 +69,6 @@ class EventLogHelper {
      * @return A helper with all this plus a userid and appName and a linkedId already generated.
      */
     EventLogHelper(String component, String jobName = null, String jobParams = null, Boolean isPrimaryJob = false) {
-        //secService = (SecService) Holders.applicationContext.getBean('secService')
-        eventLogger = (EventLogger) Holders.applicationContext.getBean('eventLogger')
-        this.appName = "${Holders.grailsApplication.config.getProperty("info.app.name", String)}"
         this.component = component
         this.jobName = jobName ? (jobName.replaceAll('.groovy', '')) : component
         this.isPrimaryJob = isPrimaryJob
@@ -88,25 +91,25 @@ class EventLogHelper {
     @SuppressWarnings('ConfusingMethodName')
     String error(Map params) {
         Map p = mergeParams([action: ERROR], params)
-        eventLogger.error(p)
+        getEventLogger().error(p)
         return p.message
     }
 
     String warn(Map params) {
         Map p = mergeParams([action: WARNING], params)
-        eventLogger.warn(p)
+        getEventLogger().warn(p)
         return p.message
     }
 
     String info(Map params) {
         Map p = mergeParams([:], params)
-        eventLogger.info(p)
+        getEventLogger().info(p)
         return p.message
     }
 
     String debug(Map params) {
         Map p = mergeParams([priority: EventLog.DEBUG_INT], params)
-        eventLogger.log(p)
+        getEventLogger().log(p)
         return p.message
     }
 
@@ -230,14 +233,15 @@ class EventLogHelper {
 
     }
 
-    /** mergeParams safely merges three maps:  Default values, method defaults and passed-in parameters.
+    /**
+     * mergeParams safely merges three maps:  Default values, method defaults and passed-in parameters.
      * @param base A Map with method-default values.
      * @param extras A map with other values, duplicates here override values in base.
      * @param a Map containing nothing, or the merged combination of base and extras.
      */
     @CompileDynamic
     Map mergeParams(Map base, Map extras) {
-        Map r = [appName : appName, component: component, isPrimaryJob: isPrimaryJob, jobName: jobName,
+        Map r = [component: component, isPrimaryJob: isPrimaryJob, jobName: jobName,
                  linkedId: linkedId, jobParams: jobParams, userId: userId, action: '...', message: ''
         ]
         base?.each { key, value ->

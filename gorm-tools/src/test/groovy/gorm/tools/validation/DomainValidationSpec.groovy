@@ -4,23 +4,18 @@
 */
 package gorm.tools.validation
 
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
-import org.springframework.beans.factory.annotation.Autowired
-import yakworks.gorm.testing.model.ValidationEntity
+
+import spock.lang.Specification
 import yakworks.i18n.icu.GrailsICUMessageSource
-import yakworks.i18n.icu.ICUMessageSource
+import yakworks.testing.gorm.model.ValidationEntity
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class DomainValidationSpec extends GormToolsHibernateSpec {
+class DomainValidationSpec extends Specification implements GormHibernateTest  {
 
-    @Autowired
-    ICUMessageSource msgService
+    static List entityClasses = [ValidationEntity]
 
-    // void setupSpec() {
-    //     mockDomains ValidationEntity
-    // }
-    List<Class> getDomainClasses() { [ValidationEntity] }
-
-    Closure doWithDomains() { { ->
+    Closure doWithGormBeans() { { ->
+        //FIXME this should be in the commonGormBeans, configed so it picks up more
         messageSource(GrailsICUMessageSource){
             searchClasspath = true
             messageBundleLocations = "classpath*:*messages*.properties"
@@ -124,17 +119,17 @@ class DomainValidationSpec extends GormToolsHibernateSpec {
 
         then:
         errors.errorCount == 10
-        msgService.getMessage(errors['xRequired']) == 'must not be null'
-        msgService.getMessage(errors['xMax']) == 'must be less than or equal to 3'
-        msgService.getMessage(errors['xMin']) == 'must be greater than or equal to 3'
-        msgService.getMessage(errors['xMatches']) == 'must match "HI"'
-        msgService.getMessage(errors['xEmail']) == 'must be a well-formed email address'
-        msgService.getMessage(errors['xNotBlank']) == 'must not be blank'
-        msgService.getMessage(errors['xRange']) == 'must be between 1 and 3'
+        messageSource.getMessage(errors['xRequired']) == 'must not be null'
+        messageSource.getMessage(errors['xMax']) == 'must be less than or equal to 3'
+        messageSource.getMessage(errors['xMin']) == 'must be greater than or equal to 3'
+        messageSource.getMessage(errors['xMatches']) == 'must match "HI"'
+        messageSource.getMessage(errors['xEmail']) == 'must be a well-formed email address'
+        messageSource.getMessage(errors['xNotBlank']) == 'must not be blank'
+        messageSource.getMessage(errors['xRange']) == 'must be between 1 and 3'
 
-        msgService.getMessage(errors['xMinSize']) == 'length must be greater than or equal to 3'
-        msgService.getMessage(errors['xMaxSize']) == 'length must be less than or equal to 3'
-        msgService.getMessage(errors['xInList']) == 'must be in list [a, b]'
+        messageSource.getMessage(errors['xMinSize']) == 'length must be greater than or equal to 3'
+        messageSource.getMessage(errors['xMaxSize']) == 'length must be less than or equal to 3'
+        messageSource.getMessage(errors['xInList']) == 'must be in list [a, b]'
 
     }
 }

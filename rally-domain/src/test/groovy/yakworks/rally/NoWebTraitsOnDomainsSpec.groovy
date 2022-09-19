@@ -1,12 +1,11 @@
 package yakworks.rally
 
-import org.springframework.util.ReflectionUtils
-
-import gorm.tools.testing.unit.DomainRepoTest
 import grails.artefact.DomainClass
 import grails.web.databinding.WebDataBinding
+import org.springframework.util.ReflectionUtils
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Org
+import yakworks.testing.gorm.unit.DataRepoTest
 
 /**
  * This will fail if the org.grails:grails-plugin-controllers is in compile dependency during compile of gorm domain
@@ -14,7 +13,8 @@ import yakworks.rally.orgs.model.Org
  * we don't want it as it adds a map constructor that uses the slow Grails binder and ties domains to controllers
  * we want the default groovy map constructor or ability to use the Groovy @MapConstrutor AST transformation
  */
-class NoWebTraitsOnDomainsSpec extends Specification implements DomainRepoTest<Org> {
+class NoWebTraitsOnDomainsSpec extends Specification implements DataRepoTest {
+    static List entityClasses = [Org]
 
     void "check for instanceControllersDomainBindingApi"() {
         expect:

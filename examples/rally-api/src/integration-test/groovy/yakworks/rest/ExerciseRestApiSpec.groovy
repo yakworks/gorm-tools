@@ -1,15 +1,12 @@
 package yakworks.rest
 
 import org.springframework.http.HttpStatus
-
-import spock.lang.Ignore
 import yakworks.commons.map.Maps
-import gorm.tools.rest.client.OkHttpRestTrait
+import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
 import spock.lang.Specification
 import spock.lang.Unroll
-import yakworks.rally.orgs.model.Org
 
 /**
  * Sanity checks to hit the main endpoints. KISS, keep it simple

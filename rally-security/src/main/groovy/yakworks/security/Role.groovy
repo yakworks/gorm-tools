@@ -6,9 +6,9 @@ package yakworks.security
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.security.domain.SecRole
 import yakworks.commons.lang.EnumUtils
 import yakworks.commons.model.IdEnum
+import yakworks.security.gorm.model.SecRole
 
 @CompileStatic
 enum Role implements IdEnum<Role, Long> {

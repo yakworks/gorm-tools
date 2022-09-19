@@ -17,7 +17,6 @@ import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 import groovy.util.logging.Slf4j
 
-import gorm.tools.beans.AppCtx
 import gorm.tools.repository.model.IdGeneratorRepo
 import yakworks.api.ApiResults
 import yakworks.api.Result
@@ -28,6 +27,7 @@ import yakworks.commons.lang.Validate
 import yakworks.json.groovy.JsonEngine
 import yakworks.json.groovy.JsonStreaming
 import yakworks.message.spi.MsgService
+import yakworks.spring.AppCtx
 
 @SuppressWarnings('Println')
 @Builder(builderStrategy= SimpleStrategy, prefix="")
@@ -92,7 +92,7 @@ class SyncJobContext {
 
         if(args.savePayload){
             if (payload && args.savePayloadAsFile) {
-                data.payloadId = writePayloadFile(payload as Collection<Map>)
+                data.payloadId = writePayloadFile(payload as Collection)
             }
             else {
                 String res = JsonEngine.toJson(payload)
@@ -236,7 +236,7 @@ class SyncJobContext {
         return ret
     }
 
-    Long writePayloadFile(Collection<Map> payload){
+    Long writePayloadFile(Collection payload){
         String filename = "SyncJobPayload_${jobId}_.json"
         Path path = syncJobService.createTempFile(filename)
         JsonStreaming.streamToFile(payload, path)

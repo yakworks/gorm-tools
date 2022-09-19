@@ -2,11 +2,9 @@ package yakworks.rally.orgs
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import org.grails.datastore.mapping.query.Query
 import spock.lang.Ignore
-import spock.lang.IgnoreRest
 import spock.lang.Specification
-import yakworks.gorm.testing.DomainIntTest
+import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 

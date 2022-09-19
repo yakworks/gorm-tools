@@ -5,21 +5,17 @@
 package gorm.tools.metamap
 
 
-import gorm.tools.testing.unit.DataRepoTest
+import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
-import yakworks.gorm.testing.model.Enummy
-import yakworks.gorm.testing.model.KitchenSink
-import yakworks.gorm.testing.model.SinkExt
-import yakworks.gorm.testing.model.SinkItem
-import yakworks.gorm.testing.model.Thing
+import yakworks.testing.gorm.model.Enummy
+import yakworks.testing.gorm.model.KitchenSink
+import yakworks.testing.gorm.model.SinkExt
+import yakworks.testing.gorm.model.SinkItem
+import yakworks.testing.gorm.model.Thing
 import yakworks.meta.MetaEntity
 
 class MetaGormEntityBuilderSpec extends Specification implements DataRepoTest {
-
-    void setupSpec() {
-        //mockDomain Person
-        mockDomains KitchenSink, SinkExt, SinkItem, Thing, Enummy
-    }
+    static entityClasses = [KitchenSink, SinkExt, SinkItem, Thing, Enummy]
 
     void "KitchenSink *"(){
         when:
@@ -37,13 +33,13 @@ class MetaGormEntityBuilderSpec extends Specification implements DataRepoTest {
         def res = MetaGormEntityBuilder.build("Thing", ['name'])
 
         then:
-        res.className == 'yakworks.gorm.testing.model.Thing'
+        res.className == 'yakworks.testing.gorm.model.Thing'
 
         when: "use fully qualified"
-        res = MetaGormEntityBuilder.build('yakworks.gorm.testing.model.Thing', ['name'])
+        res = MetaGormEntityBuilder.build('yakworks.testing.gorm.model.Thing', ['name'])
 
         then:
-        res.className == 'yakworks.gorm.testing.model.Thing'
+        res.className == 'yakworks.testing.gorm.model.Thing'
     }
 
     void "test buildIncludesMap"(){
@@ -51,7 +47,7 @@ class MetaGormEntityBuilderSpec extends Specification implements DataRepoTest {
         def res = MetaGormEntityBuilder.build("Thing", ['name'])
 
         then:
-        res.className == 'yakworks.gorm.testing.model.Thing'
+        res.className == 'yakworks.testing.gorm.model.Thing'
         res.shortClassName == 'Thing'
         res.metaProps.keySet() == ['name'] as Set
 
@@ -71,7 +67,7 @@ class MetaGormEntityBuilderSpec extends Specification implements DataRepoTest {
         res.metaEntityProps.size() == 1
 
         def itemsIncs = res.metaEntityProps['items']
-        itemsIncs.className == 'yakworks.gorm.testing.model.SinkItem'
+        itemsIncs.className == 'yakworks.testing.gorm.model.SinkItem'
         itemsIncs.shortClassName == 'SinkItem'
         itemsIncs.metaProps.keySet() == ['id', 'name'] as Set
 
@@ -122,7 +118,7 @@ class MetaGormEntityBuilderSpec extends Specification implements DataRepoTest {
 
         def extIncs = emapIncs.metaEntityProps['ext']
         extIncs.className == SinkExt.name
-        extIncs.metaProps.keySet() == ['id', 'kitchenParent', 'thing', 'version', 'textMax', 'name', 'kitchenSink'] as Set
+        extIncs.metaProps.keySet() == ['id', 'kitchenParent', 'thing', 'version', 'textMax', 'name'] as Set
 
     }
 

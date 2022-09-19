@@ -6,7 +6,7 @@ package restify
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.rest.controller.RestRepoApiController
+import yakworks.rest.gorm.controller.RestRepoApiController
 
 import static org.springframework.http.HttpStatus.CREATED
 

@@ -1,18 +1,16 @@
 package gorm.tools.mango
 
 import gorm.tools.mango.jpql.JpqlQueryBuilder
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
-import grails.testing.spring.AutowiredTest
-import spock.lang.Ignore
-import spock.lang.IgnoreRest
-import yakworks.gorm.testing.model.KitchenSink
+import spock.lang.Specification
+import yakworks.testing.gorm.model.KitchenSink
+import yakworks.testing.gorm.unit.GormHibernateTest
 
 /**
  * Test for JPA builder
  */
-class JpqlQueryBuilderSelectSpec extends GormToolsHibernateSpec implements AutowiredTest{
+class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateTest  {
 
-    List<Class> getDomainClasses() { [KitchenSink] }
+    static List entityClasses = [KitchenSink]
 
     String strip(String val){
         val.stripIndent().replace('\n',' ').trim()
@@ -31,7 +29,7 @@ class JpqlQueryBuilderSelectSpec extends GormToolsHibernateSpec implements Autow
 
         then:"The query is valid"
         query != null
-        query == 'SELECT DISTINCT kitchenSink FROM yakworks.gorm.testing.model.KitchenSink AS kitchenSink WHERE (kitchenSink.name=:p1)'
+        query == 'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE (kitchenSink.name=:p1)'
     }
 
     void "Test build simple select"() {
@@ -46,7 +44,7 @@ class JpqlQueryBuilderSelectSpec extends GormToolsHibernateSpec implements Autow
 
         then:"The query is valid"
         query != null
-        query == 'SELECT DISTINCT kitchenSink FROM yakworks.gorm.testing.model.KitchenSink AS kitchenSink WHERE (kitchenSink.name=:p1)'
+        query == 'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE (kitchenSink.name=:p1)'
     }
 
     void "Test build select with or"() {
@@ -64,7 +62,7 @@ class JpqlQueryBuilderSelectSpec extends GormToolsHibernateSpec implements Autow
 
         then:"The query is valid"
         queryInfo.query!= null
-        queryInfo.query == 'SELECT DISTINCT kitchenSink FROM yakworks.gorm.testing.model.KitchenSink AS kitchenSink WHERE ((kitchenSink.name=:p1 OR kitchenSink.name=:p2))'
+        queryInfo.query == 'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE ((kitchenSink.name=:p1 OR kitchenSink.name=:p2))'
         queryInfo.parameters == ['Bob', 'Fred']
 
     }
@@ -85,7 +83,7 @@ class JpqlQueryBuilderSelectSpec extends GormToolsHibernateSpec implements Autow
         query != null
         query == strip("""\
         SELECT new map( SUM(kitchenSink.amount) as amount_sum,kitchenSink.kind as kind )
-        FROM yakworks.gorm.testing.model.KitchenSink AS kitchenSink
+        FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
         GROUP BY kitchenSink.kind
         """)
         //
@@ -115,7 +113,7 @@ class JpqlQueryBuilderSelectSpec extends GormToolsHibernateSpec implements Autow
         query != null
         query.trim() == strip('''\
         SELECT new map( SUM(kitchenSink.sinkLink.amount) as sinkLink_amount_sum,kitchenSink.kind as kind )
-        FROM yakworks.gorm.testing.model.KitchenSink AS kitchenSink
+        FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
         GROUP BY kitchenSink.kind
         HAVING (SUM(kitchenSink.sinkLink.amount) < :p1)
         ORDER BY sinkLink_amount_sum ASC ''')
@@ -145,7 +143,7 @@ class JpqlQueryBuilderSelectSpec extends GormToolsHibernateSpec implements Autow
         query != null
         query.trim() == strip('''\
         SELECT new map( SUM(kitchenSink.sinkLink.amount) as sinkLink_amount_sum,kitchenSink.kind as kind )
-        FROM yakworks.gorm.testing.model.KitchenSink AS kitchenSink
+        FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
         WHERE (kitchenSink.ext.id=:p1 AND kitchenSink.thing.id=:p2 AND kitchenSink.inactive=:p3)
         GROUP BY kitchenSink.kind
         HAVING (SUM(kitchenSink.sinkLink.amount) < :p4)

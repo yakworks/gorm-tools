@@ -10,11 +10,6 @@ import groovy.transform.CompileStatic
 
 import org.springframework.jdbc.core.JdbcTemplate
 
-import gorm.tools.beans.AppCtx
-import gorm.tools.security.domain.AppUser
-import gorm.tools.security.domain.SecRole
-import gorm.tools.security.domain.SecRolePermission
-import gorm.tools.security.domain.SecRoleUser
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactFlex
@@ -24,6 +19,11 @@ import yakworks.rally.orgs.model.OrgCalc
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.rally.tag.model.Tag
+import yakworks.security.gorm.model.AppUser
+import yakworks.security.gorm.model.SecRole
+import yakworks.security.gorm.model.SecRolePermission
+import yakworks.security.gorm.model.SecRoleUser
+import yakworks.spring.AppCtx
 
 @SuppressWarnings('BuilderMethodWithSideEffects')
 @CompileStatic

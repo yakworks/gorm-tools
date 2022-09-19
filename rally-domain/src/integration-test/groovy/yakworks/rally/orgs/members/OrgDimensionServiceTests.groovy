@@ -4,7 +4,7 @@ import yakworks.commons.lang.EnumUtils
 
 import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
-import yakworks.gorm.testing.DomainIntTest
+import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.orgs.OrgDimensionService
 import yakworks.rally.orgs.model.OrgType
 import spock.lang.Specification

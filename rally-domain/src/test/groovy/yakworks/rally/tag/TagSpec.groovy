@@ -1,16 +1,12 @@
 package yakworks.rally.tag
 
-
-import yakworks.gorm.testing.SecurityTest
-import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Specification
 import yakworks.rally.tag.model.Tag
+import yakworks.testing.gorm.unit.SecurityTest
+import yakworks.testing.gorm.unit.DataRepoTest
 
-class TagSpec extends Specification implements DomainRepoTest<Tag>, SecurityTest {
-
-    // void setupSpec() {
-    //     mockDomains Tag, Attachment
-    // }
+class TagSpec extends Specification implements DataRepoTest, SecurityTest {
+    static List entityClasses = [Tag]
 
     void "test isValidFor"() {
         when:

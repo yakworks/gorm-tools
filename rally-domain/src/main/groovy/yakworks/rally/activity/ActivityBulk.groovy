@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service
 
 import gorm.tools.model.SourceType
 import gorm.tools.problem.ProblemHandler
-import gorm.tools.security.services.SecService
 import grails.gorm.transactions.Transactional
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.Task
@@ -25,6 +24,7 @@ import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.orgs.model.Org
+import yakworks.security.SecService
 
 /**
  * WIP

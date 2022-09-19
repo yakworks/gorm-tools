@@ -370,8 +370,8 @@ Can be used to unit test with full hibernate support with inmemory database.
 ```groovy
 
 class CitySpec extends GormToolsHibernateSpec {
-   
-  List<Class> getDomainClasses() { [City] }
+
+  static List entityClasses = [City]
    
    void "test create"() {
      given:
@@ -397,12 +397,12 @@ See example bellow:
 
 ```groovy
 
-import gorm.tools.testing.hibernate.AutoHibernateSpec
+import yakworks.testing.gorm.hibernate.AutoHibernateSpec
 import testing.Project
 
 class ProjectSpec extends AutoHibernateSpec<Project> {
 
-    /** automatically runs tests on persist(), create(), update(), delete().*/
+  /** automatically runs tests on persist(), create(), update(), delete().*/
 
 }
 

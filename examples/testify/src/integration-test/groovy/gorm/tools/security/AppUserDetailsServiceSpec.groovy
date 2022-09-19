@@ -1,15 +1,15 @@
 package gorm.tools.security
 
-import gorm.tools.security.services.AppUserService
+import yakworks.security.gorm.AppUserService
 
 import java.time.LocalDateTime
 
-import gorm.tools.security.domain.AppUser
-import gorm.tools.testing.integration.DataIntegrationTest
-import grails.plugin.springsecurity.userdetails.GrailsUser
+import yakworks.security.gorm.model.AppUser
+import yakworks.security.spring.AppUserDetailsService
+import yakworks.security.spring.SpringSecUser
+import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
-import spock.lang.Ignore
 import spock.lang.Specification
 
 @Integration
@@ -22,7 +22,7 @@ class AppUserDetailsServiceSpec extends Specification implements DataIntegration
         when:
         AppUser.repo.create([username:"karen", password:"karen", repassword:"karen", email:"karen@9ci.com"])
         flush()
-        GrailsUser gUser = userDetailsService.loadUserByUsername('karen')
+        SpringSecUser gUser = userDetailsService.loadUserByUsername('karen')
 
         then:
         gUser != null
@@ -38,7 +38,7 @@ class AppUserDetailsServiceSpec extends Specification implements DataIntegration
         when:
         AppUser.repo.create([username:"karen", repassword:"karen", email:"karen@9ci.com"])
         flush()
-        GrailsUser gUser = userDetailsService.loadUserByUsername('karen')
+        SpringSecUser gUser = userDetailsService.loadUserByUsername('karen')
 
         then:
         gUser != null
@@ -61,7 +61,7 @@ class AppUserDetailsServiceSpec extends Specification implements DataIntegration
         user.persist()
 
         when:
-        GrailsUser nineUser = userDetailsService.loadUserByUsername(user.username, false)
+        SpringSecUser nineUser = userDetailsService.loadUserByUsername(user.username, false)
 
         then:
         nineUser.credentialsNonExpired == false

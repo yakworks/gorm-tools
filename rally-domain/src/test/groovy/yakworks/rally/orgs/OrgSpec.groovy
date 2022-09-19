@@ -1,9 +1,9 @@
 package yakworks.rally.orgs
 
-import spock.lang.IgnoreRest
-import yakworks.gorm.testing.SecurityTest
-import gorm.tools.testing.TestDataJson
-import gorm.tools.testing.unit.DataRepoTest
+
+import yakworks.testing.gorm.unit.SecurityTest
+import yakworks.testing.gorm.TestDataJson
+import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
@@ -14,20 +14,16 @@ import yakworks.rally.orgs.model.OrgInfo
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
-import yakworks.rally.testing.RallySeedData
 
 class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
-    //Automatically runs the basic crud tests
 
-    def setupSpec() {
-        defineBeans {
-            //scriptExecutorService(ScriptExecutorService)
-            orgDimensionService(OrgDimensionService)
-            orgMemberService(OrgMemberService)
-        }
-        mockDomains(
-            OrgTag, Location, Contact, Org, OrgSource, OrgFlex, OrgCalc, OrgInfo
-        )
+    Closure doWithGormBeans() { { ->
+        orgDimensionService(OrgDimensionService)
+        orgMemberService(OrgMemberService)
+    }}
+
+    void setupSpec() {
+        mockDomains(Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo)
     }
 
     void "sanity check build"() {

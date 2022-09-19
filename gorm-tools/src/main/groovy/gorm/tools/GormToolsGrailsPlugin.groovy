@@ -4,59 +4,49 @@
 */
 package gorm.tools
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.grails.orm.hibernate.HibernateDatastore
+import org.springframework.context.MessageSource
+
+import gorm.tools.boot.GormToolsConfiguration
+import gorm.tools.jdbc.DbDialectService
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
+import gorm.tools.validation.RepoValidatorRegistry
 import grails.core.ArtefactHandler
+import grails.plugins.Plugin
 
 /**
  * @author Joshua Burnett (@basejump)
  */
+@SuppressWarnings(['Indentation'])
+@CompileStatic
 @Slf4j
-class GormToolsGrailsPlugin extends grails.plugins.Plugin {
+class GormToolsGrailsPlugin extends Plugin {
 
     def loadAfter = ['hibernate', 'datasources']
     //make sure we load before controllers as might be creating rest controllers
     def loadBefore = ['controllers']
 
-    def watchedResources = [
-        "file:./grails-app/repository/**/*Repo.groovy",
-        "file:./grails-app/services/**/*Repo.groovy",
-        "file:./grails-app/domain/**/*.groovy",
-        "file:./plugins/*/grails-app/repository/**/*Repo.groovy",
-        "file:./plugins/*/grails-app/services/**/*Repo.groovy"
-    ]
-
-    List<ArtefactHandler> artefacts = [new RepositoryArtefactHandler()]
-
-    GormToolsBeanConfig getBeanConfig(){
-        new GormToolsBeanConfig(getConfig(), getApplicationContext())
-    }
-
-    Closure doWithSpring() {
-        return beanConfig.getBeanDefinitions()
-    }
+    List<ArtefactHandler> artefacts = [new RepositoryArtefactHandler()] as List<ArtefactHandler>
 
     @Override
-    void onChange(Map<String, Object> event) {
-        GormToolsBeanConfig.onChange(event, grailsApplication, this)
-    }
+    @CompileDynamic
+    Closure doWithSpring() {{ ->
+        //with how we change config its only accesible in grails config
+        DbDialectService.hibernateDialect = config.getProperty("hibernate.dialect")
 
-    @Override
-    void onStartup(Map event) {
-        // GormToolsPluginHelper.addQSearchFields(
-        //     config.gorm?.tools?.mango?.qSearchDefault ?: [],
-        //     grailsApplication.getMappingContext().getPersistentEntities() as List
-        // )
-    }
+        gormToolsConfiguration(GormToolsConfiguration, grailsApplication)
+    }}
 
     //This is kind of equivalent to init in bootstrap
-    @CompileStatic
+    @Override
     void doWithApplicationContext() {
-        beanConfig.doWithApplicationContext()
+        HibernateDatastore datastore = applicationContext.getBean("hibernateDatastore", HibernateDatastore)
+        RepoValidatorRegistry.init(datastore, applicationContext.getBean('messageSource', MessageSource))
     }
-
 
     /**
      * Invoked in a phase where plugins can add dynamic methods. Subclasses should override
@@ -72,72 +62,5 @@ class GormToolsGrailsPlugin extends grails.plugins.Plugin {
 //            }
 //        }
 //        assert GrailsDomainBinder.FOREIGN_KEY_SUFFIX == 'Id'
-
-       /* Class[] domainClasses = grailsApplication.domainClasses*.clazz
-        domainClasses.each { Class dc ->
-
-            if (dc.name.startsWith('grails.plugin.')) {
-                //domains from Spring Security Acl, for example, works only with default GORM behaviour
-                //most likely same is for other standard domains
-                return
-            }
-
-            def extension = dc.metaClass
-            String datasourceName = MultipleDataSourceSupport.getDefaultDataSource(dc.gormPersistentEntity)
-            boolean isDefault = (datasourceName == ConnectionSource.DEFAULT)
-            String suffix = isDefault ? '' : '_' + datasourceName
-            SessionFactory sessionFactory = grailsApplication.mainContext.getBean("sessionFactory$suffix")
-            HibernateDatastore datastore = grailsApplication.mainContext.getBean("hibernateDatastore")
-
-            if (!sessionFactory) {
-                log.error("No session factory found for datasource $datasourceName configured in domain class $dc.simpleName")
-            }
-
-            if (!datastore) {
-                log.error("No DataStore bean found for datasource $datasourceName configured in domain class $dc.simpleName")
-            }
-            registerCriteria(dc, extension, sessionFactory, datastore, grailsApplication)
-        }*/
-
     }
-
-    // private void registerCriteria(Class dc, MetaClass extension, SessionFactory sessionFactory,
-    //                               HibernateDatastore datastore, GrailsApplication grailsApplication) {
-    //     Class domainClassType = dc
-    //     ['createCriteria', 'makeCriteria'].eachWithIndex { name, idx ->
-    //         extension.static."$name" = { ->
-    //             GormHibernateCriteriaBuilder builder = new GormHibernateCriteriaBuilder(domainClassType, sessionFactory)
-    //             builder.conversionService = datastore.mappingContext.conversionService
-    //             //builder.grailsApplication = grailsApplication
-    //             return builder
-    //         }
-    //     }
-    //     ['withCriteria', 'forCriteria'].each {
-    //         extension.'static'."$it" = { Closure callable ->
-    //             def builder = new GormHibernateCriteriaBuilder(domainClassType, sessionFactory)
-    //             builder.conversionService = datastore.mappingContext.conversionService
-    //             //builder.grailsApplication = grailsApplication
-    //             builder.invokeMethod("doCall", callable)
-    //         }
-    //         extension.'static'."$it" = { Map builderArgs, Closure callable ->
-    //             def builder = new GormHibernateCriteriaBuilder(domainClassType, sessionFactory)
-    //             builder.conversionService = datastore.mappingContext.conversionService
-    //             builder.grailsApplication = grailsApplication
-    //             def builderBean = new BeanWrapperImpl(builder)
-    //             for (entry in builderArgs) {
-    //                 if (builderBean.isWritableProperty(entry.key)) {
-    //                     builderBean.setPropertyValue(entry.key, entry.value)
-    //                 }
-    //             }
-    //             builder.invokeMethod("doCall", callable)
-    //         }
-    //     }
-    // }
-
-    // @Override
-    // void doWithApplicationContext() {
-    //     String[] entities = grailsApplication.getMappingContext().getPersistentEntities()*.name
-    //     println ("doWithApplicationContext entities $entities")
-    // }
-
 }

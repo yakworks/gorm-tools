@@ -5,27 +5,20 @@
 package gorm.tools.mango
 
 import gorm.tools.mango.jpql.SimplePagedQuery
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
-import grails.gorm.transactions.Transactional
-import grails.testing.spring.AutowiredTest
-import yakworks.gorm.testing.model.KitchenSeedData
-import yakworks.gorm.testing.model.KitchenSink
-import yakworks.gorm.testing.model.SinkItem
+import spock.lang.Specification
+import yakworks.testing.gorm.model.KitchenSink
+import yakworks.testing.gorm.model.SinkItem
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class SimplePagedQuerySpec extends GormToolsHibernateSpec implements AutowiredTest {
+class SimplePagedQuerySpec extends Specification implements GormHibernateTest  {
+    static List entityClasses = [KitchenSink, SinkItem]
 
-    DefaultMangoQuery mangoQuery
-
-    List<Class> getDomainClasses() { [KitchenSink, SinkItem] }
-
-    @Transactional
     void setupSpec() {
-        KitchenSeedData.createKitchenSinks(10)
+        KitchenSink.createKitchenSinks(10)
     }
 
-    @Transactional
     void cleanupSpec() {
-        KitchenSink.deleteAll()
+        KitchenSink.cleanup()
     }
 
     void "sanity check"() {

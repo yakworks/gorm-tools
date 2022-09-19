@@ -49,19 +49,32 @@ repositories {
   mavenCentral()
 }
 ...
-compile "org.yakworks:gorm-tools:7.0.8-v.33"
+implementation "org.yakworks:gorm-tools:7.3.23"
 ``` 
+## Libs
+
+- `org.yakworks:gorm-tools` - main plugin for the base gorm-tools extensions
+- `org.yakworks:gorm-security` - implementations of the domains for security, audit stamp traits and events. 
+- `org.yakworks:gorm-rest` - foundation and ASTs for automated rest api from gorm domains
+- `org.yakworks:gorm-openapi` - gorm swagger and json schema foundation. 
+- `org.yakworks:gorm-etl` - Extract, Transform, Load for creating Excel and CSV
+- `org.yakworks:rally-domain` - Opinionated CRM like models that serve as foundation for our business apps. Also used for examples and testing.
+- `org.yakworks:rally-security` - Extra security models and shiro to spring-security adapter for fine grained ACL
+
+** Testing Libs
+- `org.yakworks:gorm-test-support` - Testing framework for gorm domains
+- `org.yakworks:gorm-test-domain` - common domain model used for tests. KitchenSink is commonly used in tests
+
 
 ## Groovy 3, Grails 5 and Gorm 7.3
 
-Versioning will track the `gorm.version` for example gorm-tools 7.3.20, 7.3.21, etc will be compiled against gorm.version 7.3.2.
-
+Versioning will track the `gorm.version` for example gorm-tools 7.3.20, 7.3.21, etc will be compiled against gorm.version 7.3.2, 7.3.31 -> gorm.version 7.3.3 etc...
 
 
 ## Purpose 
 
 Gorm-tools allows your Grails/Gorm project to start with a design of best practices that they can customize along the way. 
-This brings an opinionated starting point to a Grails/Gorm project but without being locked in.
+This brings an opinionated SpringBoot based starting point to a Grails/Gorm project but without being locked in.
 Developers are free to easily customize, replace and disable these patterns when their opinions differ.
 
 ## Overview

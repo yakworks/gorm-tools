@@ -4,22 +4,22 @@
 */
 package gorm.tools.mango
 
-import org.hibernate.QueryException
-
 import java.time.LocalDate
 
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import org.hibernate.QueryException
+import org.springframework.beans.factory.annotation.Autowired
+import spock.lang.Specification
 import testing.Address
 import testing.AddyNested
 import testing.Cust
 import testing.TestIdent
 import testing.TestSeedData
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class MangoCriteriaSpec extends GormToolsHibernateSpec {
+class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
+    static List entityClasses = [Cust, Address, AddyNested]
 
-    MangoBuilder mangoBuilder
-
-    List<Class> getDomainClasses() { [Cust, Address, AddyNested] }
+    @Autowired MangoBuilder mangoBuilder
 
     MangoDetachedCriteria build(map, Closure closure = null) {
         //DetachedCriteria detachedCriteria = new DetachedCriteria(Org)

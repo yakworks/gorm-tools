@@ -3,7 +3,7 @@ apply plugin: "yakworks.grails-plugin"
 apply from: "${rootProject.projectDir}/gradle/test-integration.gradle"
 
 //shared resources to pick up the Gorm defaults from application.groovy, as well as simple logback
-sourceSets.test.resources.srcDirs += [project(':gorm-test-support').sourceSets.main.resources]
+// sourceSets.test.resources.srcDirs += [project(':gorm-test-support').sourceSets.main.resources]
 
 dependencies {
 
@@ -11,10 +11,10 @@ dependencies {
   profile "org.grails.profiles:rest-api"
 
   api project(":gorm-tools")
-  api project(":gorm-tools-security")
-  api project(":gorm-tools-csv")
-  api "org.yakworks:grails-kit:$vYakGrailsKit"
-  api "org.yakworks:grails-external-config:$vYakGrailsKit"
+  api project(":gorm-security")
+  api project(":gorm-etl")
+  api "org.yakworks:grails-kit:$vSpringGrailsKit"
+  api "org.yakworks:grails-external-config:$vSpringGrailsKit"
   //api "dk.glasius:external-config:$vExternalConfig"
   api 'jakarta.annotation:jakarta.annotation-api:2.1.0'
 
@@ -30,11 +30,6 @@ dependencies {
 
   implementation "org.grails:grails-web-boot"
   implementation "org.grails:grails-plugin-services"
-
-  testRuntimeOnly "com.h2database:h2:$vH2"
-  testRuntimeOnly "javax.xml.bind:jaxb-api:2.3.1"
-  testRuntimeOnly "com.zaxxer:HikariCP:$vHikari"
-
 }
 
 bootRun {

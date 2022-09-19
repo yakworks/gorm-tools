@@ -4,13 +4,14 @@
 */
 package gorm.tools.utils
 
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import spock.lang.Specification
 import testing.Cust
 import testing.CustType
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class GormMetaUtilsSpec extends GormToolsHibernateSpec {
+class GormMetaUtilsSpec extends Specification implements GormHibernateTest {
 
-    List<Class> getDomainClasses() { [Cust, CustType] }
+    static List entityClasses = [Cust, CustType]
 
     void setupSpec(){
         new CustType(name: 'foo').persist(flush: true)

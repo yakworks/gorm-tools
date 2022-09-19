@@ -9,7 +9,6 @@ import yakworks.rally.testing.RallySeedData
 class BootStrap {
 
     def init = { servletContext ->
-
         RallySeedData.init()
         RallySeedData.fullMonty()
     }

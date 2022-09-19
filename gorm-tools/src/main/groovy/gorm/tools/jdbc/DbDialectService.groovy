@@ -5,20 +5,22 @@
 package gorm.tools.jdbc
 
 import java.sql.SQLException
+import javax.annotation.PostConstruct
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.reflect.ClassUtils
-import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.beans.factory.annotation.Value
 
-import gorm.tools.beans.AppCtx
+import yakworks.spring.SpringEnvironment
 
 /**
  * Utility class to help create generic code and SQL that can work across supported databases.
  */
+@SuppressWarnings(['AssignmentToStaticFieldFromInstanceMethod'])
 @CompileStatic
-class DbDialectService {
+class DbDialectService implements SpringEnvironment {
 
     static final int UNKNOWN = 0
     static final int MSSQL = 1
@@ -27,38 +29,44 @@ class DbDialectService {
     static final int H2 = 4
     static final int POSTGRESQL = 5
 
-    // injected in bean setup
-    JdbcTemplate jdbcTemplate
+    @Value('${hibernate.dialect}')
+    static String hibernateDialect
 
-    static String dialectName
+    /** dialect identity*/
+    static int dialect
 
-    //need this static so that getGlobalVariables can be accessed from doWithSpring in rally plugin
-    private static int setupDialect() {
+    @PostConstruct
+    void init() {
+        // hibernateDialect = environment
+        dialect = translateHibernateDialect(hibernateDialect)
+    }
+
+    /**
+     * converts a hibernate dialiect name into the static database ids we use.
+     * @return 0-5 to map to DbDialectService.H2, DbDialectService.MSSQL etc....
+     */
+    static int translateHibernateDialect(String hibernateDialectName) {
         int result = UNKNOWN
         // just to make the stuff below easier to read.
-        if (!dialectName) {
-            dialectName = AppCtx.config.getProperty('hibernate.dialect')
-        }
+        // if (!dialectName) {
+        //     dialectName = hibernateDialect //GrailsHolder.config.getProperty('hibernate.dialect')
+        // }
 
         //fallback to H2 just like how Datasources plugin does. if H2 is present in classpath
-        if ((dialectName == null && ClassUtils.isPresent("org.h2.Driver"))
-            || dialectName.contains('H2')) result = H2
-        else if (dialectName.contains("SQLServerDialect")) result = MSSQL
-        else if (dialectName.matches(".*SQLServer20\\d\\dDialect")) result = MSSQL
-        else if (dialectName.contains("MySQL5InnoDBDialect")) result = MYSQL
-        else if (dialectName.contains("Oracle")) result = ORACLE
-        else if (dialectName.contains("Postgre")) result = POSTGRESQL
+        if ((!hibernateDialectName && ClassUtils.isPresent("org.h2.Driver"))
+            || hibernateDialectName.contains('H2')) result = H2
+        else if (hibernateDialectName.contains("SQLServerDialect")) result = MSSQL
+        else if (hibernateDialectName.matches(".*SQLServer20\\d\\dDialect")) result = MSSQL
+        else if (hibernateDialectName.contains("MySQL5InnoDBDialect")) result = MYSQL
+        else if (hibernateDialectName.contains("Oracle")) result = ORACLE
+        else if (hibernateDialectName.contains("Postgre")) result = POSTGRESQL
 
         if (result == UNKNOWN) {
-            throw new SQLException("Unknown dialect ${dialectName} in gorm.tools.jdbc.DbDialectService.\n"
+            throw new SQLException("Unknown dialect ${hibernateDialectName} in gorm.tools.jdbc.DbDialectService.\n"
                     + "Please specify a known for for config hibernate.dialect")
         }
 
         return result
-    }
-
-    int getDialect() {
-        return setupDialect()
     }
 
     String getCurrentDate() {
@@ -139,7 +147,7 @@ class DbDialectService {
         func
     }
 
-    String getDialectName() {
+    static String getDialectName() {
         return getSimpleDialectName(dialect)
     }
 
@@ -155,11 +163,12 @@ class DbDialectService {
         top
     }
 
-    void updateOrDateFormat() {
+
+    void updateOracleDateFormat() {
         if (dialect == ORACLE) {
             String alterOrDateFormat = "alter session set nls_date_format = 'YYYY-MM-dd hh24:mi:ss'"
-
-            jdbcTemplate.update(alterOrDateFormat)
+            //if we decide to support oracle again.
+            // jdbcTemplate.update(alterOrDateFormat)
         }
     }
 
@@ -181,25 +190,21 @@ class DbDialectService {
     }
 
     static String getSimpleDialectName(int dialectKey) {
-        String dialectName
+        String simpleName
         switch (dialectKey) {
-            case MSSQL: dialectName = "mssql"; break
-            case MYSQL: dialectName = "mysql"; break
-            case ORACLE: dialectName = "oracle"; break
-            case H2: dialectName = "h2"; break
-            case POSTGRESQL: dialectName = "postgresql"; break
-            default: dialectName = "mysql"
+            case MSSQL: simpleName = "mssql"; break
+            case MYSQL: simpleName = "mysql"; break
+            case ORACLE: simpleName = "oracle"; break
+            case H2: simpleName = "h2"; break
+            case POSTGRESQL: simpleName = "postgresql"; break
+            default: simpleName = "mysql"
         }
-        dialectName
+        simpleName
     }
 
+    //used to inject confugrationProperties into ibatis SqlSessionFactoryBean
     static Map getGlobalVariables() {
-        Map result = [:]
-        int dialect = setupDialect()
-        String dialectName = getSimpleDialectName(dialect)
-        result.dialect = dialectName
-        // result['databaseId'] = dialectName
-        return result
+        return [dialect: getDialectName()]
     }
 
     boolean isMySql() {

@@ -4,18 +4,16 @@
 */
 package gorm.tools.repository
 
-import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.repository.model.UuidGormRepo
-import gorm.tools.testing.RepoTestData
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import spock.lang.Specification
 import testing.UuidSample
-import yakworks.gorm.testing.model.Thing
-import yakworks.gorm.testing.model.ThingRepo
+import yakworks.testing.gorm.RepoTestData
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class UuidRepoSpec extends GormToolsHibernateSpec {
+class UuidRepoSpec extends Specification implements GormHibernateTest {
 
     //test the thing
-    List<Class> getDomainClasses() { [UuidSample] }
+    static List entityClasses = [UuidSample]
 
     def "assert proper repos are setup"() {
         expect:

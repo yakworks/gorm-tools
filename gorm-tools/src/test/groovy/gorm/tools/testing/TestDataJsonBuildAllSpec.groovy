@@ -4,8 +4,9 @@
 */
 package gorm.tools.testing
 
-import gorm.tools.testing.unit.DataRepoTest
-import gorm.tools.testing.unit.RepoBuildDataTest
+import yakworks.testing.gorm.TestDataJson
+import yakworks.testing.gorm.unit.DataRepoTest
+import yakworks.testing.gorm.support.RepoBuildDataTest
 import spock.lang.Specification
 import testing.Address
 import testing.Cust

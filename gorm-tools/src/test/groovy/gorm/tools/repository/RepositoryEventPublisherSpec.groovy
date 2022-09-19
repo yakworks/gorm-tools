@@ -7,14 +7,15 @@ package gorm.tools.repository
 import gorm.tools.databinding.BindAction
 import gorm.tools.repository.model.RepoEntity
 import gorm.tools.repository.events.*
-import gorm.tools.testing.unit.DataRepoTest
+import org.springframework.beans.factory.annotation.Autowired
+import yakworks.testing.gorm.unit.DataRepoTest
 import grails.persistence.Entity
 import org.springframework.context.event.EventListener
 import spock.lang.Specification
 
 class RepositoryEventPublisherSpec extends Specification implements DataRepoTest {
 
-    RepoEventPublisher repoEventPublisher
+    @Autowired RepoEventPublisher repoEventPublisher
 
     void setupSpec() {
         mockDomains(City)

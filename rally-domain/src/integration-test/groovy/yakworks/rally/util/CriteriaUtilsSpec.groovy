@@ -1,6 +1,6 @@
 package yakworks.rally.util
 
-import gorm.tools.testing.integration.DataIntegrationTest
+import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
 import yakworks.rally.orgs.model.Contact

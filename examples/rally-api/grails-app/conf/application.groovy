@@ -1,18 +1,6 @@
 import grails.util.Environment
 import yakworks.commons.util.BuildSupport
 
-grails {
-    gorm.failOnError = true
-    gorm.default.mapping = {
-        id generator: 'gorm.tools.hibernate.SpringBeanIdGenerator'
-        '*'(cascadeValidate: 'dirty')
-        //cache usage: System.getProperty("cacheStrategy", "read-write").toString()
-    }
-    gorm.default.constraints = {
-        '*'(nullable:true)
-    }
-}
-
 // securityConfig << "classpath:security/security-config.groovy"
 
 grails.config.locations = ["classpath:restapi-config.yml", "classpath*:restapi/rally/*.yml"]

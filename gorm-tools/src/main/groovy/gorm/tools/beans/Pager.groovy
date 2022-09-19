@@ -10,6 +10,7 @@ import groovy.util.logging.Slf4j
 
 import gorm.tools.metamap.services.MetaMapService
 import yakworks.meta.MetaMapList
+import yakworks.spring.AppCtx
 
 /**
  * a holder object for paged data, used mostly in the rest and views
@@ -169,7 +170,7 @@ class Pager {
     @Deprecated //use setupList
     Pager setupData(List dlist, List includes = null) {
         MetaMapList entityMapList = AppCtx.get('metaMapService', MetaMapService).createMetaMapList(dlist, includes)
-        setEntityMapList(entityMapList)
+        setMetaMapList(entityMapList)
         return this
     }
 
@@ -181,7 +182,7 @@ class Pager {
      * @param includes list of fields names which values should be in the result list based on dlist
      * @return new list with values selected from dlist based on fieldLists field names
      */
-    Pager setEntityMapList(MetaMapList entityMapList) {
+    Pager setMetaMapList(MetaMapList entityMapList) {
         if(entityMapList){
             setRecordCount(entityMapList.getTotalCount())
             setData(entityMapList)

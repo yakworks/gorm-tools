@@ -11,7 +11,7 @@ import spock.lang.Specification
 import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.json.groovy.JsonEngine
-import yakworks.gorm.testing.DomainIntTest
+import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Org
 
@@ -38,14 +38,28 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         JsonException ex = thrown()
     }
 
-    def "test create job"() {
+    void "test create job and save payload to file"() {
+        when:
+        List payload = [1,2,3,4]
+        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source')
+        syncJobArgs.entityClass = Org
+        syncJobArgs.savePayload = true
+        syncJobArgs.savePayloadAsFile = true
+        SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, payload)
+
+        then:
+        noExceptionThrown()
+        jobContext.jobId
+        SyncJob.get(jobContext.jobId)
+    }
+
+    void "test create job"() {
         when:
         SyncJobContext jobContext = createJob()
 
         then:
         jobContext.jobId
         SyncJob.get(jobContext.jobId)
-
     }
 
     def "test update job"() {
@@ -122,7 +136,7 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         SyncJobContext jobContext = createJob()
         String transformResultsClosureWasCalled
 
-        jobContext.transformResultsClosure = {apiResults ->
+        jobContext.transformResultsClosure = { apiResults ->
             transformResultsClosureWasCalled = apiResults.title
         }
 

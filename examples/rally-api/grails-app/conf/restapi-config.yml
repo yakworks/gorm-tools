@@ -4,7 +4,7 @@ api:
   namespaces: {rally: 'Core / Rally'}
   paths:
     kitchen:
-      entityClass: yakworks.gorm.testing.model.KitchenSink
+      entityClass: yakworks.testing.gorm.model.KitchenSink
 
     rally:
       activity:
@@ -34,10 +34,10 @@ api:
 
       # Security
       user:
-        entityClass: gorm.tools.security.domain.AppUser
+        entityClass: yakworks.security.gorm.model.AppUser
       role:
-        entityClass: gorm.tools.security.domain.SecRole
+        entityClass: yakworks.security.gorm.model.SecRole
         allowedOps: [read]
       roleUser:
-        entityClass: gorm.tools.security.domain.SecRoleUser
+        entityClass: yakworks.security.gorm.model.SecRoleUser
         allowedOps: [create, delete]

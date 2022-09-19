@@ -10,10 +10,10 @@ import groovy.transform.CompileStatic
 
 import org.springframework.cache.annotation.Cacheable
 
-import gorm.tools.beans.AppCtx
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.map.Maps
 import yakworks.grails.support.ConfigAware
+import yakworks.spring.AppCtx
 
 /**
  * Helper to lookup includes for map or list based api, usually a json and rest based api.
@@ -152,8 +152,8 @@ class IncludesConfig implements ConfigAware {
     /**
      * setup pathKeys for entityClass
      * this scans the api.paths base for entityClassName and store the pathKey with namespace.
-     * when it finds  api.paths.security.user.entityClass: gorm.tools.security.domain.AppUser
-     * it will store ['gorm.tools.security.domain.AppUser': 'api.paths.security.user'] for faster lookup
+     * when it finds  api.paths.security.user.entityClass: yakworks.security.domain.AppUser
+     * it will store ['yakworks.security.domain.AppUser': 'api.paths.security.user'] for faster lookup
      */
     void setupEntityClassPathKeys() {
         Properties cfgProps = config.toProperties()

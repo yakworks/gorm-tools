@@ -24,8 +24,8 @@ dependencies {
   implementation "org.hibernate:hibernate-ehcache:$vHibernate"
 
   implementation project(":testify")
-  implementation project(":gorm-tools-security")
-  implementation project(":gorm-tools-rest")
+  implementation project(":gorm-security")
+  implementation project(":gorm-rest")
 
   //??wtf
   implementation "commons-lang:commons-lang:2.6"
@@ -57,7 +57,10 @@ bootRun {
   jvmArgs('-Dspring.output.ansi.enabled=always', '-noverify', '-XX:TieredStopAtLevel=1', '-Xmx1024m')
   sourceResources sourceSets.main
   String springProfilesActive = 'spring.profiles.active'
-  systemProperty springProfilesActive, System.getProperty(springProfilesActive)
+  String profileVal = System.getProperty(springProfilesActive) //?: 'dev'
+  systemProperty springProfilesActive, profileVal
+  systemProperty "gradle.rootProjectDir", rootProject.projectDir.absolutePath
+  systemProperty "gradle.projectDir", project.projectDir.absolutePath
 }
 
 bootJar.enabled = true

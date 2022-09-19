@@ -2,13 +2,13 @@ package gorm.tools.beans
 
 
 import gorm.tools.metamap.services.MetaMapService
-import gorm.tools.security.domain.AppUser
-import gorm.tools.testing.integration.DataIntegrationTest
+import yakworks.security.gorm.model.AppUser
+import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.gorm.testing.SecuritySpecHelper
+import yakworks.testing.gorm.integration.SecuritySpecHelper
 
 @Integration
 @Rollback

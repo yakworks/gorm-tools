@@ -2,31 +2,28 @@ package yakworks.rally.common
 
 import java.nio.file.Files
 
-import gorm.tools.testing.unit.DataRepoTest
-import yakworks.commons.io.ZipUtils
-import yakworks.grails.resource.AppResourceLoader
-import spock.lang.Shared
+import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
+import yakworks.commons.io.ZipUtils
 import yakworks.commons.util.BuildSupport
-import yakworks.gorm.testing.SecurityTest
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.model.FileData
+import yakworks.spring.AppResourceLoader
+import yakworks.testing.gorm.unit.SecurityTest
+import yakworks.testing.gorm.unit.DataRepoTest
 
 class DefaultCsvToMapTransformerSpec extends Specification implements DataRepoTest, SecurityTest {
+    static List entityClasses = [ Attachment, AttachmentLink, FileData ]
 
-    @Shared
-    DefaultCsvToMapTransformer csvToMapTransformer
+    @Autowired DefaultCsvToMapTransformer csvToMapTransformer
 
-    def setupSpec() {
-        defineBeans {
-            appResourceLoader(AppResourceLoader)
-            attachmentSupport(AttachmentSupport)
-            csvToMapTransformer(DefaultCsvToMapTransformer)
-        }
-        mockDomains(Attachment, AttachmentLink, FileData)
-    }
+    Closure doWithGormBeans() { { ->
+        appResourceLoader(AppResourceLoader)
+        attachmentSupport(AttachmentSupport)
+        csvToMapTransformer(DefaultCsvToMapTransformer)
+    }}
 
     void "sanity checks"() {
         expect:

@@ -241,7 +241,7 @@ class EventLogHelper {
      */
     @CompileDynamic
     Map mergeParams(Map base, Map extras) {
-        Map r = [appName : appName, component: component, isPrimaryJob: isPrimaryJob, jobName: jobName,
+        Map r = [component: component, isPrimaryJob: isPrimaryJob, jobName: jobName,
                  linkedId: linkedId, jobParams: jobParams, userId: userId, action: '...', message: ''
         ]
         base?.each { key, value ->

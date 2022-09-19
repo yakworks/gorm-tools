@@ -8,6 +8,7 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import gorm.tools.jdbc.DbDialectService
 import org.grails.orm.hibernate.HibernateDatastore
 import org.springframework.context.MessageSource
 
@@ -34,6 +35,9 @@ class GormToolsGrailsPlugin extends Plugin {
     @Override
     @CompileDynamic
     Closure doWithSpring() {{ ->
+        //with how we change config its only accesible in grails config
+        DbDialectService.hibernateDialect = config.getProperty("hibernate.dialect")
+
         gormToolsConfiguration(GormToolsConfiguration, grailsApplication)
     }}
 

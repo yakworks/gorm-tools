@@ -271,6 +271,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#libs" title="Libs" class="md-nav__link">
+    Libs
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#groovy-3-grails-5-and-gorm-73" title="Groovy 3, Grails 5 and Gorm 7.3" class="md-nav__link">
     Groovy 3, Grails 5 and Gorm 7.3
   </a>
@@ -616,6 +623,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#libs" title="Libs" class="md-nav__link">
+    Libs
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#groovy-3-grails-5-and-gorm-73" title="Groovy 3, Grails 5 and Gorm 7.3" class="md-nav__link">
     Groovy 3, Grails 5 and Gorm 7.3
   </a>
@@ -758,7 +772,7 @@
     |    |(  <_> |  <_> )  |__\___ \               `!!! !!!! !!  )!!!!!!!!!!!!!
     |____| \____/ \____/|____/____  >               !!  ! ! \( \(  !!!|/!  |/!
                                   \/               /_(      /_(/_(    /_(  /_(   
-         Version: 7.3.23
+         Version: 7.3.25
 
 </pre>
 
@@ -794,14 +808,27 @@ More breaking changes in 7.0.8-v6. is required on domain entity now or it needs 
   mavenCentral()
 }
 ...
-compile &quot;org.yakworks:gorm-tools:7.0.8-v.33&quot;
+implementation &quot;org.yakworks:gorm-tools:7.3.23&quot;
 </pre></div>
 
+<h2 id="libs">Libs<a class="headerlink" href="#libs" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>org.yakworks:gorm-tools</code> - main plugin for the base gorm-tools extensions</li>
+<li><code>org.yakworks:gorm-security</code> - implementations of the domains for security, audit stamp traits and events. </li>
+<li><code>org.yakworks:gorm-rest</code> - foundation and ASTs for automated rest api from gorm domains</li>
+<li><code>org.yakworks:gorm-openapi</code> - gorm swagger and json schema foundation. </li>
+<li><code>org.yakworks:gorm-etl</code> - Extract, Transform, Load for creating Excel and CSV</li>
+<li><code>org.yakworks:rally-domain</code> - Opinionated CRM like models that serve as foundation for our business apps. Also used for examples and testing.</li>
+<li><code>org.yakworks:rally-security</code> - Extra security models and shiro to spring-security adapter for fine grained ACL</li>
+</ul>
+<p>** Testing Libs
+- <code>org.yakworks:gorm-test-support</code> - Testing framework for gorm domains
+- <code>org.yakworks:gorm-test-domain</code> - common domain model used for tests. KitchenSink is commonly used in tests</p>
 <h2 id="groovy-3-grails-5-and-gorm-73">Groovy 3, Grails 5 and Gorm 7.3<a class="headerlink" href="#groovy-3-grails-5-and-gorm-73" title="Permanent link">&para;</a></h2>
-<p>Versioning will track the <code>gorm.version</code> for example gorm-tools 7.3.20, 7.3.21, etc will be compiled against gorm.version 7.3.2.</p>
+<p>Versioning will track the <code>gorm.version</code> for example gorm-tools 7.3.20, 7.3.21, etc will be compiled against gorm.version 7.3.2, 7.3.31 -&gt; gorm.version 7.3.3 etc...</p>
 <h2 id="purpose">Purpose<a class="headerlink" href="#purpose" title="Permanent link">&para;</a></h2>
 <p>Gorm-tools allows your Grails/Gorm project to start with a design of best practices that they can customize along the way. 
-This brings an opinionated starting point to a Grails/Gorm project but without being locked in.
+This brings an opinionated SpringBoot based starting point to a Grails/Gorm project but without being locked in.
 Developers are free to easily customize, replace and disable these patterns when their opinions differ.</p>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
 <p>This is a library of tools to help standardize and simplify the service and Restful controller layer business logic for 

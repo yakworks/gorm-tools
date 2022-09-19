@@ -727,11 +727,11 @@ The details of whats available can be seen in the <a class="new-tab" href="https
 <p>If you used the script to create the domains then the tests will already be in place for us or you can add one manually like so.</p>
 <div class="codehilite"><pre><span></span><span class="kn">package</span> <span class="n">testing</span>
 
-<span class="kn">import</span> <span class="nn">gorm.tools.testing.hibernate.AutoHibernateSpec</span>
+<span class="kn">import</span> <span class="nn">yakworks.testing.gorm.hibernate.AutoHibernateSpec</span>
 <span class="kn">import</span> <span class="nn">spock.lang.Specification</span>
 
 <span class="kd">class</span> <span class="nc">ProjectSpec</span> <span class="kd">extends</span> <span class="n">AutoHibernateSpec</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="o">{</span>
-    <span class="cm">/** automatically runs tests on persist(), create(), update(), delete().*/</span>
+  <span class="cm">/** automatically runs tests on persist(), create(), update(), delete().*/</span>
 <span class="o">}</span>
 </pre></div>
 

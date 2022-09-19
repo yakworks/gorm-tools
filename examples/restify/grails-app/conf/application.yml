@@ -22,11 +22,6 @@ info:
     grailsVersion: '@info.app.grailsVersion@'
 
 spring:
-#  profiles:
-#    active: dev
-#  config:
-#    additional-location:
-
   main:
     banner-mode: "off"
     lazy-initialization: true

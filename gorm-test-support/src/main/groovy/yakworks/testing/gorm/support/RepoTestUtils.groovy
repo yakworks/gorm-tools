@@ -86,27 +86,31 @@ class RepoTestUtils {
         // xmlns([context:"http://www.springframework.org/schema/context"])
         // context.'component-scan'('base-package': 'gorm.tools.settings')
 
-        entityMapBinder(EntityMapBinder)
-        repoEventPublisher(RepoEventPublisher)
+        entityMapBinder(EntityMapBinder, lazy())
+        repoEventPublisher(RepoEventPublisher, lazy())
         //repoUtilBean(RepoUtil)
-        repoExceptionSupport(RepoExceptionSupport)
-        mangoQuery(DefaultMangoQuery)
-        mangoBuilder(MangoBuilder)
-        trxService(TrxService)
-
-        jdbcIdGenerator(MockJdbcIdGenerator)
-        idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"))
-        persistenceContextInterceptor(NullPersistentContextInterceptor) //required for parallelTools
-        parallelTools(ParallelStreamTools)
-        asyncService(AsyncService)
-        includesConfig(IncludesConfig)
-        metaEntityService(MetaEntityService)
-        metaMapService(MetaMapService)
-        problemHandler(ProblemHandler)
-        messageSource(GrailsICUMessageSource)
-        externalConfigLoader(ExternalConfigLoader)
-        // asyncProperties(AsyncProperties)
+        repoExceptionSupport(RepoExceptionSupport, lazy())
+        mangoQuery(DefaultMangoQuery, lazy())
+        mangoBuilder(MangoBuilder, lazy())
+        trxService(TrxService, lazy())
+        jdbcIdGenerator(MockJdbcIdGenerator, lazy())
+        idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"), lazy())
+        persistenceContextInterceptor(NullPersistentContextInterceptor, lazy()) //required for parallelTools
+        parallelTools(ParallelStreamTools, lazy())
+        asyncService(AsyncService, lazy())
+        includesConfig(IncludesConfig, lazy())
+        metaEntityService(MetaEntityService, lazy())
+        metaMapService(MetaMapService, lazy())
+        problemHandler(ProblemHandler, lazy())
+        messageSource(GrailsICUMessageSource, lazy())
+        externalConfigLoader(ExternalConfigLoader, lazy())
     }}
+
+    @CompileDynamic
+    Closure lazy() {{ bean ->
+        bean.lazyInit = true
+    }}
+
 
     @CompileDynamic
     Closure repoBeansClosure(Class<?>... domainClassesToMock){ { ->
@@ -115,9 +119,9 @@ class RepoTestUtils {
             grailsApplication.addArtefact(RepositoryArtefactHandler.TYPE, repoClass)
             String repoName = RepoUtil.getRepoBeanName(domainClass)
             if (repoClass == DefaultGormRepo || repoClass == UuidGormRepo) {
-                "$repoName"(repoClass, domainClass)
+                "$repoName"(repoClass, domainClass, lazy())
             } else {
-                "$repoName"(repoClass)
+                "$repoName"(repoClass, lazy())
             }
         }
     }}

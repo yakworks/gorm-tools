@@ -12,8 +12,6 @@ class EventLogHelperSpec extends Specification implements GormHibernateTest  {
     static final String COMPONENT = 'service/method'
     static final String APP_NAME  = 'rally-domain'
 
-
-
     Closure doWithGormBeans() { { ->
         eventLogger(EventLogger)
     }}

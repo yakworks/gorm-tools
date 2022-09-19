@@ -21,7 +21,7 @@ class FuturesSpec extends Specification implements GormHibernateTest{
 
         Supplier<String> supplierFunc = () -> { return 'foo' }
 
-        asyncService.supplyAsync(new AsyncConfig(enabled:false), supplierFunc).whenComplete{ String result, ex ->
+        asyncService.supplyAsync(new AsyncArgs(enabled:false), supplierFunc).whenComplete{ String result, ex ->
             assert result == 'foo'
             message = result
             println "whenComplete with $result"
@@ -38,7 +38,7 @@ class FuturesSpec extends Specification implements GormHibernateTest{
 
         Supplier supplierFunc = () -> { throw new RuntimeException('some exception') }
 
-        asyncService.supplyAsync(new AsyncConfig(enabled:false), supplierFunc).whenComplete{ String result, ex ->
+        asyncService.supplyAsync(new AsyncArgs(enabled:false), supplierFunc).whenComplete{ String result, ex ->
             assert result == null
             assert ex.message == 'some exception'
             message = ex.message

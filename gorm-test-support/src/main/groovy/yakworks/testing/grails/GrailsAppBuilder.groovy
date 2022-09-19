@@ -33,8 +33,8 @@ class GrailsAppBuilder extends GrailsApplicationBuilder {
         ConfigurableBeanFactory beanFactory = context.getBeanFactory()
         prepareContext(context, beanFactory)
 
-        context.register(BasicConfiguration)
-
+        context.register(TestConfiguration)
+        context.scan("gorm.tools.config")
         context.refresh()
         context.registerShutdownHook()
         context

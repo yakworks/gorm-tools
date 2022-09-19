@@ -1,5 +1,7 @@
 spring.config.import: classpath:./gorm/tools/datasource-test.yml
 
+hibernate.jdbc.batch_size: 50
+
 logging:
   level:
     root: DEBUG
@@ -8,9 +10,13 @@ logging:
 
 gorm:
   tools:
+    hello: world
     async:
       poolSize: 2
       foo: bar
+    idGenerator:
+      startValue: 1
+
 ---
 
 

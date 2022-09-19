@@ -6,7 +6,7 @@ import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
 import grails.plugins.metadata.PluginSource
 
-@ComponentScan(['yakworks.testify', 'gorm.tools.settings', 'yakworks.security', 'yakworks.rally', 'yakworks.testing.gorm.model'])
+@ComponentScan(['yakworks.testify', 'yakworks.security', 'yakworks.rally', 'yakworks.testing.gorm.model'])
 @PluginSource
 class Application extends GrailsAutoConfiguration {
 

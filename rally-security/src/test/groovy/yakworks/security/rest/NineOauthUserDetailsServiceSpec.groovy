@@ -1,5 +1,6 @@
 package yakworks.security.rest
 
+import org.springframework.beans.factory.annotation.Autowired
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRoleUser
@@ -13,16 +14,17 @@ import org.springframework.security.core.userdetails.UserDetailsChecker
 import org.springframework.security.core.userdetails.UserDetailsService
 import spock.lang.Specification
 
-class NineOauthUserDetailsServiceSpec extends Specification implements DataRepoTest, ServiceUnitTest<NineOauthUserDetailsService> {
+class NineOauthUserDetailsServiceSpec extends Specification implements DataRepoTest{
+    static entityClasses = [AppUser, SecRole, SecRoleUser]
 
-    void setupSpec() {
-        defineBeans({
-            preAuthenticationChecks(InstanceFactoryBean, Mock(UserDetailsChecker), UserDetailsChecker)
-            userDetailsService(InstanceFactoryBean, Mock(UserDetailsService), UserDetailsService)
-            passwordEncoder(NoOpPasswordEncoder)
-        })
-        mockDomains(AppUser, SecRole, SecRoleUser)
-    }
+    @Autowired NineOauthUserDetailsService nineOauthUserDetailsService
+
+    Closure doWithGormBeans(){{ ->
+        preAuthenticationChecks(InstanceFactoryBean, Mock(UserDetailsChecker), UserDetailsChecker)
+        userDetailsService(InstanceFactoryBean, Mock(UserDetailsService), UserDetailsService)
+        passwordEncoder(NoOpPasswordEncoder)
+        nineOauthUserDetailsService(NineOauthUserDetailsService)
+    }}
 
     void "load user shoud not fail when no password"() {
         setup:
@@ -36,7 +38,7 @@ class NineOauthUserDetailsServiceSpec extends Specification implements DataRepoT
             getId() >> "test"
         }
 
-        OauthUser oauthUser = service.loadUser(profile, [])
+        OauthUser oauthUser = nineOauthUserDetailsService.loadUser(profile, [])
 
         then:
         oauthUser != null

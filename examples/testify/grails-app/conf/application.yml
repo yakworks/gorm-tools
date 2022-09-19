@@ -8,6 +8,7 @@ info:
 spring:
   main:
     banner-mode: "off"
+    lazy-initialization: true
   groovy:
     template:
       check-template-location: false
@@ -35,6 +36,8 @@ app:
 
 gorm:
   tools:
+    hello: world
     async:
       poolSize: 2
-      foo: bar
+    idGenerator:
+      startValue: 999

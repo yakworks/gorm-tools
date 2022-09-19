@@ -9,7 +9,7 @@ import org.grails.datastore.mapping.core.Session
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
-import gorm.tools.async.AsyncConfig
+import gorm.tools.async.AsyncArgs
 import gorm.tools.beans.Pager
 import gorm.tools.databinding.BindAction
 import gorm.tools.mango.DefaultMangoQuery
@@ -77,7 +77,7 @@ abstract class BenchProcessData implements BenchConfig, WithTrx  {
             def sliceClosure = parallelTools.sliceClosure { Map item ->
                 getBindAndSaveClosure().call(domainClass, item)
             }
-            parallelTools.each(AsyncConfig.transactional(), collatedList, sliceClosure)
+            parallelTools.each(AsyncArgs.transactional(), collatedList, sliceClosure)
         }
     }
 

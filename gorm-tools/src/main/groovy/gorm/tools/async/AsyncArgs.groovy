@@ -17,7 +17,7 @@ import gorm.tools.repository.RepoLookup
  */
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @CompileStatic
-class AsyncConfig {
+class AsyncArgs {
 
     /**
      * the size of the lists when collated or sliced into chunks,
@@ -55,22 +55,22 @@ class AsyncConfig {
      */
     Datastore datastore
 
-    static AsyncConfig transactional(){
-        new AsyncConfig(transactional: true)
+    static AsyncArgs transactional(){
+        new AsyncArgs(transactional: true)
     }
 
-    static AsyncConfig withSession(){
-        new AsyncConfig(session: true)
+    static AsyncArgs withSession(){
+        new AsyncArgs(session: true)
     }
 
-    static AsyncConfig of(Datastore ds, boolean session = true){
+    static AsyncArgs of(Datastore ds, boolean session = true){
         // if passing in a datastore then assume you want a session too. so set to false if not desired
         // if transactional is set later then it overrides session
-        new AsyncConfig(datastore: ds, session: true)
+        new AsyncArgs(datastore: ds, session: true)
     }
 
-    static AsyncConfig of(Class entity){
+    static AsyncArgs of(Class entity){
         def repo = RepoLookup.findRepo(entity)
-        AsyncConfig.of(repo.datastore)
+        AsyncArgs.of(repo.datastore)
     }
 }

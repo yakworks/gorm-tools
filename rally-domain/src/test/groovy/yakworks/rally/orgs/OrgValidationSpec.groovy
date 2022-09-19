@@ -14,15 +14,8 @@ import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.DataRepoTest
 
 class OrgValidationSpec extends Specification implements DataRepoTest, SecurityTest {
-    static List entityClasses = [Org]
-
-    Closure doWithGormBeans() { { ->
-        orgDimensionService(OrgDimensionService)
-    }}
-
-    void setupSpec() {
-        mockDomains(OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo)
-    }
+    static List entityClasses = [Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo]
+    static springBeans = [ orgDimensionService: OrgDimensionService ]
 
     void "sanity check validation"() {
         when:

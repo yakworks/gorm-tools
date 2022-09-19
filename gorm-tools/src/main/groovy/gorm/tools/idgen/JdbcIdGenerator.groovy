@@ -7,12 +7,13 @@ package gorm.tools.idgen
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.BadSqlGrammarException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.annotation.Propagation
 
+import gorm.tools.config.IdGeneratorConfig
 import grails.gorm.transactions.Transactional
 import yakworks.commons.lang.Validate
 
@@ -33,15 +34,13 @@ import yakworks.commons.lang.Validate
 @Slf4j
 @CompileStatic
 class JdbcIdGenerator implements IdGenerator {
-    JdbcTemplate jdbcTemplate
-
-    @Value('${gorm.tools.idGenerator.seedValue:1000}')
-    long seedValue//the Id to start with if it does not exist in the table
+    @Autowired JdbcTemplate jdbcTemplate
+    @Autowired IdGeneratorConfig idGenConfig
 
     //if true then will not automatically create a row for the key and will throw an error if row does not exist
     boolean requireKeyRow = false
 
-    String table = "NEWOBJECTID"
+    String table = "NewObjectId"
     String keyColumn = "KeyName"
     String idColumn = "NextId"
 
@@ -84,8 +83,8 @@ class JdbcIdGenerator implements IdGenerator {
         }
 
         if (oid > 0) { //found it
-            if (oid < seedValue) {
-                oid = seedValue
+            if (oid < idGenConfig.startValue) {
+                oid = idGenConfig.startValue
             }
             long newValue = oid + increment
             jdbcTemplate.update("Update " + table + " set " + idColumn + " = " + newValue + " where " + keyColumn
@@ -98,7 +97,7 @@ class JdbcIdGenerator implements IdGenerator {
     }
 
     private long createRow(String table, String keyColumn, String idColumn, String name) {
-        Long maxId = seedValue
+        Long maxId = idGenConfig.startValue
         String[] tableInfo = name.split("\\.")
         if (tableInfo.length > 1) {
             try {

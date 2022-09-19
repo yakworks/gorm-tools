@@ -20,8 +20,8 @@ import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
 import yakworks.rally.testing.MockData
 import yakworks.spring.AppResourceLoader
-import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.GormHibernateTest
+import yakworks.testing.gorm.unit.SecurityTest
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 
@@ -30,13 +30,12 @@ class ActivitySpec extends Specification implements GormHibernateTest, SecurityT
         AttachmentLink, ActivityLink, Activity, TaskType, Org, OrgTag,
         Tag, TagLink, Attachment, ActivityNote, Contact, ActivityContact
     ]
+    static springBeans = [
+        appResourceLoader: AppResourceLoader,
+        attachmentSupport: AttachmentSupport
+    ]
 
     @Shared Long orgId
-
-    Closure doWithGormBeans() { { ->
-        appResourceLoader(AppResourceLoader)
-        attachmentSupport(AttachmentSupport)
-    }}
 
     void setupSpec(){
         // super.setupSpec()

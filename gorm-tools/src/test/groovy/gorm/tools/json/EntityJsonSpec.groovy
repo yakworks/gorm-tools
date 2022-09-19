@@ -29,14 +29,9 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson
 
 class EntityJsonSpec extends Specification implements DataRepoTest {
-    static List entityClasses = [Cust]
-    @Autowired MetaMapService metaMapService
+    static List entityClasses = [Cust, CustExt, CustType, AddyNested, Address, JsonifyDom, JsonifyDomExt, NestedDom]
 
-    void setupSpec(){
-        //these won't automatically get picked up as thet are not required.
-        mockDomains(CustExt, CustType, AddyNested, Address, JsonifyDom, JsonifyDomExt, NestedDom)
-        //defineBeans(new JsonViewGrailsPlugin())
-    }
+    @Autowired MetaMapService metaMapService
 
     /**
      * Calls createEntityMap and then passed to JsonEngine to generate json string

@@ -5,11 +5,13 @@
 package yakworks.testing.gorm.support
 
 import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 import org.grails.config.PropertySourcesConfig
 import org.grails.datastore.mapping.core.AbstractDatastore
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.testing.gorm.spock.DataTestSetupSpecInterceptor
+import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.MessageSource
 import org.springframework.transaction.PlatformTransactionManager
@@ -23,6 +25,7 @@ import gorm.tools.validation.RepoValidatorRegistry
 import grails.config.Config
 import grails.core.GrailsApplication
 import yakworks.commons.lang.PropertyTools
+import yakworks.testing.grails.SpringBeanUtils
 
 /**
  * Base trait for mocking spring beans needed to test repository's and domain entities.
@@ -31,7 +34,7 @@ import yakworks.commons.lang.PropertyTools
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
-@CompileDynamic
+@CompileStatic
 @SuppressWarnings(["Indentation", "AssignmentToStaticFieldFromInstanceMethod"])
 trait BaseRepoEntityUnitTest {
 
@@ -75,6 +78,7 @@ trait BaseRepoEntityUnitTest {
     /**
      * see commonGormBeans, sets up beans for common services for binders, mango, idegen, parralelTools and msgService
      */
+    @CompileDynamic
     void defineCommonGormBeans(){
         if(!_hasCommonBeansSetup){
             defineBeans(commonGormBeans())
@@ -90,6 +94,8 @@ trait BaseRepoEntityUnitTest {
 
         def beanClosures = [commonGormBeans(), beanClos, hibernateBeans(), doWithGormBeans(), doWithSecurityBeans()]
         getRepoTestUtils().defineBeansMany(beanClosures)
+
+        registerSpringBeansMap()
 
         // rescan needed after the beans are added
         ctx.getBean('repoEventPublisher', RepoEventPublisher).scanAndCacheEventsMethods()
@@ -109,6 +115,20 @@ trait BaseRepoEntityUnitTest {
     List<Class> findEntityClasses(){
         def persistentClasses = (PropertyTools.getOrNull(this, 'domainClasses')?:PropertyTools.getOrNull(this, 'entityClasses')) as List<Class>
         return persistentClasses
+    }
+
+    /**
+     * if springBeans static prop or getter is defined then this will do the SpringBeanUtils.registerBeans
+     * Overrides the one in GrailsAppUnitTest
+     */
+    @CompileDynamic
+    void registerSpringBeansMap(){
+        def springBeans = PropertyTools.getOrNull(this, 'springBeans')
+        // GrailsAppUnitTest calls this method in the getGrailsApplication but before it sets initialized = true,
+        // so this wont run the first time its called from there, we want to only regiestser the beans when the defineRepoBeans is called
+        if(springBeans && getInitialized()){
+            SpringBeanUtils.registerBeans((BeanDefinitionRegistry)applicationContext, springBeans as Map<String, Object>)
+        }
     }
 
     /**

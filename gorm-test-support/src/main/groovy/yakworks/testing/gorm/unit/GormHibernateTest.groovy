@@ -11,16 +11,21 @@ import org.grails.plugin.hibernate.support.HibernatePersistenceContextIntercepto
 import org.hibernate.Session
 import org.hibernate.SessionFactory
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
+import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.core.env.PropertyResolver
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.TransactionStatus
 
+import gorm.tools.jdbc.DbDialectService
 import grails.config.Config
 import spock.lang.AutoCleanup
 import spock.lang.Shared
+import yakworks.commons.lang.PropertyTools
 import yakworks.testing.gorm.support.BaseRepoEntityUnitTest
 import yakworks.testing.gorm.support.RepoTestDataBuilder
 import yakworks.testing.grails.GrailsAppUnitTest
+import yakworks.testing.grails.SpringBeanUtils
 
 /**
  * Can be a drop in replacement for the HibernateSpec. Makes sure repositories are setup for the domains
@@ -81,15 +86,16 @@ trait GormHibernateTest implements GrailsAppUnitTest, BaseRepoEntityUnitTest, Re
         if (persistentClasses) {
             hibernateDatastore = new HibernateDatastore((PropertyResolver) config, persistentClasses as Class[])
         } else {
-            String packageName = getPackageToScan(config)
-            Package packageToScan = Package.getPackage(packageName) ?: getClass().getPackage()
-            hibernateDatastore = new HibernateDatastore((PropertyResolver) config, packageToScan)
+            List entityPackages = (PropertyTools.getOrNull(this, 'entityPackages')?:[]) as List
+            List<Package> packagesToScan = entityPackages.collect{ grailsApplication.classLoader.getDefinedPackage(it as String) }
+            hibernateDatastore = new HibernateDatastore((PropertyResolver) config, packagesToScan as Package[])
         }
         transactionManager = hibernateDatastore.getTransactionManager()
         assert transactionManager
     }
 
     void registerHibernateBeans(){
+        BeanDefinitionRegistry bdr = (BeanDefinitionRegistry)ctx
         ctx.beanFactory.registerSingleton("hibernateDatastore", hibernateDatastore)
         if (!ctx.containsBean("dataSource"))
             ctx.beanFactory.registerSingleton("dataSource", hibernateDatastore.getDataSource())
@@ -101,6 +107,19 @@ trait GormHibernateTest implements GrailsAppUnitTest, BaseRepoEntityUnitTest, Re
             pci.sessionFactory = hibernateDatastore.sessionFactory
             ctx.beanFactory.registerSingleton("persistenceInterceptor", pci)
         }
+        def springBeans = [
+            dbDialectService: DbDialectService,
+            jdbcTemplate: [JdbcTemplate, "@dataSource"]
+        ]
+        SpringBeanUtils.registerBeans((BeanDefinitionRegistry)ctx, springBeans)
+        //
+        // BeanDefinition bdJdbcTemplate = BeanDefinitionBuilder.rootBeanDefinition(JdbcTemplate)
+        //         .addConstructorArgReference("dataSource").getBeanDefinition()
+        // bdr.registerBeanDefinition("jdbcTemplate", bdJdbcTemplate)
+        //
+        // BeanDefinition bdDbDialectService = BeanDefinitionBuilder.rootBeanDefinition(DbDialectService).getBeanDefinition()
+        // bdr.registerBeanDefinition("dbDialectService", bdDbDialectService)
+
     }
 
     // @AfterClass
@@ -140,13 +159,10 @@ trait GormHibernateTest implements GrailsAppUnitTest, BaseRepoEntityUnitTest, Re
 
     /**
      * Obtains the default package to scan
-     *
-     * @param config The configuration
-     * @return The package to scan
      */
-    String getPackageToScan(Config config) {
-        config.getProperty('grails.codegen.defaultPackage', getClass().package.name)
-    }
+    // String getPackageToScan(Config config) {
+    //     config.getProperty('grails.codegen.defaultPackage', getClass().package.name)
+    // }
 
     /** consistency with other areas of grails and other unit tests */
     @Override

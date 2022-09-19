@@ -9,9 +9,6 @@ import yakworks.testing.gorm.unit.DataRepoTest
 
 class TagLinkSpec extends Specification implements DataRepoTest, SecurityTest {
     static List entityClasses = [TagLink, Tag, Attachment]
-    void setupSpec() {
-        mockDomains Tag, Attachment
-    }
 
     List createSomeTags(){
         def tag1 = Tag.create(name: 'tag1', code: 'tag1')

@@ -1,3 +1,9 @@
+### v7.3.25
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.23...v7.3.25)
+- release [link](https://github.com/yakworks/gorm-tools/commit/a9182634113d3af0ee88aa936836839b37e34d73)
+- move to yakworks packages, excel etl plugin and performance, use config objects(#569) [link](https://github.com/yakworks/gorm-tools/commit/9ab1a5877379502bb656320aef590b38235914d5)
+
 ### v7.3.23
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.22...v7.3.23)

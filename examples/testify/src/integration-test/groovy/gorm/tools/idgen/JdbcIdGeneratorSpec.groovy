@@ -1,8 +1,9 @@
 package gorm.tools.idgen
 
-
+import gorm.tools.config.IdGeneratorConfig
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
 
 //import grails.persistence.Entity
@@ -12,6 +13,8 @@ class JdbcIdGeneratorSpec extends Specification {
     private static final String TABLE_KEY = "Org.id"
 
     JdbcIdGenerator jdbcIdGenerator
+    @Autowired IdGeneratorConfig idGenConfig
+
     //JdbcTemplate jdbcTemplate
 
     void "test getNextId"() {
@@ -19,7 +22,7 @@ class JdbcIdGeneratorSpec extends Specification {
         int startVal = jdbcIdGenerator.getNextId(TABLE_KEY, 100)
 
         then:
-        startVal >= jdbcIdGenerator.seedValue //100 is < than seedValue of 1000 so it should get the seed start
+        startVal >= idGenConfig.startValue //100 is < than seedValue of 1000 so it should get the seed start
 
         when:
         int i1 = jdbcIdGenerator.getNextId(TABLE_KEY, 50)

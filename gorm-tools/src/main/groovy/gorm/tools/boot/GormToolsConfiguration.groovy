@@ -64,10 +64,7 @@ class GormToolsConfiguration {
     JdbcTemplate jdbcTemplate(DataSource dataSource){ new JdbcTemplate(dataSource)}
 
     @Bean
-    JdbcIdGenerator jdbcIdGenerator(){
-        var jig = new JdbcIdGenerator(table: "NewObjectId")
-        return jig
-    }
+    JdbcIdGenerator jdbcIdGenerator(){ new JdbcIdGenerator(table: "NewObjectId") }
 
     @Bean
     IdGenerator idGenerator(){ new PooledIdGenerator(jdbcIdGenerator())}

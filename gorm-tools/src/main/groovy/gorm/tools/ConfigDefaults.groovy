@@ -9,7 +9,7 @@ import groovy.transform.CompileStatic
 import org.springframework.core.env.MapPropertySource
 
 /**
- * The defualts for we think makes more sense to have out of the box. done here so it can be shared across the base test helpers
+ * The gorm defaults we think makes more sense to have out of the box. done here so it can be shared across the base test helpers
  * and for the ConfigDefaultsRunListener
  */
 @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection'])
@@ -37,6 +37,7 @@ class ConfigDefaults {
     static Map<String, Object> getConfigMap(boolean isProd = true) {
         ConfigSlurper slurper = new ConfigSlurper()
         String cfgStr = isProd ? getConfigString(springBeanIdGenMapping) : getConfigString('')
+        // String cfgStr = getConfigString(springBeanIdGenMapping)
         ConfigObject configObject = slurper.parse(cfgStr)
         Map<String, Object> properties = configObject.flatten() as Map<String, Object>
         return properties

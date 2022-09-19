@@ -11,16 +11,8 @@ import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.rally.listeners.RallyEventListener
 
 class RallyEventListenerSpec extends Specification implements DataRepoTest, SecurityTest {
-
-    void setupSpec() {
-        defineBeans({
-            rallyEventListener(RallyEventListener) { bean ->
-                bean.lazyInit = true
-                bean.autowire = "byType"
-            }
-        })
-        mockDomains AppUser, SecRole, SecRoleUser
-    }
+    static entityClasses = [AppUser, SecRole, SecRoleUser]
+    static springBeans = [rallyEventListener: RallyEventListener]
 
     void "test orgid assignment"() {
         setup:

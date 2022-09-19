@@ -18,11 +18,6 @@ class IncludesConfigSpec extends Specification  implements DataRepoTest  {
 
     @Autowired IncludesConfig includesConfig
 
-    // void setupSpec() {
-    //     //mockDomain Person
-    //     mockDomains KitchenSink, SinkExt, SinkItem, Thing, Enummy
-    // }
-
     void 'getIncludes for key'() {
 
         when:

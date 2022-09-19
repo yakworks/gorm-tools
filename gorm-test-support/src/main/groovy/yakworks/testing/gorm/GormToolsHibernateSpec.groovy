@@ -26,8 +26,8 @@ import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.spring.AppCtx
 import yakworks.testing.gorm.support.BaseRepoEntityUnitTest
-import yakworks.testing.grails.BasicConfiguration
 import yakworks.testing.grails.GrailsAppUnitTest
+import yakworks.testing.grails.TestConfiguration
 
 /**
  * Can be a drop in replacement for the HibernateSpec. Makes sure repositories are setup for the domains
@@ -58,7 +58,7 @@ abstract class GormToolsHibernateSpec extends Specification implements Autowired
     void setupHibernate() {
         //setup the ConfigurationProperties beans
         def cfgRegistry = (AnnotationConfigRegistry)ctx
-        cfgRegistry.register(BasicConfiguration)
+        cfgRegistry.register(TestConfiguration)
 
         //Sets up the HibernateDatastore, reads the getDomainClasses and sets up whats returned there.
         initDatastore()

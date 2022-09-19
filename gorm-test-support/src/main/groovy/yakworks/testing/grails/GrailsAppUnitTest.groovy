@@ -4,7 +4,6 @@
 */
 package yakworks.testing.grails
 
-
 import groovy.transform.CompileStatic
 
 import org.grails.core.lifecycle.ShutdownOperations
@@ -19,17 +18,20 @@ import grails.core.GrailsApplication
 import grails.spring.BeanBuilder
 import grails.util.Holders
 import grails.validation.DeferredBindingActions
+import yakworks.commons.lang.PropertyTools
 
 /**
  * replacement of the GrailUnitTest and adds the following
  * - in order to build a GrailsApplication with a Spring Boot AnnotationConfigApplicationContext
  * - runs autowire for any annotations such as @Autowired, also runs any beanPostProcessing so @PostConstruct methods should get called too
+ * - fixes defineBeans for
  */
 @SuppressWarnings(['AssignmentToStaticFieldFromInstanceMethod', ''])
 @CompileStatic
 trait GrailsAppUnitTest extends GrailsUnitTest{
 
     private static GrailsApplication _grailsApp
+    boolean initialized
     private static Object _servletContext
 
     /**
@@ -45,6 +47,11 @@ trait GrailsAppUnitTest extends GrailsUnitTest{
         (ConfigurableApplicationContext) getGrailsApplication().mainContext
     }
 
+    /** convenience shortcut for applicationContext */
+    ConfigurableApplicationContext getCtx() {
+        getApplicationContext()
+    }
+
     @Override
     GrailsApplication getGrailsApplication() {
         if (_grailsApp == null) {
@@ -57,10 +64,26 @@ trait GrailsAppUnitTest extends GrailsUnitTest{
             ).build()
             _grailsApp = builder.grailsApplication
             _servletContext = builder.servletContext
+            registerSpringBeansMap()
+            initialized = true
         }
+
         _grailsApp
     }
 
+    /**
+     * if springBeans static prop or getter is defined then this will do the SpringBeanUtils.registerBeans
+     */
+    void registerSpringBeansMap(){
+        def springBeans = PropertyTools.getOrNull(this, 'springBeans')
+        if(springBeans){
+            SpringBeanUtils.registerBeans((BeanDefinitionRegistry)applicationContext, springBeans as Map<String, Object>)
+        }
+    }
+
+    /**
+     * Override to remove the call to preInstantiateSingletons which fails in certain circumstances with AnnotationConfigApplicationContext
+     */
     @Override
     void defineBeans(Closure closure) {
         def binding = new Binding()
@@ -73,6 +96,13 @@ trait GrailsAppUnitTest extends GrailsUnitTest{
         // applicationContext.beanFactory.preInstantiateSingletons()
     }
 
+    void registerBeans(Map<String, Object> beanMap) {
+        SpringBeanUtils.registerBeans((BeanDefinitionRegistry)applicationContext, beanMap)
+    }
+
+    /**
+     * since we need to store a local ref to _grailsApp this cleans up that.
+     */
     @Override
     void cleanupGrailsApplication() {
         if (_grailsApp != null) {
@@ -100,6 +130,7 @@ trait GrailsAppUnitTest extends GrailsUnitTest{
             cleanupPromiseFactory()
             Holders.clear()
         }
+        initialized = false
     }
 
     private void cleanupPromiseFactory() {

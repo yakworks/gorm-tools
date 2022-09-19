@@ -5,8 +5,10 @@
 package yakworks.rally.eventlog
 
 import java.time.LocalDateTime
+import javax.annotation.PostConstruct
 import javax.inject.Inject
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import groovy.util.logging.Slf4j
@@ -35,8 +37,16 @@ class EventLogger {
     @Value('${nine.eventLog.searchDays:7}')
     int searchDays
 
+    @Value('${info.app.name}')
+    String appName
+
     @Inject
     GrailsApplication grailsApplication
+
+    @PostConstruct
+    void init() {
+        if(!appName) appName = Metadata.current.getApplicationName()
+    }
 
     EventLog error(String message) {
         log(message: message, priority: EventLog.ERROR_INT)
@@ -85,7 +95,7 @@ class EventLogger {
     private EventLog logTransactional(Map params) {
         EventLog row = new EventLog()
         row.bind(params)
-        row.appName = row.appName ?: Metadata.current.getApplicationName()
+        row.appName = row.appName ?: appName
 
         String message = params['message']
         if (message?.size() > MAX_MESSAGE_SIZE)
@@ -154,4 +164,5 @@ class EventLogger {
             }
         }
     }
+
 }

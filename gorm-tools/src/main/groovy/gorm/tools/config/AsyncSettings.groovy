@@ -2,21 +2,23 @@
 * Copyright 2022 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.settings
+package gorm.tools.config
 
 import javax.annotation.PostConstruct
 
 import groovy.transform.CompileStatic
 
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.context.annotation.Configuration
 
 import yakworks.spring.SpringEnvironment
 
 @Configuration
 @ConfigurationProperties(prefix="gorm.tools.async")
+// @ConfigurationPropertiesScan
 @CompileStatic
-class AsyncProperties implements SpringEnvironment{
+class AsyncSettings implements SpringEnvironment{
 
     /**
      * The default slice or chunk size for collating. for example if this is 100 and you pass list of of 100

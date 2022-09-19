@@ -7,6 +7,7 @@ package gorm.tools.idgen
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.BadSqlGrammarException
@@ -33,7 +34,7 @@ import yakworks.commons.lang.Validate
 @Slf4j
 @CompileStatic
 class JdbcIdGenerator implements IdGenerator {
-    JdbcTemplate jdbcTemplate
+    @Autowired JdbcTemplate jdbcTemplate
 
     @Value('${gorm.tools.idGenerator.seedValue:1000}')
     long seedValue//the Id to start with if it does not exist in the table

@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.transaction.TransactionStatus
 
-import gorm.tools.settings.AsyncProperties
+import gorm.tools.config.GormConfig
 import gorm.tools.transaction.TrxService
 import grails.persistence.support.PersistenceContextInterceptor
 import yakworks.grails.support.ConfigAware
@@ -55,7 +55,7 @@ class AsyncService implements ConfigAware  {
     TrxService trxService
 
     @Autowired(required = false)
-    AsyncProperties asyncProperties
+    GormConfig gormConfig
 
     /** setup defaults for poolSize and batchSize if config isn't present. batchSize set to 100 if not config found*/
     @PostConstruct

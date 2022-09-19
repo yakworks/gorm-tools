@@ -5,93 +5,93 @@
 package gorm.tools
 
 import gorm.tools.jdbc.DbDialectService
-import grails.testing.services.ServiceUnitTest
+import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
+import testing.Cust
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDialectService> {
+class DbDialectServiceSpec extends Specification implements GormHibernateTest {
 
-    void setup() {
-        service.dialectName = null
-    }
+    //dbDialectService is already one of the beans setup in GormHibernateTest so just inject it
+    @Autowired DbDialectService dbDialectService
 
-    void "test getDialect"() {
+    void "test initFromHibernateDialect"() {
         when: "dialect is null"
-        config.hibernate.dialect = null
-        int dialect = service.getDialect()
+        dbDialectService.hibernateDialect = null
+        dbDialectService.init()
+        int dialect = dbDialectService.dialect
 
         then:
         dialect == DbDialectService.H2
-        service.dialectName == "h2"
-        service.isH2() == true
+        dbDialectService.dialectName == "h2"
+        dbDialectService.isH2() == true
 
         when: "mysql"
-        config.hibernate.dialect = 'MySQL5InnoDBDialect'
-        dialect = service.getDialect()
+        dbDialectService.hibernateDialect = 'MySQL5InnoDBDialect'
+        dbDialectService.init()
+        dialect = dbDialectService.getDialect()
 
         then:
         dialect == DbDialectService.MYSQL
-        service.dialectName == "mysql"
-        service.isMySql() == true
+        dbDialectService.dialectName == "mysql"
+        dbDialectService.isMySql() == true
 
         when: "mssql server 20**"
-        service.dialectName = null
-        config.hibernate.dialect = 'testSQLServer2012Dialect'
-        dialect = service.getDialect()
+        dbDialectService.hibernateDialect = 'testSQLServer2012Dialect'
+        dbDialectService.init()
+        dialect = dbDialectService.getDialect()
 
         then:
         dialect == DbDialectService.MSSQL
-        service.dialectName == "mssql"
-        service.isMsSql() == true
+        dbDialectService.dialectName == "mssql"
+        dbDialectService.isMsSql() == true
 
         when: "sql server"
-        service.dialectName = null
-        config.hibernate.dialect = 'SQLServerDialect'
-        dialect = service.getDialect()
+        dbDialectService.hibernateDialect = 'SQLServerDialect'
+        dbDialectService.init()
+        dialect = dbDialectService.getDialect()
 
         then:
         dialect == DbDialectService.MSSQL
-        service.dialectName == "mssql"
-        service.isMsSql() == true
+        dbDialectService.dialectName == "mssql"
+        dbDialectService.isMsSql() == true
 
         when: "postgresql"
-        service.dialectName = null
-        config.hibernate.dialect = 'PostgreSQLDialect'
-        dialect = service.getDialect()
+        dbDialectService.hibernateDialect  = 'PostgreSQLDialect'
+        dbDialectService.init()
+        dialect = dbDialectService.getDialect()
 
         then:
         dialect == DbDialectService.POSTGRESQL
-        service.dialectName == "postgresql"
-        service.isPostgres() == true
+        dbDialectService.dialectName == "postgresql"
+        dbDialectService.isPostgres() == true
     }
 
     void "test getCurrentDate"() {
         when: "dialect is H2"
-        config.hibernate.dialect = 'H2Dialect'
-        String date = service.currentDate
+        dbDialectService.dialect = DbDialectService.H2
+        String date = dbDialectService.currentDate
 
         then:
         date == "CURRENT_DATE()"
 
         when: "mysql"
-        service.dialectName = null
-        config.hibernate.dialect = 'MySQL5InnoDBDialect'
-        date = service.currentDate
+        dbDialectService.dialect = DbDialectService.MYSQL
+        date = dbDialectService.currentDate
 
         then:
         date == "now()"
 
         when: "sql server"
-        service.dialectName = null
-        config.hibernate.dialect = 'SQLServerDialect'
-        date = service.currentDate
+        dbDialectService.dialect = DbDialectService.MSSQL
+        date = dbDialectService.currentDate
 
         then:
         date == "getdate()"
 
         when: "postgresql"
-        service.dialectName = null
-        config.hibernate.dialect = "PostgreSQLDialect"
-        date = service.currentDate
+        dbDialectService.dialect = DbDialectService.POSTGRESQL
+        date = dbDialectService.currentDate
 
         then:
         date == "now()"
@@ -99,32 +99,29 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
 
     void "test getIfNull"() {
         when: "dialect is H2"
-        config.hibernate.dialect = 'H2Dialect'
-        String function = service.ifNull
+        dbDialectService.dialect = DbDialectService.H2
+        String function = dbDialectService.ifNull
 
         then:
         function == "ifnull"
 
         when: "mysql"
-        service.dialectName = null
-        config.hibernate.dialect = 'MySQL5InnoDBDialect'
-        function = service.ifNull
+        dbDialectService.dialect = DbDialectService.MYSQL
+        function = dbDialectService.ifNull
 
         then:
         function == "ifnull"
 
         when: "sql server"
-        service.dialectName = null
-        config.hibernate.dialect = 'SQLServerDialect'
-        function = service.ifNull
+        dbDialectService.dialect = DbDialectService.MSSQL
+        function = dbDialectService.ifNull
 
         then:
         function == "isnull"
 
         when: "postgresql"
-        service.dialectName = null
-        config.hibernate.dialect = "PostgreSQLDialect"
-        function = service.ifNull
+        dbDialectService.dialect = DbDialectService.POSTGRESQL
+        function = dbDialectService.ifNull
 
         then:
         function == 'COALESCE'
@@ -132,32 +129,29 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
 
     void "test getConcat"() {
         when: "dialect is H2"
-        config.hibernate.dialect = 'H2Dialect'
-        String function = service.concat
+        dbDialectService.dialect = DbDialectService.H2
+        String function = dbDialectService.concat
 
         then:
         function == "||"
 
         when: "mysql"
-        service.dialectName = null
-        config.hibernate.dialect = 'MySQL5InnoDBDialect'
-        function = service.concat
+        dbDialectService.dialect = DbDialectService.MYSQL
+        function = dbDialectService.concat
 
         then:
         function == "+"
 
         when: "sql server"
-        service.dialectName = null
-        config.hibernate.dialect = 'SQLServerDialect'
-        function = service.concat
+        dbDialectService.dialect = DbDialectService.MSSQL
+        function = dbDialectService.concat
 
         then:
         function == "+"
 
         when: "postgresql"
-        service.dialectName = null
-        config.hibernate.dialect = "PostgreSQLDialect"
-        function = service.concat
+        DbDialectService.dialect = DbDialectService.POSTGRESQL
+        function = dbDialectService.concat
 
         then:
         function == "||"
@@ -166,40 +160,29 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
 
     void "test getCharFn"() {
         when: "dialect is H2"
-        config.hibernate.dialect = 'H2Dialect'
-        String function = service.charFn
+        dbDialectService.dialect = DbDialectService.H2
+        String function = dbDialectService.charFn
 
         then:
         function == "CHAR"
 
         when: "mysql"
-        service.dialectName = null
-        config.hibernate.dialect = 'MySQL5InnoDBDialect'
-        function = service.charFn
+        dbDialectService.dialect = DbDialectService.MYSQL
+        function = dbDialectService.charFn
 
         then:
         function == "CHAR"
 
         when: "sql server"
-        service.dialectName = null
-        config.hibernate.dialect = 'SQLServerDialect'
-        function = service.charFn
+        dbDialectService.dialect = DbDialectService.MSSQL
+        function = dbDialectService.charFn
 
         then:
         function == "CHAR"
 
-        when: "Oracle"
-        service.dialectName = null
-        config.hibernate.dialect = 'OracleDailect'
-        function = service.charFn
-
-        then:
-        function == "CHR"
-
         when: "postgresql"
-        service.dialectName = null
-        config.hibernate.dialect = "PostgreSQLDialect"
-        function = service.charFn
+        DbDialectService.dialect = DbDialectService.POSTGRESQL
+        function = dbDialectService.charFn
 
         then:
         function == "CHAR"
@@ -208,40 +191,29 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
 
     void "test getSubstringFn"() {
         when: "dialect is H2"
-        config.hibernate.dialect = 'H2Dialect'
-        String function = service.substringFn
+        dbDialectService.dialect = DbDialectService.H2
+        String function = dbDialectService.substringFn
 
         then:
         function == "SUBSTRING"
 
         when: "mysql"
-        service.dialectName = null
-        config.hibernate.dialect = 'MySQL5InnoDBDialect'
-        function = service.substringFn
+        dbDialectService.dialect = DbDialectService.MYSQL
+        function = dbDialectService.substringFn
 
         then:
         function == "SUBSTRING"
 
         when: "sql server"
-        service.dialectName = null
-        config.hibernate.dialect = 'SQLServerDialect'
-        function = service.substringFn
+        dbDialectService.dialect = DbDialectService.MSSQL
+        function = dbDialectService.substringFn
 
         then:
         function == "SUBSTRING"
 
-        when: "Oracle"
-        service.dialectName = null
-        config.hibernate.dialect = 'OracleDailect'
-        function = service.substringFn
-
-        then:
-        function == "SUBSTR"
-
         when: "postgresql"
-        service.dialectName = null
-        config.hibernate.dialect = "PostgreSQLDialect"
-        function = service.substringFn
+        dbDialectService.dialect = DbDialectService.POSTGRESQL
+        function = dbDialectService.substringFn
 
         then:
         function == "SUBSTRING"

@@ -93,7 +93,6 @@ class RepoTestUtils {
         mangoQuery(DefaultMangoQuery)
         mangoBuilder(MangoBuilder)
         trxService(TrxService)
-
         jdbcIdGenerator(MockJdbcIdGenerator)
         idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"))
         persistenceContextInterceptor(NullPersistentContextInterceptor) //required for parallelTools
@@ -105,7 +104,6 @@ class RepoTestUtils {
         problemHandler(ProblemHandler)
         messageSource(GrailsICUMessageSource)
         externalConfigLoader(ExternalConfigLoader)
-        // asyncProperties(AsyncProperties)
     }}
 
     @CompileDynamic

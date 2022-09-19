@@ -13,15 +13,11 @@ import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 
 class SyncJobSpec extends Specification implements DataRepoTest, SecurityTest {
-
-    Closure doWithGormBeans() { { ->
-        attachmentSupport(AttachmentSupport)
-        syncJobService(DefaultSyncJobService)
-    }}
-
-    void setupSpec() {
-        mockDomains(SyncJob, Attachment)
-    }
+    static entityClasses = [SyncJob, Attachment]
+    static springBeans = [
+        attachmentSupport:AttachmentSupport,
+        syncJobService:DefaultSyncJobService
+    ]
 
     SyncJob createJob(){
         return new SyncJob([sourceType: SourceType.ERP, sourceId: 'ar/org']).persist(flush:true)

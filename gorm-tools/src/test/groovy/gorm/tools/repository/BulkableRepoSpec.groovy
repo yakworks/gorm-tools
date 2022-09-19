@@ -20,15 +20,11 @@ import yakworks.testing.gorm.unit.GormHibernateTest
 import static yakworks.json.groovy.JsonEngine.parseJson
 
 class BulkableRepoSpec extends Specification implements GormHibernateTest {
+    static entityClasses = [KitchenSink, SinkExt, TestSyncJob]
+    static springBeans = [syncJobService: TestSyncJobService]
 
     @Autowired AsyncService asyncService
     @Autowired KitchenSinkRepo kitchenSinkRepo
-
-    static List entityClasses = [KitchenSink, SinkExt, TestSyncJob]
-
-    Closure doWithGormBeans() { { ->
-        syncJobService(TestSyncJobService)
-    }}
 
     SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
         return new SyncJobArgs(asyncEnabled: false, op: op, source: "test", sourceId: "test",

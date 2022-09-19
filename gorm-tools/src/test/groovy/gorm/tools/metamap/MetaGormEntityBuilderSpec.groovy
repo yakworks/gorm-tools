@@ -15,11 +15,7 @@ import yakworks.testing.gorm.model.Thing
 import yakworks.meta.MetaEntity
 
 class MetaGormEntityBuilderSpec extends Specification implements DataRepoTest {
-
-    void setupSpec() {
-        //mockDomain Person
-        mockDomains KitchenSink, SinkExt, SinkItem, Thing, Enummy
-    }
+    static entityClasses = [KitchenSink, SinkExt, SinkItem, Thing, Enummy]
 
     void "KitchenSink *"(){
         when:

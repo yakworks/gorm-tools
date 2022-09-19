@@ -8,9 +8,13 @@ logging:
 
 gorm:
   tools:
+    hello: world
     async:
       poolSize: 2
       foo: bar
+    idGenerator:
+      startValue: 1
+
 ---
 
 

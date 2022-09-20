@@ -8,6 +8,7 @@ import javax.sql.DataSource
 
 import groovy.transform.CompileStatic
 
+import org.grails.datastore.mapping.model.AbstractMappingContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.context.annotation.Bean
@@ -46,15 +47,16 @@ class GormToolsConfiguration {
 
     // @Autowired DataSource dataSource
 
-    GormToolsConfiguration(GrailsApplication grailsApplication){
-        this.grailsApplication = grailsApplication
-    }
+    // GormToolsConfiguration(GrailsApplication grailsApplication){
+    //     this.grailsApplication = grailsApplication
+    // }
 
-    @Bean
-    GormRepoBeanFactoryPostProcessor gormRepoBeanFactoryPostProcessor() {
-        List<Class> repoClasses = grailsApplication.getArtefacts("Repository")*.clazz
-        List<Class> entityClasses = grailsApplication.getArtefacts("Domain")*.clazz
-        return new GormRepoBeanFactoryPostProcessor(repoClasses, entityClasses)
+    @Bean @Lazy(false)
+    GormRepoBeanFactoryPostProcessor gormRepoBeanFactoryPostProcessor(AbstractMappingContext grailsDomainClassMappingContext) {
+        // List<Class> repoClasses = grailsApplication.getArtefacts("Repository")*.clazz
+        // List<Class> entityClasses = grailsApplication.getArtefacts("Domain")*.clazz
+        // return new GormRepoBeanFactoryPostProcessor(repoClasses, entityClasses)
+        return new GormRepoBeanFactoryPostProcessor(grailsDomainClassMappingContext)
     }
 
     @Bean

@@ -38,7 +38,8 @@ class GormToolsGrailsPlugin extends Plugin {
         //with how we change config its only accesible in grails config
         DbDialectService.hibernateDialect = config.getProperty("hibernate.dialect")
 
-        gormToolsConfiguration(GormToolsConfiguration, grailsApplication)
+        // gormToolsConfiguration(GormToolsConfiguration, grailsApplication)
+        gormToolsConfiguration(GormToolsConfiguration)
     }}
 
     //This is kind of equivalent to init in bootstrap

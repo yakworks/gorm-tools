@@ -4,7 +4,6 @@
 */
 package yakworks.rally.activity
 
-
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
@@ -12,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
-import gorm.tools.repository.model.LongIdGormRepo
+import gorm.tools.problem.ProblemHandler
 import gorm.tools.utils.GormUtils
 import grails.gorm.transactions.Transactional
 import yakworks.api.ApiResults
@@ -31,13 +30,16 @@ import yakworks.rally.tag.model.TagLink
 @Service @Lazy
 @Slf4j
 @CompileStatic
-class ActivityCopier extends LongIdGormRepo<Activity> {
+class ActivityCopier {
 
     @Autowired(required = false)
     ActivityLinkRepo activityLinkRepo
 
     @Autowired(required = false)
     AttachmentRepo attachmentRepo
+
+    @Autowired
+    ProblemHandler problemHandler
 
     @Transactional
     Activity copy(Activity fromAct, Activity toAct) {
@@ -47,7 +49,7 @@ class ActivityCopier extends LongIdGormRepo<Activity> {
         toAct.note = GormUtils.copyDomain(ActivityNote, fromAct.note, [activity: toAct], false)
         toAct.task = GormUtils.copyDomain(Task, fromAct.task, [activity: toAct], false)
         if(fromAct.template) toAct.template = attachmentRepo.copy(fromAct.template)
-        if(!toAct.id) toAct.id = generateId()
+        if(!toAct.id) toAct.id = Activity.repo.generateId()
 
         //actCopy.persist()
 

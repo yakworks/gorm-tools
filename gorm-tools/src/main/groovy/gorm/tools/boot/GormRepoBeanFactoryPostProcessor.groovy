@@ -30,27 +30,25 @@ import yakworks.commons.lang.NameUtils
  * make a DefaultGormRepo or UuidGormRepo depending on what setup.
  */
 @CompileStatic
-class GormRepoBeanFactoryPostProcessor implements BeanFactoryPostProcessor, ApplicationContextAware {
+class GormRepoBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
-    List<Class> repoClasses
     List<Class> entityClasses
 
-    ApplicationContext applicationContext
     AbstractMappingContext grailsDomainClassMappingContext
 
-    GormRepoBeanFactoryPostProcessor(List<Class> repoClasses, List<Class> entityClasses){
-        this.repoClasses = repoClasses
+    GormRepoBeanFactoryPostProcessor(List<Class> entityClasses){
         this.entityClasses = entityClasses
     }
 
     GormRepoBeanFactoryPostProcessor(AbstractMappingContext grailsDomainClassMappingContext){
         this.grailsDomainClassMappingContext = grailsDomainClassMappingContext
+        this.entityClasses = grailsDomainClassMappingContext.persistentEntities*.javaClass
     }
 
     @Override
     void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory){
         // def entClasses = beanFactory.getBean(AbstractMappingContext).persistentEntities
-        entityClasses = grailsDomainClassMappingContext.persistentEntities*.javaClass
+        // entityClasses = grailsDomainClassMappingContext.persistentEntities*.javaClass
         var registry = (BeanDefinitionRegistry) beanFactory
 
         // for(Class repoClass: repoClasses){

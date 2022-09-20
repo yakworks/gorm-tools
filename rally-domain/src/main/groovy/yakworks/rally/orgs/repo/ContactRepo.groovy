@@ -37,8 +37,6 @@ import yakworks.security.gorm.model.AppUser
 @CompileStatic
 class ContactRepo extends LongIdGormRepo<Contact> {
 
-    List<String> toOneAssociations = ['flex']
-
     @RepoListener
     void beforeValidate(Contact contact) {
         setupNameProps(contact)

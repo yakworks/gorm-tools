@@ -14,6 +14,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.DependsOn
 import org.springframework.context.annotation.Lazy
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -43,19 +44,19 @@ import grails.core.GrailsApplication
 @CompileStatic
 class GormToolsConfiguration {
 
-    GrailsApplication grailsApplication
-
-    // @Autowired DataSource dataSource
+    // GrailsApplication grailsApplication
 
     // GormToolsConfiguration(GrailsApplication grailsApplication){
     //     this.grailsApplication = grailsApplication
     // }
 
-    @Bean @Lazy(false)
+    @Bean
+    @DependsOn("grailsDomainClassMappingContext") //important here, if we dont do DependsOn then it eagerly instantiates the DataSource before its ready.
     GormRepoBeanFactoryPostProcessor gormRepoBeanFactoryPostProcessor(AbstractMappingContext grailsDomainClassMappingContext) {
+        //AbstractMappingContext grailsDomainClassMappingContext
         // List<Class> repoClasses = grailsApplication.getArtefacts("Repository")*.clazz
         // List<Class> entityClasses = grailsApplication.getArtefacts("Domain")*.clazz
-        // return new GormRepoBeanFactoryPostProcessor(repoClasses, entityClasses)
+        // return new GormRepoBeanFactoryPostProcessor(entityClasses)
         return new GormRepoBeanFactoryPostProcessor(grailsDomainClassMappingContext)
     }
 

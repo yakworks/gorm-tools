@@ -149,7 +149,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * No events fired for this
      */
     void doAfterValidateBeforeSave(D entity, PersistArgs args){
-        if(getToOneAssociations()) persistToOneAssociations(entity, getToOneAssociations())
+        persistToOneAssociations(entity, getToOneAssociations())
     }
 
     /**
@@ -455,7 +455,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * Used in persistToOneAssociations
      */
     List<String> getToOneAssociations(){
-        return []
+        return ( ClassUtils.getStaticPropertyValue(entityClass, "toOneAssociations") ?: [] ) as List<String>
     }
 
     /**

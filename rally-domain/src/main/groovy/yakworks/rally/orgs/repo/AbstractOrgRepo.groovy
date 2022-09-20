@@ -50,8 +50,6 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
     @Autowired(required=false)
     OrgMemberService orgMemberService
 
-    List<String> toOneAssociations = ['flex', 'info', 'calc', 'member']
-
     @RepoListener
     void beforeValidate(Org org, Errors errors) {
         if(org.isNew()) {

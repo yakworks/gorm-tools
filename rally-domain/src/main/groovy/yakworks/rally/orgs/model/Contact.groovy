@@ -65,6 +65,8 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
 
     static hasMany = [phones: ContactPhone, emails: ContactEmail, sources: ContactSource]
 
+    static List<String> toOneAssociations = ['flex']
+
     static Map includes = [
         get: ['id', 'num', 'name', 'altName', 'firstName', 'lastName', 'email', 'phone', 'inactive', 'org', 'user'],
         qSearch: ['num', 'name', 'altName', 'email'],

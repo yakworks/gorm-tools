@@ -24,7 +24,7 @@ import yakworks.security.audit.AuditStampTrait
 @IdEqualsHashCode
 @GrailsCompileStatic
 class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEntity<Activity, ActivityRepo>, Attachable, Taggable, Serializable {
-    // static transients = ['hasAttachments']
+    static List<String> toOneAssociations = ['note', 'task']
 
     Kind kind = Kind.Note
 

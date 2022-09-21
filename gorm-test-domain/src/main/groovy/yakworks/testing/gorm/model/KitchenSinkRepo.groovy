@@ -41,8 +41,6 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
 
     Faker _faker
 
-    List<String> toOneAssociations = [ 'ext' ]
-
     Faker faker(){
         if(!_faker) _faker = new Faker(new Random(0))
         return _faker

@@ -2,7 +2,7 @@
 * Copyright 2022 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.utils
+package gorm.tools.boot
 
 import groovy.transform.CompileStatic
 
@@ -10,8 +10,37 @@ import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
 
+import gorm.tools.repository.DefaultGormRepo
+import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.model.UuidGormRepo
+import gorm.tools.repository.model.UuidRepoEntity
+
 @CompileStatic
 class SpringBeanUtils {
+
+    /**
+     * creates the GormRepo bean definitions in the registry for the entityClasses.
+     * Checks to see if a bean name for the repo already exists and does nothing if so.
+     * Otherwise registers a DefaultGormRepo or UuidGormRepo depending interfaces assigned to entityClass
+     */
+    static void registerRepos(BeanDefinitionRegistry registry, List<Class<?>> entityClasses) {
+        for(Class entityClass: entityClasses){
+            String repoName = RepoUtil.getRepoBeanName(entityClass)
+            // def hasRepo = repoClasses.find { NameUtils.getPropertyName(it.simpleName) == repoName }
+            if (!registry.containsBeanDefinition(repoName)) {
+                Class repoClass = DefaultGormRepo
+                if(UuidRepoEntity.isAssignableFrom(entityClass)) {
+                    repoClass = UuidGormRepo
+                }
+                // newRepoBeanMap[repoName] = [repoClass, entityClass]
+                var bdef = BeanDefinitionBuilder.rootBeanDefinition(repoClass)
+                    .addConstructorArgValue(entityClass)
+                    .setLazyInit(true)
+                    .getBeanDefinition()
+                registry.registerBeanDefinition(repoName, bdef)
+            }
+        }
+    }
 
     /**
      * Uses the beanDefMap to setup beans. similiar to the BeanBuilder but doesnt require closures.
@@ -41,4 +70,5 @@ class SpringBeanUtils {
             beanDefinitionRegistry.registerBeanDefinition(beanName, bdef)
         }
     }
+
 }

@@ -31,6 +31,7 @@ class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRep
     // example of how to explcitly force the "belongsTo"  with the mappedBy
     static mappedBy = [ext: "kitchenSink"]
     static hasMany = [stringList: String]
+    static toOneAssociations = [ 'ext' ]
 
     //strings
     String name2

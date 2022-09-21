@@ -50,8 +50,6 @@ class ActivityBulk {
     @Autowired(required = false)
     ProblemHandler problemHandler
 
-    List<String> toOneAssociations = ['note', 'task']
-
     /**
      * insert a single activity and note for a list of domains.
      * @param targets A list of domains which need to have the activity assigned.

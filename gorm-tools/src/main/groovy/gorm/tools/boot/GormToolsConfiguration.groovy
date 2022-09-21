@@ -8,11 +8,13 @@ import javax.sql.DataSource
 
 import groovy.transform.CompileStatic
 
+import org.grails.datastore.mapping.model.AbstractMappingContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.DependsOn
 import org.springframework.context.annotation.Lazy
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -42,26 +44,29 @@ import grails.core.GrailsApplication
 @CompileStatic
 class GormToolsConfiguration {
 
-    GrailsApplication grailsApplication
+    // GrailsApplication grailsApplication
 
-    // @Autowired DataSource dataSource
-
-    GormToolsConfiguration(GrailsApplication grailsApplication){
-        this.grailsApplication = grailsApplication
-    }
+    // GormToolsConfiguration(GrailsApplication grailsApplication){
+    //     this.grailsApplication = grailsApplication
+    // }
 
     @Bean
-    GormRepoBeanFactoryPostProcessor gormRepoBeanFactoryPostProcessor() {
-        List<Class> repoClasses = grailsApplication.getArtefacts("Repository")*.clazz
-        List<Class> entityClasses = grailsApplication.getArtefacts("Domain")*.clazz
-        return new GormRepoBeanFactoryPostProcessor(repoClasses, entityClasses)
+    @DependsOn("grailsDomainClassMappingContext") //important here, if we dont do DependsOn then it eagerly instantiates the DataSource before its ready.
+    GormRepoBeanFactoryPostProcessor gormRepoBeanFactoryPostProcessor(AbstractMappingContext grailsDomainClassMappingContext) {
+        //AbstractMappingContext grailsDomainClassMappingContext
+        // List<Class> repoClasses = grailsApplication.getArtefacts("Repository")*.clazz
+        // List<Class> entityClasses = grailsApplication.getArtefacts("Domain")*.clazz
+        // return new GormRepoBeanFactoryPostProcessor(entityClasses)
+        return new GormRepoBeanFactoryPostProcessor(grailsDomainClassMappingContext)
     }
 
     @Bean
     IncludesConfig includesConfig(){ new IncludesConfig()}
 
     @Bean
-    JdbcTemplate jdbcTemplate(DataSource dataSource){ new JdbcTemplate(dataSource)}
+    JdbcTemplate jdbcTemplate(DataSource dataSource){
+        new JdbcTemplate(dataSource)
+    }
 
     @Bean
     JdbcIdGenerator jdbcIdGenerator(){ new JdbcIdGenerator(table: "NewObjectId") }

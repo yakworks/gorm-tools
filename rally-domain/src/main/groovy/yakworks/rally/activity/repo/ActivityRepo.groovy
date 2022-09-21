@@ -61,8 +61,6 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
     @Autowired(required = false)
     ProblemHandler problemHandler
 
-    List<String> toOneAssociations = ['note', 'task']
-
     @RepoListener
     void beforeValidate(Activity activity) {
         updateNameSummary(activity)

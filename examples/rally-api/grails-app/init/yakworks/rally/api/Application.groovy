@@ -43,7 +43,7 @@ class Application extends GrailsAutoConfiguration {
     in order for other spring boot Autoconfigure (such as actuator metrics) to get picked up then datasource needs to be setup early.
     it looks like best solution is to fork or modify the hibernate5 plugin so it uses AutoConfgure and can participate in the normal sboot process
     so instead of using HibernateDatastoreSpringInitializer it can autoconfigure the dataSourceConnectionSourceFactory(CachedDataSourceConnectionSourceFactory)
-    and the Datasource early (which should be a factory based on dataSourceConnectionSourceFactory)
+    and the Datasource early (which looks like it should be a factory based on dataSourceConnectionSourceFactory)
     this is a WIP example.
     */
     @Bean // @Primary

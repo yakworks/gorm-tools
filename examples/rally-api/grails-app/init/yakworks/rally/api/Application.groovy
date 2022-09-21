@@ -4,6 +4,15 @@
 */
 package yakworks.rally.api
 
+import javax.sql.DataSource
+
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
+
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.autoconfigure.hazelcast.HazelcastAutoConfiguration
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+import org.springframework.boot.jdbc.DataSourceBuilder
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
@@ -18,12 +27,35 @@ import yakworks.rest.grails.AppInfoBuilder
 // the services marked with @Component
 @ComponentScan(['yakworks.security', 'yakworks.rally', 'yakworks.testing.gorm.model'])
 @RestApiFromConfig
-// @EnableCaching
+// caching will use hazelcast for spring caching too, look into how to use caffiene for spring stuff and hazel for hibernate.
+@EnableCaching
+// this does not appear to be needed if hibernateDatastore depends on hazelcastInstance, see below hack
+// might want to do this if we are trying to force cache to use caffiene and only use hazel for hibernate.
 // @EnableAutoConfiguration(exclude = [HazelcastAutoConfiguration]) // in order to avoid autoconfiguring an extra Hazelcast instance
+@CompileStatic
 class Application extends GrailsAutoConfiguration {
     static void main(String[] args) {
         GrailsApp.run(Application, args)
     }
+
+    /*
+    grails HibernateDatastoreConnectionSourcesRegistrar.postProcessBeanDefinitionRegistry sets up the dataSource but checks for existing first.
+    in order for other spring boot Autoconfigure (such as actuator metrics) to get picked up then datasource needs to be setup early.
+    it looks like best solution is to fork or modify the hibernate5 plugin so it uses AutoConfgure and can participate in the normal sboot process
+    so instead of using HibernateDatastoreSpringInitializer it can autoconfigure the dataSourceConnectionSourceFactory(CachedDataSourceConnectionSourceFactory)
+    and the Datasource early (which should be a factory based on dataSourceConnectionSourceFactory)
+    this is a WIP example.
+    */
+    @Bean // @Primary
+    // DataSource dataSource() {
+    //     return DataSourceBuilder
+    //         .create()
+    //         .username("sa")
+    //         .password("")
+    //         .url("jdbc:h2:mem:devDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE")
+    //         .driverClassName("org.h2.Driver")
+    //         .build();
+    // }
 
     /**
      * To scan and pick up the gorm domains that are marked with @entity
@@ -47,6 +79,7 @@ class Application extends GrailsAutoConfiguration {
 
     @SuppressWarnings('Indentation')
     @Override
+    @CompileDynamic
     Closure doWithSpring() {{ ->
         appInfoBuilder(AppInfoBuilder)
 
@@ -64,7 +97,7 @@ class Application extends GrailsAutoConfiguration {
         }
 
         //hack to make sure hazel get setup before the one that is setup for hibernates L2 cache as that one
-        //is configured to join the name of the one setup in spring.
+        //is configured to join the name of one already setup in spring.
         def hibernateDatastoreBeanDef = getBeanDefinition('hibernateDatastore')
         if (hibernateDatastoreBeanDef) {
             // make it depend on my bean

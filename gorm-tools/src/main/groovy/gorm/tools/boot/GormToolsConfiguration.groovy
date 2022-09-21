@@ -64,7 +64,9 @@ class GormToolsConfiguration {
     IncludesConfig includesConfig(){ new IncludesConfig()}
 
     @Bean
-    JdbcTemplate jdbcTemplate(DataSource dataSource){ new JdbcTemplate(dataSource)}
+    JdbcTemplate jdbcTemplate(DataSource dataSource){
+        new JdbcTemplate(dataSource)
+    }
 
     @Bean
     JdbcIdGenerator jdbcIdGenerator(){ new JdbcIdGenerator(table: "NewObjectId") }

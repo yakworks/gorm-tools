@@ -9,6 +9,9 @@ import groovy.transform.CompileStatic
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.User
 
+import gorm.tools.model.NameCode
+import yakworks.security.UserTrait
+
 /**
  * Grails security has a GrailsUser that it uses by default, this replaces it to remove confusion.
  * NOTES:
@@ -18,6 +21,8 @@ import org.springframework.security.core.userdetails.User
  *  - think of it as a DTO or serializable value object for a Spring Security User, this is whats stored in the context for the logged in user
  *
  * @see org.springframework.security.core.userdetails.User
+ *
+ * TODO have this implement the UserTrait too.
  */
 @SuppressWarnings(['ParameterCount'])
 @CompileStatic
@@ -59,4 +64,14 @@ class SpringSecUser extends User {
         super(username, password, true, true, true, true, authorities)
         this.id = id
     }
+
+    // @Override
+    // Set<? extends NameCode> getRoles(){
+    //     throw new UnsupportedOperationException("Not supported in SpringSecUser impl yet")
+    // }
+    //
+    // @Override
+    // String getDisplayName(){
+    //     throw new UnsupportedOperationException("Not supported in SpringSecUser impl yet")
+    // }
 }

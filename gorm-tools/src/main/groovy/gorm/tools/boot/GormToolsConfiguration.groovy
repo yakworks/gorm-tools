@@ -9,10 +9,8 @@ import javax.sql.DataSource
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.model.AbstractMappingContext
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.DependsOn
 import org.springframework.context.annotation.Lazy
@@ -22,6 +20,9 @@ import gorm.tools.api.IncludesConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelStreamTools
 import gorm.tools.async.ParallelTools
+import gorm.tools.config.AsyncConfig
+import gorm.tools.config.GormConfig
+import gorm.tools.config.IdGeneratorConfig
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.IdGenerator
 import gorm.tools.idgen.JdbcIdGenerator
@@ -36,11 +37,13 @@ import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.transaction.TrxService
-import grails.core.GrailsApplication
 
-@Configuration @Lazy
-@ComponentScan(['gorm.tools.config'])
-@ConfigurationPropertiesScan
+@Configuration(proxyBeanMethods = false)
+@Lazy
+// @ComponentScan(['gorm.tools.config'])
+// @ConfigurationPropertiesScan
+@EnableConfigurationProperties([AsyncConfig, GormConfig, IdGeneratorConfig])
+// @Import([AsyncConfig, GormConfig, IdGeneratorConfig])
 @CompileStatic
 class GormToolsConfiguration {
 
@@ -69,10 +72,10 @@ class GormToolsConfiguration {
     }
 
     @Bean
-    JdbcIdGenerator jdbcIdGenerator(){ new JdbcIdGenerator(table: "NewObjectId") }
+    JdbcIdGenerator jdbcIdGenerator(){ new JdbcIdGenerator() }
 
     @Bean
-    IdGenerator idGenerator(){ new PooledIdGenerator(jdbcIdGenerator())}
+    IdGenerator idGenerator(JdbcIdGenerator jdbcIdGenerator){ new PooledIdGenerator(jdbcIdGenerator)}
 
     @Bean
     MangoQuery mangoQuery(){ new DefaultMangoQuery()}

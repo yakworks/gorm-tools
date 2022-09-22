@@ -19,6 +19,8 @@ import yakworks.security.gorm.model.AppUserToken
 /**
  * GORM implementation for token storage. It will look for tokens on the DB using a domain class that will contain the
  * generated token and the username associated.
+ * NOTE: The PostgresTokenStorageService is prefered over this since it encrypts the token, this is here more for H2 testing and potential
+ * other databases.
  *
  * Once the username is found, it will delegate to the configured {@link UserDetailsService} for obtaining authorities
  * information.

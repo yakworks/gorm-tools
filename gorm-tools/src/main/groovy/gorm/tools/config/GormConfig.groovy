@@ -13,7 +13,8 @@ import org.springframework.context.annotation.Configuration
 
 import yakworks.spring.SpringEnvironment
 
-@Configuration @ConfigurationProperties(prefix="gorm.tools")
+@Configuration(proxyBeanMethods = false)
+@ConfigurationProperties(prefix="gorm.tools")
 @CompileStatic
 class GormConfig implements SpringEnvironment{
 

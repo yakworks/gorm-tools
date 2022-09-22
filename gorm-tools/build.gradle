@@ -31,7 +31,17 @@ dependencies {
   //   exclude group:"org.grails", module: "grails-plugin-controllers"
   // }
   // compileOnly "org.grails.plugins:views-json-templates:$vViews"
-  compileOnly "org.grails:grails-plugin-mimetypes"
+
+  // compileOnly("org.grails:grails-web-common"){
+  //   exclude group: 'org.grails', module: 'grails-web-databinding'
+  // }
+  // compileOnly("org.grails:grails-web"){
+  //   exclude group: 'org.grails', module: 'grails-web-databinding'
+  // }
+  // compileOnly("org.grails:grails-plugin-mimetypes"){
+  //   exclude group: 'org.grails', module: 'grails-web'
+  //   exclude group: 'org.grails', module: 'grails-web-common'
+  // }
 
   //gets rid of the 'warning: unknown enum constant When.MAYBE' until we can figure out where it comes from
   compileOnly 'com.google.code.findbugs:jsr305:3.0.2'

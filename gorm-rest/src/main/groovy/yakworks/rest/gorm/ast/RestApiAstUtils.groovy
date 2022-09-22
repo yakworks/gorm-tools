@@ -181,7 +181,7 @@ class RestApiAstUtils {
      */
     static File findSourceFile(String className) {
         //File applicationDir = BuildSettings.BASE_DIR
-        String projectDir = BuildSupport.gradleProjectDir
+        String projectDir = BuildSupport.projectDir
         File applicationDir = new File(projectDir)
         //println "applicationDir $applicationDir"
         File file = null

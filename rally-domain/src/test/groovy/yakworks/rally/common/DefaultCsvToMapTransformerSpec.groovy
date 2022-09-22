@@ -28,13 +28,13 @@ class DefaultCsvToMapTransformerSpec extends Specification implements DataRepoTe
     void "sanity checks"() {
         expect:
         csvToMapTransformer != null
-        def csvFile = BuildSupport.gradleRootProjectPath.resolve("examples/resources/csv/contact.csv")
+        def csvFile = BuildSupport.rootProjectPath.resolve("examples/resources/csv/contact.csv")
         Files.exists(csvFile)
     }
 
     void "test with zip"() {
         when:
-        def csvFile = BuildSupport.gradleRootProjectPath.resolve("examples/resources/csv/contact.csv")
+        def csvFile = BuildSupport.rootProjectPath.resolve("examples/resources/csv/contact.csv")
         File zip = ZipUtils.zip("test.zip", null, csvFile.toFile())
 
         then:

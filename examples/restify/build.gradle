@@ -59,8 +59,8 @@ bootRun {
   String springProfilesActive = 'spring.profiles.active'
   String profileVal = System.getProperty(springProfilesActive) //?: 'dev'
   systemProperty springProfilesActive, profileVal
-  systemProperty "gradle.rootProjectDir", rootProject.projectDir.absolutePath
-  systemProperty "gradle.projectDir", project.projectDir.absolutePath
+  systemProperty "project.rootProjectDir", rootProject.projectDir.absolutePath
+  systemProperty "project.projectDir", project.projectDir.absolutePath
 }
 
 bootJar.enabled = true

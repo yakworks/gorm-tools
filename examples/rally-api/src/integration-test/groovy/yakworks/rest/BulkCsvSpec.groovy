@@ -29,7 +29,7 @@ class BulkCsvSpec  extends RestIntTest {
         setup: "Create zip"
         //Org.create(num:"bulk1", name:"bulk1", companyId: Company.DEFAULT_COMPANY_ID).persist()
 
-        File contactCsv =  new File(BuildSupport.gradleRootProjectDir, "examples/resources/csv/contact.csv")
+        File contactCsv =  new File(BuildSupport.rootProjectDir, "examples/resources/csv/contact.csv")
         assert contactCsv.exists()
 
         File zip = ZipUtils.zip("test.zip", appResourceLoader.rootPath.toFile(), contactCsv)

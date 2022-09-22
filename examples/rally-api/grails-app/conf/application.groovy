@@ -17,7 +17,7 @@ grails.config.locations = [
 //     [pattern: '/**', access: ['IS_AUTHENTICATED_ANONYMOUSLY']]
 // ]
 
-String projectRoot = BuildSupport.gradleRootProjectDir
+String projectRoot = BuildSupport.rootProjectDir
 app {
     resources {
         rootLocation = "${projectRoot}/examples/resources"

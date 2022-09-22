@@ -20,7 +20,7 @@ class TestSyncJobService implements SyncJobService<TestSyncJob> {
 
     @Override
     Path createTempFile(String filename){
-        def path = Paths.get(BuildSupport.gradleProjectDir, "build/bulk")
+        def path = Paths.get(BuildSupport.projectDir, "build/bulk")
         Files.createDirectories(path)
         return path.resolve(filename)
     }

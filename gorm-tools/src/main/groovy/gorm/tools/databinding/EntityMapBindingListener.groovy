@@ -29,7 +29,7 @@ class EntityMapBindingListener extends DataBindingListenerAdapter {
     }
 
     @Override
-    void bindingError(BindingError error, errors) {
+    void bindingError(BindingError error, Object errors) {
         BindingResult bindingResult = (BindingResult)errors
         String className = error.object?.getClass()?.getName()
         String classAsPropertyName = GrailsNameUtils.getPropertyNameRepresentation(className)
@@ -53,7 +53,7 @@ class EntityMapBindingListener extends DataBindingListenerAdapter {
         final Locale locale = LocaleContextHolder.getLocale()
         String propertyNameCode = className + '.' + propertyName + ".label"
         String resolvedPropertyName = messageSource.getMessage(propertyNameCode, null, propertyName, locale)
-        if (resolvedPropertyName.equals(propertyName)) {
+        if (resolvedPropertyName == propertyName) {
             propertyNameCode = classAsPropertyName + '.' + propertyName + ".label"
             resolvedPropertyName = messageSource.getMessage(propertyNameCode, null, propertyName, locale)
         }

@@ -17,11 +17,11 @@ grails.config.locations = [
 //     [pattern: '/**', access: ['IS_AUTHENTICATED_ANONYMOUSLY']]
 // ]
 
-String projectRoot = BuildSupport.rootProjectDir
-app {
-    resources {
-        rootLocation = "${projectRoot}/examples/resources"
-        tempDir = "./build/rootLocation/tempDir"
-        attachments.location = 'attachments'
-    }
-}
+
+// app {
+//     resources {
+//         rootLocation = "${project.rootProjectDir}/examples/resources"
+//         tempDir = "./build/rootLocation/tempDir"
+//         attachments.location = 'attachments'
+//     }
+// }

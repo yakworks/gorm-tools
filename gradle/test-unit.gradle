@@ -19,7 +19,7 @@ test {
     logLevel 'quiet'
     // theme 'mocha'
     showExceptions true
-    // showStandardStreams = true //shows the printlns in console
+    showStandardStreams true //shows the printlns in console
     showPassed false
     // showSkipped true
     showFailed true

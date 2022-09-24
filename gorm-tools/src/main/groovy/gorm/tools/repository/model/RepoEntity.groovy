@@ -6,8 +6,6 @@ package gorm.tools.repository.model
 
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.gorm.GormEntity
-
 import gorm.tools.mango.api.QueryMangoEntity
 import gorm.tools.repository.GormRepo
 

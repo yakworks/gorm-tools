@@ -13,9 +13,10 @@ import org.hibernate.type.descriptor.sql.SqlTypeDescriptor
 import org.hibernate.usertype.ParameterizedType
 
 import com.vladmihalcea.hibernate.type.json.internal.JsonTypeDescriptor
+import com.vladmihalcea.hibernate.type.util.Configuration
 
 /**
- * Overrides so we can access set using the gorm mapping
+ * Overrides so we can access setParameterValues using the gorm mapping
  */
 @SuppressWarnings(["ClassNameSameAsSuperclass"])
 @CompileStatic
@@ -40,17 +41,27 @@ class JsonType extends com.vladmihalcea.hibernate.type.json.JsonType {
         }
     }
 
-    //dynamic so we can access the setPropertyClass method on the JsonTypeDescriptor
-    @CompileDynamic
+    /**
+     * Uses config like
+     * `json type: JsonType, params: [type: Map]`
+     * @param parameters the params from the mapping
+     */
     void setJavaTypeDescriptorClass(Properties parameters) {
-        //type prop can be either class or String
+        //type prop can be either class or String of with the class name
         def typeProp = parameters.getProperty("type")
         //if typeProp then it string ref, otherwise assume its the class ref itself
         Type type = (Class) ( typeProp ? loadClass(typeProp) : parameters.get("type") )
-
-        ((JsonTypeDescriptor) getJavaTypeDescriptor()).setPropertyClass(type)
+        setJavaTypeDescriptorPropertyClass(type)
     }
 
+    //dynamic so we can access the private setPropertyClass method on the JsonTypeDescriptor
+    @CompileDynamic
+    void setJavaTypeDescriptorPropertyClass(Type type) {
+        ((JsonTypeDescriptor) getJavaTypeDescriptor()).setPropertyClass(type)
+        //might be able to do this and move off the private access
+        // var jtd = new JsonTypeDescriptor(Configuration.INSTANCE.getObjectMapperWrapper(), type)
+        // setJavaTypeDescriptor(jtd)
+    }
     static Class loadClass(String clazz){
         Thread.currentThread().contextClassLoader.loadClass(clazz)
     }

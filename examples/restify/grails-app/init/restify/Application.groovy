@@ -4,7 +4,9 @@
 */
 package restify
 
+import org.springframework.boot.ResourceBanner
 import org.springframework.context.annotation.ComponentScan
+import org.springframework.core.io.ClassPathResource
 
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
@@ -15,8 +17,12 @@ import yakworks.rest.gorm.RestApiFromConfig
 @ComponentScan(['restify', 'yakworks.testify', 'yakworks.security', 'yakworks.rally', 'yakworks.testing.gorm.model'])
 @RestApiFromConfig
 class Application extends GrailsAutoConfiguration {
+
     static void main(String[] args) {
-        GrailsApp.run(Application, args)
+        GrailsApp grailsApp = new GrailsApp([ Application ] as Class[])
+        grailsApp.setLazyInitialization(true) //alternative to lazy-initialization: true
+        // grailsApp.banner = new ResourceBanner(new ClassPathResource(GRAILS_BANNER))
+        grailsApp.run(args)
     }
 
     /**

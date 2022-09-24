@@ -17,15 +17,15 @@ test {
   // Defaults from https://github.com/radarsh/gradle-test-logger-plugin
   testlogger {
     logLevel 'quiet'
-    // theme 'standard'
+    // theme 'mocha'
     showExceptions true
-    showStandardStreams = true //shows the printlns in console
+    // showStandardStreams = true //shows the printlns in console
     showPassed false
-    showSkipped true
+    // showSkipped true
     showFailed true
     // slowThreshold 2000 //if tests take longer than this will show time it took
     showSummary true
-    // showSimpleNames false
+    // showSimpleNames true
     // showPassed true
     // showSkipped true
     // showFailed true

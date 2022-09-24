@@ -1,12 +1,18 @@
+debug: true
+
 spring.config.import: classpath:./gorm/tools/datasource-test.yml
 
 hibernate.jdbc.batch_size: 50
 
-logging:
-  level:
-    root: DEBUG
-    org.springframework: WARN
-    org.hibernate.orm.deprecation: OFF # turns off deprecation notices
+---
+
+#logging:
+#  level:
+#    root: WARN
+#    # For unit test need to setup in the logback-test.xml
+#    org.springframework: WARN
+#    org.hibernate.orm.deprecation: OFF # turns off deprecation notices
+#    org.hibernate.SQL: DEBUG
 
 gorm:
   tools:

@@ -13,6 +13,7 @@ import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
+import org.grails.datastore.mapping.proxy.ProxyHandler
 import org.grails.orm.hibernate.cfg.Mapping
 import org.springframework.validation.Validator
 
@@ -102,12 +103,19 @@ class GormMetaUtils {
     }
 
     /**
-     * If the name has `_$$_` then it removes it then returns it. otherwise just returns the same name passed in
+     * Doesnt require proxyHandler and just looks at the name.
+     * - If the name has `_$$_` its java assist
+     * - if it matches $HibernateProxy$ then its ByteBuddy
+     * method then removes the suffixes then returns just the name.
+     * if no match then it just returns the name
      */
     static String unwrapIfProxy(String name) {
-        final int proxyIndicator = name.indexOf('_$$_')
-        if (proxyIndicator > -1) {
-            name = name.substring(0, proxyIndicator)
+        final int proxyIndicatorJavaAssist = name.indexOf('_$$_')
+        final int proxyIndicatorByteBuddy = name.indexOf('$HibernateProxy$')
+        if (proxyIndicatorJavaAssist > -1) {
+            name = name.substring(0, proxyIndicatorJavaAssist)
+        } else if(proxyIndicatorByteBuddy > -1){
+            name = name.substring(0, proxyIndicatorByteBuddy)
         }
         return name
     }
@@ -207,7 +215,7 @@ class GormMetaUtils {
      */
     static Serializable getId(GormEntity instance) {
         PersistentEntity persistentEntity = getPersistentEntity(instance)
-        def proxyHandler = persistentEntity.mappingContext.proxyHandler
+        ProxyHandler proxyHandler = persistentEntity.mappingContext.proxyHandler
         if(proxyHandler.isProxy(instance)) {
             return proxyHandler.getIdentifier(instance)
         }

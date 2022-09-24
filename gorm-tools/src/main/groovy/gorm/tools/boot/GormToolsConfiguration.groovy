@@ -40,10 +40,7 @@ import gorm.tools.transaction.TrxService
 
 @Configuration(proxyBeanMethods = false)
 @Lazy
-// @ComponentScan(['gorm.tools.config'])
-// @ConfigurationPropertiesScan
 @EnableConfigurationProperties([AsyncConfig, GormConfig, IdGeneratorConfig])
-// @Import([AsyncConfig, GormConfig, IdGeneratorConfig])
 @CompileStatic
 class GormToolsConfiguration {
 
@@ -53,6 +50,7 @@ class GormToolsConfiguration {
     //     this.grailsApplication = grailsApplication
     // }
 
+    // see https://zetcode.com/spring/beanfactorypostprocessor/ for lambda BeanFactoryPostProcessor
     @Bean
     @DependsOn("grailsDomainClassMappingContext") //important here, if we dont do DependsOn then it eagerly instantiates the DataSource before its ready.
     GormRepoBeanFactoryPostProcessor gormRepoBeanFactoryPostProcessor(AbstractMappingContext grailsDomainClassMappingContext) {

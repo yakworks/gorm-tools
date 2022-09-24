@@ -17,16 +17,28 @@ class HibernateProxyInitSpec extends Specification implements DataIntegrationTes
 
     ProxyHandler proxyHandler
 
+    void "load Org"() {
+        expect:
+        HibernateProxyAsserts.load()
+    }
+
+    void "HibernateProxyAsserts"() {
+        expect:
+        def proxy = Org.load(2)
+        // HibernateProxyAsserts.assertIdCheckStaysProxy(proxy, proxyHandler)
+        assert proxy
+    }
+
     void "calling id prop should not unwrap proxy"() {
         when:
         def proxy = Org.load(2)
 
         then: "load returns a proxy"
-        proxy
-        !proxyHandler.isInitialized(proxy)
+        proxy.id
+        !Hibernate.isInitialized(proxy)
         proxy.getId() == GormMetaUtils.getId(proxy)
         // getId should also not unwrap the proxy
-        !proxyHandler.isInitialized(proxy)
+        !Hibernate.isInitialized(proxy)
 
         //this triggers it, seems any method call does it
         // proxy.isAttached()
@@ -37,6 +49,7 @@ class HibernateProxyInitSpec extends Specification implements DataIntegrationTes
         // !proxyHandler.isInitialized(proxy)
         // id should also not unwrap the proxy
         // proxy.id
+        // !proxyHandler.isInitialized(proxy)
         // !Hibernate.isInitialized(proxy)
 
     }
@@ -50,18 +63,22 @@ class HibernateProxyInitSpec extends Specification implements DataIntegrationTes
         org.info
         //access does not init
         !GrailsHibernateUtil.isInitialized(org, "info")
+        !Hibernate.isInitialized(org.info)
 
         //id does not init
         org.infoId == 4
         !GrailsHibernateUtil.isInitialized(org, "info")
+        !Hibernate.isInitialized(org.info)
 
         //getId does not init
         org.info.getId() == 4
         !GrailsHibernateUtil.isInitialized(org, "info")
+        !Hibernate.isInitialized(org.info)
 
-        //id inits it
+        // id check does not init it
         // org.info.id == 4
-        // !GrailsHibernateUtil.isInitialized(org, "info")
+        !GrailsHibernateUtil.isInitialized(org, "info")
+        !Hibernate.isInitialized(org.info)
     }
 
     void "verify association not initialized on getId() prop check"() {
@@ -71,6 +88,10 @@ class HibernateProxyInitSpec extends Specification implements DataIntegrationTes
 
         then:
         org.info.getId() == 4
+        !Hibernate.isInitialized(org.info)
+        !GrailsHibernateUtil.isInitialized(org, "info")
+
+        org.info.id == 4
         !Hibernate.isInitialized(org.info)
         !GrailsHibernateUtil.isInitialized(org, "info")
     }
@@ -109,6 +130,6 @@ class HibernateProxyInitSpec extends Specification implements DataIntegrationTes
 
         then:
         !GrailsHibernateUtil.isInitialized(org,"info")
-
+        !Hibernate.isInitialized(org.info)
     }
 }

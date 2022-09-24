@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration
 
 import yakworks.spring.SpringEnvironment
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConfigurationProperties(prefix="gorm.tools.async")
 // @ConfigurationPropertiesScan
 @CompileStatic

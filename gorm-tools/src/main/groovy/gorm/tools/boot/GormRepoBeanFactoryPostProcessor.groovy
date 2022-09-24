@@ -6,22 +6,16 @@ package gorm.tools.boot
 
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.mapping.core.AbstractDatastore
 import org.grails.datastore.mapping.model.AbstractMappingContext
-import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
-import org.springframework.context.ApplicationContext
-import org.springframework.context.ApplicationContextAware
 
 import gorm.tools.repository.DefaultGormRepo
-import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.UuidGormRepo
 import gorm.tools.repository.model.UuidRepoEntity
-import yakworks.commons.lang.NameUtils
 
 /**
  * Sets up the spring beans for the GormRepos.

@@ -51,7 +51,7 @@ class AuditStampConfigLoader {
      * See README for module.path
      */
     private File loadFileFromConfigDir(String name) {
-        String modulePath = BuildSupport.gradleProjectDir
+        String modulePath = BuildSupport.projectDir
         //assert modulePath
         String configPath
         if (modulePath != null){

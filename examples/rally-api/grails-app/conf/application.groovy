@@ -10,18 +10,18 @@ grails.config.locations = [
 ]
 
 //default security
-grails.plugin.springsecurity.rest.active = false
-grails.plugin.springsecurity.securityConfigType = "InterceptUrlMap"
-grails.plugin.springsecurity.interceptUrlMap = [
-    // all accesible anoymously by default
-    [pattern: '/**', access: ['IS_AUTHENTICATED_ANONYMOUSLY']]
-]
+// grails.plugin.springsecurity.rest.active = false
+// grails.plugin.springsecurity.securityConfigType = "InterceptUrlMap"
+// grails.plugin.springsecurity.interceptUrlMap = [
+//     // all accesible anoymously by default
+//     [pattern: '/**', access: ['IS_AUTHENTICATED_ANONYMOUSLY']]
+// ]
 
-String projectRoot = BuildSupport.gradleRootProjectDir
-app {
-    resources {
-        rootLocation = "${projectRoot}/examples/resources"
-        tempDir = "./build/rootLocation/tempDir"
-        attachments.location = 'attachments'
-    }
-}
+
+// app {
+//     resources {
+//         rootLocation = "${project.rootProjectDir}/examples/resources"
+//         tempDir = "./build/rootLocation/tempDir"
+//         attachments.location = 'attachments'
+//     }
+// }

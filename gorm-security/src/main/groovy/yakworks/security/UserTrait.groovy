@@ -12,7 +12,7 @@ import gorm.tools.model.NamedEntity
 /**
  * Trait for a User. We depend on this so that we are not locked into a specific security framework such as Spring or Shiro.
  * Roughly based on Springs UserDetails
- *
+ * Both the AppUser domain and the SpringSecUser implement this.
  * @see org.springframework.security.core.userdetails.UserDetails
  */
 @CompileStatic
@@ -38,7 +38,7 @@ trait UserTrait<ID> extends NamedEntity {
 
     /** The unique id for the user, be default will be the normal generated id from gorm */
     abstract ID getId()
-    abstract void setId(ID id)
+    // abstract void setId(ID id)
 
     /** The roles assigned to the User */
     abstract Set<? extends NameCode> getRoles()

@@ -41,13 +41,14 @@ class SpringSecService<D extends UserTrait> implements SecService<D> {
     SpringSecService(Class<D> clazz) {
         this.entityClass = clazz
     }
+
     /**
      * Get the currently logged in user's principal. If not authenticated and the
      * AnonymousAuthenticationFilter is active (true by default) then the anonymous
      * user's name will be returned ('anonymousUser' unless overridden).
      * calls same method on springSecurityService
-     *
-     * @return the principal
+     * @see SpringSecUser
+     * @return the principal (which as we have setup is the SpringSecUser
      */
     def getPrincipal() {
         springSecurityService.getPrincipal()

@@ -6,6 +6,19 @@ spring:
   config:
     import: classpath:./datasource.yml, classpath:./testify-defaults.yml
 
+logging:
+  level:
+    root: INFO
+    #    org.springframework: WARN
+    org.hibernate.orm.deprecation: OFF # turns off deprecation notices
+    restify.Application: INFO
+
+app:
+  resources:
+    # project.rootProjectDir comes from project.rootProjectDir system prop setup in gradle or defaults to . if not set and running from intellij
+    rootLocation: "${project.rootProjectDir}/examples/resources"
+    tempDir: "./build/rootLocation/tempDir"
+    attachments.location: 'attachments'
 ---
 
 grails:
@@ -93,14 +106,6 @@ grails:
 
 ---
 
-#projectRoot: ${gradle.rootProjectDir}
-app:
-  resources:
-    rootLocation: "${gradle.rootProjectDir}/examples/resources"
-    tempDir: "./build/rootLocation/tempDir"
-    attachments.location: 'attachments'
-
----
 #spring.config.activate.on-profile: dev
 #spring.config.import: classpath:testify-dev.yml
 

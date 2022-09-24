@@ -1,7 +1,7 @@
 apply plugin: 'groovy'
 
 dependencies {
-  compileOnly "io.micronaut:micronaut-inject-groovy"
+  // compileOnly "io.micronaut:micronaut-inject-groovy"
   implementation "org.springframework.boot:spring-boot-starter-logging"
   implementation "org.springframework.boot:spring-boot-autoconfigure"
   implementation "org.grails:grails-core"

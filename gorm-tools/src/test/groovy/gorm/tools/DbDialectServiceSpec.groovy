@@ -15,10 +15,10 @@ class DbDialectServiceSpec extends Specification implements GormHibernateTest {
     //dbDialectService is already one of the beans setup in GormHibernateTest so just inject it
     @Autowired DbDialectService dbDialectService
 
+    //test a bunch of ways to setup dialect
     void "test initFromHibernateDialect"() {
         when: "dialect is null"
-        dbDialectService.hibernateDialect = null
-        dbDialectService.init()
+        dbDialectService.init("")
         int dialect = dbDialectService.dialect
 
         then:
@@ -27,8 +27,7 @@ class DbDialectServiceSpec extends Specification implements GormHibernateTest {
         dbDialectService.isH2() == true
 
         when: "mysql"
-        dbDialectService.hibernateDialect = 'MySQL5InnoDBDialect'
-        dbDialectService.init()
+        DbDialectService.init('MySQL5InnoDBDialect')
         dialect = dbDialectService.getDialect()
 
         then:
@@ -37,8 +36,7 @@ class DbDialectServiceSpec extends Specification implements GormHibernateTest {
         dbDialectService.isMySql() == true
 
         when: "mssql server 20**"
-        dbDialectService.hibernateDialect = 'testSQLServer2012Dialect'
-        dbDialectService.init()
+        DbDialectService.init('testSQLServer2012Dialect')
         dialect = dbDialectService.getDialect()
 
         then:
@@ -47,8 +45,7 @@ class DbDialectServiceSpec extends Specification implements GormHibernateTest {
         dbDialectService.isMsSql() == true
 
         when: "sql server"
-        dbDialectService.hibernateDialect = 'SQLServerDialect'
-        dbDialectService.init()
+        DbDialectService.init('SQLServerDialect')
         dialect = dbDialectService.getDialect()
 
         then:
@@ -57,8 +54,7 @@ class DbDialectServiceSpec extends Specification implements GormHibernateTest {
         dbDialectService.isMsSql() == true
 
         when: "postgresql"
-        dbDialectService.hibernateDialect  = 'PostgreSQLDialect'
-        dbDialectService.init()
+        DbDialectService.init('PostgreSQLDialect')
         dialect = dbDialectService.getDialect()
 
         then:

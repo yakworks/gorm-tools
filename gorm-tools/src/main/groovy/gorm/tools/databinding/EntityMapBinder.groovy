@@ -19,10 +19,9 @@ import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
-import org.grails.web.databinding.DataBindingEventMulticastListener
-import org.grails.web.databinding.GrailsWebDataBindingListener
-import org.grails.web.databinding.SpringConversionServiceAdapter
 import org.springframework.context.MessageSource
+import org.springframework.core.convert.ConversionService
+import org.springframework.core.convert.support.DefaultConversionService
 import org.springframework.validation.AbstractBindingResult
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.BindingResult
@@ -64,9 +63,10 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
     boolean trimStrings = true
     boolean convertEmptyStringsToNull = true
     protected List<DataBindingListener> listeners = []
+    protected ConversionService springConversionService
 
     EntityMapBinder() {
-        this.conversionService = new SpringConversionServiceAdapter()
+        this.springConversionService = new DefaultConversionService()
         // registerConverter new ByteArrayMultipartFileValueConverter()
     }
 
@@ -115,17 +115,13 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
     @Override
     protected void doBind(Object object, DataBindingSource source, String filter, List whiteList, List blackList,
                           DataBindingListener listener, Object errors) {
-        //TODO this is where we will store errors
-        BeanPropertyBindingResult bindingResult = (BeanPropertyBindingResult) errors
-        GrailsWebDataBindingListener errorHandlingListener = new GrailsWebDataBindingListener(messageSource)
-        List<DataBindingListener> allListeners = []
-        allListeners << errorHandlingListener
 
-        DataBindingEventMulticastListener listenerWrapper = new DataBindingEventMulticastListener(allListeners)
+        EntityMapBindingListener errorHandlingListener = new EntityMapBindingListener(messageSource)
 
-        fastBind(object, source, whiteList, listenerWrapper, errors)
+        fastBind(object, source, whiteList, errorHandlingListener, errors)
 
-        if(bindingResult.hasErrors())populateErrors(object, bindingResult)
+        def bindingResult = (BeanPropertyBindingResult) errors
+        if(bindingResult.hasErrors()) populateErrors(object, bindingResult)
     }
 
     /**
@@ -236,7 +232,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
         Object valueToAssign = propValue
         // if its string this wil get populated
 
-        Class typeToConvertTo = prop.getType() as Class
+        Class<?> typeToConvertTo = prop.getType() as Class<?>
 
         //try association first
         if (prop instanceof Association) {
@@ -259,8 +255,8 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
                         if (converter) {
                             parsedVal = converter.convert(propValue)
                         }
-                    } else if (conversionService?.canConvert(propValue.getClass(), typeToConvertTo)) {
-                        parsedVal = conversionService.convert(propValue, typeToConvertTo)
+                    } else if (springConversionService?.canConvert(propValue.getClass(), typeToConvertTo)) {
+                        parsedVal = springConversionService.convert(propValue, typeToConvertTo as Class<Object>)
                     }
                 }
             }

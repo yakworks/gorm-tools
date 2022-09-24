@@ -53,18 +53,18 @@ class OpenApiGenerator implements ConfigAware {
     }
 
     /**
-     * gets a path using the gradle.projectDir as the root
+     * gets a path using the project.projectDir as the root
      */
     Path getApiSrcPath(String sub = null){
-        def path =  Paths.get(BuildSupport.gradleRootProjectDir?:'', apiSrc)
+        def path =  Paths.get(BuildSupport.rootProjectDir?:'', apiSrc)
         return sub ? path.resolve(sub) : path
     }
 
     /**
-     * gets a path using the gradle.projectDir as the root
+     * gets a path using the project.projectDir as the root
      */
     Path getApiBuildPath(String sub = null){
-        def path =  Paths.get(BuildSupport.gradleRootProjectDir?:'', apiBuild)
+        def path =  Paths.get(BuildSupport.rootProjectDir?:'', apiBuild)
         return sub ? path.resolve(sub) : path
     }
 

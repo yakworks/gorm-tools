@@ -104,7 +104,7 @@ class ExportBenchmarkSpecs extends Specification implements GormHibernateTest, J
 
     @CompileStatic
     ExcelBuilder writeXlsx(MetaMapList mapList){
-        Path prjPath = BuildSupport.gradleProjectPath.resolve("build/testing.xlsx")
+        Path prjPath = BuildSupport.projectPath.resolve("build/testing.xlsx")
         ExcelBuilder eb
         prjPath.withOutputStream { os ->
             eb = ExcelBuilder.of(os)
@@ -117,7 +117,7 @@ class ExportBenchmarkSpecs extends Specification implements GormHibernateTest, J
 
     @CompileStatic
     Path writerToFile(Writer writer, String filename) {
-        Path prjPath = BuildSupport.gradleProjectPath.resolve("build/$filename")
+        Path prjPath = BuildSupport.projectPath.resolve("build/$filename")
         prjPath.setText(writer.toString())
         return prjPath
     }

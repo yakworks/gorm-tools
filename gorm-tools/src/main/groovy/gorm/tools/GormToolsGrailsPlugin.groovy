@@ -36,7 +36,7 @@ class GormToolsGrailsPlugin extends Plugin {
     @CompileDynamic
     Closure doWithSpring() {{ ->
         //with how we change config its only accesible in grails config
-        DbDialectService.hibernateDialect = config.getProperty("hibernate.dialect")
+        DbDialectService.init(config.getProperty("hibernate.dialect"))
 
         // gormToolsConfiguration(GormToolsConfiguration, grailsApplication)
         gormToolsConfiguration(GormToolsConfiguration)

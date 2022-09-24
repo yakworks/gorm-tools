@@ -31,7 +31,7 @@ dataSource:
 
 app:
   resources:
-    rootLocation: "${gradle.rootProjectDir}/examples/resources"
+    rootLocation: "${project.rootProjectDir}/examples/resources"
     tempDir: "./build/rootLocation/tempDir"
 
 gorm:

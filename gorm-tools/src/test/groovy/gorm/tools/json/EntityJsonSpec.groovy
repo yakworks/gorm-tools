@@ -24,11 +24,12 @@ import yakworks.meta.MetaMap
 import yakworks.meta.MetaMapList
 import yakworks.testing.gorm.RepoTestData
 import yakworks.testing.gorm.unit.DataRepoTest
+import yakworks.testing.gorm.unit.GormHibernateTest
 
 import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson
 
-class EntityJsonSpec extends Specification implements DataRepoTest {
+class EntityJsonSpec extends Specification implements GormHibernateTest {
     static List entityClasses = [Cust, CustExt, CustType, AddyNested, Address, JsonifyDom, JsonifyDomExt, NestedDom]
 
     @Autowired MetaMapService metaMapService
@@ -74,7 +75,7 @@ class EntityJsonSpec extends Specification implements DataRepoTest {
             "kind":"CLIENT",
             "beforeValidateCheck":"got it",
             "testIdent":{"id":2,"name":"Num2"},
-            "type":{"id":1}
+            "type":{"id":2}
         }
         ''')
 
@@ -83,36 +84,37 @@ class EntityJsonSpec extends Specification implements DataRepoTest {
     void "test JsonifyDom json stock"() {
         when: "no includes"
         def excludes = ['version']
-        def jdom = RepoTestData.build(JsonifyDom)
+        def jdom = RepoTestData.build(JsonifyDom, id:1)
         def res = toJson(jdom, null, excludes)
 
         then: 'should not include the ext because its null'
         assertThatJson(res).isEqualTo('{"id":1,"localDate":"2018-01-25","isActive":false,"date":"2018-01-26T01:36:02Z","name":"name","amount":0}')
 
         when: "ext association is mocked up in data"
-        jdom = RepoTestData.build(JsonifyDom, includes: ['ext'])
+        jdom.ext = RepoTestData.build(JsonifyDomExt, id: 1)
+
         res = toJson(jdom, ['*', 'ext'], excludes)
 
         then: 'the default will be just the ext.id'
-        assertThatJson(res).isEqualTo('{"id":2,"localDate":"2018-01-25","ext":{"id":1},"isActive":false,"date":"2018-01-26T01:36:02Z","name":"name","amount":0}')
+        assertThatJson(res).isEqualTo('{"id":1,"localDate":"2018-01-25","ext":{"id":1},"isActive":false,"date":"2018-01-26T01:36:02Z","name":"name","amount":0}')
 
         when: "ext association is in includes with \$stamp"
         res = toJson(jdom, ['id', 'name', 'ext.$stamp'], excludes)
 
         then: 'ext fields should be shown'
-        assertThatJson(res).isEqualTo('{"id":2,"name":"name","ext":{"id":1,"nameExt":"nameExt"}}')
+        assertThatJson(res).isEqualTo('{"id":1,"name":"name","ext":{"id":1,"nameExt":"nameExt"}}')
 
         when: "ext association is in includes and \$* should use stamp"
         res = toJson(jdom, ['id', 'name', 'ext.$*'], excludes)
 
         then: 'ext fields should be shown'
-        assertThatJson(res).isEqualTo('{"id":2,"name":"name","ext":{"id":1,"nameExt":"nameExt"}}')
+        assertThatJson(res).isEqualTo('{"id":1,"name":"name","ext":{"id":1,"nameExt":"nameExt"}}')
 
     }
 
     void "currency converter should work"() {
         when:
-        def jdom = RepoTestData.build(JsonifyDom, currency: Currency.getInstance('USD'))
+        def jdom = RepoTestData.build(JsonifyDom, currency: Currency.getInstance('USD'), id:1)
         def res = toJson(jdom, ['id', 'currency'])
 
         then:
@@ -122,8 +124,9 @@ class EntityJsonSpec extends Specification implements DataRepoTest {
 
     void "transients should be rendered"() {
         when:
-        def jdom = RepoTestData.build(JsonifyDom, includes: ['ext'])
-        def args = [includes: ['id', 'ext.nameExt', 'company'], deep: true]
+        def jdom = RepoTestData.build(JsonifyDom, id: 1)
+        // def args = [includes: ['id', 'ext.nameExt', 'company'], deep: true]
+        jdom.ext = RepoTestData.build(JsonifyDomExt, id: 1)
 
         def res = toJson(jdom, ['id', 'ext.nameExt', 'company'])
 
@@ -161,16 +164,6 @@ class EntityJsonSpec extends Specification implements DataRepoTest {
 
     }
 
-    void "test json includes ext.*"() {
-        when:
-        def org = build(Cust, includes: '*')
-        def result = toJson(org, ["name", 'ext.*'])
-
-        then:
-        assertThatJson(result).isEqualTo('{"ext":{"id":1,"version":0,"text1":"text1","org":{"id":1}},"name":"name"}')
-
-    }
-
 }
 
 @Entity @GrailsCompileStatic
@@ -191,6 +184,10 @@ class JsonifyDom implements RepoEntity<JsonifyDom> {
 
     String getCompany() {
         'Tesla'
+    }
+
+    static mapping = {
+        id generator: "assigned"
     }
 
     static constraints = {
@@ -220,7 +217,7 @@ class JsonifyDomExt {
     ]
 
     static mapping = {
-        id generator:'foreign', params:[property:'testJsonifyDom']
+        id generator: "assigned"
         testJsonifyDom insertable: false, updateable: false , column:'id'
     }
     static constraints = {

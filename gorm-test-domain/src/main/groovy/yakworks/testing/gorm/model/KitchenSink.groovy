@@ -25,7 +25,7 @@ import yakworks.security.audit.AuditStamp
 @Entity
 // @ManagedEntity //see ManagedEntitySinkSpec
 @GrailsCompileStatic
-class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRepo>, CreateCriteriaSupport {
+class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRepo> {
     //<- ext belong to KitchenSink
     // since ext also has an KitchenSink property (kitchenParent) it will confused
     // example of how to explcitly force the "belongsTo"  with the mappedBy
@@ -101,33 +101,6 @@ class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRep
     List<SinkItem> getItems(){
         SinkItem.listByKitchenSink(this)
     }
-
-    // static KitchenSink build(Long id){
-    //     def loc = new Thing(city: "City$id")
-    //     loc.id = id
-    //     loc.persist()
-    //
-    //     def ks = new KitchenSink(
-    //         id: id,
-    //         num: "$id",
-    //         name: "Kitchen$id",
-    //         name2: (id % 2) ? "OrgName2" + id : null ,
-    //         kind: (id % 2) ? KitchenSink.Kind.VENDOR : KitchenSink.Kind.CLIENT ,
-    //         status: (id % 2) ? SinkStatus.Inactive : SinkStatus.Active,
-    //         inactive: (id % 2 == 0),
-    //         amount: (id - 1) * 1.25,
-    //         actDate: LocalDateTime.now().plusDays(id).toDate(),
-    //         localDate: LocalDate.now().plusDays(id),
-    //         localDateTime: LocalDateTime.now().plusDays(id),
-    //         thing: loc
-    //     ).persist()
-    //     ks.ext = new SinkExt(
-    //         kitchenSink: ks,
-    //         name: "ext$id",
-    //         kitchenParent: id % 2 == 0 ? KitchenSink.load(1) : KitchenSink.load(2)
-    //     ).persist()
-    //     return ks
-    // }
 
     static KitchenSink build(Long id, boolean flushIt = true){
         return getRepo().build(id, flushIt)

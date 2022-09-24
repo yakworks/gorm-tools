@@ -10,10 +10,14 @@ include $(SHIPKIT_DIR)/makefiles/ship-gh-pages.make
 # DB = true # set this to true to turn on the DB environment options
 
 ## Run spotlessApply and normal check
-check:
+check: lint
 	# $(gradlew) spotlessApply
 	# $(gradlew) check --max-workers=3
 	$(gradlew) check
+
+## Runs the gradle snapshot
+snapshot:
+	$(gradlew) snapshot
 
 # should run vault.decrypt before this,
 # sets up github, kubernetes and docker login

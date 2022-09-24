@@ -25,7 +25,7 @@ import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import grails.artefact.Artefact
 
 /**
- * A transformation that makes the GormRepository class into an @Artefact and adds the @Service
+ * A transformation that makes the GormRepository class into an @Artefact and adds the @Component annotation for scan
  */
 @CompileStatic
 @GroovyASTTransformation(phase = CompilePhase.CANONICALIZATION)

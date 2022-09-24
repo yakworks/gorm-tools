@@ -36,7 +36,7 @@ class AttachmentSpec extends Specification implements GormHibernateTest, Securit
 
     // gets a file from example/resources
     Path getFile(String name){
-        Paths.get(BuildSupport.gradleRootProjectDir, "examples/resources/$name")
+        Paths.get(BuildSupport.rootProjectDir, "examples/resources/$name")
     }
 
     Path createTempFile(String sourceFile){

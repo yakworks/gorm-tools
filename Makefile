@@ -15,10 +15,6 @@ check: lint
 	# $(gradlew) check --max-workers=3
 	$(gradlew) check
 
-## Runs the gradle snapshot
-snapshot:
-	$(gradlew) snapshot
-
 # should run vault.decrypt before this,
 # sets up github, kubernetes and docker login
 # sets up github, kubernetes and docker login, commented out # kubectl.config dockerhub.login
@@ -42,6 +38,19 @@ publish:
 		fi
 		$(logr.done) "published"
 	fi
+
+## publish snapsot to repo.9ci
+publish.snapshot:
+	if [ "$(IS_SNAPSHOT)" ]; then
+		$(gradlew) publishJavaLibraryPublicationToMavenRepository
+		$(logr.done) "- libs with version $(VERSION)$(VERSION_SUFFIX) published to snapshot repo"
+	fi
+
+## Build snapshot and publishes to your local maven.
+snapshot:
+	# snapshot task comes from the yakworks shipkit plugin.
+	$(gradlew) snapshot
+	$(logr.done) "- libs with version $(VERSION)$(VERSION_SUFFIX) published to local ~/.m2 maven"
 
 
 ifdef PUBLISHABLE_BRANCH_OR_DRY_RUN

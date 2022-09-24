@@ -16,6 +16,7 @@ tasks.withType(Test) {
 test {
   // Defaults from https://github.com/radarsh/gradle-test-logger-plugin
   testlogger {
+    //COMMENT THIS OUT to show logging on console
     logLevel 'quiet'
     // theme 'mocha'
     showExceptions true

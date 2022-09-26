@@ -210,7 +210,17 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
         return valueToAssign
     }
 
-    static class UnParsed {}
+    static class UnParsed {
+        // see good explanation of thread safe static instance stratgey https://stackoverflow.com/a/16106598/6500859
+        @SuppressWarnings('UnusedPrivateField')
+        private static class Holder {
+            private static final UnParsed INSTANCE = new UnParsed();
+        }
+
+        static UnParsed getInstance() {
+            return Holder.INSTANCE
+        }
+    }
 
     /**
      * Sets a value to a specified target's property.

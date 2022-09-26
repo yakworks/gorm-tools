@@ -110,7 +110,7 @@ grails:
 hibernate:
   generate_statistics: true
   format_sql: false
-  schema_management_tool: 'gorm.tools.hibernate.schema.CustomSchemaManagementTool'
+  schema_management_tool: 'yakworks.hibernate.schema.SimpleSchemaManagementTool'
   naming_strategy: 'org.hibernate.cfg.DefaultNamingStrategy'
   show_sql: false
   cache:

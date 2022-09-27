@@ -6,9 +6,10 @@ package yakworks.rally.job
 
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.RepoLookup
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.annotation.Entity
-import yakworks.security.audit.AuditStamp
+import yakworks.security.audit.AuditStampTrait
 
 /**
  * An instance created right away when "any job" in 9ci is called.
@@ -17,9 +18,8 @@ import yakworks.security.audit.AuditStamp
  * Job may no longer exist to query. 9ci only logs the last 100 jobs. Jobs also expire within an hour.
  */
 @Entity
-@AuditStamp
 @GrailsCompileStatic
-class SyncJob implements SyncJobEntity<SyncJob>, Serializable {
+class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity<SyncJob>,  AuditStampTrait, Serializable {
 
     byte[] getData(){
         getRepo().getData(this)

@@ -6,7 +6,6 @@ package testing
 
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.RepoLookup
-import gorm.tools.repository.model.GormRepoEntity
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -15,7 +14,7 @@ import yakworks.commons.transform.IdEqualsHashCode
 @IdEqualsHashCode
 @Entity
 @GrailsCompileStatic
-class TestSyncJob implements SyncJobEntity<TestSyncJob>, GormRepoEntity<TestSyncJob, TestSyncJobRepo> {
+class TestSyncJob implements RepoEntity<TestSyncJob>, SyncJobEntity<TestSyncJob> {
 
     @Override
     String dataToString(){

@@ -11,7 +11,6 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.reflect.ClassUtils
-import org.springframework.beans.factory.annotation.Value
 
 import yakworks.spring.SpringEnvironment
 

@@ -6,6 +6,8 @@ package yakworks.rally.orgs.model
 
 import javax.persistence.Transient
 
+import groovy.transform.ToString
+
 import gorm.tools.model.NameCodeDescription
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic

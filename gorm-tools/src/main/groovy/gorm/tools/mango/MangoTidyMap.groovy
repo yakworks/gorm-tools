@@ -78,53 +78,50 @@ class MangoTidyMap {
             if (EnumUtils.isValidEnum(MangoOps.JunctionOp, key as String)) {
                 if (val instanceof Map) {
                     result[key] = (val as Map).collect { k, v -> tidy([(k.toString()): v]) }
-                    return
                 }
-
-                if (val instanceof List) {
+                else if (val instanceof List) {
                     result[key] = (val as List).collect { v -> tidy(['$and': v]) }
-                    return
                 }
             }
-            if (val instanceof Map && key != MangoOps.SORT && key != MangoOps.Q && key != MangoOps.QSEARCH) {
+            else if (val instanceof Map && key != MangoOps.SORT && key != MangoOps.Q && key != MangoOps.QSEARCH) {
                 toMangoOperator(val as Map, result[key] as Map)
-            } else {
+            }
+            else {
                 if (key.toString().startsWith('$')) {
                     result[key] = val
-                    return
                 } //if we already have Mango method
-                if (val instanceof List) {
+                else if (val instanceof List) {
                     List valAsList = val as List
                     // for handling case {customer: [{id:1}, {id:2}]}, transforms to {customer:{id:{'$in': [1,2]}}}
                     if (valAsList[0] instanceof Map) {
                         Map mapVal = valAsList[0]
                         Map inMap = ['$in': valAsList.collect { (it as Map).values()[0] }]
                         result[key]["${mapVal.keySet()[0]}"] = inMap
-                        return
+                    } else {
+                        result[key]['$in'] = val
                     }
-                    result[key]['$in'] = val
-                    return
                 }
-                //be smart about wildcards
-                if (val instanceof String && val.contains("%")) {
-                    result[key]['$ilike'] = val
-                    return
+                else if (val instanceof String){
+                    //be smart about wildcards
+                    if (val.contains("%")) {
+                        result[key]['$ilike'] = val
+                    }
+                    else if (val.endsWith("*")) {
+                        result[key]['$ilike'] = val.substring(0, val.length() - 1) + '%'
+                    }
+                    else if (EnumUtils.isValidEnum(MangoOps.ExistOp, val)) {
+                        (result[key] as Map)[val] = true
+                    }
+                    else {
+                        result[key]['$eq'] = val
+                    }
                 }
-
-                if (val instanceof String && val.endsWith("*")) {
-                    result[key]['$ilike'] = val.substring(0, val.length() - 1) + '%'
-                    return
-                }
-
-                if (EnumUtils.isValidEnum(MangoOps.ExistOp, val as String)) {
-                    (result[key] as Map)[val] = true
-                } else {
+                else {
                     result[key]['$eq'] = val
                 }
             }
         }
         result
-
     }
 
     static Map tidySort(String path, Object val, Map map) {

@@ -27,16 +27,17 @@ publish:
 		echo "🌮 dry_run ->  $(gradlew) publish"
 	else
 		if [ "$(IS_SNAPSHOT)" ]; then
-			$(logr) "publishing SNAPSHOT"
 			$(gradlew) publishJavaLibraryPublicationToMavenRepository
+			$(logr.done) "- published SNAPSHOT to repo.9ci.com - libraries with version $(VERSION)$(VERSION_SUFFIX)"
 		else
 			${gradlew} rally-domain:verifyNoSnapshots
-			$(logr) "publishing to repo.9ci"
 			$(gradlew) publishJavaLibraryPublicationToMavenRepository
-			$(logr) "publishing to Sonatype Maven Central"
+			$(logr.done) "- published to repo.9ci.com - libraries with version $(VERSION)"
+
+			$(logr) "Starting publishing to Sonatype Maven Central"
 			$(gradlew) publishToSonatype closeAndReleaseSonatypeStagingRepository
+			$(logr.done) "- published to Maven Central - libraries with version $(VERSION)"
 		fi
-		$(logr.done) "published"
 	fi
 
 ## publish snapsot to repo.9ci

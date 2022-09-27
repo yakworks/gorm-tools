@@ -24,7 +24,7 @@ import yakworks.security.audit.AuditStamp
  */
 @Entity
 @AuditStamp
-@IdEqualsHashCode @ToString
+@IdEqualsHashCode
 @GrailsCompileStatic
 class Org implements NameNum, RepoEntity<Org>, HasTags, CreateCriteriaSupport, Serializable {
 

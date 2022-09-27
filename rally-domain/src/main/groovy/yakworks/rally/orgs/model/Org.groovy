@@ -4,7 +4,6 @@
 */
 package yakworks.rally.orgs.model
 
-import groovy.transform.ToString
 
 import gorm.tools.hibernate.criteria.CreateCriteriaSupport
 import gorm.tools.model.NameNum

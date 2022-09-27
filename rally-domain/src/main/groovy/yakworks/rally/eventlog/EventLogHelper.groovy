@@ -7,7 +7,6 @@ package yakworks.rally.eventlog
 import groovy.transform.CompileDynamic
 
 import grails.compiler.GrailsCompileStatic
-import grails.util.Holders
 import yakworks.spring.AppCtx
 
 @GrailsCompileStatic

@@ -4,6 +4,8 @@
 */
 package yakworks.rally.orgs.model
 
+import groovy.transform.ToString
+
 import gorm.tools.hibernate.criteria.CreateCriteriaSupport
 import gorm.tools.model.NameNum
 import gorm.tools.repository.RepoLookup
@@ -22,7 +24,7 @@ import yakworks.security.audit.AuditStamp
  */
 @Entity
 @AuditStamp
-@IdEqualsHashCode
+@IdEqualsHashCode @ToString
 @GrailsCompileStatic
 class Org implements NameNum, RepoEntity<Org>, HasTags, CreateCriteriaSupport, Serializable {
 

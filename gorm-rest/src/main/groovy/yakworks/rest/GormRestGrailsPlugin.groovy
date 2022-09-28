@@ -39,7 +39,12 @@ class GormRestGrailsPlugin extends Plugin {
         //setup to try and speed up constraint eval so its only setup once.
         urlMappingsConstraintRegistry(DefaultConstraintRegistry, ref('messageSource'))
         //the default UrlMappings calls this.
-        repoApiMappingsService(RepoApiMappingsService)
+        repoApiMappingsService(RepoApiMappingsService){
+            // FIXME @Autowired is not working on RepoApiMappingsService during dev, works when run from tests or in prod.
+            // doing this for now until we sort out why.
+            grailsApplication = ref('grailsApplication')
+            urlMappingsConstraintRegistry = ref('urlMappingsConstraintRegistry')
+        }
         //renderers
         mapJsonRenderer(JsonGeneratorRenderer, Map)
         apiResultsRenderer(ApiResultsRenderer)

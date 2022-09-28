@@ -7,13 +7,14 @@ package yakworks.testing.gorm
 import groovy.transform.CompileStatic
 
 import yakworks.security.SecService
+import yakworks.security.UserInfo
 import yakworks.security.gorm.model.SecRole
 
 /**
  * Spring implementation of the generic base SecService
  */
 @CompileStatic
-class TestingSecService<D> implements SecService<D> {
+class TestingSecService<D extends UserInfo> implements SecService<D> {
 
     TestingSecService(Class<D> clazz) {
         this.entityClass = clazz
@@ -83,10 +84,9 @@ class TestingSecService<D> implements SecService<D> {
      * Get the current user's roles.
      * @return a list of roles (empty if not authenticated).
      */
-    List<String> getPrincipalRoles() {
-        if (!isLoggedIn()) return []
-        def roles = user['roles'] as Set<SecRole>
-        return roles*.name
+    Set<String> getPrincipalRoles() {
+        if (!isLoggedIn()) return new HashSet<>()
+        return user.roles as Set<String>
     }
 
 

@@ -15,7 +15,7 @@ import yakworks.security.gorm.model.AppUser
  * common generic helpers for security, implement with generics D for the domain entity and I for the id type
  */
 @CompileStatic
-trait SecService<D extends UserTrait> {
+trait SecService<D extends UserInfo> {
 
     /**
      * The java class for the Gorm domain (persistence entity) that is the user
@@ -73,7 +73,7 @@ trait SecService<D extends UserTrait> {
      * Gets the currently logged in user id
      */
     Long getOrgId(){
-        getUser().orgId
+        getUser().orgId as Long
     }
 
     /**

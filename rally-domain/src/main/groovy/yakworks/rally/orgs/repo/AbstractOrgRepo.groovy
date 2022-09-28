@@ -21,6 +21,7 @@ import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
+import gorm.tools.utils.GormMetaUtils
 import gorm.tools.validation.Rejector
 import yakworks.rally.orgs.OrgMemberService
 import yakworks.rally.orgs.model.Contact
@@ -100,8 +101,8 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
     @Override
     void persistToOneAssociations(Org org, List<String> associations){
         super.persistToOneAssociations(org, associations)
-        if(org.location?.isNewOrDirty()) org.location.persist() //FIXME is this already validated?
-        if(org.contact?.isNewOrDirty()) org.contact.persist()
+        if(GormMetaUtils.isNewOrDirty(org.location)) org.location.persist() //FIXME is this already validated?
+        if(GormMetaUtils.isNewOrDirty(org.contact)) org.contact.persist()
     }
 
     void persistManyList(Org org, GormRepo assocRepo, List<Map> assocList){

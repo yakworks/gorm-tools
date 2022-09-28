@@ -61,10 +61,10 @@ public class SecServiceSpec extends Specification implements SecuritySpecHelper,
 
     def "test principal roles"() {
         when:
-        List roles = secService.principalRoles
+        def roles = secService.principalRoles
 
         then:
         roles.size() == secService.user.roles.size()
-        roles.containsAll(secService.user.roles.name)
+        roles.containsAll(secService.user.roles)
     }
 }

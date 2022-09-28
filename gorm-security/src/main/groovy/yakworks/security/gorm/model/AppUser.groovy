@@ -14,30 +14,43 @@ import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-import yakworks.security.UserTrait
+import yakworks.security.UserInfo
 import yakworks.security.audit.AuditStampTrait
 
 @Entity
 @GrailsCompileStatic
 @EqualsAndHashCode(includes='username', useCanEqual=false)
-class AppUser implements UserTrait<Long>, AuditStampTrait, RepoEntity<AppUser>, Serializable {
+class AppUser implements UserInfo, AuditStampTrait, RepoEntity<AppUser>, Serializable {
 
     static Map includes = [
         qSearch: ['username', 'name', 'email'], // quick search includes
         stamp: ['id', 'username', 'name']  //picklist or minimal for joins
     ]
 
-    /** the unique username, specified so @EqualsAndHashCode works */
+    /** the unique username, may be same as email. see displayName for the short handle */
     String  username
 
-    String  passwordHash // the password hash
+    /** the full name, may come from contact or defaults to username if not populated */
+    String  name
+
+    /** users email for username or lost password*/
+    String  email
+
+    /** will be true when user is inactivated !enabled */
+    Boolean inactive = false
+
+    /** the organization ID */
+    Long orgId
+
+    /** the hashed password  */
+    String  passwordHash
     Boolean passwordExpired = false // passwordExpired
     LocalDateTime passwordChangedDate //date when password was changed. passwordExpireDays is added to this to see if its time to change again
     String  resetPasswordToken // temp token for a password reset, TODO move to userToken once we have that setup?
     LocalDateTime resetPasswordDate // //date when user requested to reset password, adds resetPasswordExpireDays to see if its still valid
 
     @Transient
-    boolean getEnabled() { !inactive }
+    boolean isEnabled() { !inactive }
     void setEnabled(Boolean val) { inactive = !val }
 
     @Transient
@@ -67,7 +80,8 @@ class AppUser implements UserTrait<Long>, AuditStampTrait, RepoEntity<AppUser>, 
                    editable: false],
         password:[ d: "The pwd", oapi:'CU', password: true],
         orgId:[ d: "The org to which this user belongs to", bindable: true, editable: false, nullable: true],
-        roles:[ d: 'The roles assigned to this user', oapi: [read: true, edit: ['id']]],
+        roles:[ d: 'The string list of roles assigned to this user', validate: false, oapi: [read: true, edit: ['id']]],
+        secRoles:[ d: 'The roles assigned to this user', validate: false, oapi: [read: true, edit: ['id']]],
         passwordHash:[ d: "The pwd hash, internal use only, never show this",
                        nullable: true, maxSize: 60, bindable: false, display:false, password: true],
         passwordChangedDate:[ d: "The date password was changed",
@@ -85,10 +99,32 @@ class AppUser implements UserTrait<Long>, AuditStampTrait, RepoEntity<AppUser>, 
         AppUser.findByUsername(uname.trim())
     }
 
-    @Override
+    @Override //UserInfo
     @CompileDynamic
-    Set<SecRole> getRoles() {
-        SecRoleUser.findAllByUser(this)*.role as Set
+    Set<String> getRoles() {
+        List res = SecRoleUser.executeQuery('select role.code from SecRoleUser where user.id = :uid',
+            [uid: this.id] )
+        return res
+        // SecRoleUser.findAllByUser(this).collect{ ((SecRole) it.role).code } as Set<String>
+        // SecRoleUser.query {
+        //     eq "user", this
+        // }.projections { property("role") }.list() as Set<String>
+        // def res = SecRoleUser.query {
+        //     eq "user", this
+        // }.projections { property("role") }.list()
+        //
+        // return res*.code as Set<String>
+    }
+
+    List<SecRole> getSecRoles() {
+        // List res = SecRoleUser.executeQuery('select role.code from SecRoleUser where user.id = :uid',
+        //     [uid: this.id] )
+        // SecRoleUser.findAllByUser(this).collect{ ((SecRole) it.role).code } as Set<String>
+        def res = SecRoleUser.query {
+            eq "user", this
+        }.projections { property("role") }.list()
+
+        return res as List<SecRole>
     }
 
     /**
@@ -97,13 +133,18 @@ class AppUser implements UserTrait<Long>, AuditStampTrait, RepoEntity<AppUser>, 
      * @return the display name
      */
     //
-    @Override
+    @Override //UserInfo
     String getDisplayName() {
         if(username.indexOf("@") != -1){
             return username.substring(0, username.indexOf("@"))
         } else {
             return username
         }
+    }
+
+    @Override //UserInfo
+    Map getUserProfile() {
+        throw new UnsupportedOperationException("Not yet supported here")
     }
 
     // other Spring/Grails Security default fields not used right now

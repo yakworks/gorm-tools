@@ -16,7 +16,7 @@ import gorm.tools.transaction.WithTrx
 import grails.testing.spock.OnceBefore
 import yakworks.security.SecService
 import yakworks.security.gorm.model.AppUser
-import yakworks.security.spring.SpringSecUser
+import yakworks.security.spring.SpringUserInfo
 
 /**
  * Integration support for the gorm-security plugin.
@@ -38,10 +38,10 @@ trait SecuritySpecHelper implements WithTrx{
 
     void authenticate(AppUser user, String... roles) {
         roles = roles.collect { it}
-        List authorities = AuthorityUtils.createAuthorityList(roles)
+        List authorities = roles ? AuthorityUtils.createAuthorityList(roles) : null
 
-        SpringSecUser secUser = new SpringSecUser(user.username, user.passwordHash, user.enabled, true, !user.passwordExpired, true, authorities, user.id)
-        SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(secUser, user.passwordHash, authorities)
+        SpringUserInfo secUser = new SpringUserInfo(user, user.passwordHash, authorities)
+        SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(secUser, user.passwordHash, secUser.authorities)
     }
 
  }

@@ -13,6 +13,7 @@ import org.grails.datastore.gorm.GormEntity
 
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.RepoLookup
 import gorm.tools.utils.GormMetaUtils
 import gorm.tools.validation.ApiConstraints
@@ -30,7 +31,15 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>, ID> extends GormEntity<D> 
 
     R findRepo() { return (R) RepoLookup.findRepo(getClass()) }
 
-    D persist(Map args = [:]) {
+    D persist() {
+        return findRepo().persist((D) this, [:])
+    }
+
+    D persist(Map args) {
+        return findRepo().persist((D) this, args)
+    }
+
+    D persist(PersistArgs args) {
         return findRepo().persist((D) this, args)
     }
 

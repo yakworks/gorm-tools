@@ -15,8 +15,7 @@ import org.springframework.stereotype.Service
 import yakworks.commons.lang.Validate
 import yakworks.rally.orgs.model.Org
 import yakworks.security.SecService
-import yakworks.security.UserTrait
-import yakworks.security.gorm.model.AppUser
+import yakworks.security.UserInfo
 
 @Service @Lazy
 @Slf4j
@@ -35,9 +34,9 @@ class UserOrgService {
     /**
      * gets the org for the passed in AppUser
      */
-    Org getUserOrg(UserTrait appUser){
-        assert appUser
-        Validate.notNull(appUser.orgId, "User.orgId is null for user ${appUser.id}:${appUser.username}")
-        return Org.get(appUser.orgId)
+    Org getUserOrg(UserInfo userInfo){
+        assert userInfo
+        Validate.notNull(userInfo.orgId, "User.orgId is null for user ${userInfo.id}:${userInfo.username}")
+        return Org.get(userInfo.orgId)
     }
 }

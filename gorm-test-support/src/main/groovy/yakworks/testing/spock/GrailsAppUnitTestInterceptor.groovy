@@ -37,6 +37,8 @@ class GrailsAppUnitTestInterceptor extends AbstractMethodInterceptor {
     void autowire(Object testInstance) {
         AutowireCapableBeanFactory beanFactory = testInstance.applicationContext.autowireCapableBeanFactory
         beanFactory.autowireBean testInstance
+        // AutowireCapableBeanFactory beanFactory = testInstance.applicationContext.autowireCapableBeanFactory
+        // beanFactory.autowireBeanProperties testInstance, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false
     }
 
 }

@@ -4,10 +4,12 @@
 */
 package yakworks.testing.spock
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.spockframework.runtime.extension.AbstractMethodInterceptor
 import org.spockframework.runtime.extension.IMethodInvocation
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute
 
 import yakworks.testing.gorm.unit.GormHibernateTest
@@ -28,7 +30,7 @@ class GormHibernateTestInterceptor extends AbstractMethodInterceptor {
 
     @Override
     void interceptSetupMethod(IMethodInvocation invocation) throws Throwable {
-        // autowire(invocation.instance)
+        // autowire(invocation.sharedInstance)
         def testInstance =  invocation.sharedInstance as GormHibernateTest
         testInstance.transactionStatus = testInstance.getTransactionManager().getTransaction(new DefaultTransactionAttribute())
         invocation.proceed()
@@ -51,10 +53,11 @@ class GormHibernateTestInterceptor extends AbstractMethodInterceptor {
     //     invocation.proceed()
     // }
 
-    // @CompileDynamic
-    // void autowire(testInstance) {
-    //     AutowireCapableBeanFactory beanFactory = testInstance.applicationContext.autowireCapableBeanFactory
-    //     beanFactory.autowireBean testInstance
-    // }
-
+    @CompileDynamic
+    void autowire(Object testInstance) {
+        AutowireCapableBeanFactory beanFactory = testInstance.applicationContext.autowireCapableBeanFactory
+        beanFactory.autowireBean testInstance
+        // AutowireCapableBeanFactory beanFactory = testInstance.applicationContext.autowireCapableBeanFactory
+        // beanFactory.autowireBeanProperties testInstance, AutowireCapableBeanFactory.AUTOWIRE_NO, false
+    }
 }

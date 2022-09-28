@@ -6,8 +6,6 @@ package yakworks.security
 
 import groovy.transform.CompileStatic
 
-import yakworks.security.SecService
-import yakworks.security.UserTrait
 import yakworks.spring.AppCtx
 
 /**
@@ -20,13 +18,17 @@ import yakworks.spring.AppCtx
 @CompileStatic
 class SecUtils {
 
+    boolean mapFoo(){
+        []
+    }
+
     private static SecService cachedSecService
 
     private SecUtils() {
         // statics only
     }
 
-    static UserTrait getUser(Serializable uid) {
+    static UserInfo getUser(Serializable uid) {
         return getSecService().getUser(uid)
     }
 

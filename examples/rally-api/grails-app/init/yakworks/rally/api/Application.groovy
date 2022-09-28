@@ -34,6 +34,7 @@ import yakworks.rest.grails.AppInfoBuilder
 // @EnableAutoConfiguration(exclude = [HazelcastAutoConfiguration]) // in order to avoid autoconfiguring an extra Hazelcast instance
 @CompileStatic
 class Application extends GrailsAutoConfiguration {
+
     static void main(String[] args) {
         GrailsApp.run(Application, args)
     }

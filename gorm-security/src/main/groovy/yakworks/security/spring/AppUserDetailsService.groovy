@@ -43,18 +43,17 @@ class AppUserDetailsService implements GrailsUserDetailsService {
 
         Boolean mustChange = userService.isPasswordExpired(user)
 
-        List<SimpleGrantedAuthority> authorities = []
+        List<SimpleGrantedAuthority> authorities = null
 
-        if (loadRoles) {
-            authorities = user.roles.collect { new SimpleGrantedAuthority(it.code) }
+        if (!loadRoles) {
+            authorities = [] //pass empty list
         }
-        // password is required so make sure its filled even if its pauth or ldap
-        String password = user.passwordHash ?: "N/A"
+        // password is required so make sure its filled even if its OAuth or ldap
+        String passwordHash = user.passwordHash ?: "N/A"
 
-        new SpringSecUser(user.username, password,
-            user.enabled, true, !mustChange, true,
-            authorities as Collection<GrantedAuthority>,
-            user.id)
+        new SpringUserInfo(user, passwordHash,
+            true, !mustChange, true,
+            authorities)
 
     }
 

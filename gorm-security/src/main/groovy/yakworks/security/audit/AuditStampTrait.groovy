@@ -10,7 +10,7 @@ import javax.persistence.Transient
 import groovy.transform.CompileStatic
 
 import yakworks.security.SecUtils
-import yakworks.security.UserTrait
+import yakworks.security.UserInfo
 
 /**
  * flags a domain entity as stampable for events
@@ -26,13 +26,13 @@ trait AuditStampTrait {
     Long editedBy
 
     @Transient
-    UserTrait getEditedByUser() {
+    UserInfo getEditedByUser() {
         SecUtils.getUser(getEditedBy())
     }
 
     /** comes from username - first section of email, if email is a username*/
     @Transient
-    UserTrait getCreatedByUser() {
+    UserInfo getCreatedByUser() {
         SecUtils.getUser(getCreatedBy())
     }
 

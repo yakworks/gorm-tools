@@ -38,10 +38,6 @@ import yakworks.security.tenant.UserRequest
 @SuppressWarnings(['Indentation', 'Println'])
 @CompileDynamic //ok
 class RallySecurityGrailsPlugin extends Plugin {
-    //FIXME This is not working
-    // !!! THIS IS IMPORTANT FOR SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL)
-    // We set that in doWithApplicationContext so thread spun off get the same security.
-    // needs to be called after spring-security-core
     def loadAfter = ['spring-security-core', 'spring-security-ldap', 'spring-security-rest',
                      'gorm-tools', 'rally-domain', 'datasource', 'jasper-reports', 'hibernate5']
 
@@ -52,7 +48,7 @@ class RallySecurityGrailsPlugin extends Plugin {
         // context.'component-scan'('base-package': 'nine.security')
 
         rallyUserService(RallyUserService, autowireLazy())
-        currentUser(CurrentUser, autowireLazy())
+        // currentUser(CurrentUser, autowireLazy())
 
         // userTenantResolver(UserTenantResolver)
 

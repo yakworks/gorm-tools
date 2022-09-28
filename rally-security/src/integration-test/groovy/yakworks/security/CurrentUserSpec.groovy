@@ -1,6 +1,6 @@
 package yakworks.security
 
-
+import spock.lang.Ignore
 import yakworks.security.gorm.model.AppUser
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
@@ -23,6 +23,7 @@ import yakworks.rally.orgs.model.OrgType
 // )
 @Integration
 @Rollback
+@Ignore
 class CurrentUserSpec extends Specification implements DomainIntTest {//, ApplicationContextAware {
 
     // ApplicationContext ctx

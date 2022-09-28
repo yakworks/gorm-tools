@@ -33,7 +33,7 @@ class HibernateProxyAsserts  {
 
         //this triggers it, seems any method call does it
         // proxy.isAttached()
-        // GormMetaUtils.getId(proxy)
+        GormMetaUtils.getId(proxy)
         // getId should also not unwrap the proxy
         // !proxyHandler.isInitialized(proxy)
         //def proxyHandler = Org.getGormPersistentEntity().mappingContext.proxyHandler

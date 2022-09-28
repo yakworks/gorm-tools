@@ -18,7 +18,7 @@ import org.springframework.core.annotation.AnnotationUtils
 
 import gorm.tools.utils.GormMetaUtils
 import yakworks.commons.lang.ClassUtils
-import yakworks.security.SecService
+import yakworks.security.UserInfo
 import yakworks.security.audit.ast.FieldProps
 
 /**
@@ -27,9 +27,11 @@ import yakworks.security.audit.ast.FieldProps
 @CompileStatic
 class AuditStampSupport {
     private static final String DISABLE_AUDITSTAMP_FIELD = 'disableAuditStamp'
+    //static accessor for the getUserInfo used in AuditStampTrait
+    protected static AuditUserResolver USER_RESOLVER
 
+    @Autowired AuditUserResolver auditUserResolver
     @Autowired MappingContext grailsDomainClassMappingContext
-    @Autowired SecService secService
 
     Map<String, FieldProps> fieldProps
     final Set<String> auditStampedEntities = [] as Set
@@ -41,8 +43,16 @@ class AuditStampSupport {
         for (PersistentEntity persistentEntity : grailsDomainClassMappingContext.getPersistentEntities()) {
             if (isClassAuditStamped(persistentEntity.javaClass)) auditStampedEntities << persistentEntity.name
         }
+        USER_RESOLVER = auditUserResolver
         //initCurrentUserClosure()
     }
+
+    // //inject so it has a static reference
+    // @Autowired
+    // void setAuditUserResolver(AuditUserResolver auditUserResolver){
+    //     AuditStampSupport.USER_RESOLVER = auditUserResolver
+    // }
+
 
     //check if the given domain class should be audit stamped.
     boolean isClassAuditStamped(Class domainClass) {
@@ -140,8 +150,12 @@ class AuditStampSupport {
     }
 
     Serializable getCurrentUserId() {
-        Serializable uid = secService.getUserId()
+        Serializable uid = USER_RESOLVER.getCurrentUserId()
         return uid ?: 0L
+    }
+
+    static UserInfo getUserInfo(Serializable uid) {
+        return USER_RESOLVER.getUserInfo(uid)
     }
 
 }

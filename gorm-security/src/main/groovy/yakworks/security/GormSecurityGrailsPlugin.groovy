@@ -12,6 +12,7 @@ import grails.plugins.Plugin
 import yakworks.security.audit.AuditStampBeforeValidateListener
 import yakworks.security.audit.AuditStampPersistenceEventListener
 import yakworks.security.audit.AuditStampSupport
+import yakworks.security.audit.DefaultAuditUserResolver
 import yakworks.security.gorm.AppUserService
 import yakworks.security.gorm.PasswordValidator
 import yakworks.security.gorm.model.AppUser
@@ -56,6 +57,7 @@ class GormSecurityGrailsPlugin extends Plugin {
             auditStampBeforeValidateListener(AuditStampBeforeValidateListener)
             auditStampPersistenceEventListener(AuditStampPersistenceEventListener)
             auditStampSupport(AuditStampSupport)
+            auditUserResolver(DefaultAuditUserResolver)
         }
 
     } }

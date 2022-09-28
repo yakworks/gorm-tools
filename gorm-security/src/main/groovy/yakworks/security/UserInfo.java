@@ -31,10 +31,20 @@ public interface UserInfo extends Serializable {
     String getPasswordHash();
 
     /** the full name, may come from contact or defaults to username if not populated */
-    String  getName();
+    default String getName() {
+        return getUsername();
+    }
 
     /** The short display name or nickname for the user, can returns username or first part of email if username contains @, etc..*/
-    String getDisplayName();
+
+    default String getDisplayName() {
+        String uname = getUsername();
+        if(uname != null && uname.indexOf("@") != -1){
+            return uname.substring(0, uname.indexOf("@"));
+        } else {
+            return uname;
+        }
+    }
 
     /** users email for username or lost password*/
     String  getEmail();

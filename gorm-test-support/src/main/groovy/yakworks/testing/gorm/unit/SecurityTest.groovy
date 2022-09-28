@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder
 import yakworks.security.audit.AuditStampBeforeValidateListener
 import yakworks.security.audit.AuditStampPersistenceEventListener
 import yakworks.security.audit.AuditStampSupport
+import yakworks.security.audit.DefaultAuditUserResolver
 import yakworks.security.gorm.model.AppUser
 import yakworks.testing.gorm.TestingSecService
 
@@ -28,6 +29,7 @@ trait SecurityTest {
         { ->
             passwordEncoder(NoOpPasswordEncoder)
             secService(TestingSecService, AppUser)
+            auditUserResolver(DefaultAuditUserResolver)
             auditStampBeforeValidateListener(AuditStampBeforeValidateListener)
             auditStampPersistenceEventListener(AuditStampPersistenceEventListener)
             auditStampSupport(AuditStampSupport)

@@ -9,7 +9,6 @@ import javax.persistence.Transient
 
 import groovy.transform.CompileStatic
 
-import yakworks.security.SecUtils
 import yakworks.security.UserInfo
 
 /**
@@ -27,13 +26,13 @@ trait AuditStampTrait {
 
     @Transient
     UserInfo getEditedByUser() {
-        SecUtils.getUser(getEditedBy())
+        AuditStampSupport.getUserInfo(getEditedBy())
     }
 
     /** comes from username - first section of email, if email is a username*/
     @Transient
     UserInfo getCreatedByUser() {
-        SecUtils.getUser(getCreatedBy())
+        AuditStampSupport.getUserInfo(getCreatedBy())
     }
 
     static constraintsMap = [

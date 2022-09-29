@@ -4,7 +4,6 @@
 */
 package yakworks.rally.orgs
 
-
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
@@ -14,7 +13,7 @@ import org.springframework.stereotype.Service
 
 import yakworks.commons.lang.Validate
 import yakworks.rally.orgs.model.Org
-import yakworks.security.SecService
+import yakworks.security.user.CurrentUser
 import yakworks.security.user.UserInfo
 
 @Service @Lazy
@@ -22,13 +21,13 @@ import yakworks.security.user.UserInfo
 @CompileStatic
 class UserOrgService {
 
-    @Autowired(required=false) SecService secService
+    @Autowired(required=false) CurrentUser currentUser
 
     /**
      * gets the org from contact for the currently logged in user
      */
     Org getUserOrg(){
-        getUserOrg(secService.getUser())
+        getUserOrg(currentUser.userInfo)
     }
 
     /**

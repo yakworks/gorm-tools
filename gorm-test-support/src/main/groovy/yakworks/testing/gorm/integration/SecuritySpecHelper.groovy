@@ -17,6 +17,7 @@ import grails.testing.spock.OnceBefore
 import yakworks.security.SecService
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.spring.SpringUserInfo
+import yakworks.security.user.CurrentUser
 
 /**
  * Integration support for the gorm-security plugin.
@@ -27,6 +28,8 @@ trait SecuritySpecHelper implements WithTrx{
 
     @Autowired @Qualifier("secService")
     SecService secService
+
+    @Autowired CurrentUser currentUser
 
     //need to name it like this, otherwise subclasses cant use setupSpec method
     @OnceBefore

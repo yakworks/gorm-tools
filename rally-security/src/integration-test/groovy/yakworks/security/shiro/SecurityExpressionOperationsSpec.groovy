@@ -1,4 +1,4 @@
-package yakworks.security
+package yakworks.security.shiro
 
 
 import org.apache.shiro.realm.Realm
@@ -14,7 +14,6 @@ import org.springframework.security.web.FilterInvocation
 import grails.gorm.transactions.Rollback
 import grails.gorm.transactions.Transactional
 import grails.testing.mixin.integration.Integration
-import grails.testing.spock.OnceBefore
 import spock.lang.Specification
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
@@ -23,25 +22,25 @@ import yakworks.security.gorm.model.SecRoleUser
 import yakworks.security.gorm.model.SecUserPermission
 import yakworks.security.spring.SpringSecService
 import yakworks.security.user.CurrentUser
-import yakworks.testing.gorm.integration.DomainIntTest
 
 @Integration
 @Rollback
-class CurrentUserSpec extends Specification implements DomainIntTest {
+class SecurityExpressionOperationsSpec extends Specification {
 
+    WebSecurityManager shiroSecurityManager
+    Realm springSecurityRealm
+    SpringSecService secService
+    @Autowired AbstractSecurityExpressionHandler securityExpressionHandler
     @Autowired CurrentUser currentUser
-    // @Autowired SpringSecService springSecService
 
-    // @OnceBefore
-    // void doPerms() {
-    //     setupPerms()
-    // }
+    // private request = new MockHttpServletRequest()
+    // private response = new MockHttpServletResponse()
 
-    // void setup() {
-    //     // ThreadContext.bind shiroSecurityManager
-    //     setupPerms()
-    //     logout()
-    // }
+    void setup() {
+        assert securityExpressionHandler
+        ThreadContext.bind shiroSecurityManager
+        logout()
+    }
 
     private void login(String username) {
         secService.reauthenticate(username, 'password')
@@ -56,52 +55,34 @@ class CurrentUserSpec extends Specification implements DomainIntTest {
     }
 
     void "sanity check"() {
-        expect:
+        setup:
         setupPerms()
-        login "userAdmin"
-        currentUser
+        expect:
+        securityExpressionHandler
     }
 
     void "test hasRole"() {
-        expect:
+        setup:
         setupPerms()
         login "userAdmin"
-        currentUser.hasRole('ADMIN')
-        currentUser.hasRole('MGR')
-        !currentUser.hasRole('CUST')
-        currentUser.hasAnyRole('ADMIN', 'CUST')
 
-    }
+        when:
+        def fi = new FilterInvocation('currentUser', 'hasRole')
+        def ctx = securityExpressionHandler.createEvaluationContext(getAuth(), fi)
+        SecurityExpressionOperations secExp = (SecurityExpressionOperations)ctx.getRootObject().getValue()
 
-    def testIsLoggedIn() {
-        expect:
-        setupPerms()
-        login "userAdmin"
-        currentUser.isLoggedIn()
-    }
+        then:
+        secExp
+        secExp.hasRole('ADMIN')
+        secExp.hasRole('MGR')
+        !secExp.hasRole('CUST')
+        secExp.hasAnyRole('ADMIN', 'CUST')
 
-    def testIfAllGranted() {
-        expect: "All roles of current user"
-        setupPerms()
-        login "userAdmin"
-        currentUser.hasRole(SecRole.ADMIN)
-    }
-
-    def testIfAnyGranted(){
-        expect:
-        setupPerms()
-        login "userAdmin"
-        currentUser.hasAnyRole(SecRole.ADMIN, "FakeRole")
-    }
-
-    def "test user roles"() {
-        expect:
-        roles.size() == currentUser.userInfo.roles.size()
-        roles.containsAll(currentUser.userInfo.roles)
     }
 
     @Transactional
     void setupPerms(){
+        def save = { it.save(failOnError: true) }
         //these are on top of whats done in BootStrap, so keep that in mind, an admin user already exists for example
         AppUser admin = AppUser.create(getUserParams('userAdmin'))
         AppUser user2 = AppUser.create(getUserParams('user2'))
@@ -110,23 +91,17 @@ class CurrentUserSpec extends Specification implements DomainIntTest {
         SecRole roleMgr = SecRole.create(code: "MGR")
         SecRole roleUser = SecRole.create(code: 'CUST')
 
-        new SecUserPermission(admin, 'printer:print:*').persist()
+        save new SecUserPermission(admin, 'printer:print:*')
 
-        new SecUserPermission(user2, 'printer:print:*').persist()
+        save new SecUserPermission(user2, 'printer:print:*')
+        save new SecUserPermission(user2, 'printer:maintain:epsoncolor')
+        save new SecUserPermission(user2, 'action:kick')
 
-        new SecUserPermission(user2, 'printer:maintain:epsoncolor').persist()
+        save new SecUserPermission(user3, 'action:jump')
+        save new SecUserPermission(user3, 'action:kick')
 
-        new SecUserPermission(user2, 'action:kick').persist()
-
-        new SecUserPermission(user3, 'action:jump').persist()
-
-        new SecUserPermission(user3, 'action:kick').persist()
-
-
-        new SecRolePermission(roleAdmin, 'printer:admin').persist()
-
-        new SecRolePermission(roleUser, 'printer:use').persist()
-
+        save new SecRolePermission(roleAdmin, 'printer:admin')
+        save new SecRolePermission(roleUser, 'printer:use')
 
         SecRoleUser.create admin, roleAdmin, true
         SecRoleUser.create admin, roleMgr, true
@@ -137,7 +112,6 @@ class CurrentUserSpec extends Specification implements DomainIntTest {
         // assert 3 == AppUser.count()
         // assert 3 == SecRoleUser.count()
         // assert 6 == SecUserPermission.count()
-        flushAndClear()
     }
 
     Map getUserParams(String uname){

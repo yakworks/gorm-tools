@@ -33,16 +33,31 @@ class AppUserDetailsService implements UserDetailsService {
 
     @Autowired PasswordValidator passwordValidator
 
+    @Override
     @Transactional
-    UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    SpringUserInfo loadUserByUsername(String username) throws UsernameNotFoundException {
         log.debug "loadUserByName(${username})"
-
         AppUser user = AppUser.getByUsername(username.trim())
-        if (!user) {
-            throw new UsernameNotFoundException("User not found: $username")
-        }
-        log.debug "Found user ${user} in the database"
+        if (!user) throw new UsernameNotFoundException("User not found for username: $username")
 
+        return createSpringUser(user)
+    }
+
+    // @Override
+    @Transactional
+    SpringUserInfo loadUserByUserId(Serializable id) throws UsernameNotFoundException {
+        log.debug "loadUserByUserId(${id})"
+        AppUser user = AppUser.get(id)
+        if (!user) throw new UsernameNotFoundException("User not found for id: $id")
+
+        return createSpringUser(user)
+    }
+
+    /**
+     * Creates SpringUserInfo (UserDetails) from the AppUser
+     */
+    SpringUserInfo createSpringUser(AppUser user){
+        log.debug "Found AppUser ${user.username}, creating SpringUserInfo"
         SpringUserInfo springUser = SpringUserInfo.of(user)
         checkCredentialExpiration(springUser, user)
         return springUser
@@ -58,4 +73,5 @@ class AppUserDetailsService implements UserDetailsService {
             ClassUtils.setFieldValue(springUser, "credentialsNonExpired", false )
         }
     }
+
 }

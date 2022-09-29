@@ -31,7 +31,7 @@ import yakworks.security.user.UserInfo
  * Spring implementation of the generic base SecService
  */
 @CompileStatic
-class SpringSecService<D extends UserInfo> implements SecService<D> {
+class SpringSecService implements SecService<AppUser> {
 
     @Autowired(required = false) //required = false so this bean works in case security. active is false
     SpringSecurityService springSecurityService
@@ -39,8 +39,8 @@ class SpringSecService<D extends UserInfo> implements SecService<D> {
     @Autowired(required = false)
     AuthenticationTrustResolver authenticationTrustResolver
 
-    SpringSecService(Class<D> clazz) {
-        this.entityClass = clazz
+    SpringSecService() {
+        this.entityClass = AppUser
     }
 
     /**
@@ -73,37 +73,12 @@ class SpringSecService<D extends UserInfo> implements SecService<D> {
     }
 
     /**
-     * Gets the currently logged in user id from principal
-     */
-    @Override
-    Long getUserId() {
-        def curPrincipal = getPrincipal()
-        if (curPrincipal instanceof SpringUserInfo) {
-            return (curPrincipal as SpringUserInfo).id as Long
-        }
-        else if (curPrincipal instanceof User) { //FIXME when would this happen?
-            //has to be User, might be Oauth. So lookup by Username
-            getUserIdByUsername((curPrincipal as User).username) as Long
-        }
-    }
-
-    /**
      * Encode the password using the configured PasswordEncoder.
      * calls same method on springSecurityService
      */
     @Override
     String encodePassword(String password) {
         springSecurityService.encodePassword(password)
-    }
-
-    /**
-     * Quick check to see if the current user is logged in.
-     * calls same method on springSecurityService
-     * @return <code>true</code> if the authenticated and not anonymous
-     */
-    @Override
-    boolean isLoggedIn() {
-        return springSecurityService.isLoggedIn()
     }
 
     /**
@@ -116,13 +91,6 @@ class SpringSecService<D extends UserInfo> implements SecService<D> {
         List<GrantedAuthority> authorities = parseAuthoritiesString([SecRole.ADMIN] as String[])
         SpringUserInfo secUser = SpringUserInfo.of(user)
         SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(secUser, user.passwordHash, secUser.authorities)
-    }
-
-    /**
-     * Verify that user has logged in fully (ie has presented username/password) and is not logged in using rememberMe cookie
-     */
-    boolean isAuthenticatedFully() {
-        return (isLoggedIn() && !isRememberMe())
     }
 
     /**
@@ -158,54 +126,6 @@ class SpringSecService<D extends UserInfo> implements SecService<D> {
 
         return requiredAuthorities
     }
-
-    /**
-     * Check if current user has any of the specified roles
-     */
-    @Override
-    boolean ifAnyGranted(String... roles) {
-        return SpringSecurityUtils.ifAnyGranted(parseAuthoritiesString(roles))
-    }
-
-    /**
-     * Check if current user has all of the specified roles
-     */
-    @Override
-    boolean ifAllGranted(String... roles) {
-        return SpringSecurityUtils.ifAllGranted(parseAuthoritiesString(roles))
-    }
-
-    /**
-     * Check if current user has none of the specified roles
-     */
-    boolean ifNotGranted(String... roles) {
-        return SpringSecurityUtils.ifNotGranted(parseAuthoritiesString(roles))
-    }
-
-    /**
-     * Get the current user's roles.
-     * @return a list of roles (empty if not authenticated).
-     */
-    Set<String> getPrincipalRoles() {
-        if (!isLoggedIn()) return new HashSet<>()
-        return user.roles as Set<String>
-    }
-
-    /**
-     * Logout current user programmatically
-     */
-    void logout() {
-        // if(RequestContextHolder.getRequestAttributes()){
-        //     HttpSession session = WebUtils.retrieveGrailsWebRequest()?.currentRequest?.getSession(false)
-        //     if (session) {
-        //         session.invalidate()
-        //     }
-        // }
-
-        SecurityContextHolder.context.setAuthentication(null)
-        SecurityContextHolder.clearContext()
-    }
-
 
     @CompileDynamic
     AuthenticationException getLastAuthenticationException() {

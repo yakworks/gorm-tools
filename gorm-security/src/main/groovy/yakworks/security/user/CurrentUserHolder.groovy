@@ -8,22 +8,20 @@ import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 
-import yakworks.security.SecService
-
 /**
  * Contains statics to get the CurrentUserContext implementation
  */
 @CompileStatic
 class CurrentUserHolder {
 
-    private static SecService SECURITY_SERVICE
+    private static CurrentUser CURRENT_USER
 
     static UserInfo getUserInfo(){
-        SECURITY_SERVICE.getUserInfo()
+        CURRENT_USER.getUserInfo()
     }
 
     @Autowired
-    void setSecService(SecService secService){
-        SECURITY_SERVICE = secService
+    void setCurrentUser(CurrentUser currentUser){
+        CURRENT_USER = currentUser
     }
 }

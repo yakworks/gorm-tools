@@ -9,6 +9,7 @@ import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 
 import yakworks.security.SecService
+import yakworks.security.user.CurrentUser
 import yakworks.security.user.UserInfo
 
 /**
@@ -18,6 +19,7 @@ import yakworks.security.user.UserInfo
 @CompileStatic
 class DefaultAuditUserResolver implements AuditUserResolver {
 
+    @Autowired CurrentUser currentUser
     @Autowired SecService secService
 
     /**
@@ -25,7 +27,7 @@ class DefaultAuditUserResolver implements AuditUserResolver {
      */
     @Override
     Serializable getCurrentUserId(){
-        Serializable uid = secService.getUserId()
+        Serializable uid = currentUser.getUserId()
         return uid ?: 0L
     }
 

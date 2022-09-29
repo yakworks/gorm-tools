@@ -32,86 +32,10 @@ import static yakworks.security.spring.SpringUserInfoUtils.*
 class SpringUserInfo extends User implements SpringUserInfoTrait {
     private static final long serialVersionUID = 1
 
-    // --- Implements UserInfo ---
-    /** The unique id for the user, be default will be the unique generated id from db */
-    // protected Serializable id
-    // /** the username is implemented in the User object */
-    //
-    // /** the full name, may come from contact or defaults to username if not populated */
-    // protected String name
-    // /** the display name */
-    // protected String displayName
-    // /** the users email */
-    // protected String email
-    // /** the organization ID */
-    // protected Serializable orgId
-    //
-    // Map<String, Object> userProfile
-
-    /**
-     * SpringUserInfo constructor
-     * @param sourceUser the source UserInfo (AppUser)
-     * @param password the password that should be presented to the
-     *        <code>DaoAuthenticationProvider</code>
-     * @param accountNonExpired set to <code>true</code> if the account has not expired
-     * @param credentialsNonExpired set to <code>true</code> if the credentials have not expired
-     * @param accountNonLocked set to <code>true</code> if the account is not locked
-     */
-    // SpringUserInfo(String username,
-    //                String passwordHash,
-    //                boolean enabled,
-    //                boolean accountNonExpired,
-    //                boolean credentialsNonExpired,
-    //                boolean accountNonLocked,
-    //                Collection<? extends GrantedAuthority> authorities = null ) {
-    //
-    //     super( username,
-    //         passwordHash,
-    //         enabled,
-    //         accountNonExpired,
-    //         credentialsNonExpired,
-    //         accountNonLocked,
-    //         authorities)
-    // }
-
-    // void copyUserInfo(UserInfo sourceUser){
-    //     this.id = sourceUser.id
-    //     this.name = sourceUser.name
-    //     this.displayName = sourceUser.displayName
-    //     this.email = sourceUser.email
-    //     this.orgId = sourceUser.orgId
-    // }
-
-    // @Override //UserInfo
-    // Serializable getId() {
-    //     return this.id
-    // }
-    //
     @Override
     String getPasswordHash() {
         return this.password
     }
-    //
-    // @Override //UserInfo
-    // String getName() {
-    //     return this.name
-    // }
-    //
-    // @Override //UserInfo
-    // String getDisplayName() {
-    //     //can't call UserInfo.super until groovy 4.
-    //     return this.displayName //?: UserInfo.super.getDisplayName()
-    // }
-
-    // @Override //UserInfo
-    // String getEmail() {
-    //     return this.email
-    // }
-    //
-    // @Override //UserInfo
-    // Serializable getOrgId() {
-    //     return this.orgId
-    // }
 
     @Override //UserInfo
     Set<String> getRoles() {

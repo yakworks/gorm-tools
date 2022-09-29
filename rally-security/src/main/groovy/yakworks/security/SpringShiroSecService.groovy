@@ -28,7 +28,7 @@ import yakworks.spring.AppCtx
  * so it it logs in and out of both for example.
  */
 @CompileStatic
-class SpringShiroSecService<D> extends SpringSecService<D> {
+class SpringShiroSecService extends SpringSecService {
 
     @Autowired(required = false)
     SpringSecurityRealm springSecurityRealm
@@ -36,10 +36,9 @@ class SpringShiroSecService<D> extends SpringSecService<D> {
     @Autowired(required = false)
     WebSecurityManager shiroSecurityManager
 
-    SpringShiroSecService(Class<D> clazz) {
-        super(clazz)
+    SpringShiroSecService(){
+        super()
     }
-
     /**
      * Used in automation to username a bot/system user, also used for tests
      */

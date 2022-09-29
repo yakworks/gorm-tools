@@ -7,15 +7,26 @@ package yakworks.security.user
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEnhancer
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 
+import gorm.tools.metamap.services.MetaMapService
 import yakworks.security.gorm.model.AppUser
 
 /**
- * common generic helpers for security, implement with generics D for the domain entity and I for the id type
+ * CurrentUser contract to be implemented by prefered security framework.
  */
 @CompileStatic
 trait CurrentUser {
+
+    @Autowired MetaMapService metaMapService
+
+    /**
+     * gets the current user info
+     */
+    Serializable getUserId(){
+        getUserInfo().id
+    }
 
     /**
      * gets the current user info
@@ -27,78 +38,32 @@ trait CurrentUser {
      */
     abstract boolean isLoggedIn()
 
+    /**
+     * logout current user
+     */
     abstract void logout()
 
-    abstract boolean ifAnyGranted(String... roles)
+    /**
+     * Check if current user has any of the specified roles
+     */
+    abstract boolean hasAnyRole(String... roles)
+
+    abstract boolean hasRole(String role)
 
     /**
-     * Check if current user has all of the specified roles
+     * Gets user fields to send to client about their login
      */
-    abstract boolean ifAllGranted(String... roles)
-
-    /**
-     * gets the user id from username, hard wired to AppUser.getByUsername.
-     * Used when User is something like OauthUser
-     */
-    Serializable getUserIdByUsername(String username) {
-        if (!isLoggedIn()) {
-            return null
-        }
-        return AppUser.getByUsername(username.trim()).id
+    Map getUserMap() {
+        List incs = ['id', 'username', 'name', 'email', 'orgId']
+        return getUserMap(incs)
     }
 
     /**
-     * returns the name property from the AppUser for logged in user
-     * @return the username
+     * Gets user fields to send to client about their login
      */
-    String getUserFullName() {
-        return getUserFullName(getUserId())
+    Map getUserMap(List incs) {
+        Map userMap = metaMapService.createMetaMap(getUserInfo(), incs).clone() as Map
+        // if (isCustomer()) userMap.put('isCustomer', true)
+        return userMap
     }
-
-    /**
-     * returns the name
-     * @return the full name / display name
-     */
-    String getUserFullName(Serializable uid) {
-        D usr = getUser(uid)
-        return usr ? usr['name'] : null
-    }
-
-    /**
-     * returns the username handle for logged in user
-     * @return the username
-     */
-    String getUsername() {
-        return getUsername(getUserId())
-    }
-
-    /**
-     * returns the username handle for the passed in id
-     * @return the username
-     */
-    String getUsername(Serializable uid) {
-        D usr = getUser(uid)
-        return usr ? usr['username'] : null
-    }
-
-    /**
-     * returns first section of email before @
-     * @return the username
-     */
-    // String getDisplayName(Serializable uid) {
-    //     D usr = getUser(uid)
-    //     if(!usr) return null
-    //     String email = usr['email']
-    //     return email.substring(0, email.indexOf("@"))
-    // }
-
-    /**
-     * get the user entity for the id
-     * @param uid the user id
-     * @return the user entity
-     */
-    D getUser(Serializable uid) {
-        GormEnhancer.findStaticApi(getEntityClass()).get(uid)
-    }
-
 }

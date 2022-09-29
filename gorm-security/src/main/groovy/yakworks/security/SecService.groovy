@@ -7,44 +7,27 @@ package yakworks.security
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEnhancer
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 
-import yakworks.security.gorm.model.AppUser
+import yakworks.security.user.CurrentUser
 import yakworks.security.user.UserInfo
 
 /**
  * common generic helpers for security, implement with generics D for the domain entity and I for the id type
  */
 @CompileStatic
-trait SecService<D extends UserInfo> {
+trait SecService<D> {
 
-    /**
-     * The java class for the Gorm domain (persistence entity) that is the user
-     */
-    Class<D> entityClass // the domain class this is for
+    Class<D> entityClass
 
-    /**
-     * The gorm domain class. uses the {@link org.springframework.core.GenericTypeResolver} is not set during contruction
-     */
     Class<D> getEntityClass() {
         if (!entityClass) this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), SecService)
         return entityClass
     }
 
-    /**
-     * gets the current user info
-     */
-    abstract UserInfo getUserInfo()
-
-    /**
-     * is a user logged in
-     */
-    abstract boolean isLoggedIn()
-
-    /**
-     * Gets the currently logged in user id
-     */
-    abstract Serializable getUserId()
+    @Autowired(required = false)
+    CurrentUser currentUser
 
     /**
      * encodes the password
@@ -55,96 +38,15 @@ trait SecService<D extends UserInfo> {
      * Used in automation to username a bot/system user, also used for tests
      */
     abstract void loginAsSystemUser()
-    abstract void logout()
     abstract void reauthenticate(String username, String password)
 
-    abstract boolean ifAnyGranted(String... roles)
-
     /**
-     * Check if current user has all of the specified roles
-     */
-    abstract boolean ifAllGranted(String... roles)
-
-    /**
-     * Get the domain class instance associated with the current authentication.
-     */
-    D getUser() {
-        if (!isLoggedIn()) {
-            return null
-        }
-        getUser(getUserId())
-    }
-
-    /**
-     * Gets the currently logged in user id
-     */
-    Long getOrgId(){
-        getUser().orgId as Long
-    }
-
-    /**
-     * gets the user id from username, hard wired to AppUser.getByUsername.
-     * Used when User is something like OauthUser
-     */
-    Serializable getUserIdByUsername(String username) {
-        if (!isLoggedIn()) {
-            return null
-        }
-        return AppUser.getByUsername(username.trim()).id
-    }
-
-    /**
-     * returns the name property from the AppUser for logged in user
-     * @return the username
-     */
-    String getUserFullName() {
-        return getUserFullName(getUserId())
-    }
-
-    /**
-     * returns the name
-     * @return the full name / display name
-     */
-    String getUserFullName(Serializable uid) {
-        D usr = getUser(uid)
-        return usr ? usr['name'] : null
-    }
-
-    /**
-     * returns the username handle for logged in user
-     * @return the username
-     */
-    String getUsername() {
-        return getUsername(getUserId())
-    }
-
-    /**
-     * returns the username handle for the passed in id
-     * @return the username
-     */
-    String getUsername(Serializable uid) {
-        D usr = getUser(uid)
-        return usr ? usr['username'] : null
-    }
-
-    /**
-     * returns first section of email before @
-     * @return the username
-     */
-    // String getDisplayName(Serializable uid) {
-    //     D usr = getUser(uid)
-    //     if(!usr) return null
-    //     String email = usr['email']
-    //     return email.substring(0, email.indexOf("@"))
-    // }
-
-    /**
-     * get the user entity for the id
+     * get the user entity for the id. Default impl is to pull from DB.
      * @param uid the user id
      * @return the user entity
      */
-    D getUser(Serializable uid) {
-        GormEnhancer.findStaticApi(getEntityClass()).get(uid)
+    UserInfo getUser(Serializable uid) {
+        GormEnhancer.findStaticApi(getEntityClass()).get(uid) as UserInfo
     }
 
 }

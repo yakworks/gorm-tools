@@ -6,6 +6,7 @@ package yakworks.security.audit.scratch
 
 import javax.annotation.PostConstruct
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.DefaultGroovyMethods
@@ -40,7 +41,7 @@ class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
     private static final String DISABLE_AUDITSTAMP_FIELD = 'disableAuditTrailStamp'
 
     @Autowired GrailsApplication grailsApplication
-    @Autowired SecService secService
+    // @Autowired SecService secService
 
     final Set<String> auditStampedEntities = [] as Set
     Map<String, FieldProps> fieldProps
@@ -124,9 +125,11 @@ class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
         setUserField(FieldProps.EDITED_BY_KEY, ea)
     }
 
+    @CompileDynamic
     Serializable getCurrentUserId() {
-        Serializable uid = secService.getUserId()
-        return uid ?: 0L
+        // Serializable uid = secService.getUserId()
+        // return uid ?: 0L
+        return 0
     }
 
     @Override

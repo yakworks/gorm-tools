@@ -20,16 +20,6 @@ class TestingSecService<D extends UserInfo> implements SecService<D> {
         this.entityClass = clazz
     }
 
-    Long userId = 1
-
-    /**
-     * Gets the currently logged in user id from principal
-     */
-    @Override
-    Long getUserId() {
-        userId
-    }
-
     /**
      * Encode the password using the configured PasswordEncoder.
      * calls same method on springSecurityService
@@ -39,45 +29,8 @@ class TestingSecService<D extends UserInfo> implements SecService<D> {
         password
     }
 
-    /**
-     * Quick check to see if the current user is logged in.
-     * calls same method on springSecurityService
-     * @return <code>true</code> if the authenticated and not anonymous
-     */
-    @Override
-    UserInfo getUserInfo() {
-        return BasicUserInfo.create(username: "testuser", email: "testuser@testing.com",roles: ["ADMIN"])
-    }
-
-    @Override
-    boolean isLoggedIn() {
-        return true
-    }
-
-    /**
-     * Check if current user has any of the specified roles
-     */
-    @Override
-    boolean ifAnyGranted(String... roles) {
-        return true
-    }
-
-    /**
-     * Check if current user has all of the specified roles
-     */
-    @Override
-    boolean ifAllGranted(String... roles) {
-        return true
-    }
-
-
     @Override
     void loginAsSystemUser() {
-
-    }
-
-    @Override
-    void logout() {
 
     }
 
@@ -85,15 +38,5 @@ class TestingSecService<D extends UserInfo> implements SecService<D> {
     void reauthenticate(String username, String password = null) {
 
     }
-    /**
-     * Get the current user's roles.
-     * @return a list of roles (empty if not authenticated).
-     */
-    Set<String> getPrincipalRoles() {
-        if (!isLoggedIn()) return new HashSet<>()
-        return user.roles as Set<String>
-    }
-
-
 
 }

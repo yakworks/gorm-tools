@@ -40,7 +40,10 @@ final class SpringUserInfoUtils {
         }
     }
 
-    static Set<String> authoritiesToRoles(Collection authorities) {
+    /**
+     * Converts spring authorites to Set of string names.
+     */
+    static Set<String> authoritiesToRoles(Collection<GrantedAuthority> authorities) {
         AuthorityUtils.authorityListToSet(authorities)
     }
 

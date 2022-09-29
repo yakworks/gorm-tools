@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
 import yakworks.security.gorm.model.SecRolePermission
 import yakworks.security.gorm.model.SecUserPermission
+import yakworks.security.user.CurrentUser
 
 @Integration
 @Rollback
@@ -25,6 +26,7 @@ class AnnotatedServiceSpec extends Specification {
     Realm springSecurityRealm
     SecService secService
     @Autowired TestService testService
+    @Autowired CurrentUser currentUser
 
 
     // private request = new MockHttpServletRequest()
@@ -41,7 +43,7 @@ class AnnotatedServiceSpec extends Specification {
     }
 
     private void logout() {
-        secService.logout()
+        currentUser.logout()
     }
 
     void "sanity check"() {

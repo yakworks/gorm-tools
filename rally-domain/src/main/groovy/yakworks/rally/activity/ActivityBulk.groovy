@@ -25,7 +25,6 @@ import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.orgs.model.Org
-import yakworks.security.SecService
 
 /**
  * WIP

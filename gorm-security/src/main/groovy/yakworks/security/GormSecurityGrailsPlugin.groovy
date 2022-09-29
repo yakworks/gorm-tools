@@ -18,6 +18,7 @@ import yakworks.security.gorm.PasswordValidator
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.spring.AppUserDetailsService
 import yakworks.security.spring.AsyncSecureService
+import yakworks.security.spring.CurrentSpringUser
 import yakworks.security.spring.SpringSecService
 import yakworks.security.spring.listeners.SecLoginHandler
 import yakworks.security.spring.listeners.SecLogoutHandler
@@ -34,7 +35,9 @@ class GormSecurityGrailsPlugin extends Plugin {
         secService(SpringSecService, AppUser){ bean -> bean.lazyInit = true}
         userService(AppUserService){ bean -> bean.lazyInit = true}
 
-        currentUser(CurrentUserHolder){ bean -> bean.lazyInit = true}
+        "${CurrentUserHolder.name}"(CurrentUserHolder) //here just to set the static
+        //the one to be injected, spring specific right now
+        currentUser(CurrentSpringUser)
 
         def securityConf = SpringSecurityUtils.securityConfig
         if (securityConf.active) {

@@ -1,3 +1,10 @@
+### v7.3.26
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.25...v7.3.26)
+- bump commons to 3.9 and grails-kit to 5.0.8 [link](https://github.com/yakworks/gorm-tools/commit/9b482eee91759485304ec233814f0429f993ded5)
+- release [link](https://github.com/yakworks/gorm-tools/commit/4701f61e7b15079c1ee2627f36b94659d67065a0)
+- BuildSupport, hibernate-groovy-proxy,  RepoEntity now extends GormEntity (#575) [link](https://github.com/yakworks/gorm-tools/commit/7c36c947ab758b5c35d4080d94df12ab74acbb43)
+
 ### v7.3.25
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.23...v7.3.25)

@@ -95,7 +95,7 @@ class SecRoleUser implements RepoEntity<SecRoleUser>, Serializable {
         Set userRoleNames = []
         if (userInstance.getId()) {
             for (r in userInstance.roles) {
-                userRoleNames << r.code
+                userRoleNames << r
             }
         }
         Map<SecRole, Boolean> roleMap = [:]

@@ -16,21 +16,20 @@ import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.User
 import org.springframework.security.web.WebAttributes
 
 import grails.plugin.springsecurity.SpringSecurityService
-import grails.plugin.springsecurity.SpringSecurityUtils
 import yakworks.security.SecService
-import yakworks.security.UserTrait
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
+import yakworks.security.user.BasicUserInfo
+import yakworks.security.user.UserInfo
 
 /**
  * Spring implementation of the generic base SecService
  */
 @CompileStatic
-class SpringSecService<D extends UserTrait> implements SecService<D> {
+class SpringSecService implements SecService<AppUser> {
 
     @Autowired(required = false) //required = false so this bean works in case security. active is false
     SpringSecurityService springSecurityService
@@ -38,8 +37,8 @@ class SpringSecService<D extends UserTrait> implements SecService<D> {
     @Autowired(required = false)
     AuthenticationTrustResolver authenticationTrustResolver
 
-    SpringSecService(Class<D> clazz) {
-        this.entityClass = clazz
+    SpringSecService() {
+        this.entityClass = AppUser
     }
 
     /**
@@ -47,12 +46,16 @@ class SpringSecService<D extends UserTrait> implements SecService<D> {
      * AnonymousAuthenticationFilter is active (true by default) then the anonymous
      * user's name will be returned ('anonymousUser' unless overridden).
      * calls same method on springSecurityService
-     * @see SpringSecUser
-     * @return the principal (which as we have setup is the SpringSecUser
+     * @see SpringUserInfo
+     * @return the principal (which as we have setup is the SpringUserInfo
      */
-    def getPrincipal() {
-        springSecurityService.getPrincipal()
-    }
+    // def getPrincipal() {
+    //     getAuthentication()?.principal
+    // }
+    //
+    // UserInfo getUserInfo(){
+    //     getPrincipal() as UserInfo
+    // }
 
     /**
      * Get the currently logged in user's <code>Authentication</code>. If not authenticated
@@ -64,22 +67,7 @@ class SpringSecService<D extends UserTrait> implements SecService<D> {
      * @return the authentication
      */
     Authentication getAuthentication() {
-        springSecurityService.getAuthentication()
-    }
-
-    /**
-     * Gets the currently logged in user id from principal
-     */
-    @Override
-    Long getUserId() {
-        def curPrincipal = getPrincipal()
-        if (curPrincipal instanceof SpringSecUser) {
-            return (curPrincipal as SpringSecUser).id as Long
-        }
-        else if (curPrincipal instanceof User) { //FIXME when would this happen?
-            //has to be User, might be Oauth. So lookup by Username
-            getUserIdByUsername((curPrincipal as User).username) as Long
-        }
+        SecurityContextHolder.context?.authentication
     }
 
     /**
@@ -92,16 +80,6 @@ class SpringSecService<D extends UserTrait> implements SecService<D> {
     }
 
     /**
-     * Quick check to see if the current user is logged in.
-     * calls same method on springSecurityService
-     * @return <code>true</code> if the authenticated and not anonymous
-     */
-    @Override
-    boolean isLoggedIn() {
-        return springSecurityService.isLoggedIn()
-    }
-
-    /**
      * Used in automation to username a bot/system user, also used for tests
      */
     @Override
@@ -109,15 +87,8 @@ class SpringSecService<D extends UserTrait> implements SecService<D> {
         AppUser user = AppUser.get(1)
         assert user
         List<GrantedAuthority> authorities = parseAuthoritiesString([SecRole.ADMIN] as String[])
-        SpringSecUser secUser = new SpringSecUser(user.username, user.passwordHash, authorities, user.id)
-        SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(secUser, user.passwordHash, authorities)
-    }
-
-    /**
-     * Verify that user has logged in fully (ie has presented username/password) and is not logged in using rememberMe cookie
-     */
-    boolean isAuthenticatedFully() {
-        return (isLoggedIn() && !isRememberMe())
+        SpringUserInfo secUser = SpringUserInfo.of(user)
+        SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(secUser, user.passwordHash, secUser.authorities)
     }
 
     /**
@@ -154,58 +125,15 @@ class SpringSecService<D extends UserTrait> implements SecService<D> {
         return requiredAuthorities
     }
 
-    /**
-     * Check if current user has any of the specified roles
-     */
-    @Override
-    boolean ifAnyGranted(String... roles) {
-        return SpringSecurityUtils.ifAnyGranted(parseAuthoritiesString(roles))
-    }
-
-    /**
-     * Check if current user has all of the specified roles
-     */
-    @Override
-    boolean ifAllGranted(String... roles) {
-        return SpringSecurityUtils.ifAllGranted(parseAuthoritiesString(roles))
-    }
-
-    /**
-     * Check if current user has none of the specified roles
-     */
-    boolean ifNotGranted(String... roles) {
-        return SpringSecurityUtils.ifNotGranted(parseAuthoritiesString(roles))
-    }
-
-    /**
-     * Get the current user's roles.
-     * @return a list of roles (empty if not authenticated).
-     */
-    List<String> getPrincipalRoles() {
-        if (!isLoggedIn()) return []
-        def roles = user['roles'] as Set<SecRole>
-        return roles*.name
-    }
-
-    /**
-     * Logout current user programmatically
-     */
-    void logout() {
-        // if(RequestContextHolder.getRequestAttributes()){
-        //     HttpSession session = WebUtils.retrieveGrailsWebRequest()?.currentRequest?.getSession(false)
-        //     if (session) {
-        //         session.invalidate()
-        //     }
-        // }
-
-        SecurityContextHolder.context.setAuthentication(null)
-        SecurityContextHolder.clearContext()
-    }
-
-
     @CompileDynamic
     AuthenticationException getLastAuthenticationException() {
         return WebUtils.retrieveGrailsWebRequest().getSession().getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION)
+    }
+
+    @CompileDynamic
+    static SpringUserInfo mockUser(String username, String pwd, List roles, Long id, Long orgId){
+        def u = new BasicUserInfo(username: username, passwordHash: pwd, roles: roles, id: id, orgId: orgId)
+        SpringUserInfo.of(u)
     }
 
 }

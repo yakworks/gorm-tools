@@ -160,11 +160,11 @@ class RallySeedData {
 
     static void buildAppUser(){
         AppUser.withTransaction {
-            AppUser user = new AppUser(id: 1, username: "admin", email: "admin@9ci.com", password:"123Foo")
+            AppUser user = new AppUser(id: 1, username: "admin", email: "admin@9ci.com", password:"123Foo", orgId: 2)
             user.persist()
             assert user.id == 1
 
-            AppUser custUser = new AppUser(id: 2, username: "cust", email: "cust@9ci.com", password:"123Foo")
+            AppUser custUser = new AppUser(id: 2, username: "cust", email: "cust@9ci.com", password:"123Foo", orgId: 2)
             custUser.persist()
             assert custUser.id == 2
 
@@ -178,7 +178,7 @@ class RallySeedData {
             SecRoleUser.create(user, power, true)
             SecRoleUser.create(custUser, custRole, true)
 
-            AppUser noRoleUser = AppUser.create([id: 3, username: "noroles", email: "noroles@9ci.com", password:"123Foo"], bindId: true)
+            AppUser noRoleUser = AppUser.create([id: 3, username: "noroles", email: "noroles@9ci.com", password:"123Foo", orgId: 3], bindId: true)
             assert noRoleUser.id == 3
             return
         }

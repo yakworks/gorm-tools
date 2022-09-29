@@ -40,7 +40,7 @@ import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.TagLink
-import yakworks.security.SecService
+import yakworks.security.user.CurrentUser
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKind
 import static yakworks.rally.activity.model.Activity.VisibleTo
@@ -56,7 +56,7 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
     AttachmentRepo attachmentRepo
 
     @Autowired(required = false)
-    SecService secService
+    CurrentUser currentUser
 
     @Autowired(required = false)
     ProblemHandler problemHandler
@@ -338,7 +338,7 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
                     ne("visibleTo", VisibleTo.Owner)
                     and {
                         eq("visibleTo", VisibleTo.Owner)
-                        eq("createdBy", secService.userId)
+                        eq("createdBy", currentUser.userId)
                     }
                 }
             }

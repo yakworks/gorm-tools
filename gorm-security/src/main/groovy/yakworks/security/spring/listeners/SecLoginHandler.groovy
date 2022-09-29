@@ -17,7 +17,7 @@ import org.springframework.security.authentication.event.InteractiveAuthenticati
 
 import yakworks.security.gorm.AppUserService
 import yakworks.security.gorm.model.AppUser
-import yakworks.security.spring.SpringSecUser
+import yakworks.security.spring.SpringUserInfo
 
 /**
  * Springsecurity username handler
@@ -37,8 +37,8 @@ class SecLoginHandler implements ApplicationListener<AbstractAuthenticationEvent
     void onApplicationEvent(AbstractAuthenticationEvent event) {
         //do password check only if local user, not if a federated user, eg from Okta, in which case it would be OauthUser.
         def principal = event.authentication.principal
-        if (event instanceof AuthenticationSuccessEvent && principal instanceof SpringSecUser) {
-            Serializable uid = (principal as SpringSecUser).id
+        if (event instanceof AuthenticationSuccessEvent && principal instanceof SpringUserInfo) {
+            Serializable uid = (principal as SpringUserInfo).id
             if (shouldWarnAboutPasswordExpiry(uid)) {
                 GrailsWebRequest webRequest = WebUtils.retrieveGrailsWebRequest()
                 if (webRequest) {
@@ -56,15 +56,11 @@ class SecLoginHandler implements ApplicationListener<AbstractAuthenticationEvent
     }
 
     boolean shouldWarnAboutPasswordExpiry(Serializable userId) {
-        boolean result = false
-        AppUser.withTransaction {
-            if (passwordExpiryEnabled) {
-                int remainingDays = userService.remainingDaysForPasswordExpiry(AppUser.get(userId))
-                if (passwordWarnDays >= remainingDays) result = true
-            }
+        if (passwordExpiryEnabled) {
+            int remainingDays = userService.remainingDaysForPasswordExpiry(AppUser.get(userId))
+            if (passwordWarnDays >= remainingDays) return true
         }
-
-        return result
+        return false
     }
 
 }

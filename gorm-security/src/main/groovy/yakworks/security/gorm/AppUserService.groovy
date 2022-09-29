@@ -17,10 +17,10 @@ import org.springframework.beans.factory.annotation.Value
 
 import grails.gorm.transactions.Transactional
 import yakworks.api.Result
-import yakworks.security.SecService
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecLoginHistory
 import yakworks.security.gorm.model.SecPasswordHistory
+import yakworks.security.user.CurrentUser
 
 /**
  * AppUserService is for user level helpers, such as sending emails to user,
@@ -44,7 +44,7 @@ class AppUserService {
     int passwordWarnDays
 
     @Autowired
-    SecService<AppUser> secService
+    CurrentUser currentUser
 
     @Autowired(required = false) //required = false so in case spring sec is not working
     PasswordValidator passwordValidator
@@ -53,17 +53,17 @@ class AppUserService {
      * Create new record in secLoginHistory with logged in user and date
      */
     void trackUserLogin() {
-        AppUser user = secService.user
-        SecLoginHistory secLoginHistory = SecLoginHistory.create([user: user, loginDate: new Date()])
+        Long userId = currentUser.userId as Long
+        SecLoginHistory secLoginHistory = SecLoginHistory.create([userId: userId, loginDate: new Date()])
     }
 
     @CompileDynamic //doesn't pick up maxResults with GrCompStatic
     void trackUserLogout() {
-        AppUser user = secService.user
-        if (!user) return
+        Long userId = currentUser.userId as Long
+        if (!userId) return
         Criteria criteria = SecLoginHistory.createCriteria()
         List secLoginHistoryList = criteria.list {
-            eq("user", user)
+            eq("userId", userId)
             isNull("logoutDate")
             maxResults(1)
             order("loginDate", "desc")
@@ -89,7 +89,6 @@ class AppUserService {
      */
     //FIXME make sure we have good integration tests for this
     boolean isPasswordExpired(AppUser user = null) {
-        if(!user) user = (AppUser)secService.getUser()
         //can always force a password change by setting passwordExpired field to true
         if(user.passwordExpired) return true
         if (passwordExpiryEnabled) {
@@ -102,9 +101,8 @@ class AppUserService {
         return false
     }
 
-    Integer remainingDaysForPasswordExpiry(AppUser u = null) {
-        AppUser user = u ?: (AppUser)secService.getUser()
-        LocalDateTime pExpire = user.passwordChangedDate.plusDays(passwordExpireDays)
+    Integer remainingDaysForPasswordExpiry(AppUser u) {
+        LocalDateTime pExpire = u.passwordChangedDate.plusDays(passwordExpireDays)
         return Duration.between(LocalDateTime.now(), pExpire).toDays().toInteger()
     }
 

@@ -87,5 +87,6 @@ ext.codenarcRuleset= '''
   getRule('SynchronizedMethod').enabled = false
   getRule('UnnecessaryDotClass').enabled = false
   getRule('ExplicitCallToEqualsMethod').enabled = false
-
+  getRule('ExplicitHashSetInstantiation').enabled = false
+  getRule('AssignmentToStaticFieldFromInstanceMethod').enabled = false
 '''

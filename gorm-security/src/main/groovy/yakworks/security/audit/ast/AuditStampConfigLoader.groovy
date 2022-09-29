@@ -10,6 +10,7 @@ import yakworks.commons.util.BuildSupport
 
 /**
  * Just a helper to load config during AST
+ * NOT CURRENTLY USED
  */
 @CompileStatic
 class AuditStampConfigLoader {

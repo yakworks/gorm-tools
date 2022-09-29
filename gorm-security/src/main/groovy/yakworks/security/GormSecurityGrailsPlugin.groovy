@@ -4,22 +4,26 @@
 */
 package yakworks.security
 
-
+import org.springframework.security.authentication.AuthenticationTrustResolverImpl
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter
 
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugins.Plugin
 import yakworks.security.audit.AuditStampBeforeValidateListener
 import yakworks.security.audit.AuditStampPersistenceEventListener
 import yakworks.security.audit.AuditStampSupport
+import yakworks.security.audit.DefaultAuditUserResolver
 import yakworks.security.gorm.AppUserService
 import yakworks.security.gorm.PasswordValidator
-import yakworks.security.gorm.model.AppUser
 import yakworks.security.spring.AppUserDetailsService
 import yakworks.security.spring.AsyncSecureService
+import yakworks.security.spring.CurrentSpringUser
 import yakworks.security.spring.SpringSecService
+import yakworks.security.spring.anonymous.AnonToken
 import yakworks.security.spring.listeners.SecLoginHandler
 import yakworks.security.spring.listeners.SecLogoutHandler
+import yakworks.security.user.CurrentUserHolder
 
 @SuppressWarnings(['Indentation'])
 class GormSecurityGrailsPlugin extends Plugin {
@@ -28,8 +32,13 @@ class GormSecurityGrailsPlugin extends Plugin {
     def pluginExcludes = ["**/init/**"]
 
     Closure doWithSpring() { { ->
-        secService(SpringSecService, AppUser){ bean -> bean.lazyInit = true}
+
+        secService(SpringSecService)
         userService(AppUserService){ bean -> bean.lazyInit = true}
+
+        "${CurrentUserHolder.name}"(CurrentUserHolder) //here just to set the static
+        //the one to be injected, spring specific right now
+        currentUser(CurrentSpringUser)
 
         def securityConf = SpringSecurityUtils.securityConfig
         if (securityConf.active) {
@@ -48,6 +57,21 @@ class GormSecurityGrailsPlugin extends Plugin {
             secLoginHandler(SecLoginHandler){ bean -> bean.lazyInit = true}
             secLogoutHandler(SecLogoutHandler){ bean -> bean.lazyInit = true}
             // authenticationDetailsSource(RallyAuthenticationDetailsSource)
+
+            // ANONYMOUS SETUP
+            // replace authenticationTrustResolver so we can set out own anonymousClass
+            // authenticationTrustResolver( AuthenticationTrustResolverImpl) {
+            //     anonymousClass = AnonToken
+            // }
+            // anonymousAuthenticationFilter(classFor('anonymousAuthenticationFilter', GrailsAnonymousAuthenticationFilter)) {
+            //     authenticationDetailsSource = ref('authenticationDetailsSource')
+            //     key = conf.anon.key
+            // }
+            // anonymousAuthenticationFilter(AnonymousAuthenticationFilter) {
+            //     // authenticationDetailsSource = ref('authenticationDetailsSource')
+            //     key = "Anon_key"
+            //     userAttribute = "ANONYMOUS"
+            // }
         }
 
         //dont register beans if audit trail is disabled.
@@ -56,6 +80,7 @@ class GormSecurityGrailsPlugin extends Plugin {
             auditStampBeforeValidateListener(AuditStampBeforeValidateListener)
             auditStampPersistenceEventListener(AuditStampPersistenceEventListener)
             auditStampSupport(AuditStampSupport)
+            auditUserResolver(DefaultAuditUserResolver)
         }
 
     } }

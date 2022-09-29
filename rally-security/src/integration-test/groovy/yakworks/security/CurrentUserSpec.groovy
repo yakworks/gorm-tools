@@ -1,72 +1,153 @@
 package yakworks.security
 
 
-import yakworks.security.gorm.model.AppUser
-import grails.gorm.transactions.Rollback
-import grails.testing.mixin.integration.Integration
+import org.apache.shiro.realm.Realm
+import org.apache.shiro.util.ThreadContext
+import org.apache.shiro.web.mgt.WebSecurityManager
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.context.WebApplicationContext
-import spock.lang.Specification
-import yakworks.testing.gorm.integration.DomainIntTest
-import yakworks.rally.orgs.model.Org
-import yakworks.rally.orgs.model.OrgType
+import org.springframework.security.access.expression.AbstractSecurityExpressionHandler
+import org.springframework.security.access.expression.SecurityExpressionOperations
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.web.FilterInvocation
 
-/**
- * Proof of concept.
- */
-// @Rollback
-// @WebAppConfiguration
-// @SpringBootTest
-// @ContextConfiguration(
-//     loader = GrailsApplicationContextLoader,
-//     classes = [Application]
-// )
+import grails.gorm.transactions.Rollback
+import grails.gorm.transactions.Transactional
+import grails.testing.mixin.integration.Integration
+import grails.testing.spock.OnceBefore
+import spock.lang.Specification
+import yakworks.security.gorm.model.AppUser
+import yakworks.security.gorm.model.SecRole
+import yakworks.security.gorm.model.SecRolePermission
+import yakworks.security.gorm.model.SecRoleUser
+import yakworks.security.gorm.model.SecUserPermission
+import yakworks.security.spring.SpringSecService
+import yakworks.security.user.CurrentUser
+import yakworks.testing.gorm.integration.DomainIntTest
+
 @Integration
 @Rollback
-class CurrentUserSpec extends Specification implements DomainIntTest {//, ApplicationContextAware {
+class CurrentUserSpec extends Specification implements DomainIntTest {
 
-    // ApplicationContext ctx
+    @Autowired CurrentUser currentUser
+    // @Autowired SpringSecService springSecService
 
-    @Autowired
-    WebApplicationContext ctx
-
-    @Autowired
-    CurrentUser currentUser
-
-    // @Before
-    // void controllerIntegrationSetup() {
-    //     MockRestRequest request = new MockRestRequest(ctx.servletContext)
-    //     MockRestResponse response = new MockRestResponse()
-    //     GrailsWebMockUtil.bindMockWebRequest(ctx, request, response)
-    //     // currentRequestAttributes.setControllerName(controllerName)
+    // @OnceBefore
+    // void doPerms() {
+    //     setupPerms()
     // }
 
-    // void setApplicationContext(ApplicationContext ctx) {
-    //     this.ctx = ctx
+    // void setup() {
+    //     // ThreadContext.bind shiroSecurityManager
+    //     setupPerms()
+    //     logout()
     // }
 
-    void "getUserMap admin"() {
-
-        when:
-        def userMap = currentUser.getUserMap()
-
-        then:
-        currentUser.org.id == 2
-        userMap.username == 'admin'
+    private void login(String username) {
+        secService.reauthenticate(username, 'password')
     }
 
-    void "getUserMap for customer user"() {
-        when:
-        def org = Org.get(2)
-        org.type = OrgType.Customer
-        org.persist(flush: true)
-        authenticate(AppUser.get(1), Roles.CUSTOMER)
-        def userMap = currentUser.getUserMap()
-
-        then:
-        currentUser.org.id == 2
-        userMap.isCustomer
-        currentUser.isCustomer()
+    private void logout() {
+        currentUser.logout()
     }
 
+    Authentication getAuth(){
+        SecurityContextHolder.context?.authentication
+    }
+
+    void "sanity check"() {
+        expect:
+        setupPerms()
+        login "userAdmin"
+        currentUser
+    }
+
+    void "test hasRole"() {
+        expect:
+        setupPerms()
+        login "userAdmin"
+        currentUser.hasRole('ADMIN')
+        currentUser.hasRole('MGR')
+        !currentUser.hasRole('CUST')
+        currentUser.hasAnyRole('ADMIN', 'CUST')
+
+    }
+
+    def testIsLoggedIn() {
+        expect:
+        setupPerms()
+        login "userAdmin"
+        currentUser.isLoggedIn()
+    }
+
+    def testIfAllGranted() {
+        expect: "All roles of current user"
+        setupPerms()
+        login "userAdmin"
+        currentUser.hasRole(SecRole.ADMIN)
+    }
+
+    def testIfAnyGranted(){
+        expect:
+        setupPerms()
+        login "userAdmin"
+        currentUser.hasAnyRole(SecRole.ADMIN, "FakeRole")
+    }
+
+    // def "test user roles"() {
+    //     expect:
+    //     roles.size() == currentUser.userInfo.roles.size()
+    //     roles.containsAll(currentUser.userInfo.roles)
+    // }
+
+    @Transactional
+    void setupPerms(){
+        //these are on top of whats done in BootStrap, so keep that in mind, an admin user already exists for example
+        AppUser admin = AppUser.create(getUserParams('userAdmin'))
+        AppUser user2 = AppUser.create(getUserParams('user2'))
+        AppUser user3 = AppUser.create(getUserParams('user3'))
+        SecRole roleAdmin = SecRole.create(code: "ADMIN")
+        SecRole roleMgr = SecRole.create(code: "MGR")
+        SecRole roleUser = SecRole.create(code: 'CUST')
+
+        new SecUserPermission(admin, 'printer:print:*').persist()
+
+        new SecUserPermission(user2, 'printer:print:*').persist()
+
+        new SecUserPermission(user2, 'printer:maintain:epsoncolor').persist()
+
+        new SecUserPermission(user2, 'action:kick').persist()
+
+        new SecUserPermission(user3, 'action:jump').persist()
+
+        new SecUserPermission(user3, 'action:kick').persist()
+
+
+        new SecRolePermission(roleAdmin, 'printer:admin').persist()
+
+        new SecRolePermission(roleUser, 'printer:use').persist()
+
+
+        SecRoleUser.create admin, roleAdmin, true
+        SecRoleUser.create admin, roleMgr, true
+        SecRoleUser.create user2, roleAdmin, true
+        SecRoleUser.create user2, roleUser, true
+
+        // assert 2 == SecRole.count()
+        // assert 3 == AppUser.count()
+        // assert 3 == SecRoleUser.count()
+        // assert 6 == SecUserPermission.count()
+        flushAndClear()
+    }
+
+    Map getUserParams(String uname){
+        Map baseParams = [
+            name: uname,
+            email:"${uname}@9ci.com",
+            username: uname,
+            password:'secretStuff',
+            repassword:'secretStuff',
+        ]
+        return baseParams
+    }
 }

@@ -6,8 +6,6 @@ package yakworks.security
 
 import groovy.transform.CompileStatic
 
-import yakworks.security.SecService
-import yakworks.security.UserTrait
 import yakworks.spring.AppCtx
 
 /**
@@ -19,45 +17,10 @@ import yakworks.spring.AppCtx
  */
 @CompileStatic
 class SecUtils {
-
     private static SecService cachedSecService
 
     private SecUtils() {
         // statics only
-    }
-
-    static UserTrait getUser(Serializable uid) {
-        return getSecService().getUser(uid)
-    }
-
-    static String getUserFullName(Serializable userId) {
-        return getSecService().getUserFullName(userId)
-    }
-
-    static String getUserFullName() {
-        getSecService().getUserFullName()
-    }
-
-    static String getUsername(Serializable userId) {
-        return getSecService().getUsername(userId)
-    }
-
-    // static String getDisplayName(Serializable userId) {
-    //     return getSecService().getDisplayName(userId)
-    // }
-
-    /**
-     * gets the currently logged in username
-     */
-    static String getUsername() {
-        getSecService().getUsername()
-    }
-
-    /**
-     * gets the currently logged in user id
-     */
-    static Serializable getUserId() {
-        getSecService().getUserId()
     }
 
     /**

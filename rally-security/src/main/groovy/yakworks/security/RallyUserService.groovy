@@ -29,7 +29,7 @@ import yakworks.security.gorm.model.SecRoleUser
 @CompileStatic
 class RallyUserService {
 
-    SecService secService
+    // SecService secService
     // def freeMarkerViewService
     // EmailerService emailerService
 

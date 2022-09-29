@@ -17,7 +17,7 @@ import yakworks.commons.lang.Validate
  * The main class is the LinkedEntity Persitable and the Linked item (such as Tag) is the related
  *
  * @param <X> the cross ref (LinkXRef) links domain
- * @param <I> the linked Item entity, Tag for example
+ * @param <R> the Related linked Item entity, Tag for example
  */
 @Slf4j
 @CompileStatic

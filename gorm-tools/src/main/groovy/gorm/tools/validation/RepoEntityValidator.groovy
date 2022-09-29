@@ -331,12 +331,11 @@ class RepoEntityValidator extends PersistentEntityValidator {
         // newCodes.add("${propName}.${code}".toString())
         if(valCode?.jakartaCode) newCodes.add(valCode.jakartaCode)
         newCodes.add(valCode ? valCode.name() : code)
-
-
-        ClassUtils.setPrivateFinal(DefaultMessageSourceResolvable, fieldError, 'codes', newCodes as String[])
+        //sets the private final for codes and args.
+        ClassUtils.setFieldValue(DefaultMessageSourceResolvable, fieldError, 'codes', newCodes as String[])
         // icu4jArgs
         Object[] newArgs = icu4jArgs(valCode, fieldError.arguments)
-        ClassUtils.setPrivateFinal(DefaultMessageSourceResolvable, fieldError, 'arguments', newArgs as Object[])
+        ClassUtils.setFieldValue(DefaultMessageSourceResolvable, fieldError, 'arguments', newArgs as Object[])
     }
 
     /**

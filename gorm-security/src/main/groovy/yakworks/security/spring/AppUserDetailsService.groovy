@@ -4,64 +4,70 @@
 */
 package yakworks.security.spring
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 
 import grails.gorm.transactions.Transactional
-import grails.plugin.springsecurity.userdetails.GrailsUserDetailsService
-import yakworks.security.gorm.AppUserService
+import yakworks.commons.lang.ClassUtils
+import yakworks.security.gorm.PasswordValidator
 import yakworks.security.gorm.model.AppUser
 
 /**
- * Default Gorm-Tools implementation of GrailsUserDetailsService that uses AppUser to load users and roles
- * We dont use the default GormUserDetailsService from Grails Spring Security because we need more flexibility for oauth and ldap.
+ * Default Gorm-Tools implementation of UserDetailsService that uses AppUser to load users and roles
+ * We dont use the default Gorm or GrailsUserDetailsService from Grails Spring Security because we need more flexibility for oauth and ldap.
  * This uses the AppUserService and creates baseline for the various OAuth and Ldap.
- * @see grails.plugin.springsecurity.userdetails.GormUserDetailsService
+ * @see UserDetailsService
  */
 @Slf4j
 @CompileStatic
-class AppUserDetailsService implements GrailsUserDetailsService {
+class AppUserDetailsService implements UserDetailsService {
 
-    @Autowired
-    AppUserService userService
-
-    @Transactional
-    UserDetails loadUserByUsername(String username, boolean loadRoles) throws UsernameNotFoundException {
-        log.debug "loadUserByName(${username}, ${loadRoles})"
-
-        AppUser user = AppUser.getByUsername(username.trim())
-        if (!user) {
-            throw new UsernameNotFoundException("User not found: $username")
-        }
-        log.debug "Found user ${user} in the database"
-
-        Boolean mustChange = userService.isPasswordExpired(user)
-
-        List<SimpleGrantedAuthority> authorities = []
-
-        if (loadRoles) {
-            authorities = user.roles.collect { new SimpleGrantedAuthority(it.code) }
-        }
-        // password is required so make sure its filled even if its pauth or ldap
-        String password = user.passwordHash ?: "N/A"
-
-        new SpringSecUser(user.username, password,
-            user.enabled, true, !mustChange, true,
-            authorities as Collection<GrantedAuthority>,
-            user.id)
-
-    }
+    @Autowired PasswordValidator passwordValidator
 
     @Override
-    UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    @Transactional
+    SpringUserInfo loadUserByUsername(String username) throws UsernameNotFoundException {
         log.debug "loadUserByName(${username})"
-        loadUserByUsername username, true
+        AppUser user = AppUser.getByUsername(username.trim())
+        if (!user) throw new UsernameNotFoundException("User not found for username: $username")
+
+        return createSpringUser(user)
+    }
+
+    // @Override
+    @Transactional
+    SpringUserInfo loadUserByUserId(Serializable id) throws UsernameNotFoundException {
+        log.debug "loadUserByUserId(${id})"
+        AppUser user = AppUser.get(id)
+        if (!user) throw new UsernameNotFoundException("User not found for id: $id")
+
+        return createSpringUser(user)
+    }
+
+    /**
+     * Creates SpringUserInfo (UserDetails) from the AppUser
+     */
+    SpringUserInfo createSpringUser(AppUser user){
+        log.debug "Found AppUser ${user.username}, creating SpringUserInfo"
+        SpringUserInfo springUser = SpringUserInfo.of(user)
+        checkCredentialExpiration(springUser, user)
+        return springUser
+    }
+
+    /**
+     * sets the credentialsNonExpired=false (its backwards) if isPasswordExpired=true
+     */
+    @CompileDynamic //so we can set the private
+    void checkCredentialExpiration(SpringUserInfo springUser, AppUser sourceUser){
+        if(passwordValidator.isPasswordExpired(sourceUser)){
+            //its private so set with reflection
+            ClassUtils.setFieldValue(springUser, "credentialsNonExpired", false )
+        }
     }
 
 }

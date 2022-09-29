@@ -11,8 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import gorm.tools.metamap.services.MetaMapService
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
-import yakworks.security.SecService
-import yakworks.security.gorm.model.AppUser
+import yakworks.security.user.CurrentUser
 
 /**
  * Customer security service for unique handling.
@@ -23,10 +22,8 @@ import yakworks.security.gorm.model.AppUser
 @CompileStatic
 class UserRequest {
 
-    @Autowired SecService<AppUser> secService
+    @Autowired CurrentUser currentUser
     @Autowired MetaMapService metaMapService
-
-    AppUser user
 
     /**
      * Org the user is logged in as
@@ -40,7 +37,7 @@ class UserRequest {
     // }
 
     Org getOrg(){
-        if(!org) org = Org.get(secService.user.orgId)
+        if(!org) org = Org.get(currentUser.userInfo.orgId)
         return org
     }
 
@@ -64,7 +61,7 @@ class UserRequest {
      * Gets user fields to send to client about their login
      */
     Map getUserMap(List incs) {
-        Map userMap = metaMapService.createMetaMap(secService.user, incs).clone() as Map
+        Map userMap = metaMapService.createMetaMap(currentUser.userInfo, incs).clone() as Map
         if (isCustomer()) userMap.put('isCustomer', true)
         return userMap
     }

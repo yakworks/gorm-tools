@@ -14,13 +14,13 @@ import grails.persistence.Entity
 @GrailsCompileStatic
 class SecLoginHistory implements RepoEntity<SecLoginHistory>, Serializable {
 
-    AppUser user
+    Long userId
     LocalDateTime loginDate
     LocalDateTime logoutDate
 
     static mapping = {
         table 'SecLoginHistory'
-        user column: 'userId'
+        // user column: 'userId'
         version false
     }
 

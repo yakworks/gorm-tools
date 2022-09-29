@@ -6,7 +6,7 @@ package gorm.tools.boot
 
 import groovy.transform.CompileStatic
 
-import org.springframework.beans.factory.config.BeanDefinition
+import org.grails.datastore.mapping.model.AbstractMappingContext
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
@@ -16,37 +16,47 @@ import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.UuidGormRepo
 import gorm.tools.repository.model.UuidRepoEntity
-import yakworks.commons.lang.NameUtils
 
 /**
- * Sets up the spring beans for the Repos.
+ * Sets up the spring beans for the GormRepos.
+ * The GormRepo annotation should have already put the @Component annotation on it to make it eligible for scanning
+ * this will spin through the entities and look for ones that dont have a concerete one setup and
+ * make a DefaultGormRepo or UuidGormRepo depending on what setup.
  */
 @CompileStatic
 class GormRepoBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
-    List<Class> repoClasses
     List<Class> entityClasses
 
-    GormRepoBeanFactoryPostProcessor(List<Class> repoClasses, List<Class> entityClasses){
-        this.repoClasses = repoClasses
+    AbstractMappingContext grailsDomainClassMappingContext
+
+    GormRepoBeanFactoryPostProcessor(List<Class> entityClasses){
         this.entityClasses = entityClasses
+    }
+
+    GormRepoBeanFactoryPostProcessor(AbstractMappingContext grailsDomainClassMappingContext){
+        this.grailsDomainClassMappingContext = grailsDomainClassMappingContext
+        this.entityClasses = grailsDomainClassMappingContext.persistentEntities*.javaClass
     }
 
     @Override
     void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory){
+        // def entClasses = beanFactory.getBean(AbstractMappingContext).persistentEntities
+        // entityClasses = grailsDomainClassMappingContext.persistentEntities*.javaClass
         var registry = (BeanDefinitionRegistry) beanFactory
-        for(Class repoClass: repoClasses){
-            BeanDefinition bdef = BeanDefinitionBuilder.rootBeanDefinition(repoClass).getBeanDefinition()
-            String beanName = NameUtils.getPropertyName(repoClass.simpleName)
-            registry.registerBeanDefinition(beanName, bdef)
-        }
+
+        // for(Class repoClass: repoClasses){
+        //     BeanDefinition bdef = BeanDefinitionBuilder.rootBeanDefinition(repoClass).getBeanDefinition()
+        //     String beanName = NameUtils.getPropertyName(repoClass.simpleName)
+        //     registry.registerBeanDefinition(beanName, bdef)
+        // }
 
         // Map<String, Object> newRepoBeanMap = [:]
 
         for(Class entityClass: entityClasses){
             String repoName = RepoUtil.getRepoBeanName(entityClass)
-            def hasRepo = repoClasses.find { NameUtils.getPropertyName(it.simpleName) == repoName }
-            if (!hasRepo) {
+            // def hasRepo = repoClasses.find { NameUtils.getPropertyName(it.simpleName) == repoName }
+            if (!registry.containsBeanDefinition(repoName)) {
                 Class repoClass = DefaultGormRepo
                 if(UuidRepoEntity.isAssignableFrom(entityClass)) {
                     repoClass = UuidGormRepo

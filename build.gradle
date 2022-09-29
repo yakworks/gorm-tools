@@ -85,4 +85,7 @@ ext.codenarcRuleset= '''
   // getRule('AbcMetric').enabled = false
   getRule('FieldName').enabled = false
   getRule('SynchronizedMethod').enabled = false
+  getRule('UnnecessaryDotClass').enabled = false
+  getRule('ExplicitCallToEqualsMethod').enabled = false
+
 '''

@@ -11,7 +11,6 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.reflect.ClassUtils
-import org.springframework.beans.factory.annotation.Value
 
 import yakworks.spring.SpringEnvironment
 
@@ -20,7 +19,7 @@ import yakworks.spring.SpringEnvironment
  */
 @SuppressWarnings(['AssignmentToStaticFieldFromInstanceMethod'])
 @CompileStatic
-class DbDialectService implements SpringEnvironment {
+class DbDialectService implements SpringEnvironment{
 
     static final int UNKNOWN = 0
     static final int MSSQL = 1
@@ -29,28 +28,27 @@ class DbDialectService implements SpringEnvironment {
     static final int H2 = 4
     static final int POSTGRESQL = 5
 
-    @Value('${hibernate.dialect}')
     static String hibernateDialect
 
-    /** dialect identity*/
-    static int dialect
+    /** dialect identity, use init or setHibernateDialect*/
+    static int dialect = 0
 
     @PostConstruct
     void init() {
-        // hibernateDialect = environment
-        dialect = translateHibernateDialect(hibernateDialect)
+        def hibDialect = environment.getProperty('hibernate.dialect')
+        //dont overwrite it if its null in case we already initialized with static
+        if(hibDialect) hibernateDialect = hibDialect
+        // init if dialect is not setup yet
+        if(!dialect) init(hibernateDialect)
     }
 
     /**
      * converts a hibernate dialiect name into the static database ids we use.
      * @return 0-5 to map to DbDialectService.H2, DbDialectService.MSSQL etc....
      */
-    static int translateHibernateDialect(String hibernateDialectName) {
+    static int init(String hibernateDialectName) {
+        DbDialectService.hibernateDialect = hibernateDialectName
         int result = UNKNOWN
-        // just to make the stuff below easier to read.
-        // if (!dialectName) {
-        //     dialectName = hibernateDialect //GrailsHolder.config.getProperty('hibernate.dialect')
-        // }
 
         //fallback to H2 just like how Datasources plugin does. if H2 is present in classpath
         if ((!hibernateDialectName && ClassUtils.isPresent("org.h2.Driver"))
@@ -66,7 +64,8 @@ class DbDialectService implements SpringEnvironment {
                     + "Please specify a known for for config hibernate.dialect")
         }
 
-        return result
+        dialect = result
+        return dialect
     }
 
     String getCurrentDate() {

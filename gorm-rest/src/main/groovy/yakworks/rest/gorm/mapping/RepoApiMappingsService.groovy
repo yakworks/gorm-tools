@@ -26,6 +26,7 @@ class RepoApiMappingsService {
     //the root/base dir for the paths TODO get this from config
     String contextPath = '/api'
 
+    //FIXME see note in GormRestGrailsPlugin, Autowired not working. Might be being picked up to early in the game with dev.
     @Autowired ConstraintRegistry urlMappingsConstraintRegistry
     @Autowired GrailsApplication grailsApplication
 
@@ -34,6 +35,7 @@ class RepoApiMappingsService {
      * @param builderDelegate the DefaultUrlMappingEvaluator.UrlMappingBuilder from mapping closuer
      */
     void createMappings(Object builderDelegate){
+        if(!grailsApplication) return
         GrailsClass[] controllerClasses = grailsApplication.getArtefacts(ControllerArtefactHandler.TYPE)
         for (controller in controllerClasses) {
             // println "controler $controller.fullName"

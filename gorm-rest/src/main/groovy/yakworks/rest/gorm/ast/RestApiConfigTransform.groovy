@@ -44,7 +44,7 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
         }
 
         // this should be set for multi project builds
-        String projectDir = BuildSupport.gradleProjectDir
+        String projectDir = BuildSupport.projectDir
         // add slash
         if (projectDir) projectDir = "${projectDir}/"
         // println "projectDir ${projectDir}"

@@ -16,16 +16,13 @@ class DomainMethodsTests extends Specification {
         when:
         def org = Org.create(num:'123', name: 'jumper1', type: "Customer").persist(flush: true)
 
+        Org.executeUpdate("update Org j set j.version=20 where j.name='jumper1'")
+        org.name = 'fukt'
+        org.persist(flush: true)
+        fail "it was supposed to fail the save because of OptimisticLockingFailureException"
+
         then:
-        try {
-            Org.executeUpdate("update Org j set j.version=20 where j.name='jumper1'")
-            org.name = 'fukt'
-            org.persist(flush: true)
-            fail "it was supposed to fail the save because of OptimisticLockingFailureException"
-        } catch (OptimisticLockingFailureException e) {
-            //assert e.message == "Another user has updated the skydive.Jumper while you were editing"
-            assert e.message.contains('optimistic locking failed')
-        }
+        thrown(OptimisticLockingFailureException)
     }
 
 }

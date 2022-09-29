@@ -4,6 +4,7 @@
 */
 package yakworks.rally.orgs.model
 
+
 import gorm.tools.hibernate.criteria.CreateCriteriaSupport
 import gorm.tools.model.NameNum
 import gorm.tools.repository.RepoLookup

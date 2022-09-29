@@ -78,7 +78,7 @@ class ActivityBulkSpec extends Specification implements DataRepoTest, SecurityTe
         Payment p2 = Payment.create(amount: 200, org: org).persist()
 
 
-        File origFile = new File(BuildSupport.gradleRootProjectDir, "examples/resources/test.txt")
+        File origFile = new File(BuildSupport.rootProjectDir, "examples/resources/test.txt")
         byte[] bytes = FileUtils.readFileToByteArray(origFile)
         Path tmpFile = attachmentSupport.createTempFile('test.txt', bytes)
         String tempFileName = tmpFile.fileName

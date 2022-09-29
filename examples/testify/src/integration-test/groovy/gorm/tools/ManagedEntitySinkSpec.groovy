@@ -1,5 +1,6 @@
 package gorm.tools
 
+import org.hibernate.Hibernate
 
 import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
@@ -20,6 +21,9 @@ class ManagedEntitySinkSpec extends Specification implements DataIntegrationTest
 
         then: "load returns a proxy"
         proxy
+        !Hibernate.isInitialized(proxy)
+        proxy.name
+        Hibernate.isInitialized(proxy)
         // proxy.thing
         // proxy.comments
         // proxy.ext

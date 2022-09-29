@@ -10,7 +10,7 @@ include $(SHIPKIT_DIR)/makefiles/ship-gh-pages.make
 # DB = true # set this to true to turn on the DB environment options
 
 ## Run spotlessApply and normal check
-check:
+check: lint
 	# $(gradlew) spotlessApply
 	# $(gradlew) check --max-workers=3
 	$(gradlew) check
@@ -27,17 +27,31 @@ publish:
 		echo "🌮 dry_run ->  $(gradlew) publish"
 	else
 		if [ "$(IS_SNAPSHOT)" ]; then
-			$(logr) "publishing SNAPSHOT"
 			$(gradlew) publishJavaLibraryPublicationToMavenRepository
+			$(logr.done) "- published SNAPSHOT to repo.9ci.com - libraries with version $(VERSION)$(VERSION_SUFFIX)"
 		else
 			${gradlew} rally-domain:verifyNoSnapshots
-			$(logr) "publishing to repo.9ci"
 			$(gradlew) publishJavaLibraryPublicationToMavenRepository
-			$(logr) "publishing to Sonatype Maven Central"
+			$(logr.done) "- published to repo.9ci.com - libraries with version $(VERSION)"
+
+			$(logr) "Starting publishing to Sonatype Maven Central"
 			$(gradlew) publishToSonatype closeAndReleaseSonatypeStagingRepository
+			$(logr.done) "- published to Maven Central - libraries with version $(VERSION)"
 		fi
-		$(logr.done) "published"
 	fi
+
+## publish snapsot to repo.9ci
+publish.snapshot:
+	if [ "$(IS_SNAPSHOT)" ]; then
+		$(gradlew) publishJavaLibraryPublicationToMavenRepository
+		$(logr.done) "- libs with version $(VERSION)$(VERSION_SUFFIX) published to snapshot repo"
+	fi
+
+## Build snapshot and publishes to your local maven.
+snapshot:
+	# snapshot task comes from the yakworks shipkit plugin.
+	$(gradlew) snapshot
+	$(logr.done) "- libs with version $(VERSION)$(VERSION_SUFFIX) published to local ~/.m2 maven"
 
 
 ifdef PUBLISHABLE_BRANCH_OR_DRY_RUN

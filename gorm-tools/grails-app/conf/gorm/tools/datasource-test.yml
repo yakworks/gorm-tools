@@ -1,9 +1,9 @@
 hibernate:
   format_sql: false
   show_sql: false
-  schema_management_tool: 'gorm.tools.hibernate.schema.CustomSchemaManagementTool'
+  schema_management_tool: 'yakworks.hibernate.schema.SimpleSchemaManagementTool'
   naming_strategy: 'org.hibernate.cfg.DefaultNamingStrategy'
-  dialect: 'gorm.tools.hibernate.ExtendedH2Dialect'
+  dialect: 'yakworks.hibernate.h2.ExtendedH2Dialect'
   cache:
     queries: false
     use_second_level_cache: false

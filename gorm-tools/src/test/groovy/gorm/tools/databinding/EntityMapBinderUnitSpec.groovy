@@ -6,6 +6,7 @@ package gorm.tools.databinding
 
 import groovy.transform.CompileStatic
 
+import spock.lang.Ignore
 import yakworks.commons.lang.IsoDateUtil
 import gorm.tools.repository.model.RepoEntity
 import yakworks.testing.gorm.unit.DataRepoTest
@@ -90,7 +91,6 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         domain.localDateTime == LocalDateTime.parse(isoDateNoTZ)
     }
 
-
     void "should fallback to conversion helpers"() {
         setup:
         ValueConverter currencyConverter = Mock(ValueConverter)
@@ -108,18 +108,32 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         domain.currency == Currency.getInstance("INR")
     }
 
-    void "should fallback to conversion service if no converversion helpers found"() {
+    void "should fallback to conversion helpers2"() {
         setup:
-        ConversionService conversionService = Mock(ConversionService)
-        binder.conversionService = conversionService
+        // ValueConverter currencyConverter = Mock(ValueConverter)
+        // binder.conversionHelpers.put(Currency, [currencyConverter])
+
         TestDomain domain = new TestDomain()
 
         when:
         binder.bind(domain, [currency: "INR"])
 
         then:
-        1 * conversionService.canConvert(_, _) >> true
-        1 * conversionService.convert("INR", _) >> Currency.getInstance("INR")
+        domain.currency == Currency.getInstance("INR")
+    }
+
+    void "should fallback to conversion service if no converversion helpers found"() {
+        setup:
+        def springConversionService = Mock(org.springframework.core.convert.ConversionService)
+        binder.springConversionService  = springConversionService
+        TestDomain domain = new TestDomain()
+
+        when:
+        binder.bind(domain, [currency: "INR"])
+
+        then:
+        1 * springConversionService.canConvert(_, _) >> true
+        1 * springConversionService.convert("INR", _) >> Currency.getInstance("INR")
 
         domain.currency == Currency.getInstance("INR")
     }

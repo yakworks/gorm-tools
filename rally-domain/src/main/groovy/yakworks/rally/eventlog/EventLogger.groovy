@@ -8,7 +8,6 @@ import java.time.LocalDateTime
 import javax.annotation.PostConstruct
 import javax.inject.Inject
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import groovy.util.logging.Slf4j

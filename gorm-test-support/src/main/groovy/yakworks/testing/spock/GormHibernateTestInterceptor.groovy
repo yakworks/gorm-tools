@@ -4,15 +4,12 @@
 */
 package yakworks.testing.spock
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.spockframework.runtime.extension.AbstractMethodInterceptor
 import org.spockframework.runtime.extension.IMethodInvocation
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute
 
-import yakworks.spring.AppCtx
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 /**

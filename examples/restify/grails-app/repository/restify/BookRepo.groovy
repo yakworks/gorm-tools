@@ -8,9 +8,11 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.GormRepository
 import grails.gorm.transactions.Transactional
 
 @CompileStatic
+@GormRepository
 class BookRepo implements GormRepo<Book> {
 
     @Transactional(rollbackForClassName = "TestTransactionException")

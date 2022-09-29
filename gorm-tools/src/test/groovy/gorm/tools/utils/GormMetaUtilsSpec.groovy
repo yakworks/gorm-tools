@@ -66,4 +66,12 @@ class GormMetaUtilsSpec extends Specification implements GormHibernateTest {
         custTypeMap == [id:1, version:0, name: 'foo']
     }
 
+    void "test getProperties"() {
+        when:
+        Map custTypeMap = GormMetaUtils.getProperties(CustType.get(1))
+
+        then:
+        custTypeMap == [id:1, version:0, name: 'foo']
+    }
+
 }

@@ -32,6 +32,10 @@ dependencies {
   implementation "org.grails:grails-plugin-services"
 }
 
+test {
+  maxParallelForks = 4
+}
+
 bootRun {
   ignoreExitValue true
   jvmArgs(

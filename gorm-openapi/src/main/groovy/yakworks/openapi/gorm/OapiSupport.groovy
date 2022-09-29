@@ -91,7 +91,7 @@ class OapiSupport {
     }
 
     static OapiSupport of(String root){
-        def path = Paths.get(BuildSupport.gradleRootProjectDir?:'', OAPI_SRC)
+        def path = Paths.get(BuildSupport.rootProjectDir ?: '', OAPI_SRC)
         ParseOptions options = new ParseOptions()
         options.resolve = true
         options.resolveFully = true

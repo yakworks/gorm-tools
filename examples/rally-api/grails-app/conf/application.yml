@@ -1,4 +1,7 @@
+#debug: true
+
 ---
+
 grails:
   profile: rest-api
   codegen:
@@ -15,7 +18,7 @@ info:
 spring:
   main:
     banner-mode: "off"
-    lazy-initialization: true
+#    lazy-initialization: true
   groovy:
     template:
       check-template-location: false
@@ -44,17 +47,26 @@ management:
 logging:
   level:
     root: INFO
-    org.springframework: WARN
+#    org.springframework: WARN
     org.hibernate.orm.deprecation: OFF # turns off deprecation notices
-    com.hazelcast: INFO
-    yakworks.security.shiro: DEBUG
+#    com.hazelcast: INFO
+#    yakworks.security.shiro: DEBUG
     # TURN ON for benchmarks
     # org.hibernate: INFO
     # for stats and sql logging
     # org.hibernate.stat: DEBUG
-    # org.hibernate.SQL: DEBUG
+    org.hibernate.SQL: ERROR
     # this one is very noisy but if neede will show the values passed to sql statements
     # org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+---
+
+app:
+  resources:
+    # project.rootProjectDir comes from project.rootProjectDir system prop setup in gradle or defaults to . if not set and running from intellij
+    rootLocation: "${project.rootProjectDir}/examples/resources"
+    tempDir: "./build/rootLocation/tempDir"
+    attachments.location: 'attachments'
 
 ---
 
@@ -98,7 +110,7 @@ grails:
 hibernate:
   generate_statistics: true
   format_sql: false
-  schema_management_tool: 'gorm.tools.hibernate.schema.CustomSchemaManagementTool'
+  schema_management_tool: 'yakworks.hibernate.schema.SimpleSchemaManagementTool'
   naming_strategy: 'org.hibernate.cfg.DefaultNamingStrategy'
   show_sql: false
   cache:
@@ -121,20 +133,9 @@ dataSource:
   username: sa
   password:
   type: com.zaxxer.hikari.HikariDataSource
-
-environments:
-  development:
-    dataSource:
-      dbCreate: create-drop
-      url: jdbc:h2:mem:devDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
-  test:
-    dataSource:
-      dbCreate: create-drop
-      url: jdbc:h2:mem:testDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
-  production:
-    dataSource:
-      dbCreate: create-drop
-      url: jdbc:h2:./prodDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
-      properties:
-        defaultTransactionIsolation: 2 # Connection.TRANSACTION_READ_COMMITTED
-        transactionIsolation: "TRANSACTION_READ_COMMITTED" # Hikari needs this
+  dbCreate: create-drop
+  url: jdbc:h2:mem:devDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+#  url: jdbc:h2:./prodDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+#  properties:
+#    defaultTransactionIsolation: 2 # Connection.TRANSACTION_READ_COMMITTED
+#    transactionIsolation: "TRANSACTION_READ_COMMITTED" # Hikari needs this

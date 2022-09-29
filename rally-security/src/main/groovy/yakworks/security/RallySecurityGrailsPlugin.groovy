@@ -112,6 +112,7 @@ class RallySecurityGrailsPlugin extends Plugin {
             permissionEvaluator = ref('permissionEvaluator')
             roleHierarchy = ref('roleHierarchy')
             trustResolver = ref('authenticationTrustResolver')
+            //the default is the ROLE_, so we set it to nothing here.
             defaultRolePrefix = ''
         }
         // securityContextRepository(org.springframework.security.web.context.NullSecurityContextRepository)

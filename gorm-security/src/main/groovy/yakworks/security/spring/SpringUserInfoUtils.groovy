@@ -23,13 +23,6 @@ import yakworks.security.user.UserInfo
 @Slf4j
 final class SpringUserInfoUtils {
 
-    /**
-     * Used to ensure that all authenticated users have at least one granted authority to work
-     * around Spring Security code that assumes at least one. By granting this non-authority,
-     * the user can't do anything but gets past the somewhat arbitrary restrictions.
-     */
-    public static final String NO_ROLE = 'ROLE_NO_ROLES'
-
     private SpringUserInfoUtils() {
         // static only
     }

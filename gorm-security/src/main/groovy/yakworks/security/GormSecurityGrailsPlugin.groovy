@@ -32,7 +32,7 @@ class GormSecurityGrailsPlugin extends Plugin {
 
     Closure doWithSpring() { { ->
 
-        secService(SpringSecService, AppUser){ bean -> bean.lazyInit = true}
+        secService(SpringSecService)
         userService(AppUserService){ bean -> bean.lazyInit = true}
 
         "${CurrentUserHolder.name}"(CurrentUserHolder) //here just to set the static

@@ -12,7 +12,8 @@ import yakworks.security.audit.AuditStampBeforeValidateListener
 import yakworks.security.audit.AuditStampPersistenceEventListener
 import yakworks.security.audit.AuditStampSupport
 import yakworks.security.audit.DefaultAuditUserResolver
-import yakworks.security.gorm.model.AppUser
+import yakworks.security.user.CurrentUserHolder
+import yakworks.testing.gorm.CurrentTestUser
 import yakworks.testing.gorm.TestingSecService
 
 /**
@@ -28,7 +29,9 @@ trait SecurityTest {
     Closure doWithSecurityBeans() {
         { ->
             passwordEncoder(NoOpPasswordEncoder)
-            secService(TestingSecService, AppUser)
+            currentUserHolder(CurrentUserHolder)
+            currentUser(CurrentTestUser)
+            secService(TestingSecService)
             auditUserResolver(DefaultAuditUserResolver)
             auditStampBeforeValidateListener(AuditStampBeforeValidateListener)
             auditStampPersistenceEventListener(AuditStampPersistenceEventListener)

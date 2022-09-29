@@ -10,8 +10,6 @@ import org.grails.orm.hibernate.HibernateDatastore
 import org.grails.plugin.hibernate.support.HibernatePersistenceContextInterceptor
 import org.hibernate.Session
 import org.hibernate.SessionFactory
-import org.junit.After
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.core.env.PropertyResolver
@@ -20,7 +18,6 @@ import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.TransactionStatus
 
 import gorm.tools.jdbc.DbDialectService
-import grails.config.Config
 import spock.lang.AutoCleanup
 import spock.lang.Shared
 import yakworks.commons.lang.PropertyTools

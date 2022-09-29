@@ -9,15 +9,11 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.mock.web.MockHttpServletResponse
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
-import org.springframework.util.ReflectionUtils
 
 import grails.gorm.transactions.Transactional
 import yakworks.commons.lang.ClassUtils
-import yakworks.security.gorm.AppUserService
 import yakworks.security.gorm.PasswordValidator
 import yakworks.security.gorm.model.AppUser
 

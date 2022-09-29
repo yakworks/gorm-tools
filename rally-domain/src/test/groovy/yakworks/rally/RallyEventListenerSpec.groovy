@@ -16,33 +16,19 @@ class RallyEventListenerSpec extends Specification implements DataRepoTest, Secu
 
     void "test orgid assignment"() {
         setup:
-        Map userProps = [email: "email@9ci.com", username: "test-user-1", save:false]
-        Map args = TestDataJson.buildMap(Maps.clone(userProps), AppUser)
-        args.orgId = 100
-        AppUser loggedInUser = AppUser.create(args)
+        Map userProps = [email: "email@9ci.com", username: "test-user-1",  orgId: 100]
 
-        expect:
-        loggedInUser.id == 1
-        loggedInUser.orgId == 100
+        when: "appUser is created with an orgId"
+        AppUser user = AppUser.create(userProps)
 
-        when: "assign logged in user orgid"
-        args = TestDataJson.buildMap(Maps.clone(userProps), AppUser)
-        AppUser user = AppUser.create(args)
-
-        then:
-        user.id == 2
-        user.orgId != null
-        user.orgId == loggedInUser.orgId
+        then: "it should keep that orgId"
         user.orgId == 100
 
-        when: "logged in orgid is null"
-        loggedInUser.orgId = null
-        loggedInUser.save()
-        user = AppUser.create(TestDataJson.buildMap(Maps.clone(userProps), AppUser))
+        when: "its creates with null orgId"
+        user = AppUser.create([email: "email@9ci.com", username: "test-user-2"])
 
-        then:
-        user.orgId != null
-        user.orgId == 2 //default
+        then: "should get the users"
+        user.orgId == 1 //default
     }
 
 }

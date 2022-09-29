@@ -6,12 +6,9 @@ package yakworks.security.user
 
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.gorm.GormEnhancer
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.core.GenericTypeResolver
 
 import gorm.tools.metamap.services.MetaMapService
-import yakworks.security.gorm.model.AppUser
 
 /**
  * CurrentUser contract to be implemented by prefered security framework.

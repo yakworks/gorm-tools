@@ -18,24 +18,9 @@ import yakworks.security.user.UserInfo
 class CurrentTestUser implements CurrentUser{
 
     Long userId = 1
-
-    /**
-     * Gets the currently logged in user id from principal
-     */
-    @Override
-    Long getUserId() {
-        userId
-    }
-
-    /**
-     * Quick check to see if the current user is logged in.
-     * calls same method on springSecurityService
-     * @return <code>true</code> if the authenticated and not anonymous
-     */
-    @Override
-    UserInfo getUserInfo() {
-        return BasicUserInfo.create(username: "testuser", email: "testuser@testing.com",roles: ["ADMIN"])
-    }
+    UserInfo userInfo = BasicUserInfo.create(
+        username: "testuser", email: "testuser@testing.com", roles: ["ADMIN"], orgId:1
+    )
 
     @Override
     boolean isLoggedIn() {

@@ -18,13 +18,13 @@ import grails.plugin.springsecurity.SecurityFilterPosition
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugins.Plugin
 import grails.util.Environment
-import yakworks.security.gorm.model.AppUser
 import yakworks.security.rest.NineOauthUserDetailsService
 import yakworks.security.rest.RestAuthenticationProvider
 import yakworks.security.rest.RestAuthenticationSuccessHandler
 import yakworks.security.rest.token.GormTokenStorageService
 import yakworks.security.rest.token.HeaderTokenReader
 import yakworks.security.rest.token.PostgresTokenStorageService
+import yakworks.security.shiro.CurrentSpringShiroUser
 import yakworks.security.shiro.GormShiroPermissionResolver
 import yakworks.security.shiro.GormShiroRolePermissionResolver
 import yakworks.security.shiro.ShiroGrailsExceptionResolver
@@ -32,7 +32,9 @@ import yakworks.security.shiro.ShiroLogoutHandler
 import yakworks.security.shiro.ShiroSpringSecurityEventListener
 import yakworks.security.shiro.ShiroSubjectBindingFilter
 import yakworks.security.shiro.SpringSecurityRealm
+import yakworks.security.shiro.SpringShiroSecService
 import yakworks.security.tenant.UserRequest
+
 // import yakworks.security.tenant.UserTenantResolver
 
 @SuppressWarnings(['Indentation', 'Println'])
@@ -124,9 +126,12 @@ class RallySecurityGrailsPlugin extends Plugin {
         SpringSecurityUtils.registerFilter 'shiroSubjectBindingFilter',
             SecurityFilterPosition.ANONYMOUS_FILTER.order + 2
 
-        //override the secService
-        secService(SpringShiroSecService, AppUser){ bean -> bean.lazyInit = true}
+        //override the SecService and CurrentUser for Shiro
+        secService(SpringShiroSecService)
+        currentUser(CurrentSpringShiroUser)
 
+        // pulled what we need from ShiroBeanConfiguration, ShiroConfiguration, ShiroAnnotationProcessorConfiguration
+        //see those for stock
         shiroLifecycleBeanPostProcessor(LifecycleBeanPostProcessor)
 
         shiroAdvisorAutoProxyCreator(DefaultAdvisorAutoProxyCreator) { bean ->
@@ -142,7 +147,7 @@ class RallySecurityGrailsPlugin extends Plugin {
 
         shiroRolePermissionResolver(GormShiroRolePermissionResolver)
 
-        //override to replace so the shiro annotation exceptions can be handled properly
+        // override to replace so the shiro annotation exceptions can be handled properly
         // since they fire outside the normal grails handling
         exceptionHandler(ShiroGrailsExceptionResolver) {
             exceptionMappings = [

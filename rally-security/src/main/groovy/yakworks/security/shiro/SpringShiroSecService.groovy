@@ -2,7 +2,7 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.security
+package yakworks.security.shiro
 
 
 import groovy.transform.CompileDynamic
@@ -36,9 +36,6 @@ class SpringShiroSecService extends SpringSecService {
     @Autowired(required = false)
     WebSecurityManager shiroSecurityManager
 
-    SpringShiroSecService(){
-        super()
-    }
     /**
      * Used in automation to username a bot/system user, also used for tests
      */

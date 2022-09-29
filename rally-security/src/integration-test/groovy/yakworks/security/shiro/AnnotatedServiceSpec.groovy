@@ -1,5 +1,6 @@
 package yakworks.security.shiro
 
+
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRoleUser
@@ -9,7 +10,6 @@ import grails.gorm.transactions.Transactional
 import grails.testing.mixin.integration.Integration
 import org.apache.shiro.authz.UnauthenticatedException
 import org.apache.shiro.authz.UnauthorizedException
-import org.apache.shiro.realm.Realm
 import org.apache.shiro.util.ThreadContext
 import org.apache.shiro.web.mgt.WebSecurityManager
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,8 +23,8 @@ import yakworks.security.user.CurrentUser
 class AnnotatedServiceSpec extends Specification {
 
     WebSecurityManager shiroSecurityManager
-    Realm springSecurityRealm
-    SecService secService
+    // @Autowired  Realm springSecurityRealm
+    @Autowired SecService secService
     @Autowired TestService testService
     @Autowired CurrentUser currentUser
 
@@ -34,6 +34,7 @@ class AnnotatedServiceSpec extends Specification {
 
     void setup() {
         assert shiroSecurityManager
+        assert secService instanceof SpringShiroSecService
         ThreadContext.bind shiroSecurityManager
         logout()
     }

@@ -7,17 +7,16 @@ package yakworks.testing.gorm
 import groovy.transform.CompileStatic
 
 import yakworks.security.SecService
-import yakworks.security.user.BasicUserInfo
-import yakworks.security.user.UserInfo
+import yakworks.security.gorm.model.AppUser
 
 /**
  * Spring implementation of the generic base SecService
  */
 @CompileStatic
-class TestingSecService<D extends UserInfo> implements SecService<D> {
+class TestingSecService implements SecService<AppUser> {
 
-    TestingSecService(Class<D> clazz) {
-        this.entityClass = clazz
+    TestingSecService() {
+        this.entityClass = AppUser
     }
 
     /**

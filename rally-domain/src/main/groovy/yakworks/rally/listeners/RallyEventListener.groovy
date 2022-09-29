@@ -37,8 +37,6 @@ class RallyEventListener {
         if(user.orgId == null) {
             if(currentUser.isLoggedIn() && currentUser.userInfo.orgId != null) {
                 user.orgId = currentUser.userInfo.orgId as Long
-            } else {
-                user.orgId = Company.DEFAULT_COMPANY_ID
             }
         }
     }

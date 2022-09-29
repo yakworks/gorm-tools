@@ -32,16 +32,18 @@ class CurrentSpringUser implements CurrentUser {
     /**
      * Get the currently logged in UserInfo.
      * @see SpringUserInfo
-     * @return the SpringUserInfo UserDetails
+     * @return the SpringUserInfo UserDetails or null if not logged in.
      */
     @Override
     SpringUserInfo getUserInfo(){
-        getAuthentication()?.principal as SpringUserInfo
+        def user = getAuthentication()?.principal
+        if(user) assert user instanceof SpringUserInfo
+        return user as SpringUserInfo
     }
 
     @Override
     Serializable getUserId(){
-        getUserInfo().id
+        getUserInfo()?.id
     }
 
     /**
@@ -90,7 +92,7 @@ class CurrentSpringUser implements CurrentUser {
     }
 
     static Object getPrincipal() {
-        getAuthentication().getPrincipal()
+        getAuthentication()?.getPrincipal()
     }
 
     SecurityExpressionOperations getSecurityOperations(){

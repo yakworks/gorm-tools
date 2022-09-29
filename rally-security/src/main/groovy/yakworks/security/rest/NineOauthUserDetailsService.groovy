@@ -66,7 +66,7 @@ class NineOauthUserDetailsService implements OauthUserDetailsService {
         }
         log.debug "Found user ${user} in the database"
 
-        Collection<GrantedAuthority> authorities = user.roles.collect { new SimpleGrantedAuthority(it.code) }  as Collection<GrantedAuthority>
+        Collection<GrantedAuthority> authorities = user.roles.collect { new SimpleGrantedAuthority(it) }  as Collection<GrantedAuthority>
 
         Collection<GrantedAuthority> allRoles = (authorities + defaultRoles) as Collection<GrantedAuthority>
         return new OauthUser(user.username, "N/A", allRoles, profile) //no password for oauth users

@@ -3,14 +3,17 @@ package yakworks.security.gorm
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.utils.GormMetaUtils
 import org.apache.commons.lang3.RandomStringUtils
+
+import grails.gorm.transactions.Rollback
 import spock.lang.Specification
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRoleUser
+import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.DataRepoTest
 
-class AppUserSpec extends Specification implements DataRepoTest, SecurityTest {
+class AppUserSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [AppUser, SecRole, SecRoleUser]
 
     String genRandomEmail(){
@@ -76,14 +79,16 @@ class AppUserSpec extends Specification implements DataRepoTest, SecurityTest {
 
     }
 
+
     void "simple persist"() {
         when:
-        def con = build(AppUser)
-        con.persist(flush: true)
+        Map data = buildMap([:])
+        AppUser user = AppUser.create(data)
+        user.persist(flush: true)
 
         then:
-        con.editedBy == 1
-        con.editedDate
+        user.editedBy == 1
+        user.editedDate
 
     }
 
@@ -96,6 +101,7 @@ class AppUserSpec extends Specification implements DataRepoTest, SecurityTest {
         then:
         thrown ValidationProblem.Exception
     }
+
 
     def "insert with roles"() {
         setup:
@@ -121,7 +127,9 @@ class AppUserSpec extends Specification implements DataRepoTest, SecurityTest {
         SecRoleUser.count() == 2
         SecRoleUser.findAllByUser(user)*.role.id == [1L, 2L]
         user.getRoles().size() == 2
-
+        user.getRoles()[0] instanceof String
+        user.getSecRoles().size() == 2
+        user.getSecRoles()[0] instanceof SecRole
     }
 
     def "test username"() {
@@ -148,12 +156,12 @@ class AppUserSpec extends Specification implements DataRepoTest, SecurityTest {
         user.displayName == "jimmy"
 
         when:
-        data = [ email: 'jimmy@foo.com']
+        data = [email: 'jimmy2@foo.com']
         AppUser user2 = AppUser.create(data)
         flush()
 
         then:
-        user2.displayName == "jimmy"
+        user2.displayName == "jimmy2"
     }
 
     def "test defaults"() {
@@ -170,12 +178,12 @@ class AppUserSpec extends Specification implements DataRepoTest, SecurityTest {
         user.displayName == 'jimmy'
 
         when: "only email and username"
-        data = [ username: 'sally', email: 'jimmy@foo.com' ]
+        data = [ username: 'sally', email: 'jimmy2@foo.com' ]
         user = AppUser.create(data)
         flush()
 
         then:
-        user.email == 'jimmy@foo.com'
+        user.email == 'jimmy2@foo.com'
         user.name == 'sally'
         //username default to?
         user.username == 'sally'

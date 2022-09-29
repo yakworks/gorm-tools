@@ -18,7 +18,6 @@ import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.TransactionStatus
 
 import gorm.tools.jdbc.DbDialectService
-import grails.config.Config
 import spock.lang.AutoCleanup
 import spock.lang.Shared
 import yakworks.commons.lang.PropertyTools

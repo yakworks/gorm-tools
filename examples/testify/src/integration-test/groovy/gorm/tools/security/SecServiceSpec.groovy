@@ -1,19 +1,21 @@
 package gorm.tools.security
 
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
+import spock.lang.Specification
+import yakworks.security.SecService
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
-import yakworks.testing.gorm.integration.SecuritySpecHelper
+import yakworks.security.user.CurrentUser
 import yakworks.testing.gorm.integration.DataIntegrationTest
-import yakworks.security.SecService
-import grails.testing.mixin.integration.Integration
-import grails.gorm.transactions.Rollback
-import spock.lang.Specification
+import yakworks.testing.gorm.integration.SecuritySpecHelper
 
 @Integration
 @Rollback
 public class SecServiceSpec extends Specification implements SecuritySpecHelper, DataIntegrationTest  {
 
     SecService secService
+    CurrentUser currentUser
 
     def setup() {
         authenticate(AppUser.get(1), SecRole.ADMIN)
@@ -21,7 +23,7 @@ public class SecServiceSpec extends Specification implements SecuritySpecHelper,
 
     def testGetPrincipal() {
         expect:
-        secService.getPrincipal() != null
+        currentUser.getPrincipal() != null
     }
 
     def testGetAuthentication() {
@@ -31,40 +33,7 @@ public class SecServiceSpec extends Specification implements SecuritySpecHelper,
 
     def testGetUserId() {
         expect:
-        1 == secService.userId
+        1 == currentUser.userId
     }
 
-    def testGetUser() {
-        expect:
-        AppUser.get(1) == secService.user
-    }
-
-    def testIsLoggedIn() {
-        expect:
-        secService.isLoggedIn()
-    }
-
-    def testIfAllGranted() {
-        expect: "All roles of current user"
-        secService.ifAllGranted(SecRole.ADMIN)
-    }
-
-    def testIfAnyGranted(){
-        expect:
-        secService.ifAnyGranted(SecRole.ADMIN, "FakeRole")
-    }
-
-    def testIfNotGranted() {
-        expect:
-        secService.ifNotGranted("fakeRole") == true
-    }
-
-    def "test principal roles"() {
-        when:
-        List roles = secService.principalRoles
-
-        then:
-        roles.size() == secService.user.roles.size()
-        roles.containsAll(secService.user.roles.name)
-    }
 }

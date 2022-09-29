@@ -7,26 +7,16 @@ package yakworks.testing.gorm
 import groovy.transform.CompileStatic
 
 import yakworks.security.SecService
-import yakworks.security.gorm.model.SecRole
+import yakworks.security.gorm.model.AppUser
 
 /**
  * Spring implementation of the generic base SecService
  */
 @CompileStatic
-class TestingSecService<D> implements SecService<D> {
+class TestingSecService implements SecService<AppUser> {
 
-    TestingSecService(Class<D> clazz) {
-        this.entityClass = clazz
-    }
-
-    Long userId = 1
-
-    /**
-     * Gets the currently logged in user id from principal
-     */
-    @Override
-    Long getUserId() {
-        userId
+    TestingSecService() {
+        this.entityClass = AppUser
     }
 
     /**
@@ -38,40 +28,8 @@ class TestingSecService<D> implements SecService<D> {
         password
     }
 
-    /**
-     * Quick check to see if the current user is logged in.
-     * calls same method on springSecurityService
-     * @return <code>true</code> if the authenticated and not anonymous
-     */
-    @Override
-    boolean isLoggedIn() {
-        return true
-    }
-
-    /**
-     * Check if current user has any of the specified roles
-     */
-    @Override
-    boolean ifAnyGranted(String... roles) {
-        return true
-    }
-
-    /**
-     * Check if current user has all of the specified roles
-     */
-    @Override
-    boolean ifAllGranted(String... roles) {
-        return true
-    }
-
-
     @Override
     void loginAsSystemUser() {
-
-    }
-
-    @Override
-    void logout() {
 
     }
 
@@ -79,16 +37,5 @@ class TestingSecService<D> implements SecService<D> {
     void reauthenticate(String username, String password = null) {
 
     }
-    /**
-     * Get the current user's roles.
-     * @return a list of roles (empty if not authenticated).
-     */
-    List<String> getPrincipalRoles() {
-        if (!isLoggedIn()) return []
-        def roles = user['roles'] as Set<SecRole>
-        return roles*.name
-    }
-
-
 
 }

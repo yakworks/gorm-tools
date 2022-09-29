@@ -1,24 +1,24 @@
 package yakworks.security
 
-import yakworks.security.gorm.model.AppUser
-import yakworks.security.gorm.model.SecRole
-import yakworks.security.gorm.model.SecRoleUser
+import org.springframework.security.crypto.password.PasswordEncoder
+
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import org.springframework.security.crypto.password.PasswordEncoder
 import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
+import yakworks.security.gorm.model.AppUser
+import yakworks.security.gorm.model.SecRole
+import yakworks.security.gorm.model.SecRoleUser
+import yakworks.testing.gorm.integration.DomainIntTest
 
 @Integration
 @Rollback
 class RallyUserServiceSpec extends Specification implements DomainIntTest {
     RallyUserService rallyUserService
     //UserRepo userRepo
-    SecService secService
     PasswordEncoder passwordEncoder
 
     static String CONTACT_PASSWORD = "password"

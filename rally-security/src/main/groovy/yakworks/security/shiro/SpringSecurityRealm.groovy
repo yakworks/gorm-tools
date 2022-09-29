@@ -85,6 +85,6 @@ class SpringSecurityRealm extends AuthorizingRealm {
         }
 
         UserDetails user = getCurrentUser(username, SecurityContextHolder.context.authentication)
-        new SimpleAuthenticationInfo(username, user.password.toCharArray(), name)
+        new SimpleAuthenticationInfo(username, user.password.toCharArray(), getName())
     }
 }

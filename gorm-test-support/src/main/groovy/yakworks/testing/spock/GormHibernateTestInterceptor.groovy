@@ -28,7 +28,7 @@ class GormHibernateTestInterceptor extends AbstractMethodInterceptor {
 
     @Override
     void interceptSetupMethod(IMethodInvocation invocation) throws Throwable {
-        // autowire(invocation.instance)
+        // autowire(invocation.sharedInstance)
         def testInstance =  invocation.sharedInstance as GormHibernateTest
         testInstance.transactionStatus = testInstance.getTransactionManager().getTransaction(new DefaultTransactionAttribute())
         invocation.proceed()
@@ -51,10 +51,11 @@ class GormHibernateTestInterceptor extends AbstractMethodInterceptor {
     //     invocation.proceed()
     // }
 
-    // @CompileDynamic
-    // void autowire(testInstance) {
-    //     AutowireCapableBeanFactory beanFactory = testInstance.applicationContext.autowireCapableBeanFactory
-    //     beanFactory.autowireBean testInstance
-    // }
-
+    @CompileDynamic
+    void autowire(Object testInstance) {
+        AutowireCapableBeanFactory beanFactory = testInstance.applicationContext.autowireCapableBeanFactory
+        beanFactory.autowireBean testInstance
+        // AutowireCapableBeanFactory beanFactory = testInstance.applicationContext.autowireCapableBeanFactory
+        // beanFactory.autowireBeanProperties testInstance, AutowireCapableBeanFactory.AUTOWIRE_NO, false
+    }
 }

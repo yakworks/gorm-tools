@@ -13,8 +13,9 @@ import org.pac4j.core.profile.CommonProfile
 import org.springframework.security.core.userdetails.UserDetailsChecker
 import org.springframework.security.core.userdetails.UserDetailsService
 import spock.lang.Specification
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class NineOauthUserDetailsServiceSpec extends Specification implements DataRepoTest{
+class NineOauthUserDetailsServiceSpec extends Specification implements GormHibernateTest {
     static entityClasses = [AppUser, SecRole, SecRoleUser]
 
     @Autowired NineOauthUserDetailsService nineOauthUserDetailsService

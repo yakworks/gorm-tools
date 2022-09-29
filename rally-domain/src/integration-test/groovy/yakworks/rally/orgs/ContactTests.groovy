@@ -1,8 +1,11 @@
 package yakworks.rally.orgs
 
+import org.springframework.beans.factory.annotation.Autowired
+
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+import yakworks.security.user.CurrentUser
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemCodes
@@ -46,7 +49,7 @@ class ContactTests extends Specification implements DomainIntTest {
     def testDeleteFailure_ForLoggedInUserContact(){
 
         expect:
-        secService.userId == 1
+        currentUser.userId == 1
 
         when:
         Contact contact = Contact.get(1)

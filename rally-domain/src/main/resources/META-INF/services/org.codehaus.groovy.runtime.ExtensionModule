@@ -1,0 +1,4 @@
+moduleName = rally-domain-extensions
+moduleVersion = ${moduleVersion}
+extensionClasses = yakworks.rally.extensions.CurrentUserExt
+# staticExtensionClasses = yakworks.commons.extensions.MathStaticExtensions

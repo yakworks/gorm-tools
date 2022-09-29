@@ -90,3 +90,11 @@ tasks.register("verifyNoSnapshots") {
     }
   }
 }
+
+processResources {
+  filesMatching('**/org.codehaus.groovy.runtime.ExtensionModule') {
+    expand([
+      moduleVersion: version
+    ])
+  }
+}

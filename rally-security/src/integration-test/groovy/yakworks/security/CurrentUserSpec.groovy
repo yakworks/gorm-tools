@@ -94,11 +94,11 @@ class CurrentUserSpec extends Specification implements DomainIntTest {
         currentUser.hasAnyRole(SecRole.ADMIN, "FakeRole")
     }
 
-    def "test user roles"() {
-        expect:
-        roles.size() == currentUser.userInfo.roles.size()
-        roles.containsAll(currentUser.userInfo.roles)
-    }
+    // def "test user roles"() {
+    //     expect:
+    //     roles.size() == currentUser.userInfo.roles.size()
+    //     roles.containsAll(currentUser.userInfo.roles)
+    // }
 
     @Transactional
     void setupPerms(){

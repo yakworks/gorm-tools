@@ -13,9 +13,12 @@ import org.springframework.security.access.expression.SecurityExpressionOperatio
 import org.springframework.security.authentication.AuthenticationTrustResolver
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.User
 import org.springframework.security.web.FilterInvocation
 
+import yakworks.security.user.BasicUserInfo
 import yakworks.security.user.CurrentUser
+import yakworks.security.user.UserInfo
 
 /**
  * Spring implementation of the generic base SecService
@@ -35,15 +38,24 @@ class CurrentSpringUser implements CurrentUser {
      * @return the SpringUserInfo UserDetails or null if not logged in.
      */
     @Override
-    SpringUserInfo getUserInfo(){
+    UserInfo getUserInfo(){
         def user = getAuthentication()?.principal
-        if(user) assert user instanceof SpringUserInfo
-        return user as SpringUserInfo
+        if(user && !(user instanceof SpringUserInfo)) {
+            if(user instanceof User && ((User)user).username.contains('anonymous')){
+                return BasicUserInfo.of("anonymous", ['ANONYMOUS']).id(-1L)
+            }
+            // else {
+            //     //should never get here unless we have something misconfigured
+            // }
+
+        } else {
+            return user as UserInfo
+        }
     }
 
     @Override
     Serializable getUserId(){
-        getUserInfo()?.id
+        getUserInfo()?.id ?: 0
     }
 
     /**

@@ -35,7 +35,7 @@ class UserOrgService {
      */
     Org getUserOrg(UserInfo userInfo){
         assert userInfo
-        Validate.notNull(userInfo.orgId, "User.orgId is null for user ${userInfo.id}:${userInfo.username}")
+        Validate.notNull(userInfo.orgId, "User.orgId is null for user:[id:${userInfo.id}, username: ${userInfo.username}]")
         return Org.get(userInfo.orgId)
     }
 }

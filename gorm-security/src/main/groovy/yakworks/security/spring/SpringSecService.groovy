@@ -49,13 +49,13 @@ class SpringSecService implements SecService<AppUser> {
      * @see SpringUserInfo
      * @return the principal (which as we have setup is the SpringUserInfo
      */
-    def getPrincipal() {
-        getAuthentication()?.principal
-    }
-
-    UserInfo getUserInfo(){
-        getPrincipal() as UserInfo
-    }
+    // def getPrincipal() {
+    //     getAuthentication()?.principal
+    // }
+    //
+    // UserInfo getUserInfo(){
+    //     getPrincipal() as UserInfo
+    // }
 
     /**
      * Get the currently logged in user's <code>Authentication</code>. If not authenticated

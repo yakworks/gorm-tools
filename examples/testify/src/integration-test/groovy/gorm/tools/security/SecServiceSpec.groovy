@@ -6,6 +6,7 @@ import spock.lang.Specification
 import yakworks.security.SecService
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
+import yakworks.security.user.CurrentUser
 import yakworks.testing.gorm.integration.DataIntegrationTest
 import yakworks.testing.gorm.integration.SecuritySpecHelper
 
@@ -14,6 +15,7 @@ import yakworks.testing.gorm.integration.SecuritySpecHelper
 public class SecServiceSpec extends Specification implements SecuritySpecHelper, DataIntegrationTest  {
 
     SecService secService
+    CurrentUser currentUser
 
     def setup() {
         authenticate(AppUser.get(1), SecRole.ADMIN)
@@ -21,7 +23,7 @@ public class SecServiceSpec extends Specification implements SecuritySpecHelper,
 
     def testGetPrincipal() {
         expect:
-        secService.getPrincipal() != null
+        currentUser.getPrincipal() != null
     }
 
     def testGetAuthentication() {
@@ -31,12 +33,7 @@ public class SecServiceSpec extends Specification implements SecuritySpecHelper,
 
     def testGetUserId() {
         expect:
-        1 == secService.currentUser.userId
-    }
-
-    def testIfNotGranted() {
-        expect:
-        secService.ifNotGranted("fakeRole") == true
+        1 == currentUser.userId
     }
 
 }

@@ -22,9 +22,10 @@ import org.springframework.security.web.WebAttributes
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
 import yakworks.security.SecService
-import yakworks.security.UserInfo
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
+import yakworks.security.user.BasicUserInfo
+import yakworks.security.user.UserInfo
 
 /**
  * Spring implementation of the generic base SecService
@@ -51,7 +52,11 @@ class SpringSecService<D extends UserInfo> implements SecService<D> {
      * @return the principal (which as we have setup is the SpringUserInfo
      */
     def getPrincipal() {
-        springSecurityService.getPrincipal()
+        getAuthentication()?.principal
+    }
+
+    UserInfo getUserInfo(){
+        getPrincipal() as UserInfo
     }
 
     /**
@@ -64,7 +69,7 @@ class SpringSecService<D extends UserInfo> implements SecService<D> {
      * @return the authentication
      */
     Authentication getAuthentication() {
-        springSecurityService.getAuthentication()
+        SecurityContextHolder.context?.authentication
     }
 
     /**
@@ -109,7 +114,7 @@ class SpringSecService<D extends UserInfo> implements SecService<D> {
         AppUser user = AppUser.get(1)
         assert user
         List<GrantedAuthority> authorities = parseAuthoritiesString([SecRole.ADMIN] as String[])
-        SpringUserInfo secUser = new SpringUserInfo(user, user.passwordHash)
+        SpringUserInfo secUser = SpringUserInfo.of(user)
         SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(secUser, user.passwordHash, secUser.authorities)
     }
 
@@ -208,8 +213,9 @@ class SpringSecService<D extends UserInfo> implements SecService<D> {
     }
 
     @CompileDynamic
-    static SpringUserInfo mockUser(String username, String pwd, List auths, Long id, Long orgId){
-        new SpringUserInfo(username, pwd, auths, id, orgId)
+    static SpringUserInfo mockUser(String username, String pwd, List roles, Long id, Long orgId){
+        def u = new BasicUserInfo(username: username, passwordHash: pwd, roles: roles, id: id, orgId: orgId)
+        SpringUserInfo.of(u)
     }
 
 }

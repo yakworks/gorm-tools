@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service
 import yakworks.commons.lang.Validate
 import yakworks.rally.orgs.model.Org
 import yakworks.security.SecService
-import yakworks.security.UserInfo
+import yakworks.security.user.UserInfo
 
 @Service @Lazy
 @Slf4j

@@ -7,8 +7,8 @@ package yakworks.testing.gorm
 import groovy.transform.CompileStatic
 
 import yakworks.security.SecService
-import yakworks.security.UserInfo
-import yakworks.security.gorm.model.SecRole
+import yakworks.security.user.BasicUserInfo
+import yakworks.security.user.UserInfo
 
 /**
  * Spring implementation of the generic base SecService
@@ -44,6 +44,11 @@ class TestingSecService<D extends UserInfo> implements SecService<D> {
      * calls same method on springSecurityService
      * @return <code>true</code> if the authenticated and not anonymous
      */
+    @Override
+    UserInfo getUserInfo() {
+        return BasicUserInfo.create(username: "testuser", email: "testuser@testing.com",roles: ["ADMIN"])
+    }
+
     @Override
     boolean isLoggedIn() {
         return true

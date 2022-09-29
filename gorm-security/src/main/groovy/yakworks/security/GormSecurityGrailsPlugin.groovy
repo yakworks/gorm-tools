@@ -21,6 +21,7 @@ import yakworks.security.spring.AsyncSecureService
 import yakworks.security.spring.SpringSecService
 import yakworks.security.spring.listeners.SecLoginHandler
 import yakworks.security.spring.listeners.SecLogoutHandler
+import yakworks.security.user.CurrentUser
 
 @SuppressWarnings(['Indentation'])
 class GormSecurityGrailsPlugin extends Plugin {
@@ -29,8 +30,11 @@ class GormSecurityGrailsPlugin extends Plugin {
     def pluginExcludes = ["**/init/**"]
 
     Closure doWithSpring() { { ->
+
         secService(SpringSecService, AppUser){ bean -> bean.lazyInit = true}
         userService(AppUserService){ bean -> bean.lazyInit = true}
+
+        currentUser(CurrentUser){ bean -> bean.lazyInit = true}
 
         def securityConf = SpringSecurityUtils.securityConfig
         if (securityConf.active) {

@@ -6,7 +6,7 @@ package yakworks.security.audit
 
 import groovy.transform.CompileStatic
 
-import yakworks.security.UserInfo
+import yakworks.security.user.UserInfo
 
 /**
  * Interface for service that audit-stamp uses to get what it needs

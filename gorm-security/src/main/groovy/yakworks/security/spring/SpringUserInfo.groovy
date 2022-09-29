@@ -4,15 +4,17 @@
 */
 package yakworks.security.spring
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
-import groovy.transform.MapConstructor
+import groovy.transform.InheritConstructors
 
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.User
 
-import yakworks.security.UserInfo
+import yakworks.security.user.BasicUserInfo
+import yakworks.security.user.UserInfo
 
-import static yakworks.security.spring.SpringUserInfoUtils.rolesToAuthorities
+import static yakworks.security.spring.SpringUserInfoUtils.*
 
 /**
  * Grails security has a GrailsUser that it uses by default, this replaces it to remove confusion.
@@ -25,25 +27,26 @@ import static yakworks.security.spring.SpringUserInfoUtils.rolesToAuthorities
  * @see org.springframework.security.core.userdetails.User
  */
 @SuppressWarnings(['ParameterCount'])
+@InheritConstructors
 @CompileStatic
-class SpringUserInfo extends User implements UserInfo {
+class SpringUserInfo extends User implements SpringUserInfoTrait {
     private static final long serialVersionUID = 1
 
     // --- Implements UserInfo ---
     /** The unique id for the user, be default will be the unique generated id from db */
-    protected Serializable id
-    /** the username is implemented in the User object */
-
-    /** the full name, may come from contact or defaults to username if not populated */
-    protected String name
-    /** the display name */
-    protected String displayName
-    /** the users email */
-    protected String email
-    /** the organization ID */
-    protected Serializable orgId
-
-    Map<String, Object> userProfile
+    // protected Serializable id
+    // /** the username is implemented in the User object */
+    //
+    // /** the full name, may come from contact or defaults to username if not populated */
+    // protected String name
+    // /** the display name */
+    // protected String displayName
+    // /** the users email */
+    // protected String email
+    // /** the organization ID */
+    // protected Serializable orgId
+    //
+    // Map<String, Object> userProfile
 
     /**
      * SpringUserInfo constructor
@@ -54,81 +57,90 @@ class SpringUserInfo extends User implements UserInfo {
      * @param credentialsNonExpired set to <code>true</code> if the credentials have not expired
      * @param accountNonLocked set to <code>true</code> if the account is not locked
      */
-    SpringUserInfo(UserInfo sourceUser,
-                    String passwordHash,
-                   boolean accountNonExpired,
-                   boolean credentialsNonExpired,
-                   boolean accountNonLocked,
-                   Collection<? extends GrantedAuthority> authorities = null ) {
+    // SpringUserInfo(String username,
+    //                String passwordHash,
+    //                boolean enabled,
+    //                boolean accountNonExpired,
+    //                boolean credentialsNonExpired,
+    //                boolean accountNonLocked,
+    //                Collection<? extends GrantedAuthority> authorities = null ) {
+    //
+    //     super( username,
+    //         passwordHash,
+    //         enabled,
+    //         accountNonExpired,
+    //         credentialsNonExpired,
+    //         accountNonLocked,
+    //         authorities)
+    // }
 
-        super(sourceUser.username,
-            passwordHash,
-            sourceUser.enabled,
-            accountNonExpired,
-            credentialsNonExpired,
-            accountNonLocked,
-            authorities != null ? authorities : rolesToAuthorities(sourceUser.roles))
+    // void copyUserInfo(UserInfo sourceUser){
+    //     this.id = sourceUser.id
+    //     this.name = sourceUser.name
+    //     this.displayName = sourceUser.displayName
+    //     this.email = sourceUser.email
+    //     this.orgId = sourceUser.orgId
+    // }
 
-        copyUserInfo(sourceUser)
-    }
-
-    SpringUserInfo(UserInfo sourceUser, String password, Collection<? extends GrantedAuthority> authorities = null) {
-        super(sourceUser.username, password, authorities != null ? authorities : rolesToAuthorities(sourceUser.roles))
-        copyUserInfo(sourceUser)
-    }
-
-    SpringUserInfo(UserInfo sourceUser) {
-        super(sourceUser.username, sourceUser.passwordHash, rolesToAuthorities(sourceUser.roles))
-        copyUserInfo(sourceUser)
-    }
-
-    /** minumum for mocking our a user */
-    SpringUserInfo(String username, String password, Collection<? extends GrantedAuthority> authorities,
-                    Serializable id, Serializable orgId) {
-        super(username, password, authorities)
-
-    }
-
-    void copyUserInfo(UserInfo sourceUser){
-        this.id = sourceUser.id
-        this.name = sourceUser.name
-        this.displayName = sourceUser.displayName
-        this.email = sourceUser.email
-        this.orgId = sourceUser.orgId
-    }
-
-    @Override //UserInfo
-    Serializable getId() {
-        return this.id
-    }
-
+    // @Override //UserInfo
+    // Serializable getId() {
+    //     return this.id
+    // }
+    //
     @Override
     String getPasswordHash() {
         return this.password
     }
+    //
+    // @Override //UserInfo
+    // String getName() {
+    //     return this.name
+    // }
+    //
+    // @Override //UserInfo
+    // String getDisplayName() {
+    //     //can't call UserInfo.super until groovy 4.
+    //     return this.displayName //?: UserInfo.super.getDisplayName()
+    // }
 
-    @Override //UserInfo
-    String getName() {
-        return this.name
-    }
-
-    @Override //UserInfo
-    String getDisplayName() {
-        return this.displayName
-    }
-
-    @Override //UserInfo
-    String getEmail() {
-        return this.email
-    }
-
-    @Override //UserInfo
-    Serializable getOrgId() {
-        return this.orgId
-    }
+    // @Override //UserInfo
+    // String getEmail() {
+    //     return this.email
+    // }
+    //
+    // @Override //UserInfo
+    // Serializable getOrgId() {
+    //     return this.orgId
+    // }
 
     @Override //UserInfo
     Set<String> getRoles() {
         SpringUserInfoUtils.authoritiesToRoles(this.authorities);
+    }
+
+    static SpringUserInfo of(UserInfo userInfo){
+        def roles = (userInfo.roles ?: []) as List<String>
+        return SpringUserInfo.of(userInfo, roles)
+    }
+
+    static SpringUserInfo of(UserInfo userInfo, Collection<String> roles){
+        List<GrantedAuthority> authorities = rolesToAuthorities(roles)
+        // password is required so make sure its filled even if its OAuth or ldap
+        String passwordHash = userInfo.passwordHash ?: "N/A"
+        def spu = new SpringUserInfo(userInfo.username, passwordHash, userInfo.enabled, true, true, true, authorities)
+        merge(spu, userInfo)
+        return spu
+    }
+
+    static SpringUserInfo create(Map props){
+        def userInfo = BasicUserInfo.create(props)
+        return SpringUserInfo.of(userInfo)
+    }
+
+    @CompileDynamic
+    static void merge(UserInfo target, UserInfo sourceUser){
+        ['id', 'name', 'displayName', 'email', 'orgId'].each{
+            target[it] = sourceUser[it]
+        }
     }
 }

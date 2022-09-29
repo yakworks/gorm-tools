@@ -89,7 +89,6 @@ class AppUserService {
      */
     //FIXME make sure we have good integration tests for this
     boolean isPasswordExpired(AppUser user = null) {
-        if(!user) user = (AppUser)secService.getUser()
         //can always force a password change by setting passwordExpired field to true
         if(user.passwordExpired) return true
         if (passwordExpiryEnabled) {

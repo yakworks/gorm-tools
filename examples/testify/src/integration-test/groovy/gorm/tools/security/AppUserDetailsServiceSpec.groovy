@@ -4,6 +4,7 @@ import yakworks.security.gorm.AppUserService
 
 import java.time.LocalDateTime
 
+import yakworks.security.gorm.PasswordValidator
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.spring.AppUserDetailsService
 import yakworks.security.spring.SpringUserInfo
@@ -17,6 +18,7 @@ import spock.lang.Specification
 class AppUserDetailsServiceSpec extends Specification implements DataIntegrationTest {
     AppUserDetailsService userDetailsService
     AppUserService appUserService
+    PasswordValidator passwordValidator
 
     void testLoadUserByUsername() {
         when:
@@ -26,6 +28,7 @@ class AppUserDetailsServiceSpec extends Specification implements DataIntegration
 
         then:
         gUser != null
+        gUser.getDisplayName()
 
         when:
         AppUser user = AppUser.get(gUser.id)
@@ -54,21 +57,21 @@ class AppUserDetailsServiceSpec extends Specification implements DataIntegration
     void "test expired password"() {
         given:
         AppUser user = AppUser.first()
-        appUserService.passwordExpiryEnabled = true
-        appUserService.passwordExpireDays = 10
+        passwordValidator.passwordExpiryEnabled = true
+        passwordValidator.passwordExpireDays = 10
         user.passwordExpired = true
         user.passwordChangedDate = LocalDateTime.now().minusDays(11)
         user.persist()
 
         when:
-        SpringUserInfo nineUser = userDetailsService.loadUserByUsername(user.username, false)
+        SpringUserInfo nineUser = userDetailsService.loadUserByUsername(user.username)
 
         then:
         nineUser.credentialsNonExpired == false
 
         cleanup:
-        appUserService.passwordExpiryEnabled = false
-        appUserService.passwordExpireDays = 30
+        passwordValidator.passwordExpiryEnabled = false
+        passwordValidator.passwordExpireDays = 30
     }
 
 }

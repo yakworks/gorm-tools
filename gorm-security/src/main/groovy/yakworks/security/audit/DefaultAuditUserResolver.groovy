@@ -9,7 +9,7 @@ import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 
 import yakworks.security.SecService
-import yakworks.security.UserInfo
+import yakworks.security.user.UserInfo
 
 /**
  * Default implementation for AuditUserResolver

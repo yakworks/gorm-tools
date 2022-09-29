@@ -38,7 +38,7 @@ class GormUtils {
      * @param ignoreAssociations - should associations be copied ? - ignored by default
      */
     static <T> T copyDomain(Class<T> domainClass, Object source, Map override = [:], boolean ignoreAssociations = true) {
-        T copy = domainClass.newInstance()
+        T copy = domainClass.getDeclaredConstructor().newInstance()
         return copyDomain(copy, source, override, ignoreAssociations) as T
     }
 

@@ -4,12 +4,15 @@
 */
 package yakworks.security.spring
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.AuthorityUtils
-import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.userdetails.User
+
+import yakworks.security.user.UserInfo
 
 /**
  * Helper methods.
@@ -31,24 +34,33 @@ final class SpringUserInfoUtils {
         // static only
     }
 
-    /**
-     * Extract the role names from authorities.
-     * @param authorities the authorities (a collection or array of {@link GrantedAuthority}).
-     * @return the names
-     */
-    static Set<String> authoritiesToRoles(Collection authorities) {
-        AuthorityUtils.authorityListToSet(authorities)
-        // def roles = authorities.collect { grantedAuthority ->
-        //     ((GrantedAuthority)grantedAuthority).authority
-        // }
-        // return roles as Set<String>
+    @CompileDynamic
+    static void copyUserInfo(User target, UserInfo sourceUser){
+        target.@username = sourceUser.username
+
     }
 
-    static List<? extends GrantedAuthority> rolesToAuthorities(Set roleNames) {
-        AuthorityUtils.createAuthorityList(roleNames as String[])
-        // def authorities = roleNames.collect { role ->
-        //     new SimpleGrantedAuthority(role as String)
-        // }
-        // return authorities
+    @CompileDynamic
+    static void copyUserInfo(UserInfo target, UserInfo sourceUser){
+        ['id', 'name', 'displayName', 'email', 'orgId'].each{
+            target[it] = sourceUser[it]
+        }
+    }
+
+    static Set<String> authoritiesToRoles(Collection authorities) {
+        AuthorityUtils.authorityListToSet(authorities)
+    }
+
+    /**
+     * Helper for constructor
+     * If authorities=null then build from UserInfo, otherwise return whats passed in
+     */
+    static List<GrantedAuthority> rolesToAuthorities(Collection roleNames, Collection authorities = null) {
+        if(authorities == null ){
+            return AuthorityUtils.createAuthorityList(roleNames as String[])
+        } else {
+            return authorities as List<GrantedAuthority>
+        }
+
     }
 }

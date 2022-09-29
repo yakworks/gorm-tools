@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service
 import gorm.tools.model.SourceType
 import gorm.tools.problem.ProblemHandler
 import grails.gorm.transactions.Transactional
+import jakarta.annotation.Nullable
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.Task
 import yakworks.rally.activity.model.TaskStatus
@@ -35,19 +36,16 @@ import yakworks.security.SecService
 @CompileStatic
 class ActivityBulk {
 
-    @Autowired(required = false)
+    @Autowired @Nullable
     ActivityRepo activityRepo
 
-    @Autowired(required = false)
+    @Autowired @Nullable
     ActivityLinkRepo activityLinkRepo
 
-    @Autowired(required = false)
+    @Autowired @Nullable
     AttachmentRepo attachmentRepo
 
-    @Autowired(required = false)
-    SecService secService
-
-    @Autowired(required = false)
+    @Autowired @Nullable
     ProblemHandler problemHandler
 
     /**

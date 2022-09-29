@@ -10,6 +10,7 @@ import org.grails.datastore.gorm.GormEnhancer
 import org.springframework.core.GenericTypeResolver
 
 import yakworks.security.gorm.model.AppUser
+import yakworks.security.user.UserInfo
 
 /**
  * common generic helpers for security, implement with generics D for the domain entity and I for the id type
@@ -29,6 +30,11 @@ trait SecService<D extends UserInfo> {
         if (!entityClass) this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), SecService)
         return entityClass
     }
+
+    /**
+     * gets the current user info
+     */
+    abstract UserInfo getUserInfo()
 
     /**
      * is a user logged in

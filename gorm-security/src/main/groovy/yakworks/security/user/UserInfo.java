@@ -2,16 +2,15 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.security;
+package yakworks.security.user;
 
 
 import gorm.tools.model.NameCode;
 import gorm.tools.model.NamedEntity;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.security.Principal;
+import java.util.*;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
@@ -20,7 +19,7 @@ import org.springframework.security.core.GrantedAuthority;
  * Both the AppUser domain and the SpringUserInfo implement this.
  * @see org.springframework.security.core.userdetails.UserDetails
  */
-public interface UserInfo extends Serializable {
+public interface UserInfo extends Principal, Serializable {
 
     /** The unique id for the user, be default will be the unique generated id from db */
     Serializable getId();
@@ -59,4 +58,5 @@ public interface UserInfo extends Serializable {
     Map getUserProfile();
 
     Set getRoles();
+
 }

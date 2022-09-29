@@ -9,7 +9,7 @@ import javax.persistence.Transient
 
 import groovy.transform.CompileStatic
 
-import yakworks.security.UserInfo
+import yakworks.security.user.UserInfo
 
 /**
  * flags a domain entity as stampable for events

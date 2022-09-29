@@ -14,8 +14,8 @@ import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-import yakworks.security.UserInfo
 import yakworks.security.audit.AuditStampTrait
+import yakworks.security.user.UserInfo
 
 @Entity
 @GrailsCompileStatic

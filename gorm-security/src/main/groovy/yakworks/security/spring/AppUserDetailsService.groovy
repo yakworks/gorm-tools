@@ -4,35 +4,38 @@
 */
 package yakworks.security.spring
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
+import org.springframework.util.ReflectionUtils
 
 import grails.gorm.transactions.Transactional
-import grails.plugin.springsecurity.userdetails.GrailsUserDetailsService
+import yakworks.commons.lang.ClassUtils
 import yakworks.security.gorm.AppUserService
+import yakworks.security.gorm.PasswordValidator
 import yakworks.security.gorm.model.AppUser
 
 /**
- * Default Gorm-Tools implementation of GrailsUserDetailsService that uses AppUser to load users and roles
- * We dont use the default GormUserDetailsService from Grails Spring Security because we need more flexibility for oauth and ldap.
+ * Default Gorm-Tools implementation of UserDetailsService that uses AppUser to load users and roles
+ * We dont use the default Gorm or GrailsUserDetailsService from Grails Spring Security because we need more flexibility for oauth and ldap.
  * This uses the AppUserService and creates baseline for the various OAuth and Ldap.
- * @see grails.plugin.springsecurity.userdetails.GormUserDetailsService
+ * @see UserDetailsService
  */
 @Slf4j
 @CompileStatic
-class AppUserDetailsService implements GrailsUserDetailsService {
+class AppUserDetailsService implements UserDetailsService {
 
-    @Autowired
-    AppUserService userService
+    @Autowired PasswordValidator passwordValidator
 
     @Transactional
-    UserDetails loadUserByUsername(String username, boolean loadRoles) throws UsernameNotFoundException {
-        log.debug "loadUserByName(${username}, ${loadRoles})"
+    UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        log.debug "loadUserByName(${username})"
 
         AppUser user = AppUser.getByUsername(username.trim())
         if (!user) {
@@ -40,26 +43,19 @@ class AppUserDetailsService implements GrailsUserDetailsService {
         }
         log.debug "Found user ${user} in the database"
 
-        Boolean mustChange = userService.isPasswordExpired(user)
+        SpringUserInfo springUser = SpringUserInfo.of(user)
+        checkCredentialExpiration(springUser, user)
+        return springUser
+    }
 
-        List<SimpleGrantedAuthority> authorities = null
-
-        if (!loadRoles) {
-            authorities = [] //pass empty list
+    /**
+     * sets the credentialsNonExpired=false (its backwards) if isPasswordExpired=true
+     */
+    @CompileDynamic //so we can set the private
+    void checkCredentialExpiration(SpringUserInfo springUser, AppUser sourceUser){
+        if(passwordValidator.isPasswordExpired(sourceUser)){
+            //its private so set with reflection
+            ClassUtils.setFieldValue(springUser, "credentialsNonExpired", false )
         }
-        // password is required so make sure its filled even if its OAuth or ldap
-        String passwordHash = user.passwordHash ?: "N/A"
-
-        new SpringUserInfo(user, passwordHash,
-            true, !mustChange, true,
-            authorities)
-
     }
-
-    @Override
-    UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        log.debug "loadUserByName(${username})"
-        loadUserByUsername username, true
-    }
-
 }

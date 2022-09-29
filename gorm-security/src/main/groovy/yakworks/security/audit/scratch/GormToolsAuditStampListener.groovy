@@ -51,6 +51,7 @@ class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
 
     @PostConstruct
     void init() {
+        //NOTE AuditStampConfigLoader is not currently loading something.
         if(!fieldProps) fieldProps = FieldProps.buildFieldMap(new AuditStampConfigLoader().load())
         GrailsClass[] domains = grailsApplication.getArtefacts(DomainClassArtefactHandler.TYPE)
         for (GrailsClass domain : domains) {

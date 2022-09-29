@@ -4,6 +4,7 @@
 */
 package yakworks.security.gorm
 
+import java.time.LocalDate
 import javax.inject.Inject
 
 import groovy.transform.CompileStatic
@@ -24,6 +25,15 @@ import yakworks.security.gorm.model.SecPasswordHistory
 class PasswordValidator {
 
     @Inject PasswordEncoder passwordEncoder
+
+    @Value('${yakworks.security.password.expireDays:90}')
+    int passwordExpireDays
+
+    @Value('${yakworks.security.password.expireEnabled:false}')
+    boolean passwordExpiryEnabled
+
+    @Value('${yakworks.security.password.warnDays:30}')
+    int passwordWarnDays
 
     @Value('${yakworks.security.password.minLength:4}')
     Integer passwordMinLength
@@ -94,4 +104,21 @@ class PasswordValidator {
         passwordHistoryList.any { passwordEncoder.matches(it.password, password) }
     }
 
+    /**
+     * checks if password is expired. first checks the passwordExpired field and then if expireEnabled
+     * it adds the expireDays to see if we are under that date
+     * @param user is optional, will look in the security context if not passed in
+     */
+    boolean isPasswordExpired(AppUser user) {
+        //can always force a password change by setting passwordExpired field to true
+        if(user.passwordExpired) return true
+        if (passwordExpiryEnabled) {
+            LocalDate expireDate = user.passwordChangedDate?.plusDays(passwordExpireDays).toLocalDate()
+            //check if user's password has expired
+            if (!expireDate || LocalDate.now() >= expireDate) {
+                return true
+            }
+        }
+        return false
+    }
 }

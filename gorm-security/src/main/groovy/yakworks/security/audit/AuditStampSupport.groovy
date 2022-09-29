@@ -18,8 +18,8 @@ import org.springframework.core.annotation.AnnotationUtils
 
 import gorm.tools.utils.GormMetaUtils
 import yakworks.commons.lang.ClassUtils
-import yakworks.security.UserInfo
 import yakworks.security.audit.ast.FieldProps
+import yakworks.security.user.UserInfo
 
 /**
  * support service for making sure entites are stamped with appropriate fields

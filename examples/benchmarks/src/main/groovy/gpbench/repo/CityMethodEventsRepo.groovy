@@ -6,9 +6,9 @@ import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.RepoListener
-import gpbench.SecUtil
 import gpbench.model.fat.CityMethodEvents
 import grails.persistence.Entity
+import yakworks.security.user.CurrentUserHolder
 
 @GormRepository
 @CompileStatic
@@ -16,7 +16,7 @@ class CityMethodEventsRepo implements GormRepo<CityMethodEvents> {
 
     @RepoListener
     void beforePersist(CityMethodEvents entity, BeforePersistEvent e) {
-        Long uid = SecUtil.userId
+        Long uid = CurrentUserHolder.user.id as Long
         Date dt = new Date()
         entity.createdBy = uid
         entity.editedBy = uid

@@ -6,8 +6,8 @@ import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 
 import gorm.tools.repository.events.BeforeBindEvent
-import gpbench.SecUtil
 import gpbench.model.fat.CitySpringEvents
+import yakworks.security.user.CurrentUserHolder
 
 /**
  * for Spring Event Listener Bean for CitySpringEvents repo events
@@ -21,7 +21,7 @@ class CitySpringAnnotationEventListener {
         assert event.data
         //println "beforeBind on CitySpringEvents"
         CitySpringEvents entity = event.entity
-        Long uid = SecUtil.userId
+        Long uid = CurrentUserHolder.user.id as Long
         Date dt = new Date()
         entity.createdBy = uid
         entity.editedBy = uid

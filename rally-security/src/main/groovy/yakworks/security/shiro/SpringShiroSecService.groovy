@@ -4,11 +4,9 @@
 */
 package yakworks.security.shiro
 
-
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import org.apache.shiro.SecurityUtils
 import org.apache.shiro.web.mgt.WebSecurityManager
 import org.grails.web.util.WebUtils
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,10 +14,7 @@ import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.WebAttributes
 
-import grails.plugin.springsecurity.SpringSecurityUtils
 import yakworks.grails.web.GrailsWebEnvironment
-import yakworks.security.shiro.ShiroUtils
-import yakworks.security.shiro.SpringSecurityRealm
 import yakworks.security.spring.SpringSecService
 import yakworks.security.user.UserInfo
 import yakworks.spring.AppCtx

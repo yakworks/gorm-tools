@@ -6,6 +6,7 @@ package yakworks.security
 
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler
 
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugins.Plugin
@@ -70,6 +71,16 @@ class GormSecurityGrailsPlugin extends Plugin {
             //     key = "Anon_key"
             //     userAttribute = "ANONYMOUS"
             // }
+
+            //replace so we can set the role prefix to be blank and not ROLE_
+            webExpressionHandler(DefaultWebSecurityExpressionHandler) {
+                expressionParser = ref('voterExpressionParser')
+                permissionEvaluator = ref('permissionEvaluator')
+                roleHierarchy = ref('roleHierarchy')
+                trustResolver = ref('authenticationTrustResolver')
+                //the default is the ROLE_, so we set it to nothing here.
+                defaultRolePrefix = ''
+            }
         }
 
         //dont register beans if audit trail is disabled.

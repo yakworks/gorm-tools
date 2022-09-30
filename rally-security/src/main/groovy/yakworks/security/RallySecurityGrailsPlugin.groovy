@@ -11,7 +11,6 @@ import org.apache.shiro.spring.LifecycleBeanPostProcessor
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator
-import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler
 import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler
 
 import grails.plugin.springsecurity.SecurityFilterPosition
@@ -108,15 +107,6 @@ class RallySecurityGrailsPlugin extends Plugin {
         restAuthenticationSuccessHandler(RestAuthenticationSuccessHandler)
         cookieClearingLogoutHandler(CookieClearingLogoutHandler, ['jwt'])
 
-        //replace so we can set the role prefix to be blank and not ROLE_
-        webExpressionHandler(DefaultWebSecurityExpressionHandler) {
-            expressionParser = ref('voterExpressionParser')
-            permissionEvaluator = ref('permissionEvaluator')
-            roleHierarchy = ref('roleHierarchy')
-            trustResolver = ref('authenticationTrustResolver')
-            //the default is the ROLE_, so we set it to nothing here.
-            defaultRolePrefix = ''
-        }
         // securityContextRepository(org.springframework.security.web.context.NullSecurityContextRepository)
     }}
 

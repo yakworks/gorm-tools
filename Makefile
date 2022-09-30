@@ -47,6 +47,9 @@ publish.snapshot:
 		$(logr.done) "- libs with version $(VERSION)$(VERSION_SUFFIX) published to snapshot repo"
 	fi
 
+## alias to publish.snapshot
+snapshot.publish: publish.snapshot
+
 ## Build snapshot and publishes to your local maven.
 snapshot:
 	# snapshot task comes from the yakworks shipkit plugin.

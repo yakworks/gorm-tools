@@ -56,11 +56,9 @@
     "lint": "npm run lint:markdown && npm run lint:js",
     "lint:markdown": "npx markdownlint-cli2 \"./content/**/*.md\"",
     "lint:js": "eslint '**/*.js'",
-    "start": "npm run oapi:bundle && npm run oapi:lint && npm run serve",
+    "start": "npm run oapi:bundle && npm run oapi:lint && npm run build.sass && npm run serve",
     "build.sass": "npx sass --update --style compressed --no-source-map ./eleventy/slate/css:./eleventy/slate/css",
-    "serve": "npm run build.sass && npx eleventy --serve --port=4567",
-    "build": "npm run build:oapi && npm run build.sass && npm run build:eleventy ",
-    "build:oapi": "npm run oapi:bundle && npm run oapi:lint",
+    "serve": "npx eleventy --serve --port=4567",
     "build:eleventy": "eleventy"
   }
 }

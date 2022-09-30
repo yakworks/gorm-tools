@@ -9,6 +9,9 @@ include $(SHIPKIT_DIR)/makefiles/spring-common.make
 include $(SHIPKIT_DIR)/makefiles/ship-gh-pages.make
 # DB = true # set this to true to turn on the DB environment options
 
+# open api targets
+include ./api-docs/Makefile
+
 ## Run spotlessApply and normal check
 check: lint
 	# $(gradlew) spotlessApply
@@ -172,12 +175,6 @@ oapi.docs-push:
 # starts the eleventy server for the api docs, assumes the oapi.generate-api-yaml has been generated already into the dist
 oapi.start:
 	cd api-docs && npm run start
-
-# Runs the test that generates the api.yml from the domains.
-oapi.generate-api-yaml:
-	# HACK, rm test-results to force a run if only editing yaml
-	rm -rf examples/restify/build/test-results
-	${gradlew} restify:integrationTest --tests *OpenapiGeneratorSpec*
 
 # generates api yaml with grails test and runs oapi.start
 oapi.generate-start: oapi.generate-api-yaml oapi.start

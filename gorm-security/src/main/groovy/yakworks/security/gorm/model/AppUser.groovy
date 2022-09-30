@@ -80,7 +80,7 @@ class AppUser implements UserInfo, AuditStampTrait, RepoEntity<AppUser>, Seriali
                    editable: false],
         password:[ d: "The pwd", oapi:'CU', password: true],
         orgId:[ d: "The org to which this user belongs to", bindable: true, editable: false, nullable: true],
-        roles:[ d: 'The string list of roles assigned to this user', validate: false, oapi: [read: true, edit: ['id']]],
+        roles:[ d: 'The string list of roles assigned to this user', validate: false, editable: false ],
         secRoles:[ d: 'The roles assigned to this user', validate: false, oapi: [read: true, edit: ['id']]],
         passwordHash:[ d: "The pwd hash, internal use only, never show this",
                        nullable: true, maxSize: 60, bindable: false, display:false, password: true],
@@ -100,11 +100,10 @@ class AppUser implements UserInfo, AuditStampTrait, RepoEntity<AppUser>, Seriali
     }
 
     @Override //UserInfo
-    @CompileDynamic
     Set<String> getRoles() {
         List res = SecRoleUser.executeQuery('select role.code from SecRoleUser where user.id = :uid',
             [uid: this.id] )
-        return res
+        return res as Set<String>
         // SecRoleUser.findAllByUser(this).collect{ ((SecRole) it.role).code } as Set<String>
         // SecRoleUser.query {
         //     eq "user", this

@@ -112,3 +112,13 @@ oapi.clean:
 
 clean.node_modules:
 	rm -rf $(api_docs_dir)/node_modules
+
+
+# OLD STUFF here
+# pushes the changes to the api-docs branch, the way the docs works is it pulls from repo on docker startup and builds
+#oapi.docs-push:
+#	git -C $(API_DOCS_BUILD_DIR) add -A .
+#	# or true so doesnt blow error if no changes
+#	git -C $(API_DOCS_BUILD_DIR) commit -a -m "CI API docs published [skip ci]" || true
+#	git -C $(API_DOCS_BUILD_DIR) push -q $(GITHUB_URL) $(API_DOCS_BRANCH) || true
+#	$(logr.done)

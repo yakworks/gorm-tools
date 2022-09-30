@@ -14,7 +14,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.logout.LogoutHandler
 
 /**
- * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
+ * Spring Sec LogoutHandler that will call Shiro logout too.
  */
 @CompileStatic
 class ShiroLogoutHandler implements LogoutHandler {

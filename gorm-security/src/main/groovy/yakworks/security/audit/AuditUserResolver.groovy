@@ -14,12 +14,12 @@ import yakworks.security.user.UserInfo
 @CompileStatic
 interface AuditUserResolver {
     /**
-     * @return the current actor
+     * @return the current user id
      */
     Serializable getCurrentUserId()
 
     /**
-     * @return the current request URI or null if no active request
+     * @return the userInfo for an id, used to get the full object.
      */
     UserInfo getUserInfo(Serializable userId)
 }

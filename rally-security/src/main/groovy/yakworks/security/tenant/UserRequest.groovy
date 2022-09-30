@@ -37,7 +37,7 @@ class UserRequest {
     // }
 
     Org getOrg(){
-        if(!org) org = Org.get(currentUser.userInfo.orgId)
+        if(!org) org = Org.get(currentUser.user.orgId)
         return org
     }
 
@@ -61,7 +61,7 @@ class UserRequest {
      * Gets user fields to send to client about their login
      */
     Map getUserMap(List incs) {
-        Map userMap = metaMapService.createMetaMap(currentUser.userInfo, incs).clone() as Map
+        Map userMap = metaMapService.createMetaMap(currentUser.user, incs).clone() as Map
         if (isCustomer()) userMap.put('isCustomer', true)
         return userMap
     }

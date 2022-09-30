@@ -8,7 +8,6 @@ import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEnhancer
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.core.GenericTypeResolver
 
 import yakworks.security.user.CurrentUser
 import yakworks.security.user.UserInfo
@@ -17,28 +16,31 @@ import yakworks.security.user.UserInfo
  * common generic helpers for security, implement with generics D for the domain entity and I for the id type
  */
 @CompileStatic
-trait SecService<D> {
+trait SecService {
 
-    Class<D> entityClass
-
-    Class<D> getEntityClass() {
-        if (!entityClass) this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), SecService)
-        return entityClass
-    }
+    Class<?> entityClass
 
     @Autowired(required = false)
     CurrentUser currentUser
 
     /**
-     * encodes the password
+     * Used in automation to username a bot/system user, also used for tests
+     * Only does it if isLog
      */
-    abstract String encodePassword(String password)
+    abstract UserInfo loginAsSystemUser()
 
     /**
-     * Used in automation to username a bot/system user, also used for tests
+     * programmatic login, skips password check and filter chain and registers the user in the context
+     * @param userInfo the UserInfo object to login with
      */
-    abstract void loginAsSystemUser()
-    abstract void reauthenticate(String username, String password)
+    abstract UserInfo login(String username, String password = null)
+
+    abstract UserInfo authenticate(UserInfo userInfo)
+
+    /**
+     * is a user logged in
+     */
+    abstract boolean isLoggedIn()
 
     /**
      * get the user entity for the id. Default impl is to pull from DB.

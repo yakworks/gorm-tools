@@ -22,6 +22,7 @@ import yakworks.security.gorm.model.SecRolePermission
 import yakworks.security.gorm.model.SecRoleUser
 import yakworks.security.gorm.model.SecUserPermission
 import yakworks.security.spring.SpringSecService
+import yakworks.security.user.BasicUserInfo
 import yakworks.security.user.CurrentUser
 import yakworks.testing.gorm.integration.DomainIntTest
 
@@ -44,7 +45,7 @@ class CurrentUserSpec extends Specification implements DomainIntTest {
     // }
 
     private void login(String username) {
-        secService.reauthenticate(username, 'password')
+        secService.login(username)
     }
 
     private void logout() {
@@ -69,7 +70,7 @@ class CurrentUserSpec extends Specification implements DomainIntTest {
         currentUser.hasRole('ADMIN')
         currentUser.hasRole('MGR')
         !currentUser.hasRole('CUST')
-        currentUser.hasAnyRole('ADMIN', 'CUST')
+        currentUser.hasAnyRole(['ADMIN', 'CUST'])
 
     }
 
@@ -91,7 +92,7 @@ class CurrentUserSpec extends Specification implements DomainIntTest {
         expect:
         setupPerms()
         login "userAdmin"
-        currentUser.hasAnyRole(SecRole.ADMIN, "FakeRole")
+        currentUser.hasAnyRole([SecRole.ADMIN, "FakeRole"])
     }
 
     // def "test user roles"() {

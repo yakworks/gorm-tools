@@ -2,7 +2,7 @@
 * Copyright 2006-2016 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.security.spring
+package yakworks.security.spring.user
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -21,11 +21,9 @@ import yakworks.security.user.UserInfo
  */
 @CompileStatic
 @Slf4j
-final class SpringUserInfoUtils {
+final class SpringUserUtils {
 
-    private SpringUserInfoUtils() {
-        // static only
-    }
+    private SpringUserUtils() { /* static only */ }
 
     @CompileDynamic
     static void copyUserInfo(User target, UserInfo sourceUser){

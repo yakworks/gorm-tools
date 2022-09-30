@@ -2,7 +2,7 @@
 * Copyright 2006-2016 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.security.spring
+package yakworks.security.spring.user
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -13,8 +13,6 @@ import org.springframework.security.core.userdetails.User
 
 import yakworks.security.user.BasicUserInfo
 import yakworks.security.user.UserInfo
-
-import static yakworks.security.spring.SpringUserInfoUtils.*
 
 /**
  * Grails security has a GrailsUser that it uses by default, this replaces it to remove confusion.
@@ -29,36 +27,26 @@ import static yakworks.security.spring.SpringUserInfoUtils.*
 @SuppressWarnings(['ParameterCount'])
 @InheritConstructors
 @CompileStatic
-class SpringUserInfo extends User implements SpringUserInfoTrait {
+class SpringUser extends User implements SpringUserInfo {
     private static final long serialVersionUID = 1
 
-    @Override
-    String getPasswordHash() {
-        return this.password
-    }
-
-    @Override //UserInfo
-    Set<String> getRoles() {
-        SpringUserInfoUtils.authoritiesToRoles(this.authorities);
-    }
-
-    static SpringUserInfo of(UserInfo userInfo){
+    static SpringUser of(UserInfo userInfo){
         def roles = (userInfo.roles ?: []) as List<String>
-        return SpringUserInfo.of(userInfo, roles)
+        return SpringUser.of(userInfo, roles)
     }
 
-    static SpringUserInfo of(UserInfo userInfo, Collection<String> roles){
-        List<GrantedAuthority> authorities = rolesToAuthorities(roles)
+    static SpringUser of(UserInfo userInfo, Collection<String> roles){
+        List<GrantedAuthority> authorities = SpringUserUtils.rolesToAuthorities(roles)
         // password is required so make sure its filled even if its OAuth or ldap
         String passwordHash = userInfo.passwordHash ?: "N/A"
-        def spu = new SpringUserInfo(userInfo.username, passwordHash, userInfo.enabled, true, true, true, authorities)
+        def spu = new SpringUser(userInfo.username, passwordHash, userInfo.enabled, true, true, true, authorities)
         merge(spu, userInfo)
         return spu
     }
 
-    static SpringUserInfo create(Map props){
+    static SpringUser create(Map props){
         def userInfo = BasicUserInfo.create(props)
-        return SpringUserInfo.of(userInfo)
+        return SpringUser.of(userInfo)
     }
 
     @CompileDynamic

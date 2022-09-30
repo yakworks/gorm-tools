@@ -8,33 +8,35 @@ import groovy.transform.CompileStatic
 
 import yakworks.security.SecService
 import yakworks.security.gorm.model.AppUser
+import yakworks.security.user.UserInfo
 
 /**
  * Spring implementation of the generic base SecService
  */
 @CompileStatic
-class TestingSecService implements SecService<AppUser> {
+class TestingSecService implements SecService {
 
     TestingSecService() {
         this.entityClass = AppUser
     }
 
-    /**
-     * Encode the password using the configured PasswordEncoder.
-     * calls same method on springSecurityService
-     */
     @Override
-    String encodePassword(String password) {
-        password
+    boolean isLoggedIn() {
+        true
     }
 
     @Override
-    void loginAsSystemUser() {
+    UserInfo loginAsSystemUser() {
 
     }
 
     @Override
-    void reauthenticate(String username, String password = null) {
+    UserInfo login(String username, String password) {
+
+    }
+
+    @Override
+    UserInfo authenticate(UserInfo userInfo) {
 
     }
 

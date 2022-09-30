@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
 import yakworks.security.gorm.model.SecRolePermission
 import yakworks.security.gorm.model.SecUserPermission
+import yakworks.security.user.BasicUserInfo
 import yakworks.security.user.CurrentUser
 
 @Integration
@@ -40,7 +41,7 @@ class AnnotatedServiceSpec extends Specification {
     }
 
     private void login(String username) {
-        secService.reauthenticate(username, 'password')
+        secService.login(username)
     }
 
     private void logout() {

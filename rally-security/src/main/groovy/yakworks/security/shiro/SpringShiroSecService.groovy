@@ -21,6 +21,7 @@ import yakworks.grails.web.GrailsWebEnvironment
 import yakworks.security.shiro.ShiroUtils
 import yakworks.security.shiro.SpringSecurityRealm
 import yakworks.security.spring.SpringSecService
+import yakworks.security.user.UserInfo
 import yakworks.spring.AppCtx
 
 /**
@@ -37,15 +38,6 @@ class SpringShiroSecService extends SpringSecService {
     WebSecurityManager shiroSecurityManager
 
     /**
-     * Used in automation to username a bot/system user, also used for tests
-     */
-    @Override
-    void loginAsSystemUser() {
-        super.loginAsSystemUser()
-        reauthenticateShiro()
-    }
-
-    /**
      * Rebuild an Authentication for the given username and register it in the security context.
      * Typically used after updating a user's authorities or other auth-cached info.
      * <p/>
@@ -56,15 +48,16 @@ class SpringShiroSecService extends SpringSecService {
      * @param password optional
      */
     @Override
-    void reauthenticate(String username, String password = null) {
-        SpringSecurityUtils.reauthenticate  username, password
-        reauthenticateShiro()
+    UserInfo login(String username, String password){
+        def uinfo = super.login(username, password)
+        loginShiro()
+        return uinfo
     }
 
     /**
-     * Called after reauthenticate and loginAsSystem user
+     * Called after login
      */
-    void reauthenticateShiro() {
+    void loginShiro() {
         GrailsWebEnvironment.bindRequestIfNull(AppCtx.ctx)
         def currentRequest = WebUtils.retrieveGrailsWebRequest().currentRequest
         def currentResponse = WebUtils.retrieveGrailsWebRequest().currentResponse
@@ -72,15 +65,6 @@ class SpringShiroSecService extends SpringSecService {
         ShiroUtils.bindSubject SecurityContextHolder.context.authentication,
             springSecurityRealm, shiroSecurityManager, currentRequest, currentResponse
     }
-
-    /**
-     * Logout current user programmatically
-     */
-    void logout() {
-        SecurityContextHolder.clearContext()
-        SecurityUtils.subject.logout()
-    }
-
 
     @CompileDynamic
     AuthenticationException getLastAuthenticationException() {

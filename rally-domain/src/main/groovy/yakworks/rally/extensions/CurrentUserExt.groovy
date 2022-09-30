@@ -5,13 +5,9 @@
 package yakworks.rally.extensions
 
 import groovy.transform.CompileStatic
-import groovy.transform.NullCheck
 
-import yakworks.commons.lang.Validate
 import yakworks.rally.orgs.model.Org
-import yakworks.rally.orgs.model.OrgType
 import yakworks.security.user.CurrentUser
-import yakworks.security.user.UserInfo
 
 /**
  * Extensions to add getUserOrg to the CurrentUser
@@ -19,27 +15,19 @@ import yakworks.security.user.UserInfo
 @CompileStatic
 class CurrentUserExt {
 
+    static Long getOrgId(CurrentUser self){
+       self.user.orgId as Long
+    }
+
     /**
     * gets the org from contact for the currently logged in user
     */
-    static Org getUserOrg(CurrentUser self){
-        def uinfo = self.getUserInfo()
-        Validate.notNull(uinfo, '[userInfo]')
-        getUserOrg(self, uinfo)
-    }
-
-    /**
-    * gets the org for the passed in UserInfo
-    */
-    @NullCheck
-    static Org getUserOrg(CurrentUser self, UserInfo userInfo){
-        Validate.notNull(userInfo.orgId, "userInfo.orgId is null for user:[id:${userInfo.id}, username: ${userInfo.username}]")
-        return Org.repo.getWithTrx(userInfo.orgId)
+    static Org getOrg(CurrentUser self){
+        UserInfoExt.getOrg(self.user)
     }
 
     static boolean isCustomer(CurrentUser self){
-        def org = getUserOrg(self)
-        return org.type == OrgType.Customer
+        UserInfoExt.isCustomer(self.user)
     }
 
 }

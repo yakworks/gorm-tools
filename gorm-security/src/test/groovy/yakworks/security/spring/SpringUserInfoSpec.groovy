@@ -3,11 +3,11 @@ package yakworks.security.spring
 import org.apache.commons.lang3.RandomStringUtils
 
 import gorm.tools.problem.ValidationProblem
-import gorm.tools.utils.GormMetaUtils
 import spock.lang.Specification
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRoleUser
+import yakworks.security.spring.user.SpringUser
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
@@ -31,7 +31,7 @@ class SpringUserInfoSpec extends Specification implements GormHibernateTest, Sec
         when:
         def appUser = new AppUser(userMap(id:1))
         assert appUser.validate()
-        def springUser = SpringUserInfo.of(appUser)
+        def springUser = SpringUser.of(appUser)
 
         then:
         springUser.username.startsWith("test-user-")

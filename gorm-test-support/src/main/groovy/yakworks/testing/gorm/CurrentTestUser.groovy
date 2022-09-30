@@ -18,8 +18,8 @@ import yakworks.security.user.UserInfo
 class CurrentTestUser implements CurrentUser{
 
     Long userId = 1
-    UserInfo userInfo = BasicUserInfo.create(
-        username: "testuser", email: "testuser@testing.com", roles: ["ADMIN"], orgId:1
+    UserInfo user = BasicUserInfo.create(
+        id:1, username: "testuser", email: "testuser@testing.com", roles: ["ADMIN"], orgId:1
     )
 
     @Override
@@ -33,8 +33,8 @@ class CurrentTestUser implements CurrentUser{
     }
 
     @Override
-    boolean hasAnyRole(String... roles) {
-        return false
+    boolean hasAnyRole(Collection<String> roles){
+        return true
     }
 
     @Override

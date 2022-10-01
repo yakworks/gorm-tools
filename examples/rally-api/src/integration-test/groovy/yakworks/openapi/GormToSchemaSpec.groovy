@@ -2,6 +2,7 @@ package yakworks.openapi
 
 import yakworks.openapi.gorm.ApiSchemaEntity
 import yakworks.openapi.gorm.GormToSchema
+import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRoleUser
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
@@ -16,6 +17,15 @@ class GormToSchemaSpec extends Specification {
     @Autowired
     GormToSchema gormToSchema
 
+    def "check Set string generic"() {
+        given:
+        Map schema = gormToSchema.generate(AppUser)
+
+        expect:
+        //role should be array of strings
+        schema.properties.roles.items.type == 'string'
+    }
+
     def "check composite keys"() {
         given:
         Map schema = gormToSchema.generate(SecRoleUser)
@@ -26,6 +36,7 @@ class GormToSchemaSpec extends Specification {
         //schema.description == "This is a task"
         schema.type == "object"
     }
+
 
     def "sanity check Org read"() {
         given:

@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service
 
 import gorm.tools.repository.events.BeforePersistEvent
 import jakarta.annotation.Nullable
-import yakworks.rally.orgs.model.Company
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.user.CurrentUser
 
@@ -35,8 +34,8 @@ class RallyEventListener {
     void beforeUserPersist(BeforePersistEvent<AppUser> event) {
         AppUser user = event.entity
         if(user.orgId == null) {
-            if(currentUser.isLoggedIn() && currentUser.userInfo.orgId != null) {
-                user.orgId = currentUser.userInfo.orgId as Long
+            if(currentUser.isLoggedIn() && currentUser.user.orgId != null) {
+                user.orgId = currentUser.user.orgId as Long
             }
         }
     }

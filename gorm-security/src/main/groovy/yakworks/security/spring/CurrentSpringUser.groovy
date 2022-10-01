@@ -16,6 +16,8 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.web.FilterInvocation
 
+import yakworks.security.spring.user.SpringUser
+import yakworks.security.spring.user.SpringUserInfo
 import yakworks.security.user.BasicUserInfo
 import yakworks.security.user.CurrentUser
 import yakworks.security.user.UserInfo
@@ -34,11 +36,11 @@ class CurrentSpringUser implements CurrentUser {
 
     /**
      * Get the currently logged in UserInfo.
-     * @see SpringUserInfo
-     * @return the SpringUserInfo UserDetails or null if not logged in.
+     * @see SpringUser
+     * @return the SpringUser UserDetails or null if not logged in.
      */
     @Override
-    UserInfo getUserInfo(){
+    UserInfo getUser(){
         def user = getAuthentication()?.principal
         if(user && !(user instanceof SpringUserInfo)) {
             if(user instanceof User && ((User)user).username.contains('anonymous')){
@@ -55,7 +57,7 @@ class CurrentSpringUser implements CurrentUser {
 
     @Override
     Serializable getUserId(){
-        getUserInfo()?.id ?: 0
+        getUser()?.id ?: 0
     }
 
     /**
@@ -73,8 +75,8 @@ class CurrentSpringUser implements CurrentUser {
      * Check if current user has any of the specified roles
      */
     @Override
-    boolean hasAnyRole(String... roles) {
-        getSecurityOperations().hasAnyRole(roles)
+    boolean hasAnyRole(Collection<String> roles){
+        getSecurityOperations().hasAnyRole(roles as String[])
     }
 
     @Override

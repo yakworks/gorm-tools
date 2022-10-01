@@ -160,9 +160,17 @@ class ApiSchemaEntity {
             Class returnType = constrainedProp.propertyType
             if(Collection.isAssignableFrom(returnType)){
                 Class genClass =(Class) PropertyTools.findGenericTypeForCollection(entityClass, propName)
-                // Class genClass = findGenericClassForCollection(entityClass, propName)
-                //println "  ${propName} collection of type ${genClass.simpleName}"
-                Map propsToAdd = setupAssociationObject(type, apiProp, genClass.simpleName, constrainedProp, null)
+                //if its primitive or Object collection then just do the the typ
+                Map propsToAdd
+                if(ClassUtils.isBasicType(genClass)){
+                    propsToAdd = OapiUtils.getJsonType(genClass)
+                }
+                else if(genClass == Object){
+                    propsToAdd = [type: 'object']
+                }
+                else {
+                    propsToAdd = setupAssociationObject(type, apiProp, genClass.simpleName, constrainedProp, null)
+                }
                 apiProp['type'] = 'array'
                 apiProp['items'] = propsToAdd
             } else {

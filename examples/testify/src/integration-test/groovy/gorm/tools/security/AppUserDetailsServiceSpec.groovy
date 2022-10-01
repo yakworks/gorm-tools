@@ -6,8 +6,8 @@ import java.time.LocalDateTime
 
 import yakworks.security.gorm.PasswordValidator
 import yakworks.security.gorm.model.AppUser
-import yakworks.security.spring.AppUserDetailsService
-import yakworks.security.spring.SpringUserInfo
+import yakworks.security.spring.user.AppUserDetailsService
+import yakworks.security.spring.user.SpringUser
 import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
@@ -24,7 +24,7 @@ class AppUserDetailsServiceSpec extends Specification implements DataIntegration
         when:
         AppUser.repo.create([username:"karen", password:"karen", repassword:"karen", email:"karen@9ci.com"])
         flush()
-        SpringUserInfo gUser = userDetailsService.loadUserByUsername('karen')
+        SpringUser gUser = userDetailsService.loadUserByUsername('karen')
 
         then:
         gUser != null
@@ -41,7 +41,7 @@ class AppUserDetailsServiceSpec extends Specification implements DataIntegration
         when:
         AppUser.repo.create([username:"karen", repassword:"karen", email:"karen@9ci.com"])
         flush()
-        SpringUserInfo gUser = userDetailsService.loadUserByUsername('karen')
+        SpringUser gUser = userDetailsService.loadUserByUsername('karen')
 
         then:
         gUser != null
@@ -64,7 +64,7 @@ class AppUserDetailsServiceSpec extends Specification implements DataIntegration
         user.persist()
 
         when:
-        SpringUserInfo nineUser = userDetailsService.loadUserByUsername(user.username)
+        SpringUser nineUser = userDetailsService.loadUserByUsername(user.username)
 
         then:
         nineUser.credentialsNonExpired == false

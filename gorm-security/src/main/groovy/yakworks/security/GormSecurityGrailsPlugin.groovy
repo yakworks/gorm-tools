@@ -4,9 +4,9 @@
 */
 package yakworks.security
 
-import org.springframework.security.authentication.AuthenticationTrustResolverImpl
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.web.authentication.AnonymousAuthenticationFilter
+import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler
 
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugins.Plugin
@@ -16,13 +16,12 @@ import yakworks.security.audit.AuditStampSupport
 import yakworks.security.audit.DefaultAuditUserResolver
 import yakworks.security.gorm.AppUserService
 import yakworks.security.gorm.PasswordValidator
-import yakworks.security.spring.AppUserDetailsService
 import yakworks.security.spring.AsyncSecureService
 import yakworks.security.spring.CurrentSpringUser
 import yakworks.security.spring.SpringSecService
-import yakworks.security.spring.anonymous.AnonToken
 import yakworks.security.spring.listeners.SecLoginHandler
 import yakworks.security.spring.listeners.SecLogoutHandler
+import yakworks.security.spring.user.AppUserDetailsService
 import yakworks.security.user.CurrentUserHolder
 
 @SuppressWarnings(['Indentation'])
@@ -72,6 +71,16 @@ class GormSecurityGrailsPlugin extends Plugin {
             //     key = "Anon_key"
             //     userAttribute = "ANONYMOUS"
             // }
+
+            //replace so we can set the role prefix to be blank and not ROLE_
+            webExpressionHandler(DefaultWebSecurityExpressionHandler) {
+                expressionParser = ref('voterExpressionParser')
+                permissionEvaluator = ref('permissionEvaluator')
+                roleHierarchy = ref('roleHierarchy')
+                trustResolver = ref('authenticationTrustResolver')
+                //the default is the ROLE_, so we set it to nothing here.
+                defaultRolePrefix = ''
+            }
         }
 
         //dont register beans if audit trail is disabled.

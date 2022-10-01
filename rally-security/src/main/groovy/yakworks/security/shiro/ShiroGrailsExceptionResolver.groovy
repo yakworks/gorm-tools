@@ -22,9 +22,6 @@ import grails.web.mapping.UrlMappingsHolder
 
 import static org.springframework.http.HttpStatus.FORBIDDEN
 
-/**
- * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
- */
 @CompileStatic
 @Slf4j
 class ShiroGrailsExceptionResolver extends GrailsExceptionResolver {

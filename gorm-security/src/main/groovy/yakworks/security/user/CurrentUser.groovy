@@ -9,9 +9,11 @@ import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.metamap.services.MetaMapService
+import yakworks.util.StringUtils
 
 /**
- * CurrentUser contract to be implemented by prefered security framework.
+ * CurrentUser contract to be implemented with a prefered security framework.
+ * this is intentionally very basic.
  */
 @CompileStatic
 trait CurrentUser {
@@ -22,13 +24,13 @@ trait CurrentUser {
      * gets the current user info
      */
     Serializable getUserId(){
-        getUserInfo().id
+        getUser().id
     }
 
     /**
      * gets the current user info
      */
-    abstract UserInfo getUserInfo()
+    abstract UserInfo getUser()
 
     /**
      * is a user logged in
@@ -41,11 +43,21 @@ trait CurrentUser {
     abstract void logout()
 
     /**
-     * Check if current user has any of the specified roles
+     * Returns true if this Subject has the specified role
      */
-    abstract boolean hasAnyRole(String... roles)
-
     abstract boolean hasRole(String role)
+
+    /**
+     * Returns true if current user has any of the specified roles
+     */
+    abstract boolean hasAnyRole(Collection<String> roles)
+
+    /**
+     * Returns true if current user has any of roles in comma seperated list
+     */
+    boolean hasAnyRole(String rolesString){
+        hasAnyRole(StringUtils.commaDelimitedListToSet(rolesString))
+    }
 
     /**
      * Gets user fields to send to client about their login
@@ -59,7 +71,7 @@ trait CurrentUser {
      * Gets user fields to send to client about their login
      */
     Map getUserMap(List incs) {
-        Map userMap = metaMapService.createMetaMap(getUserInfo(), incs).clone() as Map
+        Map userMap = metaMapService.createMetaMap(getUser(), incs).clone() as Map
         // if (isCustomer()) userMap.put('isCustomer', true)
         return userMap
     }

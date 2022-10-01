@@ -15,7 +15,7 @@ import gorm.tools.transaction.WithTrx
 import grails.testing.spock.OnceBefore
 import yakworks.security.SecService
 import yakworks.security.gorm.model.AppUser
-import yakworks.security.spring.SpringUserInfo
+import yakworks.security.spring.user.SpringUser
 import yakworks.security.user.CurrentUser
 
 /**
@@ -43,7 +43,7 @@ trait SecuritySpecHelper implements WithTrx{
         if(roles.size()){
             rolesToUse = roles.toList()
         }
-        SpringUserInfo secUser = SpringUserInfo.of(user, rolesToUse)
+        SpringUser secUser = SpringUser.of(user, rolesToUse)
         SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(secUser, user.passwordHash, secUser.authorities)
     }
 

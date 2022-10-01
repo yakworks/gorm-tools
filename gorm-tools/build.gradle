@@ -23,6 +23,8 @@ dependencies {
   // api "com.vladmihalcea:hibernate-types-52:$vHibTypes"
   api "com.vladmihalcea:$vHibTypes"
 
+  api "jakarta.annotation:jakarta.annotation-api:$vJakartaAnn"
+
   implementation "org.codehaus.groovy:groovy-sql:$groovyVersion"
   // compileOnly "org.codehaus.gpars:gpars:$vGpars"
 

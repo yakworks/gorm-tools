@@ -31,6 +31,10 @@ class BasicUserInfo implements Named, UserInfo {
     Set roles = [] as Set
     Map userProfile
 
+    static BasicUserInfo of(String username){
+        return new BasicUserInfo(username: username)
+    }
+
     static BasicUserInfo of(String username, List<String> roles){
         return new BasicUserInfo(username: username, roles: roles as Set)
     }

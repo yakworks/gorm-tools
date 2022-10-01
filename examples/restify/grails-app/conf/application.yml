@@ -1,6 +1,8 @@
+# do profiles and groups early or it gets confused.
 spring:
   profiles:
     group:
+      # grails passes in development and production, so this maps them to dev and prod.
       development: dev
       production: prod
   config:
@@ -19,6 +21,7 @@ app:
     rootLocation: "${project.rootProjectDir}/examples/resources"
     tempDir: "./build/rootLocation/tempDir"
     attachments.location: 'attachments'
+
 ---
 
 grails:

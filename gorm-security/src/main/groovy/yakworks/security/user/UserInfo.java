@@ -16,7 +16,7 @@ import org.springframework.security.core.GrantedAuthority;
 /**
  * Trait for a User. We depend on this so that we are not locked into a specific security framework such as Spring or Shiro.
  * Roughly based on Springs UserDetails
- * Both the AppUser domain and the SpringUserInfo implement this.
+ * Both the AppUser domain and the SpringUser implement this.
  * @see org.springframework.security.core.userdetails.UserDetails
  */
 public interface UserInfo extends Principal, Serializable {

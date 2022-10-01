@@ -43,7 +43,7 @@ class SecurityExpressionOperationsSpec extends Specification {
     }
 
     private void login(String username) {
-        secService.reauthenticate(username, 'password')
+        secService.login(username, 'password')
     }
 
     private void logout() {

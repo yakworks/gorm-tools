@@ -10,6 +10,7 @@ dependencies {
     exclude group: 'org.grails', module: 'grails-dependencies'
     exclude group: 'org.grails', module: 'grails-web-boot'
   }
+  api "jakarta.annotation:jakarta.annotation-api:$vJakartaAnn"
 
   compileOnly project(":gorm-tools")
   // for the org.grails.web.util.WebUtils

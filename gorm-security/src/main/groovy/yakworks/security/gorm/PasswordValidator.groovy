@@ -109,7 +109,8 @@ class PasswordValidator {
      * it adds the expireDays to see if we are under that date
      * @param user is optional, will look in the security context if not passed in
      */
-    boolean isPasswordExpired(AppUser user) {
+    boolean isPasswordExpired(Serializable id) {
+        AppUser user = AppUser.get(id)
         //can always force a password change by setting passwordExpired field to true
         if(user.passwordExpired) return true
         if (passwordExpiryEnabled) {

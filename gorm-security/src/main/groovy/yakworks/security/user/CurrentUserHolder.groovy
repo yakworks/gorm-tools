@@ -16,8 +16,8 @@ class CurrentUserHolder {
 
     private static CurrentUser CURRENT_USER
 
-    static UserInfo getUserInfo(){
-        CURRENT_USER.getUserInfo()
+    static UserInfo getUser(){
+        CURRENT_USER.getUser()
     }
 
     @Autowired

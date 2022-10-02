@@ -1,7 +1,11 @@
 apply plugin:"war"
 apply plugin:"org.grails.grails-web"
-apply plugin:"org.grails.plugins.views-json"
-apply from: "${rootProject.projectDir}/gradle/test-integration.gradle"
+// apply plugin:"org.grails.plugins.views-json"
+
+apply from: "${rootDir}/gradle/compile.gradle"
+apply from: "${rootDir}/gradle/example.gradle"
+apply from: "${rootDir}/gradle/test-unit.gradle"
+apply from: "${rootDir}/gradle/test-integration.gradle"
 
 repositories {
   maven { url "https://build.shibboleth.net/nexus/content/repositories/releases/" } //for pac4j deps

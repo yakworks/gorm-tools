@@ -1,5 +1,7 @@
 apply plugin: "yakworks.grails-plugin"
 
+apply from: "${rootDir}/gradle/gorm-lib.gradle"
+
 dependencies {
   api project(":gorm-tools")
   api project(":gorm-security")

@@ -1,4 +1,7 @@
-apply plugin: 'groovy'
+//Common setup for the gorm libraries in this project
+apply from: "${rootDir}/gradle/compile.gradle"
+apply from: "${rootDir}/gradle/publish.gradle"
+apply from: "${rootDir}/gradle/test-unit.gradle"
 
 dependencies {
   // compileOnly "io.micronaut:micronaut-inject-groovy"

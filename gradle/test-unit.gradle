@@ -11,9 +11,7 @@ tasks.withType(Test) {
   jvmArgs("--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED")
   jvmArgs("--add-opens", "java.base/sun.nio.ch=ALL-UNNAMED")
   // options.forkOptions.jvmArgs += ['--add-opens', 'java.base/java.lang=ALL-UNNAMED']
-}
 
-test {
   // Defaults from https://github.com/radarsh/gradle-test-logger-plugin
   testlogger {
     //COMMENT THIS OUT to show logging on console

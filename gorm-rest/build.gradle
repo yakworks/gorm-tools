@@ -1,5 +1,7 @@
 apply plugin: "yakworks.grails-plugin"
 
+apply from: "${rootDir}/gradle/gorm-lib.gradle"
+
 dependencies {
   //for the RestTomcatWebServerCustomizer
   compileOnly "org.springframework.boot:spring-boot-starter-tomcat"

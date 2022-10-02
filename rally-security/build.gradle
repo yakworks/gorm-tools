@@ -1,5 +1,7 @@
 apply plugin: "yakworks.grails-plugin"
-apply from: "${rootProject.projectDir}/gradle/test-integration.gradle"
+
+apply from: "${rootDir}/gradle/gorm-lib.gradle"
+apply from: "${rootDir}/gradle/test-integration.gradle"
 
 repositories {
   maven { url "https://build.shibboleth.net/nexus/content/repositories/releases/" } //for pac4j deps

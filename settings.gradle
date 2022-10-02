@@ -1,3 +1,28 @@
+// This sets up and allows the normal gradle plugin dsl with grails.
+pluginManagement {
+  repositories {
+    mavenLocal() //try local first for dev with local snapshots
+    gradlePluginPortal()
+    maven { url "https://repo.grails.org/grails/core" }
+  }
+  plugins {
+    id 'io.spring.dependency-management'        version "${springDependencyVersion}"
+    id 'org.springframework.boot'               version "${springBootVersion}"
+    id "io.github.gradle-nexus.publish-plugin"  version "${vMavenNexus}"
+    id "org.grails.grails-web"                  version "${grailsGradlePluginVersion}"
+  }
+  resolutionStrategy {
+    eachPlugin {
+      if (requested.id.namespace == 'org.grails') {
+        useModule("org.grails:grails-gradle-plugin:$grailsGradlePluginVersion")
+      }
+      if (requested.id.namespace == 'yakworks') {
+        useModule("org.yakworks:gradle-plugins:$vShipyak")
+      }
+    }
+  }
+}
+
 rootProject.name = 'gorm-tools-root'
 //the releasable plugins
 include 'gorm-tools'
@@ -15,14 +40,19 @@ include 'gorm-test-domain'
 
 // tests will be included in main runs but not deploy tasks and doc tasks
 include "examples/testify"
-include 'examples/restify'
-include 'examples/benchmarks'
-include 'examples/rally-api'
-
 findProject(':examples/testify').name = 'testify'
+
+include 'examples/restify'
 findProject(':examples/restify').name = 'restify'
+
+include 'examples/benchmarks'
 findProject(':examples/benchmarks').name = 'benchmarks'
+
+include 'examples/rally-api'
 findProject(':examples/rally-api').name = 'rally-api'
+
+include 'examples/hello-security-grails'
+findProject(':examples/hello-security-grails').name = 'hello-security-grails'
 
 //project(':testify').projectDir = new File('examples/testify')
 

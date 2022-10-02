@@ -10,7 +10,14 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 
 /**
- * Fall through if GormEntity makes it to Json conversion it needs the misc conditions filtered out.
+ * Fall through if GormEntity makes it to Json conversion. With the special fields added in with AST it will get a
+ * stackoverflow if the groovy json engine tries to convert it.
+ * Uses GormMetaUtils.getProperties to only get the relavent props.
+ *
+ * This is registered as a java service in META-INF/services/groovy.json.JsonGenerator$Converter.
+ * Its picked up in groovy-commons's JsonEngine.
+ * @see yakworks.json.groovy.JsonEngine#getConverters
+ * @see GormMetaUtils#getProperties
  */
 @CompileStatic
 class GormEntityJsonConverter implements JsonGenerator.Converter {

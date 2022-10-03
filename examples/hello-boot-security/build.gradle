@@ -1,31 +1,42 @@
 //see the settings.gradle pluginManagement config for usign the recomended graild plugins DSL
 plugins {
-  id 'io.spring.dependency-management'
-  id 'org.springframework.boot'
+  // id 'io.spring.dependency-management'
+  // id 'org.springframework.boot'
+  // id "groovy"
   // id "war"
   id "org.grails.grails-web"
   id "org.grails.grails-gsp"
 }
 
+// apply from: "${rootDir}/gradle/spring-bootRun.gradle"
+
 dependencies {
-  implementation 'org.springframework.boot:spring-boot-starter-security'
-  implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  implementation 'org.springframework.boot:spring-boot-starter-security'
+  implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
   implementation "org.grails:grails-core"
   implementation "org.grails:grails-web-boot"
   implementation "org.grails:grails-plugin-url-mappings"
   implementation "org.grails.plugins:gsp"
 
-  //implementation project(":gorm-tools")
+  implementation project(":gorm-tools")
+  implementation project(":boot-security")
 
-  testImplementation 'org.springframework.boot:spring-boot-starter-test'
-  testImplementation 'org.springframework.security:spring-security-test'
+  implementation "org.grails:grails-datastore-gorm-hibernate5:$vGormHibernate"
+  implementation "org.grails.plugins:hibernate5:$vGormHibernate"
+  implementation "org.hibernate:hibernate-core:$vHibernate"
 
-  // testImplementation "org.grails:grails-gorm-testing-support"
-  // testImplementation "org.grails:grails-web-testing-support"
+  runtimeOnly "com.h2database:h2:$vH2"
+  runtimeOnly "com.zaxxer:HikariCP:$vHikari"
+
+  // runtimeOnly "com.h2database:h2:$vH2"
+
+  testImplementation "org.grails:grails-gorm-testing-support"
+  testImplementation "org.grails:grails-web-testing-support"
 }
+
 
 bootRun {
   ignoreExitValue true

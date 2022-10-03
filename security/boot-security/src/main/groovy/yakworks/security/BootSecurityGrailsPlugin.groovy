@@ -69,14 +69,15 @@ class BootSecurityGrailsPlugin extends Plugin {
         //     }
         // }
 
+
         //dont register beans if audit trail is disabled.
-        if (config.getProperty('gorm.tools.audit.enabled', Boolean, true)) {
-            // auditStampEventListener(AuditStampEventListener)
-            auditStampBeforeValidateListener(AuditStampBeforeValidateListener)
-            auditStampPersistenceEventListener(AuditStampPersistenceEventListener)
-            auditStampSupport(AuditStampSupport)
-            auditUserResolver(DefaultAuditUserResolver)
-        }
+        // if (config.getProperty('gorm.tools.audit.enabled', Boolean, true)) {
+        //     // auditStampEventListener(AuditStampEventListener)
+        //     auditStampBeforeValidateListener(AuditStampBeforeValidateListener)
+        //     auditStampPersistenceEventListener(AuditStampPersistenceEventListener)
+        //     auditStampSupport(AuditStampSupport)
+        //     auditUserResolver(DefaultAuditUserResolver)
+        // }
 
     } }
 

@@ -1,4 +1,4 @@
-package yakity
+package yakity.security
 
 class UrlMappings {
 

@@ -7,6 +7,7 @@ package yakworks.security.config
 
 import groovy.transform.CompileStatic
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
@@ -14,6 +15,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 
 import yakworks.security.SecService
+import yakworks.security.audit.AuditStampBeforeValidateListener
+import yakworks.security.audit.AuditStampPersistenceEventListener
+import yakworks.security.audit.AuditStampSupport
+import yakworks.security.audit.DefaultAuditUserResolver
 import yakworks.security.gorm.AppUserService
 import yakworks.security.gorm.PasswordValidator
 import yakworks.security.spring.CurrentSpringUser
@@ -77,4 +82,33 @@ class SpringSecurityConfiguration {
     //     new BCryptPasswordEncoder()
     // }
 
+    //dont register beans if audit trail is disabled.
+    @ConditionalOnProperty(value="gorm.tools.audit.enabled", havingValue = "true", matchIfMissing = false)
+    @Configuration @Lazy
+    static class AuditStampConfiguration {
+        //dont register beans if audit trail is disabled.
+        // if (config.getProperty('gorm.tools.audit.enabled', Boolean, true)) {
+        //     // auditStampEventListener(AuditStampEventListener)
+        //     auditStampBeforeValidateListener(AuditStampBeforeValidateListener)
+        //     auditStampPersistenceEventListener(AuditStampPersistenceEventListener)
+        //     auditStampSupport(AuditStampSupport)
+        //     auditUserResolver(DefaultAuditUserResolver)
+        // }
+        @Bean
+        AuditStampBeforeValidateListener auditStampBeforeValidateListener(){
+            new AuditStampBeforeValidateListener()
+        }
+        @Bean
+        AuditStampPersistenceEventListener auditStampPersistenceEventListener(){
+            new AuditStampPersistenceEventListener()
+        }
+        @Bean
+        AuditStampSupport auditStampSupport(){
+            new AuditStampSupport()
+        }
+        @Bean
+        DefaultAuditUserResolver auditUserResolver(){
+            new DefaultAuditUserResolver()
+        }
+    }
 }

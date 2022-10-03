@@ -21,6 +21,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -37,18 +39,15 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // http.requestMatcher(EndpointRequest.toAnyEndpoint());
-        // http.authorizeRequests((requests) -> requests.anyRequest().permitAll());
         http
             .authorizeHttpRequests((authorize) -> authorize
-                .mvcMatchers("/actuator/**", "/resources/**", "/signup", "/about").permitAll()
+                .mvcMatchers("/actuator/**", "/resources/**", "/about").permitAll()
                 .anyRequest().authenticated()
             )
             .httpBasic(withDefaults())
             .formLogin(withDefaults());
         return http.build();
     }
-
         // // Added *ONLY* to display the dbConsole.
         // // Best not to do this in production.  If you need frames, it would be best to use
         // //     http.headers().frameOptions().addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsMode.SAMEORIGIN));
@@ -59,6 +58,21 @@ public class SecurityConfiguration {
         // // https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet
         // http.csrf().disable()
 
+    // @Bean
+    // public PasswordEncoder passwordEncoder() {
+    //     return new BCryptPasswordEncoder();
+    // }
+
+    // @Bean
+    // public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
+    //     UserDetails user = User.builder().passwordEncoder(passwordEncoder::encode)
+    //         .username("user")
+    //         .password("123")
+    //         .roles("ADMIN")
+    //         .build();
+    //     return new InMemoryUserDetailsManager(user);
+    // }
+
     @Bean
     public InMemoryUserDetailsManager userDetailsService() {
         UserDetails user = User.withDefaultPasswordEncoder()
@@ -68,5 +82,6 @@ public class SecurityConfiguration {
             .build();
         return new InMemoryUserDetailsManager(user);
     }
+
 
 }

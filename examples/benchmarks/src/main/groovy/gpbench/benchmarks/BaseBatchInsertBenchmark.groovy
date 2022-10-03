@@ -3,12 +3,11 @@ package gpbench.benchmarks
 import groovy.transform.CompileDynamic
 
 import gorm.tools.async.ParallelTools
-import gorm.tools.repository.RepoUtil
 import gpbench.helpers.JsonReader
 import gpbench.helpers.RecordsLoader
 import gpbench.model.basic.CityBasic
 import grails.gorm.transactions.Transactional
-import grails.plugin.springsecurity.SpringSecurityService
+import yakworks.security.user.CurrentUser
 
 //@CompileStatic
 abstract class BaseBatchInsertBenchmark<T> extends AbstractBenchmark {
@@ -19,7 +18,7 @@ abstract class BaseBatchInsertBenchmark<T> extends AbstractBenchmark {
 
     JsonReader jsonReader
 
-    SpringSecurityService springSecurityService
+    CurrentUser currentUser
 
     Class<T> domainClass = CityBasic
 
@@ -44,8 +43,8 @@ abstract class BaseBatchInsertBenchmark<T> extends AbstractBenchmark {
     }
 
     void setup() {
-        assert springSecurityService.principal.id != null
-        assert springSecurityService.principal.id == 1
+        assert currentUser.user.id != null
+        assert currentUser.user.id == 1
         assert domainClass.count() == 0
 
         RecordsLoader recordsLoader = jsonReader //useDatabinding ? csvReader : jsonReader

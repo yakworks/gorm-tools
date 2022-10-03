@@ -28,7 +28,7 @@ dependencies {
   implementation "org.hibernate:hibernate-ehcache:$vHibernate"
 
   implementation project(":testify")
-  implementation project(":gorm-security")
+  implementation project(":boot-security")
   implementation project(":gorm-rest")
 
   //??wtf

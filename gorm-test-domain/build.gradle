@@ -4,6 +4,6 @@ apply from: "${rootDir}/gradle/gorm-lib.gradle"
 
 dependencies {
   api project(":gorm-tools")
-  api project(":gorm-security")
+  api project(":boot-security")
   api 'net.datafaker:datafaker:1.5.0'
 }

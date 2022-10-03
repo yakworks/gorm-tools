@@ -7,7 +7,13 @@ package yakworks.security.config
 
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.BeansException
+import org.springframework.beans.factory.BeanFactory
+import org.springframework.beans.factory.BeanFactoryAware
+import org.springframework.boot.autoconfigure.AutoConfigurationPackages
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.context.ApplicationContext
+import org.springframework.context.ApplicationContextAware
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
@@ -33,10 +39,14 @@ import yakworks.security.user.CurrentUserHolder
 @Lazy
 //@EnableConfigurationProperties([AsyncConfig, GormConfig, IdGeneratorConfig])
 @CompileStatic
-class SpringSecurityConfiguration {
+class SpringSecurityConfiguration implements ApplicationContextAware, BeanFactoryAware {
+
+    BeanFactory beanFactory
+    ApplicationContext applicationContext
 
     @Bean
     SecuritySeedData securitySeedData(){
+        List<String> packageNames = AutoConfigurationPackages.get(this.beanFactory)
         new SecuritySeedData()
     }
 

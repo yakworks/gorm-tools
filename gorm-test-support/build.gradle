@@ -6,10 +6,11 @@ dependencies {
   console "org.grails:grails-console"
 
   compileOnly project(":gorm-tools")
-  compileOnly project(":gorm-security")
+  compileOnly project(":boot-security")
 
   implementation "org.grails:grails-plugin-controllers"
 
+  api "org.springframework.security:spring-security-config"
   //used for bundled Test traits
   api "org.grails:grails-gorm-testing-support:$vGrailsTesting"
 

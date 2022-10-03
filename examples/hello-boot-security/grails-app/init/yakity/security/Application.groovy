@@ -10,11 +10,11 @@ import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
 
 @ComponentScan(['yakity.security', 'yakworks.security.gorm'])
-// @Import([yakworks.security.config.SpringSecurityConfiguration])
+@Import([yakworks.security.config.SpringSecurityConfiguration])
 @CompileStatic
 class Application extends GrailsAutoConfiguration {
-    //@entity scan packages
-    List<String> entityScan = ['yakworks.security.gorm']
+    //@Entity scan packages
+    List<String> artifactScan = ['yakworks.security.gorm']
 
     static void main(String[] args) {
         System.setProperty("grails.env.standalone", "true")
@@ -22,8 +22,7 @@ class Application extends GrailsAutoConfiguration {
     }
 
     /**
-     * To scan and pick up the gorm domains that are marked with @entity
-     * outside of the package this Application class is in then this needs to be set to true
+     * true by default for some reason.
      */
     @Override
     protected boolean limitScanningToApplication() {
@@ -33,7 +32,7 @@ class Application extends GrailsAutoConfiguration {
     @Override
     Collection<String> packageNames() {
         List<String> pkgsNames = packages()*.name
-        pkgsNames.addAll( getEntityScan() )
+        pkgsNames.addAll( getArtifactScan() )
         return pkgsNames
     }
 }

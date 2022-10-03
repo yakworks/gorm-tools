@@ -77,23 +77,15 @@ class SpringSecurityConfiguration {
         new AppUserDetailsService()
     }
 
-    // @Bean
-    // PasswordEncoder passwordEncoder(){
-    //     new BCryptPasswordEncoder()
-    // }
+    @Bean
+    PasswordEncoder passwordEncoder(){
+        new BCryptPasswordEncoder()
+    }
 
     //dont register beans if audit trail is disabled.
-    @ConditionalOnProperty(value="gorm.tools.audit.enabled", havingValue = "true", matchIfMissing = false)
+    @ConditionalOnProperty(value="gorm.tools.audit.enabled", havingValue = "true", matchIfMissing = true)
     @Configuration @Lazy
     static class AuditStampConfiguration {
-        //dont register beans if audit trail is disabled.
-        // if (config.getProperty('gorm.tools.audit.enabled', Boolean, true)) {
-        //     // auditStampEventListener(AuditStampEventListener)
-        //     auditStampBeforeValidateListener(AuditStampBeforeValidateListener)
-        //     auditStampPersistenceEventListener(AuditStampPersistenceEventListener)
-        //     auditStampSupport(AuditStampSupport)
-        //     auditUserResolver(DefaultAuditUserResolver)
-        // }
         @Bean
         AuditStampBeforeValidateListener auditStampBeforeValidateListener(){
             new AuditStampBeforeValidateListener()

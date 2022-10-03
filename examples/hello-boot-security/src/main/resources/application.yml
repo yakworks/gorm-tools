@@ -4,7 +4,8 @@ logging:
   level:
     root: INFO
     org.springframework: INFO
-
+    org.hibernate.SQL: DEBUG
+    org.springframework.security: DEBUG
 ---
 info:
   app:
@@ -19,10 +20,35 @@ management:
       exposure:
         include: '*'
 
+management.info.env.enabled: true
 management.endpoint.health.show-details: always
 
 
 ---
-grails:
-  controllers:
-    defaultScope: singleton
+
+grails.controllers.defaultScope: singleton
+
+hibernate:
+  format_sql: false
+  show_sql: false
+  schema_management_tool: 'yakworks.hibernate.schema.SimpleSchemaManagementTool'
+  naming_strategy: 'org.hibernate.cfg.DefaultNamingStrategy'
+  dialect: 'yakworks.hibernate.h2.ExtendedH2Dialect'
+  cache:
+    queries: false
+    use_second_level_cache: false
+    use_query_cache: false
+  jdbc:
+    time_zone: 'UTC'
+#  enhancer:
+#    enableLazyInitialization: true
+#    enableAssociationManagement: true
+
+dataSource:
+  type: com.zaxxer.hikari.HikariDataSource
+  pooled: true
+  driverClassName: org.h2.Driver
+  username: sa
+  password:
+  dbCreate: create-drop
+  url: jdbc:h2:mem:testDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE

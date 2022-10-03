@@ -73,15 +73,15 @@ public class SecurityConfiguration {
     //     return new InMemoryUserDetailsManager(user);
     // }
 
-    @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-        UserDetails user = User.withDefaultPasswordEncoder()
-            .username("user")
-            .password("123")
-            .roles("USER")
-            .build();
-        return new InMemoryUserDetailsManager(user);
-    }
+    // @Bean
+    // public InMemoryUserDetailsManager userDetailsService() {
+    //     UserDetails user = User.withDefaultPasswordEncoder()
+    //         .username("user")
+    //         .password("123")
+    //         .roles("USER")
+    //         .build();
+    //     return new InMemoryUserDetailsManager(user);
+    // }
 
 
 }

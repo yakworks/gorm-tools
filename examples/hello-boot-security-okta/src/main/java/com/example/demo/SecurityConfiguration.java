@@ -11,6 +11,9 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.saml2.provider.service.authentication.OpenSaml4AuthenticationProvider;
 import org.springframework.security.saml2.provider.service.authentication.OpenSaml4AuthenticationProvider.ResponseToken;
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
@@ -34,6 +37,8 @@ public class SecurityConfiguration {
                 .mvcMatchers("/favicon.ico").permitAll()
                 .anyRequest().authenticated()
             )
+            .httpBasic(withDefaults())
+            .formLogin(withDefaults())
             .saml2Login(saml2 -> saml2
                 .authenticationManager(new ProviderManager(authenticationProvider))
             )
@@ -61,4 +66,16 @@ public class SecurityConfiguration {
             return new Saml2Authentication(principal, authentication.getSaml2Response(), authorities);
         };
     }
+
+
+    @Bean
+    public InMemoryUserDetailsManager userDetailsService() {
+        UserDetails user = User.withDefaultPasswordEncoder()
+            .username("user")
+            .password("123")
+            .roles("USER")
+            .build();
+        return new InMemoryUserDetailsManager(user);
+    }
+
 }

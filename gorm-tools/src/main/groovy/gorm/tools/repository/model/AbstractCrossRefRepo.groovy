@@ -24,8 +24,8 @@ import static gorm.tools.utils.GormUtils.listToIdMap
  * XRef Repo for linking 2 entities. Also called a join table in hibernate.
  * One class is designated as the main and the other as related.
  * The 'main' is the first part the name, and related the second.
- * So for example: ActivityContact xref table, the Activity is the 'main' and the Contact is the 'related'
- * Its really arbitraty but this provides a way to grok it
+ * So for example: ActivityContact xref table, the Activity is the 'primary' or 'main' and the Contact is the 'related'
+ * Its really arbitrary, Contact could be primary and it would be functionaly the same. It just provides a way to grok it
  *
  * @param <X> the cross ref domain this Repo is for
  * @param <P> the the Primary or main entity that will have the items as "children"
@@ -78,7 +78,7 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     }
 
     /**
-     * this is the map that makes the composite key across the 3 fields.
+     * this is the map that makes the composite key with the fields.
      */
     Map getKeyMap(P main, R related){
         [ (mainPropName): main, (relatedPropName): related ]

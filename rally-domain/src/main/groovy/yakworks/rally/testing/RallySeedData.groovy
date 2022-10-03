@@ -41,7 +41,7 @@ class RallySeedData {
     }
 
     static fullMonty(int count = 100){
-        buildAppUser()
+        buildAppUsers()
         createOrgTypeSetups()
         buildClientOrg()
         buildOrgs(count)
@@ -158,7 +158,7 @@ class RallySeedData {
         }
     }
 
-    static void buildAppUser(){
+    static void buildAppUsers(){
         AppUser.withTransaction {
             AppUser user = new AppUser(id: 1, username: "admin", email: "admin@9ci.com", password:"123Foo", orgId: 2)
             user.persist()

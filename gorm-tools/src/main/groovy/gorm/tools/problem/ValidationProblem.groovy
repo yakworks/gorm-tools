@@ -9,6 +9,7 @@ import groovy.transform.CompileStatic
 import org.springframework.validation.Errors
 import org.springframework.validation.ObjectError
 
+import grails.util.GrailsUtil
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
 import yakworks.api.problem.ProblemUtils
@@ -50,7 +51,14 @@ class ValidationProblem implements DataProblemTrait<ValidationProblem> {
 
     @Override
     ThrowableProblem toException(){
-        return getCause() ? new ValidationProblem.Exception(getCause()).problem(this) : new ValidationProblem.Exception().problem(this)
+        //if it has a cause then use it, otherwise just throw the problem, the code here is verbose on purpose to make it easier to debug
+        Throwable ex = getCause()
+        if(ex){
+            ex = GrailsUtil.deepSanitize(ex)
+            return new ValidationProblem.Exception(getCause()).problem(this)
+        } else {
+            return new ValidationProblem.Exception().problem(this)
+        }
     }
 
     static ValidationProblem of(Object entity, Throwable cause) {

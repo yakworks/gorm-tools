@@ -28,7 +28,6 @@ import yakworks.security.user.CurrentUserHolder
 class GormSecurityGrailsPlugin extends Plugin {
 
     def loadAfter = ['spring-security-core', 'spring-security-ldap', 'spring-security-rest', 'gorm-tools', 'datasource']
-    def pluginExcludes = ["**/init/**"]
 
     Closure doWithSpring() { { ->
 

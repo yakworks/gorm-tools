@@ -44,16 +44,10 @@ import gorm.tools.transaction.TrxService
 @CompileStatic
 class GormToolsConfiguration {
 
-    // GrailsApplication grailsApplication
-
-    // GormToolsConfiguration(GrailsApplication grailsApplication){
-    //     this.grailsApplication = grailsApplication
-    // }
-
     // see https://zetcode.com/spring/beanfactorypostprocessor/ for lambda BeanFactoryPostProcessor
     @Bean
     @DependsOn("grailsDomainClassMappingContext") //important here, if we dont do DependsOn then it eagerly instantiates the DataSource before its ready.
-    GormRepoBeanFactoryPostProcessor gormRepoBeanFactoryPostProcessor(AbstractMappingContext grailsDomainClassMappingContext) {
+    static GormRepoBeanFactoryPostProcessor gormRepoBeanFactoryPostProcessor(AbstractMappingContext grailsDomainClassMappingContext) {
         //AbstractMappingContext grailsDomainClassMappingContext
         // List<Class> repoClasses = grailsApplication.getArtefacts("Repository")*.clazz
         // List<Class> entityClasses = grailsApplication.getArtefacts("Domain")*.clazz

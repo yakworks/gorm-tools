@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.TransactionStatus
 
 import gorm.tools.config.AsyncConfig
-import gorm.tools.config.GormConfig
 import gorm.tools.transaction.TrxService
 import grails.persistence.support.PersistenceContextInterceptor
 import yakworks.grails.support.ConfigAware
@@ -38,9 +37,6 @@ class AsyncService implements ConfigAware  {
 
     @Autowired
     TrxService trxService
-
-    @Autowired(required = false)
-    GormConfig gormConfig
 
     // static cheater to get the bean, use sparingly if at all
     // static AsyncService getBean(){

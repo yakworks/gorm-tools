@@ -16,7 +16,7 @@ import yakworks.spring.SpringEnvironment
 @Configuration(proxyBeanMethods = false)
 @ConfigurationProperties(prefix="gorm.tools")
 @CompileStatic
-class GormConfig implements SpringEnvironment{
+class GormConfig {
 
     /** almost never would this be false if including it unless turning off for a test */
     boolean enabled = true

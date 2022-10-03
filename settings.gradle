@@ -36,6 +36,10 @@ include 'rally-security'
 // include 'commons'
 include 'gorm-test-support'
 include 'gorm-test-domain'
+
+include "security/boot-security"
+findProject(':security/boot-security').name = 'boot-security'
+
 //findProject(':security').name = 'gorm-security' // the name that will be published
 
 // tests will be included in main runs but not deploy tasks and doc tasks
@@ -51,8 +55,8 @@ findProject(':examples/benchmarks').name = 'benchmarks'
 include 'examples/rally-api'
 findProject(':examples/rally-api').name = 'rally-api'
 
-include 'examples/hello-security-grails'
-findProject(':examples/hello-security-grails').name = 'hello-security-grails'
+include 'examples/hello-boot-security'
+findProject(':examples/hello-boot-security').name = 'hello-boot-security'
 
 //project(':testify').projectDir = new File('examples/testify')
 

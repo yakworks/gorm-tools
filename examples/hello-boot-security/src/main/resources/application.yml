@@ -1,0 +1,28 @@
+spring.main.lazy-initialization: true
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+
+---
+info:
+  app:
+    name: '@info.app.name@'
+    version: '@info.app.version@'
+    grailsVersion: '@info.app.grailsVersion@'
+
+management:
+  endpoints:
+    enabled-by-default: true
+    web:
+      exposure:
+        include: '*'
+
+management.endpoint.health.show-details: always
+
+
+---
+grails:
+  controllers:
+    defaultScope: singleton

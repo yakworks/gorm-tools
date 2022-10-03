@@ -10,7 +10,9 @@ import groovy.transform.CompileStatic
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
+import org.springframework.context.EnvironmentAware
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.env.Environment
 
 import yakworks.spring.SpringEnvironment
 
@@ -18,7 +20,9 @@ import yakworks.spring.SpringEnvironment
 @ConfigurationProperties(prefix="gorm.tools.async")
 // @ConfigurationPropertiesScan
 @CompileStatic
-class AsyncConfig implements SpringEnvironment{
+class AsyncConfig implements EnvironmentAware {
+
+    private Environment env
 
     /**
      * The default slice or chunk size for collating. for example if this is 100 and you pass list of of 100
@@ -37,7 +41,14 @@ class AsyncConfig implements SpringEnvironment{
     @PostConstruct
     void init() {
         //if batchSize is 0 then hibernate may not bbe installed and hibernate.jdbc.batch_size is not set. force it to 100
-        Integer batchSize = environment.getProperty('hibernate.jdbc.batch_size', Integer)
+        Integer batchSize = env.getProperty('hibernate.jdbc.batch_size', Integer)
         sliceSize = batchSize ?: sliceSize
+    }
+
+    /**
+     * Set the {@code Environment} that this component runs in.
+     */
+    void setEnvironment(Environment environment){
+        env = environment
     }
 }

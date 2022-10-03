@@ -1,0 +1,46 @@
+//see the settings.gradle pluginManagement config for usign the recomended graild plugins DSL
+plugins {
+  id 'io.spring.dependency-management'
+  id 'org.springframework.boot'
+  // id "war"
+  id "org.grails.grails-web"
+  id "org.grails.grails-gsp"
+}
+
+dependencies {
+  implementation 'org.springframework.boot:spring-boot-starter-security'
+  implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+  implementation "org.grails:grails-core"
+  implementation "org.grails:grails-web-boot"
+  implementation "org.grails:grails-plugin-url-mappings"
+  implementation "org.grails.plugins:gsp"
+
+  //implementation project(":gorm-tools")
+
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'org.springframework.security:spring-security-test'
+
+  // testImplementation "org.grails:grails-gorm-testing-support"
+  // testImplementation "org.grails:grails-web-testing-support"
+}
+
+bootRun {
+  ignoreExitValue true
+  jvmArgs('-Dspring.output.ansi.enabled=always', '-noverify', '-XX:TieredStopAtLevel=1', '-Xmx1024m')
+  sourceResources sourceSets.main
+  String springProfilesActive = 'spring.profiles.active'
+  systemProperty springProfilesActive, System.getProperty(springProfilesActive)
+}
+
+tasks.withType(GroovyCompile) {
+  configure(groovyOptions) {
+    forkOptions.jvmArgs = ['-Xmx1024m']
+  }
+}
+
+tasks.withType(Test) {
+  useJUnitPlatform()
+}

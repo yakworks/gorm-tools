@@ -9,6 +9,7 @@ import javax.annotation.PostConstruct
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 
 import org.grails.datastore.mapping.reflect.ClassUtils
 
@@ -18,6 +19,7 @@ import yakworks.spring.SpringEnvironment
  * Utility class to help create generic code and SQL that can work across supported databases.
  */
 @SuppressWarnings(['AssignmentToStaticFieldFromInstanceMethod'])
+@Slf4j
 @CompileStatic
 class DbDialectService implements SpringEnvironment{
 
@@ -47,12 +49,21 @@ class DbDialectService implements SpringEnvironment{
      * @return 0-5 to map to DbDialectService.H2, DbDialectService.MSSQL etc....
      */
     static int init(String hibernateDialectName) {
+
+        if(!hibernateDialectName){
+            //if no hibernateDialectName then set default to H2
+            hibernateDialectName = "H2"
+            //if no h2 on classpath then hibernate is miconfiged, show error for user.
+            if(! ClassUtils.isPresent("org.h2.Driver", DbDialectService.classLoader)){
+                log.error("no hibernateDialect set, defaulting to H2 but org.h2.Driver doesnt appear on the classpath.")
+            }
+        }
+
         DbDialectService.hibernateDialect = hibernateDialectName
         int result = UNKNOWN
 
         //fallback to H2 just like how Datasources plugin does. if H2 is present in classpath
-        if ((!hibernateDialectName && ClassUtils.isPresent("org.h2.Driver"))
-            || hibernateDialectName.contains('H2')) result = H2
+        if (hibernateDialectName.contains('H2')) result = H2
         else if (hibernateDialectName.contains("SQLServerDialect")) result = MSSQL
         else if (hibernateDialectName.matches(".*SQLServer20\\d\\dDialect")) result = MSSQL
         else if (hibernateDialectName.contains("MySQL5InnoDBDialect")) result = MYSQL

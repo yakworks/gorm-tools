@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Import
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
 
-@ComponentScan(['yakity.security', 'yakworks.security.gorm'])
-@Import([yakworks.security.config.SpringSecurityConfiguration])
+@ComponentScan(['yakity.security', 'yakworks.security'])
+// @Import([yakworks.security.config.SpringSecurityConfiguration])
 @CompileStatic
 class Application extends GrailsAutoConfiguration {
     //@Entity scan packages

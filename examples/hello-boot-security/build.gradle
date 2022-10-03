@@ -35,6 +35,9 @@ dependencies {
 
   testImplementation "org.grails:grails-gorm-testing-support"
   testImplementation "org.grails:grails-web-testing-support"
+
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'org.springframework.security:spring-security-test'
 }
 
 

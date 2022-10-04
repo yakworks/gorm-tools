@@ -19,7 +19,7 @@ import yakworks.security.spring.user.SpringUser
 import yakworks.security.user.CurrentUser
 
 /**
- * Integration support for the gorm-security plugin.
+ * Integration support for the bootsecurity plugin.
  *
  */
 @CompileDynamic

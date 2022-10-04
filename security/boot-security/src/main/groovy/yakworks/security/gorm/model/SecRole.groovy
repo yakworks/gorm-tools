@@ -46,4 +46,7 @@ class SecRole implements NameCodeDescription, RepoEntity<SecRole>, Serializable 
         cache "read-write"
     }
 
+    static SecRole getByCode(String cd){
+        return SecRole.findWhere(code: cd)
+    }
 }

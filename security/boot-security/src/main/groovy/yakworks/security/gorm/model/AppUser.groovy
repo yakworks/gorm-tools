@@ -83,7 +83,7 @@ class AppUser implements UserInfo, AuditStampTrait, RepoEntity<AppUser>, Seriali
         roles:[ d: 'The string list of roles assigned to this user', validate: false, editable: false ],
         secRoles:[ d: 'The roles assigned to this user', validate: false, oapi: [read: true, edit: ['id']]],
         passwordHash:[ d: "The pwd hash, internal use only, never show this",
-                       nullable: true, maxSize: 60, bindable: false, display:false, password: true],
+                       nullable: true, maxSize: 255, bindable: false, display:false, password: true],
         passwordChangedDate:[ d: "The date password was changed",
                               nullable: true, bindable: false, oapi:'R'],
         passwordExpired:[ d: "The password expired",
@@ -146,7 +146,8 @@ class AppUser implements UserInfo, AuditStampTrait, RepoEntity<AppUser>, Seriali
         throw new UnsupportedOperationException("Not yet supported here")
     }
 
-    // other Spring/Grails Security default fields not used right now
-    // boolean accountExpired = false
-    // boolean accountLocked = false
+
+    SecRoleUser addRole(String roleCode, boolean flushAfterPersist) {
+        getRepo().addUserRole(this, roleCode, flushAfterPersist)
+    }
 }

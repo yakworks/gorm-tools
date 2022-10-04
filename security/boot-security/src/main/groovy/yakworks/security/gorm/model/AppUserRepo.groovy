@@ -93,10 +93,15 @@ class AppUserRepo implements GormRepo<AppUser> {
 
     /**
      * Adds roles to the user
+     *
+     * @param user the user
+     * @param roleCode the role.code, all uppercase, no ROLE_ prefix.
+     * @param flushAfterPersist flush after save
+     * @return the SecRoleUser that was created.
      */
-    AppUser addUserRole(AppUser user, String role) {
-        SecRoleUser.create(user, SecRole.findByName(role))
-        return user
+    SecRoleUser addUserRole(AppUser user, String roleCode, boolean flushAfterPersist) {
+        def sru = SecRoleUser.create(user, SecRole.getByCode(roleCode), flushAfterPersist)
+        return sru
     }
 
     /**

@@ -1,17 +1,19 @@
-package yakworks.security.spring
-
-import org.apache.commons.lang3.RandomStringUtils
+package yakworks.security.gorm
 
 import gorm.tools.problem.ValidationProblem
+import gorm.tools.utils.GormMetaUtils
+import org.apache.commons.lang3.RandomStringUtils
+
+import grails.gorm.transactions.Rollback
 import spock.lang.Specification
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRoleUser
-import yakworks.security.spring.user.SpringUser
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
+import yakworks.testing.gorm.unit.DataRepoTest
 
-class SpringUserInfoSpec extends Specification implements GormHibernateTest, SecurityTest {
+class AppUserSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [AppUser, SecRole, SecRoleUser]
 
     String genRandomEmail(){
@@ -20,30 +22,67 @@ class SpringUserInfoSpec extends Specification implements GormHibernateTest, Sec
     }
 
     // @Override
-    Map userMap(Map args = [:]) {
+    Map buildMap(Map args) {
+        args.get('save', false)
         args.email = genRandomEmail()
-        args.name = "Joe ${System.currentTimeMillis()}"
-        args.username = "test-user-${System.currentTimeMillis()}"
+        args.name = "test-user-${System.currentTimeMillis()}"
+        args.username = "some_login_123"
         args
     }
+    //
+    // @Override
+    // AppUser createEntity(Map args){
+    //     //def entity = new AppUser()
+    //     args = buildMap(args)
+    //     args << [password:'secretStuff', repassword:'secretStuff']
+    //     def entity = AppUser.create(args)
+    //     //We have to add 'password' field manually, because it has the "bindable: false" constraint
+    //     entity.password = 'test_pass_123'
+    //     entity.persist(flush: true)
+    //
+    //     get(entity.id)
+    // }
+    //
+    // @Override
+    // AppUser persistEntity(Map args){
+    //     args.get('save', false) //adds save:false if it doesn't exists
+    //     args['password'] = "test"
+    //     def entity = build(buildMap(args))
+    //     assert entity.persist(flush: true)
+    //     return get(entity.id)
+    // }
 
-    void "create SpringUser from AppUser"() {
+    void "did it get the audit stamp fields"() {
         when:
-        def appUser = new AppUser(userMap(id:1))
-        assert appUser.validate()
-        def springUser = SpringUser.of(appUser)
+        def con = build(AppUser)
+        con.validate()
+
+        Map conProps = GormMetaUtils.findConstrainedProperties(AppUser)
 
         then:
-        springUser.username.startsWith("test-user-")
-        ['id', 'username', 'name', 'displayName', 'email', 'orgId'].each{
-            assert springUser[it] == appUser[it]
+        //sanity check the main ones
+        conProps.username.nullable == false
+        conProps['passwordHash'].metaConstraints["bindable"] == false
+        conProps.passwordHash.display == false
+        conProps['passwordHash'].display == false
+
+        conProps['editedBy'].metaConstraints["bindable"] == false
+        conProps['editedBy'].metaConstraints["description"] == "edited by user id"
+
+        ['editedBy','createdBy', 'editedDate','createdDate'].each {
+            assert con.hasProperty(it)
+            def conProp = conProps[it]
+            conProp.metaConstraints["bindable"] == false
+            assert conProp.nullable == false
+            assert !conProp.editable
         }
+
     }
 
 
     void "simple persist"() {
         when:
-        Map data = userMap([:])
+        Map data = buildMap([:])
         AppUser user = AppUser.create(data)
         user.persist(flush: true)
 
@@ -77,7 +116,7 @@ class SpringUserInfoSpec extends Specification implements GormHibernateTest, Sec
         SecRole.get(2).code == "B"
 
         when:
-        Map data = userMap([:])
+        Map data = buildMap([:])
         data.roles = ["1", "2"]
         data << [password:'secretStuff', repassword:'secretStuff']
         AppUser user = AppUser.create(data)
@@ -95,20 +134,20 @@ class SpringUserInfoSpec extends Specification implements GormHibernateTest, Sec
 
     def "test username"() {
         when:
-        Map data = userMap([:])
+        Map data = buildMap([:])
         data << [username:'jimmy', password:'secretStuff', repassword:'secretStuff']
         AppUser user = AppUser.create(data)
         flush()
 
         then:
         user.username == "jimmy"
-        user.name.startsWith("Joe ")
+        user.name.startsWith("test")
 
     }
 
     def "test displayName"() {
         when:
-        Map data = userMap([:])
+        Map data = buildMap([:])
         data << [username:'jimmy', password:'secretStuff', repassword:'secretStuff']
         AppUser user = AppUser.create(data)
         flush()

@@ -4,7 +4,7 @@
 */
 package yakworks.security.spring.user
 
-import groovy.transform.CompileDynamic
+
 import groovy.transform.CompileStatic
 import groovy.transform.InheritConstructors
 
@@ -40,7 +40,7 @@ class SpringUser extends User implements SpringUserInfo {
         // password is required so make sure its filled even if its OAuth or ldap
         String passwordHash = userInfo.passwordHash ?: "N/A"
         def spu = new SpringUser(userInfo.username, passwordHash, userInfo.enabled, true, true, true, authorities)
-        merge(spu, userInfo)
+        spu.merge(userInfo)
         return spu
     }
 
@@ -49,10 +49,4 @@ class SpringUser extends User implements SpringUserInfo {
         return SpringUser.of(userInfo)
     }
 
-    @CompileDynamic
-    static void merge(UserInfo target, UserInfo sourceUser){
-        ['id', 'name', 'displayName', 'email', 'orgId'].each{
-            target[it] = sourceUser[it]
-        }
-    }
 }

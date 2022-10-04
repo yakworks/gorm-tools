@@ -10,6 +10,7 @@ import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.expression.AbstractSecurityExpressionHandler
 import org.springframework.security.access.expression.SecurityExpressionOperations
+import org.springframework.security.authentication.AnonymousAuthenticationToken
 import org.springframework.security.authentication.AuthenticationTrustResolver
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
@@ -27,9 +28,6 @@ import yakworks.security.user.UserInfo
  */
 @CompileStatic
 class CurrentSpringUser implements CurrentUser {
-
-    @Autowired(required = false)
-    AuthenticationTrustResolver authenticationTrustResolver
 
     @Autowired(required = false)
     AbstractSecurityExpressionHandler securityExpressionHandler
@@ -67,8 +65,9 @@ class CurrentSpringUser implements CurrentUser {
      */
     @Override
     boolean isLoggedIn() {
-        def authentication = SecurityContextHolder.context.authentication
-        return getAuthentication() && !authenticationTrustResolver.isAnonymous(getAuthentication())
+        def authentication = getAuthentication()
+        if(authentication == null || authentication instanceof AnonymousAuthenticationToken) return false
+        return true
     }
 
     /**

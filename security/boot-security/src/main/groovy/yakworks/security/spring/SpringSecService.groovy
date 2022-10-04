@@ -109,7 +109,7 @@ class SpringSecService implements SecService {
         if(userInfo instanceof UserDetails) { grantedAuthories = ((User)userInfo).authorities }
         CONTEXT.authentication = new UsernamePasswordAuthenticationToken(userInfo, userInfo.passwordHash, grantedAuthories)
         //before or after?
-        userCache.removeUserFromCache userInfo.username
+        userCache?.removeUserFromCache userInfo.username
     }
 
     /**

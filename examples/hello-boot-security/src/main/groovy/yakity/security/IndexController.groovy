@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package yakity.security;
+package yakity.security
+
+import groovy.transform.CompileStatic;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -25,18 +27,19 @@ import org.springframework.web.bind.annotation.GetMapping;
  * @author Joe Grandja
  */
 @Controller
+@CompileStatic
 class IndexController {
 
-	@GetMapping("/")
+    @GetMapping("/")
     String home() {
         var auth = SecurityContextHolder.getContext().getAuthentication()
-        println "user ${auth.principal}"
+        // println "************************************** user ${auth.principal}"
         "index"
-	}
+    }
 
-	@GetMapping("/spring")
+    @GetMapping("/spring")
     String index() {
         "spring/index"
-	}
+    }
 
 }

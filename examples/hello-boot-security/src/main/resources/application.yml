@@ -20,8 +20,8 @@ logging:
   level:
     root: INFO
     org.springframework: INFO
-    org.hibernate.SQL: DEBUG
-    org.springframework.security: DEBUG
+#    org.hibernate.SQL: DEBUG
+#    org.springframework.security: DEBUG
     grails.plugins.DefaultGrailsPluginManager: ERROR
 
 ---

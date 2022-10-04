@@ -4,14 +4,12 @@
 */
 package yakworks.security.spring
 
-
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.access.expression.AbstractSecurityExpressionHandler
+import org.springframework.security.access.expression.SecurityExpressionHandler
 import org.springframework.security.access.expression.SecurityExpressionOperations
 import org.springframework.security.authentication.AnonymousAuthenticationToken
-import org.springframework.security.authentication.AuthenticationTrustResolver
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.User
@@ -29,8 +27,9 @@ import yakworks.security.user.UserInfo
 @CompileStatic
 class CurrentSpringUser implements CurrentUser {
 
-    @Autowired(required = false)
-    AbstractSecurityExpressionHandler securityExpressionHandler
+    // @Autowired(required = false)
+    // AbstractSecurityExpressionHandler securityExpressionHandler
+    @Autowired SecurityExpressionHandler<FilterInvocation> securityExpressionHandler
 
     /**
      * Get the currently logged in UserInfo.

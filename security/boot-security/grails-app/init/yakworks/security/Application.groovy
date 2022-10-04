@@ -4,17 +4,31 @@
 */
 package yakworks.security
 
+import groovy.transform.CompileStatic
+
+import org.springframework.context.annotation.ComponentScan
 
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
-import grails.compiler.GrailsCompileStatic
 import grails.plugins.metadata.PluginSource
 
-// @ComponentScan
+/**
+ * THIS SETUP IS ONLY USED FOR INTEGRATION TESTS
+ * HACK IN
+ */
+@ComponentScan(['yakworks.security', 'yakworks.rally'])
 @PluginSource
-@GrailsCompileStatic
+@CompileStatic
 class Application extends GrailsAutoConfiguration {
     static void main(String[] args) {
         GrailsApp.run(Application, args)
+    }
+
+    @Override
+    protected boolean limitScanningToApplication() { false }
+
+    @Override
+    Collection<String> packageNames() {
+        super.packageNames() + ['yakworks.security', 'yakworks.rally']
     }
 }

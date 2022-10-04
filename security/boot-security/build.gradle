@@ -5,6 +5,7 @@ plugins {
 }
 
 apply from: "${rootDir}/gradle/gorm-lib.gradle"
+apply from: "${rootDir}/gradle/test-integration.gradle"
 
 //shared resources to pick up the Gorm defaults from application.groovy, as well as simple logback
 // sourceSets.test.resources.srcDirs += [project(':gorm-test-support').sourceSets.main.resources]
@@ -22,11 +23,11 @@ dependencies {
 
   implementation "jakarta.annotation:jakarta.annotation-api:$vJakartaAnn"
 
-
   compileOnly project(":gorm-tools")
   // for the org.grails.web.util.WebUtils
   // compileOnly "org.grails:grails-web-common"
 
+  testImplementation project(":rally-domain")
 }
 
 // configurations.api {

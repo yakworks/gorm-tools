@@ -1,28 +1,16 @@
 package yakworks.security
 
-
-import org.apache.shiro.realm.Realm
-import org.apache.shiro.util.ThreadContext
-import org.apache.shiro.web.mgt.WebSecurityManager
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.access.expression.AbstractSecurityExpressionHandler
-import org.springframework.security.access.expression.SecurityExpressionOperations
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.web.FilterInvocation
 
 import grails.gorm.transactions.Rollback
 import grails.gorm.transactions.Transactional
 import grails.testing.mixin.integration.Integration
-import grails.testing.spock.OnceBefore
 import spock.lang.Specification
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRolePermission
 import yakworks.security.gorm.model.SecRoleUser
 import yakworks.security.gorm.model.SecUserPermission
-import yakworks.security.spring.SpringSecService
-import yakworks.security.user.BasicUserInfo
 import yakworks.security.user.CurrentUser
 import yakworks.testing.gorm.integration.DomainIntTest
 
@@ -52,15 +40,11 @@ class CurrentUserSpec extends Specification implements DomainIntTest {
         currentUser.logout()
     }
 
-    Authentication getAuth(){
-        SecurityContextHolder.context?.authentication
-    }
-
     void "sanity check"() {
         expect:
         setupPerms()
         login "userAdmin"
-        currentUser
+        currentUser.user.username == "userAdmin"
     }
 
     void "test hasRole"() {

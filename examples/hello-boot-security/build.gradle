@@ -50,8 +50,8 @@ dependencies {
 
   // runtimeOnly "com.h2database:h2:$vH2"
 
-  testImplementation "org.grails:grails-gorm-testing-support"
-  testImplementation "org.grails:grails-web-testing-support"
+  testImplementation project(":gorm-test-support")
+  testImplementation "org.grails:grails-web-testing-support:$vGrailsTesting"
 
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation 'org.springframework.security:spring-security-test'

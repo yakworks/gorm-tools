@@ -10,7 +10,9 @@ import groovy.util.logging.Slf4j
 
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.AuthorityUtils
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
+import org.springframework.util.Assert
 
 import yakworks.security.user.UserInfo
 
@@ -40,7 +42,19 @@ final class SpringUserUtils {
      * Converts spring authorites to Set of string names.
      */
     static Set<String> authoritiesToRoles(Collection<GrantedAuthority> authorities) {
-        AuthorityUtils.authorityListToSet(authorities)
+        // AuthorityUtils.authorityListToSet(authorities)
+        authorityListToRoleSet(authorities)
+    }
+
+    static Set<String> authorityListToRoleSet(Collection<? extends GrantedAuthority> userAuthorities) {
+        Assert.notNull(userAuthorities, "userAuthorities cannot be null");
+        Set<String> set = new HashSet<>(userAuthorities.size());
+        for (GrantedAuthority authority : userAuthorities) {
+            String authName = authority.getAuthority().substring('ROLE_'.length())
+            String roleName = authName.startsWith('ROLE_') ? authName.minus('ROLE_') : authName
+            set.add(roleName);
+        }
+        return set;
     }
 
     /**
@@ -49,10 +63,17 @@ final class SpringUserUtils {
      */
     static List<GrantedAuthority> rolesToAuthorities(Collection roleNames, Collection authorities = null) {
         if(authorities == null ){
-            return AuthorityUtils.createAuthorityList(roleNames as String[])
+            return createAuthorityList(roleNames as String[])
         } else {
             return authorities as List<GrantedAuthority>
         }
+    }
 
+    static List<GrantedAuthority> createAuthorityList(String... authorities) {
+        List<GrantedAuthority> grantedAuthorities = new ArrayList<>(authorities.length);
+        for (String authority : authorities) {
+            grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_${authority}"));
+        }
+        return grantedAuthorities;
     }
 }

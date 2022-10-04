@@ -92,7 +92,7 @@ class SpringSecService implements SecService {
         SpringUserInfo secUser = ((AppUserDetailsService)userDetailsService).loadUserByUsername(username)
         CONTEXT.authentication = new UsernamePasswordAuthenticationToken(secUser, secUser.passwordHash, secUser.authorities)
         //before or after?
-        userCache.removeUserFromCache secUser.username
+        userCache?.removeUserFromCache secUser.username
         return secUser
     }
 

@@ -15,8 +15,12 @@ import org.springframework.context.ApplicationContextAware
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
+import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.web.SecurityFilterChain
 
 import yakworks.security.SecService
 import yakworks.security.audit.AuditStampBeforeValidateListener
@@ -33,14 +37,34 @@ import yakworks.security.testing.SecuritySeedData
 import yakworks.security.user.CurrentUser
 import yakworks.security.user.CurrentUserHolder
 
+import static org.springframework.security.config.Customizer.withDefaults
+
 @Configuration //(proxyBeanMethods = false)
 @Lazy
 //@EnableConfigurationProperties([AsyncConfig, GormConfig, IdGeneratorConfig])
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @CompileStatic
 class SpringSecurityConfiguration implements ApplicationContextAware, BeanFactoryAware {
 
     BeanFactory beanFactory
     ApplicationContext applicationContext
+
+    //defaults
+    @Bean
+    SecurityFilterChain basicSecurityFilterChain(HttpSecurity http) throws Exception {
+
+        http
+            .authorizeHttpRequests((authorize) -> authorize
+                .mvcMatchers("/actuator/**", "/resources/**", "/about").permitAll()
+                .anyRequest().authenticated()
+            )
+            .httpBasic(withDefaults())
+        // .formLogin(withDefaults())
+            .formLogin()
+            .defaultSuccessUrl("/", true)
+        return http.build();
+    }
 
     @Bean
     SecuritySeedData securitySeedData(){
@@ -110,5 +134,6 @@ class SpringSecurityConfiguration implements ApplicationContextAware, BeanFactor
         DefaultAuditUserResolver auditUserResolver(){
             new DefaultAuditUserResolver()
         }
+
     }
 }

@@ -29,6 +29,24 @@ class AppUserSpec extends Specification implements GormHibernateTest, SecurityTe
         args.username = "some_login_123"
         args
     }
+
+    void createRoles(){
+
+        SecRole.create(code: 'admin')
+        SecRole.create(code: 'user')
+        flush()
+        assert SecRole.get(1) != null
+        assert SecRole.get(1).code == "ADMIN"
+
+        assert SecRole.get(2) != null
+        assert SecRole.get(2).code == "USER"
+    }
+
+    def setupSpec(){
+        SecRole.withTransaction {
+            createRoles()
+        }
+    }
     //
     // @Override
     // AppUser createEntity(Map args){
@@ -104,20 +122,28 @@ class AppUserSpec extends Specification implements GormHibernateTest, SecurityTe
 
 
     def "insert with roles"() {
-        setup:
-        SecRole.create(code: 'A')
-        SecRole.create(code: 'B')
-
-        expect:
-        SecRole.get(1) != null
-        SecRole.get(1).code == "A"
-
-        SecRole.get(2) != null
-        SecRole.get(2).code == "B"
-
         when:
         Map data = buildMap([:])
-        data.roles = ["1", "2"]
+        data.roles = ["ADMIN", "USER"]
+        data << [password:'secretStuff', repassword:'secretStuff']
+        AppUser user = AppUser.create(data)
+        flush()
+
+        then:
+        user != null
+        SecRoleUser.count() == 2
+        SecRoleUser.findAllByUser(user)*.role.id == [1L, 2L]
+        user.getRoles().size() == 2
+        user.getRoles()[0] instanceof String
+        user.getSecRoles().size() == 2
+        user.getSecRoles()[0] instanceof SecRole
+    }
+
+
+    def "insert with role IDS"() {
+        when:
+        Map data = buildMap([:])
+        data.roles = [[id:1], [id:2]]
         data << [password:'secretStuff', repassword:'secretStuff']
         AppUser user = AppUser.create(data)
         flush()

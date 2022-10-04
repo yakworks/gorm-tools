@@ -4,10 +4,8 @@
 */
 package yakworks.security.config
 
-
 import groovy.transform.CompileStatic
 
-import org.springframework.beans.BeansException
 import org.springframework.beans.factory.BeanFactory
 import org.springframework.beans.factory.BeanFactoryAware
 import org.springframework.boot.autoconfigure.AutoConfigurationPackages

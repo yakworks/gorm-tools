@@ -4,11 +4,10 @@
 */
 package yakworks.security.spring.user
 
-import groovy.transform.CompileDynamic
+
 import groovy.transform.CompileStatic
 
 import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 
 import yakworks.commons.model.Named

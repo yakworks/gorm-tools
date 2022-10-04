@@ -4,18 +4,12 @@
 */
 package yakworks.security.spring.user
 
-
 import groovy.transform.CompileStatic
 import groovy.transform.InheritConstructors
 
 import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.userdetails.User
 import org.springframework.security.saml2.provider.service.authentication.DefaultSaml2AuthenticatedPrincipal
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal
-import org.springframework.util.Assert
-
-import yakworks.security.user.BasicUserInfo
-import yakworks.security.user.UserInfo
 
 /**
  * Grails security has a GrailsUser that it uses by default, this replaces it to remove confusion.

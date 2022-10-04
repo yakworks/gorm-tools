@@ -13,6 +13,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 
+/**
+ * WIP for an anonymous token.
+ */
 @CompileStatic
 class AnonToken extends AnonymousAuthenticationToken {
     // TODO use this

@@ -4,7 +4,7 @@
 */
 package yakworks.security.spring.user
 
-import groovy.transform.CompileDynamic
+
 import groovy.transform.CompileStatic
 import groovy.transform.InheritConstructors
 

@@ -13,6 +13,7 @@ dependencies {
   console "org.grails:grails-console"
 
   implementation 'org.springframework.boot:spring-boot-starter-security'
+  compileOnly 'org.springframework.security:spring-security-saml2-service-provider'
 
   // implementation("org.grails.plugins:spring-security-core:$vSpringSecurity"){
   //   exclude group: 'org.grails', module: 'grails-dependencies'
@@ -20,6 +21,7 @@ dependencies {
   // }
 
   implementation "jakarta.annotation:jakarta.annotation-api:$vJakartaAnn"
+
 
   compileOnly project(":gorm-tools")
   // for the org.grails.web.util.WebUtils

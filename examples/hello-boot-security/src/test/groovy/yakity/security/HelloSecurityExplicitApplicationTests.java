@@ -40,6 +40,8 @@ public class HelloSecurityExplicitApplicationTests {
 		// @formatter:off
 		this.mockMvc.perform(get("/"))
 				.andExpect(status().isUnauthorized());
+        this.mockMvc.perform(get("/spring"))
+            .andExpect(status().isUnauthorized());
 		// @formatter:on
 	}
 
@@ -49,6 +51,8 @@ public class HelloSecurityExplicitApplicationTests {
 		// @formatter:off
 		this.mockMvc.perform(get("/"))
 				.andExpect(status().isOk());
+        this.mockMvc.perform(get("/spring"))
+            .andExpect(status().isOk());
 		// @formatter:on
 	}
 

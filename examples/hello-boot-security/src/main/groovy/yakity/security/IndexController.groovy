@@ -15,6 +15,7 @@
  */
 package yakity.security;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -24,16 +25,18 @@ import org.springframework.web.bind.annotation.GetMapping;
  * @author Joe Grandja
  */
 @Controller
-public class IndexController {
+class IndexController {
 
 	@GetMapping("/")
-	public String home() {
-		return "index";
+    String home() {
+        var auth = SecurityContextHolder.getContext().getAuthentication()
+        println "user ${auth.principal}"
+        "index"
 	}
 
 	@GetMapping("/spring")
-	public String index() {
-		return "spring/index";
+    String index() {
+        "spring/index"
 	}
 
 }

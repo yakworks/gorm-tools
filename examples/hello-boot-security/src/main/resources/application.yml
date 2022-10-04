@@ -1,11 +1,29 @@
 spring.main.lazy-initialization: true
 
+spring:
+  security:
+    saml2:
+      relyingparty:
+        registration:
+          okta:
+#            signing:
+#              credentials:
+#                - private-key-location: classpath:local.key
+#                  certificate-location: classpath:local.crt
+            singlelogout:
+              binding: POST
+              response-url: "{baseUrl}/logout/saml2/slo"
+            assertingparty:
+              metadata-uri: https://dev-86091574.okta.com/app/exk6q8gnhjgmEfqI65d7/sso/saml/metadata
+
 logging:
   level:
     root: INFO
     org.springframework: INFO
     org.hibernate.SQL: DEBUG
     org.springframework.security: DEBUG
+    grails.plugins.DefaultGrailsPluginManager: ERROR
+
 ---
 info:
   app:
@@ -22,7 +40,6 @@ management:
 
 management.info.env.enabled: true
 management.endpoint.health.show-details: always
-
 
 ---
 

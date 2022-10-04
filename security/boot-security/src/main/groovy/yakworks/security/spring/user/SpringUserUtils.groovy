@@ -25,16 +25,14 @@ final class SpringUserUtils {
 
     private SpringUserUtils() { /* static only */ }
 
-    @CompileDynamic
-    static void copyUserInfo(User target, UserInfo sourceUser){
+    @CompileDynamic //so we can set the username on User
+    static void setUserUsername(User target, UserInfo sourceUser){
         target.@username = sourceUser.username
-
     }
 
-    @CompileDynamic
-    static void copyUserInfo(UserInfo target, UserInfo sourceUser){
-        ['id', 'name', 'displayName', 'email', 'orgId'].each{
-            target[it] = sourceUser[it]
+    static void merge(UserInfo target, UserInfo sourceUser){
+        ['id', 'name', 'displayName', 'email', 'orgId'].each{ String prop ->
+            target[prop] = sourceUser[prop]
         }
     }
 

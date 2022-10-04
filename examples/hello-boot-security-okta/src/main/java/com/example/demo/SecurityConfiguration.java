@@ -38,11 +38,16 @@ public class SecurityConfiguration {
                 .anyRequest().authenticated()
             )
             .httpBasic(withDefaults())
-            .formLogin(withDefaults())
+            // .formLogin(withDefaults())
+            .formLogin()
+                .defaultSuccessUrl("/", true)
+                .and()
             .saml2Login(saml2 -> saml2
                 .authenticationManager(new ProviderManager(authenticationProvider))
+                .defaultSuccessUrl("/okta", true)
             )
             .saml2Logout(withDefaults());
+
         // @formatter:on
 
         return http.build();

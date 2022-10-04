@@ -39,5 +39,5 @@ class SpringUserSpec extends Specification implements GormHibernateTest, Securit
             assert springUser[it] == appUser[it]
         }
     }
-    
+
 }

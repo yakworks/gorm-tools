@@ -7,16 +7,20 @@ package yakworks.security
 import groovy.transform.CompileStatic
 
 import org.springframework.context.annotation.ComponentScan
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
 import grails.plugins.metadata.PluginSource
 
 /**
- * THIS SETUP IS ONLY USED FOR INTEGRATION TESTS
+ * THIS CONFIGURATION IS ONLY USED FOR INTEGRATION TESTS
  * HACK IN
  */
 @ComponentScan(['yakworks.security', 'yakworks.rally'])
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @PluginSource
 @CompileStatic
 class Application extends GrailsAutoConfiguration {

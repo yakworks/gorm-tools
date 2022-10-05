@@ -65,8 +65,7 @@ class CurrentSpringUser implements CurrentUser {
     @Override
     boolean isLoggedIn() {
         def authentication = getAuthentication()
-        if(authentication == null || authentication instanceof AnonymousAuthenticationToken) return false
-        return true
+        return (authentication != null && !(authentication instanceof AnonymousAuthenticationToken))
     }
 
     /**

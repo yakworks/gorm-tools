@@ -6,32 +6,17 @@ package yakworks.security
 
 import groovy.transform.CompileDynamic
 
-import org.apache.shiro.cache.MemoryConstrainedCacheManager
-import org.apache.shiro.spring.LifecycleBeanPostProcessor
-import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor
-import org.apache.shiro.web.mgt.DefaultWebSecurityManager
-import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator
 import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler
 
-import grails.plugin.springsecurity.SecurityFilterPosition
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugins.Plugin
-import grails.util.Environment
+import yakworks.rally.security.RallyUserService
 import yakworks.security.rest.NineOauthUserDetailsService
 import yakworks.security.rest.RestAuthenticationProvider
 import yakworks.security.rest.RestAuthenticationSuccessHandler
 import yakworks.security.rest.token.GormTokenStorageService
 import yakworks.security.rest.token.HeaderTokenReader
 import yakworks.security.rest.token.PostgresTokenStorageService
-import yakworks.security.shiro.CurrentSpringShiroUser
-import yakworks.security.shiro.GormShiroPermissionResolver
-import yakworks.security.shiro.GormShiroRolePermissionResolver
-import yakworks.security.shiro.ShiroGrailsExceptionResolver
-import yakworks.security.shiro.ShiroLogoutHandler
-import yakworks.security.shiro.ShiroSpringSecurityEventListener
-import yakworks.security.shiro.ShiroSubjectBindingFilter
-import yakworks.security.shiro.SpringSecurityRealm
-import yakworks.security.shiro.SpringShiroSecService
 import yakworks.security.tenant.UserRequest
 
 // import yakworks.security.tenant.UserTenantResolver
@@ -60,10 +45,6 @@ class RallySecurityGrailsPlugin extends Plugin {
         def secConf = SpringSecurityUtils.securityConfig
 
         if (secConf.active) {
-
-            if(shiroActive) {
-                registerBeans(shiroBeans, delegate)
-            }
 
             if(secConf.rest.active) {
                 registerBeans(restSecurityBeans, delegate)
@@ -108,79 +89,6 @@ class RallySecurityGrailsPlugin extends Plugin {
         cookieClearingLogoutHandler(CookieClearingLogoutHandler, ['jwt'])
 
         // securityContextRepository(org.springframework.security.web.context.NullSecurityContextRepository)
-    }}
-
-    Closure getShiroBeans() { { ->
-        println ".. Integrate Shiro Permissions with Spring Security"
-        //Shiro Permission integration, do 2 after ANONYMOUS_FILTER so it runs after the restTokenValidationFilter
-        SpringSecurityUtils.registerFilter 'shiroSubjectBindingFilter',
-            SecurityFilterPosition.ANONYMOUS_FILTER.order + 2
-
-        //override the SecService and CurrentUser for Shiro
-        secService(SpringShiroSecService)
-        currentUser(CurrentSpringShiroUser)
-
-        // pulled what we need from ShiroBeanConfiguration, ShiroConfiguration, ShiroAnnotationProcessorConfiguration
-        //see those for stock
-        shiroLifecycleBeanPostProcessor(LifecycleBeanPostProcessor)
-
-        shiroAdvisorAutoProxyCreator(DefaultAdvisorAutoProxyCreator) { bean ->
-            bean.dependsOn = 'shiroLifecycleBeanPostProcessor'
-            proxyTargetClass = true
-        }
-
-        shiroAttributeSourceAdvisor(AuthorizationAttributeSourceAdvisor) {
-            securityManager = ref('shiroSecurityManager')
-        }
-
-        shiroPermissionResolver(GormShiroPermissionResolver)
-
-        shiroRolePermissionResolver(GormShiroRolePermissionResolver)
-
-        // override to replace so the shiro annotation exceptions can be handled properly
-        // since they fire outside the normal grails handling
-        exceptionHandler(ShiroGrailsExceptionResolver) {
-            exceptionMappings = [
-                'java.lang.Exception': '/error',
-                'org.apache.shiro.authz.UnauthorizedException': '/forbidden'
-            ]
-            // statusCodes = [ '/unauthorized': 403 ]
-        }
-
-        boolean useCache = Environment.getCurrent() != Environment.TEST // conf.shiro.useCache
-
-        if (useCache) {
-            shiroCacheManager(MemoryConstrainedCacheManager)
-        }
-
-        springSecurityRealm(SpringSecurityRealm) {
-            authenticationTrustResolver = ref('authenticationTrustResolver')
-            shiroPermissionResolver = ref('shiroPermissionResolver')
-            rolePermissionResolver = ref('shiroRolePermissionResolver')
-            if (useCache) {
-                cacheManager = ref('shiroCacheManager')
-            }
-        }
-
-        shiroSecurityManager(DefaultWebSecurityManager) { bean ->
-            realm = ref('springSecurityRealm')
-            if (useCache) {
-                cacheManager = ref('shiroCacheManager')
-            }
-        }
-
-        shiroSpringSecurityEventListener(ShiroSpringSecurityEventListener) {
-            realm = ref('springSecurityRealm')
-            securityManager = ref('shiroSecurityManager')
-        }
-
-        shiroSubjectBindingFilter(ShiroSubjectBindingFilter) {
-            authenticationTrustResolver = ref('authenticationTrustResolver')
-            realm = ref('springSecurityRealm')
-            securityManager = ref('shiroSecurityManager')
-        }
-
-        shiroLogoutHandler(ShiroLogoutHandler)
     }}
 
     Closure getLdapBeans() { { ->

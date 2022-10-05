@@ -15,6 +15,8 @@
  */
 package yakity.security;
 
+import yakworks.security.config.SpringSecurityConfiguration;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,26 +46,12 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfiguration {
 
     @Bean
-    public GrantedAuthorityDefaults grantedAuthorityDefaults(){
-        return new GrantedAuthorityDefaults("");
-    }
-
-    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         OpenSaml4AuthenticationProvider samlAuthenticationProvider = new OpenSaml4AuthenticationProvider();
         samlAuthenticationProvider.setResponseAuthenticationConverter(groupsConverter());
 
-        http
-            .authorizeHttpRequests((authorize) -> authorize
-                .mvcMatchers("/actuator/**", "/resources/**", "/about").permitAll()
-                .anyRequest().authenticated()
-            )
-            .httpBasic(withDefaults())
-            // .formLogin(withDefaults())
-            .formLogin()
-                .defaultSuccessUrl("/", true)
-            .and()
-            .saml2Login(saml2 -> saml2
+        SpringSecurityConfiguration.applyDefaultSecurity(http);
+        http.saml2Login(saml2 -> saml2
                 .authenticationManager(new ProviderManager(samlAuthenticationProvider))
                 .defaultSuccessUrl("/okta", true)
             )

@@ -4,8 +4,14 @@
 */
 package yakworks.security
 
+import org.apache.shiro.cache.MemoryConstrainedCacheManager
+import org.apache.shiro.spring.LifecycleBeanPostProcessor
+import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor
+import org.apache.shiro.web.mgt.DefaultWebSecurityManager
+import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator
 
 import grails.plugins.Plugin
+import grails.util.Environment
 import yakworks.security.audit.AuditStampBeforeValidateListener
 import yakworks.security.audit.AuditStampPersistenceEventListener
 import yakworks.security.audit.AuditStampSupport
@@ -79,21 +85,90 @@ class BootSecurityGrailsPlugin extends Plugin {
         //     auditUserResolver(DefaultAuditUserResolver)
         // }
 
-    } }
-
-    @Override
-    void doWithApplicationContext() {
-        // def persList = applicationContext.getBean('auditStampPersistenceEventListener', AuditStampPersistenceEventListener)
-        // applicationContext.addApplicationListener(persList)
-        // datastore.applicationEventPublisher.addApplicationListener(ctx.getBean("auditStampPersistenceEventListener"))
-
-        // applicationContext.getBeansOfType(Datastore).each { String key, Datastore datastore ->
-        //     println "key $key datastore $datastore"
-        //     // def persList = applicationContext.getBean('auditStampPersistenceEventListener', AuditStampPersistenceEventListener)
-        //     // assert persList
-        //     def evPublisher = datastore.applicationEventPublisher
-        //     evPublisher.addApplicationListener(new AuditStampPersistenceListener(datastore))
+        // if (secConf.active) {
+        //
+        //     if(shiroActive) {
+        //         registerBeans(shiroBeans, delegate)
+        //     }
+        //
+        //     if(secConf.rest.active) {
+        //         registerBeans(restSecurityBeans, delegate)
+        //     }
         // }
 
-    }
+    } }
+
+
+    Closure getShiroBeans() { { ->
+        println ".. Integrate Shiro Permissions with Spring Security"
+        //Shiro Permission integration, do 2 after ANONYMOUS_FILTER so it runs after the restTokenValidationFilter
+        SpringSecurityUtils.registerFilter 'shiroSubjectBindingFilter',
+            SecurityFilterPosition.ANONYMOUS_FILTER.order + 2
+
+        //override the SecService and CurrentUser for Shiro
+        secService(SpringShiroSecService)
+        currentUser(CurrentSpringShiroUser)
+
+        // pulled what we need from ShiroBeanConfiguration, ShiroConfiguration, ShiroAnnotationProcessorConfiguration
+        //see those for stock
+        shiroLifecycleBeanPostProcessor(LifecycleBeanPostProcessor)
+
+        shiroAdvisorAutoProxyCreator(DefaultAdvisorAutoProxyCreator) { bean ->
+            bean.dependsOn = 'shiroLifecycleBeanPostProcessor'
+            proxyTargetClass = true
+        }
+
+        shiroAttributeSourceAdvisor(AuthorizationAttributeSourceAdvisor) {
+            securityManager = ref('shiroSecurityManager')
+        }
+
+        shiroPermissionResolver(GormShiroPermissionResolver)
+
+        shiroRolePermissionResolver(GormShiroRolePermissionResolver)
+
+        // override to replace so the shiro annotation exceptions can be handled properly
+        // since they fire outside the normal grails handling
+        exceptionHandler(ShiroGrailsExceptionResolver) {
+            exceptionMappings = [
+                'java.lang.Exception': '/error',
+                'org.apache.shiro.authz.UnauthorizedException': '/forbidden'
+            ]
+            // statusCodes = [ '/unauthorized': 403 ]
+        }
+
+        boolean useCache = Environment.getCurrent() != Environment.TEST // conf.shiro.useCache
+
+        if (useCache) {
+            shiroCacheManager(MemoryConstrainedCacheManager)
+        }
+
+        springSecurityRealm(SpringSecurityRealm) {
+            authenticationTrustResolver = ref('authenticationTrustResolver')
+            shiroPermissionResolver = ref('shiroPermissionResolver')
+            rolePermissionResolver = ref('shiroRolePermissionResolver')
+            if (useCache) {
+                cacheManager = ref('shiroCacheManager')
+            }
+        }
+
+        shiroSecurityManager(DefaultWebSecurityManager) { bean ->
+            realm = ref('springSecurityRealm')
+            if (useCache) {
+                cacheManager = ref('shiroCacheManager')
+            }
+        }
+
+        shiroSpringSecurityEventListener(ShiroSpringSecurityEventListener) {
+            realm = ref('springSecurityRealm')
+            securityManager = ref('shiroSecurityManager')
+        }
+
+        shiroSubjectBindingFilter(ShiroSubjectBindingFilter) {
+            authenticationTrustResolver = ref('authenticationTrustResolver')
+            realm = ref('springSecurityRealm')
+            securityManager = ref('shiroSecurityManager')
+        }
+
+        shiroLogoutHandler(ShiroLogoutHandler)
+    }}
 }

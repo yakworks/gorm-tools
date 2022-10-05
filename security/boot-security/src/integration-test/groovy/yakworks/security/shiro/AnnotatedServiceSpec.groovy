@@ -1,6 +1,6 @@
 package yakworks.security.shiro
 
-
+import spock.lang.Ignore
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRoleUser
@@ -16,11 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
 import yakworks.security.gorm.model.SecRolePermission
 import yakworks.security.gorm.model.SecUserPermission
-import yakworks.security.user.BasicUserInfo
 import yakworks.security.user.CurrentUser
 
 @Integration
 @Rollback
+@Ignore
 class AnnotatedServiceSpec extends Specification {
 
     WebSecurityManager shiroSecurityManager

@@ -7,7 +7,6 @@ import org.apache.shiro.authz.annotation.RequiresGuest
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.apache.shiro.authz.annotation.RequiresRoles
 import org.apache.shiro.authz.annotation.RequiresUser
-import grails.plugin.springsecurity.annotation.Secured
 
 @Component
 class TestService {

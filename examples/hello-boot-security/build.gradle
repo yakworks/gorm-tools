@@ -26,6 +26,8 @@ dependencies {
 
   //SAML
   implementation 'org.springframework.security:spring-security-saml2-service-provider'
+  implementation 'org.springframework.security:spring-security-oauth2-authorization-server:0.3.1'
+
   constraints {
     implementation "org.opensaml:opensaml-core:4.1.1"
     implementation "org.opensaml:opensaml-saml-api:4.1.1"

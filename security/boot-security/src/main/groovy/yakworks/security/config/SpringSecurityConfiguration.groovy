@@ -4,20 +4,20 @@
 */
 package yakworks.security.config
 
+
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.BeanFactory
 import org.springframework.beans.factory.BeanFactoryAware
 import org.springframework.boot.autoconfigure.AutoConfigurationPackages
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
@@ -41,19 +41,13 @@ import static org.springframework.security.config.Customizer.withDefaults
 
 @Configuration //(proxyBeanMethods = false)
 @Lazy
-//@EnableConfigurationProperties([AsyncConfig, GormConfig, IdGeneratorConfig])
-@EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 @CompileStatic
 class SpringSecurityConfiguration implements ApplicationContextAware, BeanFactoryAware {
 
     BeanFactory beanFactory
     ApplicationContext applicationContext
 
-    //defaults
-    @Bean
-    SecurityFilterChain basicSecurityFilterChain(HttpSecurity http) throws Exception {
-
+    static void applyDefaultSecurity(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests((authorize) -> authorize
                 .mvcMatchers("/actuator/**", "/resources/**", "/about").permitAll()
@@ -61,9 +55,17 @@ class SpringSecurityConfiguration implements ApplicationContextAware, BeanFactor
             )
             .httpBasic(withDefaults())
         // .formLogin(withDefaults())
-            .formLogin()
-            .defaultSuccessUrl("/", true)
-        return http.build();
+            .formLogin( formLoginCustomizer ->
+                formLoginCustomizer.defaultSuccessUrl("/", true)
+            )
+    }
+
+    //defaults
+    @Bean
+    @ConditionalOnMissingBean([ SecurityFilterChain.class ])
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        applyDefaultSecurity(http)
+        return http.build()
     }
 
     @Bean

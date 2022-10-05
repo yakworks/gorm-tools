@@ -14,6 +14,7 @@ import org.springframework.security.web.FilterInvocation
 import grails.gorm.transactions.Rollback
 import grails.gorm.transactions.Transactional
 import grails.testing.mixin.integration.Integration
+import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
@@ -25,6 +26,7 @@ import yakworks.security.user.CurrentUser
 
 @Integration
 @Rollback
+@Ignore
 class SecurityExpressionOperationsSpec extends Specification {
 
     WebSecurityManager shiroSecurityManager

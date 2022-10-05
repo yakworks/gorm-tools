@@ -1,4 +1,4 @@
-package yakworks.security
+package yakworks.rally.security
 
 import org.springframework.security.crypto.password.PasswordEncoder
 
@@ -9,6 +9,7 @@ import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
+import yakworks.rally.security.RallyUserService
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRoleUser

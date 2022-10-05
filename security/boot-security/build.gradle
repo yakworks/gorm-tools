@@ -23,6 +23,12 @@ dependencies {
 
   implementation "jakarta.annotation:jakarta.annotation-api:$vJakartaAnn"
 
+  ['aspectj', 'core', 'spring', 'web'].each {
+    api "org.apache.shiro:shiro-$it:$vShiro"
+  }
+
+  compileOnly("org.grails:grails-web-mvc")
+
   compileOnly project(":gorm-tools")
   // for the org.grails.web.util.WebUtils
   // compileOnly "org.grails:grails-web-common"

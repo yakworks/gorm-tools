@@ -47,11 +47,11 @@ class SpringSecurityConfiguration implements ApplicationContextAware, BeanFactor
     BeanFactory beanFactory
     ApplicationContext applicationContext
 
-    static void applyDefaultSecurity(HttpSecurity http) throws Exception {
+    static void applyHttpSecurity(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests((authorize) -> authorize
-                .mvcMatchers("/actuator/**", "/resources/**", "/about").permitAll()
-                .anyRequest().authenticated()
+            .authorizeHttpRequests((authorize) ->
+                authorize.mvcMatchers("/actuator/**", "/resources/**", "/about").permitAll()
+                    .anyRequest().authenticated()
             )
             .httpBasic(withDefaults())
         // .formLogin(withDefaults())
@@ -64,7 +64,7 @@ class SpringSecurityConfiguration implements ApplicationContextAware, BeanFactor
     @Bean
     @ConditionalOnMissingBean([ SecurityFilterChain.class ])
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        applyDefaultSecurity(http)
+        applyHttpSecurity(http)
         return http.build()
     }
 

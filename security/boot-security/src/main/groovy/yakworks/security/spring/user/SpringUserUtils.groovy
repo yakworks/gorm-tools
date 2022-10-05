@@ -51,7 +51,7 @@ final class SpringUserUtils {
         Set<String> set = new HashSet<>(userAuthorities.size());
         for (GrantedAuthority authority : userAuthorities) {
             String authName = authority.getAuthority().substring('ROLE_'.length())
-            String roleName = authName.startsWith('ROLE_') ? authName.minus('ROLE_') : authName
+            String roleName = authName.startsWith('ROLE_') ? authName - 'ROLE_' : authName
             set.add(roleName);
         }
         return set;
@@ -72,7 +72,8 @@ final class SpringUserUtils {
     static List<GrantedAuthority> createAuthorityList(String... authorities) {
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>(authorities.length);
         for (String authority : authorities) {
-            grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_${authority}"));
+            if(!authority.startsWith('ROLE_')) authority = "ROLE_$authority".toString()
+            grantedAuthorities.add( new SimpleGrantedAuthority(authority) );
         }
         return grantedAuthorities;
     }

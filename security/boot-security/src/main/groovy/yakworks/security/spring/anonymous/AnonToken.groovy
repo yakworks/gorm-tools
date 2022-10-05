@@ -31,7 +31,7 @@ class AnonToken extends AnonymousAuthenticationToken {
     /**
      * Constructor.
      */
-    AnonToken(String key, details) {
+    AnonToken(String key, Object details) {
         super(key, USER_DETAILS, ROLES)
         setDetails details
     }

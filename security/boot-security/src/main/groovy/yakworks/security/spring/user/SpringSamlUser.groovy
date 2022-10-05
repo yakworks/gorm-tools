@@ -7,19 +7,14 @@ package yakworks.security.spring.user
 import groovy.transform.CompileStatic
 import groovy.transform.InheritConstructors
 
-import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.saml2.provider.service.authentication.DefaultSaml2AuthenticatedPrincipal
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal
 
+import yakworks.security.user.UserInfo
+
 /**
- * Grails security has a GrailsUser that it uses by default, this replaces it to remove confusion.
- * NOTES:
- *  - Extends the default Spring Security User class (which implements the UserDetails interface)
- *  - adds the id (the default implementation will set to the AppUser.id)
- *  - We dont use the AppUser gorm domain and instead create this with the data from AppUser instance
- *  - think of it as a DTO or serializable value object for a Spring Security User, this is whats stored in the context for the logged in user
- *
- * @see org.springframework.security.core.userdetails.User
+ * This extends Saml2AuthenticatedPrincipal and implements UserInfo and UserDetails.
+ * Giving it a compatible interface with all the bases.
  */
 @SuppressWarnings(['ParameterCount'])
 @InheritConstructors
@@ -27,34 +22,43 @@ import org.springframework.security.saml2.provider.service.authentication.Saml2A
 class SpringSamlUser extends DefaultSaml2AuthenticatedPrincipal implements SpringUserInfo {
     private static final long serialVersionUID = 1
 
-    // SpringSamlUser(String name, Map<String, List<Object>> attributes,  List<String> sessionIndexes) {
-    //     super(name, attributes, sessionIndexes)
-    // }
+    /** Hard wire username */
+    String username
 
-    @Override
-    Collection<? extends GrantedAuthority> getAuthorities(){
-        return SpringUserUtils.rolesToAuthorities(roles)
+    /** This is also a AuthenticatedPrincipal so name is used. Override it completely to take ambiguity out of it */
+    String name
+
+    SpringSamlUser(Saml2AuthenticatedPrincipal samlAuthPrincipal, SpringUserInfo userInfo){
+        super(samlAuthPrincipal.name, samlAuthPrincipal.attributes, samlAuthPrincipal.sessionIndexes)
+        this.relyingPartyRegistrationId = samlAuthPrincipal.relyingPartyRegistrationId
+        //keep userName  from okta saml
+        userProfile['userName'] = samlAuthPrincipal.name
+        setUsername(userInfo.username)
+        merge(userInfo)
+        attributesToUserProfile()
     }
-
-    static SpringSamlUser of(Saml2AuthenticatedPrincipal samlAuthPrincipal){
-        return SpringSamlUser.of(samlAuthPrincipal, [] as List<String>)
-    }
-
-    static SpringSamlUser of(Saml2AuthenticatedPrincipal samlAuthPrincipal, Collection<String> roles){
-        def spu = new SpringSamlUser(samlAuthPrincipal.name, samlAuthPrincipal.attributes, samlAuthPrincipal.sessionIndexes)
-        spu.relyingPartyRegistrationId = samlAuthPrincipal.relyingPartyRegistrationId
-        spu.roles = roles as Set<String>
+    /**
+     * Build SpringSamlUser from the built SamlAuthPricipal (from Okta) and merge in the userInfo from internal db
+     * @param samlAuthPrincipal SamlAuthPricipal (built from Okta)
+     * @param userInfo our userDetails from database, built from AppUser
+     * @return the new intance to store in authentication
+     */
+    static SpringSamlUser of(Saml2AuthenticatedPrincipal samlAuthPrincipal, SpringUserInfo userInfo){
+        //name doesnt matter here as it gets set in merge
+        def spu = new SpringSamlUser(samlAuthPrincipal, userInfo)
         return spu
     }
 
+    /** Saml spec is for attributes to be a list, which 99.9% of the time its not. So convert its attributes to our userProfile map*/
+    def attributesToUserProfile(){
 
-    @Override
-    String getPassword() {
-        return null
+        getAttributes().each { k, v ->
+            userProfile[k] = v[0] //first item in list
+        }
     }
 
     @Override
-    String getUsername() {
+    String getPassword() {
         return null
     }
 
@@ -74,8 +78,13 @@ class SpringSamlUser extends DefaultSaml2AuthenticatedPrincipal implements Sprin
     }
 
     @Override
+    String getPasswordHash() {
+        return "N/A"
+    }
+
+    @Override
     boolean isEnabled() {
-        return false
+        return true
     }
 
 }

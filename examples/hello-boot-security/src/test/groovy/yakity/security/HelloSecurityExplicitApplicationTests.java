@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * @author Rob Winch
  */
-@SpringBootTest
+@SpringBootTest(classes={HelloSecuritySpringApplication.class})
 @AutoConfigureMockMvc
 public class HelloSecurityExplicitApplicationTests {
 

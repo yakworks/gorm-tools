@@ -1,10 +1,9 @@
 package yakity.security
 
-import groovy.transform.CompileDynamic
+
 import groovy.transform.CompileStatic
 
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.context.annotation.Import
 
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
@@ -13,11 +12,10 @@ import grails.boot.config.GrailsAutoConfiguration
 // @Import([yakworks.security.config.SpringSecurityConfiguration])
 @CompileStatic
 class Application extends GrailsAutoConfiguration {
-    //@Entity scan packages
+    //@Entity scan packages to include in additions to this Application class's package
     List<String> artifactScan = ['yakworks.security.gorm']
 
     static void main(String[] args) {
-        System.setProperty("grails.env.standalone", "true")
         GrailsApp.run(Application, args)
     }
 

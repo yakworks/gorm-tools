@@ -18,7 +18,7 @@ import yakworks.security.gorm.model.SecRolePermission
 @CompileStatic
 class SecuritySeedData {
 
-    @Autowired JdbcTemplate jdbcTemplate
+    // @Autowired JdbcTemplate jdbcTemplate
 
     void fullMonty(){
         createRoles()
@@ -29,20 +29,20 @@ class SecuritySeedData {
     void createAppUsers(){
 
         AppUser admin = new AppUser([
-            id: (Long)1, username: "admin", email: "admin@9ci.com", password:"123", orgId: 2
+            id: (Long)1, username: "admin", email: "admin@yak.com", password:"123", orgId: 2
         ]).persist()
 
         admin.addRole('ADMIN', true)
         admin.addRole('POWER_USER', true)
 
         AppUser custUser = new AppUser([
-            id: (Long)2, username: "cust", email: "cust@9ci.com", password:"123", orgId: 2
+            id: (Long)2, username: "cust", email: "cust@yak.com", password:"123", orgId: 2
         ]).persist()
         assert custUser.id == 2
 
         admin.addRole('CUSTOMER', true)
 
-        AppUser noRoleUser = AppUser.create([id: 3L, username: "noroles", email: "noroles@9ci.com", password:"123", orgId: 3], bindId: true)
+        AppUser noRoleUser = AppUser.create([id: 3L, username: "noroles", email: "noroles@yak.com", password:"123", orgId: 3], bindId: true)
         assert noRoleUser.id == 3
     }
 

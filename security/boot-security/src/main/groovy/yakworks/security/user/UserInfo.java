@@ -54,9 +54,16 @@ public interface UserInfo extends Principal, Serializable {
     /** Indicates whether the user is enabled or disabled. A disabled user cannot be authenticated. */
     boolean isEnabled();
 
-    /** the organization ID */
+    /** profile info */
     Map getUserProfile();
 
     Set getRoles();
 
+    // static BasicUserInfo of(String username){
+    //     return BasicUserInfo.of(username);
+    // }
+    //
+    // static BasicUserInfo of(String username, Collection<String> roles){
+    //     return BasicUserInfo.of(username, roles);
+    // }
 }

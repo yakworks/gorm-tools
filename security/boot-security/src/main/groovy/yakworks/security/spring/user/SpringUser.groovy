@@ -4,18 +4,14 @@
 */
 package yakworks.security.spring.user
 
-
 import groovy.transform.CompileStatic
-import groovy.transform.InheritConstructors
-
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.userdetails.User
+import groovy.transform.MapConstructor
 
 import yakworks.security.user.BasicUserInfo
 import yakworks.security.user.UserInfo
 
 /**
- * Grails security has a GrailsUser that it uses by default, this replaces it to remove confusion.
+ * Grails security has a GrailsUser that it uses by default, this replaces it to remove confusion and make it Spring thats all the we depend on.
  * NOTES:
  *  - Extends the default Spring Security User class (which implements the UserDetails interface)
  *  - adds the id (the default implementation will set to the AppUser.id)
@@ -25,10 +21,19 @@ import yakworks.security.user.UserInfo
  * @see org.springframework.security.core.userdetails.User
  */
 @SuppressWarnings(['ParameterCount'])
-@InheritConstructors
+@MapConstructor
 @CompileStatic
-class SpringUser extends User implements SpringUserInfo {
+class SpringUser implements SpringUserInfo {
     private static final long serialVersionUID = 1
+    /** UserInfo &  UserDetails*/
+    final String username
+    final String passwordHash
+
+    boolean accountNonExpired = true
+    boolean accountNonLocked = true
+    boolean credentialsNonExpired = true
+    boolean enabled = true
+
 
     static SpringUser of(UserInfo userInfo){
         def roles = (userInfo.roles ?: []) as List<String>
@@ -36,12 +41,21 @@ class SpringUser extends User implements SpringUserInfo {
     }
 
     static SpringUser of(UserInfo userInfo, Collection<String> roles){
-        List<GrantedAuthority> authorities = SpringUserUtils.rolesToAuthorities(roles)
         // password is required so make sure its filled even if its OAuth or ldap
         String passwordHash = userInfo.passwordHash ?: "N/A"
-        def spu = new SpringUser(userInfo.username, passwordHash, userInfo.enabled, true, true, true, authorities)
+        def spu = new SpringUser(
+            username: userInfo.username,
+            passwordHash: passwordHash,
+            enabled: userInfo.enabled
+        )
+        spu.roles = roles as Set<String>
         spu.merge(userInfo)
         return spu
+    }
+
+    //Used mostly for testing
+    static SpringUser of(String username, Collection<String> roles){
+        return SpringUser.of(BasicUserInfo.of(username), roles)
     }
 
     static SpringUser create(Map props){

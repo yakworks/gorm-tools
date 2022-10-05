@@ -15,19 +15,20 @@
  */
 package yakity.security;
 
+import yakworks.security.config.SamlSecurityConfiguration;
 import yakworks.security.config.SpringSecurityConfiguration;
+import yakworks.security.spring.user.UserInfoDetailsService;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.saml2.provider.service.authentication.OpenSaml4AuthenticationProvider;
@@ -42,20 +43,16 @@ import static org.springframework.security.config.Customizer.withDefaults;
  *
  * @author Rob Winch
  */
+@Lazy
 @Configuration
 public class SecurityConfiguration {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        OpenSaml4AuthenticationProvider samlAuthenticationProvider = new OpenSaml4AuthenticationProvider();
-        samlAuthenticationProvider.setResponseAuthenticationConverter(groupsConverter());
+    // @DependsOn("samlAuthenticationProvider")
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, UserInfoDetailsService userDetailsService) throws Exception {
+        SpringSecurityConfiguration.applyHttpSecurity(http);
+        SamlSecurityConfiguration.applyHttpSecurity(http, userDetailsService);
 
-        SpringSecurityConfiguration.applyDefaultSecurity(http);
-        http.saml2Login(saml2 -> saml2
-                .authenticationManager(new ProviderManager(samlAuthenticationProvider))
-                .defaultSuccessUrl("/okta", true)
-            )
-            .saml2Logout(withDefaults());
         return http.build();
     }
         // // Added *ONLY* to display the dbConsole.

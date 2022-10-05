@@ -21,30 +21,41 @@ trait SpringUserInfo implements UserDetails, Named, UserInfo {
     /** UserInfo */
     Serializable id
     /** UserInfo */
+    String name
+    // /** UserInfo &  UserDetails*/
+    // String username
+    /** UserInfo */
     String displayName
     /** UserInfo */
     String email
     /** UserInfo */
     Serializable orgId
     /** roles */
-    Set<String> roles
+    Set<String> roles = [] as Set<String>
     /** future use */
-    Map<String, Object> userProfile
+    Map<String, Object> userProfile = [:] as Map<String, Object>
 
-    @Override //UserInfo
-    Set<String> getRoles() {
-        SpringUserUtils.authoritiesToRoles((Collection<GrantedAuthority>)this.getAuthorities())
+    // @Override //UserInfo
+    // Set<String> getRoles() {
+    //     SpringUserUtils.authoritiesToRoles((Collection<GrantedAuthority>)this.getAuthorities())
+    // }
+
+    @Override
+    String getPassword() {
+        return getPasswordHash()
     }
 
     @Override
-    String getPasswordHash() {
-        return this.getPassword()
+    Collection<? extends GrantedAuthority> getAuthorities(){
+        return SpringUserUtils.rolesToAuthorities(roles)
     }
 
-    void merge(UserInfo sourceUser){
-        ['id', 'name', 'displayName', 'email', 'orgId'].each{ String prop ->
+    /** merges only a subset of the data */
+    def merge(UserInfo sourceUser){
+        ['id', 'name', 'displayName', 'email', 'orgId', 'roles'].each{ String prop ->
             this[prop] = sourceUser[prop]
         }
+        return this
     }
 
 }

@@ -35,7 +35,7 @@ class BasicUserInfo implements Named, UserInfo {
         return new BasicUserInfo(username: username)
     }
 
-    static BasicUserInfo of(String username, List<String> roles){
+    static BasicUserInfo of(String username, Collection<String> roles){
         return new BasicUserInfo(username: username, roles: roles as Set)
     }
 

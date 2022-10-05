@@ -16,7 +16,6 @@ import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserCache
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -106,10 +105,11 @@ class SpringSecService implements SecService {
     @Override
     UserInfo authenticate(UserInfo userInfo) {
         Collection<? extends GrantedAuthority> grantedAuthories
-        if(userInfo instanceof UserDetails) { grantedAuthories = ((User)userInfo).authorities }
+        if(userInfo instanceof UserDetails) grantedAuthories = ((UserDetails)userInfo).authorities
         CONTEXT.authentication = new UsernamePasswordAuthenticationToken(userInfo, userInfo.passwordHash, grantedAuthories)
         //before or after?
         userCache?.removeUserFromCache userInfo.username
+        return userInfo
     }
 
     /**

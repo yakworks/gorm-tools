@@ -23,15 +23,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 /**
- * Hello Security application.
- *
- * @author Joe Grandja
+ * For now seperate from Grails Application class. If adding gsp it blows up on groovyPagesTemplateEngine'
+ * if removing the deps on gsp then doesnt find the GrailsWebRequest.lookup(). I think if we mock that out then
+ * test will start working.
  */
 @SpringBootApplication
-public class HelloSecuritySpringApplication {
+public class TestSpringApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(HelloSecuritySpringApplication.class, args);
+        SpringApplication.run(TestSpringApplication.class, args);
     }
 
     @Bean

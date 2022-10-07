@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
 import org.springframework.security.authentication.AuthenticationManager
@@ -52,9 +53,9 @@ import yakworks.security.config.SpringSecurityConfiguration
 
 /**
  * An example of explicitly configuring Spring Security with the defaults.
- *
- * @author Rob Winch
  */
+// keep componentScan in Application.groovy for now so test work. see notes in the TestSpringApplication class in tests
+// @ComponentScan(['yakity.security', 'yakworks.security'])
 @Lazy
 @EnableWebSecurity(debug = true)
 @CompileStatic

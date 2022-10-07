@@ -17,26 +17,26 @@ package yakity.security;
 
 import yakworks.security.config.SamlSecurityConfiguration;
 import yakworks.security.config.SpringSecurityConfiguration;
-import yakworks.security.spring.user.UserInfoDetailsService;
 
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.saml2.provider.service.authentication.OpenSaml4AuthenticationProvider;
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
 import org.springframework.security.saml2.provider.service.authentication.Saml2Authentication;
 import org.springframework.security.web.SecurityFilterChain;
-
-import static org.springframework.security.config.Customizer.withDefaults;
+import org.springframework.stereotype.Component;
 
 /**
  * An example of explicitly configuring Spring Security with the defaults.
@@ -45,11 +45,24 @@ import static org.springframework.security.config.Customizer.withDefaults;
  */
 @Lazy
 @Configuration
-public class SecurityConfiguration {
+public class AppSecurityConfiguration {
+
+    @Component
+    @ConfigurationProperties(prefix="app.security.jwt")
+    static class JwtProperties {
+
+        RSAPublicKey publicKey;
+        RSAPrivateKey privateKey;
+
+        long expiry = 60L;
+        String issuer = "self";
+
+    }
+
 
     @Bean
     // @DependsOn("samlAuthenticationProvider")
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, UserInfoDetailsService userDetailsService) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService userDetailsService) throws Exception {
         SpringSecurityConfiguration.applyHttpSecurity(http);
         SamlSecurityConfiguration.applyHttpSecurity(http, userDetailsService);
 

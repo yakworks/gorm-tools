@@ -181,3 +181,8 @@ docker.circle.shell:
 	-v "$$PWD":/root/project \
 	$(DOCKER_SHELL) $(BIN_BASH)
 	#	-v ~/.gradle_docker:/root/.gradle \
+
+test.hello:
+	TOKEN=`http POST admin:123@localhost:8080/token -b`
+	echo "$$TOKEN"
+	http localhost:8080 -A bearer -a "$$TOKEN"

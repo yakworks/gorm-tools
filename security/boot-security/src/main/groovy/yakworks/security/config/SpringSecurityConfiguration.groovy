@@ -17,9 +17,12 @@ import org.springframework.context.ApplicationContextAware
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
+import org.springframework.security.authentication.ProviderManager
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.saml2.provider.service.authentication.OpenSaml4AuthenticationProvider
 import org.springframework.security.web.SecurityFilterChain
 
 import yakworks.security.SecService
@@ -59,6 +62,21 @@ class SpringSecurityConfiguration implements ApplicationContextAware, BeanFactor
                 formLoginCustomizer.defaultSuccessUrl("/", true)
             )
     }
+
+    static void applySamlSecurity(HttpSecurity http, UserDetailsService userDetailsService) throws Exception {
+        //as soon bean is setup then it tries to use it for everything instead of just this one so we do it without bean
+        //need to sort out how to make it not do this.
+        OpenSaml4AuthenticationProvider samlAuthenticationProvider = new OpenSaml4AuthenticationProvider();
+        samlAuthenticationProvider.setResponseAuthenticationConverter(new SamlResponseConverter(userDetailsService));
+
+        http
+            .saml2Login(saml2 -> saml2
+                .authenticationManager(new ProviderManager(samlAuthenticationProvider))
+                .defaultSuccessUrl("/saml", true)
+            )
+            .saml2Logout(withDefaults());
+    }
+
 
     //defaults
     @Bean

@@ -17,6 +17,10 @@ package yakity.security;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 /**
  * Hello Security application.
@@ -26,8 +30,19 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class HelloSecuritySpringApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(HelloSecuritySpringApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(HelloSecuritySpringApplication.class, args);
+    }
+
+    @Bean
+    public InMemoryUserDetailsManager userDetailsService() {
+        UserDetails user = User.withDefaultPasswordEncoder()
+            .username("user")
+            .password("123")
+            .roles("USER")
+            .build();
+        return new InMemoryUserDetailsManager(user);
+    }
+
 
 }

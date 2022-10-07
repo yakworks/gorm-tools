@@ -4,11 +4,13 @@ package yakity.security
 import groovy.transform.CompileStatic
 
 import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.Import
 
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
 
 @ComponentScan(['yakity.security', 'yakworks.security'])
+@Import([AppSecurityConfiguration])
 // @Import([yakworks.security.config.SpringSecurityConfiguration])
 @CompileStatic
 class Application extends GrailsAutoConfiguration {

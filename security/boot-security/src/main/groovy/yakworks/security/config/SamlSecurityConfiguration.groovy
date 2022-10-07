@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
 import org.springframework.security.authentication.ProviderManager
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.saml2.provider.service.authentication.OpenSaml4AuthenticationProvider
 
 import yakworks.security.spring.user.UserInfoDetailsService
@@ -37,7 +38,7 @@ class SamlSecurityConfiguration implements ApplicationContextAware {
     //     return samlAuthenticationProvider
     // }
 
-    static void applyHttpSecurity(HttpSecurity http, UserInfoDetailsService userDetailsService) throws Exception {
+    static void applyHttpSecurity(HttpSecurity http, UserDetailsService userDetailsService) throws Exception {
         //as soon bean is setup then it tries to use it for everything instead of just this one so we do it without bean
         //need to sort out how to make it not do this.
         OpenSaml4AuthenticationProvider samlAuthenticationProvider = new OpenSaml4AuthenticationProvider();

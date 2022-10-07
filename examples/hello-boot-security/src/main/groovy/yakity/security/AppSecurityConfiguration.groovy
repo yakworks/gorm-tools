@@ -13,8 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package yakity.security;
+package yakity.security
 
+import groovy.transform.CompileStatic
+
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import yakworks.security.config.SamlSecurityConfiguration;
 import yakworks.security.config.SpringSecurityConfiguration;
 
@@ -44,27 +51,32 @@ import org.springframework.stereotype.Component;
  * @author Rob Winch
  */
 @Lazy
+@EnableWebSecurity(debug = true)
+@CompileStatic
 @Configuration
-public class AppSecurityConfiguration {
+class AppSecurityConfiguration {
+
+    @Autowired(required = false) Saml2RelyingPartyProperties samlProps
+    @Autowired(required = false) ObjectMapper objectMapper
 
     @Component
     @ConfigurationProperties(prefix="app.security.jwt")
     static class JwtProperties {
 
-        RSAPublicKey publicKey;
-        RSAPrivateKey privateKey;
+        RSAPublicKey publicKey
+        RSAPrivateKey privateKey
 
-        long expiry = 60L;
-        String issuer = "self";
+        long expiry = 60L
+        String issuer = "self"
 
     }
 
-
     @Bean
-    // @DependsOn("samlAuthenticationProvider")
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService userDetailsService) throws Exception {
-        SpringSecurityConfiguration.applyHttpSecurity(http);
-        SamlSecurityConfiguration.applyHttpSecurity(http, userDetailsService);
+    SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService userDetailsService) throws Exception {
+        SpringSecurityConfiguration.applyHttpSecurity(http)
+        if(samlProps?.registration?.containsKey('okta')){
+            SpringSecurityConfiguration.applySamlSecurity(http, userDetailsService)
+        }
 
         return http.build();
     }
@@ -87,24 +99,5 @@ public class AppSecurityConfiguration {
     //         .build();
     //     return new InMemoryUserDetailsManager(user);
     // }
-
-    private Converter<OpenSaml4AuthenticationProvider.ResponseToken, Saml2Authentication> groupsConverter() {
-
-        Converter<OpenSaml4AuthenticationProvider.ResponseToken, Saml2Authentication> delegate =
-            OpenSaml4AuthenticationProvider.createDefaultResponseAuthenticationConverter();
-
-        return (responseToken) -> {
-            Saml2Authentication authentication = delegate.convert(responseToken);
-            Saml2AuthenticatedPrincipal principal = (Saml2AuthenticatedPrincipal) authentication.getPrincipal();
-            List<String> groups = principal.getAttribute("groups");
-            Set<GrantedAuthority> authorities = new HashSet<>();
-            if (groups != null) {
-                groups.stream().map(SimpleGrantedAuthority::new).forEach(authorities::add);
-            } else {
-                authorities.addAll(authentication.getAuthorities());
-            }
-            return new Saml2Authentication(principal, authentication.getSaml2Response(), authorities);
-        };
-    }
 
 }

@@ -20,8 +20,18 @@ import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.oauth2.jwt.JwtDecoder
+import org.springframework.security.oauth2.jwt.JwtEncoder
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.nimbusds.jose.jwk.JWK
+import com.nimbusds.jose.jwk.JWKSet
+import com.nimbusds.jose.jwk.RSAKey
+import com.nimbusds.jose.jwk.source.ImmutableJWKSet
+import com.nimbusds.jose.jwk.source.JWKSource
+import com.nimbusds.jose.proc.SecurityContext;
 import yakworks.security.config.SamlSecurityConfiguration;
 import yakworks.security.config.SpringSecurityConfiguration;
 
@@ -78,6 +88,13 @@ class AppSecurityConfiguration {
             SpringSecurityConfiguration.applySamlSecurity(http, userDetailsService)
         }
 
+        //JWT
+        // http.csrf((csrf) -> csrf.ignoringAntMatchers("/token"))
+        http.csrf().disable()
+            .oauth2ResourceServer((oauthServer) ->
+                oauthServer.jwt()
+            )
+
         return http.build();
     }
         // // Added *ONLY* to display the dbConsole.
@@ -99,5 +116,19 @@ class AppSecurityConfiguration {
     //         .build();
     //     return new InMemoryUserDetailsManager(user);
     // }
+
+    @Bean
+    JwtDecoder jwtDecoder(JwtProperties jwtProperties) {
+        return NimbusJwtDecoder.withPublicKey(jwtProperties.publicKey).build();
+    }
+
+    @Bean
+    JwtEncoder jwtEncoder(JwtProperties jwtProperties) {
+        JWK jwk = new RSAKey.Builder(jwtProperties.publicKey).privateKey(jwtProperties.privateKey).build();
+        JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
+        NimbusJwtEncoder encoder = new NimbusJwtEncoder(jwks);
+        return encoder
+    }
+
 
 }

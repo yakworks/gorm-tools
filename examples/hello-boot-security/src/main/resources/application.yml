@@ -1,4 +1,5 @@
 spring.main.lazy-initialization: true
+spring.main.allow-bean-definition-overriding: true
 
 spring:
   security:
@@ -6,15 +7,14 @@ spring:
       relyingparty:
         registration:
           okta:
-#            signing:
-#              credentials:
-#                - private-key-location: classpath:local.key
-#                  certificate-location: classpath:local.crt
             singlelogout:
               binding: POST
               response-url: "{baseUrl}/logout/saml2/slo"
             assertingparty:
               metadata-uri: https://dev-86091574.okta.com/app/exk6q8gnhjgmEfqI65d7/sso/saml/metadata
+
+app.security.jwt.privateKey: classpath:jwt/app.key
+app.security.jwt.publicKey: classpath:jwt/app.pub
 
 logging:
   level:
@@ -22,6 +22,9 @@ logging:
     org.springframework: INFO
 #    org.hibernate.SQL: DEBUG
 #    org.springframework.security: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.security.web: TRACE
+    org.springframework.security.authentication: TRACE
     grails.plugins.DefaultGrailsPluginManager: ERROR
 
 ---

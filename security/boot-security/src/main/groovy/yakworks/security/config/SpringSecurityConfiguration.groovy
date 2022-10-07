@@ -125,7 +125,7 @@ class SpringSecurityConfiguration implements ApplicationContextAware, BeanFactor
     }
 
     @Bean
-    UserInfoDetailsService userDetailsService(){
+    UserDetailsService userDetailsService(){
         new AppUserDetailsService()
     }
 

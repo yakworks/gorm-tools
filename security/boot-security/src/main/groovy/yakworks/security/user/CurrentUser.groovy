@@ -21,7 +21,7 @@ trait CurrentUser {
     @Autowired MetaMapService metaMapService
 
     /**
-     * gets the current user info
+     * gets the current user ID, usually a long
      */
     Serializable getUserId(){
         getUser().id

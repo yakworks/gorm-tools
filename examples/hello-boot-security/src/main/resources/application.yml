@@ -22,10 +22,11 @@ logging:
     org.springframework: INFO
 #    org.hibernate.SQL: DEBUG
 #    org.springframework.security: DEBUG
-    org.springframework.security: DEBUG
-    org.springframework.security.web: TRACE
-    org.springframework.security.authentication: TRACE
-    grails.plugins.DefaultGrailsPluginManager: ERROR
+#    org.springframework.security: DEBUG
+#    org.springframework.security.web: TRACE
+#    org.springframework.security.authentication: TRACE
+#    grails.plugins.DefaultGrailsPluginManager: ERROR
+    yakity.security: TRACE
 
 ---
 info:

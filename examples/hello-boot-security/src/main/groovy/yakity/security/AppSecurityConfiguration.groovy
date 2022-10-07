@@ -57,7 +57,7 @@ import yakworks.security.config.SpringSecurityConfiguration
 // keep componentScan in Application.groovy for now so test work. see notes in the TestSpringApplication class in tests
 // @ComponentScan(['yakity.security', 'yakworks.security'])
 @Lazy
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity //(debug = true)
 @CompileStatic
 @Configuration
 class AppSecurityConfiguration {
@@ -123,13 +123,8 @@ class AppSecurityConfiguration {
         // http.csrf().disable()
 
     // @Bean
-    // public InMemoryUserDetailsManager userDetailsService() {
-    //     UserDetails user = User.withDefaultPasswordEncoder()
-    //         .username("user")
-    //         .password("123")
-    //         .roles("USER")
-    //         .build();
-    //     return new InMemoryUserDetailsManager(user);
+    // AuthenticationEvents authenticationEvents(){
+    //     new AuthenticationEvents()
     // }
 
     @Bean
@@ -149,6 +144,7 @@ class AppSecurityConfiguration {
     JwtTokenGenerator tokenGenerator(){
         new JwtTokenGenerator()
     }
+
 
 
 }

@@ -145,6 +145,7 @@ class AppSecurityConfiguration {
         return encoder
     }
 
+    @Bean
     JwtTokenGenerator tokenGenerator(){
         new JwtTokenGenerator()
     }

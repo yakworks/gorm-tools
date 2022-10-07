@@ -2,6 +2,8 @@ package yakity.security.token
 
 import java.time.Instant
 
+import groovy.transform.CompileStatic
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.jwt.Jwt
@@ -18,6 +20,7 @@ import com.nimbusds.jose.jwk.source.JWKSource
 import com.nimbusds.jose.proc.SecurityContext
 import yakity.security.AppSecurityConfiguration
 
+@CompileStatic
 class JwtTokenGenerator implements TokenGenerator<Jwt> {
 
     @Autowired JwtEncoder jwtEncoder
@@ -37,9 +40,9 @@ class JwtTokenGenerator implements TokenGenerator<Jwt> {
         String scope = authentication.authorities.collect { it.authority }.join(' ')
         Instant now = Instant.now()
         JwtClaimsSet claims = JwtClaimsSet.builder()
-            .issuer(jwtProps.issuer)
+            .issuer(jwtProperties.issuer)
             .issuedAt(now)
-            .expiresAt(now.plusSeconds(jwtProps.expiry))
+            .expiresAt(now.plusSeconds(jwtProperties.expiry))
             .subject(authentication.name)
             .claim("scope", scope)
             .build()

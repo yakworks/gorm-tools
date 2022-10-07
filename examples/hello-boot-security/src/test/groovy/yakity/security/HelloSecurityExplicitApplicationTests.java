@@ -28,32 +28,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * @author Rob Winch
  */
-@SpringBootTest(classes={TestSpringApplication.class})
+@SpringBootTest(classes = {TestSpringApplication.class})
 @AutoConfigureMockMvc
 public class HelloSecurityExplicitApplicationTests {
 
-	@Autowired
-	private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-	@Test
-	void indexWhenUnAuthenticatedThenRedirect() throws Exception {
-		// @formatter:off
-		this.mockMvc.perform(get("/"))
-				.andExpect(status().isUnauthorized());
+    @Test
+    void indexWhenUnAuthenticatedThenRedirect() throws Exception {
+        // @formatter:off
+        this.mockMvc.perform(get("/"))
+            .andExpect(status().isUnauthorized());
         this.mockMvc.perform(get("/spring"))
             .andExpect(status().isUnauthorized());
-		// @formatter:on
-	}
+        // @formatter:on
+    }
 
-	@Test
-	@WithMockUser
-	void indexWhenAuthenticatedThenOk() throws Exception {
-		// @formatter:off
-		this.mockMvc.perform(get("/"))
-				.andExpect(status().isOk());
+    @Test
+    @WithMockUser
+    void indexWhenAuthenticatedThenOk() throws Exception {
+        // @formatter:off
+        this.mockMvc.perform(get("/"))
+            .andExpect(status().isOk());
         this.mockMvc.perform(get("/spring"))
             .andExpect(status().isOk());
-		// @formatter:on
-	}
+        // @formatter:on
+    }
 
 }

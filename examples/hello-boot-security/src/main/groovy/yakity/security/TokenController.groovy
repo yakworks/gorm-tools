@@ -33,6 +33,8 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
 
+import yakity.security.token.JwtTokenGenerator
+
 /**
  * A controller for the token resource.
  *
@@ -42,25 +44,24 @@ import org.springframework.web.bind.annotation.RestController
 @CompileStatic
 class TokenController {
 
-    @Autowired
-    Supplier<Jwt> jwtSupplier
+    @Autowired JwtTokenGenerator tokenGenerator
 
     @PostMapping("/token")
     String token() {
-        return jwtSupplier.get().tokenValue
+        return tokenGenerator.genererate().tokenValue
     }
 
     @PostMapping("/api/login")
     Map apiLogin() {
         return [
             token_type: 'Bearer',
-            access_token: jwtSupplier.get().tokenValue
+            access_token: tokenGenerator.genererate().tokenValue
         ]
     }
 
     @PostMapping("/api/wtf")
     Map wtf() {
-        return [access_token: jwtSupplier.get().tokenValue]
+        return [access_token: tokenGenerator.genererate().tokenValue]
     }
 
 }

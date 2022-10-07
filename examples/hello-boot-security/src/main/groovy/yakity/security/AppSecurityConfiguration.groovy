@@ -15,15 +15,30 @@
  */
 package yakity.security
 
+import java.security.interfaces.RSAPrivateKey
+import java.security.interfaces.RSAPublicKey
+
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Lazy
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.JwtEncoder
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder
+import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.ForwardAuthenticationSuccessHandler
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher
+import org.springframework.stereotype.Component
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.nimbusds.jose.jwk.JWK
@@ -31,29 +46,9 @@ import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet
 import com.nimbusds.jose.jwk.source.JWKSource
-import com.nimbusds.jose.proc.SecurityContext;
-import yakworks.security.config.SamlSecurityConfiguration;
-import yakworks.security.config.SpringSecurityConfiguration;
-
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.saml2.provider.service.authentication.OpenSaml4AuthenticationProvider;
-import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
-import org.springframework.security.saml2.provider.service.authentication.Saml2Authentication;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.stereotype.Component;
+import com.nimbusds.jose.proc.SecurityContext
+import yakity.security.token.JwtTokenGenerator
+import yakworks.security.config.SpringSecurityConfiguration
 
 /**
  * An example of explicitly configuring Spring Security with the defaults.
@@ -95,7 +90,26 @@ class AppSecurityConfiguration {
                 oauthServer.jwt()
             )
 
-        return http.build();
+        // .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        // .exceptionHandling((exceptions) -> exceptions
+        // 		.authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
+        // 		.accessDeniedHandler(new BearerTokenAccessDeniedHandler())
+        // );
+
+        def jsonUnameFilter = new JsonUsernamePasswordLoginFilter(objectMapper)
+        jsonUnameFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/api/login", "POST"))
+        jsonUnameFilter.setAuthenticationSuccessHandler(new ForwardAuthenticationSuccessHandler("/token"))
+        http.addFilterAfter(jsonUnameFilter, BasicAuthenticationFilter)
+
+        // def restUnameFilter = new JsonLoginUserPasswordFilter(objectMapper)
+        // http.addFilterAfter(restUnameFilter, BasicAuthenticationFilter)
+
+        def builtChain =  http.build();
+        //do after build as need to set the AuthenticationManager
+        def authManagerAfter = http.getSharedObject(AuthenticationManager.class)
+        jsonUnameFilter.setAuthenticationManager(authManagerAfter)
+
+        return builtChain
     }
         // // Added *ONLY* to display the dbConsole.
         // // Best not to do this in production.  If you need frames, it would be best to use
@@ -128,6 +142,10 @@ class AppSecurityConfiguration {
         JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
         NimbusJwtEncoder encoder = new NimbusJwtEncoder(jwks);
         return encoder
+    }
+
+    JwtTokenGenerator tokenGenerator(){
+        new JwtTokenGenerator()
     }
 
 

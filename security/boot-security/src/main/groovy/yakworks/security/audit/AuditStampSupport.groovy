@@ -9,7 +9,6 @@ import javax.annotation.PostConstruct
 
 import groovy.transform.CompileStatic
 
-import org.codehaus.groovy.runtime.DefaultGroovyMethods
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.grails.datastore.mapping.engine.EntityAccess
 import org.grails.datastore.mapping.model.MappingContext

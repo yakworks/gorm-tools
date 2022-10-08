@@ -7,6 +7,7 @@ apply from: "${rootDir}/gradle/gorm-lib.gradle"
 dependencies {
   console "org.grails:grails-console"
 
+  compileOnly "org.springframework.boot:spring-boot-autoconfigure"
   // api project(":commons")
   // TODO use this standard for json converters
   // api "jakarta.json.bind:jakarta.json.bind-api:2.0.0"

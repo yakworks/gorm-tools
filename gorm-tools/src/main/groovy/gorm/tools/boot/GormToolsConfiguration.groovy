@@ -9,6 +9,7 @@ import javax.sql.DataSource
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.model.AbstractMappingContext
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -94,6 +95,7 @@ class GormToolsConfiguration {
     ParallelTools parallelTools(){ new ParallelStreamTools()}
 
     @Bean
+    @ConditionalOnMissingBean
     AsyncService asyncService(){ new AsyncService()}
 
     @Bean @Lazy(false)

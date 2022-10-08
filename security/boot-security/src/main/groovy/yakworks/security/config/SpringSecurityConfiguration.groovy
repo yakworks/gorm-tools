@@ -32,6 +32,7 @@ import yakworks.security.audit.AuditStampSupport
 import yakworks.security.audit.DefaultAuditUserResolver
 import yakworks.security.gorm.AppUserService
 import yakworks.security.gorm.PasswordValidator
+import yakworks.security.spring.AsyncSecureService
 import yakworks.security.spring.CurrentSpringUser
 import yakworks.security.spring.SpringSecService
 import yakworks.security.spring.user.AppUserDetailsService
@@ -134,6 +135,11 @@ class SpringSecurityConfiguration implements ApplicationContextAware, BeanFactor
         new BCryptPasswordEncoder()
     }
 
+    @Bean
+    AsyncSecureService asyncService(){
+        new AsyncSecureService()
+    }
+
     //dont register beans if audit trail is disabled.
     @ConditionalOnProperty(value="gorm.tools.audit.enabled", havingValue = "true", matchIfMissing = true)
     @Configuration @Lazy
@@ -156,4 +162,14 @@ class SpringSecurityConfiguration implements ApplicationContextAware, BeanFactor
         }
 
     }
+
+    // @Configuration //(proxyBeanMethods = false)
+    // @Lazy
+    // @ConditionalOnProperty("spring.security.saml2.relyingparty.registration.okta.assertingparty.metadata-uri")
+    // @CompileStatic
+    // static class SamlSecurityConfiguration implements ApplicationContextAware {
+    //
+    //     ApplicationContext applicationContext
+    // }
+
 }

@@ -18,6 +18,6 @@ class AuthenticationEvents {
 
     @EventListener
     void onFailure(AbstractAuthenticationFailureEvent failures) {
-        log.trace("👹👹👹👹👹👹👹👹👹 Failuer ${failures.class.name}", failures.exception)
+        log.trace("👹👹👹👹👹👹👹👹👹FAILURE ${failures.class.name}", failures.exception)
     }
 }

@@ -10,6 +10,7 @@ import javax.annotation.PostConstruct
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.DefaultGroovyMethods
+import org.codehaus.groovy.runtime.InvokerHelper
 import org.grails.datastore.mapping.engine.EntityAccess
 import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
@@ -124,7 +125,7 @@ class AuditStampSupport {
     }
 
     public <T> T createTimestamp(Class<?> dateTimeClass = LocalDateTime) {
-        return (T) DefaultGroovyMethods.invokeMethod(dateTimeClass, "now", null);
+        return (T) InvokerHelper.invokeStaticMethod(dateTimeClass, "now", null);
     }
 
     /**

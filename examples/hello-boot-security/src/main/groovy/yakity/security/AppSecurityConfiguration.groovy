@@ -65,18 +65,6 @@ class AppSecurityConfiguration {
     @Autowired(required = false) Saml2RelyingPartyProperties samlProps
     @Autowired(required = false) ObjectMapper objectMapper
 
-    @Component
-    @ConfigurationProperties(prefix="app.security.jwt")
-    static class JwtProperties {
-
-        RSAPublicKey publicKey
-        RSAPrivateKey privateKey
-
-        long expiry = 60L
-        String issuer = "self"
-
-    }
-
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService userDetailsService) throws Exception {
         SpringSecurityConfiguration.applyHttpSecurity(http)

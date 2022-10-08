@@ -19,12 +19,13 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet
 import com.nimbusds.jose.jwk.source.JWKSource
 import com.nimbusds.jose.proc.SecurityContext
 import yakity.security.AppSecurityConfiguration
+import yakity.security.JwtProperties
 
 @CompileStatic
 class JwtTokenGenerator implements TokenGenerator<Jwt> {
 
     @Autowired JwtEncoder jwtEncoder
-    @Autowired AppSecurityConfiguration.JwtProperties jwtProperties
+    @Autowired JwtProperties jwtProperties
 
     JwtEncoder getJwtEncoder(){
         if(!this.jwtEncoder) {

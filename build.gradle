@@ -36,6 +36,8 @@ subprojects { subprj ->
       }
     }
     maven { url "http://repo.9ci.com/public-libs"; allowInsecureProtocol = true }
+    maven { url "https://repo.spring.io/milestone" }
+    maven { url "https://repo.spring.io/snapshot" }
   }
   // get prop with default if null, converts to boolean
   Closure getProp = { pname, defualtv -> (subprj.findProperty(pname) ?: defualtv).toBoolean() }

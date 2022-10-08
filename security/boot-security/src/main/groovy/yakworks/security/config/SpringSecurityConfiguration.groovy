@@ -53,15 +53,15 @@ class SpringSecurityConfiguration implements ApplicationContextAware, BeanFactor
 
     static void applyHttpSecurity(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests((authorize) ->
-                authorize.mvcMatchers("/actuator/**", "/resources/**", "/about").permitAll()
-                    .anyRequest().authenticated()
+            .authorizeHttpRequests((authorize) -> authorize
+                .requestMatchers("/actuator/**", "/resources/**", "/about").permitAll()
+                .anyRequest().authenticated()
             )
             .httpBasic(withDefaults())
-        // .formLogin(withDefaults())
-            .formLogin( formLoginCustomizer ->
-                formLoginCustomizer.defaultSuccessUrl("/", true)
-            )
+            .formLogin(withDefaults())
+            // .formLogin( formLoginCustomizer ->
+            //     formLoginCustomizer.defaultSuccessUrl("/", true)
+            // )
     }
 
     static void applySamlSecurity(HttpSecurity http, UserDetailsService userDetailsService) throws Exception {

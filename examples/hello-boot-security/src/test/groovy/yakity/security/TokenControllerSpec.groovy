@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.MediaType
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
@@ -53,6 +54,23 @@ class TokenControllerSpec extends Specification {
         mockMvc.perform(get("/")
             .header("Authorization", "Bearer " + token))
             .andExpect(status().isOk())
+    }
+
+    void "Post auth and bearer auth should give ok status and hello"() {
+        when: "we login with basic auth"
+        //does asserts too
+        MvcResult result = mockMvc
+            .perform(post("/api/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content('{ "username": "user", "password": 123 }')
+            )
+            .andExpect(status().isOk())
+            .andReturn()
+
+        //the mock mvc doesn't do forwards so just check that it sent it over to token on success
+        then:
+        result.response.forwardedUrl == "/token"
+
     }
 
     void "should be unauthroized"() {

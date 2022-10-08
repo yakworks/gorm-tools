@@ -28,6 +28,7 @@ import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
 import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -66,7 +67,13 @@ class AppSecurityConfiguration {
     @Autowired(required = false) ObjectMapper objectMapper
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService userDetailsService) throws Exception {
+    AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) {
+        //this gets the default authManager from the the authConfig which gets injected during the autoconfig securityFilterChain process
+        return authConfig.getAuthenticationManager()
+    }
+
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService userDetailsService, AuthenticationManager authenticationManager) throws Exception {
         SpringSecurityConfiguration.applyHttpSecurity(http)
         if(samlProps?.registration?.containsKey('okta')){
             SpringSecurityConfiguration.applySamlSecurity(http, userDetailsService)
@@ -88,15 +95,13 @@ class AppSecurityConfiguration {
         def jsonUnameFilter = new JsonUsernamePasswordLoginFilter(objectMapper)
         jsonUnameFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/api/login", "POST"))
         jsonUnameFilter.setAuthenticationSuccessHandler(new ForwardAuthenticationSuccessHandler("/token"))
+        jsonUnameFilter.setAuthenticationManager(authenticationManager)
         http.addFilterAfter(jsonUnameFilter, BasicAuthenticationFilter)
-
-        // def restUnameFilter = new JsonLoginUserPasswordFilter(objectMapper)
-        // http.addFilterAfter(restUnameFilter, BasicAuthenticationFilter)
 
         def builtChain =  http.build();
         //do after build as need to set the AuthenticationManager
-        def authManagerAfter = http.getSharedObject(AuthenticationManager.class)
-        jsonUnameFilter.setAuthenticationManager(authManagerAfter)
+        // def authManagerAfter = http.getSharedObject(AuthenticationManager.class)
+        // jsonUnameFilter.setAuthenticationManager(authManagerAfter)
 
         return builtChain
     }

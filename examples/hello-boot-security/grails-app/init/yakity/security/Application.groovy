@@ -11,7 +11,6 @@ import grails.boot.config.GrailsAutoConfiguration
 
 @ComponentScan(['yakity.security', 'yakworks.security'])
 @Import([AppSecurityConfiguration])
-// @Import([yakworks.security.config.SpringSecurityConfiguration])
 @CompileStatic
 class Application extends GrailsAutoConfiguration {
     //@Entity scan packages to include in additions to this Application class's package

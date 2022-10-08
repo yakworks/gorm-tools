@@ -186,3 +186,8 @@ test.hello:
 	TOKEN=`http POST admin:123@localhost:8080/token -b`
 	echo "$$TOKEN"
 	http localhost:8080 -A bearer -a "$$TOKEN"
+
+test.hello-post:
+	TOKEN=`http -b POST localhost:8080/api/login username=admin password=1234`
+	echo "$$TOKEN"
+	http localhost:8080 -A bearer -a "$$TOKEN"

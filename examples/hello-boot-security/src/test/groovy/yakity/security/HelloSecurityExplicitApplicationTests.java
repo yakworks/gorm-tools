@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * @author Rob Winch
  */
-@SpringBootTest(classes = {TestSpringApplication.class})
+@SpringBootTest //(classes = {TestSpringApplication.class})
 @AutoConfigureMockMvc
 public class HelloSecurityExplicitApplicationTests {
 
@@ -53,6 +53,8 @@ public class HelloSecurityExplicitApplicationTests {
             .andExpect(status().isOk());
         this.mockMvc.perform(get("/spring"))
             .andExpect(status().isOk());
+        // this.mockMvc.perform(get("/grails"))
+        //     .andExpect(status().isOk());
         // @formatter:on
     }
 

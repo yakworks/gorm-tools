@@ -1,4 +1,8 @@
-package yakity.security.token
+/*
+* Copyright 2022 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
+* You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+*/
+package yakworks.security.spring.token
 
 import java.time.Instant
 
@@ -18,8 +22,7 @@ import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet
 import com.nimbusds.jose.jwk.source.JWKSource
 import com.nimbusds.jose.proc.SecurityContext
-import yakity.security.AppSecurityConfiguration
-import yakity.security.JwtProperties
+import yakworks.security.spring.JwtProperties
 
 @CompileStatic
 class JwtTokenGenerator implements TokenGenerator<Jwt> {

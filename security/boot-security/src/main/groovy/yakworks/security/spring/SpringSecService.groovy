@@ -23,11 +23,12 @@ import org.springframework.security.web.WebAttributes
 
 import jakarta.annotation.Nullable
 import yakworks.security.SecService
+import yakworks.security.gorm.AppUserDetailsService
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
-import yakworks.security.spring.user.AppUserDetailsService
 import yakworks.security.spring.user.SpringUser
 import yakworks.security.spring.user.SpringUserInfo
+import yakworks.security.spring.user.SpringUserUtils
 import yakworks.security.user.BasicUserInfo
 import yakworks.security.user.UserInfo
 
@@ -72,7 +73,7 @@ class SpringSecService implements SecService {
      */
     @Override
     UserInfo loginAsSystemUser() {
-        SpringUserInfo secUser = ((AppUserDetailsService)userDetailsService).loadUserByUserId(1)
+        SpringUserInfo secUser = SpringUserUtils.systemUser() //((AppUserDetailsService)userDetailsService).loadUserByUserId(1)
         assert secUser.roles.contains(SecRole.ADMIN)
         authenticate(secUser)
         return secUser
@@ -129,12 +130,6 @@ class SpringSecService implements SecService {
     @CompileDynamic
     AuthenticationException getLastAuthenticationException() {
         return WebUtils.retrieveGrailsWebRequest().getSession().getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION)
-    }
-
-    @CompileDynamic
-    static SpringUserInfo mockUser(String username, String pwd, List roles, Long id, Long orgId){
-        def u = new BasicUserInfo(username: username, passwordHash: pwd, roles: roles, id: id, orgId: orgId)
-        SpringUser.of(u)
     }
 
 }

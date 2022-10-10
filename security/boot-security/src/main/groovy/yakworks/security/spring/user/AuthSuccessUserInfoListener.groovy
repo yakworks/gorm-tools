@@ -7,13 +7,15 @@ package yakworks.security.spring.user
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.event.EventListener
 import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent
 import org.springframework.security.core.AuthenticatedPrincipal
 import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal
-import org.springframework.stereotype.Component
 
 /**
  * Listener to update details in the Authentication with our UserInfo facade.
@@ -24,6 +26,8 @@ import org.springframework.stereotype.Component
 @Slf4j
 @CompileStatic
 class AuthSuccessUserInfoListener {
+
+    @Autowired UserDetailsService userDetailsService
 
     @EventListener
     void onSuccess(AuthenticationSuccessEvent success) {
@@ -59,6 +63,16 @@ class AuthSuccessUserInfoListener {
     void doIdentityProvided(AbstractAuthenticationToken authentication, AuthenticatedPrincipal principal){
         if(principal instanceof Saml2AuthenticatedPrincipal){
             log.debug("😀😀😀 SAML LOGIN")
+            Saml2AuthenticatedPrincipal samlPrincipal = (Saml2AuthenticatedPrincipal) principal
+            String username = samlPrincipal.name
+            SpringUserInfo springUser = (SpringUserInfo)userDetailsService.loadUserByUsername(username)
+            //TODO This is where we can call out to create one.
+            if (!springUser) {
+                throw new UsernameNotFoundException("Saml authentication was successful but no application user found for username: $username")
+            }
+            springUser.setAuditDetails(authentication.details)
+            //replace with this springUserInfo
+            authentication.setDetails(springUser)
         }
         //FUTURE USE
     }

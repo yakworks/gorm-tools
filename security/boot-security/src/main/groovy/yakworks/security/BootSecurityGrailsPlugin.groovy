@@ -12,12 +12,6 @@ import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreato
 
 import grails.plugins.Plugin
 import grails.util.Environment
-import yakworks.security.audit.AuditStampBeforeValidateListener
-import yakworks.security.audit.AuditStampPersistenceEventListener
-import yakworks.security.audit.AuditStampSupport
-import yakworks.security.audit.DefaultAuditUserResolver
-import yakworks.security.config.SpringSecurityConfiguration
-import yakworks.security.spring.AsyncSecureService
 
 @SuppressWarnings(['Indentation'])
 class BootSecurityGrailsPlugin extends Plugin {

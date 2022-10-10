@@ -14,8 +14,8 @@ dependencies {
   console "org.grails:grails-console"
 
   implementation "org.springframework.boot:spring-boot-starter-security"
-  compileOnly 'org.springframework.security:spring-security-saml2-service-provider'
-  compileOnly 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+  api 'org.springframework.security:spring-security-saml2-service-provider'
+  api 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 
   // implementation("org.grails.plugins:spring-security-core:$vSpringSecurity"){
   //   exclude group: 'org.grails', module: 'grails-dependencies'

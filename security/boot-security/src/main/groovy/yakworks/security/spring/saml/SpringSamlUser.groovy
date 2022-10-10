@@ -2,7 +2,7 @@
 * Copyright 2006-2016 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.security.spring.user
+package yakworks.security.spring.saml
 
 import groovy.transform.CompileStatic
 import groovy.transform.InheritConstructors
@@ -10,7 +10,7 @@ import groovy.transform.InheritConstructors
 import org.springframework.security.saml2.provider.service.authentication.DefaultSaml2AuthenticatedPrincipal
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal
 
-import yakworks.security.user.UserInfo
+import yakworks.security.spring.user.SpringUserInfo
 
 /**
  * This extends Saml2AuthenticatedPrincipal and implements UserInfo and UserDetails.

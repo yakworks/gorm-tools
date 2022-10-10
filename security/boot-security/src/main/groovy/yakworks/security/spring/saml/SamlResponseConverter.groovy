@@ -2,7 +2,7 @@
 * Copyright 2022 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.security.config
+package yakworks.security.spring.saml
 
 import groovy.transform.CompileStatic
 
@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal
 import org.springframework.security.saml2.provider.service.authentication.Saml2Authentication
 
-import yakworks.security.spring.user.SpringSamlUser
 import yakworks.security.spring.user.SpringUserInfo
 
 import static org.springframework.security.saml2.provider.service.authentication.OpenSaml4AuthenticationProvider.ResponseToken

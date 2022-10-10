@@ -2,7 +2,7 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.security.spring.user
+package yakworks.security.gorm
 
 
 import groovy.transform.CompileStatic
@@ -13,6 +13,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 
 import grails.gorm.transactions.Transactional
 import yakworks.security.gorm.model.AppUser
+import yakworks.security.spring.user.SpringUserInfo
+import yakworks.security.spring.user.UserInfoDetailsService
 
 /**
  * Default Gorm-Tools implementation of UserDetailsService that uses AppUser to load users and roles

@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 
 import yakworks.security.gorm.PasswordValidator
 import yakworks.security.gorm.model.AppUser
-import yakworks.security.spring.user.AppUserDetailsService
+import yakworks.security.gorm.AppUserDetailsService
 import yakworks.security.spring.user.SpringUser
 import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.testing.mixin.integration.Integration

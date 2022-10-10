@@ -15,11 +15,21 @@
  */
 package yakity.security;
 
+import yakworks.security.spring.JwtProperties;
+import yakworks.security.spring.SpringSecurityConfiguration;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 /**
@@ -28,6 +38,8 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
  * test will start working.
  */
 @SpringBootApplication
+// @Import({SpringSecurityConfiguration.JwtTokenConfiguration.class})
+// @EnableConfigurationProperties({JwtProperties.class})
 public class TestSpringApplication {
 
     public static void main(String[] args) {
@@ -35,14 +47,18 @@ public class TestSpringApplication {
     }
 
     @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-        UserDetails user = User.withDefaultPasswordEncoder()
-            .username("user")
+    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
+        UserDetails user = User.withUsername("user")
+            .passwordEncoder(passwordEncoder::encode)
             .password("123")
             .roles("USER")
             .build();
         return new InMemoryUserDetailsManager(user);
     }
 
+    @Bean
+    PasswordEncoder passwordEncoder(){
+        return NoOpPasswordEncoder.getInstance();
+    }
 
 }

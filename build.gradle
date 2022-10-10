@@ -69,4 +69,5 @@ ext.codenarcRuleset= '''
   getRule('ExplicitCallToEqualsMethod').enabled = false
   getRule('ExplicitHashSetInstantiation').enabled = false
   getRule('AssignmentToStaticFieldFromInstanceMethod').enabled = false
+  getRule('UnnecessaryCollectCall').enabled = false
 '''

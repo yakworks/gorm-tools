@@ -18,7 +18,7 @@ import yakworks.util.StringUtils
 @CompileStatic
 trait CurrentUser {
 
-    @Autowired MetaMapService metaMapService
+    // @Autowired MetaMapService metaMapService
 
     /**
      * gets the current user ID, usually a long
@@ -72,7 +72,8 @@ trait CurrentUser {
      * Gets user fields to send to client about their login
      */
     Map getUserMap(List incs) {
-        Map userMap = metaMapService.createMetaMap(getUser(), incs).clone() as Map
+        Map userMap = getUser().properties.subMap(incs)
+        // Map userMap = metaMapService.createMetaMap(getUser(), incs).clone() as Map
         // if (isCustomer()) userMap.put('isCustomer', true)
         return userMap
     }

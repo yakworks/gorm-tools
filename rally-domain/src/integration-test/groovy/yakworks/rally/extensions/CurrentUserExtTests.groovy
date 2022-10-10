@@ -25,7 +25,7 @@ class CurrentUserExtTests extends Specification implements DomainIntTest {
     def "isCustomer"() {
         when:
         assert !currentUser.isCustomer()
-        def org = Org.get(2)
+        def org = Org.get(1)
         org.type = OrgType.Customer
         org.persist()
         flushAndClear()

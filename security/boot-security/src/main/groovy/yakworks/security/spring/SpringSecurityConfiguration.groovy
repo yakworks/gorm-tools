@@ -2,38 +2,43 @@
 * Copyright 2022 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.security.config
+package yakworks.security.spring
 
 import groovy.transform.CompileStatic
 
-import org.springframework.beans.factory.BeanFactory
-import org.springframework.beans.factory.BeanFactoryAware
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext
-import org.springframework.context.ApplicationContextAware
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
-import org.springframework.security.authentication.ProviderManager
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.security.saml2.provider.service.authentication.OpenSaml4AuthenticationProvider
+import org.springframework.security.oauth2.jwt.JwtDecoder
+import org.springframework.security.oauth2.jwt.JwtEncoder
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.ForwardAuthenticationSuccessHandler
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.nimbusds.jose.jwk.JWK
+import com.nimbusds.jose.jwk.JWKSet
+import com.nimbusds.jose.jwk.RSAKey
+import com.nimbusds.jose.jwk.source.ImmutableJWKSet
+import com.nimbusds.jose.jwk.source.JWKSource
+import com.nimbusds.jose.proc.SecurityContext
 import yakworks.security.SecService
-import yakworks.security.audit.AuditStampBeforeValidateListener
-import yakworks.security.audit.AuditStampPersistenceEventListener
-import yakworks.security.audit.AuditStampSupport
-import yakworks.security.audit.DefaultAuditUserResolver
+import yakworks.security.gorm.AppUserDetailsService
 import yakworks.security.gorm.AppUserService
 import yakworks.security.gorm.PasswordValidator
-import yakworks.security.spring.AsyncSecureService
-import yakworks.security.spring.CurrentSpringUser
-import yakworks.security.spring.SpringSecService
-import yakworks.security.spring.user.AppUserDetailsService
+import yakworks.security.spring.token.JwtTokenGenerator
 import yakworks.security.spring.user.AuthSuccessUserInfoListener
 import yakworks.security.user.CurrentUser
 import yakworks.security.user.CurrentUserHolder
@@ -43,12 +48,10 @@ import static org.springframework.security.config.Customizer.withDefaults
 @Configuration //(proxyBeanMethods = false)
 @Lazy
 @CompileStatic
-class SpringSecurityConfiguration implements ApplicationContextAware, BeanFactoryAware {
+@EnableConfigurationProperties([JwtProperties])
+class SpringSecurityConfiguration {
 
-    BeanFactory beanFactory
-    ApplicationContext applicationContext
-
-    static void applyHttpSecurity(HttpSecurity http) throws Exception {
+    static void applyHttpSecurity(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
         http
             .authorizeHttpRequests((authorize) -> authorize
                 .requestMatchers("/actuator/**", "/resources/**", "/about").permitAll()
@@ -59,22 +62,29 @@ class SpringSecurityConfiguration implements ApplicationContextAware, BeanFactor
             // .formLogin( formLoginCustomizer ->
             //     formLoginCustomizer.defaultSuccessUrl("/", true)
             // )
+
+        def ctx = http.getSharedObject(ApplicationContext.class)
+        //POC for enabling the legacy login with a POST to the /api/login endpoint.
+        def jsonUnameFilter = new JsonUsernamePasswordLoginFilter(ctx.getBean(ObjectMapper))
+        jsonUnameFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/api/login", "POST"))
+        jsonUnameFilter.setAuthenticationSuccessHandler(new ForwardAuthenticationSuccessHandler("/token"))
+        jsonUnameFilter.setAuthenticationManager(authenticationManager)
+        http.addFilterAfter(jsonUnameFilter, BasicAuthenticationFilter)
+
+
     }
 
     static void applySamlSecurity(HttpSecurity http, UserDetailsService userDetailsService) throws Exception {
-        //as soon bean is setup then it tries to use it for everything instead of just this one so we do it without bean
-        //need to sort out how to make it not do this.
-        OpenSaml4AuthenticationProvider samlAuthenticationProvider = new OpenSaml4AuthenticationProvider();
-        samlAuthenticationProvider.setResponseAuthenticationConverter(new SamlResponseConverter(userDetailsService));
-
         http
-            .saml2Login(saml2 -> saml2
-                .authenticationManager(new ProviderManager(samlAuthenticationProvider))
-                .defaultSuccessUrl("/saml", true)
-            )
+            .saml2Login(withDefaults())
             .saml2Logout(withDefaults());
     }
 
+    @Bean
+    AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) {
+        //this gets the default authManager from the the authConfig which gets injected during the autoconfig securityFilterChain process
+        return authConfig.getAuthenticationManager()
+    }
 
     @Bean
     AuthSuccessUserInfoListener authSuccessUserInfoListener(){
@@ -84,8 +94,8 @@ class SpringSecurityConfiguration implements ApplicationContextAware, BeanFactor
     //defaults
     @Bean
     @ConditionalOnMissingBean([ SecurityFilterChain.class ])
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        applyHttpSecurity(http)
+    SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
+        applyHttpSecurity(http, authenticationManager)
         return http.build()
     }
 
@@ -110,23 +120,19 @@ class SpringSecurityConfiguration implements ApplicationContextAware, BeanFactor
         new CurrentSpringUser()
     }
 
-    //FIXME done in plugin until we figure out order here in java config
-    // @Bean
-    // AsyncSecureService asyncService(){
-    //     new AsyncSecureService()
-    // }
-
     @Bean
     PasswordValidator passwordValidator(){
         new PasswordValidator()
     }
 
     @Bean
+    @ConditionalOnMissingBean
     UserDetailsService userDetailsService(){
         new AppUserDetailsService()
     }
 
     @Bean
+    @ConditionalOnMissingBean
     PasswordEncoder passwordEncoder(){
         new BCryptPasswordEncoder()
     }
@@ -136,25 +142,24 @@ class SpringSecurityConfiguration implements ApplicationContextAware, BeanFactor
         new AsyncSecureService()
     }
 
-    //dont register beans if audit trail is disabled.
-    @ConditionalOnProperty(value="gorm.tools.audit.enabled", havingValue = "true", matchIfMissing = true)
     @Configuration @Lazy
-    static class AuditStampConfiguration {
+    static class JwtTokenConfiguration {
         @Bean
-        AuditStampBeforeValidateListener auditStampBeforeValidateListener(){
-            new AuditStampBeforeValidateListener()
+        JwtDecoder jwtDecoder(JwtProperties jwtProperties) {
+            return NimbusJwtDecoder.withPublicKey(jwtProperties.publicKey).build();
         }
+
         @Bean
-        AuditStampPersistenceEventListener auditStampPersistenceEventListener(){
-            new AuditStampPersistenceEventListener()
+        JwtEncoder jwtEncoder(JwtProperties jwtProperties) {
+            JWK jwk = new RSAKey.Builder(jwtProperties.publicKey).privateKey(jwtProperties.privateKey).build();
+            JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
+            NimbusJwtEncoder encoder = new NimbusJwtEncoder(jwks);
+            return encoder
         }
+
         @Bean
-        AuditStampSupport auditStampSupport(){
-            new AuditStampSupport()
-        }
-        @Bean
-        DefaultAuditUserResolver auditUserResolver(){
-            new DefaultAuditUserResolver()
+        JwtTokenGenerator tokenGenerator(){
+            new JwtTokenGenerator()
         }
 
     }

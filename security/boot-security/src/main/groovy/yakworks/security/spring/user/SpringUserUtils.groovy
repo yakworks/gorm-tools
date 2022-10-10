@@ -9,11 +9,10 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.User
 import org.springframework.util.Assert
 
+import yakworks.security.user.BasicUserInfo
 import yakworks.security.user.UserInfo
 
 /**
@@ -72,5 +71,15 @@ final class SpringUserUtils {
             grantedAuthorities.add( new SimpleGrantedAuthority(authority) );
         }
         return grantedAuthorities;
+    }
+
+    static SpringUserInfo buildSpringUser(String username, String pwd, List roles, Long id, Long orgId){
+        def u = new BasicUserInfo(username: username, passwordHash: pwd, roles: roles as Set, id: id, orgId: orgId)
+        SpringUser.of(u)
+    }
+
+    static SpringUserInfo systemUser(){
+        def u = new BasicUserInfo(username: 'system', passwordHash: "N/A", roles: ['ADMIN'] as Set, id: 1L, orgId: 1L)
+        SpringUser.of(u)
     }
 }

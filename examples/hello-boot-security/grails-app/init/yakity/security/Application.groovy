@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Import
 
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
+import yakworks.security.audit.AuditStampConfiguration
 
 @ComponentScan(['yakity.security', 'yakworks.security'])
 @Import([AppSecurityConfiguration])

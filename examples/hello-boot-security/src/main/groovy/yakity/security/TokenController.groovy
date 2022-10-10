@@ -14,28 +14,18 @@
  * limitations under the License.
  */
 
-package yakity.security;
+package yakity.security
 
-import java.time.Instant
-import java.util.function.Supplier
-import java.util.stream.Collectors
-import java.util.stream.Stream
 
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.CacheControl
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.oauth2.jwt.Jwt
-import org.springframework.security.oauth2.jwt.JwtClaimsSet
-import org.springframework.security.oauth2.jwt.JwtEncoder
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
 
-import yakity.security.token.JwtTokenGenerator
+import yakworks.security.spring.token.JwtTokenGenerator
 
 /**
  * A controller for the token resource.

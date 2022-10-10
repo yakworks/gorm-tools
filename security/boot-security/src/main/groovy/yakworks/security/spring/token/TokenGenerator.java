@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package yakity.security.token;
+package yakworks.security.spring.token;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

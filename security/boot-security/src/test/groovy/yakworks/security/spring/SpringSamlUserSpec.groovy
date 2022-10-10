@@ -1,18 +1,12 @@
 package yakworks.security.spring
 
-import org.apache.commons.lang3.RandomStringUtils
+
 import org.springframework.security.saml2.provider.service.authentication.DefaultSaml2AuthenticatedPrincipal
 
-import gorm.tools.problem.ValidationProblem
 import spock.lang.Specification
-import yakworks.security.gorm.model.AppUser
-import yakworks.security.gorm.model.SecRole
-import yakworks.security.gorm.model.SecRoleUser
-import yakworks.security.spring.user.SpringSamlUser
+import yakworks.security.spring.saml.SpringSamlUser
 import yakworks.security.spring.user.SpringUser
 import yakworks.security.user.BasicUserInfo
-import yakworks.testing.gorm.unit.GormHibernateTest
-import yakworks.testing.gorm.unit.SecurityTest
 
 class SpringSamlUserSpec extends Specification {
 

@@ -15,17 +15,14 @@
  */
 package yakity.security
 
-import java.security.interfaces.RSAPrivateKey
-import java.security.interfaces.RSAPublicKey
 
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties
-import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Lazy
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
@@ -40,7 +37,6 @@ import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.ForwardAuthenticationSuccessHandler
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
-import org.springframework.stereotype.Component
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.nimbusds.jose.jwk.JWK
@@ -49,8 +45,9 @@ import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet
 import com.nimbusds.jose.jwk.source.JWKSource
 import com.nimbusds.jose.proc.SecurityContext
-import yakity.security.token.JwtTokenGenerator
-import yakworks.security.config.SpringSecurityConfiguration
+import yakworks.security.spring.JwtProperties
+import yakworks.security.spring.SpringSecurityConfiguration
+import yakworks.security.spring.token.JwtTokenGenerator
 
 /**
  * An example of explicitly configuring Spring Security with the defaults.
@@ -61,20 +58,14 @@ import yakworks.security.config.SpringSecurityConfiguration
 @EnableWebSecurity //(debug = true)
 @CompileStatic
 @Configuration
+@Import([SpringSecurityConfiguration])
 class AppSecurityConfiguration {
 
     @Autowired(required = false) Saml2RelyingPartyProperties samlProps
-    @Autowired(required = false) ObjectMapper objectMapper
-
-    @Bean
-    AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) {
-        //this gets the default authManager from the the authConfig which gets injected during the autoconfig securityFilterChain process
-        return authConfig.getAuthenticationManager()
-    }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService userDetailsService, AuthenticationManager authenticationManager) throws Exception {
-        SpringSecurityConfiguration.applyHttpSecurity(http)
+        SpringSecurityConfiguration.applyHttpSecurity(http, authenticationManager)
         if(samlProps?.registration?.containsKey('okta')){
             SpringSecurityConfiguration.applySamlSecurity(http, userDetailsService)
         }
@@ -85,61 +76,23 @@ class AppSecurityConfiguration {
             .oauth2ResourceServer((oauthServer) ->
                 oauthServer.jwt()
             )
-
         // .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         // .exceptionHandling((exceptions) -> exceptions
         // 		.authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
         // 		.accessDeniedHandler(new BearerTokenAccessDeniedHandler())
         // );
 
-        //POC for enabling the legacy login with posting.
-        def jsonUnameFilter = new JsonUsernamePasswordLoginFilter(objectMapper)
-        jsonUnameFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/api/login", "POST"))
-        jsonUnameFilter.setAuthenticationSuccessHandler(new ForwardAuthenticationSuccessHandler("/token"))
-        jsonUnameFilter.setAuthenticationManager(authenticationManager)
-        http.addFilterAfter(jsonUnameFilter, BasicAuthenticationFilter)
-
-        def builtChain =  http.build();
-
-        //If not setting up authenticationManager do after build as need to set the AuthenticationManager
-        // def authManagerAfter = http.getSharedObject(AuthenticationManager.class)
-        // jsonUnameFilter.setAuthenticationManager(authManagerAfter)
-
-        return builtChain
+        return http.build()
     }
-        // // Added *ONLY* to display the dbConsole.
-        // // Best not to do this in production.  If you need frames, it would be best to use
-        // //     http.headers().frameOptions().addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsMode.SAMEORIGIN));
-        // // or in Spring Security 4, changing .disable() to .sameOrigin()
-        // http.headers().frameOptions().disable()
-
-        // // Again, do not do this in production unless you fully understand how to mitigate Cross-Site Request Forgery
-        // // https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet
-        // http.csrf().disable()
+    // // Added *ONLY* to display the dbConsole.
+    // // Best not to do this in production.  If you need frames, it would be best to use
+    // //     http.headers().frameOptions().addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsMode.SAMEORIGIN));
+    // // or in Spring Security 4, changing .disable() to .sameOrigin()
+    // http.headers().frameOptions().disable()
 
     // @Bean
     // AuthenticationEvents authenticationEvents(){
     //     new AuthenticationEvents()
     // }
-
-    @Bean
-    JwtDecoder jwtDecoder(JwtProperties jwtProperties) {
-        return NimbusJwtDecoder.withPublicKey(jwtProperties.publicKey).build();
-    }
-
-    @Bean
-    JwtEncoder jwtEncoder(JwtProperties jwtProperties) {
-        JWK jwk = new RSAKey.Builder(jwtProperties.publicKey).privateKey(jwtProperties.privateKey).build();
-        JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
-        NimbusJwtEncoder encoder = new NimbusJwtEncoder(jwks);
-        return encoder
-    }
-
-    @Bean
-    JwtTokenGenerator tokenGenerator(){
-        new JwtTokenGenerator()
-    }
-
-
 
 }

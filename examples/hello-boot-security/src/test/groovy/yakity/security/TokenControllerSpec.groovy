@@ -25,6 +25,7 @@ import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import spock.lang.Specification
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
@@ -38,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class TokenControllerSpec extends Specification {
 
     @Autowired MockMvc mockMvc
+    @Autowired ObjectMapper objectMapper
 
     // @WithMockUser // mock user should not be needed since we are doing basic auth
     void "Basic auth and bearer auth should give ok status and hello"() {
@@ -48,7 +50,8 @@ class TokenControllerSpec extends Specification {
             .andExpect(status().isOk())
             .andReturn()
 
-        String token = result.getResponse().getContentAsString()
+        String token = objectMapper.readValue(result.getResponse().getContentAsString(), Map)['access_token']
+        //ObjectMapper objectMapper = new ObjectMapper();
 
         then: "we can use the returned jwt as bearer"
         mockMvc.perform(get("/")

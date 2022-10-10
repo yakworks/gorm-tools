@@ -34,23 +34,30 @@ class CurrentSpringUser implements CurrentUser {
     /**
      * Get the currently logged in UserInfo.
      * @see SpringUser
-     * @return the SpringUser UserDetails or null if not logged in.
+     * @return the SpringUser thats stored in Authentication.details from AuthSuccessUserInfoListener
      */
     @Override
     UserInfo getUser(){
-        def user = getAuthentication()?.principal
-        if(user && !(user instanceof SpringUserInfo)) {
-            if(user instanceof User && ((User)user).username.contains('anonymous')){
-                return BasicUserInfo.of("anonymous", ['ANONYMOUS']).id(-1L)
-            }
-            // else {
-            //     //should never get here unless we have something misconfigured
-            // }
-
+        def principal = getAuthentication()?.principal
+        def user = getAuthentication()?.details
+        if(principal instanceof String && principal == "anonymousUser") {
+            return BasicUserInfo.of("anonymous", ['ANONYMOUS']).id(-1L)
         } else {
             return user as UserInfo
         }
     }
+    // @Override
+    // UserInfo getUser(){
+    //     def user = getAuthentication()?.principal
+    //     if(user && !(user instanceof SpringUserInfo)) {
+    //         if(user instanceof User && ((User)user).username.contains('anonymous')){
+    //             return BasicUserInfo.of("anonymous", ['ANONYMOUS']).id(-1L)
+    //         }
+    //     } else {
+    //         return user as UserInfo
+    //     }
+    // }
+
 
     @Override
     Serializable getUserId(){

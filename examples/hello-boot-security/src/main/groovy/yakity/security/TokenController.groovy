@@ -24,6 +24,8 @@ import java.util.stream.Stream
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.CacheControl
+import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.oauth2.jwt.Jwt
@@ -46,17 +48,21 @@ class TokenController {
 
     @Autowired JwtTokenGenerator tokenGenerator
 
-    @PostMapping("/token")
+    @PostMapping("/token.txt")
     String token() {
         return tokenGenerator.genererate().tokenValue
     }
 
-    @PostMapping("/api/login")
-    Map apiLogin() {
-        return [
+    @PostMapping("/token")
+    ResponseEntity<Map> apiLogin() {
+        Map body = [
             token_type: 'Bearer',
-            access_token: tokenGenerator.genererate().tokenValue
+            access_token: tokenGenerator.genererate().tokenValue,
+            "expires_in":3600
         ]
+        return ResponseEntity.ok()
+            .cacheControl(CacheControl.noStore())
+            .body(body);
     }
 
     @PostMapping("/api/wtf")

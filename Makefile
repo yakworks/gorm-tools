@@ -183,11 +183,13 @@ docker.circle.shell:
 	#	-v ~/.gradle_docker:/root/.gradle \
 
 test.hello:
-	TOKEN=`http POST admin:123@localhost:8080/token -b`
+	TOKEN=`http POST admin:123@localhost:8080/token.txt -b`
 	echo "$$TOKEN"
 	http localhost:8080 -A bearer -a "$$TOKEN"
 
 test.hello-post:
-	TOKEN=`http -b POST localhost:8080/api/login username=admin password=1234`
-	echo "$$TOKEN"
+	RESP=`http -b POST localhost:8080/api/login username=admin password=123`
+	echo $$RESP
+	TOKEN=`echo $$RESP | awk -F'"' -v RS="," '/access_token/{ print $$4 }'`
+	echo $$TOKEN
 	http localhost:8080 -A bearer -a "$$TOKEN"

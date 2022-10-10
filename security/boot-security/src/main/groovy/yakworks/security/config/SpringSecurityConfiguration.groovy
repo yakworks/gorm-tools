@@ -34,6 +34,7 @@ import yakworks.security.spring.AsyncSecureService
 import yakworks.security.spring.CurrentSpringUser
 import yakworks.security.spring.SpringSecService
 import yakworks.security.spring.user.AppUserDetailsService
+import yakworks.security.spring.user.AuthSuccessUserInfoListener
 import yakworks.security.user.CurrentUser
 import yakworks.security.user.CurrentUserHolder
 
@@ -74,6 +75,11 @@ class SpringSecurityConfiguration implements ApplicationContextAware, BeanFactor
             .saml2Logout(withDefaults());
     }
 
+
+    @Bean
+    AuthSuccessUserInfoListener authSuccessUserInfoListener(){
+        new AuthSuccessUserInfoListener()
+    }
 
     //defaults
     @Bean

@@ -44,7 +44,8 @@ trait SecuritySpecHelper implements WithTrx{
             rolesToUse = roles.toList()
         }
         SpringUser secUser = SpringUser.of(user, rolesToUse)
-        SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(secUser, user.passwordHash, secUser.authorities)
+        secService.authenticate(secUser)
+        // SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(secUser, user.passwordHash, secUser.authorities)
     }
 
  }

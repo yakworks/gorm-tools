@@ -89,9 +89,7 @@ class SpringSecService implements SecService {
     @Override
     UserInfo login(String username, @Nullable String password) {
         SpringUserInfo secUser = ((AppUserDetailsService)userDetailsService).loadUserByUsername(username)
-        CONTEXT.authentication = new UsernamePasswordAuthenticationToken(secUser, secUser.passwordHash, secUser.authorities)
-        //before or after?
-        userCache?.removeUserFromCache secUser.username
+        authenticate(secUser)
         return secUser
     }
 
@@ -106,7 +104,9 @@ class SpringSecService implements SecService {
     UserInfo authenticate(UserInfo userInfo) {
         Collection<? extends GrantedAuthority> grantedAuthories
         if(userInfo instanceof UserDetails) grantedAuthories = ((UserDetails)userInfo).authorities
-        CONTEXT.authentication = new UsernamePasswordAuthenticationToken(userInfo, userInfo.passwordHash, grantedAuthories)
+        def upauth = new UsernamePasswordAuthenticationToken(userInfo, userInfo.passwordHash, grantedAuthories)
+        upauth.details = userInfo
+        CONTEXT.authentication = upauth
         //before or after?
         userCache?.removeUserFromCache userInfo.username
         return userInfo

@@ -6,59 +6,53 @@ package yakworks.security.testing
 
 import groovy.transform.CompileStatic
 
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.jdbc.core.JdbcTemplate
-
-import grails.gorm.transactions.Transactional
+import yakworks.security.Roles
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRolePermission
 
-@SuppressWarnings('BuilderMethodWithSideEffects')
 @CompileStatic
 class SecuritySeedData {
 
-    // @Autowired JdbcTemplate jdbcTemplate
-
-    void fullMonty(){
+    static void fullMonty(){
         createRoles()
         createAppUsers()
     }
 
-    @Transactional
-    void createAppUsers(){
+    static void createAppUsers(){
 
         AppUser admin = new AppUser([
             id: (Long)1, username: "admin", email: "admin@yak.com", password:"123", orgId: 2
         ]).persist()
 
-        admin.addRole('ADMIN', true)
-        admin.addRole('POWER_USER', true)
+        admin.addRole(Roles.ADMIN, true)
+        admin.addRole(Roles.MANAGER, true)
 
         AppUser custUser = new AppUser([
             id: (Long)2, username: "cust", email: "cust@yak.com", password:"123", orgId: 2
         ]).persist()
         assert custUser.id == 2
 
-        admin.addRole('CUSTOMER', true)
+        admin.addRole(Roles.CUSTOMER, true)
 
         AppUser noRoleUser = AppUser.create([id: 3L, username: "noroles", email: "noroles@yak.com", password:"123", orgId: 3], bindId: true)
         assert noRoleUser.id == 3
+        SecRole.repo.flush()
     }
 
-    @Transactional
-    void createRoles(){
+    static void createRoles(){
 
-        SecRole admin = new SecRole(id: (Long)1, code: SecRole.ADMIN).persist()
-        SecRole power = new SecRole(id: (Long)2, code: "POWER_USER").persist()
-        SecRole custRole = new SecRole(id: (Long)3, code: "CUSTOMER").persist()
+        SecRole admin = new SecRole(id: (Long)1, code: Roles.ADMIN).persist()
+        SecRole power = new SecRole(id: (Long)3, code: Roles.MANAGER).persist()
+        SecRole custRole = new SecRole(id: (Long)5, code: Roles.CUSTOMER).persist()
 
         //add permissions
         adminPermissions(admin)
         custPermissions(custRole)
+        SecRole.repo.flush()
     }
 
-    void adminPermissions(SecRole role){
+    static void adminPermissions(SecRole role){
 
         ['rally:org:*',
          'rally:activityNote:*',

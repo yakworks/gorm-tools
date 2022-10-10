@@ -46,8 +46,7 @@ class JsonUsernamePasswordLoginFilter extends UsernamePasswordAuthenticationFilt
     @Autowired
     ObjectMapper objectMapper;
 
-    private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REQUEST_MATCHER = new AntPathRequestMatcher("/api/login",
-        "POST");
+    private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REQUEST_MATCHER = new AntPathRequestMatcher("/api/login", "POST");
 
     JsonUsernamePasswordLoginFilter(ObjectMapper objectMapper) {
         super();

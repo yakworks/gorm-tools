@@ -17,9 +17,14 @@
     <dd th:text="${userAttribute.value}"></dd>
 </dl>
 
-<form th:action="@{/logout}" method="post">
-    <button id="logout" type="submit">Logout</button>
-</form>
+<ul>
+  <li><a th:href="@{/}">Index</a></li>
+  <li><a id="logout" th:href="@{/logout}">Log Out</a></li>
+</ul>
+foo
+<!--<form th:action="@{/logout}" method="post">-->
+<!--    <button id="logout" type="submit">Logout</button>-->
+<!--</form>-->
 
 </body>
 </html>

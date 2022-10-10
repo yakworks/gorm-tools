@@ -4,12 +4,10 @@
 */
 package yakworks.security.config
 
-
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.BeanFactory
 import org.springframework.beans.factory.BeanFactoryAware
-import org.springframework.boot.autoconfigure.AutoConfigurationPackages
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.ApplicationContext
@@ -36,8 +34,6 @@ import yakworks.security.spring.AsyncSecureService
 import yakworks.security.spring.CurrentSpringUser
 import yakworks.security.spring.SpringSecService
 import yakworks.security.spring.user.AppUserDetailsService
-import yakworks.security.spring.user.UserInfoDetailsService
-import yakworks.security.testing.SecuritySeedData
 import yakworks.security.user.CurrentUser
 import yakworks.security.user.CurrentUserHolder
 
@@ -85,12 +81,6 @@ class SpringSecurityConfiguration implements ApplicationContextAware, BeanFactor
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         applyHttpSecurity(http)
         return http.build()
-    }
-
-    @Bean
-    SecuritySeedData securitySeedData(){
-        List<String> packageNames = AutoConfigurationPackages.get(this.beanFactory)
-        new SecuritySeedData()
     }
 
     @Bean

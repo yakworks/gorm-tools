@@ -20,14 +20,12 @@ if(!isSnapshot) {
   }
 }
 
-subprojects { subprj ->
-
-  group = "org.yakworks"
-
+allprojects {
   repositories {
     mavenLocal()
     mavenCentral()
     maven { url "https://repo.grails.org/grails/core" }
+    maven { url "https://repo.spring.io/snapshot" }
     maven {
       url "http://repo.9ci.com/oss-snapshots"
       allowInsecureProtocol = true
@@ -36,9 +34,14 @@ subprojects { subprj ->
       }
     }
     maven { url "http://repo.9ci.com/public-libs"; allowInsecureProtocol = true }
-    maven { url "https://repo.spring.io/milestone" }
-    maven { url "https://repo.spring.io/snapshot" }
+    // maven { url "https://repo.spring.io/milestone" mavenContent { snapshotsOnly() } }
+
   }
+}
+subprojects { subprj ->
+
+  group = "org.yakworks"
+
   // get prop with default if null, converts to boolean
   Closure getProp = { pname, defualtv -> (subprj.findProperty(pname) ?: defualtv).toBoolean() }
 

@@ -17,12 +17,12 @@ repositories {
 dependencies {
   console "org.grails:grails-console"
   profile "org.grails.profiles:rest-api"
-  implementation("org.springframework.boot:spring-boot-starter-actuator"){ exclude module: 'micrometer-core' }
+  implementation("org.springframework.boot:spring-boot-starter-actuator")
 
-  implementation "org.grails:grails-plugin-i18n"
+  // implementation "org.grails:grails-plugin-i18n"
   implementation "org.grails:grails-plugin-rest"
   implementation "org.grails:grails-plugin-url-mappings"
-  implementation "org.grails:grails-plugin-codecs"
+  // implementation "org.grails:grails-plugin-codecs"
   implementation "org.grails:grails-plugin-interceptors"
   implementation "org.grails:grails-web-boot"
   implementation "org.grails:grails-web-url-mappings"
@@ -37,7 +37,7 @@ dependencies {
 
   implementation project(":gorm-rest")
   implementation project(":rally-domain")
-  implementation project(":rally-security")
+  implementation project(":boot-security")
   implementation project(":gorm-test-domain")
 
   implementation "org.yakworks:grails-kit:$vSpringGrailsKit"

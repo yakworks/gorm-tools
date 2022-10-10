@@ -21,7 +21,7 @@ import org.springframework.security.core.GrantedAuthority;
  */
 public interface UserInfo extends Principal, Serializable {
 
-    /** The unique id for the user, be default will be the unique generated id from db */
+    /** The unique id for the user, be default will be the unique generated id from db usually a long */
     Serializable getId();
 
     /** Returns the username used to authenticate the user. Cannot return `null` */
@@ -35,7 +35,6 @@ public interface UserInfo extends Principal, Serializable {
     }
 
     /** The short display name or nickname for the user, can returns username or first part of email if username contains @, etc..*/
-
     default String getDisplayName() {
         String uname = getUsername();
         if(uname != null && uname.indexOf("@") != -1){

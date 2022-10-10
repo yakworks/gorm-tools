@@ -43,7 +43,7 @@ class SamlResponseConverter implements Converter<ResponseToken, Saml2Authenticat
         def springUser = (SpringUserInfo)userDetailsService.loadUserByUsername(username)
         //TODO This is where we can call out to create one.
         if (!springUser) {
-            throw new UsernameNotFoundException("Saml authentication was successful but user not found in database: $username")
+            throw new UsernameNotFoundException("Saml authentication was successful but no application user found for username: $username")
         }
         // setup SpringSamlUser from principal, we keep SpringSamlUser as inheriting Saml2AuthenticatedPrincipal
         // so it more or less the same object. But we only use whats in the springUser from userDetails right now

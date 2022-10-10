@@ -29,7 +29,7 @@ class BootSecurityGrailsPlugin extends Plugin {
         // springSecurityConfiguration(SpringSecurityConfiguration)
 
         //figure out how to depend on this.
-        asyncService(AsyncSecureService)
+        // asyncService(AsyncSecureService)
 
         // def securityConf = SpringSecurityUtils.securityConfig
         // if (securityConf.active) {
@@ -100,7 +100,7 @@ class BootSecurityGrailsPlugin extends Plugin {
 
 
     Closure getShiroBeans() { { ->
-        println ".. Integrate Shiro Permissions with Spring Security"
+        // println ".. Integrate Shiro Permissions with Spring Security"
         //Shiro Permission integration, do 2 after ANONYMOUS_FILTER so it runs after the restTokenValidationFilter
         SpringSecurityUtils.registerFilter 'shiroSubjectBindingFilter',
             SecurityFilterPosition.ANONYMOUS_FILTER.order + 2

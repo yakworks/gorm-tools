@@ -20,6 +20,11 @@ import yakworks.security.user.UserInfo
 trait SpringUserInfo implements UserDetails, Named, UserInfo {
     /** UserInfo */
     Serializable id
+    /** UserInfo &  UserDetails*/
+    final String username
+    /** UserInfo , getPssword returns this*/
+    final String passwordHash
+
     /** UserInfo */
     String name
     // /** UserInfo &  UserDetails*/
@@ -34,6 +39,15 @@ trait SpringUserInfo implements UserDetails, Named, UserInfo {
     Set<String> roles = [] as Set<String>
     /** future use */
     Map<String, Object> userProfile = [:] as Map<String, Object>
+
+    //implements the extra UserDetails
+    boolean accountNonExpired = true
+    boolean accountNonLocked = true
+    boolean credentialsNonExpired = true
+    boolean enabled = true
+
+    /** the orginal details (usually ip addy and sessionId) from the Authentication */
+    Object auditDetails
 
     // @Override //UserInfo
     // Set<String> getRoles() {

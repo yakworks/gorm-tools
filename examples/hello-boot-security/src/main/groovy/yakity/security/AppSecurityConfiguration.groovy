@@ -92,6 +92,7 @@ class AppSecurityConfiguration {
         // 		.accessDeniedHandler(new BearerTokenAccessDeniedHandler())
         // );
 
+        //POC for enabling the legacy login with posting.
         def jsonUnameFilter = new JsonUsernamePasswordLoginFilter(objectMapper)
         jsonUnameFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/api/login", "POST"))
         jsonUnameFilter.setAuthenticationSuccessHandler(new ForwardAuthenticationSuccessHandler("/token"))
@@ -99,7 +100,8 @@ class AppSecurityConfiguration {
         http.addFilterAfter(jsonUnameFilter, BasicAuthenticationFilter)
 
         def builtChain =  http.build();
-        //do after build as need to set the AuthenticationManager
+
+        //If not setting up authenticationManager do after build as need to set the AuthenticationManager
         // def authManagerAfter = http.getSharedObject(AuthenticationManager.class)
         // jsonUnameFilter.setAuthenticationManager(authManagerAfter)
 

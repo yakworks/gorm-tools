@@ -51,7 +51,6 @@ class SpringSamlUser extends DefaultSaml2AuthenticatedPrincipal implements Sprin
 
     /** Saml spec is for attributes to be a list, which 99.9% of the time its not. So convert its attributes to our userProfile map*/
     def attributesToUserProfile(){
-
         getAttributes().each { k, v ->
             userProfile[k] = v[0] //first item in list
         }

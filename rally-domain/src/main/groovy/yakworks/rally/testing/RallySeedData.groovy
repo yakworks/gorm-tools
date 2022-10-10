@@ -170,7 +170,7 @@ class RallySeedData {
 
             SecRole admin = new SecRole(id:1, code: SecRole.ADMIN).persist()
             adminPermissions(admin)
-            SecRole power = new SecRole(id:2, code: "POWER_USER").persist()
+            SecRole power = new SecRole(id:2, code: "MANAGER").persist()
             SecRole custRole = new SecRole(id:3, code: "CUSTOMER").persist()
             custPermissions(custRole)
 

@@ -29,6 +29,7 @@ class SpringUser implements SpringUserInfo {
     final String username
     final String passwordHash
 
+    //implements the extra UserDetails
     boolean accountNonExpired = true
     boolean accountNonLocked = true
     boolean credentialsNonExpired = true

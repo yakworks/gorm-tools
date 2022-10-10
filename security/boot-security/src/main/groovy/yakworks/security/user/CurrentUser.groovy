@@ -63,6 +63,7 @@ trait CurrentUser {
      * Gets user fields to send to client about their login
      */
     Map getUserMap() {
+        //Will come from a customizable list. props probably
         List incs = ['id', 'username', 'name', 'email', 'orgId']
         return getUserMap(incs)
     }

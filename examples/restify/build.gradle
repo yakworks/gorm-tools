@@ -11,31 +11,31 @@ dependencies {
   console "org.grails:grails-console"
   profile "org.grails.profiles:rest-api"
 
-  implementation "org.grails:grails-plugin-i18n"
+  // implementation "org.grails:grails-plugin-i18n"
   implementation "org.grails:grails-plugin-rest"
-  implementation "org.grails:grails-plugin-url-mappings"
-  implementation "org.grails:grails-plugin-codecs"
-  implementation "org.grails:grails-plugin-interceptors"
+  // implementation "org.grails:grails-plugin-url-mappings"
+  // implementation "org.grails:grails-plugin-codecs"
+  // implementation "org.grails:grails-plugin-interceptors"
   implementation "org.grails:grails-web-boot"
   implementation "org.grails:grails-web-url-mappings"
-  implementation "org.grails.plugins:async"
-
-  implementation "org.grails.plugins:views-json:$vViews"
-  implementation "org.grails.plugins:views-json-templates:$vViews"
-
-  implementation "org.grails.plugins:hibernate5:$vGormHibernate"
-  implementation "org.hibernate:hibernate-core:$vHibernate"
-  implementation "org.hibernate:hibernate-ehcache:$vHibernate"
+  // implementation "org.grails.plugins:async"
+  //
+  // implementation "org.grails.plugins:views-json:$vViews"
+  // implementation "org.grails.plugins:views-json-templates:$vViews"
+  //
+  // implementation "org.grails.plugins:hibernate5:$vGormHibernate"
+  // implementation "org.hibernate:hibernate-core:$vHibernate"
+  // implementation "org.hibernate:hibernate-ehcache:$vHibernate"
 
   implementation project(":testify")
   implementation project(":boot-security")
   implementation project(":gorm-rest")
 
   //??wtf
-  implementation "commons-lang:commons-lang:2.6"
+  // implementation "commons-lang:commons-lang:2.6"
 
   // REST security dependencies
-  implementation "org.grails.plugins:spring-security-rest:$vSpringSecurityRest"
+  // implementation "org.grails.plugins:spring-security-rest:$vSpringSecurityRest"
   // implementation "org.grails.plugins:spring-security-rest-grailscache:$vSpringSecurityRest"
   // implementation "org.grails.plugins:spring-security-rest-gorm:$vSpringSecurityRest"
 

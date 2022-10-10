@@ -2,6 +2,7 @@ package gorm.tools.security
 
 import org.springframework.security.crypto.password.PasswordEncoder
 
+import yakworks.security.Roles
 import yakworks.security.gorm.model.SecRoleUser
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.AppUserRepo
@@ -46,7 +47,7 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
     def "test create with roles ids"() {
         when:
         // should convert the strings to long
-        Map params = getUserParams([roles: [1, "2"]])
+        Map params = getUserParams([roles: [Roles.ADMIN, "MANAGER"]])
         Long id = AppUser.create(params).id
         flushAndClear()
 
@@ -81,11 +82,12 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         when:
         //assert current admin has 2 roles id:1
         assert SecRoleUser.getByUser(1)*.role.id == [1,2]
-        Map params = [
+
+        Map updateParams = [
             id:1,
-            roles: [2, 3]
+            roles: [[id: 2], [id: 3]]
         ]
-        AppUser.update(params)
+        AppUser.update(updateParams)
         flush()
         AppUser user = AppUser.get(1)
 
@@ -94,8 +96,8 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
 
         when:
         Map params2 = [
-            id:1,
-            roles: [1]
+            id: 1,
+            roles: ["ADMIN"]
         ]
         AppUser.update(params2)
         flush()
@@ -106,20 +108,20 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
 
     def "remove roles when user is removed"() {
         setup:
-        Map params = getUserParams([roles: ["1", "2"]])
+        Map params = getUserParams([roles: ["ADMIN", "MANAGER"]])
         AppUser user = AppUser.create(params)
         flushAndClear()
 
         expect:
         SecRoleUser.get(user.id, 1)
-        SecRoleUser.get(user.id, 2)
+        SecRoleUser.get(user.id, "MANAGER")
 
         when:
         appUserRepo.remove(user)
 
         then:
         !SecRoleUser.get(user.id, 1)
-        !SecRoleUser.get(user.id, 2)
+        !SecRoleUser.get(user.id, 3)
     }
 
     def testRemove() {

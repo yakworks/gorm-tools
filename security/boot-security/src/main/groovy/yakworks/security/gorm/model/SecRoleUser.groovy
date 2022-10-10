@@ -54,6 +54,11 @@ class SecRoleUser implements RepoEntity<SecRoleUser>, Serializable {
         criteriaFor(userId, roleId).get()
     }
 
+    static SecRoleUser get(long userId, String roleCode) {
+        Long roleId = SecRole.getByCode(roleCode).id
+        criteriaFor(userId, roleId).get()
+    }
+
     static SecRoleUser create(AppUser user, SecRole role, boolean flush = false) {
         def instance = new SecRoleUser(user: user, role: role)
         instance.save(flush: flush, insert: true)

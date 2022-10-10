@@ -27,10 +27,6 @@ final class SpringUserUtils {
 
     private SpringUserUtils() { /* static only */ }
 
-    @CompileDynamic //so we can set the username on User
-    static void setUserUsername(User target, UserInfo sourceUser){
-        target.@username = sourceUser.username
-    }
 
     static void merge(UserInfo target, UserInfo sourceUser){
         ['id', 'name', 'displayName', 'email', 'orgId'].each{ String prop ->

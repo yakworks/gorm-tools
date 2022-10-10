@@ -8,7 +8,6 @@ import groovy.transform.CompileStatic
 
 import yakworks.commons.lang.EnumUtils
 import yakworks.commons.model.IdEnum
-import yakworks.security.gorm.model.SecRole
 
 @CompileStatic
 enum Role implements IdEnum<Role, Long> {
@@ -37,15 +36,6 @@ enum Role implements IdEnum<Role, Long> {
 
     Role(Long id) {
         this.id = id
-    }
-
-    SecRole getTypeSetup() {
-        return SecRole.get(id)
-    }
-
-    //get the user customizable name from domain
-    String getName(){
-        getTypeSetup().name
     }
 
     /**

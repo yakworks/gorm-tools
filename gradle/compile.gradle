@@ -10,9 +10,9 @@ plugins.withId('java') {
   configurations {
     //includes the compileOnly in tests too so we don't have to list twice
     testImplementation.extendsFrom compileOnly
-    all {
-      resolutionStrategy.cacheChangingModulesFor 1, 'seconds' //when changing = true this sets the cache time
-    }
+    // all {
+    //   resolutionStrategy.cacheChangingModulesFor 0, 'seconds' //when changing = true this sets the cache time
+    // }
   }
 }
 

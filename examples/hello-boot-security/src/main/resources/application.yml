@@ -47,6 +47,19 @@ management.endpoint.health.show-details: always
 
 ---
 
+# this is need so thymeleaf does not error
+spring.thymeleaf.view-names: "th_*"
+spring.thymeleaf.template-resolver-order: 0
+
+# uncomment starter in build.gradle to activate
+handlebars.enabled: true
+handlebars.prefix: classpath:templates/
+handlebars.suffix: .hbs
+handlebars.cache: false
+handlebars.failOnMissingFile: true
+
+---
+
 grails.controllers.defaultScope: singleton
 
 hibernate:

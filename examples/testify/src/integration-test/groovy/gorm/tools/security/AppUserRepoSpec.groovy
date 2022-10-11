@@ -54,10 +54,11 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         then:
         AppUser user = AppUser.get(id)
         user.username == 'galt'
-        SecRoleUser.findAllByUser(user)*.role.id == [1L, 2L]
+        SecRoleUser.findAllByUser(user)*.role.id == [1L, 3L]
 
     }
 
+    /*see SecuritySeedData*/
     def "test create with roles obj"() {
         when:
         // use objects that may get passed in from json in this format
@@ -65,7 +66,7 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
             username: 'galt2',
             email: 'test2@9ci.com',
             roles: [
-                [id: 2 ], [id: 3]
+                [id: 1 ], [id: 3]
             ]
         ])
         Long id2 = AppUser.create(params).id
@@ -74,14 +75,14 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         then:
         AppUser user2 = AppUser.get(id2)
         user2.username == 'galt2'
-        SecRoleUser.findAllByUser(user2)*.role.id == [2L, 3L]
+        SecRoleUser.findAllByUser(user2)*.role.id == [1L, 3L]
     }
 
 
     def "test updating roles"() {
         when:
         //assert current admin has 2 roles id:1
-        assert SecRoleUser.getByUser(1)*.role.id == [1,2]
+        assert SecRoleUser.getByUser(1)*.role.id == [1, 3]
 
         Map updateParams = [
             id:1,

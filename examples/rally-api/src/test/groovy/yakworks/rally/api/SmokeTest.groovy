@@ -14,20 +14,26 @@
  * limitations under the License.
  */
 
-package yakity.security
+package yakworks.rally.api
 
 
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.ContextConfiguration
 
 import gorm.tools.boot.GormToolsConfiguration
+import grails.boot.test.GrailsApplicationContextLoader
 import spock.lang.Specification
 import yakworks.security.spring.SpringSecurityConfiguration
 
+// @ContextConfiguration(
+//     loader = GrailsApplicationContextLoader.class,
+//     classes = [Application.class]
+// )
 @SpringBootTest
-class SanityCheckSpec extends Specification {
+class SmokeTest extends Specification {
 
-    void "groovy entity test"() {
+    void "smoke test spring boot startup"() {
         expect:
         "1" == '1'
     }

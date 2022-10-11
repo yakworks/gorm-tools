@@ -33,7 +33,7 @@ class SecuritySeedData {
         ]).persist()
         assert custUser.id == 2
 
-        admin.addRole(Roles.CUSTOMER, true)
+        custUser.addRole(Roles.CUSTOMER, true)
 
         AppUser noRoleUser = AppUser.create([id: 3L, username: "noroles", email: "noroles@yak.com", password:"123", orgId: 3], bindId: true)
         assert noRoleUser.id == 3
@@ -43,8 +43,10 @@ class SecuritySeedData {
     static void createRoles(){
 
         SecRole admin = new SecRole(id: (Long)1, code: Roles.ADMIN).persist()
-        SecRole power = new SecRole(id: (Long)3, code: Roles.MANAGER).persist()
+        SecRole power = new SecRole(id: (Long)2, code: Roles.POWER_USER).persist()
+        SecRole mgr = new SecRole(id: (Long)3, code: Roles.MANAGER).persist()
         SecRole custRole = new SecRole(id: (Long)5, code: Roles.CUSTOMER).persist()
+        // SecRole foo = new SecRole(id: (Long)6, code: "FOO").persist()
 
         //add permissions
         adminPermissions(admin)

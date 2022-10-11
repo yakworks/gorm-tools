@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package yakity.security;
+package yakworks.rally.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -25,13 +25,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 /**
+ * Allows for WebMvcTest to work.
  * For now seperate from Grails Application class. If adding gsp it blows up on groovyPagesTemplateEngine'
  * if removing the deps on gsp then doesnt find the GrailsWebRequest.lookup(). I think if we mock that out then
  * test will start working.
  */
 @SpringBootApplication
-// @Import({SpringSecurityConfiguration.JwtTokenConfiguration.class})
-// @EnableConfigurationProperties({JwtProperties.class})
 public class TestSpringApplication {
 
     public static void main(String[] args) {

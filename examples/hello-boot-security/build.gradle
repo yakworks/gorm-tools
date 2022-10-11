@@ -36,6 +36,15 @@ dependencies {
     implementation "org.opensaml:opensaml-saml-impl:4.1.1"
   }
 
+  // implementation 'pl.allegro.tech.boot:handlebars-spring-boot-starter:0.3.4'
+  // implementation 'com.github.jknack:handlebars-helpers:4.2.0',
+  //   'com.github.jknack:handlebars-jackson2:4.2.0',
+  //   'com.github.jknack:handlebars-humanize:4.2.0',
+  //   'com.github.jknack:handlebars-markdown:4.2.0'
+  // implementation 'com.github.jknack:handlebars-springmvc:4.2.0',
+  //   'com.github.jknack:handlebars-guava-cache:4.2.0'
+
+
   //GRAILS
   implementation "org.grails:grails-core"
   implementation "org.grails:grails-web-boot"

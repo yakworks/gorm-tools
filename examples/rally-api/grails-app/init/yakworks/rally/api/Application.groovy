@@ -16,6 +16,7 @@ import org.springframework.boot.jdbc.DataSourceBuilder
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.Import
 
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
@@ -26,6 +27,7 @@ import yakworks.rest.grails.AppInfoBuilder
 // the component scan here does not seem to be the same as the packageNames and is needed to pick up the
 // the services marked with @Component
 @ComponentScan(['yakworks.security', 'yakworks.rally', 'yakworks.testing.gorm.model'])
+@Import([AppConfiguration])
 @RestApiFromConfig
 // caching will use hazelcast for spring caching too, look into how to use caffiene for spring stuff and hazel for hibernate.
 @EnableCaching

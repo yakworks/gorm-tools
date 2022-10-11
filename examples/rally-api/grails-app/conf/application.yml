@@ -1,5 +1,25 @@
 #debug: true
 
+spring.main.lazy-initialization: true
+spring.main.allow-bean-definition-overriding: true
+server.port: 8081
+
+app.security.jwt.privateKey: classpath:jwt/app.key
+app.security.jwt.publicKey: classpath:jwt/app.pub
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    #    org.hibernate.SQL: DEBUG
+    #    org.springframework.security: DEBUG
+    #    org.springframework.security: DEBUG
+    #    org.springframework.security.web: TRACE
+    #    org.springframework.security.authentication: TRACE
+    #    grails.plugins.DefaultGrailsPluginManager: ERROR
+    yakity.security: TRACE
+
+
 ---
 
 grails:
@@ -20,16 +40,6 @@ info:
     version: '@info.app.version@'
     grailsVersion: '@info.app.grailsVersion@'
 
-spring:
-  main:
-    banner-mode: "off"
-#    lazy-initialization: true
-  groovy:
-    template:
-      check-template-location: false
-
-server:
-  port: 8081
 #  servlet:
 #    context-path: /api
 management:

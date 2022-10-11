@@ -52,9 +52,8 @@ findProject(':examples/restify').name = 'restify'
 include 'examples/benchmarks'
 findProject(':examples/benchmarks').name = 'benchmarks'
 
-// FOR NOW COMMENT OUT UNTIL WE GET IT ALL WORKING
-// include 'examples/rally-api'
-// findProject(':examples/rally-api').name = 'rally-api'
+include 'examples/rally-api'
+findProject(':examples/rally-api').name = 'rally-api'
 
 include 'examples/hello-boot-security'
 findProject(':examples/hello-boot-security').name = 'hello-boot-security'

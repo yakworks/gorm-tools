@@ -4,14 +4,20 @@
 */
 package yakworks.security.spring
 
+import java.security.KeyPair
+import java.security.interfaces.RSAPrivateKey
+import java.security.interfaces.RSAPublicKey
+
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
+import org.springframework.context.annotation.Role
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -99,12 +105,12 @@ class SpringSecurityConfiguration {
         return http.build()
     }
 
-    @Bean
+    @Bean @ConditionalOnMissingBean
     SecService secService(){
         new SpringSecService()
     }
 
-    @Bean
+    @Bean @ConditionalOnMissingBean
     AppUserService userService(){
         new AppUserService()
     }
@@ -115,12 +121,12 @@ class SpringSecurityConfiguration {
         new CurrentUserHolder()
     }
 
-    @Bean
+    @Bean @ConditionalOnMissingBean
     CurrentUser currentUser(){
         new CurrentSpringUser()
     }
 
-    @Bean
+    @Bean @ConditionalOnMissingBean
     PasswordValidator passwordValidator(){
         new PasswordValidator()
     }
@@ -144,20 +150,29 @@ class SpringSecurityConfiguration {
 
     @Configuration @Lazy
     static class JwtTokenConfiguration {
-        @Bean
-        JwtDecoder jwtDecoder(JwtProperties jwtProperties) {
-            return NimbusJwtDecoder.withPublicKey(jwtProperties.publicKey).build();
+
+        @Bean @ConditionalOnMissingBean
+        @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
+        KeyPair rsaKeyPair(JwtProperties jwtProperties) {
+            new KeyPair(jwtProperties.publicKey, jwtProperties.privateKey)
         }
 
-        @Bean
-        JwtEncoder jwtEncoder(JwtProperties jwtProperties) {
-            JWK jwk = new RSAKey.Builder(jwtProperties.publicKey).privateKey(jwtProperties.privateKey).build();
+        @Bean @ConditionalOnMissingBean
+        JwtDecoder jwtDecoder(KeyPair rsaKeyPair) {
+            return NimbusJwtDecoder.withPublicKey((RSAPublicKey)rsaKeyPair.public).build();
+        }
+
+        @Bean @ConditionalOnMissingBean
+        JwtEncoder jwtEncoder(KeyPair rsaKeyPair) {
+            JWK jwk = new RSAKey.Builder((RSAPublicKey)rsaKeyPair.public)
+                .privateKey((RSAPrivateKey)rsaKeyPair.private)
+                .build();
             JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
             NimbusJwtEncoder encoder = new NimbusJwtEncoder(jwks);
             return encoder
         }
 
-        @Bean
+        @Bean @ConditionalOnMissingBean
         JwtTokenGenerator tokenGenerator(){
             new JwtTokenGenerator()
         }

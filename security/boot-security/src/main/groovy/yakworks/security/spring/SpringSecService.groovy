@@ -4,32 +4,25 @@
 */
 package yakworks.security.spring
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import org.grails.web.util.WebUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.AuthenticationTrustResolver
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserCache
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.web.WebAttributes
 
 import jakarta.annotation.Nullable
+import yakworks.security.Roles
 import yakworks.security.SecService
-import yakworks.security.gorm.AppUserDetailsService
-import yakworks.security.gorm.model.AppUser
-import yakworks.security.gorm.model.SecRole
-import yakworks.security.spring.user.SpringUser
+import yakworks.security.spring.user.GetUserById
 import yakworks.security.spring.user.SpringUserInfo
 import yakworks.security.spring.user.SpringUserUtils
-import yakworks.security.user.BasicUserInfo
 import yakworks.security.user.UserInfo
 
 /**
@@ -46,10 +39,6 @@ class SpringSecService implements SecService {
 
     @Autowired(required=false)
     UserCache userCache
-
-    SpringSecService() {
-        this.entityClass = AppUser
-    }
 
     /**
      * Get the currently logged in user's <code>Authentication</code>. If not authenticated
@@ -74,7 +63,7 @@ class SpringSecService implements SecService {
     @Override
     UserInfo loginAsSystemUser() {
         SpringUserInfo secUser = SpringUserUtils.systemUser() //((AppUserDetailsService)userDetailsService).loadUserByUserId(1)
-        assert secUser.roles.contains(SecRole.ADMIN)
+        assert secUser.roles.contains(Roles.ADMIN)
         authenticate(secUser)
         return secUser
     }
@@ -89,7 +78,7 @@ class SpringSecService implements SecService {
      */
     @Override
     UserInfo login(String username, @Nullable String password) {
-        SpringUserInfo secUser = ((AppUserDetailsService)userDetailsService).loadUserByUsername(username)
+        SpringUserInfo secUser = (SpringUserInfo)userDetailsService.loadUserByUsername(username)
         authenticate(secUser)
         return secUser
     }
@@ -127,9 +116,8 @@ class SpringSecService implements SecService {
         return authenticationTrustResolver.isRememberMe(SecurityContextHolder.context?.authentication)
     }
 
-    @CompileDynamic
-    AuthenticationException getLastAuthenticationException() {
-        return WebUtils.retrieveGrailsWebRequest().getSession().getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION)
+    @Override
+    UserInfo getUser(Serializable uid) {
+        ((GetUserById)userDetailsService).getById(uid)
     }
-
 }

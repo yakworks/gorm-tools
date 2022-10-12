@@ -7,6 +7,9 @@ package yakworks.security.spring.token
 import java.security.KeyPair
 import java.security.KeyPairGenerator
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class KeyPairUtils {
 
     static KeyPair generateRsaKey() {

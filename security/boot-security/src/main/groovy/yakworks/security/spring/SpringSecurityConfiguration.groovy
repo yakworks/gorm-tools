@@ -41,9 +41,7 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet
 import com.nimbusds.jose.jwk.source.JWKSource
 import com.nimbusds.jose.proc.SecurityContext
 import yakworks.security.SecService
-import yakworks.security.gorm.AppUserDetailsService
-import yakworks.security.gorm.AppUserService
-import yakworks.security.gorm.PasswordValidator
+import yakworks.security.services.PasswordValidator
 import yakworks.security.spring.token.JwtTokenGenerator
 import yakworks.security.spring.user.AuthSuccessUserInfoListener
 import yakworks.security.user.CurrentUser
@@ -110,11 +108,6 @@ class SpringSecurityConfiguration {
         new SpringSecService()
     }
 
-    @Bean @ConditionalOnMissingBean
-    AppUserService userService(){
-        new AppUserService()
-    }
-
     @Bean('${CurrentUserHolder.name}')
     CurrentUserHolder CurrentUserHolder(){
         //here just to set the static, there a better way?
@@ -133,19 +126,8 @@ class SpringSecurityConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    UserDetailsService userDetailsService(){
-        new AppUserDetailsService()
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     PasswordEncoder passwordEncoder(){
         new BCryptPasswordEncoder()
-    }
-
-    @Bean
-    AsyncSecureService asyncService(){
-        new AsyncSecureService()
     }
 
     @Configuration @Lazy

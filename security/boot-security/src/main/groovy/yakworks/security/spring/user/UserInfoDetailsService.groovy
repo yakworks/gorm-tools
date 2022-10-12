@@ -11,8 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 
-import yakworks.commons.lang.ClassUtils
-import yakworks.security.gorm.PasswordValidator
+import yakworks.security.services.PasswordValidator
 import yakworks.security.user.UserInfo
 
 /**
@@ -24,7 +23,7 @@ trait UserInfoDetailsService implements UserDetailsService {
     // Logger LOG = LoggerFactory.getLogger(UserInfoDetailsService)
     @Autowired PasswordValidator passwordValidator
 
-    abstract SpringUserInfo loadUserByUserId(Serializable id)
+    // abstract SpringUserInfo loadUserByUserId(Serializable id)
 
     /**
      * Creates SpringUser (UserDetails) from the AppUser.

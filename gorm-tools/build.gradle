@@ -5,17 +5,19 @@ plugins {
 apply from: "${rootDir}/gradle/gorm-lib.gradle"
 
 dependencies {
-  console "org.grails:grails-console"
 
   compileOnly "org.springframework.boot:spring-boot-autoconfigure"
   // api project(":commons")
   // TODO use this standard for json converters
   // api "jakarta.json.bind:jakarta.json.bind-api:2.0.0"
 
+  //GRAILS
+  api "org.grails:grails-databinding:$grailsVersion"
+
   api "org.yakworks:hibernate-groovy-proxy:$vHibernateGroovy"
   api "org.yakworks:hibernate-groovy-db:$vHibernateGroovy"
 
-  api "org.yakworks:grails-kit:$vSpringGrailsKit"
+  api ("org.yakworks:grails-kit:$vSpringGrailsKit")
 
   api "org.yakworks:grails-icu4j:$vYakICU4J"
   // api "org.yakworks:api-messages:$vGroovyCommons"

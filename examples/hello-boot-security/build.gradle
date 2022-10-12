@@ -52,7 +52,8 @@ dependencies {
   implementation "org.grails.plugins:gsp"
 
   implementation project(":gorm-tools")
-  implementation project(":boot-security")
+  implementation project(":boot-security-gorm")
+  implementation project(":gorm-audit")
 
   implementation "org.grails:grails-datastore-gorm-hibernate5:$vGormHibernate"
   implementation "org.grails.plugins:hibernate5:$vGormHibernate"

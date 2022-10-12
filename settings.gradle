@@ -38,9 +38,20 @@ include 'rally-security'
 // include 'commons'
 include 'gorm-test-support'
 include 'gorm-test-domain'
+include "gorm-audit"
 
 include "security/boot-security"
 findProject(':security/boot-security').name = 'boot-security'
+
+include "security/boot-security-gorm"
+findProject(':security/boot-security-gorm').name = 'boot-security-gorm'
+
+include "security/boot-security-shiro"
+findProject(':security/boot-security-shiro').name = 'boot-security-shiro'
+
+
+include "security/security-core"
+findProject(':security/security-core').name = 'security-core'
 
 // tests will be included in main runs but not deploy tasks and doc tasks
 include "examples/testify"

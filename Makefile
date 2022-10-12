@@ -122,7 +122,7 @@ endif
 
 ## shows gorm-tools:dependencies --configuration runtime
 gradle.dependencies:
-	 $(gw) gorm-tools:dependencies --configuration compileClasspath
+	 $(gw) gorm-tools:dependencies # --configuration compileClasspath
 	# ./gradlew rally-api:dependencies --configuration compileClasspath
 	#./gradlew rally-security:dependencies --configuration compileClasspath
 

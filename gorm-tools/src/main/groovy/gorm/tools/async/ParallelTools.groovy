@@ -81,7 +81,8 @@ trait ParallelTools {
 
     /**
      * Will slice the data based on args or defaults and then process by slices.
-     * this differs from the eachSlice in that the itemClosure gets called for each item in the collection
+     *
+     * NOTE: this differs from the eachSlice in that the itemClosure gets called for each item in the collection
      * like a normal groovy .each where the closure passed to eachSlice gets called for each slice or chunk or data.
      *
      * pass transactional = true to have each slice be in its own transaction as you normally would for eachSlice
@@ -97,7 +98,6 @@ trait ParallelTools {
         Closure sliceClos = sliceClosure(asyncArgs.datastore, itemClosure)
 
         eachSlice(asyncArgs, collection as Collection<Object>, sliceClos) as Collection<T>
-
     }
 
 

@@ -6,6 +6,8 @@ package yakworks.testing.gorm
 
 import groovy.transform.CompileStatic
 
+import org.grails.datastore.gorm.GormEnhancer
+
 import yakworks.security.SecService
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.user.UserInfo
@@ -18,6 +20,10 @@ class TestingSecService implements SecService {
 
     TestingSecService() {
         this.entityClass = AppUser
+    }
+
+    UserInfo getUser(Serializable uid) {
+        GormEnhancer.findStaticApi(getEntityClass()).get(uid) as UserInfo
     }
 
     @Override
@@ -39,5 +45,6 @@ class TestingSecService implements SecService {
     UserInfo authenticate(UserInfo userInfo) {
 
     }
+
 
 }

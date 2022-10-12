@@ -8,21 +8,23 @@ apply from: "${rootDir}/gradle/test-integration.gradle"
 
 dependencies {
 
-  console "org.grails:grails-console"
-  profile "org.grails.profiles:rest-api"
+  // console "org.grails:grails-console"
+  // profile "org.grails.profiles:rest-api"
 
   api project(":gorm-tools")
-  api project(":boot-security")
+  api project(":gorm-audit")
+  api project(":boot-security-gorm")
   api project(":gorm-etl")
 
-  api "org.yakworks:grails-kit:$vSpringGrailsKit"
+  // api "org.yakworks:grails-kit:$vSpringGrailsKit"
   api "org.yakworks:grails-external-config:$vSpringGrailsKit"
   //api "dk.glasius:external-config:$vExternalConfig"
   api 'jakarta.annotation:jakarta.annotation-api:2.1.0'
 
   // for the mock and seed data
   compileOnly("io.github.longwa:build-test-data:$vBuildTestData"){
-    exclude group:"org.grails", module: "grails-gorm-testing-support"
+    transitive = false
+    // exclude group:"org.grails", module: "grails-gorm-testing-support"
   }
 
   implementation "org.springframework.boot:spring-boot-starter-logging"

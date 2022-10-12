@@ -5,9 +5,10 @@ apply from: "${rootDir}/gradle/gorm-lib.gradle"
 dependencies {
   //for the RestTomcatWebServerCustomizer
   compileOnly "org.springframework.boot:spring-boot-starter-tomcat"
-  implementation "org.grails:grails-plugin-rest"
-  implementation "org.grails:grails-plugin-url-mappings"
-  implementation "org.grails:grails-plugin-interceptors"
+
+  compileOnly "org.grails:grails-plugin-rest"
+  // implementation "org.grails:grails-plugin-url-mappings"
+  // implementation "org.grails:grails-plugin-interceptors"
 
   api project(":gorm-tools")
   api project(":gorm-etl")
@@ -16,6 +17,6 @@ dependencies {
   // for OkHttpRestTrait test helpers
   compileOnly "com.squareup.okhttp3:okhttp:$vOkhttp"
 
-  //tests use the rally domains for the MetaMaps
+  //schemaView tests Org
   testImplementation project(":rally-domain")
 }

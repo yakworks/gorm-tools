@@ -18,9 +18,7 @@ dependencies {
   api "org.yakworks:hibernate-groovy-db:$vHibernateGroovy"
 
   api ("org.yakworks:grails-kit:$vSpringGrailsKit")
-
   api "org.yakworks:grails-icu4j:$vYakICU4J"
-  // api "org.yakworks:api-messages:$vGroovyCommons"
   api "org.yakworks:groovy-commons:$vGroovyCommons"
 
   // see https://github.com/f4b6a3/uuid-creator
@@ -30,7 +28,7 @@ dependencies {
 
   api "jakarta.annotation:jakarta.annotation-api:$vJakartaAnn"
 
-  implementation "org.codehaus.groovy:groovy-sql:$groovyVersion"
+  api "org.codehaus.groovy:groovy-sql:$groovyVersion"
 
   //FIXME gets rid of the 'warning: unknown enum constant When.MAYBE' until we can figure out where it comes from
   compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
@@ -40,9 +38,6 @@ dependencies {
   testImplementation project(":gorm-test-domain")
   testImplementation project(":boot-security")
 
-  //
-  // testImplementation "com.vladmihalcea:hibernate-types-52:$vHibTypes"
-  //
 }
 
 test {

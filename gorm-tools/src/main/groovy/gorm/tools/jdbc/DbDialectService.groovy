@@ -54,7 +54,7 @@ class DbDialectService implements SpringEnvironment{
             //if no hibernateDialectName then set default to H2
             hibernateDialectName = "H2"
             //if no h2 on classpath then hibernate is miconfiged, show error for user.
-            if(! ClassUtils.isPresent("org.h2.Driver", DbDialectService.classLoader)){
+            if(!ClassUtils.isPresent("org.h2.Driver", DbDialectService.classLoader)){
                 log.error("no hibernateDialect set, defaulting to H2 but org.h2.Driver doesnt appear on the classpath.")
             }
         }

@@ -3,16 +3,13 @@ apply plugin:"org.grails.grails-web"
 // apply plugin:"org.grails.plugins.views-json"
 
 apply from: "${rootDir}/gradle/compile.gradle"
-apply from: "${rootDir}/gradle/example.gradle"
+// apply from: "${rootDir}/gradle/example.gradle"
 apply from: "${rootDir}/gradle/test-unit.gradle"
 apply from: "${rootDir}/gradle/test-integration.gradle"
 
 repositories {
   maven { url "https://build.shibboleth.net/nexus/content/repositories/releases/" } //for pac4j deps
 }
-
-//use common loggin in root
-// sourceSets.main.resources.srcDirs += "../../logback"
 
 dependencies {
   console "org.grails:grails-console"
@@ -38,20 +35,15 @@ dependencies {
 
   implementation project(":gorm-rest")
   implementation project(":rally-domain")
-  implementation project(":boot-security")
   implementation project(":gorm-test-domain")
-
-  // implementation "org.yakworks:grails-kit:$vSpringGrailsKit"
 
   //Hazelcast
   runtimeOnly "com.hazelcast:hazelcast-hibernate53:$vHazelcastHib"
   runtimeOnly "com.hazelcast:hazelcast:$vHazelcast"
   runtimeOnly "com.hazelcast:hazelcast-spring:$vHazelcast"
-  //compatible micrometer
-  // compile "io.micrometer:micrometer-core:1.5.0"
 
   //??wtf
-  implementation "commons-lang:commons-lang:2.6"
+  // implementation "commons-lang:commons-lang:2.6"
 
   runtimeOnly "com.h2database:h2:$vH2"
   runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"

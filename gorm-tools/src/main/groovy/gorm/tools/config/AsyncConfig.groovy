@@ -9,12 +9,9 @@ import javax.annotation.PostConstruct
 import groovy.transform.CompileStatic
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.context.EnvironmentAware
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
-
-import yakworks.spring.SpringEnvironment
 
 @Configuration(proxyBeanMethods = false)
 @ConfigurationProperties(prefix="gorm.tools.async")

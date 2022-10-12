@@ -50,7 +50,8 @@ commands:
           paths: [
             ".gradle", ".build-cache",
             "./gorm-test-domain/build", "./gorm-test-support/build", "./gorm-tools/build",
-            "./gorm-etl/build", "./gorm-rest/build", "./security/boot-security/build",
+            "./gorm-audit/build", "./gorm-etl/build", "./gorm-rest/build",
+            "./security/boot-security/build", "./security/boot-security-gorm/build", "./security/security-core/build",
             "./rally-domain/build", "./rally-security/build"
           ]
           key: build-{{ .Branch }}-{{ checksum "day-version-cache-key.tmp" }}

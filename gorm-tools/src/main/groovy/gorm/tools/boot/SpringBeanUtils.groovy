@@ -11,7 +11,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
 
 import gorm.tools.repository.DefaultGormRepo
-import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.UuidGormRepo
 import gorm.tools.repository.model.UuidRepoEntity
 
@@ -25,7 +25,7 @@ class SpringBeanUtils {
      */
     static void registerRepos(BeanDefinitionRegistry registry, List<Class<?>> entityClasses) {
         for(Class entityClass: entityClasses){
-            String repoName = RepoUtil.getRepoBeanName(entityClass)
+            String repoName = RepoLookup.getRepoBeanName(entityClass)
             // def hasRepo = repoClasses.find { NameUtils.getPropertyName(it.simpleName) == repoName }
             if (!registry.containsBeanDefinition(repoName)) {
                 Class repoClass = DefaultGormRepo

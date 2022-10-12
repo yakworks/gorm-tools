@@ -4,42 +4,16 @@ plugins {
   id "yakworks.groovy-lib"
 }
 
-// apply from: "${rootDir}/gradle/compile.gradle"
-// apply from: "${rootDir}/gradle/publish.gradle"
-// apply from: "${rootDir}/gradle/test-unit.gradle"
-
 apply from: "${rootDir}/gradle/gorm-lib.gradle"
 
 dependencies {
 
-  implementation "org.springframework.boot:spring-boot-autoconfigure"
-  implementation "jakarta.annotation:jakarta.annotation-api:$vJakartaAnn"
+  compileOnly "org.springframework.boot:spring-boot-autoconfigure"
 
   compileOnly project(":gorm-tools")
   api project(":security-core")
-  // for the org.grails.web.util.WebUtils
-  // compileOnly "org.grails:grails-web-common"
-  implementation "org.grails:grails-datastore-gorm-hibernate5:$vGormHibernate"
-  implementation "org.grails.plugins:hibernate5:$vGormHibernate"
-  implementation "org.hibernate:hibernate-core:$vHibernate"
-  // compileOnly "org.hibernate:hibernate-ehcache:$vHibernate"
 
-  // tests deps
-  testRuntimeOnly "com.h2database:h2:$vH2"
-  testRuntimeOnly "com.zaxxer:HikariCP:$vHikari"
-  //testRuntimeOnly "javax.xml.bind:jaxb-api:2.3.1"
-
-  testImplementation project(":gorm-test-support") //this might seem circular but it can be added to itself as it dif config
+  // testImplementation project(":gorm-test-support") //this might seem circular but it can be added to itself as it dif config
   testImplementation project(":boot-security-gorm")
 
-  testImplementation "org.grails:grails-web-testing-support:$vGrailsTesting"
-
-  testImplementation "org.grails:grails-plugin-interceptors:$grailsVersion"
-  testImplementation "org.grails:grails-plugin-services:$grailsVersion"
-
-  // testImplementation project(":rally-domain")
 }
-
-// configurations.api {
-//   exclude group: 'org.grails', module: 'grails-plugin-controllers'
-// }

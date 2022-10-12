@@ -24,6 +24,7 @@ import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
@@ -117,7 +118,7 @@ class RepoTestUtils {
         for(Class domainClass in domainClassesToMock){
             Class repoClass = findRepoClass(domainClass)
             grailsApplication.addArtefact(RepositoryArtefactHandler.TYPE, repoClass)
-            String repoName = RepoUtil.getRepoBeanName(domainClass)
+            String repoName = RepoLookup.getRepoBeanName(domainClass)
             if (repoClass == DefaultGormRepo || repoClass == UuidGormRepo) {
                 "$repoName"(repoClass, domainClass, lazy())
             } else {

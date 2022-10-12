@@ -18,7 +18,6 @@ import org.springframework.transaction.TransactionStatus
 import gorm.tools.config.AsyncConfig
 import gorm.tools.transaction.TrxService
 import grails.persistence.support.PersistenceContextInterceptor
-import yakworks.grails.support.ConfigAware
 
 /**
  * Support service for aysnc to wrap session, transaction, etc...
@@ -28,7 +27,7 @@ import yakworks.grails.support.ConfigAware
  */
 @Slf4j
 @CompileStatic
-class AsyncService implements ConfigAware  {
+class AsyncService {
 
     @Autowired AsyncConfig asyncConfig
 

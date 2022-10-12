@@ -3,8 +3,6 @@ apply plugin: "yakworks.grails-plugin"
 apply from: "${rootDir}/gradle/gorm-lib.gradle"
 
 dependencies {
-  console "org.grails:grails-console"
-
   compileOnly project(":gorm-tools")
   compileOnly project(":gorm-audit")
   compileOnly project(":boot-security-gorm")
@@ -17,9 +15,8 @@ dependencies {
   api "org.grails:grails-gorm-testing-support:$vGrailsTesting"
 
   api("io.github.longwa:build-test-data:$vBuildTestData"){
+    //keep the extra stuff out.
     transitive = false
-    // exclude group:"org.grails", module: "grails-gorm-testing-support"
-    // exclude group:"org.grails", module: "grails-console"
   }
 
   //add support for junit4 so before and after works

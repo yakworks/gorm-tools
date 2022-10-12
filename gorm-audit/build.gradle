@@ -17,3 +17,10 @@ dependencies {
   testImplementation project(":boot-security-gorm")
 
 }
+
+bootJar {
+  enabled = false
+}
+jar {
+  enabled = true
+}

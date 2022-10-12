@@ -39,3 +39,10 @@ dependencies {
 // configurations.api {
 //   exclude group: 'org.grails', module: 'grails-plugin-controllers'
 // }
+
+bootJar {
+  enabled = false
+}
+jar {
+  enabled = true
+}

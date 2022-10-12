@@ -20,8 +20,8 @@ dependencies {
 
   implementation "jakarta.annotation:jakarta.annotation-api:$vJakartaAnn"
 
-  implementation 'com.fasterxml.jackson.core:jackson-core:2.13.3'
-  implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
+  implementation "com.fasterxml.jackson.core:jackson-core:$vJackson"
+  implementation "com.fasterxml.jackson.core:jackson-databind:$vJackson"
 
   // implementation "org.grails:grails-datastore-gorm:${vGorm}"
   implementation "org.grails:grails-datastore-gorm-hibernate5:$vGormHibernate"
@@ -32,20 +32,24 @@ dependencies {
   // tests deps
   testRuntimeOnly "com.h2database:h2:$vH2"
   testRuntimeOnly "com.zaxxer:HikariCP:$vHikari"
+  testRuntimeOnly "org.grails:grails-web-testing-support:$vGrailsTesting"
+  //testImplementation "net.javacrumbs.json-unit:json-unit-assertj:2.28.0"
+  testRuntimeOnly "com.fasterxml.jackson.core:jackson-databind:$vJackson"
   //testRuntimeOnly "javax.xml.bind:jaxb-api:2.3.1"
 
   testImplementation project(":gorm-test-support") //this might seem circular but it can be added to itself as it dif config
+  testImplementation "net.javacrumbs.json-unit:json-unit-assertj:2.28.0"
 
   // testImplementation "org.apache.commons:commons-lang3:$vCommonsLang3"
   // testImplementation "org.mockito:mockito-core"
 
-  //testImplementation "org.grails:grails-web-testing-support:$vGrailsTesting"
+  // testImplementation "org.grails:grails-web-testing-support:$vGrailsTesting"
 
   // testCompile "org.grails:views-json-testing-support:$vViews"
-  testImplementation "net.javacrumbs.json-unit:json-unit-assertj:2.28.0"
-  testImplementation "com.fasterxml.jackson.core:jackson-databind:2.9.10"
+
+  //testImplementation "com.fasterxml.jackson.core:jackson-databind:2.9.10"
 
   //to replace grails-web-testing-support, some dependency here make integration tests work, without the gets are null
-  testImplementation "org.grails:grails-plugin-interceptors"
+  // testImplementation "org.grails:grails-plugin-interceptors"
 
 }

@@ -15,8 +15,9 @@ apply from: "${rootDir}/gradle/test-unit.gradle"
 // sourceSets.test.resources.srcDirs += [project(':gorm-test-support').sourceSets.main.resources]
 
 dependencies {
+  api "org.yakworks:groovy-commons:$vGroovyCommons"
 
-  implementation 'org.springframework.boot:spring-boot-starter-web'
+  compileOnly 'org.springframework.boot:spring-boot-starter-web'
   implementation "org.springframework.boot:spring-boot-starter-security"
 
   api 'org.springframework.security:spring-security-saml2-service-provider'
@@ -27,14 +28,11 @@ dependencies {
 
   api project(":security-core")
 
-  implementation "org.yakworks:groovy-commons:$vGroovyCommons"
-
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation 'org.springframework.security:spring-security-test'
 
   testImplementation("org.spockframework:spock-core:${vSpock}")
   testImplementation("org.spockframework:spock-spring:${vSpock}")
-
 
 }
 

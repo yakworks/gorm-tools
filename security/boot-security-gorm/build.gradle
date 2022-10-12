@@ -5,31 +5,17 @@ plugins {
 }
 
 apply from: "${rootDir}/gradle/gorm-lib.gradle"
-// apply from: "${rootDir}/gradle/test-integration.gradle"
-
-//shared resources to pick up the Gorm defaults from application.groovy, as well as simple logback
-// sourceSets.test.resources.srcDirs += [project(':gorm-test-support').sourceSets.main.resources]
 
 dependencies {
   compileOnly "org.grails:grails-web-boot:$grailsVersion"
 
-  implementation 'org.springframework.boot:spring-boot-starter-web'
-  implementation "org.springframework.boot:spring-boot-starter-security"
+  compileOnly 'org.springframework.boot:spring-boot-starter-web'
+  compileOnly "org.springframework.boot:spring-boot-starter-security"
 
+  api project(":security-core")
   api project(":boot-security")
+
   compileOnly project(":gorm-tools")
   compileOnly project(":gorm-audit")
 
-  // for the org.grails.web.util.WebUtils
-  // compileOnly "org.grails:grails-web-common"
-
-  testImplementation project(":gorm-test-support")
-  testImplementation "org.grails:grails-plugin-interceptors:$grailsVersion"
-  testImplementation "org.grails:grails-plugin-services:$grailsVersion"
-  // testImplementation "org.grails:grails-web-boot:$grailsVersion"
-  // testImplementation project(":rally-domain")
 }
-
-// configurations.api {
-//   exclude group: 'org.grails', module: 'grails-plugin-controllers'
-// }

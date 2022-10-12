@@ -4,7 +4,7 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.security.gorm.AppUserService
-import SecLoginHandler
+import yakworks.security.listeners.SecLoginHandler
 import yakworks.security.spring.user.SpringUserUtils
 import yakworks.testing.gorm.integration.DataIntegrationTest
 

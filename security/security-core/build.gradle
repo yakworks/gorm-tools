@@ -10,8 +10,8 @@ dependencies {
 
   implementation "jakarta.annotation:jakarta.annotation-api:$vJakartaAnn"
 
-  compileOnly "org.yakworks:groovy-commons:$vGroovyCommons"
-  compileOnly "javax.inject:javax.inject:1"
+  implementation "org.yakworks:groovy-commons:$vGroovyCommons"
+  implementation "javax.inject:javax.inject:1"
 
   testImplementation project(":gorm-test-support") //this might seem circular but it can be added to itself as it dif config
 

@@ -11,8 +11,6 @@ dependencies {
   console "org.grails:grails-console"
   profile "org.grails.profiles:rest-api"
 
-  // implementation "org.grails:grails-plugin-domain-class"
-
   api project(":rally-domain")
   api project(":gorm-test-domain")
   // api "org.yakworks:grails-kit:$vSpringGrailsKit"

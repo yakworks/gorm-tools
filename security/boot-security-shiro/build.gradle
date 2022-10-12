@@ -17,6 +17,9 @@ dependencies {
   api 'org.springframework.security:spring-security-saml2-service-provider'
   api 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 
+  testRuntimeOnly "org.springframework.boot:spring-boot-autoconfigure"
+  testRuntimeOnly "org.springframework.boot:spring-boot-starter-tomcat"
+
   // implementation("org.grails.plugins:spring-security-core:$vSpringSecurity"){
   //   exclude group: 'org.grails', module: 'grails-dependencies'
   //   exclude group: 'org.grails', module: 'grails-web-boot'

@@ -9,6 +9,8 @@ import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.security.audit.AuditStampTrait
 
+import static grails.gorm.hibernate.mapping.MappingBuilder.orm
+
 @Entity
 @GrailsCompileStatic
 class AppUserToken  implements AuditStampTrait, RepoEntity<AppUserToken>, Serializable {
@@ -16,7 +18,7 @@ class AppUserToken  implements AuditStampTrait, RepoEntity<AppUserToken>, Serial
     String tokenValue
     String username
 
-    static mapping = {
+    static mapping =  orm {
         version false
     }
 }

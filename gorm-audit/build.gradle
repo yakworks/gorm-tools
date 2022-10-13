@@ -1,6 +1,6 @@
 plugins {
-  id 'org.springframework.boot'
-  id 'io.spring.dependency-management'
+  // id 'org.springframework.boot'
+  // id 'io.spring.dependency-management'
   id "yakworks.groovy-lib"
 }
 
@@ -8,7 +8,7 @@ apply from: "${rootDir}/gradle/gorm-lib.gradle"
 
 dependencies {
 
-  compileOnly "org.springframework.boot:spring-boot-autoconfigure"
+  compileOnly "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion"
 
   compileOnly project(":gorm-tools")
   api project(":security-core")
@@ -18,9 +18,3 @@ dependencies {
 
 }
 
-bootJar {
-  enabled = false
-}
-jar {
-  enabled = true
-}

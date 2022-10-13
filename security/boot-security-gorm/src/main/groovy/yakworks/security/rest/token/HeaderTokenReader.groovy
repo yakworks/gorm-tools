@@ -12,15 +12,15 @@ import groovy.util.logging.Slf4j
 
 import org.springframework.http.MediaType
 
-import grails.plugin.springsecurity.rest.token.AccessToken
-import grails.plugin.springsecurity.rest.token.bearer.BearerTokenReader
+import yakworks.security.spring.token.AccessToken
+
 
 /**
  * Finds the bearer token and if not found tries the for token, like github , for our stored tokens and in Basic
  */
 @Slf4j
 @CompileStatic
-class HeaderTokenReader extends BearerTokenReader {
+class HeaderTokenReader  {
 
     final static String DEFAULT_COOKIE_NAME = 'jwt'
 
@@ -30,7 +30,6 @@ class HeaderTokenReader extends BearerTokenReader {
      * find access token in header.
      * If its in something other than Bearer then the details prop will have a value of "store"
      */
-    @Override
     AccessToken findToken(HttpServletRequest request) {
         log.debug "Looking for bearer token in Authorization header, query string or Form-Encoded body parameter"
 

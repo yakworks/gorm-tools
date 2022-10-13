@@ -16,15 +16,9 @@
 
 package yakworks.rally.api
 
-
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.annotation.Import
-import org.springframework.test.context.ContextConfiguration
 
-import gorm.tools.boot.GormToolsConfiguration
-import grails.boot.test.GrailsApplicationContextLoader
 import spock.lang.Specification
-import yakworks.security.spring.SpringSecurityConfiguration
 
 // @ContextConfiguration(
 //     loader = GrailsApplicationContextLoader.class,

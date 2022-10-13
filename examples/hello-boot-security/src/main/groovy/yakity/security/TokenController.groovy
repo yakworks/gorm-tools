@@ -16,10 +16,13 @@
 
 package yakity.security
 
+import javax.servlet.http.Cookie
+import javax.servlet.http.HttpServletResponse
 
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.CacheControl
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -37,6 +40,8 @@ import yakworks.security.spring.token.JwtTokenGenerator
 class TokenController {
 
     @Autowired JwtTokenGenerator tokenGenerator
+    @Value('${grails.serverURL:""}')
+    String serverURL
 
     @PostMapping("/token.txt")
     String token() {
@@ -44,12 +49,17 @@ class TokenController {
     }
 
     @PostMapping("/token")
-    ResponseEntity<Map> apiLogin() {
+    ResponseEntity<Map> apiLogin(HttpServletResponse response) {
+        String tokenVal = tokenGenerator.genererate().tokenValue
         Map body = [
             token_type: 'Bearer',
-            access_token: tokenGenerator.genererate().tokenValue,
+            access_token: tokenVal,
             "expires_in":3600
         ]
+
+        Cookie cookie = jwtCookie(tokenVal)
+        response.addCookie(cookie)
+
         return ResponseEntity.ok()
             .cacheControl(CacheControl.noStore())
             .body(body);
@@ -58,6 +68,22 @@ class TokenController {
     @PostMapping("/api/wtf")
     Map wtf() {
         return [access_token: tokenGenerator.genererate().tokenValue]
+    }
+
+    protected Cookie jwtCookie(String tokenValue) {
+        Cookie jwtCookie = new Cookie( 'jwt', tokenValue )
+        //FIXME some hard coded values to get it working
+        jwtCookie.maxAge = 3600
+        jwtCookie.path = '/'
+        jwtCookie.setHttpOnly(httpOnly())
+        if ( httpOnly() ) {
+            jwtCookie.setSecure(true)
+        }
+        jwtCookie
+    }
+
+    protected boolean httpOnly() {
+        serverURL?.startsWith('https')
     }
 
 }

@@ -9,7 +9,7 @@ dependencies {
 
   // implementation "org.grails:grails-plugin-controllers"
 
-  api "org.springframework.security:spring-security-config"
+  compileOnly "org.springframework.security:spring-security-config"
 
   //used for bundled Test traits
   api "org.grails:grails-gorm-testing-support:$vGrailsTesting"

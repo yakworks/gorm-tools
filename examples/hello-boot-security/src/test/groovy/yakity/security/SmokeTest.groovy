@@ -16,13 +16,9 @@
 
 package yakity.security
 
-
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.annotation.Import
 
-import gorm.tools.boot.GormToolsConfiguration
 import spock.lang.Specification
-import yakworks.security.spring.SpringSecurityConfiguration
 
 @SpringBootTest
 class SmokeTest extends Specification {

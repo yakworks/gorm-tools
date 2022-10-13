@@ -1,6 +1,5 @@
 package yakworks.security.rest
 
-import grails.plugin.springsecurity.rest.token.AccessToken
 import yakworks.security.rest.token.HeaderTokenReader
 import org.grails.plugins.testing.GrailsMockHttpServletRequest
 import org.springframework.http.MediaType
@@ -8,6 +7,7 @@ import org.springframework.mock.web.MockHttpServletResponse
 import spock.lang.Issue
 import spock.lang.Specification
 import spock.lang.Unroll
+import yakworks.security.spring.token.AccessToken
 
 class HeaderTokenReaderSpec extends Specification {
 

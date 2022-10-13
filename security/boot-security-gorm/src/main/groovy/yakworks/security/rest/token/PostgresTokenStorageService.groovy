@@ -17,9 +17,9 @@ import org.springframework.security.core.userdetails.UserDetailsService
 
 import gorm.tools.idgen.IdGenerator
 import grails.gorm.transactions.Transactional
-import grails.plugin.springsecurity.rest.token.storage.TokenNotFoundException
-import grails.plugin.springsecurity.rest.token.storage.TokenStorageService
 import yakworks.security.gorm.model.AppUserToken
+import yakworks.security.spring.token.TokenNotFoundException
+import yakworks.security.spring.token.TokenStorageService
 
 /**
  * -- Copied in from grails rest-scurity as a starting point --

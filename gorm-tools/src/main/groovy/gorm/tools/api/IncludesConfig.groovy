@@ -8,12 +8,15 @@ import java.util.concurrent.ConcurrentHashMap
 
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
 
+import gorm.tools.config.ApiProperties
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.map.Maps
 import yakworks.grails.support.ConfigAware
 import yakworks.spring.AppCtx
+import yakworks.yaml.YamlUtils
 
 /**
  * Helper to lookup includes for map or list based api, usually a json and rest based api.
@@ -23,9 +26,12 @@ import yakworks.spring.AppCtx
  * @since 6.1.12
  */
 @CompileStatic
-class IncludesConfig implements ConfigAware {
+class IncludesConfig {
 
-    static final Map<String, String> EntityClassPathKeys = new ConcurrentHashMap<String, String>()
+    // private static final Map<String, String> entityClassPathKeys = new ConcurrentHashMap<String, String>()
+    private static final Map<String, Map<String, Object>> entityClassApiProps = new ConcurrentHashMap<String, Map<String, Object>>()
+
+    @Autowired ApiProperties apiProperties
 
     //static cheater to get the bean, use sparingly if at all
     static IncludesConfig bean(){
@@ -129,24 +135,33 @@ class IncludesConfig implements ConfigAware {
      * gets the Map config for the entityKey and namespace
      */
     Map getPathConfig(String entityKey, String namespace){
-        String configPath = namespace ? "api.paths.${namespace}.${entityKey}" : "api.paths.${entityKey}"
-        Map pathConfig = config.getProperty(configPath, Map)
-        //if nothing and it has a dot than entity key might be full class name with package, so do search
-        if(!pathConfig && entityKey.indexOf('.') != -1)
-            pathConfig = findConfigByEntityClass(entityKey)
+        //String configPath = namespace ? "api.paths.${namespace}.${entityKey}" : "api.paths.${entityKey}"
+        Map<String, Object> entityConfig
+        if(namespace){
+            entityConfig = apiProperties.paths[namespace][entityKey] as Map<String, Object>
+        } else {
+            entityConfig = apiProperties.paths[entityKey] as Map<String, Object>
+        }
 
-        return pathConfig
+        // Map pathConfig = config.getProperty(configPath, Map)
+        //if nothing and it has a dot than entity key might be full class name with package, so do search
+        if(!entityConfig && entityKey.indexOf('.') != -1)
+            entityConfig = findConfigByEntityClass(entityKey) as Map<String, Object>
+
+        return entityConfig
     }
 
     /**
      * looks for the entityClass key that matches the className
      */
     Map findConfigByEntityClass(String className){
-        if(EntityClassPathKeys.isEmpty()){
-            setupEntityClassPathKeys()
+        if(entityClassApiProps.isEmpty()){
+            initEntityClassApiProps()
+            // setupEntityClassPathKeys()
         }
-        String rootCfgKey = EntityClassPathKeys[className]
-        return rootCfgKey ? config.getProperty(rootCfgKey, Map) : [:]
+        entityClassApiProps[className] ?: [:]
+        // String rootCfgKey = entityClassPathKeys[className]
+        // return rootCfgKey ? config.getProperty(rootCfgKey, Map) : [:]
     }
 
     /**
@@ -155,30 +170,58 @@ class IncludesConfig implements ConfigAware {
      * when it finds  api.paths.security.user.entityClass: yakworks.security.domain.AppUser
      * it will store ['yakworks.security.domain.AppUser': 'api.paths.security.user'] for faster lookup
      */
-    void setupEntityClassPathKeys() {
-        Properties cfgProps = config.toProperties()
-        Set keySet = cfgProps.keySet() as Set<String>
-        Set entClassKeySets = keySet.findAll{ it.matches(/api\.paths.*\.entityClass/) }
-        for(String ckey: entClassKeySets){
-            String entityClass = cfgProps.getProperty(ckey)
-            String rootCfgKey = ckey.replace(".entityClass", '')
-            EntityClassPathKeys[entityClass] = rootCfgKey
+    // void setupEntityClassPathKeys() {
+    //     Properties cfgProps = config.toProperties()
+    //     Set keySet = cfgProps.keySet() as Set<String>
+    //     Set entClassKeySets = keySet.findAll{ it.matches(/api\.paths.*\.entityClass/) }
+    //     for(String ckey: entClassKeySets){
+    //         String entityClass = cfgProps.getProperty(ckey)
+    //         String rootCfgKey = ckey.replace(".entityClass", '')
+    //         entityClassPathKeys[entityClass] = rootCfgKey
+    //     }
+    // }
+
+    /**
+     * initializes the entityClassApiProps which is keyed by class name
+     */
+    void initEntityClassApiProps(){
+        //exit fast if nothing setup
+        if(!apiProperties.paths) return
+
+        Map restApiPaths = apiProperties.paths ?: [:]
+        Map namespaces = apiProperties.namespaces ?: [:]
+
+        restApiPaths.each { String key, Object val ->
+            Map cfg = (Map)val
+            if(namespaces.containsKey(key)){
+                for(Map.Entry entry : ((Map)cfg) ){
+                    Map nestCfg = (Map)entry.value
+                    if(nestCfg.containsKey('entityClass')){
+                        entityClassApiProps[nestCfg['entityClass'].toString()] = nestCfg
+                    }
+                }
+            }
+            else { //normal not namespaced or may have slash like 'foo/bar' as key so just add it
+                if(cfg.containsKey('entityClass')){
+                    entityClassApiProps[cfg['entityClass'].toString()] = cfg
+                }
+            }
         }
     }
 
     /**
      * FIXME whats this for? can we remove or is it used?
      */
-    Map getPathConfig(String pathkey){
-        Map pathConfig
-        if(pathkey.contains('_')){
-            String[] parts = pathkey.split('[_]')
-            pathConfig = getPathConfig(parts[1], parts[0])
-        } else {
-            pathConfig = getPathConfig(pathkey, null)
-        }
-        return pathConfig
-    }
+    // Map getPathConfig(String pathkey){
+    //     Map pathConfig
+    //     if(pathkey.contains('_')){
+    //         String[] parts = pathkey.split('[_]')
+    //         pathConfig = getPathConfig(parts[1], parts[0])
+    //     } else {
+    //         pathConfig = getPathConfig(pathkey, null)
+    //     }
+    //     return pathConfig
+    // }
 
     /**
      * get the fields includes with a list of keys to search in order, stopping at the first found
@@ -189,8 +232,13 @@ class IncludesConfig implements ConfigAware {
      */
     static List<String> getFieldIncludes(Map includesMap, List<String> includesKeys){
         if(!includesKeys.contains('get')) includesKeys << 'get'
+
         for(String key : includesKeys){
-            if(includesMap.containsKey(key)) return includesMap[key] as List<String>
+            if(includesMap.containsKey(key)) {
+                def incs = includesMap[key]
+                //they get merged in as Maps when coming from external configs with the key being index, [0:id, 1:name, etc..], just need vals
+                return (incs instanceof Map ? incs.values() : incs ) as List<String>
+            }
         }
         //its should never get here but in case it does and config is messed then fall back *
         return ['*']

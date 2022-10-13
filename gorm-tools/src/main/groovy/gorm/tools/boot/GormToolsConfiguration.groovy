@@ -21,6 +21,7 @@ import gorm.tools.api.IncludesConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelStreamTools
 import gorm.tools.async.ParallelTools
+import gorm.tools.config.ApiProperties
 import gorm.tools.config.AsyncConfig
 import gorm.tools.config.GormConfig
 import gorm.tools.config.IdGeneratorConfig
@@ -41,7 +42,7 @@ import gorm.tools.transaction.TrxService
 
 @Configuration(proxyBeanMethods = false)
 @Lazy
-@EnableConfigurationProperties([AsyncConfig, GormConfig, IdGeneratorConfig])
+@EnableConfigurationProperties([AsyncConfig, GormConfig, IdGeneratorConfig, ApiProperties])
 @CompileStatic
 class GormToolsConfiguration {
 

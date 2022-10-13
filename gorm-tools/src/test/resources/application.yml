@@ -28,6 +28,8 @@ gorm:
 
 # add some api configs for testing
 api:
+  defaultPackage: yakworks.rally.api
+  namespaces: { security: 'Security' }
   paths:
     security:
       sinkExt:

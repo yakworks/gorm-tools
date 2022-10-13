@@ -14,6 +14,7 @@ import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.yaml.snakeyaml.Yaml
 
+import gorm.tools.config.ApiProperties
 import gorm.tools.utils.GormMetaUtils
 import yakworks.commons.io.PathTools
 import yakworks.commons.lang.NameUtils
@@ -40,6 +41,7 @@ class OpenApiGenerator implements ConfigAware {
     List namespaceList
 
     @Autowired GormToSchema gormToSchema
+    @Autowired ApiProperties apiProperties
 
     void generate(List nsList = []) {
         def buildDest = makeBuildDirs()
@@ -86,12 +88,12 @@ class OpenApiGenerator implements ConfigAware {
 
     //iterate over the restapi keys and add setup the yaml
     void spinThroughRestApi(Map api, List namespaceList){
-        Map restApiPaths = config.getProperty('api.paths', Map)
+        Map restApiPaths = apiProperties.paths
 
         List tags = (List)api.tags
         Map<String, List> newTagGroups = [:]
 
-        Map namespaces = config.getProperty('api.namespaces', Map, [:])
+        Map namespaces = apiProperties.namespaces ?: [:]
 
         for(entry in restApiPaths){
             if(namespaces.containsKey(entry.key)){

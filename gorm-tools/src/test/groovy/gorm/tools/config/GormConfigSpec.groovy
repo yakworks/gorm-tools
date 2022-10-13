@@ -13,9 +13,13 @@ class GormConfigSpec extends Specification implements GrailsAppUnitTest {
     @Autowired AsyncConfig asyncConfig
     @Autowired GormConfig gormConfig
     @Autowired IdGeneratorConfig idGeneratorConfig
+    @Autowired ApiProperties apiProperties
 
     def "sanity Check"() {
         expect:
+        apiProperties.namespaces
+        apiProperties.paths.size() == 1
+
         asyncConfig.poolSize == 2
         asyncConfig.sliceSize == 50
         gormConfig.async.poolSize == 2

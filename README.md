@@ -30,19 +30,6 @@
 **7.3.20+ is for grails 5.x and gorm 7.3+ , see notes**
 
 
-
-> *DOCS ARE OUT OF DATE AND BEING UPDATED FOR BREAKING CHANGES after 6.1.12-v.X*
-> *ALSO MERGING IN DOCS FOR THE REST-API AND AUDITSTAMP THAT WAS MERGED INTO HERE*
-> More breaking changes in 7.0.8-v6. is required on domain entity now or it needs to implement @GormRepoEntity
-
-[RELEASE NOTES](docs/release-notes.md)
-
-| Guide | API | 
-|------|--------|
-|[Released Docs](https://yakworks.github.io/gorm-tools/) | [Released Api](https://yakworks.github.io/gorm-tools/api)
-|[snapshot](https://yakworks.github.io/gorm-tools/snapshot) | [snapshot](https://yakworks.github.io/gorm-tools/snapshot/api)
-
-
 ```
 repositories {
   //jcenter shutdown, use mavenCentral
@@ -50,6 +37,7 @@ repositories {
 }
 ...
 implementation "org.yakworks:gorm-tools:7.3.23"
+etc...
 ``` 
 ## Libs
 
@@ -58,17 +46,29 @@ implementation "org.yakworks:gorm-tools:7.3.23"
 - `org.yakworks:gorm-rest` - foundation and ASTs for automated rest api from gorm domains
 - `org.yakworks:gorm-openapi` - gorm swagger and json schema foundation. 
 - `org.yakworks:gorm-etl` - Extract, Transform, Load for creating Excel and CSV
-- `org.yakworks:rally-domain` - Opinionated CRM like models that serve as foundation for our business apps. Also used for examples and testing.
+
+__Security__
+
 - `org.yakworks:security-core` - Dependency free, Simple facade interfaces and impls for User/Subject and Roles/Permissions
 - `org.yakworks:boot-security` - Spring Security with setup for basic, saml2, oauth. Depends only on spring boot and security
 - `org.yakworks:boot-security-gorm` - gorm entities and support for Users/Roles
 
-- `org.yakworks:boot-security-shiro` - FUTURE USE
+__Rally__
 
-** Testing Libs
+- `org.yakworks:rally-domain` - A sort of TCK. Opinionated CRM like models that serve as foundation for our business apps. Also used for examples and testing.
+- `examples/rcm-api` - Integration tests and another TCK app. front rally-domain with rest api and tests out gorm-rest lib.
+- 
+__Testing Helper Libs__
 - `org.yakworks:gorm-test-support` - Testing framework for gorm domains
 - `org.yakworks:gorm-test-domain` - common domain model used for tests. KitchenSink is commonly used in tests
 
+__Test and Example Projects__
+
+- `examples/testify` - Integration tests for gorm-tools and the others. rally-domain has its own integration tests
+- `examples/resitfy` - Playground for simple rest app
+- `examples/benchmarks` - currenty non-functional but proves out performance benchmarks for high transaction and async/parralel processins
+- 
+- `boot-security-shiro` - FUTURE USE for using shiro or shiro like permissions with spring-security
 
 ## Groovy 3, Grails 5 and Gorm 7.3
 
@@ -218,3 +218,17 @@ dependencies {
  compile('org.grails.plugins:gorm-tools:x.y.z-SNAPSHOT') { changing = true } 
 }
 ```
+
+
+## Docs Links
+
+> *DOCS ARE REALLY OUT OF DATE AND BEING UPDATED FOR BREAKING CHANGES after 6.1.12-v.X*
+> *ALSO MERGING IN DOCS FOR THE REST-API AND AUDITSTAMP THAT WAS MERGED INTO HERE*
+> More breaking changes in 7.0.8-v6. is required on domain entity now or it needs to implement @GormRepoEntity
+
+[RELEASE NOTES](docs/release-notes.md)
+
+| Guide | API | 
+|------|--------|
+|[Released Docs](https://yakworks.github.io/gorm-tools/) | [Released Api](https://yakworks.github.io/gorm-tools/api)
+|[snapshot](https://yakworks.github.io/gorm-tools/snapshot) | [snapshot](https://yakworks.github.io/gorm-tools/snapshot/api)

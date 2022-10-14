@@ -59,7 +59,11 @@ implementation "org.yakworks:gorm-tools:7.3.23"
 - `org.yakworks:gorm-openapi` - gorm swagger and json schema foundation. 
 - `org.yakworks:gorm-etl` - Extract, Transform, Load for creating Excel and CSV
 - `org.yakworks:rally-domain` - Opinionated CRM like models that serve as foundation for our business apps. Also used for examples and testing.
-- `org.yakworks:rally-security` - Extra security models and shiro to spring-security adapter for fine grained ACL
+- `org.yakworks:security-core` - Dependency free, Simple facade interfaces and impls for User/Subject and Roles/Permissions
+- `org.yakworks:boot-security` - Spring Security with setup for basic, saml2, oauth. Depends only on spring boot and security
+- `org.yakworks:boot-security-gorm` - gorm entities and support for Users/Roles
+
+- `org.yakworks:boot-security-shiro` - FUTURE USE
 
 ** Testing Libs
 - `org.yakworks:gorm-test-support` - Testing framework for gorm domains

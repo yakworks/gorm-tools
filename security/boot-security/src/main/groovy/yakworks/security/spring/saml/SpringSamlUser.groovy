@@ -32,10 +32,11 @@ class SpringSamlUser extends DefaultSaml2AuthenticatedPrincipal implements Sprin
         super(samlAuthPrincipal.name, samlAuthPrincipal.attributes, samlAuthPrincipal.sessionIndexes)
         this.relyingPartyRegistrationId = samlAuthPrincipal.relyingPartyRegistrationId
         //keep userName  from okta saml
-        userProfile['userName'] = samlAuthPrincipal.name
+        // attributes['userName'] = samlAuthPrincipal.name
         setUsername(userInfo.username)
         merge(userInfo)
-        attributesToUserProfile()
+        roles = userInfo.roles
+        // attributesToUserProfile()
     }
     /**
      * Build SpringSamlUser from the built SamlAuthPricipal (from Okta) and merge in the userInfo from internal db
@@ -50,11 +51,11 @@ class SpringSamlUser extends DefaultSaml2AuthenticatedPrincipal implements Sprin
     }
 
     /** Saml spec is for attributes to be a list, which 99.9% of the time its not. So convert its attributes to our userProfile map*/
-    def attributesToUserProfile(){
-        getAttributes().each { k, v ->
-            userProfile[k] = v[0] //first item in list
-        }
-    }
+    // def attributesToUserProfile(){
+    //     getAttributes().each { k, v ->
+    //         userProfile[k] = v[0] //first item in list
+    //     }
+    // }
 
     @Override
     String getPassword() {

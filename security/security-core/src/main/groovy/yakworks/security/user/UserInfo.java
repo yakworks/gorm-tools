@@ -9,8 +9,9 @@ import java.security.Principal;
 import java.util.*;
 
 /**
- * Trait for a User. We depend on this so that we are not locked into a specific security framework such as Spring or Shiro.
- * Roughly based on Springs UserDetails
+ * Common interface for a User and can act as a facade.
+ * We depend on this so that we are not locked into a specific security framework such as Spring or Shiro.
+ * Roughly based on Springs UserDetails, Pac4js UserProfile/CommonProfile and Shiros Subject.
  * Both the AppUser domain and the SpringUser implement this.
  * see org.springframework.security.core.userdetails.UserDetails
  */
@@ -39,25 +40,22 @@ public interface UserInfo extends Principal, Serializable {
         }
     }
 
-    /** users email for username or lost password*/
+    /** users email for username or lost password */
     String  getEmail();
 
-    /** the organization ID */
+    /** the organization ID, this is largely for Rally */
     Serializable getOrgId();
 
     /** Indicates whether the user is enabled or disabled. A disabled user cannot be authenticated. */
     boolean isEnabled();
 
-    /** profile info */
-    Map getUserProfile();
+    /** profile attributes info, sometimes can be claims in OAUTH */
+    Map<String, Object> getAttributes();
 
+    /** Set of Roles, usually should be stringss */
     Set getRoles();
 
-    // static BasicUserInfo of(String username){
-    //     return BasicUserInfo.of(username);
-    // }
-    //
-    // static BasicUserInfo of(String username, Collection<String> roles){
-    //     return BasicUserInfo.of(username, roles);
-    // }
+    /** Set of Permissions for this user. */
+    Set getPermissions();
+
 }

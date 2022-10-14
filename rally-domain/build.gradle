@@ -5,6 +5,8 @@ apply from: "${rootDir}/gradle/test-integration.gradle"
 
 dependencies {
 
+  compileOnly "org.springframework.boot:spring-boot-starter-web"
+
   api project(":gorm-tools")
   api project(":gorm-audit")
   api project(":boot-security-gorm")

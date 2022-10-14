@@ -19,6 +19,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -124,6 +125,7 @@ public class SpringSecurityConfiguration {
 
     @Configuration
     @Lazy
+    @ConditionalOnClass(JwtDecoder.class)
     public static class JwtTokenConfiguration {
         @Bean
         @ConditionalOnMissingBean

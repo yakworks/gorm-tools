@@ -12,6 +12,8 @@ dependencies {
   compileOnly "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
   compileOnly "org.springframework.boot:spring-boot-starter-security:$springBootVersion"
 
+  compileOnly "org.springframework.boot:spring-boot-starter-oauth2-resource-server:$springBootVersion"
+
   api project(":security-core")
   api project(":boot-security")
 

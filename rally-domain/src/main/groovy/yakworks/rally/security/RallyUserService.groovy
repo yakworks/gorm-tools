@@ -11,6 +11,8 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Lazy
+import org.springframework.stereotype.Service
 
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.ReadOnly
@@ -26,6 +28,7 @@ import yakworks.security.gorm.model.SecRoleUser
  * UserService is for user level helpers, such as sending emails to user,
  * tracking user login/logout And operations relating to passwords, contacts and org levels
  */
+@Service @Lazy
 @Slf4j
 @CompileStatic
 class RallyUserService {

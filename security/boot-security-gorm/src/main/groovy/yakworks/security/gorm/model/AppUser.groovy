@@ -17,6 +17,8 @@ import grails.persistence.Entity
 import yakworks.security.audit.AuditStampTrait
 import yakworks.security.user.UserInfo
 
+import static grails.gorm.hibernate.mapping.MappingBuilder.orm
+
 @Entity
 @GrailsCompileStatic
 @EqualsAndHashCode(includes='username', useCanEqual=false)
@@ -60,10 +62,10 @@ class AppUser implements UserInfo, AuditStampTrait, RepoEntity<AppUser>, Seriali
 
     static AppUserRepo getRepo() { RepoLookup.findRepo(this) as AppUserRepo }
 
-    static mapping = {
+    static mapping = orm {
         // cache "nonstrict-read-write"
         table 'Users'
-        passwordHash column: "`password`"
+        property 'passwordHash', [column: "`password`"]
     }
 
     static constraintsMap = [
@@ -142,7 +144,12 @@ class AppUser implements UserInfo, AuditStampTrait, RepoEntity<AppUser>, Seriali
     }
 
     @Override //UserInfo
-    Map getUserProfile() {
+    Map getAttributes() {
+        throw new UnsupportedOperationException("Not yet supported here")
+    }
+
+    @Override //UserInfo
+    Set getPermissions() {
         throw new UnsupportedOperationException("Not yet supported here")
     }
 

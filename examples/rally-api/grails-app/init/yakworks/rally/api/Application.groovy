@@ -97,8 +97,9 @@ class Application extends GrailsAutoConfiguration {
         //hack to make sure hazel get setup before the one that is setup for hibernates L2 cache as that one
         //is configured to join the name of one already setup in spring.
         def hibernateDatastoreBeanDef = getBeanDefinition('hibernateDatastore')
+        // def hazelBeanDef = getBeanDefinition('hazelcastInstance')
         if (hibernateDatastoreBeanDef) {
-            // make it depend on my bean
+            // make it depend on hazelcast bean
             hibernateDatastoreBeanDef.dependsOn = ['hazelcastInstance'] as String[]
         }
 

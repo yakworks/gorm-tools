@@ -18,21 +18,23 @@ dependencies {
   api "org.yakworks:groovy-commons:$vGroovyCommons"
 
   compileOnly "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
-  implementation "org.springframework.boot:spring-boot-starter-security:$springBootVersion"
+  compileOnly "org.springframework.boot:spring-boot-starter-security:$springBootVersion"
 
   // Doing this and not with io.spring.dependency-management because it was blowing up with pom for publishing
   // TODO figure that out and then lean on normal dependency mgmt.
   api "org.springframework.security:spring-security-core:$springSecurityVersion"
+  api "org.springframework.security:spring-security-web:$springSecurityVersion"
   api "org.springframework.security:spring-security-config:$springSecurityVersion"
-  //SAML
-  api "org.springframework.security:spring-security-saml2-service-provider:$springSecurityVersion"
 
+  //SAML
+  compileOnly "org.springframework.security:spring-security-saml2-service-provider:$springSecurityVersion"
   //OAUTH
-  api "org.springframework.boot:spring-boot-starter-oauth2-resource-server:$springBootVersion"
-  api "org.springframework.security:spring-security-oauth2-resource-server:$springSecurityVersion"
-  api "org.springframework.security:spring-security-oauth2-core:$springSecurityVersion"
-  api "org.springframework.security:spring-security-oauth2-jose:$springSecurityVersion"
-  api "org.springframework.security:spring-security-crypto:$springSecurityVersion"
+  compileOnly "org.springframework.boot:spring-boot-starter-oauth2-resource-server:$springBootVersion"
+  // compileOnly "org.springframework.security:spring-security-oauth2-resource-server:$springSecurityVersion"
+  // compileOnly "org.springframework.security:spring-security-oauth2-core:$springSecurityVersion"
+  // compileOnly "org.springframework.security:spring-security-oauth2-jose:$springSecurityVersion"
+  // compileOnly "org.springframework.security:spring-security-crypto:$springSecurityVersion"
+
 
   compileOnly "jakarta.annotation:jakarta.annotation-api:$vJakartaAnn"
   compileOnly "javax.inject:javax.inject:1"

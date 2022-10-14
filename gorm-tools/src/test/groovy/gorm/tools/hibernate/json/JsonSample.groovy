@@ -6,6 +6,8 @@ package gorm.tools.hibernate.json
 
 import groovy.transform.CompileDynamic
 
+import org.grails.datastore.mapping.config.MappingDefinition
+
 import gorm.tools.hibernate.type.JsonType
 import gorm.tools.repository.model.UuidGormRepo
 import gorm.tools.repository.model.UuidRepoEntity
@@ -26,24 +28,34 @@ class JsonSample implements UuidRepoEntity<JsonSample, UuidGormRepo<JsonSample>>
     //json mapped to pogo
     Addy addy
 
-    // static mapping = orm {
+    // @CompileDynamic
+    static MappingDefinition getMapping(){
+        orm {
+            id generator: "assigned"
+            //version false
+            columns(
+                json: property(type: JsonType, typeParams: [type: Map]),
+                someList: property(type: JsonType, typeParams: [type: ArrayList]),
+                addy: property(type: JsonType, typeParams: [type: Addy])
+            )
+            // someList = property {
+            //     type JsonType
+            //     typeParams([type: ArrayList.name] as Properties)
+            // }
+            // addy = property {
+            //     type JsonType
+            //     typeParams([type: Addy.name] as Properties)
+            // }
+        }
+    }
+
+    // @CompileDynamic
+    // static Closure getMapping(){ { ->
     //     id generator: "assigned"
-    //     version false
-    //     property("json", [type: JsonType, params: [clazz: Map.name] ])
-    //     // property("someList", [type: JsonType, params: [clazz: ArrayList.name] ])
-    //     property("someList", {
-    //         column([name: "someList"])
-    //         type = JsonType
-    //         typeParams = [clazz: ArrayList.name]
-    //     })
-    // }
-    @CompileDynamic
-    static Closure getMapping(){ { ->
-        id generator: "assigned"
-        json type: JsonType, params: [type: Map]
-        someList type: JsonType, params: [type: ArrayList]
-        addy type: JsonType, params: [type: Addy]
-    }}
+    //     json type: JsonType, params: [type: Map]
+    //     someList type: JsonType, params: [type: ArrayList]
+    //     addy type: JsonType, params: [type: Addy]
+    // }}
 
     static constraints = {
         name nullable: false

@@ -10,6 +10,8 @@ import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
+import static grails.gorm.hibernate.mapping.MappingBuilder.orm
+
 @Entity
 @GrailsCompileStatic
 class SecLoginHistory implements RepoEntity<SecLoginHistory>, Serializable {
@@ -18,7 +20,7 @@ class SecLoginHistory implements RepoEntity<SecLoginHistory>, Serializable {
     LocalDateTime loginDate
     LocalDateTime logoutDate
 
-    static mapping = {
+    static mapping = orm {
         table 'SecLoginHistory'
         // user column: 'userId'
         version false

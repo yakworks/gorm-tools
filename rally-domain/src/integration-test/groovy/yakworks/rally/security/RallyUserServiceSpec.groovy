@@ -38,6 +38,11 @@ class RallyUserServiceSpec extends Specification implements DomainIntTest {
 
     }
 
+    def sanityCheck(){
+        expect:
+        rallyUserService
+    }
+
     @Ignore
     void testGetOrgManagers() {
         when:

@@ -14,6 +14,7 @@ import yakworks.commons.model.Named
 @CompileStatic
 trait UserInfoTrait implements Named, UserInfo {
     // Serializable id
+    String  name
     String  username
     String  displayName
     String  email
@@ -21,6 +22,7 @@ trait UserInfoTrait implements Named, UserInfo {
     boolean enabled = true
     Long orgId
     Set roles = [] as Set
-    Map userProfile
+    Set permissions = [] as Set
+    Map<String, Object> attributes = [:] as Map<String, Object>
 
 }

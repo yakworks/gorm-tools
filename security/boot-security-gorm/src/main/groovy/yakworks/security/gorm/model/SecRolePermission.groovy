@@ -12,6 +12,8 @@ import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 import grails.persistence.Entity
 
+import static grails.gorm.hibernate.mapping.MappingBuilder.orm
+
 @Entity
 @GrailsCompileStatic
 class SecRolePermission implements RepoEntity<SecRolePermission>, Serializable  {
@@ -29,11 +31,11 @@ class SecRolePermission implements RepoEntity<SecRolePermission>, Serializable  
         permission unique: 'role'
     }
 
-    static mapping = {
+    static mapping = orm {
         cache "nonstrict-read-write"
         id composite: ['role', 'permission']
         version false
-        role column:'roleId'
+        property 'role', [column:'roleId']
     }
 
     @Override

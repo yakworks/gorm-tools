@@ -92,8 +92,11 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         flush()
         AppUser user = AppUser.get(1)
 
+        def roleIds = SecRoleUser.findAllByUser(AppUser.get(1))*.role.id
+
         then:
-        SecRoleUser.findAllByUser(AppUser.get(1))*.role.id == [2L, 3L]
+        roleIds.size() == 2
+        roleIds.containsAll([3L, 2L])
 
         when:
         Map params2 = [

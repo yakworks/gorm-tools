@@ -37,8 +37,10 @@ trait SpringUserInfo implements UserDetails, Named, UserInfo {
     Serializable orgId
     /** roles */
     Set<String> roles = [] as Set<String>
+    /** roles */
+    Set<String> permissions = [] as Set<String>
     /** future use */
-    Map<String, Object> userProfile = [:] as Map<String, Object>
+    Map<String, Object> attributes = [:] as Map<String, Object>
 
     //implements the extra UserDetails
     boolean accountNonExpired = true
@@ -66,7 +68,7 @@ trait SpringUserInfo implements UserDetails, Named, UserInfo {
 
     /** merges only a subset of the data */
     def merge(UserInfo sourceUser){
-        ['id', 'name', 'displayName', 'email', 'orgId', 'roles'].each{ String prop ->
+        ['id', 'name', 'displayName', 'email', 'orgId'].each{ String prop ->
             this[prop] = sourceUser[prop]
         }
         return this

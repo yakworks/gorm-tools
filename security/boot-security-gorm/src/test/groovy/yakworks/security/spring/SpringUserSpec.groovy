@@ -4,10 +4,12 @@ import org.apache.commons.lang3.RandomStringUtils
 
 import gorm.tools.problem.ValidationProblem
 import spock.lang.Specification
+import yakworks.security.Roles
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRoleUser
 import yakworks.security.spring.user.SpringUser
+import yakworks.security.user.BasicUserInfo
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
@@ -25,6 +27,15 @@ class SpringUserSpec extends Specification implements GormHibernateTest, Securit
         args.name = "Joe ${System.currentTimeMillis()}"
         args.username = "test-user-${System.currentTimeMillis()}"
         args
+    }
+
+    void "create SpringUser with roles"() {
+        when:
+        def uinfo = BasicUserInfo.create(id: 1, username: "admin@yak.com", email: "admin2@y.com", roles: ['ROLE1'])
+        def springUser = SpringUser.of(uinfo, [Roles.ADMIN, Roles.CUSTOMER])
+
+        then:
+        springUser.roles ==  [Roles.ADMIN, Roles.CUSTOMER] as Set
     }
 
     void "create SpringUser from AppUser"() {

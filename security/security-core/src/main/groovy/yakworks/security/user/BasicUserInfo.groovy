@@ -29,7 +29,8 @@ class BasicUserInfo implements Named, UserInfo {
     boolean enabled = true
     Long orgId
     Set roles = [] as Set
-    Map userProfile
+    Set permissions = [] as Set
+    Map<String, Object> attributes = [:] as Map<String, Object>
 
     static BasicUserInfo of(String username){
         return new BasicUserInfo(username: username)

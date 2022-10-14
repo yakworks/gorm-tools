@@ -13,6 +13,8 @@ import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 import grails.persistence.Entity
 
+import static grails.gorm.hibernate.mapping.MappingBuilder.orm
+
 @Entity
 @GrailsCompileStatic
 class SecRoleUser implements RepoEntity<SecRoleUser>, Serializable {
@@ -22,15 +24,17 @@ class SecRoleUser implements RepoEntity<SecRoleUser>, Serializable {
 
     static transients = ['roleName', 'userName']
 
-    static mapping = {
+    static mapping = orm {
         cache "nonstrict-read-write"
         id composite: ['user', 'role']
         version false
-        user column:'userId'
-        role column:'secRoleId'
+        columns(
+            user: property(column:'userId'),
+            role: property(column:'secRoleId')
+        )
     }
 
-    static constraintsMap= [
+    static constraintsMap = [
         user: [d: 'The user for the role'],
         role: [d: 'The role for the user'],
         userId: [d: 'The user id to assign the role'],

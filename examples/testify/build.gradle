@@ -4,11 +4,15 @@ apply plugin:"org.grails.grails-plugin"
 
 //none of these add dependencies, just configuration, all deps should be below
 apply from: "${rootDir}/gradle/compile.gradle"
+apply from: "${rootDir}/gradle/hibernate.gradle"
 //apply from: "${rootDir}/gradle/example.gradle"
 apply from: "${rootDir}/gradle/test-unit.gradle"
 apply from: "${rootDir}/gradle/test-integration.gradle"
 
 dependencies {
+
+  // implementation "org.springframework.boot:spring-boot-starter-logging"
+  implementation "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
 
   api project(":rally-domain")
   api project(":gorm-test-domain")
@@ -27,6 +31,8 @@ dependencies {
   testRuntimeOnly "org.springframework.boot:spring-boot-autoconfigure"
   testRuntimeOnly "org.springframework.boot:spring-boot-starter-tomcat"
 
+  testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+  testImplementation "org.springframework.security:spring-security-test:$springSecurityVersion"
 }
 
 bootRun {

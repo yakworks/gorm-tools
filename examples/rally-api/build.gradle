@@ -3,7 +3,7 @@ apply plugin:"org.grails.grails-web"
 // apply plugin:"org.grails.plugins.views-json"
 
 apply from: "${rootDir}/gradle/compile.gradle"
-// apply from: "${rootDir}/gradle/example.gradle"
+apply from: "${rootDir}/gradle/hibernate.gradle"
 apply from: "${rootDir}/gradle/test-unit.gradle"
 apply from: "${rootDir}/gradle/test-integration.gradle"
 
@@ -19,6 +19,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
   implementation 'org.springframework.boot:spring-boot-starter-security'
   // implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
 
   // implementation "org.grails:grails-plugin-i18n"
   implementation "org.grails:grails-plugin-rest"
@@ -26,7 +27,7 @@ dependencies {
   // implementation "org.grails:grails-plugin-codecs"
   implementation "org.grails:grails-plugin-interceptors"
   implementation "org.grails:grails-web-boot"
-  implementation "org.grails:grails-web-url-mappings"
+  // implementation "org.grails:grails-web-url-mappings"
   implementation "org.grails.plugins:async"
 
   implementation "org.grails.plugins:hibernate5:$vGormHibernate"

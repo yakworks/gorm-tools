@@ -45,10 +45,10 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
-@Configuration
-@Lazy
+@Configuration @Lazy
 @EnableConfigurationProperties({JwtProperties.class})
 public class SpringSecurityConfiguration {
+
     public static void applyHttpSecurity(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
         http.authorizeHttpRequests((authorize) -> authorize
             .requestMatchers("/actuator/**", "/resources/**", "/about").permitAll()
@@ -67,7 +67,6 @@ public class SpringSecurityConfiguration {
         jsonUnameFilter.setAuthenticationSuccessHandler(new ForwardAuthenticationSuccessHandler("/token"));
         jsonUnameFilter.setAuthenticationManager(authenticationManager);
         http.addFilterAfter(jsonUnameFilter, BasicAuthenticationFilter.class);
-
 
     }
 
@@ -99,7 +98,9 @@ public class SpringSecurityConfiguration {
         return new SpringSecService();
     }
 
-    @Bean("${CurrentUserHolder.name}")
+    //here just to set the static, never injected so make sure its not Lazy
+    @Bean("${CurrentUserHolder.name}") @Lazy(false)
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public CurrentUserHolder CurrentUserHolder() {
         //here just to set the static, there a better way?
         return new CurrentUserHolder();
@@ -127,15 +128,14 @@ public class SpringSecurityConfiguration {
     @Lazy
     @ConditionalOnClass(JwtDecoder.class)
     public static class JwtTokenConfiguration {
-        @Bean
-        @ConditionalOnMissingBean
+
+        @Bean @ConditionalOnMissingBean
         @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
         public KeyPair rsaKeyPair(JwtProperties jwtProperties) {
             return new KeyPair(jwtProperties.getPublicKey(), jwtProperties.getPrivateKey());
         }
 
-        @Bean
-        @ConditionalOnMissingBean
+        @Bean @ConditionalOnMissingBean
         public JwtDecoder jwtDecoder(KeyPair rsaKeyPair) {
             return NimbusJwtDecoder.withPublicKey((RSAPublicKey) rsaKeyPair.getPublic()).build();
         }

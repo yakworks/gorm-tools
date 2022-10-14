@@ -19,6 +19,7 @@ package yakworks.rally.api
 import groovy.transform.CompileStatic
 
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Lazy
@@ -28,6 +29,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.web.SecurityFilterChain
 
+import yakworks.rally.RallyConfiguration
 import yakworks.security.spring.SpringSecurityConfiguration
 
 import static org.springframework.security.config.Customizer.withDefaults
@@ -41,8 +43,8 @@ import static org.springframework.security.config.Customizer.withDefaults
 @EnableWebSecurity //(debug = true)
 @CompileStatic
 @Configuration
-@Import([SpringSecurityConfiguration])
-class AppConfiguration {
+@Import([RallyConfiguration])
+class RallyApiConfiguration {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService userDetailsService, AuthenticationManager authenticationManager) throws Exception {

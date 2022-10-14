@@ -16,13 +16,14 @@ import org.springframework.context.annotation.Import
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
 import yakworks.openapi.gorm.OpenApiGenerator
+import yakworks.rally.RallyConfiguration
 import yakworks.rest.gorm.RestApiFromConfig
 import yakworks.rest.grails.AppInfoBuilder
 
 // the component scan here does not seem to be the same as the packageNames and is needed to pick up the
 // the services marked with @Component
-@ComponentScan(['yakworks.security', 'yakworks.rally', 'yakworks.testing.gorm.model'])
-@Import([AppConfiguration])
+@Import([RallyApiConfiguration])
+@ComponentScan(['yakworks.testing.gorm.model'])
 @RestApiFromConfig
 // caching will use hazelcast for spring caching too, look into how to use caffiene for spring stuff and hazel for hibernate.
 @EnableCaching
@@ -67,7 +68,7 @@ class Application extends GrailsAutoConfiguration {
      */
     @Override
     Collection<String> packageNames() {
-        super.packageNames() + ['yakworks.rally', 'yakworks.security', 'yakworks.testing.gorm.model']
+        super.packageNames() + RallyConfiguration.entityScanPackages + ['yakworks.testing.gorm.model']
     }
 
     @Bean

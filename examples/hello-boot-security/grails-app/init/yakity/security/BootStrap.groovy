@@ -1,7 +1,7 @@
 package yakity.security
 
 import yakworks.security.gorm.model.AppUser
-import yakworks.security.testing.SecuritySeedData
+import yakworks.security.gorm.testing.SecuritySeedData
 
 class BootStrap {
 

@@ -20,10 +20,7 @@ import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.rally.tag.model.Tag
 import yakworks.security.gorm.model.AppUser
-import yakworks.security.gorm.model.SecRole
-import yakworks.security.gorm.model.SecRolePermission
-import yakworks.security.gorm.model.SecRoleUser
-import yakworks.security.testing.SecuritySeedData
+import yakworks.security.gorm.testing.SecuritySeedData
 import yakworks.spring.AppCtx
 
 @SuppressWarnings('BuilderMethodWithSideEffects')

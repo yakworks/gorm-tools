@@ -2,21 +2,18 @@
 * Copyright 2022 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.security
-
+package yakworks.security.gorm
 
 import groovy.transform.CompileStatic
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
 import org.springframework.security.core.userdetails.UserDetailsService
 
-import yakworks.security.gorm.AppUserDetailsService
-import yakworks.security.gorm.AppUserService
-import yakworks.security.spring.AsyncSecureService
-
+@ComponentScan('yakworks.security.gorm.model') //here to pick up the Repos
 @Configuration //(proxyBeanMethods = false)
 @Lazy
 @CompileStatic

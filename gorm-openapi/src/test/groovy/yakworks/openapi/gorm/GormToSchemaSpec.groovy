@@ -1,21 +1,17 @@
-package yakworks.openapi
+package yakworks.openapi.gorm
 
-import yakworks.openapi.gorm.ApiSchemaEntity
-import yakworks.openapi.gorm.GormToSchema
-import yakworks.security.gorm.model.AppUser
-import yakworks.security.gorm.model.SecRoleUser
-import grails.gorm.transactions.Rollback
-import grails.testing.mixin.integration.Integration
-import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Org
+import yakworks.security.gorm.model.AppUser
+import yakworks.security.gorm.model.SecRole
+import yakworks.security.gorm.model.SecRoleUser
+import yakworks.testing.gorm.unit.GormHibernateTest
+import yakworks.testing.gorm.unit.SecurityTest
 
-@Integration
-@Rollback
-class GormToSchemaSpec extends Specification {
+class GormToSchemaSpec extends Specification implements GormHibernateTest, SecurityTest {
+    static entityClasses = [AppUser, SecRole, SecRoleUser, Org]
 
-    @Autowired
-    GormToSchema gormToSchema
+    GormToSchema gormToSchema = new GormToSchema()
 
     def "check Set string generic"() {
         given:

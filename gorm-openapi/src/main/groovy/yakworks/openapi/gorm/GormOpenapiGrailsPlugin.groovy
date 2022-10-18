@@ -13,15 +13,15 @@ class GormOpenapiGrailsPlugin extends Plugin {
 
     Closure doWithSpring() { {->
 
-        gormToSchema(GormToSchema) { bean ->
-            bean.lazyInit = true
-        }
+        // gormToSchema(GormToSchema)
 
-        openApiGenerator(OpenApiGenerator) { bean ->
-            bean.lazyInit = true
-            apiSrc = 'src/api-docs'
-            apiBuild = 'build/api-docs'
-            namespaceList = ['rally']
+        if(!applicationContext.containsBeanDefinition("openApiGenerator")) {
+            openApiGenerator(OpenApiGenerator) { bean ->
+                bean.lazyInit = true
+                apiSrc = 'src/api-docs'
+                apiBuild = 'build/api-docs'
+                namespaceList = ['rally']
+            }
         }
 
         //overrides the metaEntityService

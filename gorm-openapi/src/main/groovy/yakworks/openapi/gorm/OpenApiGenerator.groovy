@@ -11,7 +11,6 @@ import java.nio.file.Paths
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.model.PersistentEntity
-import org.springframework.beans.factory.annotation.Autowired
 import org.yaml.snakeyaml.Yaml
 
 import gorm.tools.utils.GormMetaUtils
@@ -39,7 +38,12 @@ class OpenApiGenerator implements ConfigAware {
     String apiBuild
     List namespaceList
 
-    @Autowired GormToSchema gormToSchema
+    GormToSchema gormToSchema
+
+    GormToSchema getGormToSchema(){
+        if(!this.gormToSchema) this.gormToSchema = new GormToSchema()
+        return this.gormToSchema
+    }
 
     void generate(List nsList = []) {
         def buildDest = makeBuildDirs()
@@ -271,9 +275,9 @@ class OpenApiGenerator implements ConfigAware {
     void generateModels() {
         def mapctx = GormMetaUtils.getMappingContext()
         for( PersistentEntity entity : mapctx.persistentEntities){
-            def map = gormToSchema.generate(entity, CruType.Read)
-            def mapCreate = gormToSchema.generate(entity, CruType.Create)
-            def mapUpdate = gormToSchema.generate(entity, CruType.Update)
+            def map = getGormToSchema().generate(entity, CruType.Read)
+            def mapCreate = getGormToSchema().generate(entity, CruType.Create)
+            def mapUpdate = getGormToSchema().generate(entity, CruType.Update)
             writeYmlModel(entity.javaClass, map, CruType.Read)
             writeYmlModel(entity.javaClass, mapCreate, CruType.Create)
             writeYmlModel(entity.javaClass, mapUpdate, CruType.Update)

@@ -4,7 +4,6 @@
 */
 package yakworks.rally.api
 
-
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
@@ -33,9 +32,7 @@ import yakworks.rest.grails.AppInfoBuilder
 @CompileStatic
 class Application extends GrailsAutoConfiguration {
 
-    /**
-     * add packages here where the other grails artifacts exist such as domains marked with @Entity
-     */
+    /** add packages here where the @Entity classes are */
     @Override
     Collection<String> packageNames() {
         super.packageNames() + RallyConfiguration.entityScanPackages + ['yakworks.testing.gorm.model']
@@ -71,25 +68,13 @@ class Application extends GrailsAutoConfiguration {
     @Override
     protected boolean limitScanningToApplication() { false }
 
-    @Bean
-    AppInfoBuilder appInfoBuilder() {
-        return new AppInfoBuilder()
-    }
-
     @SuppressWarnings('Indentation')
     @Override
     @CompileDynamic
     Closure doWithSpring() {{ ->
-        appInfoBuilder(AppInfoBuilder)
 
-        // openApiGenerator(OpenApiGenerator) { bean ->
-        //     bean.lazyInit = true
-        //     apiSrc = 'api-docs/openapi'
-        //     apiBuild = 'api-docs/dist/openapi'
-        //     namespaceList = ['rally']
-        // }
-        openApiGenerator(OpenApiGenerator) { bean ->
-            bean.lazyInit = true
+        //this needs to be here for now until we figure out the config thing
+        openApiGenerator(OpenApiGenerator){
             apiSrc = 'api-docs/openapi'
             apiBuild = 'api-docs/dist/openapi'
             namespaceList = ['rally']

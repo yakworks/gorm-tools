@@ -1,4 +1,5 @@
-
+# some of the common boiler plate stuff for Grails,
+# not sure how much of this is actually needed, TODO figure out the minimal needed for shit to work
 grails:
   mime:
     disable:

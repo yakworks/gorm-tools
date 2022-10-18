@@ -32,9 +32,11 @@ class SecUserPermission implements RepoEntity<SecUserPermission>, Serializable  
 
     static mapping = orm {
         cache "nonstrict-read-write"
-        id composite: ['user', 'permission']
+        id composite('user', 'permission')
         version false
-        property 'user', [column:'userId']
+        columns(
+            role: property(column:'userId')
+        )
     }
 
     @Override

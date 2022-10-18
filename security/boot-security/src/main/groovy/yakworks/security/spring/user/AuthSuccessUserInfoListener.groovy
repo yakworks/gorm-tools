@@ -18,7 +18,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal
 
 /**
- * Listener to update details in the Authentication with our UserInfo facade.
+ * Listener to update `authentication.details` in the Authentication with common UserInfo object.
+ * Normally Spring Sec just stores an object with ip address and sessionId, so we replace that with a more generic User object.
  * By storing it in details instead of principal trying to mess around with the principal we only have one place to do it.
  * The only thing stored in details by default is the ip adresss and sessionId which we just proxy in the SpringUser.
  * Also makes it easy to override for customer funtionanlity by simply implementing you own listener.

@@ -53,10 +53,4 @@ class IndexController {
         "about page"
     }
 
-    @GetMapping("/thyme")
-    String thyme(ModelMap model) {
-        model.addAttribute('info', 'test info')
-        "th_index"
-    }
-
 }

@@ -7,10 +7,9 @@ import org.springframework.context.annotation.Import
 
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
-import yakworks.security.audit.AuditStampConfiguration
 
-@ComponentScan(['yakity.security', 'yakworks.security'])
-@Import([AppSecurityConfiguration])
+@ComponentScan(['yakity.security', 'yakworks.security.gorm'])
+@Import([HelloSecurityConfiguration])
 @CompileStatic
 class Application extends GrailsAutoConfiguration {
     //@Entity scan packages to include in additions to this Application class's package

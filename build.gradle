@@ -26,6 +26,7 @@ allprojects {
     mavenCentral()
     maven { url "https://repo.grails.org/grails/core" }
     maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://build.shibboleth.net/nexus/content/repositories/releases/" } //for opensaml
     maven {
       url "http://repo.9ci.com/oss-snapshots"
       allowInsecureProtocol = true
@@ -37,6 +38,17 @@ allprojects {
     // maven { url "https://repo.spring.io/milestone" mavenContent { snapshotsOnly() } }
 
   }
+
+  //info task to show version overrides that be ovveridden for spring/grails bom
+  tasks.register('dependencyManagementProperties') {
+    doLast {
+      dependencyManagement
+        .importedProperties
+        .toSorted()
+        .each { property -> println property }
+    }
+  }
+
 }
 subprojects { subprj ->
 

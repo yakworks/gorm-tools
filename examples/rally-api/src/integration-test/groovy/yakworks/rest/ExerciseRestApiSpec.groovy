@@ -41,7 +41,7 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
         where:
 
         entity         | qCount
-        'rally/user'   | 3
+        'rally/user'   | 4
         //FIXME depending on order this may return more than 100
         // 'rally/org'       | 100
     }

@@ -8,25 +8,32 @@ import groovy.transform.CompileDynamic
 
 import org.codehaus.groovy.util.HashCodeHelper
 
-import gorm.tools.repository.model.RepoEntity
+import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
-import grails.gorm.DetachedCriteria
 import grails.persistence.Entity
 
 import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 
 @Entity
 @GrailsCompileStatic
-class SecRoleUser implements RepoEntity<SecRoleUser>, Serializable {
+class SecRoleUser implements GormRepoEntity<SecRoleUser, SecRoleUserRepo>, Serializable {
 
     AppUser user
     SecRole role
 
     static transients = ['roleName', 'userName']
 
+    // static mappingOld = {
+    //     cache "nonstrict-read-write"
+    //     id composite: ['user', 'role']
+    //     version false
+    //     user column:'userId'
+    //     role column:'secRoleId'
+    // }
+
     static mapping = orm {
         cache "nonstrict-read-write"
-        id composite: ['user', 'role']
+        id composite('user', 'role')
         version false
         columns(
             user: property(column:'userId'),
@@ -54,29 +61,25 @@ class SecRoleUser implements RepoEntity<SecRoleUser>, Serializable {
         query([user:[id: userId]]).list()
     }
 
-    static SecRoleUser get(long userId, long roleId) {
-        criteriaFor(userId, roleId).get()
+    static SecRoleUser get(long roleId, long userId) {
+        getRepo().get(SecRole.load(roleId), AppUser.load(userId))
     }
 
-    static SecRoleUser get(long userId, String roleCode) {
-        Long roleId = SecRole.getByCode(roleCode).id
-        criteriaFor(userId, roleId).get()
+    static SecRoleUser get(String roleCode, long userId) {
+        getRepo().get(SecRole.getByCode(roleCode), AppUser.load(userId))
     }
 
+    static SecRoleUser create(SecRole role, AppUser user, Map args = [:]) {
+        getRepo().create(role, user, args)
+    }
+
+    //legacy flipped
     static SecRoleUser create(AppUser user, SecRole role, boolean flush = false) {
-        def instance = new SecRoleUser(user: user, role: role)
-        instance.save(flush: flush, insert: true)
-        instance
+        create(role, user, [flush: flush])
     }
 
-    static boolean remove(AppUser user, SecRole role, boolean flush = false) {
-        SecRoleUser instance = SecRoleUser.findByUserAndRole(user, role)
-        if (!instance) {
-            return false
-        }
-
-        instance.delete(flush: flush)
-        true
+    static void remove(SecRole role, AppUser user) {
+        getRepo().remove(role, user)
     }
 
     static void removeAll(AppUser user) {
@@ -87,17 +90,11 @@ class SecRoleUser implements RepoEntity<SecRoleUser>, Serializable {
         executeUpdate 'DELETE FROM SecRoleUser WHERE role=:role', [role: role]
     }
 
-    static boolean exists(long userId, long securityRoleId) {
-        criteriaFor(userId, securityRoleId).count()
+    static boolean exists(long securityRoleId, long userId) {
+        getRepo().exists(SecRole.load(securityRoleId), AppUser.load(userId))
     }
 
-    private static DetachedCriteria criteriaFor(long userId, long securityRoleId) {
-        SecRoleUser.where {
-            user == AppUser.load(userId) &&
-                role == SecRole.load(securityRoleId)
-        }
-    }
-
+    // FIXME I think this was an old ui concept, if still needed then add test
     @CompileDynamic
     static Map<SecRole, Boolean> getRoleMap(AppUser userInstance) {
         List roles = SecRole.list()

@@ -33,6 +33,14 @@ import yakworks.rest.grails.AppInfoBuilder
 @CompileStatic
 class Application extends GrailsAutoConfiguration {
 
+    /**
+     * add packages here where the other grails artifacts exist such as domains marked with @Entity
+     */
+    @Override
+    Collection<String> packageNames() {
+        super.packageNames() + RallyConfiguration.entityScanPackages + ['yakworks.testing.gorm.model']
+    }
+
     static void main(String[] args) {
         GrailsApp.run(Application, args)
     }
@@ -62,14 +70,6 @@ class Application extends GrailsAutoConfiguration {
      */
     @Override
     protected boolean limitScanningToApplication() { false }
-
-    /**
-     * add packages here where the other grails artifacts exist such as domains marked with @Entity
-     */
-    @Override
-    Collection<String> packageNames() {
-        super.packageNames() + RallyConfiguration.entityScanPackages + ['yakworks.testing.gorm.model']
-    }
 
     @Bean
     AppInfoBuilder appInfoBuilder() {

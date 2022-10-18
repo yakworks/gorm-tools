@@ -177,8 +177,8 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     /**
      * query by the composite key
      */
-    MangoDetachedCriteria<X> queryFor(Persistable linkedEntity, R related){
-        queryByMain(linkedEntity).eq(relatedPropName, related)
+    MangoDetachedCriteria<X> queryFor(Persistable main, R related){
+        queryByMain(main).eq(relatedPropName, related)
     }
 
 

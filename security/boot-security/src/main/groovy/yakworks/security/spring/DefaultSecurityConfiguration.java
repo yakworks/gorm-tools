@@ -10,6 +10,7 @@ import com.nimbusds.jose.proc.SecurityContext;
 import yakworks.security.SecService;
 import yakworks.security.services.PasswordValidator;
 import yakworks.security.spring.token.JwtTokenGenerator;
+import yakworks.security.spring.token.TokenController;
 import yakworks.security.spring.user.AuthSuccessUserInfoListener;
 import yakworks.security.user.CurrentUser;
 import yakworks.security.user.CurrentUserHolder;
@@ -17,7 +18,6 @@ import yakworks.security.user.CurrentUserHolder;
 import java.security.KeyPair;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -47,11 +47,30 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration @Lazy
 @EnableConfigurationProperties({JwtProperties.class})
-public class SpringSecurityConfiguration {
+public class DefaultSecurityConfiguration {
 
-    public static void applyHttpSecurity(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
+    /**
+     * Default securityFilterChain. Helper to set up HttpSecurity builder with default requestMatchers and forms.
+     * NOTE: this is more of an example and a common simple setup for smoke test apps to use.
+     * In your production app you would set this up and replace for its specifc security needs
+     */
+    @Bean
+    @ConditionalOnMissingBean({SecurityFilterChain.class})
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        applyBasicDefaults(http);
+        return http.build();
+    }
+
+    /**
+     * Helper to set up HttpSecurity builder with default requestMatchers and forms.
+     * NOTE: this is more of an example and common place for smoke test apps to use.
+     * In your production app you would set this up for its specifc security needs
+     */
+    public static void applyBasicDefaults(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((authorize) -> authorize
-            .requestMatchers("/actuator/**", "/resources/**", "/about").permitAll()
+            //by default this turns on anonymous access.
+            .requestMatchers("/**").permitAll()
+            //.requestMatchers("/actuator/**", "/resources/**", "/about").permitAll()
             .anyRequest().authenticated()
         )
         .httpBasic(withDefaults())
@@ -60,18 +79,45 @@ public class SpringSecurityConfiguration {
         //     formLoginCustomizer.defaultSuccessUrl("/", true)
         // )
 
-        ApplicationContext ctx = http.getSharedObject(ApplicationContext.class);
-        //POC for enabling the legacy login with a POST to the /api/login endpoint.
-        JsonUsernamePasswordLoginFilter jsonUnameFilter = new JsonUsernamePasswordLoginFilter(ctx.getBean(ObjectMapper.class));
-        jsonUnameFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/api/login", "POST"));
-        jsonUnameFilter.setAuthenticationSuccessHandler(new ForwardAuthenticationSuccessHandler("/token"));
-        jsonUnameFilter.setAuthenticationManager(authenticationManager);
-        http.addFilterAfter(jsonUnameFilter, BasicAuthenticationFilter.class);
-
+        //add the Filter to pick up RESTful POST calls to /api/login credential passed in the body
+        addJsonAuthenticationFilter(http);
     }
 
-    public static void applySamlSecurity(HttpSecurity http, UserDetailsService userDetailsService) throws Exception {
-        http.saml2Login(Customizer.withDefaults()).saml2Logout(Customizer.withDefaults());
+    /** Example for simple Saml setup. Its largely dealt with in the configuration. */
+    public static void applySamlSecurity(HttpSecurity http) throws Exception {
+        http.saml2Login(Customizer.withDefaults())
+            .saml2Logout(Customizer.withDefaults());
+    }
+
+    /**
+     * Legacy, Helper to setup a Filter to pick up POST to /api/login to it can be a REST call instead of just form post.
+     */
+    public static void addJsonAuthenticationFilter(HttpSecurity http) throws Exception {
+        //get the 2 beans needed
+        ApplicationContext ctx = http.getSharedObject(ApplicationContext.class);
+
+        //POC for enabling the legacy login with a POST to the /api/login endpoint.ObjMapper for parsing the json in the POST
+        JsonUsernamePasswordLoginFilter jsonUnameFilter = new JsonUsernamePasswordLoginFilter(ctx.getBean(ObjectMapper.class));
+        jsonUnameFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/api/login", "POST"));
+        //forward over to the token endpoint which will return the standard bearer object.
+        jsonUnameFilter.setAuthenticationSuccessHandler(new ForwardAuthenticationSuccessHandler("/token"));
+        jsonUnameFilter.setAuthenticationManager(ctx.getBean(AuthenticationManager.class));
+        http.addFilterAfter(jsonUnameFilter, BasicAuthenticationFilter.class);
+    }
+
+    /** Sets up the JWT */
+    public static void applyOauthJwt(HttpSecurity http) throws Exception {
+        //JWT
+        // http.csrf((csrf) -> csrf.ignoringAntMatchers("/token"))
+        http.csrf().disable();
+        http.oauth2ResourceServer((oauthServer) ->
+            oauthServer.jwt()
+        );
+        // .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        // .exceptionHandling((exceptions) -> exceptions
+        // 		.authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
+        // 		.accessDeniedHandler(new BearerTokenAccessDeniedHandler())
+        // );
     }
 
     @Bean
@@ -83,13 +129,6 @@ public class SpringSecurityConfiguration {
     @Bean
     public AuthSuccessUserInfoListener authSuccessUserInfoListener() {
         return new AuthSuccessUserInfoListener();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean({SecurityFilterChain.class})
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
-        applyHttpSecurity(http, authenticationManager);
-        return http.build();
     }
 
     @Bean
@@ -128,6 +167,11 @@ public class SpringSecurityConfiguration {
     @Lazy
     @ConditionalOnClass(JwtDecoder.class)
     public static class JwtTokenConfiguration {
+
+        @Bean @ConditionalOnMissingBean
+        public TokenController tokenController() {
+            return new TokenController();
+        }
 
         @Bean @ConditionalOnMissingBean
         @Role(BeanDefinition.ROLE_INFRASTRUCTURE)

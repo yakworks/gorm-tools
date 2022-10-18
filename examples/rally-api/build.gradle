@@ -8,7 +8,7 @@ apply from: "${rootDir}/gradle/test-unit.gradle"
 apply from: "${rootDir}/gradle/test-integration.gradle"
 
 repositories {
-  maven { url "https://build.shibboleth.net/nexus/content/repositories/releases/" } //for pac4j deps
+  maven { url "https://build.shibboleth.net/nexus/content/repositories/releases/" } //for opensaml
 }
 
 dependencies {
@@ -19,6 +19,8 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
   implementation 'org.springframework.boot:spring-boot-starter-security'
   // implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+  implementation 'org.springframework.boot:spring-boot-starter-mustache'
+
   implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
 
   // implementation "org.grails:grails-plugin-i18n"
@@ -42,6 +44,16 @@ dependencies {
   runtimeOnly "com.hazelcast:hazelcast-hibernate53:$vHazelcastHib"
   runtimeOnly "com.hazelcast:hazelcast:$vHazelcast"
   runtimeOnly "com.hazelcast:hazelcast-spring:$vHazelcast"
+
+  //SAML and OAUTH
+  implementation 'org.springframework.security:spring-security-saml2-service-provider'
+  implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+  // implementation 'org.springframework.security:spring-security-oauth2-authorization-server:0.3.1'
+  constraints {
+    implementation "org.opensaml:opensaml-core:4.1.1"
+    implementation "org.opensaml:opensaml-saml-api:4.1.1"
+    implementation "org.opensaml:opensaml-saml-impl:4.1.1"
+  }
 
   //??wtf
   // implementation "commons-lang:commons-lang:2.6"

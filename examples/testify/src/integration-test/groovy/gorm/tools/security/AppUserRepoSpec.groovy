@@ -80,16 +80,18 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
 
 
     def "test updating roles"() {
-        when:
-        //assert current admin has 2 roles id:1
+
+        when: "current admin has 2 roles 1,3"
         assert SecRoleUser.getByUser(1)*.role.id == [1, 3]
 
         Map updateParams = [
             id:1,
             roles: [[id: 2], [id: 3]]
         ]
+        //update it to 2 and 3.
         AppUser.update(updateParams)
-        flush()
+        flushAndClear()
+
         AppUser user = AppUser.get(1)
 
         def roleIds = SecRoleUser.findAllByUser(AppUser.get(1))*.role.id
@@ -99,6 +101,7 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         roleIds.containsAll([3L, 2L])
 
         when:
+        flushAndClear()
         Map params2 = [
             id: 1,
             roles: ["ADMIN"]
@@ -117,15 +120,15 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         flushAndClear()
 
         expect:
-        SecRoleUser.get(user.id, 1)
-        SecRoleUser.get(user.id, "MANAGER")
+        SecRoleUser.get(1, user.id)
+        SecRoleUser.get("MANAGER", user.id)
 
         when:
         appUserRepo.remove(user)
 
         then:
-        !SecRoleUser.get(user.id, 1)
-        !SecRoleUser.get(user.id, 3)
+        !SecRoleUser.get(1, user.id)
+        !SecRoleUser.get(3, user.id)
     }
 
     def testRemove() {

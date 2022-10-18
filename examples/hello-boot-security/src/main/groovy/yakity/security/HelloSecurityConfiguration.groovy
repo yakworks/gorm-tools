@@ -29,7 +29,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.web.SecurityFilterChain
 
-import yakworks.security.spring.SpringSecurityConfiguration
+import yakworks.security.audit.AuditStampConfiguration
+import yakworks.security.gorm.SecurityGormConfiguration
+import yakworks.security.spring.DefaultSecurityConfiguration
+
+import static org.springframework.security.config.Customizer.withDefaults
 
 /**
  * An example of explicitly configuring Spring Security with the defaults.
@@ -40,29 +44,32 @@ import yakworks.security.spring.SpringSecurityConfiguration
 @EnableWebSecurity //(debug = true)
 @CompileStatic
 @Configuration
-@Import([SpringSecurityConfiguration])
-class AppSecurityConfiguration {
+@Import([DefaultSecurityConfiguration, AuditStampConfiguration])
+class HelloSecurityConfiguration {
 
-    @Autowired(required = false) Saml2RelyingPartyProperties samlProps
+    // @Autowired(required = false) Saml2RelyingPartyProperties samlProps
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService userDetailsService, AuthenticationManager authenticationManager) throws Exception {
-        SpringSecurityConfiguration.applyHttpSecurity(http, authenticationManager)
+    SecurityFilterChain securityFilterChain(HttpSecurity http, Saml2RelyingPartyProperties samlProps) throws Exception {
+        // DefaultSecurityConfiguration.applyBasicDefaults(http)
+        http
+            .authorizeHttpRequests((authorize) -> authorize
+                .requestMatchers("/actuator/**", "/resources/**", "/about").permitAll()
+                .anyRequest().authenticated()
+            )
+            // enable basic auth
+            .httpBasic(withDefaults())
+            // add default form for testing in browser
+            .formLogin(withDefaults());
+
+        // Uncomment to enable SAML, will hit the metadata-uri on startup and fail if not found
+        // TODO need to find a way to not hit server until its needed instead of on startup
         if(samlProps?.registration?.containsKey('okta')){
-            SpringSecurityConfiguration.applySamlSecurity(http, userDetailsService)
+            DefaultSecurityConfiguration.applySamlSecurity(http)
         }
 
-        //JWT
-        // http.csrf((csrf) -> csrf.ignoringAntMatchers("/token"))
-        http.csrf().disable()
-            .oauth2ResourceServer((oauthServer) ->
-                oauthServer.jwt()
-            )
-        // .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        // .exceptionHandling((exceptions) -> exceptions
-        // 		.authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
-        // 		.accessDeniedHandler(new BearerTokenAccessDeniedHandler())
-        // );
+        DefaultSecurityConfiguration.addJsonAuthenticationFilter(http);
+        DefaultSecurityConfiguration.applyOauthJwt(http);
 
         return http.build()
     }
@@ -73,7 +80,7 @@ class AppSecurityConfiguration {
     // http.headers().frameOptions().disable()
 
     // @Bean
-    // AuthenticationEvents authenticationEvents(){
+    // AuthenticationEvents authenticationEventsExample(){
     //     new AuthenticationEvents()
     // }
 

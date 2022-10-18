@@ -1,24 +1,27 @@
 #debug: true
-
 spring.main.lazy-initialization: true
 spring.main.allow-bean-definition-overriding: true
-server.port: 8081
+#server.port: 8081
 
-app.security.jwt.privateKey: classpath:jwt/app.key
-app.security.jwt.publicKey: classpath:jwt/app.pub
+spring.config.import: classpath:./security.yml, classpath:./grails.yml, classpath:./restapi-config.yml, classpath*:./restapi/rally/*/
 
 logging:
   level:
     root: INFO
     org.springframework: INFO
-    #    org.hibernate.SQL: DEBUG
-    #    org.springframework.security: DEBUG
-    #    org.springframework.security: DEBUG
-    #    org.springframework.security.web: TRACE
-    #    org.springframework.security.authentication: TRACE
-    #    grails.plugins.DefaultGrailsPluginManager: ERROR
+    org.hibernate.orm.deprecation: OFF # turns off deprecation notices
+    # org.springframework.security: DEBUG
+    # org.springframework.security.web: TRACE
+    # org.springframework.security.authentication: TRACE
+    # grails.plugins.DefaultGrailsPluginManager: ERROR
+    # TURN ON for benchmarks
+    # org.hibernate: INFO
+    # for stats and sql logging
+    # org.hibernate.stat: DEBUG
+    org.hibernate.SQL: ERROR
+    # this one is very noisy but if neede will show the values passed to sql statements
+    # org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     yakity.security: TRACE
-
 
 ---
 
@@ -27,12 +30,10 @@ grails:
   cache:
     enabled: false
   # NOTE: reminder that anything in config.locations wins and ovewrites whats in this config
-  config:
-    locations:
-      - "classpath:grails.yml"
-      - "classpath:security.groovy"
-      - "classpath:restapi-config.yml"
-      - "classpath*:restapi/rally/*.yml"
+#  config:
+#    locations:
+#      - "classpath:restapi-config.yml"
+#      - "classpath*:restapi/rally/*.yml"
 
 info:
   app:
@@ -58,21 +59,6 @@ management:
       show-components: when-authorized
   jmx:
     enabled: true
-
-logging:
-  level:
-    root: INFO
-#    org.springframework: WARN
-    org.hibernate.orm.deprecation: OFF # turns off deprecation notices
-#    com.hazelcast: INFO
-#    yakworks.security.shiro: DEBUG
-    # TURN ON for benchmarks
-    # org.hibernate: INFO
-    # for stats and sql logging
-    # org.hibernate.stat: DEBUG
-    org.hibernate.SQL: ERROR
-    # this one is very noisy but if neede will show the values passed to sql statements
-    # org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
 ---
 

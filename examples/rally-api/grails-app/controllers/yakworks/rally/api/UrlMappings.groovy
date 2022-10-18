@@ -37,7 +37,7 @@ class UrlMappings {
         // "500"(view: '/error')
         //ShiroGrailsExceptionResolver is setup to map UnauthorizedException to this
         "/forbidden"(controller: "forbidden")
-        // "404"(controller: "errorProblem")
+        // "404"(controller: "errorProblem", action: 'notFound404')
     }
 
     static void runClosure(Closure mappingClosure, Object delegate) {

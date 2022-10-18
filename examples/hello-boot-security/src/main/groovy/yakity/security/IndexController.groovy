@@ -36,23 +36,17 @@ class IndexController {
     String home() {
         var auth = SecurityContextHolder.getContext().getAuthentication()
         // println "************************************** user ${auth.principal}"
-        "index"
+        "index.html"
     }
 
     @GetMapping("/spring")
     String index() {
-        "spring/index"
+        "spring/index.html"
     }
 
     @GetMapping("/about")
     String about(ModelMap model) {
         model.addAttribute('info', 'test info')
-        "about"
-    }
-
-    @GetMapping("/thyme")
-    String thyme(ModelMap model) {
-        model.addAttribute('info', 'test info')
-        "th_index"
+        "about" //handlebars
     }
 }

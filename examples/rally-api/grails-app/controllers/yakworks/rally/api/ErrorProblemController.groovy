@@ -22,4 +22,14 @@ class ErrorProblemController implements RestApiController {
             .detail(ex?.message)
         respond problem
     }
+
+    def notFound404() {
+        //model get forwarded to requests attributes
+        Exception ex = request['exception'] as Exception
+        def problem = Problem.of('error.notFound')
+            .status(404)
+            .title("Not Found")
+            .detail(ex?.message)
+        respond problem
+    }
 }

@@ -34,12 +34,16 @@ class AppUserSpec extends Specification implements GormHibernateTest, SecurityTe
 
         SecRole.create(code: 'admin')
         SecRole.create(code: 'user')
+        SecRole.create(code: 'cust')
         flush()
         assert SecRole.get(1) != null
         assert SecRole.get(1).code == "ADMIN"
 
         assert SecRole.get(2) != null
         assert SecRole.get(2).code == "USER"
+
+        assert SecRole.get(3) != null
+        assert SecRole.get(3).code == "CUST"
     }
 
     def setupSpec(){
@@ -144,18 +148,37 @@ class AppUserSpec extends Specification implements GormHibernateTest, SecurityTe
         when:
         Map data = buildMap([:])
         data.roles = [[id:1], [id:2]]
-        data << [password:'secretStuff', repassword:'secretStuff']
         AppUser user = AppUser.create(data)
         flush()
 
         then:
         user != null
-        SecRoleUser.count() == 2
         SecRoleUser.findAllByUser(user)*.role.id == [1L, 2L]
-        user.getRoles().size() == 2
-        user.getRoles()[0] instanceof String
-        user.getSecRoles().size() == 2
-        user.getSecRoles()[0] instanceof SecRole
+        user.roles.size() == 2
+        user.roles[0] instanceof String
+        user.secRoles.size() == 2
+        user.secRoles[0] instanceof SecRole
+    }
+
+    def "update roles"() {
+        when:
+        Map data = buildMap([:])
+        data.roles = [[id:1], [id:2]]
+        AppUser user = AppUser.create(data)
+        flushAndClear()
+
+        Map updateParams = [
+            id:user.id,
+            roles: [[id: 2], [id: 3]]
+        ]
+        //update it to 2 and 3.
+        AppUser.update(updateParams)
+        flushAndClear()
+
+        then:
+        user.roles.size() == 2
+        SecRoleUser.findAllByUser(user)*.role.id == [2L, 3L]
+
     }
 
     def "test username"() {

@@ -5,11 +5,13 @@
 package yakworks.security.spring.token
 
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
+import org.springframework.security.oauth2.core.AbstractOAuth2Token
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.jwt.JwtClaimsSet
 import org.springframework.security.oauth2.jwt.JwtEncoder
@@ -60,4 +62,20 @@ class JwtTokenGenerator implements TokenGenerator<Jwt> {
     // Jwt generate(UserDetails principal, Integer expiration) {
     //     return null
     // }
+
+    static int getExpiresIn(AbstractOAuth2Token token) {
+        if (token.expiresAt != null) {
+            return ChronoUnit.SECONDS.between(Instant.now(), token.expiresAt).toInteger()
+        }
+        return -1
+    }
+
+    static Map tokenToMap(AbstractOAuth2Token token) {
+        Map body = [
+            token_type: 'Bearer',
+            access_token: token.tokenValue,
+            "expires_in": getExpiresIn(token)
+        ]
+        return body
+    }
 }

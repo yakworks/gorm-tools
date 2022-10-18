@@ -9,6 +9,8 @@ import java.time.LocalDateTime
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
+import static grails.gorm.hibernate.mapping.MappingBuilder.orm
+
 @Entity
 @GrailsCompileStatic
 class SecPasswordHistory {
@@ -23,13 +25,21 @@ class SecPasswordHistory {
         dateCreated nullable: true
     }
 
-    static mapping = {
+    static mapping = orm {
         version false
-        user column: "userId"
-        password updateable: false
-        user updateable: false
-        dateCreated column: "dateCreated"
+        columns(
+            user: property(column:'userId', updateable: false),
+            password: property(updateable: false )
+        )
     }
+
+    // static mapping = {
+    //     version false
+    //     user column: "userId"
+    //     password updateable: false
+    //     user updateable: false
+    //     dateCreated column: "dateCreated"
+    // }
 
     /**
      * Creates new password history for given user. Will remove the oldest entry if the number of history records goes more thn MAX_HISTORY

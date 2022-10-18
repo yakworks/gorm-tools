@@ -139,6 +139,9 @@ class AppUserRepo implements GormRepo<AppUser> {
         }
     }
 
+    /**
+     * Sets the user roles for create or update.
+     */
     @Transactional
     void setUserRoles(Long userId, List rolesId) {
         // Transform both arrays to ListArray<Long> to have ability to compare them
@@ -168,7 +171,7 @@ class AppUserRepo implements GormRepo<AppUser> {
         // Delete/Add roles from table
         if (deleting?.size() > 0) {
             deleting.each { Long id ->
-                SecRoleUser.remove(user, SecRole.findById(id))
+                SecRoleUser.remove(SecRole.load(id), user)
             }
         }
         if (addition?.size() > 0) {

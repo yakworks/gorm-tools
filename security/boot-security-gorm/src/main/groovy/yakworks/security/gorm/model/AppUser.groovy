@@ -65,7 +65,9 @@ class AppUser implements UserInfo, AuditStampTrait, RepoEntity<AppUser>, Seriali
     static mapping = orm {
         // cache "nonstrict-read-write"
         table 'Users'
-        property 'passwordHash', [column: "`password`"]
+        columns (
+            passwordHash: property([column: "`password`"])
+        )
     }
 
     static constraintsMap = [

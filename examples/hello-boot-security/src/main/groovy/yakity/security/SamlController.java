@@ -14,6 +14,6 @@ public class SamlController {
         model.addAttribute("name", principal.getName());
         model.addAttribute("emailAddress", principal.getFirstAttribute("email"));
         model.addAttribute("userAttributes", principal.getAttributes());
-        return "saml";
+        return "saml.html";
     }
 }

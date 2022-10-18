@@ -20,7 +20,9 @@ class JwtProperties {
     RSAPublicKey publicKey
     RSAPrivateKey privateKey
 
-    long expiry = 60L
-    String issuer = "self"
+    /** token expiration seconds */
+    long expiry = 600L
 
+    /** Issuer key */
+    String issuer = "self"
 }

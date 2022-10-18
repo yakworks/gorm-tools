@@ -13,7 +13,7 @@ dependencies {
   implementation "org.yakworks:groovy-commons:$vGroovyCommons"
   implementation "javax.inject:javax.inject:1"
 
-  testImplementation project(":gorm-test-support") //this might seem circular but it can be added to itself as it dif config
+  // testImplementation project(":gorm-test-support") //this might seem circular but it can be added to itself as it dif config
 
 }
 

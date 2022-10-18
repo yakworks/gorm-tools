@@ -18,8 +18,9 @@ package yakworks.rally.api
 
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Lazy
@@ -30,7 +31,7 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.web.SecurityFilterChain
 
 import yakworks.rally.RallyConfiguration
-import yakworks.security.spring.SpringSecurityConfiguration
+import yakworks.security.spring.DefaultSecurityConfiguration
 
 import static org.springframework.security.config.Customizer.withDefaults
 
@@ -46,23 +47,29 @@ import static org.springframework.security.config.Customizer.withDefaults
 @Import([RallyConfiguration])
 class RallyApiConfiguration {
 
+    @Autowired(required = false) Saml2RelyingPartyProperties samlProps
+
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService userDetailsService, AuthenticationManager authenticationManager) throws Exception {
-        // SpringSecurityConfiguration.applyHttpSecurity(http, authenticationManager)
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // DefaultSecurityConfiguration.applyBasicDefaults(http)
         http
             .authorizeHttpRequests((authorize) -> authorize
-                .requestMatchers("/actuator/**", "/api/**", "/resources/**", "/about").permitAll()
+                .requestMatchers("/api/**", "/actuator/**", "/resources/**", "/about").permitAll()
                 .anyRequest().authenticated()
             )
+        // enable basic auth
             .httpBasic(withDefaults())
-            .formLogin(withDefaults())
+        // add default form for testing in browser
+            .formLogin(withDefaults());
 
-        // http.csrf((csrf) -> csrf.ignoringAntMatchers("/token"))
-        http.csrf().disable()
-            .oauth2ResourceServer((oauthServer) ->
-                oauthServer.jwt()
-            )
-        // .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        // Uncomment to enable SAML, will hit the metadata-uri on startup and fail if not found
+        // TODO need to find a way to not hit server until its needed instead of on startup
+        if(samlProps?.registration?.containsKey('okta')){
+            DefaultSecurityConfiguration.applySamlSecurity(http)
+        }
+
+        DefaultSecurityConfiguration.addJsonAuthenticationFilter(http);
+        DefaultSecurityConfiguration.applyOauthJwt(http);
 
         return http.build()
     }

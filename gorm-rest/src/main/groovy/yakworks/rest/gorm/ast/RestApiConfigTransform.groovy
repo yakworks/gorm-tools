@@ -17,6 +17,7 @@ import org.codehaus.groovy.control.SourceUnit
 import org.codehaus.groovy.transform.ASTTransformation
 import org.codehaus.groovy.transform.GroovyASTTransformation
 import org.grails.config.CodeGenConfig
+import org.springframework.core.io.ClassPathResource
 
 import yakworks.commons.util.BuildSupport
 import yakworks.rest.gorm.controller.RestRepoApiController
@@ -49,7 +50,18 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
         if (projectDir) projectDir = "${projectDir}/"
         // println "projectDir ${projectDir}"
         def config = new CodeGenConfig()
-        config.loadYml(new File("${projectDir}grails-app/conf/restapi-config.yml"))
+        // def crfRes = new ClassPathResource("restapi-config.yml", getClass().classLoader)
+        // getClass().getResource('/restapi-config.yml').withInputStream {InputStream input ->
+        //     config.loadYml(input)
+        // }
+        def apiFile = new File("${projectDir}grails-app/conf/restapi-config.yml")
+        if(apiFile.exists()) {
+            config.loadYml(apiFile)
+        } else {
+            //try regular resources
+            apiFile = new File("${projectDir}src/main/resources/restapi-config.yml")
+            config.loadYml(apiFile)
+        }
 
         Map restApi = config.getProperty('api', Map) as Map<String, Map>
         String defaultPackage = restApi.defaultPackage as String

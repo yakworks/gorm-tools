@@ -52,25 +52,25 @@ include "security/security-core"
 findProject(':security/security-core').name = 'security-core'
 
 // tests will be included in main runs but not deploy tasks and doc tasks
-// include "examples/testify"
-// findProject(':examples/testify').name = 'testify'
-//
-// include 'examples/restify'
-// findProject(':examples/restify').name = 'restify'
-//
-// include 'examples/benchmarks'
-// findProject(':examples/benchmarks').name = 'benchmarks'
-//
-// include 'examples/rally-api'
-// findProject(':examples/rally-api').name = 'rally-api'
-//
-// include 'examples/hello-boot-security'
-// findProject(':examples/hello-boot-security').name = 'hello-boot-security'
+include "examples/testify"
+findProject(':examples/testify').name = 'testify'
 
-// include 'examples/hello-boot-security-okta'
-// findProject(':examples/hello-boot-security-okta').name = 'hello-boot-security-okta'
+include 'examples/restify'
+findProject(':examples/restify').name = 'restify'
 
-//project(':testify').projectDir = new File('examples/testify')
+include 'examples/benchmarks'
+findProject(':examples/benchmarks').name = 'benchmarks'
+
+include 'examples/rally-api'
+findProject(':examples/rally-api').name = 'rally-api'
+
+include 'examples/hello-boot-security'
+findProject(':examples/hello-boot-security').name = 'hello-boot-security'
+
+include 'examples/hello-boot-security-okta'
+findProject(':examples/hello-boot-security-okta').name = 'hello-boot-security-okta'
+
+project(':testify').projectDir = new File('examples/testify')
 
 buildCache {
   local {

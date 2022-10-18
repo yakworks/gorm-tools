@@ -4,17 +4,18 @@
 */
 package restify
 
-import org.springframework.boot.ResourceBanner
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.core.io.ClassPathResource
+import org.springframework.context.annotation.Import
 
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
+import yakworks.rally.RallyConfiguration
 import yakworks.rest.gorm.RestApiFromConfig
 
 // the component scan here does not seem to be the same as the packageNames and is needed to pick up the
 // the services marked with @Component
-@ComponentScan(['restify', 'yakworks.testify', 'yakworks.security', 'yakworks.rally', 'yakworks.testing.gorm.model'])
+@ComponentScan(['restify', 'yakworks.testify', 'yakworks.testing.gorm.model'])
+@Import([RallyConfiguration])
 @RestApiFromConfig
 class Application extends GrailsAutoConfiguration {
 

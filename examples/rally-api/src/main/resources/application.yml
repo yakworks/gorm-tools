@@ -3,7 +3,7 @@ spring.main.lazy-initialization: true
 spring.main.allow-bean-definition-overriding: true
 #server.port: 8081
 
-spring.config.import: classpath:./security.yml, classpath:./grails.yml, classpath:./restapi-config.yml, classpath*:./restapi/rally/*/
+spring.config.import: classpath:./security.yml, classpath:./grails.yml
 
 logging:
   level:
@@ -30,10 +30,10 @@ grails:
   cache:
     enabled: false
   # NOTE: reminder that anything in config.locations wins and ovewrites whats in this config
-#  config:
-#    locations:
-#      - "classpath:restapi-config.yml"
-#      - "classpath*:restapi/rally/*.yml"
+  config:
+    locations:
+      - "classpath:restapi-config.yml"
+      - "classpath*:restapi/rally/*.yml"
 
 info:
   app:

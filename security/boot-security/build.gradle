@@ -34,9 +34,10 @@ dependencies {
     compileOnly "org.opensaml:opensaml-saml-impl:4.1.1"
   }
   //OAUTH
+
   compileOnly "org.springframework.boot:spring-boot-starter-oauth2-resource-server:$springBootVersion"
   // compileOnly "org.springframework.security:spring-security-oauth2-resource-server:$springSecurityVersion"
-  // compileOnly "org.springframework.security:spring-security-oauth2-core:$springSecurityVersion"
+  // api "org.springframework.security:spring-security-oauth2-core:$springSecurityVersion"
   // compileOnly "org.springframework.security:spring-security-oauth2-jose:$springSecurityVersion"
   // compileOnly "org.springframework.security:spring-security-crypto:$springSecurityVersion"
 

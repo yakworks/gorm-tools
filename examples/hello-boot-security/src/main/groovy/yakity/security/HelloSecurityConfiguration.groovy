@@ -43,14 +43,14 @@ import static org.springframework.security.config.Customizer.withDefaults
 @Lazy
 @EnableWebSecurity //(debug = true)
 @CompileStatic
+@Import([DefaultSecurityConfiguration])
 @Configuration
-@Import([DefaultSecurityConfiguration, AuditStampConfiguration])
 class HelloSecurityConfiguration {
 
-    // @Autowired(required = false) Saml2RelyingPartyProperties samlProps
+    @Autowired(required = false) Saml2RelyingPartyProperties samlProps
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, Saml2RelyingPartyProperties samlProps) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // DefaultSecurityConfiguration.applyBasicDefaults(http)
         http
             .authorizeHttpRequests((authorize) -> authorize

@@ -1,0 +1,7 @@
+# add some api configs for testing
+api:
+  paths:
+    testing:
+      sinkExt:
+        includes:
+          foo: ['id', 'name', 'thing.$stamp' ]

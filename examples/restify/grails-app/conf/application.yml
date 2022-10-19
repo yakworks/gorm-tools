@@ -1,6 +1,8 @@
 spring.main.lazy-initialization: true
 #spring.main.allow-bean-definition-overriding: true
 
+api.config.import: classpath:/restapi-config.yml,classpath:/restapi/*.yml
+
 # do profiles and groups early or it gets confused.
 spring:
   profiles:

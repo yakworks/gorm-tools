@@ -11,8 +11,10 @@ import java.nio.file.Paths
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.model.PersistentEntity
+import org.springframework.beans.factory.annotation.Autowired
 import org.yaml.snakeyaml.Yaml
 
+import gorm.tools.config.ApiProperties
 import gorm.tools.utils.GormMetaUtils
 import yakworks.commons.io.PathTools
 import yakworks.commons.lang.NameUtils
@@ -33,6 +35,7 @@ import static ApiSchemaEntity.CruType
 @SuppressWarnings(['UnnecessaryGetter', 'AbcMetric', 'Println'])
 @CompileStatic
 class OpenApiGenerator implements ConfigAware {
+    @Autowired ApiProperties apiProperties
     //inject src and build dirs when setting up bean
     String apiSrc
     String apiBuild
@@ -90,12 +93,12 @@ class OpenApiGenerator implements ConfigAware {
 
     //iterate over the restapi keys and add setup the yaml
     void spinThroughRestApi(Map api, List namespaceList){
-        Map restApiPaths = config.getProperty('api.paths', Map)
+        Map restApiPaths = apiProperties.paths
 
         List tags = (List)api.tags
         Map<String, List> newTagGroups = [:]
 
-        Map namespaces = config.getProperty('api.namespaces', Map, [:])
+        Map namespaces = apiProperties.namespaces ?: [:]
 
         for(entry in restApiPaths){
             if(namespaces.containsKey(entry.key)){

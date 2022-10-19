@@ -1,0 +1,15 @@
+# add some api configs for testing
+api:
+  defaultPackage: yakworks.rally.api
+  namespaces: { testing: 'Testing Namespace' }
+  paths:
+    testing:
+      kitchenSink:
+        entityClass: 'yakworks.testing.gorm.model.KitchenSink'
+        includes:
+          get: ['*', 'ext' ]
+
+      sinkExt:
+        entityClass: 'yakworks.testing.gorm.model.SinkExt'
+        includes:
+          getCustom: ['id', 'name', 'thing.$stamp']

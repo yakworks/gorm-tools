@@ -5,6 +5,8 @@ spring.main.allow-bean-definition-overriding: true
 
 spring.config.import: classpath:config/security.yml, classpath:config/grails.yml, classpath:config/datasource.yml
 
+api.config.import: classpath:/restapi-config.yml,classpath*:/restapi/**/*.yml
+
 logging:
   level:
     root: INFO

@@ -21,6 +21,7 @@ import gorm.tools.api.IncludesConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelStreamTools
 import gorm.tools.async.ParallelTools
+import gorm.tools.config.ApiProperties
 import gorm.tools.config.AsyncConfig
 import gorm.tools.config.GormConfig
 import gorm.tools.config.IdGeneratorConfig
@@ -54,6 +55,11 @@ class GormToolsConfiguration {
         // List<Class> entityClasses = grailsApplication.getArtefacts("Domain")*.clazz
         // return new GormRepoBeanFactoryPostProcessor(entityClasses)
         return new GormRepoBeanFactoryPostProcessor(grailsDomainClassMappingContext)
+    }
+
+    @Bean
+    ApiProperties apiProperties(){
+        new ApiProperties()
     }
 
     @Bean

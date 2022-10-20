@@ -9,7 +9,6 @@ import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 
-import gorm.tools.api.IncludesConfig
 import gorm.tools.beans.Pager
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.api.QueryMangoEntityApi
@@ -18,6 +17,7 @@ import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
 import grails.web.api.WebAttributes
 import yakworks.commons.map.Maps
+import yakworks.gorm.api.IncludesConfig
 import yakworks.meta.MetaMap
 import yakworks.meta.MetaMapList
 import yakworks.spring.AppCtx

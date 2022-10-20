@@ -1,7 +1,6 @@
 # add some api configs for testing
 api:
   paths:
-    testing:
-      kitchenSink:
-        includes:
-          get: ['*']
+    /testing/kitchenSink:
+      includes:
+        get: ['*']

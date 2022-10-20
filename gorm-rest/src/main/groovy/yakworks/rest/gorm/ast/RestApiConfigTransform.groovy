@@ -17,9 +17,9 @@ import org.codehaus.groovy.control.SourceUnit
 import org.codehaus.groovy.transform.ASTTransformation
 import org.codehaus.groovy.transform.GroovyASTTransformation
 import org.grails.config.CodeGenConfig
-import org.springframework.core.io.ClassPathResource
 
 import yakworks.commons.util.BuildSupport
+import yakworks.gorm.api.ApiUtils
 import yakworks.rest.gorm.controller.RestRepoApiController
 
 //import grails.rest.Resource
@@ -109,7 +109,7 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
             //traitNode = ClassHelper.make(RepoController)
         }
 
-        Map pathParts = RestApiAstUtils.splitPath(resourceName, ctrlConfig)
+        Map pathParts = ApiUtils.splitPath(resourceName)
         String endpoint = pathParts.name
         String namespace = pathParts.namespace
         //println "endpoint: $endpoint namespace: $namespace"

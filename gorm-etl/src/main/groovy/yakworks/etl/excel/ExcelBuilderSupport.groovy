@@ -7,10 +7,9 @@ package yakworks.etl.excel
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.api.IncludesConfig
 import yakworks.commons.lang.LabelUtils
 import yakworks.commons.lang.PropertyTools
-import yakworks.commons.map.Maps
+import yakworks.gorm.api.ApiConfig
 import yakworks.meta.MetaMapList
 import yakworks.meta.MetaProp
 
@@ -23,13 +22,12 @@ class ExcelBuilderSupport {
     /**
      * kind of a HACK until we clean up the new config. defaults to using whats in gridOptions.colModel
      */
-    static ExcelBuilder useIncludesConfig(ExcelBuilder eb, IncludesConfig includesConfig, MetaMapList dataList){
+    static ExcelBuilder useIncludesConfig(ExcelBuilder eb, ApiConfig apiConfig, MetaMapList dataList){
         if(dataList.metaEntity){
             //flatten to get the titles
             Map<String, MetaProp> metaProps = dataList.metaEntity.flatten()
             eb.includes = metaProps.keySet().toList()
-            def pcfg = includesConfig.findConfigByEntityClass(dataList.metaEntity.className)
-            pcfg = Maps.removePropertyListKeys(pcfg)
+            Map pcfg = apiConfig.getPathMap(dataList.metaEntity.className, null)
             Map colMap = columnLabels(pcfg)
             if (colMap) {
                 //set the keys from the config

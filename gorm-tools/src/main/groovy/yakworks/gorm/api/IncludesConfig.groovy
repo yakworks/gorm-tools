@@ -2,16 +2,14 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.api
+package yakworks.gorm.api
 
-import java.util.concurrent.ConcurrentHashMap
 
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
 
-import gorm.tools.config.ApiProperties
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.map.Maps
 import yakworks.spring.AppCtx
@@ -27,9 +25,9 @@ import yakworks.spring.AppCtx
 class IncludesConfig {
 
     // private static final Map<String, String> entityClassPathKeys = new ConcurrentHashMap<String, String>()
-    private static final Map<String, Map<String, Object>> entityClassApiProps = new ConcurrentHashMap<String, Map<String, Object>>()
+    // private static final Map<String, Map<String, Object>> entityClassApiProps = new ConcurrentHashMap<String, Map<String, Object>>()
 
-    @Autowired ApiProperties apiProperties
+    @Autowired ApiConfig apiConfig
 
     //static cheater to get the bean, use sparingly if at all
     static IncludesConfig bean(){
@@ -48,11 +46,9 @@ class IncludesConfig {
     @Cacheable('ApiConfig.includesByClass')
     Map getIncludes(Class entityClass){
         Map includesMap = getClassStaticIncludes(entityClass)
-        Map pathConfig = findConfigByEntityClass(entityClass.name)
-        //if anything on config then they win
-        if (pathConfig?.includes) {
-            includesMap.putAll(pathConfig.includes as Map)
-        }
+        //if anything in yml config then they win
+        Map includesConfigMap = apiConfig.getIncludesForEntity(entityClass.name)
+        if(includesConfigMap) includesMap.putAll(includesConfigMap)
         return includesMap
     }
 
@@ -107,21 +103,21 @@ class IncludesConfig {
      * @param entityClass the entity class to look for statics on
      * @param mergeIncludes may be passed in from controller etc, provides overrrides for whats in config and domain
      */
-    @Cacheable('ApiConfig.includesByKey')
-    Map getIncludes(String entityKey, String namespace, Class entityClass, Map mergeIncludes){
-        // look for includes map on the domain first
-        Map includesMap = getClassStaticIncludes(entityClass)
-        Map pathConfig = getPathConfig(entityKey, namespace)
-
-        //if anything on config then overrite them
-        if (pathConfig?.includes) {
-            includesMap.putAll(pathConfig.includes as Map)
-        }
-
-        if(mergeIncludes) includesMap.putAll(mergeIncludes)
-
-        return includesMap
-    }
+    // @Cacheable('ApiConfig.includesByKey')
+    // Map getIncludes(String entityKey, String namespace, Class entityClass, Map mergeIncludes){
+    //     // look for includes map on the domain first
+    //     Map includesMap = getClassStaticIncludes(entityClass)
+    //     Map pathConfig = getPathConfig(entityKey, namespace)
+    //
+    //     //if anything on config then overrite them
+    //     if (pathConfig?.includes) {
+    //         includesMap.putAll(pathConfig.includes as Map)
+    //     }
+    //
+    //     if(mergeIncludes) includesMap.putAll(mergeIncludes)
+    //
+    //     return includesMap
+    // }
 
     Map getClassStaticIncludes( Class entityClass) {
         // look for includes map on the domain first
@@ -129,38 +125,31 @@ class IncludesConfig {
         Map includesMap = (entityIncludes ? Maps.clone(entityIncludes) : [:]) as Map<String, Object>
         return includesMap
     }
+
     /**
      * gets the Map config for the entityKey and namespace
      */
-    Map getPathConfig(String entityKey, String namespace){
-        //String configPath = namespace ? "api.paths.${namespace}.${entityKey}" : "api.paths.${entityKey}"
-        Map<String, Object> entityConfig
-        if(namespace){
-            entityConfig = apiProperties.paths[namespace][entityKey] as Map<String, Object>
-        } else {
-            entityConfig = apiProperties.paths[entityKey] as Map<String, Object>
-        }
-
-        // Map pathConfig = config.getProperty(configPath, Map)
-        //if nothing and it has a dot than entity key might be full class name with package, so do search
-        if(!entityConfig && entityKey.indexOf('.') != -1)
-            entityConfig = findConfigByEntityClass(entityKey) as Map<String, Object>
-
-        return entityConfig
-    }
+    // Map getPathConfig(String entityKey, String namespace){
+    //     //String configPath = namespace ? "api.paths.${namespace}.${entityKey}" : "api.paths.${entityKey}"
+    //     Map<String, Object> entityConfig
+    //     String pathKey = namespace ? "/${namespace}/${entityKey}" : "/${entityKey}"
+    //     entityConfig = apiConfig.paths[pathKey] as Map<String, Object>
+    //
+    //     //if nothing and it has a dot than entity key might be full class name with package, so do search
+    //     if(!entityConfig && entityKey.indexOf('.') != -1)
+    //         entityConfig = apiConfig.pathsByEntity[entityKey] as Map<String, Object>
+    //
+    //     return entityConfig
+    // }
 
     /**
      * looks for the entityClass key that matches the className
      */
-    Map findConfigByEntityClass(String className){
-        if(entityClassApiProps.isEmpty()){
-            initEntityClassApiProps()
-            // setupEntityClassPathKeys()
-        }
-        entityClassApiProps[className] ?: [:]
-        // String rootCfgKey = entityClassPathKeys[className]
-        // return rootCfgKey ? config.getProperty(rootCfgKey, Map) : [:]
-    }
+    // ApiProperties.PathItem findConfigByEntityClass(String className){
+    //     return apiConfig.pathsByEntity[className]
+    //     // String rootCfgKey = entityClassPathKeys[className]
+    //     // return rootCfgKey ? config.getProperty(rootCfgKey, Map) : [:]
+    // }
 
     /**
      * setup pathKeys for entityClass
@@ -182,30 +171,30 @@ class IncludesConfig {
     /**
      * initializes the entityClassApiProps which is keyed by class name
      */
-    void initEntityClassApiProps(){
-        //exit fast if nothing setup
-        if(!apiProperties.paths) return
-
-        Map restApiPaths = apiProperties.paths ?: [:]
-        Map namespaces = apiProperties.namespaces ?: [:]
-
-        restApiPaths.each { String key, Object val ->
-            Map cfg = (Map)val
-            if(namespaces.containsKey(key)){
-                for(Map.Entry entry : ((Map)cfg) ){
-                    Map nestCfg = (Map)entry.value
-                    if(nestCfg.containsKey('entityClass')){
-                        entityClassApiProps[nestCfg['entityClass'].toString()] = nestCfg
-                    }
-                }
-            }
-            else { //normal not namespaced or may have slash like 'foo/bar' as key so just add it
-                if(cfg.containsKey('entityClass')){
-                    entityClassApiProps[cfg['entityClass'].toString()] = cfg
-                }
-            }
-        }
-    }
+    // void initEntityClassApiProps(){
+    //     //exit fast if nothing setup
+    //     if(!apiConfig.paths) return
+    //
+    //     Map restApiPaths = apiConfig.paths ?: [:]
+    //     Map namespaces = apiConfig.namespaces ?: [:]
+    //
+    //     restApiPaths.each { String key, Object val ->
+    //         Map cfg = (Map)val
+    //         if(namespaces.containsKey(key)){
+    //             for(Map.Entry entry : ((Map)cfg) ){
+    //                 Map nestCfg = (Map)entry.value
+    //                 if(nestCfg.containsKey('entityClass')){
+    //                     entityClassApiProps[nestCfg['entityClass'].toString()] = nestCfg
+    //                 }
+    //             }
+    //         }
+    //         else { //normal not namespaced or may have slash like 'foo/bar' as key so just add it
+    //             if(cfg.containsKey('entityClass')){
+    //                 entityClassApiProps[cfg['entityClass'].toString()] = cfg
+    //             }
+    //         }
+    //     }
+    // }
 
     /**
      * FIXME whats this for? can we remove or is it used?

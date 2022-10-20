@@ -15,13 +15,13 @@ import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.api.QueryableCriteria
 import org.springframework.beans.factory.annotation.Autowired
 
-import gorm.tools.api.IncludesConfig
-import gorm.tools.api.IncludesKey
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryArgs
 import grails.gorm.DetachedCriteria
 import yakworks.commons.lang.EnumUtils
 import yakworks.commons.model.IdEnum
+import yakworks.gorm.api.IncludesConfig
+import yakworks.gorm.api.IncludesKey
 
 import static gorm.tools.mango.MangoOps.CompareOp
 import static gorm.tools.mango.MangoOps.ExistOp

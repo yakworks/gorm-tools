@@ -99,14 +99,13 @@ class RallyApiConfiguration {
         return new AppInfoBuilder()
     }
 
-    // wont work until we sort out the config problem
-    // @Bean
-    // OpenApiGenerator openApiGenerator() {
-    //     def oag = new OpenApiGenerator()
-    //     oag.apiSrc = 'api-docs/openapi'
-    //     oag.apiBuild = 'api-docs/dist/openapi'
-    //     oag.namespaceList = ['rally']
-    //     return oag
-    // }
+    @Bean
+    OpenApiGenerator openApiGenerator() {
+        def oag = new OpenApiGenerator()
+        oag.apiSrc = 'api-docs/openapi'
+        oag.apiBuild = 'api-docs/dist/openapi'
+        oag.namespaceList = ['rally']
+        return oag
+    }
 
 }

@@ -2,9 +2,11 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.api
+package yakworks.gorm.api
 
 import org.springframework.beans.factory.annotation.Autowired
+
+import yakworks.gorm.api.IncludesConfig
 import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.testing.gorm.model.Enummy

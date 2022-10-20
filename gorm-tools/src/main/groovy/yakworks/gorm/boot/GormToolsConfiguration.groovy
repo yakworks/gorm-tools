@@ -2,7 +2,7 @@
 * Copyright 2022 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.boot
+package yakworks.gorm.boot
 
 import javax.sql.DataSource
 
@@ -17,14 +17,9 @@ import org.springframework.context.annotation.DependsOn
 import org.springframework.context.annotation.Lazy
 import org.springframework.jdbc.core.JdbcTemplate
 
-import gorm.tools.api.IncludesConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelStreamTools
 import gorm.tools.async.ParallelTools
-import gorm.tools.config.ApiProperties
-import gorm.tools.config.AsyncConfig
-import gorm.tools.config.GormConfig
-import gorm.tools.config.IdGeneratorConfig
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.IdGenerator
 import gorm.tools.idgen.JdbcIdGenerator
@@ -39,6 +34,11 @@ import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.transaction.TrxService
+import yakworks.gorm.api.ApiConfig
+import yakworks.gorm.api.IncludesConfig
+import yakworks.gorm.config.AsyncConfig
+import yakworks.gorm.config.GormConfig
+import yakworks.gorm.config.IdGeneratorConfig
 
 @Configuration(proxyBeanMethods = false)
 @Lazy
@@ -58,8 +58,8 @@ class GormToolsConfiguration {
     }
 
     @Bean
-    ApiProperties apiProperties(){
-        new ApiProperties()
+    ApiConfig apiConfig(){
+        new ApiConfig()
     }
 
     @Bean

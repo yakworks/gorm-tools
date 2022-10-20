@@ -21,4 +21,6 @@ dependencies {
   compileOnly project(":gorm-tools")
 
   testImplementation project(":gorm-test-domain")
+  // not sure why this is need but stops the error "ERROR StatusLogger Log4j2 could not find a logging implementation"
+  testImplementation "org.apache.logging.log4j:log4j-to-slf4j:$vLog4j"
 }

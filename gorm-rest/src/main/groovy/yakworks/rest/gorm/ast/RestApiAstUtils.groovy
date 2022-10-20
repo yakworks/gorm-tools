@@ -156,22 +156,22 @@ class RestApiAstUtils {
         }
     }
 
-    static Map splitPath(String resourceName, Map ctrlConfig){
-        Map pathParts = [name: resourceName, namespace: '']
-        if (resourceName.contains("/")) {
-            List parts = resourceName.split("[/]") as List
-            String name = parts.last()
-            pathParts['name'] = name
-            final int nestedIndex = resourceName.lastIndexOf('/')
-            String namespace = resourceName.substring(0, nestedIndex)
-            pathParts['namespace'] = namespace
-            return pathParts
-        } else {
-            pathParts['name'] = resourceName
-            if(ctrlConfig['namespace']) pathParts['namespace'] = ctrlConfig['namespace'] as String
-        }
-        return pathParts
-    }
+    // static Map splitPath(String resourceName, Map ctrlConfig){
+    //     Map pathParts = [name: resourceName, namespace: '']
+    //     if (resourceName.contains("/")) {
+    //         List parts = resourceName.split("[/]") as List
+    //         String name = parts.last()
+    //         pathParts['name'] = name
+    //         final int nestedIndex = resourceName.lastIndexOf('/')
+    //         String namespace = resourceName.substring(0, nestedIndex)
+    //         pathParts['namespace'] = namespace
+    //         return pathParts
+    //     } else {
+    //         pathParts['name'] = resourceName
+    //         if(ctrlConfig['namespace']) pathParts['namespace'] = ctrlConfig['namespace'] as String
+    //     }
+    //     return pathParts
+    // }
 
     /**
      * Finds a source file for the given class name

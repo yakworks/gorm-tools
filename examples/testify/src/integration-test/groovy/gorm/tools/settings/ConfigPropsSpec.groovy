@@ -1,7 +1,7 @@
 package gorm.tools.settings
 
-import gorm.tools.config.ApiProperties
-import gorm.tools.config.AsyncConfig
+import yakworks.gorm.api.ApiConfig
+import yakworks.gorm.config.AsyncConfig
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,7 +16,7 @@ import yakworks.testing.gorm.integration.DataIntegrationTest
 class ConfigPropsSpec extends Specification implements DataIntegrationTest {
 
     @Autowired AsyncConfig asyncConfig
-    @Autowired ApiProperties apiProperties
+    @Autowired ApiConfig apiConfig
 
     def "sanity Check"() {
         expect:

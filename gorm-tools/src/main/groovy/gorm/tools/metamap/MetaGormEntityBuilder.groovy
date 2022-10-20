@@ -16,10 +16,10 @@ import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.model.types.ToMany
 
-import gorm.tools.api.IncludesConfig
 import gorm.tools.utils.GormMetaUtils
 import grails.gorm.validation.ConstrainedProperty
 import yakworks.commons.lang.PropertyTools
+import yakworks.gorm.api.IncludesConfig
 import yakworks.meta.MetaEntity
 import yakworks.meta.MetaProp
 

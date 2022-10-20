@@ -15,8 +15,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.support.TransactionSynchronizationManager
 
-import gorm.tools.config.AsyncConfig
 import yakworks.commons.lang.Validate
+import yakworks.gorm.config.AsyncConfig
 
 /**
  * a trait to be used for colating/slicing a list into "batches" to then asynchronously with Transactions

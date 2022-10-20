@@ -13,7 +13,7 @@ import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
 import grails.gorm.DetachedCriteria
-import yakworks.commons.lang.Transform
+import yakworks.commons.beans.Transform
 import yakworks.rally.orgs.model.Company
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag

@@ -14,7 +14,7 @@ import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
-import yakworks.commons.lang.Transform
+import yakworks.commons.beans.Transform
 import yakworks.commons.lang.Validate
 
 import static gorm.tools.utils.GormUtils.collectLongIds

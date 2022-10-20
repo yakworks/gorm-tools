@@ -74,11 +74,11 @@ class Application extends GrailsAutoConfiguration {
     Closure doWithSpring() {{ ->
 
         //this needs to be here for now until we figure out the config thing
-        openApiGenerator(OpenApiGenerator){
-            apiSrc = 'api-docs/openapi'
-            apiBuild = 'api-docs/dist/openapi'
-            namespaceList = ['rally']
-        }
+        // openApiGenerator(OpenApiGenerator){
+        //     apiSrc = 'api-docs/openapi'
+        //     apiBuild = 'api-docs/dist/openapi'
+        //     namespaceList = ['rally']
+        // }
 
         //hack to make sure hazel get setup before the one that is setup for hibernates L2 cache as that one
         //is configured to join the name of one already setup in spring.

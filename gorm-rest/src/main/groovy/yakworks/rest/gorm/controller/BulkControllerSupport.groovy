@@ -4,6 +4,8 @@
 */
 package yakworks.rest.gorm.controller
 
+import org.springframework.beans.factory.annotation.Value
+
 import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
@@ -44,6 +46,9 @@ class BulkControllerSupport<D> {
     @Autowired(required = false)
     IncludesConfig includesConfig
 
+    @Value('${hibernate.jdbc.batch_size}')
+    int batchSize
+
     Class<D> entityClass // the domain class this is for
 
     BulkControllerSupport(Class<D> entityClass){
@@ -67,6 +72,12 @@ class BulkControllerSupport<D> {
         Map includesMap = includesConfig.getIncludes(entityClass)
         List bulkIncludes = IncludesConfig.getFieldIncludes(includesMap, [IncludesKey.bulk.name()])
         List bulkErrorIncludes = includesMap['bulkError'] as List<String>
+
+        //don't create job, call simple createOrUpdate list
+        if(!params.boolean('jobEnabled', true) && dataList.size()<batchSize) {
+            getRepo().createOrUpdate(dataList)
+            return syncJobService.getJob(1)  //XXX what to return if we don't have a job ? using 1 as our reverse job
+        }
 
         SyncJobArgs syncJobArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludes, errorIncludes: bulkErrorIncludes,
             sourceId: sourceKey, source: params.jobSource, params: params)

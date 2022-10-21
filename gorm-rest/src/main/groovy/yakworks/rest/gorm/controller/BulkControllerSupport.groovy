@@ -46,7 +46,7 @@ class BulkControllerSupport<D> {
     @Autowired(required = false)
     IncludesConfig includesConfig
 
-    @Value('${hibernate.jdbc.batch_size}')
+    @Value('${hibernate.jdbc.batch_size:100}')
     int batchSize
 
     Class<D> entityClass // the domain class this is for

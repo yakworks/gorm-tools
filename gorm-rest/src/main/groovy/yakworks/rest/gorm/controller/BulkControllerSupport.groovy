@@ -18,6 +18,7 @@ import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
+import gorm.tools.job.SyncJobState
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.DataOp
@@ -75,7 +76,10 @@ class BulkControllerSupport<D> {
 
         //don't create job, call simple createOrUpdate list
         if(!params.boolean('jobEnabled', true) && dataList.size()<batchSize) {
-            return getRepo().createOrUpdate(dataList) as SyncJobEntity
+            SyncJobEntity noJob = getRepo().createOrUpdate(dataList) as SyncJobEntity
+            noJob.ok = true
+            noJob.state = SyncJobState.Finished
+            return noJob
         }
 
         SyncJobArgs syncJobArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludes, errorIncludes: bulkErrorIncludes,

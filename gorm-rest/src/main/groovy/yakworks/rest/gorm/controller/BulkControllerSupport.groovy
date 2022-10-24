@@ -4,8 +4,6 @@
 */
 package yakworks.rest.gorm.controller
 
-import gorm.tools.job.SyncJobContext
-
 import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
@@ -17,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value
 import gorm.tools.api.IncludesConfig
 import gorm.tools.api.IncludesKey
 import gorm.tools.job.SyncJobArgs
+import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
 import gorm.tools.repository.GormRepo

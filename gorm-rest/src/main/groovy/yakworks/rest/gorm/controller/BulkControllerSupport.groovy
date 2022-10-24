@@ -76,7 +76,7 @@ class BulkControllerSupport<D> {
 
         //don't create job, call simple createOrUpdate list
         if(!params.boolean('jobEnabled', true) && dataList.size()<batchSize) {
-            runBulkWithJobDisabled(dataList)
+            return getRepo().createOrUpdate(dataList) as SyncJobEntity
         }
 
         SyncJobArgs syncJobArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludes, errorIncludes: bulkErrorIncludes,
@@ -132,13 +132,6 @@ class BulkControllerSupport<D> {
         return csvToMapTransformer.process(params)
     }
 
-    SyncJobEntity runBulkWithJobDisabled(dataList) {
-        try {
-            return getRepo().createOrUpdate(dataList) as SyncJobEntity
-        } catch (e) {
-            throw e
-        }
-    }
 
     GormRepo<D> getRepo() {
         RepoLookup.findRepo(getEntityClass())

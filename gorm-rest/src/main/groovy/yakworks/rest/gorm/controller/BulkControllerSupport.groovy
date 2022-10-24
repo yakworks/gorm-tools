@@ -4,6 +4,8 @@
 */
 package yakworks.rest.gorm.controller
 
+import gorm.tools.job.SyncJobContext
+
 import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
@@ -74,8 +76,7 @@ class BulkControllerSupport<D> {
 
         //don't create job, call simple createOrUpdate list
         if(!params.boolean('jobEnabled', true) && dataList.size()<batchSize) {
-            getRepo().createOrUpdate(dataList)
-            return syncJobService.getJob(1)  //XXX what to return if we don't have a job ? using 1 as our reverse job
+            runBulkWithJobDisabled(dataList)
         }
 
         SyncJobArgs syncJobArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludes, errorIncludes: bulkErrorIncludes,
@@ -129,6 +130,14 @@ class BulkControllerSupport<D> {
      */
     List<Map> transformCsvToBulkList(Map params) {
         return csvToMapTransformer.process(params)
+    }
+
+    SyncJobEntity runBulkWithJobDisabled(dataList) {
+        try {
+            return getRepo().createOrUpdate(dataList) as SyncJobEntity
+        } catch (e) {
+            throw e
+        }
     }
 
     GormRepo<D> getRepo() {

@@ -14,8 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.CacheControl
 import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
+
+import yakworks.security.user.CurrentUser
+import yakworks.security.user.UserInfo
 
 /**
  * A controller for the token resource.
@@ -27,18 +31,19 @@ import org.springframework.web.bind.annotation.RestController
 class TokenController {
 
     @Autowired JwtTokenGenerator tokenGenerator
+    @Autowired CurrentUser currentUser
 
     // @Value('${grails.serverURL:""}')
     // String serverURL
 
     // for dev and testing to make it easier to dump token into variable.
     // ex: `$ TOKEN=`http POST admin:123@localhost:8080/token.txt -b`
-    @PostMapping("/token.txt")
+    @PostMapping("/api/token.txt")
     String tokenTxt() {
         return tokenGenerator.genererate().tokenValue
     }
 
-    @PostMapping("/token")
+    @PostMapping("/api/token")
     ResponseEntity<Map> token(HttpServletRequest request, HttpServletResponse response) {
         Jwt token = tokenGenerator.genererate()
         //add it as a cookie
@@ -46,6 +51,17 @@ class TokenController {
         response.addCookie(cookie)
         //convert to a Map to render it as json
         Map body = JwtTokenGenerator.tokenToMap(token)
+
+        return ResponseEntity.ok()
+            .cacheControl(CacheControl.noStore())
+            .body(body)
+    }
+
+    //returns the current userMap. Will error if not valid token or login
+    @GetMapping("/api/validate")
+    ResponseEntity<Map> validateToken(HttpServletRequest request, HttpServletResponse response) {
+        //UserInfo userInfo = currentUser.user
+        Map body = currentUser.userMap
 
         return ResponseEntity.ok()
             .cacheControl(CacheControl.noStore())

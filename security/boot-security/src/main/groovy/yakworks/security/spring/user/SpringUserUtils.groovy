@@ -24,6 +24,8 @@ import yakworks.security.user.UserInfo
 @Slf4j
 final class SpringUserUtils {
 
+    public static Long SYSTEM_ORGID = 2
+
     private SpringUserUtils() { /* static only */ }
 
 
@@ -79,7 +81,7 @@ final class SpringUserUtils {
     }
 
     static SpringUserInfo systemUser(){
-        def u = new BasicUserInfo(username: 'system', passwordHash: "N/A", roles: ['ADMIN'] as Set, id: 1L, orgId: 1L)
+        def u = new BasicUserInfo(username: 'system', passwordHash: "N/A", roles: ['ADMIN'] as Set, id: 1L, orgId: SYSTEM_ORGID)
         SpringUser.of(u)
     }
 }

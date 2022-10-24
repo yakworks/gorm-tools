@@ -98,7 +98,7 @@ public class DefaultSecurityConfiguration {
         JsonUsernamePasswordLoginFilter jsonUnameFilter = new JsonUsernamePasswordLoginFilter(ctx.getBean(ObjectMapper.class));
         jsonUnameFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/api/login", "POST"));
         //forward over to the token endpoint which will return the standard bearer object.
-        jsonUnameFilter.setAuthenticationSuccessHandler(new ForwardAuthenticationSuccessHandler("/token"));
+        jsonUnameFilter.setAuthenticationSuccessHandler(new ForwardAuthenticationSuccessHandler("/api/token"));
         jsonUnameFilter.setAuthenticationManager(ctx.getBean(AuthenticationManager.class));
         http.addFilterAfter(jsonUnameFilter, BasicAuthenticationFilter.class);
     }

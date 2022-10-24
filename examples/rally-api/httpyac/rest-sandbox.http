@@ -1,5 +1,5 @@
 # Use Httyak plugin https://github.com/AnWeber/vscode-httpyac
-@host = http://localhost:8081
+@host = http://localhost:8080
 @base_url = {{host}}/api
 @contentType = application/json
 @Authorization=Bearer {{login.access_token}}
@@ -10,15 +10,17 @@
 POST {{base_url}}/login
 Content-Type: application/json
 
-{"username":"admin","password":"123Foo"}
+{"username":"admin","password":"123"}
 
-### VALIDATE AUTH
+### basic auth
+# @name login
+POST http://admin:123@localhost:8080/api/token
+Content-Type: application/json
+
+### VALIDATE WTF
 # @ref login
 GET {{base_url}}/validate
-Authorization: Bearer {{login.access_token}}
-{{
-  test.status(200);
-}}
+Authorization: {{Authorization}}
 
 ### Org
 # @ref login

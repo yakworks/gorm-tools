@@ -15,6 +15,7 @@ import org.springframework.security.core.AuthenticatedPrincipal
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
+import org.springframework.security.oauth2.server.resource.authentication.AbstractOAuth2TokenAuthenticationToken
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal
 
 /**
@@ -44,6 +45,9 @@ class AuthSuccessUserInfoListener {
         }
         else if (principal instanceof AuthenticatedPrincipal) {
             doIdentityProvided(authentication, principal)
+        }
+        else if (authentication instanceof AbstractOAuth2TokenAuthenticationToken){
+            doOAuthToken(authentication)
         }
 
     }
@@ -78,4 +82,20 @@ class AuthSuccessUserInfoListener {
         //FUTURE USE
     }
 
+    /**
+     * Do JWT and Bearer (same concept). Look up user by name.
+     */
+    void doOAuthToken(AbstractOAuth2TokenAuthenticationToken authToken){
+        String username = authToken.name
+        def springUser = userDetailsService.loadUserByUsername(username)
+        //TODO This is where we can call out to create one.
+        if (!springUser) {
+            throw new UsernameNotFoundException("Saml authentication was successful but no application user found for username: $username")
+        }
+        if(springUser instanceof SpringUserInfo){
+            springUser.setAuditDetails(authToken.details)
+        }
+        //replace with this springUserInfo
+        authToken.setDetails(springUser)
+    }
 }

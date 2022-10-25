@@ -124,7 +124,7 @@ public class DefaultSecurityConfiguration {
         return authConfig.getAuthenticationManager();
     }
 
-    @Bean
+    @Bean @Lazy(false)
     public AuthSuccessUserInfoListener authSuccessUserInfoListener() {
         return new AuthSuccessUserInfoListener();
     }

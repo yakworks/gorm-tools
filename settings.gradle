@@ -67,9 +67,6 @@ findProject(':examples/rally-api').name = 'rally-api'
 include 'examples/hello-boot-security'
 findProject(':examples/hello-boot-security').name = 'hello-boot-security'
 
-include 'examples/hello-boot-security-okta'
-findProject(':examples/hello-boot-security-okta').name = 'hello-boot-security-okta'
-
 project(':testify').projectDir = new File('examples/testify')
 
 buildCache {

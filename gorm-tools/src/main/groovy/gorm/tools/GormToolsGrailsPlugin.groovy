@@ -11,12 +11,12 @@ import groovy.util.logging.Slf4j
 import org.grails.orm.hibernate.HibernateDatastore
 import org.springframework.context.MessageSource
 
-import gorm.tools.boot.GormToolsConfiguration
 import gorm.tools.jdbc.DbDialectService
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.validation.RepoValidatorRegistry
 import grails.core.ArtefactHandler
 import grails.plugins.Plugin
+import yakworks.gorm.boot.GormToolsConfiguration
 
 /**
  * @author Joshua Burnett (@basejump)

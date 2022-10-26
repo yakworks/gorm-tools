@@ -1,0 +1,12 @@
+api:
+  paths:
+    /rally/roleUser:
+      includes:
+        get: [ "user.id", "user.username", "role.id", "role.name" ]
+
+      gridOptions:
+        colModel:
+          - { name: user.id, hidden: true }
+          - { name: user.username, label: username, width: 120}
+          - { name: role.id, width: 120, hidden: true }
+          - { name: role.name, label: role, width: 120 }

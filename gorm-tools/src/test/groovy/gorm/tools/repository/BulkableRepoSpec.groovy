@@ -1,7 +1,7 @@
 package gorm.tools.repository
 
 import gorm.tools.async.AsyncService
-import gorm.tools.config.AsyncConfig
+import yakworks.gorm.config.AsyncConfig
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobState
 import gorm.tools.problem.ValidationProblem

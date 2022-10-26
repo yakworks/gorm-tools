@@ -12,7 +12,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.util.ClassUtils
 
-import gorm.tools.api.IncludesConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelStreamTools
 import gorm.tools.databinding.EntityMapBinder
@@ -24,7 +23,7 @@ import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.GormRepo
-import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
@@ -35,6 +34,8 @@ import grails.config.Config
 import grails.core.GrailsApplication
 import grails.persistence.support.NullPersistentContextInterceptor
 import grails.spring.BeanBuilder
+import yakworks.gorm.api.ApiConfig
+import yakworks.gorm.api.IncludesConfig
 import yakworks.grails.GrailsHolder
 import yakworks.i18n.icu.GrailsICUMessageSource
 import yakworks.spring.AppCtx
@@ -98,6 +99,7 @@ class RepoTestUtils {
         persistenceContextInterceptor(NullPersistentContextInterceptor, lazy()) //required for parallelTools
         parallelTools(ParallelStreamTools, lazy())
         asyncService(AsyncService, lazy())
+        apiConfig(ApiConfig, lazy())
         includesConfig(IncludesConfig, lazy())
         metaEntityService(MetaEntityService, lazy())
         metaMapService(MetaMapService, lazy())
@@ -117,7 +119,7 @@ class RepoTestUtils {
         for(Class domainClass in domainClassesToMock){
             Class repoClass = findRepoClass(domainClass)
             grailsApplication.addArtefact(RepositoryArtefactHandler.TYPE, repoClass)
-            String repoName = RepoUtil.getRepoBeanName(domainClass)
+            String repoName = RepoLookup.getRepoBeanName(domainClass)
             if (repoClass == DefaultGormRepo || repoClass == UuidGormRepo) {
                 "$repoName"(repoClass, domainClass, lazy())
             } else {

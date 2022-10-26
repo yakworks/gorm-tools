@@ -42,10 +42,6 @@ class CurrentUserSpec extends Specification implements DomainIntTest {
         currentUser.logout()
     }
 
-    Authentication getAuth(){
-        SecurityContextHolder.context?.authentication
-    }
-
     void "sanity check"() {
         expect:
         setupPerms()

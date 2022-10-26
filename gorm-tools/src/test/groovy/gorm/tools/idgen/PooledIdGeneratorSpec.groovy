@@ -5,7 +5,7 @@
 package gorm.tools.idgen
 
 import gorm.tools.async.ParallelStreamTools
-import gorm.tools.config.AsyncConfig
+import yakworks.gorm.config.AsyncConfig
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Shared
 import spock.lang.Specification

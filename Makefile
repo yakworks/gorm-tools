@@ -8,6 +8,7 @@ include $(SHIPKIT_DIR)/makefiles/vault.make
 include $(SHIPKIT_DIR)/makefiles/spring-common.make
 include $(SHIPKIT_DIR)/makefiles/ship-gh-pages.make
 # DB = true # set this to true to turn on the DB environment options
+gw ?= ./gradlew
 
 # open api targets
 include ./api-docs/Makefile
@@ -121,13 +122,22 @@ endif
 
 ## shows gorm-tools:dependencies --configuration runtime
 gradle.dependencies:
-	 ./gradlew gorm-tools:dependencies --configuration compileClasspath
+	 $(gw) gorm-tools:dependencies # --configuration compileClasspath
 	# ./gradlew rally-api:dependencies --configuration compileClasspath
 	#./gradlew rally-security:dependencies --configuration compileClasspath
 
+## shows spring dependencyManagement, modify to show other projects https://bit.ly/3CpcIls
+spring.dependencyManagement:
+	$(gw) gorm-tools:dependencyManagement
+
+## shows spring dependencyManagement, modify to show other projects https://bit.ly/3CpcIls
+gradle.buildEnvironment:
+	$(gw) buildEnvironment
+	$(gw) gorm-tools:buildEnvironment
+
 ## runs the benchmark tests
 test.benchmarks:
-	$(gradlew) benchmarks:assemble
+	$(gw) benchmarks:assemble
 	cd examples/benchmarks
 	java -server -Xmx3g -XX:MaxMetaspaceSize=256m \
 		-DmultiplyData=3 -Dgorm.tools.async.poolSize=4 -Djava.awt.headless=true \
@@ -171,3 +181,22 @@ docker.circle.shell:
 	-v "$$PWD":/root/project \
 	$(DOCKER_SHELL) $(BIN_BASH)
 	#	-v ~/.gradle_docker:/root/.gradle \
+
+test.token.txt:
+	TOKEN=`http POST admin:123@localhost:8080/api/token.txt -b`
+	echo "$$TOKEN"
+	http localhost:8080 -A bearer -a "$$TOKEN"
+
+test.token:
+	RESP=`http -b POST admin:123@localhost:8080/api/token`
+	# use awk to parse out the access_token
+	TOKEN=`echo $$RESP | awk -F'"' -v RS="," '/access_token/{ print $$4 }'`
+	echo "$$TOKEN"
+	http localhost:8080 -A bearer -a "$$TOKEN"
+
+test.hello-post:
+	RESP=`http -b POST localhost:8080/api/login username=admin password=123`
+	echo $$RESP
+	TOKEN=`echo $$RESP | awk -F'"' -v RS="," '/access_token/{ print $$4 }'`
+	echo $$TOKEN
+	http localhost:8080 -A bearer -a "$$TOKEN"

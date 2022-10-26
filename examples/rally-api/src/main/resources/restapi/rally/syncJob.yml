@@ -1,0 +1,5 @@
+api:
+  paths:
+    /rally/syncJob:
+      includes:
+        get: ['*']

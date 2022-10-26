@@ -17,7 +17,7 @@ import yakworks.testing.gorm.CurrentTestUser
 import yakworks.testing.gorm.TestingSecService
 
 /**
- * Supports the gorm-security plugin.
+ * Supports the boot-security plugin.
  * adds mock spring beans for passwordEncoder, and secService and
  * AuditStampEventListener for created/edited fields. During and entity.create it converts test data to a map
  * and since the created/edited fields are not bindable they dont get set so needs a listener

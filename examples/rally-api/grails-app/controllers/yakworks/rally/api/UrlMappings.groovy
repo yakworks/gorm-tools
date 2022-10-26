@@ -34,9 +34,11 @@ class UrlMappings {
         //     "/bar"(resources:"contact", namespace: 'rally')
         // }
         "/api/appConfig/$nspace/$id"(controller: 'appConfig', action: 'get')
+        // "/api/wtf"(controller: 'appConfig', action: 'wtf')
         // "500"(view: '/error')
         //ShiroGrailsExceptionResolver is setup to map UnauthorizedException to this
         "/forbidden"(controller: "forbidden")
+        // "404"(controller: "errorProblem", action: 'notFound404')
     }
 
     static void runClosure(Closure mappingClosure, Object delegate) {

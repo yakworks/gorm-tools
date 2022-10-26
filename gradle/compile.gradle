@@ -1,8 +1,18 @@
+apply plugin: 'groovy'
+
 plugins.withId('java') {
   sourceCompatibility = "$javaCompatibility"
   targetCompatibility = "$javaCompatibility"
   tasks.withType(JavaCompile) {
     options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+  }
+
+  configurations {
+    //includes the compileOnly in tests too so we don't have to list twice
+    testImplementation.extendsFrom compileOnly
+    // all {
+    //   resolutionStrategy.cacheChangingModulesFor 0, 'seconds' //when changing = true this sets the cache time
+    // }
   }
 }
 

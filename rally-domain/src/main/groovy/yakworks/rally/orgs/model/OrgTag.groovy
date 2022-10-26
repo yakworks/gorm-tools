@@ -9,7 +9,7 @@ import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 import grails.persistence.Entity
-import yakworks.commons.lang.Transform
+import yakworks.commons.beans.Transform
 import yakworks.rally.orgs.repo.OrgTagRepo
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLinkTrait

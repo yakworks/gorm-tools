@@ -4,14 +4,10 @@
 */
 package yakworks.openapi.gorm
 
-import java.lang.reflect.ParameterizedType
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import org.codehaus.groovy.reflection.CachedMethod
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association

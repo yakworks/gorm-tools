@@ -1,6 +1,6 @@
 package gorm.tools.idgen
 
-import gorm.tools.config.IdGeneratorConfig
+import yakworks.gorm.config.IdGeneratorConfig
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import org.springframework.beans.factory.annotation.Autowired

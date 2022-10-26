@@ -2,22 +2,22 @@ package yakworks.rally.api
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.api.IncludesConfig
-import yakworks.commons.map.Maps
+import yakworks.gorm.api.ApiConfig
 import yakworks.rest.gorm.controller.RestApiController
+import yakworks.security.user.CurrentUser
 
 @CompileStatic
 class AppConfigController implements RestApiController {
 
-    IncludesConfig includesConfig
+    ApiConfig apiConfig
+    CurrentUser currentUser
 
     def get() {
         String namespace = params.nspace
         String controllerKey = params.id
-        def resourceConfig = includesConfig.getPathConfig(controllerKey, namespace)
+        Map resourceConfig = apiConfig.getPathMap(controllerKey, namespace)
         assert resourceConfig
-        def fixedMap = Maps.removePropertyListKeys(resourceConfig)
-        respond fixedMap
+        respond resourceConfig
     }
 
 }

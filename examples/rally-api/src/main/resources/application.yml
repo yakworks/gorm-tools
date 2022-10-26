@@ -1,0 +1,72 @@
+#debug: true
+spring.main.lazy-initialization: true
+spring.main.allow-bean-definition-overriding: true
+#server.port: 8081
+
+spring.config.import: classpath:config/security.yml, classpath:config/grails.yml, classpath:config/datasource.yml
+
+api.config.import: classpath:/restapi-config.yml,classpath*:/restapi/**/*.yml
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    org.hibernate.orm.deprecation: OFF # turns off deprecation notices
+    # org.springframework.security: DEBUG
+    # org.springframework.security.web: TRACE
+    # org.springframework.security.authentication: TRACE
+    # grails.plugins.DefaultGrailsPluginManager: ERROR
+    # TURN ON for benchmarks
+    # org.hibernate: INFO
+    # for stats and sql logging
+    # org.hibernate.stat: DEBUG
+    org.hibernate.SQL: ERROR
+    # this one is very noisy but if neede will show the values passed to sql statements
+    # org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    yakity.security: TRACE
+
+---
+
+grails:
+  profile: rest-api
+  cache:
+    enabled: false
+  # NOTE: reminder that anything in config.locations wins and ovewrites whats in this config
+  config:
+    locations:
+      - "classpath:restapi-config.yml"
+      - "classpath*:restapi/rally/*.yml"
+
+info:
+  app:
+    name: '@info.app.name@'
+    version: '@info.app.version@'
+    grailsVersion: '@info.app.grailsVersion@'
+
+#  servlet:
+#    context-path: /api
+management:
+  #  health:
+  #    diskspace:
+  #      enabled: true
+  endpoints:
+    enabled-by-default: true
+    web:
+      base-path: /api/actuator
+      exposure:
+        include: health,info,liveness,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+      show-components: when-authorized
+  jmx:
+    enabled: true
+
+---
+
+app:
+  resources:
+    # project.rootProjectDir comes from project.rootProjectDir system prop setup in gradle or defaults to . if not set and running from intellij
+    rootLocation: "${project.rootProjectDir}/examples/resources"
+    tempDir: "./build/rootLocation/tempDir"
+    attachments.location: 'attachments'

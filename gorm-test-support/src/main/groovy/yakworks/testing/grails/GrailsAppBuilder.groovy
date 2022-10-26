@@ -34,7 +34,7 @@ class GrailsAppBuilder extends GrailsApplicationBuilder {
         prepareContext(context, beanFactory)
 
         context.register(TestConfiguration)
-        context.scan("gorm.tools.config")
+        context.scan("yakworks.gorm.config")
         context.refresh()
         context.registerShutdownHook()
         context

@@ -50,8 +50,9 @@ commands:
           paths: [
             ".gradle", ".build-cache",
             "./gorm-test-domain/build", "./gorm-test-support/build", "./gorm-tools/build",
-            "./gorm-etl/build", "./gorm-rest/build", "./gorm-security/build",
-            "./rally-domain/build", "./rally-security/build"
+            "./gorm-audit/build", "./gorm-etl/build", "./gorm-rest/build",
+            "./security/boot-security/build", "./security/boot-security-gorm/build", "./security/security-core/build",
+            "./rally-domain/build"
           ]
           key: build-{{ .Branch }}-{{ checksum "day-version-cache-key.tmp" }}
 
@@ -89,7 +90,7 @@ jobs:
       - run:
           name: ✔︎ -- check
           command: |
-            ./gradlew check -x rally-domain:check -x rally-security:check \
+            ./gradlew check -x rally-domain:check \
             -x restify:check -x testify:check -x benchmarks:check -x rally-api:check
 
       - run: make gradle.merge-test-results
@@ -103,7 +104,7 @@ jobs:
       - attach_workspace:
           at: .
 
-      - run: ./gradlew rally-domain:check rally-security:check --parallel
+      - run: ./gradlew rally-domain:check --parallel
       - run: make gradle.merge-test-results
       - store_test_results: { path: build/test-results/ }
 

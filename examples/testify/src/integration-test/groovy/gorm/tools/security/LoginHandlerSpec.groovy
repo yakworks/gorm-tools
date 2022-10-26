@@ -4,8 +4,8 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.security.gorm.AppUserService
-import yakworks.security.spring.SpringSecService
-import yakworks.security.spring.listeners.SecLoginHandler
+import yakworks.security.listeners.SecLoginHandler
+import yakworks.security.spring.user.SpringUserUtils
 import yakworks.testing.gorm.integration.DataIntegrationTest
 
 @Integration
@@ -21,7 +21,7 @@ class LoginHandlerSpec extends Specification implements DataIntegrationTest {
         loginHandler.passwordWarnDays = 10
 
         when:
-        boolean result = loginHandler.shouldWarnAboutPasswordExpiry(SpringSecService.mockUser("admin", "test", [], 1, 1))
+        boolean result = loginHandler.shouldWarnAboutPasswordExpiry(SpringUserUtils.buildSpringUser("admin", "test", [], 1, 1))
 
         then:
         1 * userService.remainingDaysForPasswordExpiry(_) >> 9

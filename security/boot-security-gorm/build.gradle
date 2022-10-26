@@ -1,0 +1,30 @@
+plugins {
+  // id 'org.springframework.boot'
+  // id 'io.spring.dependency-management'
+  id 'yakworks.groovy-lib'
+}
+
+apply from: "${rootDir}/gradle/gorm-lib.gradle"
+
+dependencies {
+  compileOnly "org.grails:grails-web-boot:$grailsVersion"
+
+  compileOnly "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
+  compileOnly "org.springframework.boot:spring-boot-starter-security:$springBootVersion"
+
+  compileOnly "org.springframework.boot:spring-boot-starter-oauth2-resource-server:$springBootVersion"
+
+  api project(":security-core")
+  api project(":boot-security")
+
+  compileOnly project(":gorm-tools")
+  compileOnly project(":gorm-audit")
+
+}
+
+// bootJar {
+//   enabled = false
+// }
+// jar {
+//   enabled = true
+// }

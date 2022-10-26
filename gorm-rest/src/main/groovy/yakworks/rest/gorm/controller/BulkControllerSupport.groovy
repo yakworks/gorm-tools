@@ -11,8 +11,6 @@ import groovy.transform.CompileStatic
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.beans.factory.annotation.Autowired
 
-import gorm.tools.api.IncludesConfig
-import gorm.tools.api.IncludesKey
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
@@ -22,6 +20,8 @@ import gorm.tools.repository.model.DataOp
 import grails.util.TypeConvertingMap
 import grails.web.servlet.mvc.GrailsParameterMap
 import yakworks.etl.csv.CsvToMapTransformer
+import yakworks.gorm.api.IncludesConfig
+import yakworks.gorm.api.IncludesKey
 import yakworks.spring.AppCtx
 
 /**

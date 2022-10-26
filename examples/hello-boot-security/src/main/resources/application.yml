@@ -1,0 +1,91 @@
+spring.main.lazy-initialization: true
+spring.main.allow-bean-definition-overriding: true
+
+spring:
+  security:
+    saml2:
+      relyingparty:
+        registration:
+          okta:
+            singlelogout:
+              binding: POST
+              response-url: "{baseUrl}/logout/saml2/slo"
+            assertingparty:
+              metadata-uri: https://dev-86091574.okta.com/app/exk6q8gnhjgmEfqI65d7/sso/saml/metadata
+
+app.security.jwt.privateKey: classpath:jwt/app.key
+app.security.jwt.publicKey: classpath:jwt/app.pub
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+#    org.hibernate.SQL: DEBUG
+#    org.springframework.security: DEBUG
+#    org.springframework.security: DEBUG
+#    org.springframework.security.web: TRACE
+#    org.springframework.security.authentication: TRACE
+#    grails.plugins.DefaultGrailsPluginManager: ERROR
+    yakity.security: TRACE
+
+---
+info:
+  app:
+    name: '@info.app.name@'
+    version: '@info.app.version@'
+    grailsVersion: '@info.app.grailsVersion@'
+
+management:
+  endpoints:
+    enabled-by-default: true
+    web:
+      exposure:
+        include: '*'
+
+management.info.env.enabled: true
+management.endpoint.health.show-details: always
+
+---
+
+# enable multiple views resolvers by removing suffix and restricting viewNames so it flows through to hbs or mustache
+spring.thymeleaf.view-names: "*.html"
+spring.thymeleaf.suffix: ""
+spring.thymeleaf.template-resolver-order: 0
+
+# uncomment starter in build.gradle to activate
+handlebars.enabled: true
+handlebars.failOnMissingFile: false
+# handlebars.template-resolver-order: 1
+#handlebars.prefix: classpath:templates/
+#handlebars.suffix: .hbs
+#handlebars.cache: false
+
+
+---
+
+grails.controllers.defaultScope: singleton
+
+hibernate:
+  format_sql: false
+  show_sql: false
+  schema_management_tool: 'yakworks.hibernate.schema.SimpleSchemaManagementTool'
+  naming_strategy: 'org.hibernate.cfg.DefaultNamingStrategy'
+  dialect: 'yakworks.hibernate.h2.ExtendedH2Dialect'
+  cache:
+    queries: false
+    use_second_level_cache: false
+    use_query_cache: false
+  jdbc:
+    time_zone: 'UTC'
+#  enhancer:
+#    enableLazyInitialization: true
+#    enableAssociationManagement: true
+
+dataSource:
+  type: com.zaxxer.hikari.HikariDataSource
+  pooled: true
+  driverClassName: org.h2.Driver
+  username: sa
+  password:
+  dbCreate: create-drop
+  url: jdbc:h2:mem:testDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE

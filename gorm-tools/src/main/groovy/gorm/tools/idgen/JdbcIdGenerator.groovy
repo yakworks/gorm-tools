@@ -13,9 +13,9 @@ import org.springframework.jdbc.BadSqlGrammarException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.annotation.Propagation
 
-import gorm.tools.config.IdGeneratorConfig
 import grails.gorm.transactions.Transactional
 import yakworks.commons.lang.Validate
+import yakworks.gorm.config.IdGeneratorConfig
 
 //import grails.gorm.transactions.Transactional
 /**

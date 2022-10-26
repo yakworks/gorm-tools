@@ -1,55 +1,51 @@
 apply plugin:"war"
 apply plugin:"org.grails.grails-web"
-apply plugin:"org.grails.plugins.views-json"
-apply from: "${rootProject.projectDir}/gradle/test-integration.gradle"
+// apply plugin:"org.grails.plugins.views-json"
+
+apply from: "${rootDir}/gradle/compile.gradle"
+apply from: "${rootDir}/gradle/hibernate.gradle"
+apply from: "${rootDir}/gradle/test-unit.gradle"
+apply from: "${rootDir}/gradle/test-integration.gradle"
 
 dependencies {
   console "org.grails:grails-console"
   profile "org.grails.profiles:rest-api"
 
-  implementation "org.grails:grails-plugin-i18n"
-  implementation "org.grails:grails-plugin-rest"
-  implementation "org.grails:grails-plugin-url-mappings"
-  implementation "org.grails:grails-plugin-codecs"
-  implementation "org.grails:grails-plugin-interceptors"
+  // implementation "org.springframework.boot:spring-boot-starter-logging"
+  // implementation "org.springframework.boot:spring-boot-starter-validation"
+  implementation "org.springframework.boot:spring-boot-autoconfigure"
+  implementation "org.springframework.boot:spring-boot-starter-actuator"
+  implementation "org.springframework.boot:spring-boot-starter-tomcat"
+
+  implementation "org.grails:grails-core"
   implementation "org.grails:grails-web-boot"
-  implementation "org.grails:grails-web-url-mappings"
-  implementation "org.grails.plugins:async"
-
-  implementation "org.grails.plugins:views-json:$vViews"
-  implementation "org.grails.plugins:views-json-templates:$vViews"
-
-  implementation "org.grails.plugins:hibernate5:$vGormHibernate"
-  implementation "org.hibernate:hibernate-core:$vHibernate"
-  implementation "org.hibernate:hibernate-ehcache:$vHibernate"
+  implementation "org.grails:grails-logging"
+  implementation "org.grails:grails-plugin-rest"
+  // implementation "org.grails:grails-plugin-databinding"
+  // implementation "org.grails:grails-plugin-i18n"
+  // implementation "org.grails:grails-plugin-services"
+  implementation "org.grails:grails-plugin-url-mappings"
+  // implementation "org.grails:grails-plugin-interceptors"
+  // implementation "org.grails.plugins:cache"
+  // implementation "org.grails.plugins:async"
+  // implementation "org.grails.plugins:scaffolding"
+  // implementation "org.grails.plugins:events"
 
   implementation project(":testify")
-  implementation project(":gorm-security")
   implementation project(":gorm-rest")
 
-  //??wtf
-  implementation "commons-lang:commons-lang:2.6"
-
-  // REST security dependencies
-  implementation "org.grails.plugins:spring-security-rest:$vSpringSecurityRest"
-  // implementation "org.grails.plugins:spring-security-rest-grailscache:$vSpringSecurityRest"
-  // implementation "org.grails.plugins:spring-security-rest-gorm:$vSpringSecurityRest"
-
-  // ** for the openApi parsing, doesnt come through for some reason **
-  // runtime "io.swagger.parser.v3:swagger-parser:$vSwagger"
-  // runtime "io.swagger.parser.v3:swagger-parser-v3:$vSwagger"
-
-  // dk.glasius not working, load twice
-  // runtimeOnly "dk.glasius:external-config:$vExternalConfig"
-
   runtimeOnly "com.h2database:h2:$vH2"
-  runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"
   runtimeOnly "com.zaxxer:HikariCP:$vHikari"
+  runtimeOnly "org.glassfish.web:el-impl:2.2.1-b05"
+  runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"
 
   //for rest api testing
   testImplementation "com.squareup.okhttp3:okhttp:$vOkhttp"
   //okhttp3 needs this
   testImplementation "org.jetbrains.kotlin:kotlin-stdlib:$vKotlin"
+  testImplementation project(":gorm-test-support") //this might seem circular but it can be added to itself as it dif config
+  testImplementation "org.grails:grails-web-testing-support:$vGrailsTesting"
+
 }
 
 bootRun {

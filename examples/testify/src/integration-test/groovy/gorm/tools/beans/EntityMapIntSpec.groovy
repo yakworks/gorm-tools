@@ -61,7 +61,7 @@ class EntityMapIntSpec extends Specification implements DataIntegrationTest, Sec
         def emap = metaMapService.createMetaMap(user, ['username', 'secRoles.id', 'secRoles.code'])
 
         then:
-        emap['secRoles'] == [ [id:1, code:'ADMIN'] , [id:2, code:'POWER_USER']]
+        emap['secRoles'] == [ [id:1, code:'ADMIN'] , [id:3, code:'MANAGER']]
 
     }
 

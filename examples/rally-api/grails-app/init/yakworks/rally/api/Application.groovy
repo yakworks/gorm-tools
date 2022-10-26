@@ -4,28 +4,25 @@
 */
 package yakworks.rally.api
 
-import javax.sql.DataSource
-
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration
-import org.springframework.boot.autoconfigure.hazelcast.HazelcastAutoConfiguration
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
-import org.springframework.boot.jdbc.DataSourceBuilder
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.Import
 
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
 import yakworks.openapi.gorm.OpenApiGenerator
+import yakworks.rally.RallyConfiguration
 import yakworks.rest.gorm.RestApiFromConfig
 import yakworks.rest.grails.AppInfoBuilder
 
 // the component scan here does not seem to be the same as the packageNames and is needed to pick up the
 // the services marked with @Component
-@ComponentScan(['yakworks.security', 'yakworks.rally', 'yakworks.testing.gorm.model'])
+@Import([RallyApiConfiguration])
+@ComponentScan(['yakworks.testing.gorm.model'])
 @RestApiFromConfig
 // caching will use hazelcast for spring caching too, look into how to use caffiene for spring stuff and hazel for hibernate.
 @EnableCaching
@@ -34,6 +31,12 @@ import yakworks.rest.grails.AppInfoBuilder
 // @EnableAutoConfiguration(exclude = [HazelcastAutoConfiguration]) // in order to avoid autoconfiguring an extra Hazelcast instance
 @CompileStatic
 class Application extends GrailsAutoConfiguration {
+
+    /** add packages here where the @Entity classes are */
+    @Override
+    Collection<String> packageNames() {
+        super.packageNames() + RallyConfiguration.entityScanPackages + ['yakworks.testing.gorm.model']
+    }
 
     static void main(String[] args) {
         GrailsApp.run(Application, args)
@@ -65,43 +68,24 @@ class Application extends GrailsAutoConfiguration {
     @Override
     protected boolean limitScanningToApplication() { false }
 
-    /**
-     * add packages here where the other grails artifacts exist such as domains marked with @Entity
-     */
-    @Override
-    Collection<String> packageNames() {
-        super.packageNames() + ['yakworks.rally', 'yakworks.security', 'yakworks.testing.gorm.model']
-    }
-
-    @Bean
-    AppInfoBuilder appInfoBuilder() {
-        return new AppInfoBuilder()
-    }
-
     @SuppressWarnings('Indentation')
     @Override
     @CompileDynamic
     Closure doWithSpring() {{ ->
-        appInfoBuilder(AppInfoBuilder)
 
-        // openApiGenerator(OpenApiGenerator) { bean ->
-        //     bean.lazyInit = true
+        //this needs to be here for now until we figure out the config thing
+        // openApiGenerator(OpenApiGenerator){
         //     apiSrc = 'api-docs/openapi'
         //     apiBuild = 'api-docs/dist/openapi'
         //     namespaceList = ['rally']
         // }
-        openApiGenerator(OpenApiGenerator) { bean ->
-            bean.lazyInit = true
-            apiSrc = 'api-docs/openapi'
-            apiBuild = 'api-docs/dist/openapi'
-            namespaceList = ['rally']
-        }
 
         //hack to make sure hazel get setup before the one that is setup for hibernates L2 cache as that one
         //is configured to join the name of one already setup in spring.
         def hibernateDatastoreBeanDef = getBeanDefinition('hibernateDatastore')
+        // def hazelBeanDef = getBeanDefinition('hazelcastInstance')
         if (hibernateDatastoreBeanDef) {
-            // make it depend on my bean
+            // make it depend on hazelcast bean
             hibernateDatastoreBeanDef.dependsOn = ['hazelcastInstance'] as String[]
         }
 

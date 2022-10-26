@@ -16,7 +16,7 @@ import org.springframework.validation.AbstractBindingResult
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 
-import yakworks.commons.lang.Pogo
+import yakworks.commons.beans.BeanTools
 import yakworks.message.MsgArgs
 import yakworks.message.MsgKey
 import yakworks.message.MsgMultiKey
@@ -60,7 +60,7 @@ class Rejector {
     }
 
     void withError(String propName, List<String> codes, Map args = [:], String fallbackMessage = ''){
-        withError(propName, Pogo.value(target, propName), codes, args, fallbackMessage)
+        withError(propName, BeanTools.value(target, propName), codes, args, fallbackMessage)
     }
 
     void withError(String propName, String code, Map args = [:], String fallbackMessage = ''){
@@ -68,7 +68,7 @@ class Rejector {
     }
 
     void withError(String propName, ValidationCode valCode, Map args = [:], String fallbackMessage = ''){
-        withError(propName, Pogo.value(target, propName), [valCode.jakartaCode, valCode.name()], args, fallbackMessage)
+        withError(propName, BeanTools.value(target, propName), [valCode.jakartaCode, valCode.name()], args, fallbackMessage)
     }
 
     void withError(String propName, Object val, String code, Map args = [:], String fallbackMessage = ''){

@@ -5,16 +5,32 @@
 package yakworks.rally.api
 
 import yakworks.rally.testing.RallySeedData
+import yakworks.security.gorm.model.AppUser
+import yakworks.security.gorm.testing.SecuritySeedData
 
 class BootStrap {
 
     def init = { servletContext ->
+
         RallySeedData.init()
         RallySeedData.fullMonty()
+        addOktaUser()
+    }
+
+    //add the developers@9ci.com so saml works
+    void addOktaUser(){
+        //add one that maps to our Okta dev
+        AppUser.withTransaction {
+            AppUser.repo.flush()
+            AppUser admin = new AppUser([
+                id: (Long)6, username: "developers@9ci.com", email: "developers@9ci.com", orgId: 2
+            ]).persist()
+            admin.addRole('ADMIN', true)
+            admin.addRole('MANAGER', true)
+        }
     }
 
     def destroy = {
     }
-
 
 }

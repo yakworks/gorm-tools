@@ -1,0 +1,20 @@
+# Use Httyak plugin https://github.com/AnWeber/vscode-httpyac
+@host = http://localhost:8080
+# @base_url = {{host}}/api
+@base_url = {{host}}/actuator
+@contentType = application/json
+@Authorization=Bearer {{login.access_token}}
+# @Authorization=token 1234
+
+
+### Actuator
+# @ref login
+GET {{base_url}}
+
+### Health
+# @ref login
+GET {{base_url}}/health
+
+### Beans
+# @ref login
+GET {{base_url}}/beans

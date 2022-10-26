@@ -19,6 +19,7 @@ import org.codehaus.groovy.transform.GroovyASTTransformation
 import org.grails.config.CodeGenConfig
 
 import yakworks.commons.util.BuildSupport
+import yakworks.gorm.api.ApiUtils
 import yakworks.rest.gorm.controller.RestRepoApiController
 
 //import grails.rest.Resource
@@ -49,7 +50,18 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
         if (projectDir) projectDir = "${projectDir}/"
         // println "projectDir ${projectDir}"
         def config = new CodeGenConfig()
-        config.loadYml(new File("${projectDir}grails-app/conf/restapi-config.yml"))
+        // def crfRes = new ClassPathResource("restapi-config.yml", getClass().classLoader)
+        // getClass().getResource('/restapi-config.yml').withInputStream {InputStream input ->
+        //     config.loadYml(input)
+        // }
+        def apiFile = new File("${projectDir}grails-app/conf/restapi-config.yml")
+        if(apiFile.exists()) {
+            config.loadYml(apiFile)
+        } else {
+            //try regular resources
+            apiFile = new File("${projectDir}src/main/resources/restapi-config.yml")
+            config.loadYml(apiFile)
+        }
 
         Map restApi = config.getProperty('api', Map) as Map<String, Map>
         String defaultPackage = restApi.defaultPackage as String
@@ -97,7 +109,7 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
             //traitNode = ClassHelper.make(RepoController)
         }
 
-        Map pathParts = RestApiAstUtils.splitPath(resourceName, ctrlConfig)
+        Map pathParts = ApiUtils.splitPath(resourceName)
         String endpoint = pathParts.name
         String namespace = pathParts.namespace
         //println "endpoint: $endpoint namespace: $namespace"

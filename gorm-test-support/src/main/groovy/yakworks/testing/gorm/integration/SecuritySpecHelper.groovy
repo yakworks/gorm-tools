@@ -19,7 +19,7 @@ import yakworks.security.spring.user.SpringUser
 import yakworks.security.user.CurrentUser
 
 /**
- * Integration support for the gorm-security plugin.
+ * Integration support for the bootsecurity plugin.
  *
  */
 @CompileDynamic
@@ -44,7 +44,8 @@ trait SecuritySpecHelper implements WithTrx{
             rolesToUse = roles.toList()
         }
         SpringUser secUser = SpringUser.of(user, rolesToUse)
-        SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(secUser, user.passwordHash, secUser.authorities)
+        secService.authenticate(secUser)
+        // SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(secUser, user.passwordHash, secUser.authorities)
     }
 
  }

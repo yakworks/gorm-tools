@@ -20,9 +20,7 @@ import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.rally.tag.model.Tag
 import yakworks.security.gorm.model.AppUser
-import yakworks.security.gorm.model.SecRole
-import yakworks.security.gorm.model.SecRolePermission
-import yakworks.security.gorm.model.SecRoleUser
+import yakworks.security.gorm.testing.SecuritySeedData
 import yakworks.spring.AppCtx
 
 @SuppressWarnings('BuilderMethodWithSideEffects')
@@ -41,7 +39,7 @@ class RallySeedData {
     }
 
     static fullMonty(int count = 100){
-        buildAppUser()
+        buildAppUsers()
         createOrgTypeSetups()
         buildClientOrg()
         buildOrgs(count)
@@ -158,59 +156,60 @@ class RallySeedData {
         }
     }
 
-    static void buildAppUser(){
+    static void buildAppUsers(){
         AppUser.withTransaction {
-            AppUser user = new AppUser(id: 1, username: "admin", email: "admin@9ci.com", password:"123Foo", orgId: 2)
-            user.persist()
-            assert user.id == 1
-
-            AppUser custUser = new AppUser(id: 2, username: "cust", email: "cust@9ci.com", password:"123Foo", orgId: 2)
-            custUser.persist()
-            assert custUser.id == 2
-
-            SecRole admin = new SecRole(id:1, code: SecRole.ADMIN).persist()
-            adminPermissions(admin)
-            SecRole power = new SecRole(id:2, code: "POWER_USER").persist()
-            SecRole custRole = new SecRole(id:3, code: "CUSTOMER").persist()
-            custPermissions(custRole)
-
-            SecRoleUser.create(user, admin, true)
-            SecRoleUser.create(user, power, true)
-            SecRoleUser.create(custUser, custRole, true)
-
-            AppUser noRoleUser = AppUser.create([id: 3, username: "noroles", email: "noroles@9ci.com", password:"123Foo", orgId: 3], bindId: true)
-            assert noRoleUser.id == 3
-            return
+            SecuritySeedData.fullMonty()
+            // AppUser user = new AppUser(id: 1, username: "admin", email: "admin@9ci.com", password:"123Foo", orgId: 2)
+            // user.persist()
+            // assert user.id == 1
+            //
+            // AppUser custUser = new AppUser(id: 2, username: "cust", email: "cust@9ci.com", password:"123Foo", orgId: 2)
+            // custUser.persist()
+            // assert custUser.id == 2
+            //
+            // SecRole admin = new SecRole(id:1, code: SecRole.ADMIN).persist()
+            // adminPermissions(admin)
+            // SecRole power = new SecRole(id:2, code: "MANAGER").persist()
+            // SecRole custRole = new SecRole(id:3, code: "CUSTOMER").persist()
+            // custPermissions(custRole)
+            //
+            // SecRoleUser.create(user, admin, true)
+            // SecRoleUser.create(user, power, true)
+            // SecRoleUser.create(custUser, custRole, true)
+            //
+            // AppUser noRoleUser = AppUser.create([id: 3, username: "noroles", email: "noroles@9ci.com", password:"123Foo", orgId: 3], bindId: true)
+            // assert noRoleUser.id == 3
+            // return
         }
     }
-
-    static void adminPermissions(SecRole role){
-
-        ['rally:org:*',
-         'rally:activityNote:*',
-         'rally:company:list,get,post',
-         'rally:orgTypeSetup:list,get,post',
-         'rally:syncJob:list,get',
-         'rally:user:*',
-         'rally:role:read',
-         'rally:contact:*',
-         'rally:activity:*',
-         'rally:attachment:*',
-         'rally:tag:*'
-        ].each{
-            SecRolePermission.create(role, it)
-        }
-    }
-
-    static void custPermissions(SecRole role){
-        ['rally:org:list,get,post',
-         // 'rally:contact:*',
-         'rally:activity:list,get',
-         'rally:attachment:*',
-         'rally:tag:list,get'
-        ].each{
-            SecRolePermission.create(role, it)
-        }
-    }
+    //
+    // static void adminPermissions(SecRole role){
+    //
+    //     ['rally:org:*',
+    //      'rally:activityNote:*',
+    //      'rally:company:list,get,post',
+    //      'rally:orgTypeSetup:list,get,post',
+    //      'rally:syncJob:list,get',
+    //      'rally:user:*',
+    //      'rally:role:read',
+    //      'rally:contact:*',
+    //      'rally:activity:*',
+    //      'rally:attachment:*',
+    //      'rally:tag:*'
+    //     ].each{
+    //         SecRolePermission.create(role, it)
+    //     }
+    // }
+    //
+    // static void custPermissions(SecRole role){
+    //     ['rally:org:list,get,post',
+    //      // 'rally:contact:*',
+    //      'rally:activity:list,get',
+    //      'rally:attachment:*',
+    //      'rally:tag:list,get'
+    //     ].each{
+    //         SecRolePermission.create(role, it)
+    //     }
+    // }
 
 }

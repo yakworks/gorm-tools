@@ -23,8 +23,8 @@ class UrlMappings {
         // in another plugin (such as the ones that exists in spring sec and cache) and renders those gsps
         // instead of gson so for rest api its important to use unique names
         // "500"(view: '/error500')
-        "404"(view: '/notFound404')
-        "400"(view: '/badRequest400')
+        // "404"(view: '/notFound404')
+        // "400"(view: '/badRequest400')
     }
 
 }

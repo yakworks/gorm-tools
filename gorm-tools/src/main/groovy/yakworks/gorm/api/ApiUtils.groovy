@@ -7,6 +7,9 @@ package yakworks.gorm.api
 
 import groovy.transform.CompileStatic
 
+/**
+ * Helper statics for the API functions.
+ */
 @SuppressWarnings(['Println', 'ParameterCount'])
 @CompileStatic
 class ApiUtils {

@@ -14,6 +14,9 @@ import org.springframework.stereotype.Component
 import yakworks.commons.beans.BeanTools
 import yakworks.spring.YamlSpringUtils
 
+/**
+ * Configuration for the api endpoints. Serves as a blueprint for the OpenApi
+ */
 @Component
 @CompileStatic
 class ApiConfig {

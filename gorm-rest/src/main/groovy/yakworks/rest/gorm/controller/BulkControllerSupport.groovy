@@ -4,6 +4,8 @@
 */
 package yakworks.rest.gorm.controller
 
+import gorm.tools.config.AsyncConfig
+
 import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
@@ -47,8 +49,8 @@ class BulkControllerSupport<D> {
     @Autowired(required = false)
     IncludesConfig includesConfig
 
-    @Value('${hibernate.jdbc.batch_size:100}')
-    int batchSize
+    @Autowired
+    AsyncConfig asyncConfig
 
     Class<D> entityClass // the domain class this is for
 
@@ -75,7 +77,7 @@ class BulkControllerSupport<D> {
         List bulkErrorIncludes = includesMap['bulkError'] as List<String>
 
         //don't create job, call simple createOrUpdate list
-        if(!params.boolean('jobEnabled', true) && dataList.size()<batchSize) {
+        if(!params.boolean('jobEnabled', true) && dataList.size()< asyncConfig.sliceSize) {
             SyncJobEntity noJob = getRepo().createOrUpdate(dataList) as SyncJobEntity
             noJob.ok = true
             noJob.state = SyncJobState.Finished

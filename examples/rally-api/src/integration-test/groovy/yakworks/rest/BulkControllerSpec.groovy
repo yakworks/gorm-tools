@@ -77,4 +77,24 @@ class BulkControllerSpec extends RestIntTest {
         job.data != null
     }
 
+    void "bulk with jobEnabled=false"() {
+        given:
+        List<Map> jsonList = [
+            [num: "x00f1", name: "Foox1", type: "Customer"],
+            [num: "x00f2", name: "Foox2", type: "Customer"],
+            [num: "x00f3", name: "Foox3", type: "Customer"],
+        ]
+
+        when:
+        request.json = jsonList
+        request.method = "POST"
+
+        request.requestURI = '/api/rally/org/bulk'
+        controller.params.jobEnabled = "false"
+        controller.bulkCreate()
+        Map body = response.bodyToMap()
+
+        then:
+        body.ok
+    }
 }

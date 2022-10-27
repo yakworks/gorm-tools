@@ -76,20 +76,21 @@ class BulkControllerSupport<D> {
         List bulkIncludes = IncludesConfig.getFieldIncludes(includesMap, [IncludesKey.bulk.name()])
         List bulkErrorIncludes = includesMap['bulkError'] as List<String>
 
-        //don't create job, call simple createOrUpdate list
-        if(!params.boolean('jobEnabled', true) && dataList.size()< asyncConfig.sliceSize) {
-            SyncJobEntity noJob = getRepo().createOrUpdate(dataList) as SyncJobEntity
-            noJob.ok = true
-            noJob.state = SyncJobState.Finished
-            return noJob
-        }
-
         SyncJobArgs syncJobArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludes, errorIncludes: bulkErrorIncludes,
             sourceId: sourceKey, source: params.jobSource, params: params)
         //Can override payload storage or turn off with 'NONE' if not needed for big loads
         syncJobArgs.promiseEnabled = params.boolean('promiseEnabled', false)
         syncJobArgs.savePayload = params.boolean('savePayload', true)
         syncJobArgs.saveDataAsFile = params.boolean('saveDataAsFile')
+
+        //don't create job, call simple createOrUpdate list
+        if(!params.boolean('jobEnabled', true) && dataList.size()< asyncConfig.sliceSize) {
+            SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
+            SyncJobEntity noJob = getRepo().doBulk(dataList, jobContext ) as SyncJobEntity
+            noJob.ok = true
+            noJob.state = SyncJobState.Finished
+            return noJob
+        }
 
         Long jobId
         if(syncJobArgs.params.attachmentId) {

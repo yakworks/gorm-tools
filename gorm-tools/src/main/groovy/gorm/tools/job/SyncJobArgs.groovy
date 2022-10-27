@@ -140,6 +140,7 @@ class SyncJobArgs {
      */
     Map persistArgs
 
+    /** returns new PersistArgs instance on each call */
     PersistArgs getPersistArgs() { return this.persistArgs ? PersistArgs.of(this.persistArgs) : new PersistArgs() }
 
     /**
@@ -152,6 +153,11 @@ class SyncJobArgs {
      * Used by event listeners to filter and process selectively
      */
     Class entityClass
+
+    /** helper to return true if op=DataOp.add */
+    boolean isCreate(){
+        op == DataOp.add
+    }
 
     static SyncJobArgs of(DataOp dataOp){
         new SyncJobArgs(op: dataOp)

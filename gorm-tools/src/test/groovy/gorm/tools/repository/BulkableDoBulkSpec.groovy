@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
-import gorm.tools.job.SyncJobState
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.model.DataOp
 import spock.lang.Specification
@@ -18,7 +17,10 @@ import yakworks.testing.gorm.model.SinkExt
 import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.unit.GormHibernateTest
 
-class DoBulkSpec extends Specification implements GormHibernateTest {
+/**
+ * Tests for doBulk
+ */
+class BulkableDoBulkSpec extends Specification implements GormHibernateTest {
     static entityClasses = [KitchenSink, SinkItem, SinkExt, TestSyncJob]
     // static springBeans = [syncJobService: TestSyncJobService]
 
@@ -35,8 +37,7 @@ class DoBulkSpec extends Specification implements GormHibernateTest {
         def syncArgs = setupSyncJobArgs()
 
         when: "doBulk insert records"
-        def jobContext = new SyncJobContext(args: syncArgs, payload: list )
-        ApiResults res = kitchenSinkRepo.doBulk(list, jobContext)
+        ApiResults res = kitchenSinkRepo.doBulk(list, syncArgs)
 
         then: "verify"
         res.ok //all ok
@@ -77,8 +78,7 @@ class DoBulkSpec extends Specification implements GormHibernateTest {
         def syncArgs = setupSyncJobArgs(DataOp.update)
 
         when: "doBulk update records"
-        def jobContext = new SyncJobContext(args: syncArgs, payload: updateList )
-        ApiResults res = kitchenSinkRepo.doBulk(updateList, jobContext)
+        ApiResults res = kitchenSinkRepo.doBulk(updateList, syncArgs)
 
         then:
         res.ok
@@ -104,14 +104,13 @@ class DoBulkSpec extends Specification implements GormHibernateTest {
         list[1].name = null
 
         when: "bulk insert"
-        def jobContext = new SyncJobContext(args: syncArgs, payload: list )
-        ApiResults res = kitchenSinkRepo.doBulk(list, jobContext)
+        ApiResults res = kitchenSinkRepo.doBulk(list, syncArgs)
 
         then: "should have thrown exception"
         thrown(ValidationProblem.Exception)
 
         when: "bulk insert with trx per item"
-        res = kitchenSinkRepo.doBulk(list, jobContext, true)
+        res = kitchenSinkRepo.doBulk(list, syncArgs, true)
 
         then: "should have thrown exception"
         !res.ok //all ok

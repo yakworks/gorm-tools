@@ -118,7 +118,7 @@ trait BulkableRepo<D> {
             ApiResults results
             try {
                 withTrx {
-                    results = doBulk((List<Map>) dataSlice, jobContext)
+                    results = doBulk((List<Map>) dataSlice, jobContext.args)
                 }
                 if(results?.ok) updateJobResults(jobContext, results, startTime)
                 // ((List<Map>) dataSlice)*.clear() //clear out so mem can be garbage collected
@@ -137,7 +137,7 @@ trait BulkableRepo<D> {
             parallelTools.each(asynArgsNoTrx, sliceErrors) { dataSlice ->
                 try {
                     Long startTime = System.currentTimeMillis()
-                    ApiResults results = doBulk((List<Map>) dataSlice, jobContext, true)
+                    ApiResults results = doBulk((List<Map>) dataSlice, jobContext.args, true)
                     updateJobResults(jobContext, results, startTime)
                     // ((List<Map>) dataSlice)*.clear() //clear out so mem can be garbage collected
                 } catch(Exception ex) {
@@ -163,7 +163,7 @@ trait BulkableRepo<D> {
      *        also, if true then this method will try not to throw an exception and
      *        it will collect the errors in the results.
      */
-    ApiResults doBulk(List<Map> dataList, SyncJobContext jobContext, boolean transactionPerItem = false){
+    ApiResults doBulk(List<Map> dataList, SyncJobArgs syncJobArgs, boolean transactionPerItem = false){
         // println "will do ${dataList.size()}"
         ApiResults results = ApiResults.create(false)
         for (Map item : dataList) {
@@ -179,15 +179,12 @@ trait BulkableRepo<D> {
                 } else {
                     itemData = Maps.clone(item)
                 }
-                boolean isCreate = jobContext.args.op == DataOp.add
-                //make sure args has its own copy as GormRepo add data to it and makes changes
-                PersistArgs args = jobContext.args.getPersistArgs()
-                Map entityMapData = createOrUpdate(jobContext, isCreate, transactionPerItem, itemData, args)
-                results << Result.OK().payload(entityMapData).status(isCreate ? 201 : 200)
+                Map entityMapData = createOrUpdate(itemData, syncJobArgs, transactionPerItem)
+                results << Result.OK().payload(entityMapData).status(syncJobArgs.isCreate() ? 201 : 200)
             } catch(Exception e) {
                 // if trx by item then collect the exceptions, otherwise throw so it can rollback
                 if(transactionPerItem){
-                    results << problemHandler.handleException(e).payload(buildErrorMap(item, jobContext))
+                    results << problemHandler.handleException(e).payload(buildErrorMap(item, syncJobArgs.errorIncludes))
                 } else {
                     clear() //clear cache on error since wont hit below
                     throw e
@@ -203,32 +200,34 @@ trait BulkableRepo<D> {
         return results
     }
 
-
     /**
-     * create or update
+     * create or update based on syncJobArgs.op
      *
-     * @return the data map after bing run through createMetaMap using the inncludes in the jobContext
+     * @param data the data
+     * @param syncJobArgs - persistArgs and isCreate will be pulled from here
+     * @param transactional true if should be wraped in withTrx
+     * @return the data map after bing run through createMetaMap using the includes in the syncJobArgs
      */
-    Map createOrUpdate(SyncJobContext jobContext, boolean isCreate, boolean transactional, Map data, PersistArgs persistArgs) {
+    Map createOrUpdate(Map data, SyncJobArgs syncJobArgs, boolean transactional) {
         def closure = {
-            D entityInstance = isCreate ? doCreate(data, persistArgs) : doUpdate(data, persistArgs)
-            return buildSuccessMap(entityInstance, jobContext)
+            D entityInstance = syncJobArgs.isCreate() ? doCreate(data, syncJobArgs.persistArgs) : doUpdate(data, syncJobArgs.persistArgs)
+            return buildSuccessMap(entityInstance, syncJobArgs.includes)
         } as Closure<Map>
 
         return transactional ? withTrx(closure) : closure()
     }
 
-    //XXX missing tests
-    //creates response map based on bulk include list
-    Map buildSuccessMap(D entityInstance, SyncJobContext jobContext) {
-        return createMetaMap(entityInstance, jobContext)
+    /** creates response map based on bulk include list */
+    Map buildSuccessMap(D entityInstance, List<String> includes) {
+        return createMetaMap(entityInstance, includes)
     }
 
-    //XXX missing tests
-    //The fields to return when bulk fails for the entity, by default, return entire incoming map back.
-    Map buildErrorMap(Map originalData, SyncJobContext jobContext) {
-        if(jobContext.args.errorIncludes) {
-            return originalData.subMap(jobContext.args.errorIncludes)
+    /**
+     * The fields to return when bulk fails for the entity, by default, return entire incoming map back.
+     */
+    Map buildErrorMap(Map originalData, List<String> errorIncludes) {
+        if(errorIncludes) {
+            return originalData.subMap(errorIncludes)
         } else {
             return originalData
         }
@@ -238,8 +237,8 @@ trait BulkableRepo<D> {
      * uses metaMapService to create the map for the includes in the jobContext.args
      * Will return a clone to ensure that all properties are called and its a clean, unwrapped map
      */
-    Map createMetaMap(D entityInstance, SyncJobContext jobContext){
-        MetaMap entityMapData = metaMapService.createMetaMap(entityInstance, jobContext.args.includes)
+    Map createMetaMap(D entityInstance, List<String> includes){
+        MetaMap entityMapData = metaMapService.createMetaMap(entityInstance, includes)
         return (Map)entityMapData.clone()
     }
 

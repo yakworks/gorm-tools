@@ -165,6 +165,25 @@ static entityClasses = [Cust, CustExt, TestTrxRollback, KitchenSink, SinkExt, Si
         e.message.contains("Field error in object 'testing.Cust' on field 'type': rejected value [null]")
     }
 
+    void "test createOrUpdateItem"() {
+        when: "data has no identifier"
+        def ks = KitchenSink.repo.createOrUpdateItem([num: 1, name: "foo"])
+        flushAndClear()
+
+        then:
+        KitchenSink.get(ks.id)
+
+        when: "data has identifier"
+        flushAndClear()
+        def ksu = KitchenSink.repo.createOrUpdateItem([id: ks.id, name: "foo2"])
+        flushAndClear()
+
+        def updated = KitchenSink.get(ksu.id)
+
+        then:
+        updated.name == "foo2"
+    }
+
     def "test persist"() {
         when:
         Cust org = build(Cust, save: false)

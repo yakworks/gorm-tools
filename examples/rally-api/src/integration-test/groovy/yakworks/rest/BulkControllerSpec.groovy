@@ -1,5 +1,6 @@
 package yakworks.rest
 
+import grails.gorm.transactions.Rollback
 import yakworks.rest.gorm.controller.RestRepoApiController
 import grails.testing.mixin.integration.Integration
 import org.apache.commons.lang3.StringUtils
@@ -77,6 +78,7 @@ class BulkControllerSpec extends RestIntTest {
         job.data != null
     }
 
+    @Rollback
     void "bulk with jobEnabled=false"() {
         given:
         List<Map> jsonList = [

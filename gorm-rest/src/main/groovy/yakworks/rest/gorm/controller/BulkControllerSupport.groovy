@@ -5,6 +5,7 @@
 package yakworks.rest.gorm.controller
 
 import gorm.tools.config.AsyncConfig
+import yakworks.api.ApiResults
 
 import javax.servlet.http.HttpServletRequest
 
@@ -85,11 +86,7 @@ class BulkControllerSupport<D> {
 
         //don't create job, call simple createOrUpdate list
         if(!params.boolean('jobEnabled', true) && dataList.size()< asyncConfig.sliceSize) {
-            SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
-            SyncJobEntity noJob = getRepo().doBulk(dataList, jobContext ) as SyncJobEntity
-            noJob.ok = true
-            noJob.state = SyncJobState.Finished
-            return noJob
+            return doBulkWithNoJob(dataList, syncJobArgs )
         }
 
         Long jobId
@@ -101,6 +98,17 @@ class BulkControllerSupport<D> {
 
         SyncJobEntity job = syncJobService.getJob(jobId)
         return job
+    }
+
+    /** use doBulk to cerate dataList, don;t create SyncJob, just return plain SyncJobEntity */
+    SyncJobEntity doBulkWithNoJob(List<Map> dataList, SyncJobArgs syncJobArgs ) {
+        SyncJobContext jobContext = new SyncJobContext(args: syncJobArgs, payload: dataList)
+        ApiResults results = getRepo().doBulk(dataList, jobContext )
+        //XXX fails on missing id column, should we get it from list.payload.id ?
+        SyncJobEntity noJob =  results as SyncJobEntity // how to get SyncJobEntity from ApiResults
+        noJob.ok = results.ok
+        noJob.state = SyncJobState.Finished
+        return noJob
     }
 
     /**

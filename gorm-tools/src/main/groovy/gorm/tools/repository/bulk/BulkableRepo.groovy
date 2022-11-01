@@ -259,4 +259,3 @@ trait BulkableRepo<D> {
     }
 
 }
-

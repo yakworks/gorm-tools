@@ -302,7 +302,7 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     // ***** Unsupported some gormRepo methods should not be called with an XRef tables so blow errors for these
 
     @Override
-    X createOrUpdate(Map data){
+    X createOrUpdateItem(Map data, PersistArgs args){
         throw new UnsupportedOperationException("Method createOrUpdate is not supported by this implementation")
     }
 

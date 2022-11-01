@@ -29,6 +29,10 @@ import yakworks.json.groovy.JsonStreaming
 import yakworks.message.spi.MsgService
 import yakworks.spring.AppCtx
 
+/**
+ * Holds the state for a Bulk job.
+ * Used to update the job status and final results as it progresses.
+ */
 @SuppressWarnings('Println')
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @MapConstructor

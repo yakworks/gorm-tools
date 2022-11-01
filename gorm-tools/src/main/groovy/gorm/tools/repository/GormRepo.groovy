@@ -368,28 +368,6 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
     }
 
     /**
-     * creates, removes or updates the entity based on DataOp
-     * if data has an id then its considered an update
-     * if data has an id and data.op == remove then it will delete it, see DataOp enum
-     * otherwise create it
-     * XXX needs tests
-     */
-    //FIXME #339 if dont like this method and think it should be baked.
-    // this does nothing special for create so it really just for the update and deletes
-    // if we want to support multiple ways to do look ups, for code for example, then this wont work
-    // we can put the special look up logic in the main update maybe.
-    D createOrUpdate(Map data, PersistArgs args = PersistArgs.defaults()) {
-        if (!data) return
-        D instance = findWithData(data, false)
-        if (instance) {
-            instance = update(data, args)
-        } else {
-            instance = create(data, args)
-        }
-        return instance
-    }
-
-    /**
      * gets and verifies that the entity can be retrieved and version matches throwing error if not.
      *
      * @param id required, the id to get
@@ -523,25 +501,48 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * @return the list of created entities
      */
     List persistToManyData(D entity, GormRepo assocRepo, List<Map> assocList, String belongsToProp = null){
+        if(!assocList) return
         if(belongsToProp) assocList.each { it[belongsToProp] = entity}
         assocRepo.createOrUpdate(assocList)
     }
 
     /**
-     * Creates or updates a list of items
-     * Will rollback on any error
+     * Creates or updates a list of items.
+     * Use for small datasets, use bulk operations for larger datasets.
+     * iterates and just calls createOrUpdateItem, no special handling for data.op
+     * NOT Transactional, so should be wrapped in a trx to function properly.
+     * Will throw exception on any error.
      *
      * @param dataList the list of data maps to create/update
-     * @return the list of created entities
+     * @return the list of created or updated entities
      */
     List<D> createOrUpdate(List<Map> dataList){
         List resultList = [] as List<D>
 
         dataList.each { Map item ->
-            resultList << createOrUpdate(item)
+            resultList << createOrUpdateItem(item)
         }
 
         return resultList
+    }
+
+    /**
+     * Simple helper to updating from data.
+     * Uses findWithData and if instance is found then considers it an update.
+     * If not found then considers it a create.
+     * DOES NOT do anything with data.op operations.
+     * NOT transactional so should be wrapped in a transaction.
+     */
+    D createOrUpdateItem(Map data, PersistArgs args = PersistArgs.defaults()) {
+        if (!data) return
+        D instance = findWithData(data, false)
+        if (instance) {
+            //dont call update or doUpdate as it will do findWithData again.
+            bindAndUpdate(instance, data, args)
+        } else {
+            instance = doCreate(data, args)
+        }
+        return instance
     }
 
     /** gets the datastore for this Gorm domain instance */

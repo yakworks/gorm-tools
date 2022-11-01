@@ -93,8 +93,8 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
     @Override
     void doAfterPersistWithData(Org org, PersistArgs args) {
         Map data = args.data
-        if(data.locations) persistManyList(org, Location.repo, data.locations as List<Map>)
-        if(data.contacts) persistManyList(org, Contact.repo, data.contacts as List<Map>)
+        if(data.locations) persistToManyWithOrgId(org, Location.repo, data.locations as List<Map>)
+        if(data.contacts) persistToManyWithOrgId(org, Contact.repo, data.contacts as List<Map>)
         if(data.tags) orgTagRepo.addOrRemove((Persistable)org, data.tags)
     }
 
@@ -105,7 +105,12 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         if(GormMetaUtils.isNewOrDirty(org.contact)) org.contact.persist()
     }
 
-    void persistManyList(Org org, GormRepo assocRepo, List<Map> assocList){
+    /**
+     * replaced persistToManyData to set the orgId instead of org.
+     * persistToManyData sets the entity and we need to set the orgId instead.
+     * so this replaces that functionality
+     */
+    void persistToManyWithOrgId(Org org, GormRepo assocRepo, List<Map> assocList){
         if(!assocList) return
         assocList.each { it['orgId'] = org.getId()}
         assocRepo.createOrUpdate(assocList)
@@ -167,7 +172,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         //make sure it has the right settings
         data.isPrimary = true
         data.orgId = org.getId()
-        org.contact = contactRepo.createOrUpdate(data)
+        org.contact = contactRepo.createOrUpdateItem(data)
         return org.contact
     }
 
@@ -176,7 +181,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         //make sure params has org key
         data.orgId = org.getId()
         // if it had an op of remove then will return null and this set primary location to null
-        org.location = locationRepo.createOrUpdate(data)
+        org.location = locationRepo.createOrUpdateItem(data)
         return org.location
     }
 

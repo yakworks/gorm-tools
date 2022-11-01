@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Lazy
 import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -65,7 +66,8 @@ class HelloSecurityConfiguration {
         // Uncomment to enable SAML, will hit the metadata-uri on startup and fail if not found
         // TODO need to find a way to not hit server until its needed instead of on startup
         if(samlProps?.registration?.containsKey('okta')){
-            DefaultSecurityConfiguration.applySamlSecurity(http)
+            http.saml2Login(withDefaults())
+                .saml2Logout(withDefaults());
         }
 
         DefaultSecurityConfiguration.addJsonAuthenticationFilter(http);

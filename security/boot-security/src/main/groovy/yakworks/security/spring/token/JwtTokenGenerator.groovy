@@ -26,6 +26,9 @@ import com.nimbusds.jose.jwk.source.JWKSource
 import com.nimbusds.jose.proc.SecurityContext
 import yakworks.security.spring.JwtProperties
 
+/**
+ * generates a JWT.
+ */
 @CompileStatic
 class JwtTokenGenerator implements TokenGenerator<Jwt> {
 

@@ -9,6 +9,8 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import yakworks.security.SecService;
 import yakworks.security.services.PasswordValidator;
+import yakworks.security.spring.token.CookieAuthSuccessHandler;
+import yakworks.security.spring.token.CookieBearerTokenResolver;
 import yakworks.security.spring.token.JwtTokenGenerator;
 import yakworks.security.spring.token.TokenController;
 import yakworks.security.spring.user.AuthSuccessUserInfoListener;
@@ -28,6 +30,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Role;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -37,6 +40,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.ForwardAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -48,31 +52,19 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class DefaultSecurityConfiguration {
 
     /**
-     * Default securityFilterChain. Helper to set up HttpSecurity builder with default requestMatchers and forms.
-     * NOTE: this is more of an example and a common simple setup for smoke test apps to use.
-     * In your production app you would set this up and replace for its specifc security needs
-     */
-    @Bean
-    @ConditionalOnMissingBean({SecurityFilterChain.class})
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        applyBasicDefaults(http);
-        return http.build();
-    }
-
-    /**
      * Helper to set up HttpSecurity builder with default requestMatchers and forms.
      * NOTE: this is more of an example and common place for smoke test apps to use.
      * In your production app you would set this up for its specifc security needs
      */
     public static void applyBasicDefaults(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((authorize) -> authorize
-            //by default this turns on anonymous access.
-            .requestMatchers("/**").permitAll()
-            //.requestMatchers("/actuator/**", "/resources/**", "/about").permitAll()
-            .anyRequest().authenticated()
-        )
-        .httpBasic(withDefaults())
-        .formLogin(withDefaults());
+                //by default this turns on anonymous access.
+                .requestMatchers("/**").permitAll()
+                //.requestMatchers("/actuator/**", "/resources/**", "/about").permitAll()
+                .anyRequest().authenticated()
+            )
+            .httpBasic(withDefaults())
+            .formLogin(withDefaults());
         // .formLogin( formLoginCustomizer ->
         //     formLoginCustomizer.defaultSuccessUrl("/", true)
         // )
@@ -82,8 +74,13 @@ public class DefaultSecurityConfiguration {
     }
 
     /** Example for simple Saml setup. Its largely dealt with in the configuration. */
-    public static void applySamlSecurity(HttpSecurity http) throws Exception {
-        http.saml2Login(Customizer.withDefaults())
+    public static void applySamlSecurity(HttpSecurity http, AuthenticationSuccessHandler successHandler) throws Exception {
+
+        http.saml2Login(saml2 -> {
+                //saml2.defaultSuccessUrl("/saml", true);
+                //saml2.defaultSuccessUrl("/api/token/callback", true);
+                saml2.successHandler(successHandler);
+            })
             .saml2Logout(Customizer.withDefaults());
     }
 
@@ -116,6 +113,38 @@ public class DefaultSecurityConfiguration {
         // 		.authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
         // 		.accessDeniedHandler(new BearerTokenAccessDeniedHandler())
         // );
+    }
+
+    /**
+     * Default securityFilterChain. Helper to set up HttpSecurity builder with default requestMatchers and forms.
+     * NOTE: this is more of an example and a common simple setup for smoke test apps to use.
+     * In your production app you would set this up and replace for its specifc security needs
+     */
+    @Bean
+    @ConditionalOnMissingBean({SecurityFilterChain.class})
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        applyBasicDefaults(http);
+        return http.build();
+    }
+
+    /**
+     * Success handler that adds cookie for token
+     */
+    @Bean
+    CookieAuthSuccessHandler cookieSuccessHandler(JwtTokenGenerator tokenGenerator){
+        CookieAuthSuccessHandler handler = new CookieAuthSuccessHandler();
+        handler.setTokenGenerator(tokenGenerator);
+        handler.setDefaultTargetUrl("/");
+        // handler.setAlwaysUseDefaultTargetUrl(true);
+        return handler;
+    }
+
+    /**
+     * gets injected into the the BearerTokenAuthenticationFilter. Will look for cookie as well.
+     */
+    @Bean
+    CookieBearerTokenResolver bearerTokenResolver(){
+        return new CookieBearerTokenResolver();
     }
 
     @Bean

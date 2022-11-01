@@ -17,13 +17,19 @@ package yakworks.rally.api
 
 import groovy.transform.CompileStatic
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.annotation.CurrentSecurityContext
+import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.ui.ModelMap
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
+
+import yakworks.security.user.UserInfo
 
 /**
  * Controller for "/spring".
@@ -44,13 +50,18 @@ class IndexController {
 
     @GetMapping("/spring")
     String spring() {
-        "spring/index"
+        "spring/index.html"
     }
 
     @GetMapping("/about")
     @ResponseBody String about(ModelMap model) {
         model.addAttribute('info', 'test info')
-        "about page"
+        "just a string"
+    }
+
+    @RequestMapping("/user-info")
+    @ResponseBody UserInfo userInfo(@CurrentSecurityContext SecurityContext secContext) {
+        return secContext.authentication.details as UserInfo
     }
 
 }

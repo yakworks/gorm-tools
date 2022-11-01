@@ -15,6 +15,8 @@ import org.springframework.security.core.AuthenticatedPrincipal
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
+import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal
+import org.springframework.security.oauth2.core.oidc.StandardClaimAccessor
 
 /**
  * Listener to update `authentication.details` in the Authentication with common UserInfo object.
@@ -63,7 +65,17 @@ class AuthSuccessUserInfoListener {
     void doIdentityProvided(AbstractAuthenticationToken authentication, Object principal){
         //if its an instance of AuthenticatedPrincipal then use it
         String username
-        if (principal instanceof AuthenticatedPrincipal) {
+        //for OIDC
+        if(principal instanceof StandardClaimAccessor){
+            //if its OIDC then use email
+            username = principal.email
+        }
+        //Works with github OAuth
+        else if (principal instanceof OAuth2AuthenticatedPrincipal){
+            username = principal.getAttribute('login')
+        }
+        //SAML ends up here
+        else if (principal instanceof AuthenticatedPrincipal) {
             username = principal.name
         }
         else { //could be JWT so use the name in the authentication to do the lookup

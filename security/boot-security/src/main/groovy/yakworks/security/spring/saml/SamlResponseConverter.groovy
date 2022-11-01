@@ -18,6 +18,7 @@ import static org.springframework.security.saml2.provider.service.authentication
 import static org.springframework.security.saml2.provider.service.authentication.OpenSaml4AuthenticationProvider.createDefaultResponseAuthenticationConverter
 
 /**
+ * POC NOT USED
  * Converts the saml response to the Saml2Authentication.
  * This is a custom implementation to build our SpringSamlUser (which implements standard UserDetails and UserInfo)
  */

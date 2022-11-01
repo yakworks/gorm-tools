@@ -8,6 +8,7 @@ plugins {
 apply from: "${rootDir}/gradle/compile.gradle"
 apply from: "${rootDir}/gradle/publish.gradle"
 apply from: "${rootDir}/gradle/test-unit.gradle"
+
 // apply from: "${rootDir}/gradle/gorm-lib.gradle"
 // apply from: "${rootDir}/gradle/test-integration.gradle"
 
@@ -20,11 +21,15 @@ dependencies {
   compileOnly "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
   compileOnly "org.springframework.boot:spring-boot-starter-security:$springBootVersion"
 
-  // Doing this and not with io.spring.dependency-management because it was blowing up with pom for publishing
-  // TODO figure that out and then lean on normal dependency mgmt.
+  api project(":security-core")
+
+  //spring security
   api "org.springframework.security:spring-security-core:$springSecurityVersion"
   api "org.springframework.security:spring-security-web:$springSecurityVersion"
   api "org.springframework.security:spring-security-config:$springSecurityVersion"
+
+  //OAUTH
+  api "org.springframework.boot:spring-boot-starter-oauth2-resource-server:$springBootVersion"
 
   //SAML
   compileOnly "org.springframework.security:spring-security-saml2-service-provider:$springSecurityVersion"
@@ -33,19 +38,10 @@ dependencies {
     compileOnly "org.opensaml:opensaml-saml-api:4.1.1"
     compileOnly "org.opensaml:opensaml-saml-impl:4.1.1"
   }
-  //OAUTH
-
-  compileOnly "org.springframework.boot:spring-boot-starter-oauth2-resource-server:$springBootVersion"
-  // compileOnly "org.springframework.security:spring-security-oauth2-resource-server:$springSecurityVersion"
-  // api "org.springframework.security:spring-security-oauth2-core:$springSecurityVersion"
-  // compileOnly "org.springframework.security:spring-security-oauth2-jose:$springSecurityVersion"
-  // compileOnly "org.springframework.security:spring-security-crypto:$springSecurityVersion"
-
 
   compileOnly "jakarta.annotation:jakarta.annotation-api:$vJakartaAnn"
   compileOnly "javax.inject:javax.inject:1"
 
-  api project(":security-core")
 
   testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
   testImplementation "org.springframework.security:spring-security-test:$springSecurityVersion"

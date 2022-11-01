@@ -14,7 +14,7 @@ import org.springframework.security.saml2.provider.service.authentication.OpenSa
 import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
- * NOT USED
+ * POC NOT USED
  * Proof of Concept for using a SAML and Special User converter
  */
 class SamlConfig {

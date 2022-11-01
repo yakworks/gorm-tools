@@ -294,9 +294,10 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
 
         and: "Verify database records"
         KitchenSink.count() == 2
-        KitchenSink.withNewSession {
+        KitchenSink.withSession {
             assert KitchenSink.findByName("Sink1") != null
             assert KitchenSink.findByName("Sink1").ext.name == "SinkExt1"
+            true
         }
     }
 

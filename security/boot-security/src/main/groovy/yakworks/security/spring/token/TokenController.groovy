@@ -23,8 +23,6 @@ import yakworks.security.user.UserInfo
 
 /**
  * A controller for the token resource.
- *
- * @author Josh Cummings
  */
 @RestController
 @CompileStatic
@@ -57,6 +55,20 @@ class TokenController {
             .body(body)
     }
 
+    @GetMapping("/api/token/callback")
+    ResponseEntity<Map> callback(HttpServletRequest request, HttpServletResponse response) {
+        Jwt token = tokenGenerator.genererate()
+        //add it as a cookie
+        Cookie cookie = jwtCookie(request, token)
+        response.addCookie(cookie)
+        //convert to a Map to render it as json
+        Map body = JwtTokenGenerator.tokenToMap(token)
+
+        return ResponseEntity.ok()
+            .cacheControl(CacheControl.noStore())
+            .body(body)
+    }
+
     //returns the current userMap. Will error if not valid token or login
     @GetMapping("/api/validate")
     ResponseEntity<Map> validateToken(HttpServletRequest request, HttpServletResponse response) {
@@ -73,7 +85,7 @@ class TokenController {
         //FIXME some hard coded values to get it working
         jwtCookie.maxAge = JwtTokenGenerator.getExpiresIn(token)
         jwtCookie.path = '/'
-        //only works if its https, her for dev as its normal http most of time.
+        //only works if its https, here so we can dev with normal http
         if ( isHttps(request) ) {
             jwtCookie.setHttpOnly(true)
             jwtCookie.setSecure(true)

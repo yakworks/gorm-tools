@@ -7,19 +7,13 @@ plugins {
 apply from: "${rootDir}/gradle/gorm-lib.gradle"
 
 dependencies {
-  compileOnly "org.grails:grails-web-boot:$grailsVersion"
+  compileOnly "org.grails:grails-web-common:$grailsVersion"
+  compileOnly "javax.servlet:javax.servlet-api:4.0.1"
 
-  compileOnly "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
-  compileOnly "org.springframework.boot:spring-boot-starter-security:$springBootVersion"
-
-  compileOnly "org.springframework.boot:spring-boot-starter-oauth2-resource-server:$springBootVersion"
-
-  api project(":security-core")
   api project(":boot-security")
 
   compileOnly project(":gorm-tools")
   compileOnly project(":gorm-audit")
-
 }
 
 // bootJar {

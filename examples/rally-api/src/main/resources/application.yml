@@ -70,3 +70,11 @@ app:
     rootLocation: "${project.rootProjectDir}/examples/resources"
     tempDir: "./build/rootLocation/tempDir"
     attachments.location: 'attachments'
+
+# enable multiple views resolvers by removing suffix and restricting viewNames so it flows through to hbs or mustache
+spring.thymeleaf.view-names: "*.html"
+spring.thymeleaf.suffix: ""
+spring.thymeleaf.template-resolver-order: 0
+# uncomment starter in build.gradle to activate handlebars
+# handlebars.enabled: true
+# handlebars.failOnMissingFile: false

@@ -13,6 +13,7 @@ dependencies {
 
   // implementation "org.springframework.boot:spring-boot-starter-logging"
   implementation "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
 
   api project(":rally-domain")
   api project(":gorm-test-domain")

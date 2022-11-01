@@ -6,6 +6,8 @@ apply from: "${rootDir}/gradle/test-integration.gradle"
 dependencies {
 
   compileOnly "org.springframework.boot:spring-boot-starter-web"
+  //transitive spring security
+  //compileOnly "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
 
   api project(":gorm-tools")
   api project(":gorm-audit")
@@ -24,6 +26,7 @@ dependencies {
 
   testRuntimeOnly "org.springframework.boot:spring-boot-autoconfigure"
   testRuntimeOnly "org.springframework.boot:spring-boot-starter-tomcat"
+  //testImplementation "io.micronaut.spring:micronaut-spring:4.2.2"
 }
 
 test {

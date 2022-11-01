@@ -6,9 +6,6 @@ plugins {
 
 apply from: "${rootDir}/gradle/compile.gradle"
 apply from: "${rootDir}/gradle/hibernate.gradle"
-// apply from: "${rootDir}/gradle/example.gradle"
-// apply from: "${rootDir}/gradle/test-unit.gradle"
-// apply from: "${rootDir}/gradle/test-integration.gradle"
 
 dependencies {
 

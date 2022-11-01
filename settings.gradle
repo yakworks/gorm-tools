@@ -67,7 +67,7 @@ findProject(':examples/rally-api').name = 'rally-api'
 include 'examples/hello-boot-security'
 findProject(':examples/hello-boot-security').name = 'hello-boot-security'
 
-project(':testify').projectDir = new File('examples/testify')
+// project(':testify').projectDir = new File('examples/testify')
 
 buildCache {
   local {

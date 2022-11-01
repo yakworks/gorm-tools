@@ -17,6 +17,8 @@ repositories {
   maven { url "https://build.shibboleth.net/nexus/content/repositories/releases/" }
 }
 
+apply from: "${rootDir}/gradle/compile.gradle"
+
 dependencies {
   developmentOnly("org.springframework.boot:spring-boot-devtools")
   implementation 'org.springframework.boot:spring-boot-starter-web'

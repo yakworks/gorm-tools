@@ -51,10 +51,9 @@ management.endpoint.health.show-details: always
 spring.thymeleaf.view-names: "*.html"
 spring.thymeleaf.suffix: ""
 spring.thymeleaf.template-resolver-order: 0
-
 # uncomment starter in build.gradle to activate
-handlebars.enabled: true
-handlebars.failOnMissingFile: false
+#handlebars.enabled: true
+#handlebars.failOnMissingFile: false
 # handlebars.template-resolver-order: 1
 #handlebars.prefix: classpath:templates/
 #handlebars.suffix: .hbs

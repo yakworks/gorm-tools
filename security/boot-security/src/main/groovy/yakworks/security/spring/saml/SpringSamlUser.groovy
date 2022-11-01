@@ -13,6 +13,7 @@ import org.springframework.security.saml2.provider.service.authentication.Saml2A
 import yakworks.security.spring.user.SpringUserInfo
 
 /**
+ * POC NOT USED
  * This extends Saml2AuthenticatedPrincipal and implements UserInfo and UserDetails.
  * Giving it a compatible interface with all the bases.
  */

@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component
 
 import gorm.tools.job.SyncJobFinishedEvent
 import gorm.tools.job.SyncJobStartEvent
+import gorm.tools.repository.events.AfterBulkSaveEntityEvent
+import gorm.tools.repository.events.BeforeBulkSaveEntityEvent
 import gorm.tools.repository.model.DataOp
 import yakworks.api.OkResult
 import yakworks.rally.orgs.model.Org
@@ -16,6 +18,18 @@ import yakworks.rally.orgs.model.Org
 class SyncjobEventListener {
 
     @EventListener
+    void beforeBulkSaveEntity(BeforeBulkSaveEntityEvent<Org> e) {
+        assert e.entityClass.isAssignableFrom(Org) //verify, tht listener is called for only org events based on generic
+        e.data['flex']['text9'] = 'from before'
+    }
+
+    @EventListener
+    void afterBulkSaveEntity(AfterBulkSaveEntityEvent<Org> e) {
+        assert e.entityClass.isAssignableFrom(Org)
+        e.entity.flex.text10 = 'from after'
+    }
+
+    @EventListener
     void onBulk(SyncJobFinishedEvent<Org> event) {
         assert event.entityClass.isAssignableFrom(Org) //verify, tht listener is called for only org events based on generic
         if(event.context.args.op != DataOp.add) return
@@ -24,7 +38,7 @@ class SyncjobEventListener {
                 Long id = it.payload.id as Long
                 if (id != null) {
                     Org org = Org.get(id)
-                    org.comments = "${org.num}-SyncjobEventListener"
+                    org.comments = "${org.num}-SyncJobFinishedEvent"
                     org.save(flush: true)
                 }
             }
@@ -38,7 +52,7 @@ class SyncjobEventListener {
         if(event.context.payload && event.context.payload instanceof Collection) {
             event.context.payload.each {
                 if(it['info']) {
-                    it['info'].fax = "SyncjobEventListener"
+                    it['info'].fax = "SyncJobStartEvent"
                 }
             }
         }

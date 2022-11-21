@@ -73,9 +73,15 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         then:
         org != null
         org.comments != null
-        org.comments == "testorg-1-SyncjobEventListener"
+        //verify the SyncjobEventListener registered properly
+        org.comments == "testorg-1-SyncJobFinishedEvent"
         org.info != null
-        org.info.fax == "SyncjobEventListener"
+        //verify the SyncjobEventListener registered properly
+        org.info.fax == "SyncJobStartEvent"
+        //verify the Before and AfterCreateOrUpdate
+        org.flex.text9 == 'from before'
+        org.flex.text10 == 'from after'
+
     }
 
     @NotTransactional
@@ -348,6 +354,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         }
     }
 
+    //NOTE: SyncjobEventListener component messes with the data for tests
     private List<Map> generateOrgData(int numRecords) {
         List<Map> list = []
         (1..numRecords).each { int index ->

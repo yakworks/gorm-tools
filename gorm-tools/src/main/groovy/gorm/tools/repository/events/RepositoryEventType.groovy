@@ -17,7 +17,10 @@ enum RepositoryEventType {
     BeforeValidate(BeforeValidateEvent),
     AfterRemove(AfterRemoveEvent),
     AfterBind(AfterBindEvent),
-    AfterPersist(AfterPersistEvent)
+    AfterPersist(AfterPersistEvent),
+
+    BeforeBulkSaveEntity(BeforeBulkSaveEntityEvent),
+    AfterBulkSaveEntity(AfterBulkSaveEntityEvent)
 
     Class eventClass
     String eventKey

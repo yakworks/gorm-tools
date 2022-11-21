@@ -14,8 +14,10 @@ import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp
 
 /**
- * Used to store arguments and parameters for Bulk operations.
- * See BulkableRepo
+ * Value Object are better than using a Map to store arguments and parameters.
+ * This is used for Bulk operations.
+ * Created at the start of the process, in controller this is created from the params passed the action
+ * See BulkableRepo for its primary usage.
  */
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @MapConstructor
@@ -110,7 +112,7 @@ class SyncJobArgs {
     PersistArgs getPersistArgs() { return this.persistArgs ? PersistArgs.of(this.persistArgs) : new PersistArgs() }
 
     /**
-     * The job id, will get populated once the job is created
+     * The job id, will get populated when the job is created, normally from the syncJobContext.
      */
     Long jobId
 
@@ -119,6 +121,9 @@ class SyncJobArgs {
      * Used by event listeners to filter and process selectively
      */
     Class entityClass
+
+    //reference back to the SyncJobContext built from these args.
+    SyncJobContext context
 
     /** helper to return true if op=DataOp.add */
     boolean isCreate(){

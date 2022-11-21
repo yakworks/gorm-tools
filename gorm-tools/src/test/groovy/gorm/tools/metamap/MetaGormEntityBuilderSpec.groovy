@@ -25,7 +25,7 @@ class MetaGormEntityBuilderSpec extends Specification implements DataRepoTest {
 
         then:
         //should be 23 of them.
-        emapIncs.metaProps.size() == 23
+        emapIncs.metaProps.size() == 24
     }
 
     void "build works with short entity name and fully qualified"(){

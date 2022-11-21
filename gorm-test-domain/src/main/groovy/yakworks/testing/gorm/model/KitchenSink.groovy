@@ -74,6 +74,7 @@ class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRep
     Map bazMap
     List<String> stringList
 
+    Long createdByJobId
 
     //bug in grailsCompileStatic requires this on internal enums
     //also, internal enums must always come before the static constraints or it doesn't get set

@@ -33,7 +33,6 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
             includes: ["id", "name", "ext.name"])
     }
 
-
     void "sanity check bulkable repo"() {
         expect:
         KitchenSink.repo instanceof BulkableRepo
@@ -48,6 +47,20 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
 
         then:
         thrown(ValidationProblem.Exception)
+    }
+
+    void "simple bulk insert"() {
+        given:
+        List list = KitchenSink.generateDataList(10)
+
+        when: "bulk insert 20 records"
+        Long jobId = kitchenSinkRepo.bulk(list, setupSyncJobArgs())
+        def job = TestSyncJob.get(jobId)
+        List results = job.parseData()
+
+        then: "verify job"
+        job.state == SyncJobState.Finished
+        results[0].ok
     }
 
     void "success bulk insert"() {
@@ -106,6 +119,9 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
         bcks.ext.name == "SinkExt1"
 
         KitchenSink.count() == 300
+
+        and: "make sure beforeBulk event updated job id"
+        bcks.createdByJobId
         // KitchenSink.findByName("Oranges")
     }
 

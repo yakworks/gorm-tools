@@ -13,6 +13,8 @@ import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.events.AfterBindEvent
+import gorm.tools.repository.events.AfterBulkSaveEntityEvent
+import gorm.tools.repository.events.BeforeBulkSaveEntityEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
@@ -77,6 +79,12 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
         }
     }
 
+    @RepoListener
+    void beforeBulkSaveEntity(BeforeBulkSaveEntityEvent e) {
+        if (e.syncJobArgs.isCreate()) {
+            e.data['createdByJobId'] = e.syncJobArgs.jobId
+        }
+    }
 
     @Transactional
     KitchenSink inactivate(Long id) {

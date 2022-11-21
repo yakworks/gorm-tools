@@ -500,6 +500,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * @param belongsToProp the name of parent property to set, if any
      * @return the list of created entities
      */
+    @SuppressWarnings('ReturnsNullInsteadOfEmptyCollection')
     List persistToManyData(D entity, GormRepo assocRepo, List<Map> assocList, String belongsToProp = null){
         if(!assocList) return
         if(belongsToProp) assocList.each { it[belongsToProp] = entity}

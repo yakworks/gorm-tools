@@ -11,7 +11,7 @@ import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.model.AbstractLinkedEntityRepo
 import grails.gorm.DetachedCriteria
-import yakworks.commons.lang.Transform
+import yakworks.commons.beans.Transform
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
 

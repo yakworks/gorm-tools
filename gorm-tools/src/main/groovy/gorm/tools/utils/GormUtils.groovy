@@ -4,14 +4,13 @@
 */
 package gorm.tools.utils
 
-
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.model.types.Identity
 
-import yakworks.commons.lang.Transform
+import yakworks.commons.beans.Transform
 
 /**
  * MOSTLY LEGACY

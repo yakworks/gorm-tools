@@ -11,10 +11,17 @@ import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 
+import static yakworks.json.groovy.JsonEngine.parseJson
+
 @IdEqualsHashCode
 @Entity
 @GrailsCompileStatic
 class TestSyncJob implements RepoEntity<TestSyncJob>, SyncJobEntity<TestSyncJob> {
+
+    //parseJson
+    <T> T parseData(Class<T> clazz = List){
+        parseJson(dataToString(), clazz)
+    }
 
     @Override
     String dataToString(){
@@ -27,6 +34,7 @@ class TestSyncJob implements RepoEntity<TestSyncJob>, SyncJobEntity<TestSyncJob>
         def dta = payloadBytes
         return dta ? new String(dta, "UTF-8") : '[]'
     }
+
 
     static TestSyncJobRepo getRepo() { RepoLookup.findRepo(this) as TestSyncJobRepo }
 

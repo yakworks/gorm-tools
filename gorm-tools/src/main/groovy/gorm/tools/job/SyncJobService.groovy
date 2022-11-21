@@ -17,6 +17,7 @@ import gorm.tools.transaction.TrxService
 import yakworks.i18n.icu.ICUMessageSource
 import yakworks.spring.AppCtx
 
+/** Trait for a conretete SyncJobService that provides standard functionality to create and update a jobs status */
 @CompileStatic
 trait SyncJobService<D> {
     final static Logger LOG = LoggerFactory.getLogger(SyncJobService)
@@ -39,7 +40,7 @@ trait SyncJobService<D> {
         SyncJobContext jobContext
         //keep it in its own transaction so it doesn't depend on wrapping
         trxService.withNewTrx {
-            jobContext = new SyncJobContext(args: args, syncJobService: this, payload: payload )
+            jobContext = SyncJobContext.of(args).syncJobService(this).payload(payload)
             jobContext.createJob()
         }
         AppCtx.publishEvent(SyncJobStartEvent.of(jobContext))

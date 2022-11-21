@@ -20,4 +20,5 @@ class AfterPersistEvent<D> extends RepositoryEvent<D> {
         super(repo, entity, RepositoryEventType.AfterPersist.eventKey, args)
     }
 
+
 }

@@ -30,8 +30,8 @@ import yakworks.message.spi.MsgService
 import yakworks.spring.AppCtx
 
 /**
- * Holds the state for a Bulk job.
- * Used to update the job status and final results as it progresses.
+ * Holds the basic state and primary action methods for a Bulk job.
+ * Creates and updates the job status as it progresses and finalizes its results when finished.
  */
 @SuppressWarnings('Println')
 @Builder(builderStrategy= SimpleStrategy, prefix="")
@@ -43,7 +43,8 @@ class SyncJobContext {
 
     AtomicBoolean ok = new AtomicBoolean(true)
 
-    SyncJobService syncJobService //reference to the syncJobService
+    //reference back to the syncJobService that created this.
+    SyncJobService syncJobService
 
     SyncJobArgs args
 
@@ -64,28 +65,29 @@ class SyncJobContext {
 
     Path dataPath
 
-    /**
-     * The job id, will get populated once the job is created
-     */
-    Long jobId
-
     Closure transformResultsClosure
 
     SyncJobContext() { this([:])}
 
-    static SyncJobContext create(Map params = [:]){
-        def sjc = new SyncJobContext(params)
+    /** creates a context from the SynJobArgs and assign a back reference to this in SyncJobArgs. */
+    static SyncJobContext of(SyncJobArgs args){
+        def sjc = new SyncJobContext(args: args)
+        args.context = sjc
         return sjc
     }
 
+    /** gets the jobId, stored in args. The job id gets populated once the job is created */
+    Long getJobId(){ return args.jobId }
+
+    /** create a job using the syncJobService.repo.create */
     SyncJobContext createJob(){
         Validate.notNull(payload)
         //get jobId early so it can be used, might not need this anymore
-        jobId = ((IdGeneratorRepo)syncJobService.repo).generateId()
+        args.jobId = ((IdGeneratorRepo)syncJobService.repo).generateId()
         setPayloadSize(payload)
 
         Map data = [
-            id: jobId, source: args.source, sourceId: args.sourceId,
+            id: args.jobId, source: args.source, sourceId: args.sourceId,
             state: SyncJobState.Running, payload: payload
         ] as Map<String,Object>
 

@@ -23,6 +23,8 @@ import gorm.tools.repository.PersistArgs
 @CompileStatic
 class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvider {//extends ApplicationEvent {//
 
+    Class<D> entityClass // the domain class this is for
+
     /** the domain instance this event is for */
     D entity
     /** if this event fired during binding action or a persist that is caused from it then this is the data used */
@@ -35,21 +37,19 @@ class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvi
     /** the args passed into whatever method fired this. such as flush, failOnError etc */
     PersistArgs args
 
-    /** RepositoryEventType.eventKey. set in constructor. ex: a BeforePersistEvent this will be 'beforePersist' */
-    String eventKey //= "repoEvent"
+    /** RepositoryEventType.eventKey. set in constructor. ex: a BeforePersistEvent this would be 'beforePersist' */
+    String eventKey
+
+    RepositoryEvent(GormRepo<D> repo, String eventKey) {
+        this(repo, null, eventKey, null, null, null)
+    }
 
     RepositoryEvent(GormRepo<D> repo, final D entity, String eventKey) {
-        super(repo)
-        this.entity = entity
-        this.eventKey = eventKey
-        //this.entity = mappingContext.getPersistentEntity(entityObject.getClass().getName());
+        this(repo, entity, eventKey, null, null, null)
     }
 
     RepositoryEvent(GormRepo<D> repo, final D entity, String eventKey, PersistArgs args) {
-        super(repo)
-        this.entity = entity
-        this.eventKey = eventKey
-        this.args = args
+        this(repo, entity, eventKey, null, null, args)
         setDataFromArgMap(args)
         //this.entity = mappingContext.getPersistentEntity(entityObject.getClass().getName());
     }
@@ -61,6 +61,7 @@ class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvi
         this.data = data
         this.bindAction = bindAction
         this.args = args
+        this.entityClass = repo.getEntityClass()
     }
 
     /**
@@ -71,7 +72,8 @@ class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvi
      */
     @Override
     ResolvableType getResolvableType() {
-        return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forInstance(getEntity()))
+        // return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forInstance(getEntity()))
+        return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forClass(entityClass))
     }
 
     /**

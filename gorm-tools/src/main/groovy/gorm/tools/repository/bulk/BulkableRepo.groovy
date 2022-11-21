@@ -22,8 +22,11 @@ import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobService
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
+import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
-import gorm.tools.repository.model.DataOp
+import gorm.tools.repository.events.AfterBulkSaveEntityEvent
+import gorm.tools.repository.events.BeforeBulkSaveEntityEvent
+import gorm.tools.repository.events.RepoEventPublisher
 import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.commons.map.Maps
@@ -64,6 +67,7 @@ trait BulkableRepo<D> {
     abstract void flushAndClear()
     abstract void clear()
     abstract Datastore getDatastore()
+    abstract RepoEventPublisher getRepoEventPublisher()
     abstract <T> T withTrx(Closure<T> callable)
     abstract <T> T withNewTrx(Closure<T> callable)
 
@@ -167,19 +171,8 @@ trait BulkableRepo<D> {
         // println "will do ${dataList.size()}"
         ApiResults results = ApiResults.create(false)
         for (Map item : dataList) {
-            Map itemData
             try {
-                //need to copy the incoming map, as during create(), repos may remove entries from the data map
-                //or it can create circular references - eg org.contact.org - which would result in Stackoverflow when converting to json
-                if(item instanceof PathKeyMap){
-                    // Initialize the PathKey map so that the deep nested structure is created  and repos can expect a deep nested map
-                    // Clone after it is initialized, so that it will clone the deep nested structure and not flat map
-                    item.init()
-                    itemData = item.cloneMap()   //clone it, probably from CSV
-                } else {
-                    itemData = Maps.clone(item)
-                }
-                Map entityMapData = createOrUpdate(itemData, syncJobArgs, transactionPerItem)
+                Map entityMapData = bulkSaveEntity(item, syncJobArgs, transactionPerItem)
                 results << Result.OK().payload(entityMapData).status(syncJobArgs.isCreate() ? 201 : 200)
             } catch(Exception e) {
                 // if trx by item then collect the exceptions, otherwise throw so it can rollback
@@ -201,23 +194,43 @@ trait BulkableRepo<D> {
     }
 
     /**
-     * create or update based on syncJobArgs.op
+     * Called from doBulk for each item.
+     * create or update an entity based on the value in the syncJobArgs.op
      *
-     * @param data the data
+     * @param data the item data
      * @param syncJobArgs - persistArgs and isCreate will be pulled from here
      * @param transactional true if should be wraped in withTrx
-     * @return the data map after bing run through createMetaMap using the includes in the syncJobArgs
+     * @return the data map after bing run through buildSuccessMap using the includes in the syncJobArgs
      */
-    Map createOrUpdate(Map data, SyncJobArgs syncJobArgs, boolean transactional) {
+    Map bulkSaveEntity(Map data, SyncJobArgs syncJobArgs, boolean transactional) {
+        //need to copy the incoming map, as during create(), repos may remove entries from the data map
+        //or it can create circular references - eg org.contact.org - which would result in Stackoverflow when converting to json
+        Map dataClone
+
+        if(data instanceof PathKeyMap){
+            // Initialize the PathKey map so that the deep nested structure is created  and repos can expect a deep nested map
+            // Clone after it is initialized, so that it will clone the deep nested structure and not flat map
+            data.init()
+            dataClone = data.cloneMap()   //clone it, probably from CSV
+        } else {
+            dataClone = Maps.clone(data)
+        }
+
         def closure = {
-            D entityInstance = syncJobArgs.isCreate() ? doCreate(data, syncJobArgs.persistArgs) : doUpdate(data, syncJobArgs.persistArgs)
+            doBeforeBulkSaveEntity(dataClone, syncJobArgs)
+            PersistArgs pargs = syncJobArgs.persistArgs
+            D entityInstance = syncJobArgs.isCreate() ? doCreate(dataClone, pargs) : doUpdate(dataClone, pargs)
+            doAfterBulkSaveEntity(entityInstance, dataClone, syncJobArgs)
             return buildSuccessMap(entityInstance, syncJobArgs.includes)
         } as Closure<Map>
 
         return transactional ? withTrx(closure) : closure()
     }
 
-    /** creates response map based on bulk include list */
+    /**
+     * creates response map based on bulk include list
+     * this is called instead of just createMetaMap so it can be overriden easily in implementations.
+     */
     Map buildSuccessMap(D entityInstance, List<String> includes) {
         return createMetaMap(entityInstance, includes)
     }
@@ -258,4 +271,23 @@ trait BulkableRepo<D> {
         }
     }
 
+    /**
+     * Called from BulkSaveEntity before doCreate/doUpdate.
+     * Gives an oportunity to modify the data with any special changes needed in a bulk op.
+     * will be inside the trx if one is created, so can throw an error if needing to reject the save.
+     */
+    public void doBeforeBulkSaveEntity(Map data, SyncJobArgs syncJobArgs) {
+        GormRepo<D> self = (GormRepo<D>)this
+        def event = new BeforeBulkSaveEntityEvent<D>(self, data, syncJobArgs)
+        getRepoEventPublisher().publishEvents(self, event, [event] as Object[])
+    }
+
+    /**
+     * Called after the doupdate or create has been called for each item.
+     */
+    public <D> void doAfterBulkSaveEntity(D entity, Map data, SyncJobArgs syncJobArgs) {
+        GormRepo<D> self = (GormRepo<D>)this
+        def event = new AfterBulkSaveEntityEvent<D>(self, entity, data, syncJobArgs)
+        getRepoEventPublisher().publishEvents(self, event, [event] as Object[])
+    }
 }

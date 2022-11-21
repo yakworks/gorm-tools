@@ -4,7 +4,6 @@
 */
 package gorm.tools.utils
 
-
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.model.PersistentProperty

@@ -1,3 +1,8 @@
+
+## Okta Saml
+https://developer.okta.com/blog/2022/08/05/spring-boot-saml
+
+
 = JWT Login Sample
 
 This sample demonstrates how to accept JWTs without using a separate authorization server.

@@ -15,17 +15,24 @@ class FuturesSpec extends Specification implements GormHibernateTest{
 
     @Autowired AsyncService asyncService
 
+    //for testing a method reference
+    String getFoo(){
+        'foo'
+    }
+
     void "synchronous future example"() {
         when:
         String message
 
-        Supplier<String> supplierFunc = () -> { return 'foo' }
+        //Supplier<String> supplierFunc = () -> { return 'foo' }
 
-        asyncService.supplyAsync(new AsyncArgs(enabled:false), supplierFunc).whenComplete{ String result, ex ->
-            assert result == 'foo'
-            message = result
-            println "whenComplete with $result"
-        }
+        asyncService
+            .supplyAsync(new AsyncArgs(enabled:false), this::getFoo)
+            .whenComplete( (result, ex) -> {
+                assert result == 'foo'
+                message = result
+                println "whenComplete with $result"
+            })
 
         then:
         message == 'foo'

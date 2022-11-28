@@ -18,7 +18,12 @@ import static yakworks.json.groovy.JsonEngine.parseJson
 @Integration
 @Rollback
 class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
+
     String path = "/api/rally/org/bulk?jobSource=Oracle&savePayload=false"
+
+    def setup(){
+        login()
+    }
 
     void "verify bulk create and sanity check response"() {
         given:

@@ -1,1 +1,6 @@
-app.security.enabled: false
+app.security.enabled: true
+#server:
+#  port: 8080
+
+spring.security.user.name: admin
+spring.security.user.password: 123

@@ -130,7 +130,7 @@ class EventLogger {
 
     @CompileStatic(TypeCheckingMode.SKIP)
     List<EventLog> getEventList(Map params) {
-        Pager pager = new Pager(params)
+        Pager pager = Pager.of(params)
         Criteria criteria = EventLog.createCriteria()
         def searchDate = LocalDateTime.now().minusDays(searchDays).clearTime()
         List<EventLog> events = criteria.list(max: pager.max, offset: pager.offset) {

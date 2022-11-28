@@ -42,7 +42,7 @@ dependencies {
   //for rest api testing
   testImplementation "com.squareup.okhttp3:okhttp:$vOkhttp"
   //okhttp3 needs this
-  testImplementation "org.jetbrains.kotlin:kotlin-stdlib:$vKotlin"
+  //testImplementation "org.jetbrains.kotlin:kotlin-stdlib:$vKotlin"
   testImplementation project(":gorm-test-support") //this might seem circular but it can be added to itself as it dif config
   testImplementation "org.grails:grails-web-testing-support:$vGrailsTesting"
 

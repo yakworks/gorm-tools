@@ -24,6 +24,8 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
   implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
 
+  implementation "org.springframework.boot:spring-boot-starter-webflux"
+
   // implementation "org.grails:grails-plugin-i18n"
   implementation "org.grails:grails-plugin-rest"
   implementation "org.grails:grails-plugin-url-mappings"
@@ -65,7 +67,7 @@ dependencies {
 
   //for rest api testing
   testImplementation "com.squareup.okhttp3:okhttp:$vOkhttp"
-  testImplementation "org.jetbrains.kotlin:kotlin-stdlib:$vKotlin" //okhttp3 needs this
+  //testImplementation "org.jetbrains.kotlin:kotlin-stdlib:$vKotlin" //okhttp3 needs this
 
   testImplementation project(":gorm-test-support")
   testImplementation "org.grails:grails-web-testing-support:$vGrailsTesting"

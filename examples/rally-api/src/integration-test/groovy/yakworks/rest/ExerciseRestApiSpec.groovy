@@ -1,6 +1,8 @@
 package yakworks.rest
 
 import org.springframework.http.HttpStatus
+
+import spock.lang.Ignore
 import yakworks.commons.map.Maps
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
@@ -16,6 +18,10 @@ import spock.lang.Unroll
 class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
     String getPath(String entity) { "/api/${entity}" }
+
+    def setup(){
+        login()
+    }
 
     void "get index list"() {
         when:
@@ -71,6 +77,8 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
     @Unroll
     def "PUT update: #entity/#id"(String entity, Long id, String prop, String val) {
+        setup:
+        login()
 
         when:
         def putData = [(prop): val]
@@ -83,19 +91,22 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
         where:
 
-        entity     | id | prop   | val
+        entity           | id | prop   | val
         'rally/org'      | 1  | 'num'  | 'foo123'
-        'rally/user'     | 1  | 'username' | 'jimmy'
+        // 'rally/user'     | 1  | 'username' | 'jimmy'
         //        'location' | 1  | 'city' | 'Denver'
 
     }
 
 
+    // @Ignore
     @Unroll
     def "q text search: #entity?q=#qSearch"(String entity, Integer qCount, String qSearch) {
 
         when:
         Response resp = get("${getPath(entity)}?q=${qSearch}")
+        assert resp.code() == HttpStatus.OK.value()
+        assert resp.successful
         Map body = bodyToMap(resp)
 
         then:
@@ -104,8 +115,8 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
         where:
 
-        entity     | qCount | qSearch
-        'rally/org'      | 1      | 'foo123'
+        entity           | qCount | qSearch
+        'rally/org'      | 1      | 'Org11'
         'rally/user'     | 1      | 'admin'
         //'location' | 1      | 'Denver'
 

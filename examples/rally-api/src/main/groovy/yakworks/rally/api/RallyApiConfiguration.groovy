@@ -63,7 +63,15 @@ class RallyApiConfiguration {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         //defaults permit all
-        List permitAllMatchers = ["/actuator/**", "/resources/**", "/about"]
+        List permitAllMatchers = [
+            "/actuator/**",
+            "/resources/**",
+            // "/security-tests/error500",
+            // "/security-tests/error400",
+            "/security-tests/**",
+            "/api/login",
+            "/api/token",
+            "/about"]
 
         if(!securityEnabled){
             //permit all wildcard
@@ -72,6 +80,8 @@ class RallyApiConfiguration {
 
         http
             .authorizeHttpRequests((authorize) -> authorize
+                .requestMatchers("/security-tests/error401").authenticated()
+                .requestMatchers("/security-tests/error403").hasRole("SUPER_DUPER")
                 .requestMatchers(permitAllMatchers as String[]).permitAll()
                 .anyRequest().authenticated()
             )

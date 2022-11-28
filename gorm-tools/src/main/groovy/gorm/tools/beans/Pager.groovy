@@ -68,6 +68,12 @@ class Pager {
         setParams(params)
     }
 
+    static Pager of(Map params){
+        def pg = new Pager()
+        pg.setParams(params)
+        return pg
+    }
+
     /**
      * Computes max value, if max not specified, then 20
      * Default max allowed value is 100
@@ -102,6 +108,7 @@ class Pager {
         page = params.page = params.page ? toInteger(params.page) : 1
         max = params.max = Math.min(params.max ? toInteger(params.max) : 20, allowedMax)
         this.params = params
+        if(params.data) this.data = params.data as List
     }
 
     /**

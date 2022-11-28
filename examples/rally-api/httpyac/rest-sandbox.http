@@ -70,8 +70,13 @@ GET {{base_url}}/actuator/health
 GET {{base_url}}/rally/role/1
 Authorization: Bearer {{login.access_token}}
 
+## 404
+GET http://localhost:8080/info/urlMappings
 
-GET {{base_url}}/appInfo
+## 500 error
+GET http://localhost:8080/info/urlMappings
+
+GET http://localhost:8080/info/urlMappings
 
 ### Contact list
 # @ref login

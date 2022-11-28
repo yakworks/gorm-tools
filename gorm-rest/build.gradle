@@ -16,6 +16,8 @@ dependencies {
 
   // for OkHttpRestTrait test helpers
   compileOnly "com.squareup.okhttp3:okhttp:$vOkhttp"
+  // for WebClientTrait test helpers
+  compileOnly "org.springframework.boot:spring-boot-starter-webflux"
 
   //schemaView tests Org
   testImplementation project(":rally-domain")

@@ -153,7 +153,7 @@ class QueryArgs {
             if(params.containsKey(k)) pagerMap[k] = params.remove(k)
         }
         // if no pager was set then use what we just removed to set one up
-        if(!pager) pager = new Pager(pagerMap)
+        if(!pager) pager = Pager.of(pagerMap)
 
         //sorts
         String orderBy = params.remove('order') ?: 'asc'

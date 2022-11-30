@@ -4,7 +4,7 @@
 */
 package yakworks.rest.client
 
-
+import java.net.http.HttpClient
 import java.nio.charset.StandardCharsets
 import java.time.Duration
 import java.util.concurrent.TimeUnit
@@ -14,19 +14,26 @@ import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.io.buffer.DefaultDataBufferFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.http.client.reactive.ClientHttpConnector
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
+import org.springframework.web.reactive.function.client.DefaultWebClient
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.util.UriUtils
 
-import okhttp3.OkHttpClient
-import okhttp3.Response
-import reactor.netty.http.client.HttpClient
+import com.integralblue.http.client.reactive.JdkClientHttpConnector
+
+// import okhttp3.OkHttpClient
+// import reactor.netty.http.client.HttpClient
 import yakworks.commons.lang.EnumUtils
 import yakworks.json.groovy.JsonEngine
+
+import static org.springframework.web.reactive.function.client.WebClient.Builder
+import static org.springframework.web.reactive.function.client.WebClient.ResponseSpec
 
 /**
  * Trait with helper methods to wrap OKHttps HttpClient for rest api testing
@@ -35,7 +42,7 @@ import yakworks.json.groovy.JsonEngine
 //@CompileDynamic
 trait WebClientTrait {
 
-    @Autowired WebClient.Builder wbuilder
+    @Autowired Builder wbuilder
 
     String jsonHeader = "application/json;charset=utf-8"
 
@@ -45,10 +52,6 @@ trait WebClientTrait {
     @Value('${spring.security.user.password:123}')
     String password
 
-    String encodeQueryParam(String val){
-        return UriUtils.encodeQueryParam(val, StandardCharsets.UTF_8)
-    }
-
     /**
      * Main method to fire a request and get a response.
      * builds request and executes it with the OkHttpclient.
@@ -57,76 +60,87 @@ trait WebClientTrait {
      * @param body - the body object to convert to json, usually a Map or sometimes List
      * @return the ResponseEntity
      */
-    ResponseEntity<Map> execute(String method, String uriPath){
-        ResponseEntity respEnt  = webClient
-            .method(EnumUtils.getEnum(HttpMethod, method.toUpperCase()))
-            .uri(URI.create("${getBaseUrl()}${uriPath}"))
-            .header("Authorization", OkAuth.BEARER_TOKEN)
-            .retrieve().toEntity(Map).block();
-
-        return respEnt
-    }
-
-    ResponseEntity<Map> execute(String method, String uriPath, Object body){
-        ResponseEntity respEnt  = webClient
-            .method(EnumUtils.getEnum(HttpMethod, method.toUpperCase()))
-            .uri(uriPath)
-            .header("Authorization", OkAuth.BEARER_TOKEN)
-            .bodyValue(body)
-            .retrieve().toEntity(Map).block();
-
-        return respEnt
-    }
-
-    ResponseEntity<byte[]> executeBytes(String method, String uriPath){
-        ResponseEntity respEnt  = webClient
-            .method(EnumUtils.getEnum(HttpMethod, method.toUpperCase()))
-            .uri(URI.create("${getBaseUrl()}${uriPath}"))
-            .header("Authorization", OkAuth.BEARER_TOKEN)
-            .retrieve().toEntity(byte[].class).block();
-
-        return respEnt
-    }
-
-    <T> T doMethod(String method, String uriPath, Class<T> clazz = Map){
-        T respEnt  = webClient
-            .method(EnumUtils.getEnum(HttpMethod, method.toUpperCase()))
-            .uri(uriPath)
-            .header("Authorization", OkAuth.BEARER_TOKEN)
-            .retrieve()
-            .bodyToMono(clazz).block();
+    ResponseEntity<Map> execute(HttpMethod method, String uriPath){
+        ResponseEntity respEnt = headerSpec(method, uriPath)
+            .retrieve().toEntity(Map).block()
 
         return respEnt
     }
 
     /**
-     * build and OkHttpClient with higher time out of 120
+     * gets HttpMethod enum from string
+     * @param name GET, POST, PUT, etc..
+     * @return the HttpMethod enum
+     */
+    HttpMethod getMethod(String name){
+        return EnumUtils.getEnum(HttpMethod, name.toUpperCase())
+    }
+
+    ResponseEntity<Map> execute(HttpMethod method, String uriPath, Object body){
+        ResponseEntity respEnt  = headerSpec(method, uriPath)
+            .bodyValue(body)
+            .retrieve()
+            .toEntity(Map).block();
+
+        return respEnt
+    }
+
+    ResponseEntity<byte[]> executeBytes(HttpMethod method, String uriPath){
+        ResponseEntity respEnt  = headerSpec(method, uriPath)
+            .retrieve()
+            .toEntity(byte[].class).block()
+
+        return respEnt
+    }
+
+    <T> T doMethod(HttpMethod method, String uriPath, Class<T> clazz = Map){
+        T respEnt  = retrieve(method, uriPath)
+            .bodyToMono(clazz)
+            .block()
+
+        return respEnt
+    }
+
+    ResponseSpec retrieve(HttpMethod method, String uriPath){
+        return headerSpec(method, uriPath).retrieve()
+    }
+
+    WebClient.RequestBodySpec headerSpec(HttpMethod method, String uriPath){
+        WebClient.RequestBodySpec  reqSpec  = webClient
+            .method(method)
+            .uri(URI.create("${getBaseUrl()}${uriPath}"))
+            .header("Authorization", OkAuth.BEARER_TOKEN)
+
+        return reqSpec
+    }
+
+    /**
+     * build WebClient with higher timeout of 120
      */
     WebClient getWebClient(){
-        HttpClient httpClient = HttpClient.create()
-            .responseTimeout(Duration.ofSeconds(120))
+        // HttpClient httpClient = HttpClient.create()
+        //     .responseTimeout(Duration.ofSeconds(120))
+
+        HttpClient httpClient = HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .connectTimeout(Duration.ofSeconds(20))
+            .build();
+
+        ClientHttpConnector connector =
+            new JdkClientHttpConnector(httpClient, new DefaultDataBufferFactory());
+
         WebClient webClient = wbuilder
             .baseUrl(getBaseUrl())
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .clientConnector(new ReactorClientHttpConnector(httpClient))
+            .clientConnector(connector)
             .build()
         //increase timeout to 120 from 10 so we can debug without socketTimeout
         return webClient
     }
 
-    @CompileDynamic
-    String getBaseUrl(){
-        //serverPort is provided by the test, spring auto assigns it.
-        return "http://localhost:$serverPort"
-    }
-
-    String getUrl(String uriPath){
-        return uriPath.startsWith('http') ? uriPath : "${getBaseUrl()}$uriPath"
-    }
-
     //POST test
     ResponseEntity<Map> post(String uriPath, Object body) {
-        return execute("POST", uriPath, body)
+        return execute(HttpMethod.POST, uriPath, body)
     }
 
     //PUT
@@ -135,23 +149,23 @@ trait WebClientTrait {
     }
 
     ResponseEntity<Map> put(String uriPath, Object body) {
-        return execute("PUT", uriPath, body)
+        return execute(HttpMethod.PUT, uriPath, body)
     }
 
-    ResponseEntity<Map> get(String uriPath, Object id) {
-        return get("$uriPath/$id")
-    }
+    // ResponseEntity<Map> get(String uriPath, Object id) {
+    //     return get("$uriPath/$id")
+    // }
 
     ResponseEntity<Map> get(String uriPath) {
-        return execute("GET", uriPath)
+        return execute(HttpMethod.GET, uriPath)
     }
 
     ResponseEntity<byte[]> getBytes(String uriPath) {
-        return executeBytes("GET", uriPath)
+        return executeBytes(HttpMethod.GET, uriPath)
     }
 
     <T> T getBody(String uriPath, Class<T> clazz = Map) {
-        return doMethod("GET", uriPath)
+        return doMethod(HttpMethod.GET, uriPath)
     }
 
     ResponseEntity<Map> delete(String uriPath, Object id) {
@@ -159,19 +173,14 @@ trait WebClientTrait {
     }
 
     ResponseEntity<Map> delete(String uriPath) {
-        return execute("DELETE", uriPath)
+        return execute(HttpMethod.DELETE, uriPath)
     }
 
     /**
      * login with @Value injected username and password if not already
      */
     String login() {
-        if(!OkAuth.BEARER_TOKEN) login(getUsername(), getPassword())
-    }
-
-    OkHttpClient getHttpClient(){
-        //increase timeout to 120 from 10 so we can debug without socketTimeout
-        new OkHttpClient.Builder().readTimeout(120, TimeUnit.SECONDS).build()
+        return OkAuth.TOKEN ?: login(getUsername(), getPassword())
     }
 
     @CompileDynamic
@@ -189,20 +198,18 @@ trait WebClientTrait {
         return resp.access_token as String
     }
 
-    /**
-     * parse the body json to map
-     * @param resp the okhttp reponse
-     * @return the response body as map
-     */
-    Map bodyToMap(Response resp){
-        JsonEngine.parseJson(resp.body().string(), Map)
+    @CompileDynamic
+    String getBaseUrl(){
+        //serverPort is provided by the test, spring auto assigns it.
+        return "http://localhost:$serverPort"
     }
 
-    /**
-     * parse the body json to list
-     */
-    List bodyToList(Response resp){
-        JsonEngine.parseJson(resp.body().string(), List)
+    String getUrl(String uriPath){
+        return uriPath.startsWith('http') ? uriPath : "${getBaseUrl()}$uriPath"
+    }
+
+    String encodeQueryParam(String val){
+        return UriUtils.encodeQueryParam(val, StandardCharsets.UTF_8)
     }
 
     /**

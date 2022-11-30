@@ -14,6 +14,9 @@ import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
 import yakworks.rest.client.WebClientTrait
 
+/**
+ * Uses WebClient for testing instead of OkHttp
+ */
 @Integration
 class OrgWebApiSpec extends Specification implements WebClientTrait {
 

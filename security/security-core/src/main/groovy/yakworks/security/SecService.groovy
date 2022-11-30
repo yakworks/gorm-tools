@@ -13,7 +13,8 @@ import yakworks.security.user.CurrentUser
 import yakworks.security.user.UserInfo
 
 /**
- * common generic helpers for security, implement with generics D for the domain entity and I for the id type
+ * common generic helpers trait for security.
+ * Implemented in spring-kit with shiro and spring-security.
  */
 @CompileStatic
 trait SecService {
@@ -24,8 +25,7 @@ trait SecService {
     CurrentUser currentUser
 
     /**
-     * Used in automation to username a bot/system user, also used for tests
-     * Only does it if isLog
+     * Used in automation with a bot or system user, also usefull for tests
      */
     abstract UserInfo loginAsSystemUser()
 
@@ -38,12 +38,12 @@ trait SecService {
     abstract UserInfo authenticate(UserInfo userInfo)
 
     /**
-     * is a user logged in
+     * is a user logged in and not anonymous
      */
     abstract boolean isLoggedIn()
 
     /**
-     * get the user entity for the id. Default impl is to pull from DB.
+     * get the user entity for the user id. Default impl is to pull from DB.
      * @param uid the user id
      * @return the user entity
      */

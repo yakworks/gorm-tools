@@ -226,7 +226,6 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
      * where we have unique num. Search by sourceId is used when there is no org or org.id; for example to assign org on contact
      * @param data (num or source with sourceId and orgType)
      */
-    //FIXME this needs its own test
     @Override
     Org lookup(Map data) {
         Org org

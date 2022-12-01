@@ -340,11 +340,15 @@ class OrgRepoTests extends Specification implements DomainIntTest {
     }
 
     void "test find org by sourceid"() {
-        when: "findWithData has orgType on source"
+        setup: "findWithData has orgType on source"
         Org org = Org.create(num: "foo", name: "bar", type: OrgType.Customer)
         orgRepo.flush()
-        assert org.source.sourceId == "foo"
 
+        expect:
+        org.source.sourceId == "foo"
+        Org.repo.lookup([source: [sourceId: 'foo', orgType: 'Customer']])
+
+        when:
         Org o = Org.repo.findWithData([source: [sourceId: 'foo', orgType: 'Customer']])
 
         then: "source id is the default"
@@ -357,30 +361,39 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         then: "source id is the default"
         o
 
+        expect: "lookup by sourceid contained in org map"
+        Org.repo.lookup([type: 'Customer', org:[source: [sourceId: 'foo']]]) != null
     }
 
+
     void "test find org by num"() {
-        when:
-        Org org3 = Org.create(num: "foo3", name: "bar3", type: OrgType.Customer)
+        setup:
+        Org.create(num: "foo3", name: "bar3", type: OrgType.Customer)
         orgRepo.flush()
 
+        expect:
+        Org.repo.lookup(num: "foo3")
+
+        when:
         Org o3 = Org.repo.findWithData(num: "foo3")
 
         then: "found because unique"
-        assert o3
+        o3 != null
 
         when:
         o3 = Org.repo.findWithData(num: "foo3", type: OrgType.Customer)
 
         then: "also found"
-        assert o3
+        o3 != null
     }
 
     void "test find org by num not unique"() {
-        when:
-        Org org = Org.create(num: "foo", name: "bar", type: OrgType.Customer)
-        Org org2 = Org.create(num: "foo", name: "bar2", type: OrgType.CustAccount)
+        setup:
+        Org.create(num: "foo", name: "bar", type: OrgType.Customer)
+        Org.create(num: "foo", name: "bar2", type: OrgType.CustAccount)
         orgRepo.flush()
+
+        when:
         Org o3 = Org.repo.findWithData(num: "foo")
 
         then: "not found because not unique"
@@ -394,10 +407,15 @@ class OrgRepoTests extends Specification implements DomainIntTest {
     }
 
     void "test find org by num not unique with type"() {
-        when:
-        Org org = Org.create(num: "foo", name: "bar", type: OrgType.Customer)
-        Org org2 = Org.create(num: "foo", name: "bar2", type: OrgType.CustAccount)
+        setup:
+        Org.create(num: "foo", name: "bar", type: OrgType.Customer)
+        Org.create(num: "foo", name: "bar2", type: OrgType.CustAccount)
         orgRepo.flush()
+
+        expect:
+        Org.repo.lookup(num: "foo", type: OrgType.Customer)
+
+        when:
         Org o3 = Org.repo.findWithData(num: "foo", type: OrgType.Customer)
 
         then: "found because data has type"

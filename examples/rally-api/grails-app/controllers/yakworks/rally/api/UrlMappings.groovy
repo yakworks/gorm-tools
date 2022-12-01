@@ -15,6 +15,9 @@ class UrlMappings {
 
         "/info/$action"(controller: 'appInfo')
 
+        //for functional error tests
+        "/security-tests/$action"(controller: 'securityTests')
+
         RepoApiMappingsService repoApiMappingsService = getApplicationContext().getBean('repoApiMappingsService', RepoApiMappingsService)
         // repoApiMappingsService.createMappings(delegate)
 

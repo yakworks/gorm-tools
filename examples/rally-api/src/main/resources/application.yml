@@ -12,7 +12,7 @@ logging:
     root: INFO
     org.springframework: INFO
     org.hibernate.orm.deprecation: OFF # turns off deprecation notices
-    # org.springframework.security: DEBUG
+    org.springframework.security: DEBUG
     # org.springframework.security.web: TRACE
     # org.springframework.security.authentication: TRACE
     # grails.plugins.DefaultGrailsPluginManager: ERROR

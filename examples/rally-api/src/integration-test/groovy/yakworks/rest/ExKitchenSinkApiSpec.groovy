@@ -10,14 +10,18 @@ import spock.lang.Specification
 import yakworks.json.groovy.JsonEngine
 
 @Integration
-class KitchenSinkApiSpec extends Specification implements OkHttpRestTrait {
+class ExKitchenSinkApiSpec extends Specification implements OkHttpRestTrait {
 
     String path = "/api/kitchen"
+
+    def setup(){
+        login()
+    }
 
     @Ignore
     void "test get"() {
         when:
-        def resp = get("$path/1")
+        Response resp = get(getPath('rally/org/1'))
         String bodyText = resp.body().string()
         Map body = JsonEngine.parseJson(bodyText, Map)
 

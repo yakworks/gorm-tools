@@ -87,7 +87,7 @@ class EntityResponder<D> {
     }
 
     Pager pagedQuery(Map params, List<String> includesKeys) {
-        Pager pager = new Pager(params)
+        Pager pager = Pager.of(params)
         List dlist = query(pager, params)
         List<String> incs = findIncludes(params, includesKeys)
         MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)

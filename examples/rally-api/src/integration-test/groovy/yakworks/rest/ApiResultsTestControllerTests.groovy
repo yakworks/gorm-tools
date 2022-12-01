@@ -7,7 +7,7 @@ import yakworks.rally.api.ApiResultsTestController
 
 @Rollback
 @Integration
-class ApiResultsTestControllerTests extends RestIntTest{
+class ApiResultsTestControllerTests extends RestIntTest {
 
     ApiResultsTestController controller
 

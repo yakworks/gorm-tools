@@ -10,6 +10,10 @@ import spock.lang.Specification
 @Integration
 class AttachmentApiSpec extends Specification implements OkHttpRestTrait {
 
+    def setup(){
+        login()
+    }
+
     void "sanity check create create"() {
         when:
         Response resp = post("/api/rally/attachment", [name: "flub.txt"])

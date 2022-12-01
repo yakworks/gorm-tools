@@ -23,6 +23,8 @@
          
 </pre>
 
+## JAVA 11 required for 7.3.28+ to prep for spring 6. 
+
 **6.1.x is for grails 3.3.x and gorm 6.1.x**
 
 **7.0.8-vX is for grails 4.x and gorm 7.0.8**

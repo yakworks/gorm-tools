@@ -14,6 +14,10 @@ class BadUrlSpec extends Specification implements OkHttpRestTrait {
 
     String path = "/api/this/is/no/good"
 
+    def setup(){
+        login()
+    }
+
     void "good url"() {
         when:
         Response resp = get('/api/rally/org')

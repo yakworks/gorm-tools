@@ -15,8 +15,8 @@ dependencies {
   api project(":gorm-openapi")
 
   //FIXME remove this when we upgrade to spring 6 as its built in.
-  // this uses the HttpClient thats built into java 11.
-  api 'com.integralblue:java-httpclient-webclient-spring-boot-starter:1.0.0'
+  // this uses the HttpClient thats built into java 11 for WebClient.
+  compileOnly 'com.integralblue:java-httpclient-webclient-spring-boot-starter:1.0.0'
 
   // for OkHttpRestTrait test helpers
   compileOnly "com.squareup.okhttp3:okhttp:$vOkhttp"

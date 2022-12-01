@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
 
 import yakworks.security.user.CurrentUser
-import yakworks.security.user.UserInfo
 
 /**
  * A controller for the token resource.
@@ -38,12 +37,12 @@ class TokenController {
     // ex: `$ TOKEN=`http POST admin:123@localhost:8080/token.txt -b`
     @PostMapping("/api/token.txt")
     String tokenTxt() {
-        return tokenGenerator.genererate().tokenValue
+        return tokenGenerator.generate().tokenValue
     }
 
     @PostMapping("/api/token")
     ResponseEntity<Map> token(HttpServletRequest request, HttpServletResponse response) {
-        Jwt token = tokenGenerator.genererate()
+        Jwt token = tokenGenerator.generate()
         //add it as a cookie
         Cookie cookie = jwtCookie(request, token)
         response.addCookie(cookie)
@@ -57,7 +56,7 @@ class TokenController {
 
     @GetMapping("/api/token/callback")
     ResponseEntity<Map> callback(HttpServletRequest request, HttpServletResponse response) {
-        Jwt token = tokenGenerator.genererate()
+        Jwt token = tokenGenerator.generate()
         //add it as a cookie
         Cookie cookie = jwtCookie(request, token)
         response.addCookie(cookie)

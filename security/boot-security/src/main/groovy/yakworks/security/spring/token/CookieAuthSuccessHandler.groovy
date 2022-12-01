@@ -32,7 +32,7 @@ class CookieAuthSuccessHandler extends SavedRequestAwareAuthenticationSuccessHan
         // response.characterEncoding = 'UTF-8'
         // response.addHeader 'Cache-Control', 'no-store'
         // response.addHeader 'Pragma', 'no-cache'
-        Jwt token = tokenGenerator.genererate()
+        Jwt token = tokenGenerator.generate()
         Cookie cookie = TokenUtils.jwtCookie(request, token)
         response.addCookie(cookie)
         super.onAuthenticationSuccess(request, response, authentication);

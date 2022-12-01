@@ -37,7 +37,6 @@ class GormTokenStorageService implements TokenStorageService {
         if (username) {
             return userDetailsService.loadUserByUsername(username)
         }
-
         throw new TokenNotFoundException("Token ${tokenValue} not found")
     }
 
@@ -59,7 +58,6 @@ class GormTokenStorageService implements TokenStorageService {
         }
 
     }
-
 
     @Transactional
     String findUsernameForExistingToken(String tokenValue) {

@@ -15,7 +15,7 @@ interface TokenStorageService {
 
     /**
      * Returns a principal object given the passed token value
-     * @throws grails.plugin.springsecurity.rest.token.storage.TokenNotFoundException if no token is found in the storage
+     * @throws TokenNotFoundException if no token is found in the storage
      */
     UserDetails loadUserByToken(String tokenValue) throws TokenNotFoundException
 

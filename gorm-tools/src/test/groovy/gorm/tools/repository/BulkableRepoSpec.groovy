@@ -13,6 +13,7 @@ import spock.lang.Specification
 import testing.TestSyncJob
 import testing.TestSyncJobService
 import yakworks.commons.map.PathKeyMap
+import yakworks.meta.MetaMap
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.testing.gorm.model.SinkExt
@@ -317,4 +318,26 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
         }
     }
 
+    void "test buildErrorMap"() {
+        setup:
+        Map data = [name:"cust-1", num:"cust-1", id:1]
+
+        expect: "when no includes"
+        kitchenSinkRepo.buildErrorMap(data, null) == data
+
+        and: "when includes provided"
+        kitchenSinkRepo.buildErrorMap(data, ["id", "num"]) == [id:1, num: "cust-1"]
+    }
+
+    void "test buildSuccessMap"() {
+        setup:
+        KitchenSink kitchenSink = new KitchenSink(name: "name", secret: "secret", ext: new SinkExt(name:"ext-name", textMax: "test"))
+
+        when: "when includes provided"
+        Map result = kitchenSinkRepo.buildSuccessMap(kitchenSink, ["name", "ext.name"])
+
+        then:
+        result.size() == 2
+        result == [name: "name", ext:[name: "ext-name"]]
+    }
 }

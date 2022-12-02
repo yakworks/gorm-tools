@@ -1,15 +1,13 @@
 package yakworks.rally.security
 
-import org.springframework.security.crypto.password.PasswordEncoder
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
-import yakworks.rally.security.RallyUserService
+import yakworks.security.Roles
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRoleUser
@@ -19,23 +17,9 @@ import yakworks.testing.gorm.integration.DomainIntTest
 @Rollback
 class RallyUserServiceSpec extends Specification implements DomainIntTest {
     RallyUserService rallyUserService
-    //UserRepo userRepo
-    PasswordEncoder passwordEncoder
-
-    static String CONTACT_PASSWORD = "password"
-
+    
     void setup() {
         authenticate(AppUser.get(1), 'MANAGER')
-        // ['T001', 'T002', 'T003', 'T004'].each { String num ->
-        //     Org.findByNum(num)?.delete(flush: true)
-        //     Contact.findByFirstName(num)?.delete(flush: true)
-        //     AppUser user = AppUser.findByUsername(num)
-        //     if (user) {
-        //         SecRoleUser.findAllByUser(user).each { it.delete(flush: true) }
-        //         user.delete(flush: true)
-        //     }
-        // }
-
     }
 
     def sanityCheck(){
@@ -43,23 +27,24 @@ class RallyUserServiceSpec extends Specification implements DomainIntTest {
         rallyUserService
     }
 
-    @Ignore
     void testGetOrgManagers() {
         when:
         Org branch = Org.of("T001", "Test 1", OrgType.Branch).persist()
 
-        SecRole mgrRole = SecRole.create(code: 'MANAGER')
-        SecRole colMgrRole = SecRole.create(code: 'AR_MANAGER')
+        SecRole mgrRole = SecRole.create(code: 'MANAGER', name: Roles.MANAGER)
+        SecRole colMgrRole = SecRole.create(code: 'AR_MANAGER', name: Roles.AR_MANAGER)
         SecRole collectorRole = SecRole.create(code: 'AR_COLLECTOR')
 
         assert mgrRole != null
         assert colMgrRole != null
 
+        //user 1 with role manager
         Contact mgrContact1 = build(Contact, [email: 'manager1@foo.com', org: branch])
         rallyUserService.buildUserFromContact(mgrContact1, '1234')
         mgrContact1.persist(flush: true)
         SecRoleUser.create(mgrContact1.user, mgrRole)
 
+        //user 2 with role AR_MANAGER
         Contact mgrContact2 = build(Contact, [email: 'manager2@foo.com', org: branch])
         rallyUserService.buildUserFromContact(mgrContact2, '1234')
         mgrContact2.persist(flush: true)
@@ -84,7 +69,6 @@ class RallyUserServiceSpec extends Specification implements DomainIntTest {
         clist.each {
             assert it.user.id == it.id
         }
-        //clist[0].user instanceof AppUser
 
         List<AppUser> ulist = AppUser.executeQuery("""
             select user from Contact contact, AppUser user
@@ -103,7 +87,6 @@ class RallyUserServiceSpec extends Specification implements DomainIntTest {
 
         then:
         users.size() == 2
-
     }
 
 }

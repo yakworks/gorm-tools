@@ -17,7 +17,7 @@ import yakworks.testing.gorm.integration.DomainIntTest
 @Rollback
 class RallyUserServiceSpec extends Specification implements DomainIntTest {
     RallyUserService rallyUserService
-    
+
     void setup() {
         authenticate(AppUser.get(1), 'MANAGER')
     }

@@ -17,28 +17,19 @@ class ParallelToolsSpecSpec extends Specification {
         List<Map> list = createList(50)
 
         expect:
-        // Project.withSession {
-        //     Project.count() == 50
-        // }
         //starting org count
         Org.count() == 100
-
         list.size() == 50
 
         when:
         // FIXME #339 how is this working, transaction thats set on the test should not be rolling into parallelTools?
-        def args = new AsyncArgs(enabled: true)
+        AsyncArgs args = new AsyncArgs(enabled: true)
         parallelTools.each(args, list) { Map item ->
             new Org(num: item.name, name: "name $item.name", type: OrgType.Customer).persist()
         }
-        // Project.repo.flush()
 
         then:
         Org.count() == 150
-        // Org.withSession {
-        //     Org.count() == 150
-        // }
-
     }
 
     List<Map> createList(int num) {

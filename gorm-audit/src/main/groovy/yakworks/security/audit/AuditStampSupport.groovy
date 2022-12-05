@@ -72,9 +72,7 @@ class AuditStampSupport {
      * initialize stamp fields if need be
      */
     void stampIfNew(Object entity, Class<?> dateTimeClass = LocalDateTime) {
-        //if its not new then just exit as we will assume an updated entity is initialized correctly
-        // if (!isNewEntity(entity)) return
-        // FIXME temp fix for bad data
+        // TODO temp fix for bad data, see ensureEditedDate
         if (hasCreatedDate(entity)){
             //if it has createDate then its not new but might have bad data
             ensureEditedDate(entity)

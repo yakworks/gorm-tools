@@ -13,14 +13,17 @@ import groovy.transform.CompileStatic
 class Roles {
     // enabled by default in base data
     //full access, system user
-    static final String ADMIN = "ADMIN" //super user
-    static final String POWER_USER = "POWER_USER" //restricted super user.
+    static final String ADMIN = "ADMIN"
+    //restricted super user.
+    static final String POWER_USER = "POWER_USER"
     //default user, access to all the screens, not manager (cannot approve, view other's tasks or delete cash system data)
-    static final String MANAGER = "MANAGER" //access to all user's tasks, approval, can delete cash system data
-    static final String GUEST = "GUEST" //read only
-    static final String CUSTOMER = "CUSTOMER" // single customer user
+    static final String MANAGER = "MANAGER"
+    //read only
+    static final String GUEST = "GUEST"
+    // single customer user
+    static final String CUSTOMER = "CUSTOMER"
 
-    //FIXME move into domain9
+    //FIXME move into domain9 when we move over domain9 logic from RallyUserService
     static final String AR_MANAGER = "AR_MANAGER"  //can see other collector tasks, approvals
 
 }

@@ -4,6 +4,9 @@
 */
 package gorm.tools.mango
 
+import spock.lang.Issue
+import testing.TestSource
+
 import java.time.LocalDate
 
 import org.hibernate.QueryException
@@ -17,7 +20,7 @@ import testing.TestSeedData
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
-    static List entityClasses = [Cust, Address, AddyNested]
+    static List entityClasses = [Cust, Address, AddyNested, TestSource]
 
     @Autowired MangoBuilder mangoBuilder
 
@@ -331,6 +334,27 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
 
         then:
         res.size() == 1
+    }
+
+    @Issue("https://github.com/yakworks/gorm-tools/issues/285")
+    void "when id field is not an association"() {
+        setup:
+        new TestSource(name:"test", source:"s1", sourceId: "sid1").save()
+        new TestSource(name:"test2", source:"s2", sourceId: "sid2").save()
+
+        when:
+        List l = mangoBuilder.build(TestSource, [sourceId:"sid1"]).list()
+
+        then:
+        noExceptionThrown()
+        l.size() == 1
+
+        when:
+        l = mangoBuilder.build(TestSource, [sourceId:['$ne': 'sid1']]).list()
+
+        then:
+        l.size() == 1
+        l[0].name == "test2"
     }
 
     def "test invalid field"() {

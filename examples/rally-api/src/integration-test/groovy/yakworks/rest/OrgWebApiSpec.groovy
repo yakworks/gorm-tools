@@ -213,7 +213,6 @@ class OrgWebApiSpec extends Specification implements WebClientTrait {
         // delete(contactApiPath, contactBody.data[1].id)
     }
 
-    //@Ignore //FIXME
     void "test post with locations"() {
         when:
         Map primaryLocation =  [name: "P1", street1: "P1", city:"P1", state: "P1"]

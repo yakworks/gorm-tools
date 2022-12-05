@@ -34,8 +34,8 @@ trait NameCode<D> extends NamedEntity implements Lookupable<D> {
         if(!this.name && this.code) this.name = code.replaceAll('-', ' ')
     }
 
-    //FIXME #339 framed out example
     static D lookup(Map data){
+        //FIXME does this have a test? also, on else it returns nothing, should be specific and return null otherwise
         if(data['code']) {
             (D) RepoLookup.findRepo(this).query(code: data['code']).get()
         }

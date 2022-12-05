@@ -17,7 +17,7 @@ import org.springframework.core.ResolvableType
 
 /**
  * An event listener that adds support for auto-timestamping with userId for edits and updates
- * concepts taken from the AutoTimeStampingListener in gorm. FIXME problem is on
+ * concepts taken from the AutoTimeStampingListener in gorm.
  */
 @CompileStatic
 class AuditStampPersistenceEventListener implements GenericApplicationListener {

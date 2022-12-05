@@ -24,9 +24,6 @@ import yakworks.spring.AppCtx
 @CompileStatic
 class IncludesConfig {
 
-    // private static final Map<String, String> entityClassPathKeys = new ConcurrentHashMap<String, String>()
-    // private static final Map<String, Map<String, Object>> entityClassApiProps = new ConcurrentHashMap<String, Map<String, Object>>()
-
     @Autowired ApiConfig apiConfig
 
     //static cheater to get the bean, use sparingly if at all
@@ -94,121 +91,12 @@ class IncludesConfig {
         return getFieldIncludes(incMap, keyList)
     }
 
-    /**
-     * merges in missing props for includes map by looking in config and on the entity class.
-     * if it exists in the restApi config then that wins and overrides the others
-     *
-     * @param entityKey the name of the controller key in the restApi config
-     * @param namespace the namespace it falls under
-     * @param entityClass the entity class to look for statics on
-     * @param mergeIncludes may be passed in from controller etc, provides overrrides for whats in config and domain
-     */
-    // @Cacheable('ApiConfig.includesByKey')
-    // Map getIncludes(String entityKey, String namespace, Class entityClass, Map mergeIncludes){
-    //     // look for includes map on the domain first
-    //     Map includesMap = getClassStaticIncludes(entityClass)
-    //     Map pathConfig = getPathConfig(entityKey, namespace)
-    //
-    //     //if anything on config then overrite them
-    //     if (pathConfig?.includes) {
-    //         includesMap.putAll(pathConfig.includes as Map)
-    //     }
-    //
-    //     if(mergeIncludes) includesMap.putAll(mergeIncludes)
-    //
-    //     return includesMap
-    // }
-
     Map getClassStaticIncludes( Class entityClass) {
         // look for includes map on the domain first
         Map entityIncludes = ClassUtils.getStaticPropertyValue(entityClass, 'includes', Map)
         Map includesMap = (entityIncludes ? Maps.clone(entityIncludes) : [:]) as Map<String, Object>
         return includesMap
     }
-
-    /**
-     * gets the Map config for the entityKey and namespace
-     */
-    // Map getPathConfig(String entityKey, String namespace){
-    //     //String configPath = namespace ? "api.paths.${namespace}.${entityKey}" : "api.paths.${entityKey}"
-    //     Map<String, Object> entityConfig
-    //     String pathKey = namespace ? "/${namespace}/${entityKey}" : "/${entityKey}"
-    //     entityConfig = apiConfig.paths[pathKey] as Map<String, Object>
-    //
-    //     //if nothing and it has a dot than entity key might be full class name with package, so do search
-    //     if(!entityConfig && entityKey.indexOf('.') != -1)
-    //         entityConfig = apiConfig.pathsByEntity[entityKey] as Map<String, Object>
-    //
-    //     return entityConfig
-    // }
-
-    /**
-     * looks for the entityClass key that matches the className
-     */
-    // ApiProperties.PathItem findConfigByEntityClass(String className){
-    //     return apiConfig.pathsByEntity[className]
-    //     // String rootCfgKey = entityClassPathKeys[className]
-    //     // return rootCfgKey ? config.getProperty(rootCfgKey, Map) : [:]
-    // }
-
-    /**
-     * setup pathKeys for entityClass
-     * this scans the api.paths base for entityClassName and store the pathKey with namespace.
-     * when it finds  api.paths.security.user.entityClass: yakworks.security.domain.AppUser
-     * it will store ['yakworks.security.domain.AppUser': 'api.paths.security.user'] for faster lookup
-     */
-    // void setupEntityClassPathKeys() {
-    //     Properties cfgProps = config.toProperties()
-    //     Set keySet = cfgProps.keySet() as Set<String>
-    //     Set entClassKeySets = keySet.findAll{ it.matches(/api\.paths.*\.entityClass/) }
-    //     for(String ckey: entClassKeySets){
-    //         String entityClass = cfgProps.getProperty(ckey)
-    //         String rootCfgKey = ckey.replace(".entityClass", '')
-    //         entityClassPathKeys[entityClass] = rootCfgKey
-    //     }
-    // }
-
-    /**
-     * initializes the entityClassApiProps which is keyed by class name
-     */
-    // void initEntityClassApiProps(){
-    //     //exit fast if nothing setup
-    //     if(!apiConfig.paths) return
-    //
-    //     Map restApiPaths = apiConfig.paths ?: [:]
-    //     Map namespaces = apiConfig.namespaces ?: [:]
-    //
-    //     restApiPaths.each { String key, Object val ->
-    //         Map cfg = (Map)val
-    //         if(namespaces.containsKey(key)){
-    //             for(Map.Entry entry : ((Map)cfg) ){
-    //                 Map nestCfg = (Map)entry.value
-    //                 if(nestCfg.containsKey('entityClass')){
-    //                     entityClassApiProps[nestCfg['entityClass'].toString()] = nestCfg
-    //                 }
-    //             }
-    //         }
-    //         else { //normal not namespaced or may have slash like 'foo/bar' as key so just add it
-    //             if(cfg.containsKey('entityClass')){
-    //                 entityClassApiProps[cfg['entityClass'].toString()] = cfg
-    //             }
-    //         }
-    //     }
-    // }
-
-    /**
-     * FIXME whats this for? can we remove or is it used?
-     */
-    // Map getPathConfig(String pathkey){
-    //     Map pathConfig
-    //     if(pathkey.contains('_')){
-    //         String[] parts = pathkey.split('[_]')
-    //         pathConfig = getPathConfig(parts[1], parts[0])
-    //     } else {
-    //         pathConfig = getPathConfig(pathkey, null)
-    //     }
-    //     return pathConfig
-    // }
 
     /**
      * get the fields includes with a list of keys to search in order, stopping at the first found

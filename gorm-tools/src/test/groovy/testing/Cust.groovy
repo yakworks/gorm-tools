@@ -33,7 +33,8 @@ class Cust implements GormRepoEntity<Cust, CustRepo> {
     LocalDate locDate
     LocalDateTime locDateTime
     //special
-    //Currency currency //FIXME creates and overflow
+    //FIXME creates an overflow, add back in and figure out why or if its still and issue
+    //Currency currency
 
     //Associations
     CustType type //type is required

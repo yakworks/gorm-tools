@@ -92,7 +92,7 @@ class ApiSchemaEntity {
         //def sortedProps = propsMap.sort()
         def p = [:]
         p.putAll(propsMap.sort())
-        //FIXME be smarter about this
+        //TODO be smarter about this
         if(kind == CruType.Read){
             p.putAll(idVerMap)
         }

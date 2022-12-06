@@ -339,7 +339,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         source2.sourceType == SourceType.App
     }
 
-    void "test find org by sourceid"() {
+    void "test lookup org by sourceid"() {
         setup: "findWithData has orgType on source"
         Org org = Org.create(num: "foo", name: "bar", type: OrgType.Customer)
         orgRepo.flush()
@@ -366,7 +366,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
     }
 
 
-    void "test find org by num"() {
+    void "test lookup org by num"() {
         setup:
         Org.create(num: "foo3", name: "bar3", type: OrgType.Customer)
         orgRepo.flush()
@@ -406,7 +406,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         thrown DataRetrievalFailureException
     }
 
-    void "test find org by num not unique with type"() {
+    void "test lookup org by num not unique with type"() {
         setup:
         Org.create(num: "foo", name: "bar", type: OrgType.Customer)
         Org.create(num: "foo", name: "bar2", type: OrgType.CustAccount)
@@ -428,7 +428,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         o3
     }
 
-    def "update org lookup by sourceid"() {
+    void "update org lookup by sourceid"() {
         setup:
         Long orgId = 1111
 

@@ -8,7 +8,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.concurrent.ConcurrentHashMap
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.core.artefact.AnnotationDomainClassArtefactHandler
@@ -25,7 +24,6 @@ import org.springframework.core.convert.support.DefaultConversionService
 import org.springframework.validation.AbstractBindingResult
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.BindingResult
-import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 
@@ -305,11 +303,8 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
         return sval.trim() ?: null
     }
 
-    //FIXME clean this up so its a compile static
-    @CompileDynamic
     def getEnumWithGet(Class<?> enumClass, Number id){
-        //See the repoEvents code, we can use ReflectionUtils and cache the the get method, then use CompileStatic
-        return enumClass.get(id)
+        return ClassUtils.callStaticMethod(enumClass, 'get', id)
     }
 
     /**

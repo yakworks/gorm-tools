@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryArgs
 import grails.gorm.DetachedCriteria
+import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.EnumUtils
 import yakworks.commons.model.IdEnum
 import yakworks.gorm.api.IncludesConfig
@@ -402,14 +403,14 @@ class MangoBuilder {
                 v = parsedVal
             }
             else if (typeToConvertTo.isEnum()) {
-                v = getEnum(typeToConvertTo, v)
+                v = EnumUtils.getEnum(typeToConvertTo, (String)v)
             }
 
         }
         else if (typeToConvertTo?.isEnum() && (v instanceof Number || v instanceof Map)){
             def idVal = v //assume its a number
             if(v instanceof Map) idVal = v['id']
-            v = getEnumWithGet(typeToConvertTo, v as Number)
+            v = getEnumWithGet(typeToConvertTo, idVal as Number)
         }
         else {
             v = v.asType(typeToConvertTo)
@@ -418,16 +419,7 @@ class MangoBuilder {
         return v
     }
 
-    //FIXME clean this up so its a compile static
-    @CompileDynamic
-    static getEnum(Class typeToConvertTo, Object val){
-        return EnumUtils.getEnum(typeToConvertTo, val)
-    }
-
-    //FIXME clean this up so its a compile static
-    @CompileDynamic
     static getEnumWithGet(Class<?> enumClass, Number id){
-        //See the repoEvents code, we can use ReflectionUtils and cache the the get method, then use CompileStatic
-        return enumClass.get(id)
+        return ClassUtils.callStaticMethod(enumClass, 'get', id)
     }
 }

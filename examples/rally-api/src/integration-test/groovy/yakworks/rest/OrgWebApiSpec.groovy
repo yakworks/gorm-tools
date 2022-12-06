@@ -7,12 +7,14 @@ import org.springframework.http.ResponseEntity
 import gorm.tools.beans.Pager
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import spock.lang.Ignore
+import org.springframework.web.client.RestClientException
+import org.springframework.web.reactive.function.client.WebClientResponseException
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
 import yakworks.rest.client.WebClientTrait
+import static yakworks.json.groovy.JsonEngine.parseJson
 
 /**
  * Uses WebClient for testing instead of OkHttp
@@ -252,18 +254,22 @@ class OrgWebApiSpec extends Specification implements WebClientTrait {
         delete(path, orgId)
     }
 
-    @Ignore //Webclient throws exception for 422, need to sort that out.
     void "testing post bad data"() {
         when:
-        def resp = post(path, [name: "foobie", type: "Customer"])
+        post(path, [name: "foobie", type: "Customer"])
 
-        Map body = resp.body
+        then: //web client throws exception when encounters 422, need to get response json from exception
+        WebClientResponseException.UnprocessableEntity e = thrown()
+        e.statusCode == HttpStatus.UNPROCESSABLE_ENTITY
+        e.message.contains "422 Unprocessable Entity"
+
+        when:
+        String errorResponse = e.getResponseBodyAsString()
+        Map body = parseJson(errorResponse)
 
         then:
-        resp.statusCode == HttpStatus.UNPROCESSABLE_ENTITY
         body.status == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.title == 'Org Validation Error(s)'
-        //body.detail == "Org Validation Error(s)"
         body.errors[0].code == 'NotNull'
         body.errors[0].message == 'must not be null'
     }

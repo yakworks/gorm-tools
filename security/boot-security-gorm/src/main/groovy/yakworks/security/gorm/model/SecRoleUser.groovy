@@ -94,24 +94,6 @@ class SecRoleUser implements GormRepoEntity<SecRoleUser, SecRoleUserRepo>, Seria
         getRepo().exists(SecRole.load(securityRoleId), AppUser.load(userId))
     }
 
-    // FIXME I think this was an old ui concept, if still needed then add test
-    @CompileDynamic
-    static Map<SecRole, Boolean> getRoleMap(AppUser userInstance) {
-        List roles = SecRole.list()
-        Set userRoleNames = []
-        if (userInstance.getId()) {
-            for (r in userInstance.roles) {
-                userRoleNames << r
-            }
-        }
-        Map<SecRole, Boolean> roleMap = [:]
-        for (r in roles) {
-            roleMap[(r)] = userRoleNames.contains(r.code)
-        }
-
-        return roleMap
-    }
-
     @Override
     boolean equals(Object other) {
         if (other instanceof SecRoleUser) {

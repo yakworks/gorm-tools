@@ -1,13 +1,16 @@
 package gorm.tools.problem
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.MessageSource
+import org.springframework.validation.Errors
 import spock.lang.Specification
+import testing.Cust
+import yakworks.api.HttpStatus
 import yakworks.i18n.icu.DefaultICUMessageSource
 import yakworks.testing.gorm.unit.DataRepoTest
 
 //FIXME beef this out, it appears to be only test?
 class ProblemHandlerSpec extends Specification implements DataRepoTest {
+    static List entityClasses = [Cust]
 
     // MessageSource messageSource
     @Autowired ProblemHandler problemHandler
@@ -43,25 +46,31 @@ class ProblemHandlerSpec extends Specification implements DataRepoTest {
         then:
         rte
     }
-    //
-    // def 'validation exception'() {
-    //     when:
-    //     def valEx
-    //     try{
-    //         new Cust(companyId: Company.DEFAULT_COMPANY_ID, type: OrgType.Customer).persist()
-    //     }catch(e){
-    //         valEx = e
-    //     }
-    //     assert valEx instanceof EntityValidationException
-    //     def problem = problemHandler.handleException(valEx)
-    //
-    //     then:
-    //     problem.statuc == 422
-    //     problem.code == "validation.error"
-    //     problem.title == "Org Validation Error(s)"
-    //     problem.errors.size() == 2
-    //     //FIXME finish testing this
-    //
-    // }
+
+     void 'validation exception'() {
+         when:
+         new Cust(name2: "Test").persist(failOnError:true) //would fail constraints
+
+         then:
+         ValidationProblem.Exception ex = thrown()
+
+         when:
+         def problem = problemHandler.handleException(ex)
+
+         then:
+         problem instanceof ValidationProblem
+         problem.status == HttpStatus.UNPROCESSABLE_ENTITY
+         problem.code == "validation.problem"
+         problem.title == "Validation Error(s)"
+
+         when:
+         Errors errors =  ((ValidationProblem)problem).errors
+
+         then:
+         errors != null
+         errors.errorCount == 2
+         errors.hasFieldErrors("name")
+         errors.hasFieldErrors('type')
+     }
 
 }

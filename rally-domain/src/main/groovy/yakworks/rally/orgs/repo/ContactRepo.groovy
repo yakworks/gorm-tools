@@ -64,6 +64,10 @@ class ContactRepo extends LongIdGormRepo<Contact> {
 
         // ContactSource.query(contact: contact).deleteAll() - deleted with cascade as per domain mapping.
         Location.query(contact: contact).deleteAll()
+        
+        //NOTE: This was here for CED but it was removed as logic is faulty to keep the location around for the contact if the contact is deleted. 
+        // I think the idea was to keep its location info even if contact was removed since contacts could be some kind of job.
+        //Location.executeUpdate("update Location set contact = null where contact = :contact", [contact: contact]) //set contact to null
     }
 
     /** lookup by num or ContactSource */

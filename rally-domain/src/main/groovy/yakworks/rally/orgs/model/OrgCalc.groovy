@@ -9,11 +9,12 @@ import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.common.BaseArScoreCard
+import yakworks.security.audit.AuditStampTrait
 
 @Entity
 @IdEqualsHashCode
 @GrailsCompileStatic
-class OrgCalc implements BaseArScoreCard, RepoEntity<OrgCalc>, Serializable {
+class OrgCalc implements BaseArScoreCard, RepoEntity<OrgCalc>, AuditStampTrait, Serializable {
     static belongsTo = [Org]
 
     Long id

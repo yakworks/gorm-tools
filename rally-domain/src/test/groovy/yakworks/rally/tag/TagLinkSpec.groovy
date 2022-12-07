@@ -96,7 +96,60 @@ class TagLinkSpec extends Specification implements DataRepoTest, SecurityTest {
 
         then:
         thrown IllegalArgumentException
+    }
 
+    void "test add remove - list"() {
+        setup:
+        Attachment att = new Attachment(name: 'foo', location: 'foo').persist()
+        Tag t1 = Tag.create(name: 't1', code:'t1', entityName: 'Attachment')
+        Tag t2 = Tag.create(name: 't2', code:'t2', entityName: 'Attachment')
+        Tag t3 = Tag.create(name: 't3', code:'t3', entityName: 'Attachment')
+
+        when:
+        TagLink.addOrRemoveTags(att, [[id:t1.id], [id:t2.id]])
+
+        then:
+        TagLink.exists(att, t1)
+        TagLink.exists(att, t2)
+        !TagLink.exists(att, t3)
+
+        when:
+        TagLink.addOrRemoveTags(att, [[id:t2.id], [id:t3.id]])
+        flushAndClear()
+
+        then:
+        TagLink.count() == 2
+        !TagLink.exists(att, t1)
+        TagLink.exists(att, t2)
+        TagLink.exists(att, t3)
+        !att.tags.contains(t1)
+    }
+
+    void "test add remove - loose json string "() {
+        setup:
+        Attachment att = new Attachment(name: 'foo', location: 'foo').persist()
+        Tag t1 = Tag.create(name: 't1', code:'t1', entityName: 'Attachment')
+        Tag t2 = Tag.create(name: 't2', code:'t2', entityName: 'Attachment')
+        Tag t3 = Tag.create(name: 't3', code:'t3', entityName: 'Attachment')
+
+        when:
+        TagLink.addOrRemoveTags(att, '[{id:1}, {id:2}]')
+
+        then:
+        TagLink.exists(att, t1)
+        TagLink.exists(att, t2)
+        !TagLink.exists(att, t3)
+
+        when:
+        TagLink.addOrRemoveTags(att, '[{id:2}, {id:3}]')
+        flushAndClear()
+
+        then:
+        TagLink.count() == 2
+        !TagLink.exists(att, t1)
+        TagLink.exists(att, t2)
+        TagLink.exists(att, t3)
+        !att.tags.contains(t1)
     }
 
 }

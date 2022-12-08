@@ -207,7 +207,7 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     List<X> addOrRemove(P main, Object itemParams){
         if(!itemParams) return []
 
-        //handle if it's a json array in string
+        //handle if it's a json array in string, largely for CSV support and the binding that occurs during that process, such as creating orgs with tags
         if(itemParams instanceof String) {
             Validate.isTrue(itemParams.trim().startsWith('['), "bind data of type string must be a json array")
             itemParams = jsonSlurper.parseText(itemParams) as List

@@ -18,8 +18,9 @@ package yakworks.security.spring.token;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.AbstractOAuth2Token;
 
-public interface TokenGenerator<T> {
+public interface TokenGenerator<T extends AbstractOAuth2Token> {
 
     default T generate(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

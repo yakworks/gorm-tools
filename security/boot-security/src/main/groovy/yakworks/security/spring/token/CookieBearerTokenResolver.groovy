@@ -16,7 +16,7 @@ import org.springframework.security.oauth2.server.resource.web.DefaultBearerToke
  * If default check in auth header is null then will look for cookie too.
  */
 class CookieBearerTokenResolver implements BearerTokenResolver {
-    public static String COOKIE_NAME = "jwt"
+
     def defaultBearerTokenResolver = new DefaultBearerTokenResolver()
 
     @Override
@@ -28,7 +28,7 @@ class CookieBearerTokenResolver implements BearerTokenResolver {
     }
 
     String findTokenCookie(HttpServletRequest request) {
-        Cookie cookie = request.getCookies()?.find { Cookie cookie -> cookie.name.equalsIgnoreCase(COOKIE_NAME) }
+        Cookie cookie = request.getCookies()?.find { Cookie cookie -> cookie.name.equalsIgnoreCase(TokenUtils.COOKIE_NAME) }
         return cookie?.value
     }
 }

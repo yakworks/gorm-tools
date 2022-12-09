@@ -80,7 +80,7 @@ class TokenController {
     }
 
     protected Cookie jwtCookie(HttpServletRequest request, Jwt token) {
-        Cookie jwtCookie = new Cookie( 'jwt', token.tokenValue )
+        Cookie jwtCookie = new Cookie( TokenUtils.COOKIE_NAME, token.tokenValue )
         //FIXME some hard coded values to get it working
         jwtCookie.maxAge = JwtTokenGenerator.getExpiresIn(token)
         jwtCookie.path = '/'

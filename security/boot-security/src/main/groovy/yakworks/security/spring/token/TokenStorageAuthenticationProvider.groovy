@@ -1,6 +1,5 @@
 package yakworks.security.spring.token
 
-
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.CredentialsExpiredException
 import org.springframework.security.core.Authentication
@@ -8,6 +7,10 @@ import org.springframework.security.core.AuthenticationException
 import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken
 
+/**
+ * Adds AuthenticationProvider to the chain
+ * This looks up the token in the db and authenticates if its good.
+ */
 class TokenStorageAuthenticationProvider implements AuthenticationProvider {
 
     @Override
@@ -17,8 +20,10 @@ class TokenStorageAuthenticationProvider implements AuthenticationProvider {
         // AbstractAuthenticationToken token = this.jwtAuthenticationConverter.convert(jwt);
         // token.setDetails(bearer.getDetails());
         // this.logger.debug("Authenticated token");
+
         throw new CredentialsExpiredException("Storage token")
-        //return null;
+
+        // return null
     }
 
     @Override

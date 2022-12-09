@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
 
+import org.springframework.security.oauth2.core.AbstractOAuth2Token
 import org.springframework.security.oauth2.jwt.Jwt
 
 /**
@@ -18,6 +19,7 @@ import org.springframework.security.oauth2.jwt.Jwt
  */
 @CompileStatic
 class TokenUtils {
+    public static String COOKIE_NAME = "jwt"
 
     /**
      * Generates a keypair for RSA 2048
@@ -38,7 +40,7 @@ class TokenUtils {
     /**
      * creates a cookie for the JWT token
      */
-    static Cookie jwtCookie(HttpServletRequest request, Jwt token) {
+    static Cookie jwtCookie(HttpServletRequest request, AbstractOAuth2Token token) {
         Cookie jwtCookie = new Cookie( 'jwt', token.tokenValue )
         //FIXME some hard coded values to get it working
         jwtCookie.maxAge = JwtTokenGenerator.getExpiresIn(token)

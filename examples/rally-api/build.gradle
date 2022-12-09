@@ -58,18 +58,15 @@ dependencies {
     implementation "org.opensaml:opensaml-saml-impl:4.1.1"
   }
 
-  //??wtf
-  // implementation "commons-lang:commons-lang:2.6"
-
   runtimeOnly "com.h2database:h2:$vH2"
   runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"
   runtimeOnly "com.zaxxer:HikariCP:$vHikari"
 
-  //FIXME remove this when we upgrade to spring 6 as its built in.
+  //TODO look into this so we are using jdk11, can remove this when we upgrade to spring 6 as its built in.
   // this uses the HttpClient thats built into java 11 for WebClient.
-  testImplementation 'com.integralblue:java-httpclient-webclient-spring-boot-starter:1.0.0'
+  // testImplementation 'com.integralblue:java-httpclient-webclient-spring-boot-starter:1.0.0'
 
-  //for rest api testing
+  //for original rest api testing, WebClient uses the spring stuff
   testImplementation "com.squareup.okhttp3:okhttp:$vOkhttp"
   //testImplementation "org.jetbrains.kotlin:kotlin-stdlib:$vKotlin" //okhttp3 needs this
 

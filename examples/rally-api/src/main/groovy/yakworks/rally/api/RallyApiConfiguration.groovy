@@ -38,6 +38,7 @@ import yakworks.security.spring.token.CookieAuthSuccessHandler
 import yakworks.security.spring.token.CookieBearerTokenResolver
 import yakworks.security.spring.token.JwtTokenGenerator
 import yakworks.security.spring.token.TokenStorageAuthenticationProvider
+import yakworks.security.spring.token.TokenUtils
 
 import static org.springframework.security.config.Customizer.withDefaults
 
@@ -96,7 +97,7 @@ class RallyApiConfiguration {
             //make stateless so no session stored on server
             .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             //remove the cookie on logout
-            .logout().deleteCookies(CookieBearerTokenResolver.COOKIE_NAME);
+            .logout().deleteCookies(TokenUtils.COOKIE_NAME);
 
         // Uncomment to enable SAML, will hit the metadata-uri on startup and fail if not found
         // TODO need to find a way to not hit server until its needed instead of on startup

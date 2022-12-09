@@ -25,7 +25,9 @@ import org.springframework.web.reactive.function.client.DefaultWebClient
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.util.UriUtils
 
-import com.integralblue.http.client.reactive.JdkClientHttpConnector
+import reactor.core.publisher.Mono
+import reactor.netty.http.client.HttpClient
+
 import yakworks.commons.lang.EnumUtils
 import yakworks.json.groovy.JsonEngine
 
@@ -115,25 +117,39 @@ trait WebClientTrait {
      * build WebClient with higher timeout of 120
      */
     WebClient getWebClient(){
-        // HttpClient httpClient = HttpClient.create()
-        //     .responseTimeout(Duration.ofSeconds(120))
-
-        HttpClient httpClient = HttpClient.newBuilder()
-            .followRedirects(HttpClient.Redirect.NORMAL)
-            .connectTimeout(Duration.ofSeconds(20))
-            .build();
-
-        ClientHttpConnector connector =
-            new JdkClientHttpConnector(httpClient, new DefaultDataBufferFactory());
-
+        HttpClient httpClient = HttpClient.create()
+            .responseTimeout(Duration.ofSeconds(120))
         WebClient webClient = wbuilder
             .baseUrl(getBaseUrl())
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .clientConnector(connector)
+            .clientConnector(new ReactorClientHttpConnector(httpClient))
             .build()
-        //increase timeout to 120 from 10 so we can debug without socketTimeout
         return webClient
     }
+
+    /**
+     * build WebClient with higher timeout of 120
+     */
+    // WebClient getWebClientJava11(){
+        // HttpClient httpClient = HttpClient.create()
+        //     .responseTimeout(Duration.ofSeconds(120))
+
+    //     HttpClient httpClient = newBuilder()
+    //         .followRedirects(Redirect.NORMAL)
+    //         .connectTimeout(Duration.ofSeconds(20))
+    //         .build();
+    //
+    //     ClientHttpConnector connector =
+    //         new JdkClientHttpConnector(httpClient, new DefaultDataBufferFactory());
+    //
+    //     WebClient webClient = wbuilder
+    //         .baseUrl(getBaseUrl())
+    //         .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+    //         .clientConnector(connector)
+    //         .build()
+    //     //increase timeout to 120 from 10 so we can debug without socketTimeout
+    //     return webClient
+    // }
 
     //POST test
     ResponseEntity<Map> post(String uriPath, Object body) {

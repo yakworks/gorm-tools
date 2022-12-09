@@ -13,9 +13,11 @@ import groovy.util.logging.Slf4j
 import org.springframework.http.MediaType
 
 import yakworks.security.spring.token.AccessToken
+import yakworks.security.spring.token.TokenUtils
 
 
 /**
+ * OLD READER
  * Finds the bearer token and if not found tries the for token, like github , for our stored tokens and in Basic
  */
 @Slf4j
@@ -24,7 +26,7 @@ class HeaderTokenReader  {
 
     final static String DEFAULT_COOKIE_NAME = 'jwt'
 
-    String cookieName = DEFAULT_COOKIE_NAME
+    String cookieName = TokenUtils.COOKIE_NAME
 
     /**
      * find access token in header.

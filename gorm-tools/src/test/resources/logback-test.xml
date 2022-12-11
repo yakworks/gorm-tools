@@ -2,5 +2,8 @@
 <configuration>
   <!-- use yakworks's base that adds colors and method with line num, compatible with spring boot -->
   <include resource="yakworks/spring/logback/base.xml"/>
-  <!-- Use application.yml to configure logging level-->
+  <!-- Use application.yml to configure logging level unless trying to log out unit tests-->
+  <logger name="com.zaxxer.hikari.pool.HikariPool" level="DEBUG" />
+  <logger name="org.hibernate.SQL" level="DEBUG" />
+
 </configuration>

@@ -1,4 +1,4 @@
-package gorm.tools.mango
+package gorm.tools.mango.jpql
 
 import gorm.tools.mango.jpql.JpqlQueryBuilder
 import grails.gorm.DetachedCriteria

@@ -150,6 +150,13 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     }
 
     /**
+     * uses the count to check if its greater than 0.
+     */
+    boolean exists() {
+        return asBoolean()
+    }
+
+    /**
      * Adds a sum projection
      *
      * @param property The property to sum by

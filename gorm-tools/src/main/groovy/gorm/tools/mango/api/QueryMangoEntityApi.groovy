@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
 import gorm.tools.mango.MangoDetachedCriteria
+import gorm.tools.mango.jpql.KeyExistsQuery
 
 /**
  * For repos and concretes classes that work on a single entity
@@ -25,6 +26,9 @@ trait QueryMangoEntityApi<D> {
     @Autowired
     @Qualifier("mangoQuery")
     MangoQuery mangoQuery
+
+    //cached instance of the query for id to keep it fast
+    KeyExistsQuery idExistsQuery
 
     /**
      * Primary method. Builds detached criteria for repository's domain based on mango criteria language and additional criteria
@@ -67,5 +71,13 @@ trait QueryMangoEntityApi<D> {
     List<D> queryList(QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
         MangoDetachedCriteria<D> dcrit = query(qargs, closure)
         getMangoQuery().list(dcrit, qargs.pager)
+    }
+
+    /**
+     * performant way to check if id exists in database.
+     */
+    boolean exists(Serializable id) {
+        if( !idExistsQuery ) idExistsQuery = KeyExistsQuery.of(getEntityClass())
+        return idExistsQuery.exists(id)
     }
 }

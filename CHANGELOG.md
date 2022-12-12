@@ -1,3 +1,15 @@
+### v7.3.27
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.26...v7.3.27)
+- add fast exists query. (#602) [link](https://github.com/yakworks/gorm-tools/commit/6195c4f026eba82841c7692efcbb1667be846d70)
+- Add query utils (#593) [link](https://github.com/yakworks/gorm-tools/commit/ecde38956fa74cf8858cfdc8ece04f6b1c48f60b)
+- bump groovy-commons to 3.11 [link](https://github.com/yakworks/gorm-tools/commit/c4e38cfb01e18011a88113bcb6a1b899eea3b9c4)
+- add bulkSaveEntity events that fire during bulk create or updates only. cleans up bulk method names for clarity. (#590) [link](https://github.com/yakworks/gorm-tools/commit/e5b87fc0c19264babce6ecd9ec18660d894dda8f)
+- fix version back to 7.3.27 [link](https://github.com/yakworks/gorm-tools/commit/60418681938387dd1f198fa3212621b5ccacca03)
+- bump version so we dont stomp on master dev. [link](https://github.com/yakworks/gorm-tools/commit/ecf11bc2ad30eb917f6126282673c67a4aa20361)
+- bump commons to 3.10 (#589) [link](https://github.com/yakworks/gorm-tools/commit/94af7e49f6b9537fc45a0a603ef1fe657fe4fc72)
+- createOrUpdate cleanup. doBulk tests. (#584) [link](https://github.com/yakworks/gorm-tools/commit/266e9fbfb6b740ae9fea7369ac3564e625ecfabd)
+
 ### v7.3.26
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.25...v7.3.26)

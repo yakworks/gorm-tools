@@ -18,7 +18,7 @@ import yakworks.commons.map.Maps
  * Gorm takes a Map of arguments such as validate, failOnError, etc.
  * This is a concrete object for those that that the Gorm-Tools repo utilizes.
  */
-@Builder(builderStrategy= SimpleStrategy, prefix="")
+@Builder(builderStrategy=SimpleStrategy, prefix="")
 @MapConstructor
 @ToString
 @AutoClone

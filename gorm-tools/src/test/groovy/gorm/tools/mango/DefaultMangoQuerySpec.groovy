@@ -23,6 +23,14 @@ class DefaultMangoQuerySpec extends Specification implements GormHibernateTest {
         }
     }
 
+    def "exists"() {
+        when:
+        boolean hasIt = mangoQuery.query(Cust, [name: 'Name1']).exists()
+
+        then:
+        hasIt
+    }
+
     def "sort check"() {
         when: "Check if \$sort will cause NullPointerException"
         def list = mangoQuery.query(Cust, [name: 'joe', '$sort': 'id'])

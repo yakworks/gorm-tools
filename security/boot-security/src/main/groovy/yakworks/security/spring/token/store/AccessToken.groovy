@@ -14,7 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import com.nimbusds.jwt.JWT
 
 /**
- * TEMPORARY copy from the grails rest plugin.
+ * DEPRECATED, TEMPORARY copy from the grails rest plugin.
  */
 @ToString(includeNames = true, includeSuper = true,
     includes = ['principal', 'accessToken', 'accessTokenJwt', 'refreshToken', 'refreshTokenJwt', 'expiration'])

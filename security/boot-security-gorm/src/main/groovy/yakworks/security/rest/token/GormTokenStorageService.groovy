@@ -10,10 +10,11 @@ import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.oauth2.server.resource.introspection.BadOpaqueTokenException
+import org.springframework.security.oauth2.server.resource.introspection.OAuth2IntrospectionException
 
 import grails.gorm.transactions.Transactional
 import yakworks.security.gorm.model.AppUserToken
-import yakworks.security.spring.token.store.TokenNotFoundException
 import yakworks.security.spring.token.store.TokenStorageService
 
 /**
@@ -31,13 +32,13 @@ class GormTokenStorageService implements TokenStorageService {
 
     @Autowired UserDetailsService userDetailsService
 
-    UserDetails loadUserByToken(String tokenValue) throws TokenNotFoundException {
+    UserDetails loadUserByToken(String tokenValue) throws OAuth2IntrospectionException {
         log.debug "Finding token ${tokenValue} in GORM"
         String username = findUsernameForExistingToken(tokenValue)
         if (username) {
             return userDetailsService.loadUserByUsername(username)
         }
-        throw new TokenNotFoundException("Token ${tokenValue} not found")
+        throw new BadOpaqueTokenException("Token ${tokenValue} not found")
     }
 
     @Transactional
@@ -49,12 +50,12 @@ class GormTokenStorageService implements TokenStorageService {
     }
 
     @Transactional
-    void removeToken(String tokenValue) throws TokenNotFoundException {
+    void removeToken(String tokenValue) throws OAuth2IntrospectionException {
         def existingToken = AppUserToken.findWhere(tokenValue: tokenValue)
         if (existingToken) {
             existingToken.remove()
         } else {
-            throw new TokenNotFoundException("Token not found")
+            throw new BadOpaqueTokenException("Token not found")
         }
 
     }

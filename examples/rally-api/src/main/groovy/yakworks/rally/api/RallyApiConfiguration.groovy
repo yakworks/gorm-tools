@@ -38,7 +38,8 @@ import yakworks.security.spring.token.CookieAuthSuccessHandler
 import yakworks.security.spring.token.CookieBearerTokenResolver
 import yakworks.security.spring.token.JwtTokenGenerator
 import yakworks.security.spring.token.TokenUtils
-import yakworks.security.spring.token.store.TokenStorageAuthenticationProvider
+import yakworks.security.spring.token.store.OpaqueTokenStoreAuthProvider
+import yakworks.security.spring.token.store.TokenStorageService
 
 import static org.springframework.security.config.Customizer.withDefaults
 
@@ -61,6 +62,7 @@ class RallyApiConfiguration {
 
     @Autowired JwtTokenGenerator tokenGenerator
     @Autowired CookieAuthSuccessHandler cookieAuthSuccessHandler
+    @Autowired TokenStorageService tokenStorageService
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -107,12 +109,11 @@ class RallyApiConfiguration {
 
         http.oauth2Login(withDefaults())
 
-        DefaultSecurityConfiguration.addJsonAuthenticationFilter(http);
-        DefaultSecurityConfiguration.applyOauthJwt(http);
+        DefaultSecurityConfiguration.addJsonAuthenticationFilter(http)
+        DefaultSecurityConfiguration.applyOauthJwt(http)
 
-        AuthenticationManagerBuilder authenticationManagerBuilder =
-            http.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.authenticationProvider(new TokenStorageAuthenticationProvider());
+        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class)
+        authenticationManagerBuilder.authenticationProvider(new OpaqueTokenStoreAuthProvider(tokenStorageService))
 
         return http.build()
     }

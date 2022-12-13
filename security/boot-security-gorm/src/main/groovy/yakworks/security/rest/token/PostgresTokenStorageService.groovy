@@ -14,11 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.oauth2.server.resource.introspection.BadOpaqueTokenException
+import org.springframework.security.oauth2.server.resource.introspection.OAuth2IntrospectionException
 
 import gorm.tools.idgen.IdGenerator
 import grails.gorm.transactions.Transactional
 import yakworks.security.gorm.model.AppUserToken
-import yakworks.security.spring.token.store.TokenNotFoundException
 import yakworks.security.spring.token.store.TokenStorageService
 
 /**
@@ -56,7 +57,7 @@ class PostgresTokenStorageService implements TokenStorageService {
         """)
     }
 
-    UserDetails loadUserByToken(String tokenValue) throws TokenNotFoundException {
+    UserDetails loadUserByToken(String tokenValue) throws OAuth2IntrospectionException {
         log.debug "Finding token ${tokenValue} in GORM"
         String username = findUsernameForExistingToken(tokenValue)
 
@@ -64,7 +65,7 @@ class PostgresTokenStorageService implements TokenStorageService {
             return userDetailsService.loadUserByUsername(username)
         }
 
-        throw new TokenNotFoundException("Token ${tokenValue} not found")
+        throw new BadOpaqueTokenException("Token ${tokenValue} not found")
     }
 
     @Transactional
@@ -87,13 +88,13 @@ class PostgresTokenStorageService implements TokenStorageService {
     }
 
     @Transactional
-    void removeToken(String tokenValue) throws TokenNotFoundException {
+    void removeToken(String tokenValue) throws OAuth2IntrospectionException {
         log.debug "Removing token ${tokenValue} from GORM"
         String username = findUsernameForExistingToken(tokenValue)
         if (username) {
             AppUserToken.findWhere(username: username).remove()
         } else {
-            throw new TokenNotFoundException("Token ${tokenValue} not found")
+            throw new BadOpaqueTokenException("Token ${tokenValue} not found")
         }
 
     }

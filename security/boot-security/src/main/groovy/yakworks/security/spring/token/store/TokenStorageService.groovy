@@ -6,8 +6,8 @@ package yakworks.security.spring.token.store
 
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UserDetails
-
-import yakworks.security.spring.token.store.TokenNotFoundException
+import org.springframework.security.oauth2.server.resource.introspection.BadOpaqueTokenException
+import org.springframework.security.oauth2.server.resource.introspection.OAuth2IntrospectionException
 
 /**
  * Implementations of this interface are responsible to load user information from a token storage system, and to store
@@ -17,9 +17,9 @@ interface TokenStorageService {
 
     /**
      * Returns a principal object given the passed token value
-     * @throws yakworks.security.spring.token.store.TokenNotFoundException if no token is found in the storage
+     * @throws BadOpaqueTokenException if no token is found in the storage
      */
-    UserDetails loadUserByToken(String tokenValue) throws TokenNotFoundException
+    UserDetails loadUserByToken(String tokenValue) throws OAuth2IntrospectionException
 
     /**
      * Stores a token. It receives the principal to store any additional information together with the token,
@@ -31,7 +31,7 @@ interface TokenStorageService {
 
     /**
      * Removes a token from the storage.
-     * @throws TokenNotFoundException if the given token is not found in the storage
+     * @throws BadOpaqueTokenException if the given token is not found in the storage
      */
-    void removeToken(String tokenValue) throws TokenNotFoundException
+    void removeToken(String tokenValue) throws OAuth2IntrospectionException
 }

@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest
 import groovy.transform.CompileStatic
 
 import org.springframework.security.oauth2.core.AbstractOAuth2Token
-import org.springframework.security.oauth2.jwt.Jwt
 
 /**
  * helpers to generate key pairs, RSA right now.

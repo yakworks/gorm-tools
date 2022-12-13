@@ -2,7 +2,7 @@
 * Copyright 2013-2016 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.security.spring.token
+package yakworks.security.spring.token.store
 
 import groovy.transform.CompileStatic
 import groovy.transform.ToString
@@ -39,7 +39,8 @@ class AccessToken extends AbstractAuthenticationToken {
         super.setAuthenticated(true)
     }
 
-    AccessToken(UserDetails principal, Collection<? extends GrantedAuthority> authorities, String accessToken, String refreshToken = null, Integer expiration = null, JWT accessTokenJwt = null, JWT refreshTokenJwt = null) {
+    AccessToken(UserDetails principal, Collection<? extends GrantedAuthority> authorities, String accessToken, String refreshToken = null,
+                Integer expiration = null, JWT accessTokenJwt = null, JWT refreshTokenJwt = null) {
         this(authorities)
         this.principal = principal
         this.accessToken = accessToken

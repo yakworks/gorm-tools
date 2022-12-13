@@ -7,6 +7,8 @@ package yakworks.security.spring.token
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletRequest
 
+import groovy.transform.CompileStatic
+
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver
 import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver
 
@@ -15,9 +17,10 @@ import org.springframework.security.oauth2.server.resource.web.DefaultBearerToke
  * Wraps the DefaultBearerTokenResolver that only checks the Authorization header by default.
  * If default check in auth header is null then will look for cookie too.
  */
+@CompileStatic
 class CookieBearerTokenResolver implements BearerTokenResolver {
 
-    def defaultBearerTokenResolver = new DefaultBearerTokenResolver()
+    DefaultBearerTokenResolver defaultBearerTokenResolver = new DefaultBearerTokenResolver()
 
     @Override
     String resolve(HttpServletRequest request) {

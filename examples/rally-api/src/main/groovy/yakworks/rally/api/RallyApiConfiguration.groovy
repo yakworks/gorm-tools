@@ -37,8 +37,8 @@ import yakworks.security.spring.DefaultSecurityConfiguration
 import yakworks.security.spring.token.CookieAuthSuccessHandler
 import yakworks.security.spring.token.CookieBearerTokenResolver
 import yakworks.security.spring.token.JwtTokenGenerator
-import yakworks.security.spring.token.TokenStorageAuthenticationProvider
 import yakworks.security.spring.token.TokenUtils
+import yakworks.security.spring.token.store.TokenStorageAuthenticationProvider
 
 import static org.springframework.security.config.Customizer.withDefaults
 

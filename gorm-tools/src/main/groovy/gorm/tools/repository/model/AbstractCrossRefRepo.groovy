@@ -4,6 +4,8 @@
 */
 package gorm.tools.repository.model
 
+import groovy.json.JsonParserType
+import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
@@ -38,6 +40,8 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     Class<R> relatedClass
     List<String> propNames
 
+    JsonSlurper jsonSlurper
+
     /** the criteria remover can be customized, useful for replacing in tests */
     CriteriaRemover criteriaRemover
 
@@ -46,6 +50,7 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
         relatedClass= relatedClazz
         propNames = propKeys
         criteriaRemover = new CriteriaRemover()
+        jsonSlurper = new JsonSlurper().setType(JsonParserType.LAX)
     }
 
     /**
@@ -201,7 +206,12 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
      */
     List<X> addOrRemove(P main, Object itemParams){
         if(!itemParams) return []
-        Long mainId = main['id'] as Long
+
+        //handle if it's a json array in string, largely for CSV support and the binding that occurs during that process, such as creating orgs with tags
+        if(itemParams instanceof String) {
+            Validate.isTrue(itemParams.trim().startsWith('['), "bind data of type string must be a json array")
+            itemParams = jsonSlurper.parseText(itemParams) as List
+        }
 
         Validate.isTrue(itemParams instanceof List || itemParams instanceof Map, "bind data must be map or list: %s", itemParams.class)
 

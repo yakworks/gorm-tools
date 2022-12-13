@@ -2,13 +2,14 @@ package yakworks.rest
 
 import org.springframework.http.HttpStatus
 
-import spock.lang.Ignore
 import yakworks.commons.map.Maps
+import yakworks.rally.orgs.model.Org
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
 import spock.lang.Specification
 import spock.lang.Unroll
+import yakworks.security.gorm.model.AppUser
 
 /**
  * Sanity checks to hit the main endpoints. KISS, keep it simple
@@ -34,22 +35,25 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
     }
 
     @Unroll
-    def "LIST get test #entity"(String entity, Integer qCount) {
+    def "LIST get test #entity"(String entity, Class domain) {
 
         when:
         Response resp = get("${getPath(entity)}")
         Map body = bodyToMap(resp)
+        int count
+        Org.withNewSession {
+            //Need this, coz @Rollback dint work on @Unroll
+            count = domain.count()
+        }
 
         then:
         resp.code() == HttpStatus.OK.value()
-        body.records == qCount
+        body.records == count
 
         where:
-
-        entity         | qCount
-        'rally/user'   | 4
-        //FIXME depending on order this may return more than 100
-        // 'rally/org'       | 100
+        entity         | domain
+        'rally/user'   | AppUser
+        'rally/org'    | Org //can have more thn 100 based on order of execution, need to query count
     }
 
     @Unroll
@@ -98,8 +102,6 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
     }
 
-
-    // @Ignore
     @Unroll
     def "q text search: #entity?q=#qSearch"(String entity, Integer qCount, String qSearch) {
 

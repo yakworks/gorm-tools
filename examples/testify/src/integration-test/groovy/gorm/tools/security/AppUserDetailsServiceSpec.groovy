@@ -1,7 +1,6 @@
 package gorm.tools.security
 
 import spock.lang.Ignore
-import yakworks.security.gorm.AppUserService
 
 import java.time.LocalDateTime
 
@@ -18,7 +17,6 @@ import spock.lang.Specification
 @Rollback
 class AppUserDetailsServiceSpec extends Specification implements DataIntegrationTest {
     AppUserDetailsService userDetailsService
-    AppUserService appUserService
     PasswordValidator passwordValidator
 
     void testLoadUserByUsername() {
@@ -55,7 +53,7 @@ class AppUserDetailsServiceSpec extends Specification implements DataIntegration
     }
 
     //FIXME add a test for when credentialsNonExpired = true
-    @Ignore
+    @Ignore //See PasswordValidator, it always return hardcoded false for password expired.
     void "test expired password"() {
         given:
         AppUser user = AppUser.first()

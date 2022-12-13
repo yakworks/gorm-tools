@@ -169,16 +169,19 @@ class AttachmentSpec extends Specification implements GormHibernateTest, Securit
         when:
         Path tempFile = createTempFile('grails_logo.jpg')
         Map params = [tempFileName: tempFile.fileName]
-        Attachment attachment = attachmentRepo.create(params)
+        attachmentRepo.create(params)
 
         then: "will fail on name"
         ValidationProblem.Exception g = thrown()
         'validation.problem' == g.code
-        // FIXME fix way to verify the file got delted
-        // String destFileName = tmpFile.name.split("/")[-1]+"_12345999999.jpg"
-        // File monthDir = appResourceLoader.getMonthDirectory("attachments.location")
-        // File testFile = new File(monthDir.path, destFileName)
-        // assert !testFile.exists()
+        g.entity != null
+
+        when:
+        Attachment attachment = g.entity
+
+        then:
+        attachment != null
+        attachment.location == null //See AttachmentRepo.afterBind - Attachment file should not have been created if validation failed.
     }
 
     def "test create from MultipartFile"() {

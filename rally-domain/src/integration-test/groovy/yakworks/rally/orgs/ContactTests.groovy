@@ -90,11 +90,12 @@ class ContactTests extends Specification implements DomainIntTest {
         when:
         contactRepo.remove(contact)
         flushAndClear()
-        l.refresh()
 
         then:
-        l.contact == null
         Contact.get(contact.id) == null
+        Location.get(l.id) == null
+
+        //following associations should have been deleted through cascade as per mapping.
         ContactEmail.get(email.id) == null
         ContactFlex.get(flex.id) == null
         ContactPhone.get(phone.id) == null

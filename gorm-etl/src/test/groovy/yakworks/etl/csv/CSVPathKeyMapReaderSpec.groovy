@@ -6,7 +6,8 @@ import spock.lang.Specification
 
 class CSVPathKeyMapReaderSpec extends Specification {
 
-    @Shared File kitchenSinkCsv, sinkItemCsv
+    @Shared
+    File kitchenSinkCsv, sinkItemCsv
 
     def setup() {
         kitchenSinkCsv = new File("src/test/resources/KitchenSink.short.csv")
@@ -48,7 +49,7 @@ class CSVPathKeyMapReaderSpec extends Specification {
         while (csvReader.hasNext()) {
             Map row = csvReader.readMap { m ->
                 println("m is $m")
-                if(m) m.name = m.name + "1"
+                if (m) m.name = m.name + "1"
             }
 
             data << row
@@ -76,24 +77,16 @@ class CSVPathKeyMapReaderSpec extends Specification {
         List<Map> kitchenSinks = kitchenSinkReader.readAllRows()
         List<Map> sinkItems = []
         Map currentSink
-        while(sinkItemReader.hasNext()) {
-            Map row = sinkItemReader.readMap() {  row ->
-                if(!row) return //might have empty line on end
+        while (sinkItemReader.hasNext()) {
+            Map row = sinkItemReader.readMap() { row ->
+                if (!row) return //might have empty line on end
                 String kitchenSinkNum = row['kitchenSink_num']
-                //XXX why the if?
-                if(kitchenSinkNum) {
-                    //
-                    Map kc = kitchenSinks.find({ it.num == kitchenSinkNum})
-                    //XXX why the if here?
-                    if(kc) {
-                        row.kitchenSink = kc
-                        if(!kc.items) kc.items = []
-                        kc.items << row
-                    }
-                }
+                Map kc = kitchenSinks.find({ it.num == kitchenSinkNum })
+                row.kitchenSink = kc
+                if (!kc.items) kc.items = []
+                kc.items << row
             }
-
-            if(row) sinkItems << row
+            if (row) sinkItems << row
         }
 
         then:
@@ -123,30 +116,25 @@ class CSVPathKeyMapReaderSpec extends Specification {
         List<Map> kitchenSinks = kitchenSinkReader.readAllRows()
         List<Map> sinkItems = []
         Map currentSink
-        while(sinkItemReader.hasNext()) {
-            Map row = sinkItemReader.readMap() {  row ->
-                if(!row) return //last line is empty row
+        while (sinkItemReader.hasNext()) {
+            Map row = sinkItemReader.readMap() { row ->
+                if (!row) return //last line is empty row
                 String kitchenSinkNum = row['kitchenSink_num']
-                //XXX why the if?
-                if(kitchenSinkNum) {
-                    //if not currentSink then first row so lookup , or if they dont match
-                    if(!currentSink || currentSink.num != kitchenSinkNum) {
-                        currentSink = kitchenSinks.find({ it.num == kitchenSinkNum})
-                    }
-
-                    if(currentSink){
-                        row.kitchenSink = currentSink
-                        if(!currentSink.items) currentSink.items = []
-                        currentSink.items << row
-                    }
-                    //if we dont have one after the verification and lookup then we have problem
-                    else {
-                        // create the problem and add to the list we use to track it
-                    }
+                //if not currentSink then first row so lookup , or if they dont match
+                if (!currentSink || currentSink.num != kitchenSinkNum) {
+                    currentSink = kitchenSinks.find({ it.num == kitchenSinkNum })
+                }
+                if (currentSink) {
+                    row.kitchenSink = currentSink
+                    if (!currentSink.items) currentSink.items = []
+                    currentSink.items << row
+                }
+                //if we dont have one after the verification and lookup then we have problem
+                else {
+                    // create the problem and add to the list we use to track it
                 }
             }
-
-            if(row) sinkItems << row
+            if (row) sinkItems << row
         }
 
         then:

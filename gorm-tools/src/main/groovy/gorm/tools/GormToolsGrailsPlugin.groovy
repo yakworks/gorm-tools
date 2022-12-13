@@ -26,7 +26,8 @@ import yakworks.gorm.boot.GormToolsConfiguration
 @Slf4j
 class GormToolsGrailsPlugin extends Plugin {
 
-    def loadAfter = ['hibernate', 'datasources']
+    def loadAfter = ['hibernate', 'datasources', 'grails-kit']
+
     //make sure we load before controllers as might be creating rest controllers
     def loadBefore = ['controllers']
 

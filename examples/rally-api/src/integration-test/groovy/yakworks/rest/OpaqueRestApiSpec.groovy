@@ -1,6 +1,6 @@
 package yakworks.rest
 
-
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 
 import grails.testing.mixin.integration.Integration
@@ -8,10 +8,13 @@ import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.rest.client.OkAuth
 import yakworks.rest.client.OkHttpRestTrait
+import yakworks.security.spring.token.store.TokenStore
 
-@Ignore
+// @Ignore
 @Integration
 class OpaqueRestApiSpec extends Specification implements OkHttpRestTrait {
+
+    @Autowired TokenStore tokenStore
 
     String endpoint = "/api/rally/user"
 
@@ -20,14 +23,10 @@ class OpaqueRestApiSpec extends Specification implements OkHttpRestTrait {
         OkAuth.BEARER_TOKEN = "Bearer yak_123"
     }
 
-    // void "test OkHttpRestTrait login"() {
-    //     when:
-    //     String token = login('admin', '123')
-    //     then:
-    //     token
-    // }
-
     void "test get to make sure display false dont get returned"() {
+        setup:
+        //add token to the store.
+        tokenStore.storeToken('admin', 'yak_123')
         when:
         def resp = get("$endpoint/1")
         Map body = bodyToMap(resp)

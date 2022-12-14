@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
 import org.springframework.security.core.userdetails.UserDetailsService
 
-import yakworks.security.rest.token.GormTokenStorageService
+import yakworks.security.gorm.store.GormTokenStore
 
 @ComponentScan('yakworks.security.gorm.model') //here to pick up the Repos
 @Configuration //(proxyBeanMethods = false)
@@ -44,8 +44,8 @@ class SecurityGormConfiguration {
     }
 
     @Bean
-    GormTokenStorageService tokenStorageService(){
-        new GormTokenStorageService()
+    GormTokenStore tokenStorageService(){
+        new GormTokenStore()
     }
 
 

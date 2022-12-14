@@ -2,7 +2,7 @@
 * Copyright 2013-2016 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.security.rest.token
+package yakworks.security.gorm.testing
 
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletRequest
@@ -17,6 +17,7 @@ import yakworks.security.spring.token.store.AccessToken
 
 
 /**
+ * NOTE: NOT USED kept for reference
  * OLD READER
  * Finds the bearer token and if not found tries the for token, like github , for our stored tokens and in Basic
  */

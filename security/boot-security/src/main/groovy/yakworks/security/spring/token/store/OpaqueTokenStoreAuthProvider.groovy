@@ -4,25 +4,17 @@
 */
 package yakworks.security.spring.token.store
 
-import java.time.Instant
-
 import groovy.transform.CompileStatic
 
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.oauth2.core.DefaultOAuth2AuthenticatedPrincipal
-import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal
-import org.springframework.security.oauth2.core.OAuth2TokenIntrospectionClaimNames
-import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken
 import org.springframework.security.oauth2.server.resource.authentication.OpaqueTokenAuthenticationProvider
 import org.springframework.security.oauth2.server.resource.introspection.BadOpaqueTokenException
-import org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenIntrospector
 
 /**
  * Adds AuthenticationProvider to the chain
@@ -31,15 +23,15 @@ import org.springframework.security.oauth2.server.resource.introspection.OpaqueT
  */
 @CompileStatic
 class OpaqueTokenStoreAuthProvider implements AuthenticationProvider {
-    private static final String AUTHORITY_PREFIX = "SCOPE_";
+    public static final String AUTHORITY_PREFIX = "SCOPE_";
 
-    TokenStorageService tokenStorageService
+    TokenStore tokenStorageService
     /** the prefix of the token if its an opaque one */
-    String tokenPrefix = 'yak'
+    String tokenPrefix = 'yak_'
 
     OpaqueTokenAuthenticationProvider opaqueTokenAuthenticationProvider
 
-    OpaqueTokenStoreAuthProvider(TokenStorageService tokenStorageService){
+    OpaqueTokenStoreAuthProvider(TokenStore tokenStorageService){
         this.tokenStorageService = tokenStorageService
         // StoreOpaqueTokenIntrospector introspec = new StoreOpaqueTokenIntrospector()
         opaqueTokenAuthenticationProvider = new OpaqueTokenAuthenticationProvider(this::introspect)
@@ -60,13 +52,13 @@ class OpaqueTokenStoreAuthProvider implements AuthenticationProvider {
     }
 
     OAuth2AuthenticatedPrincipal introspect(String token) {
-        UserDetails udet = tokenStorageService.loadUserByToken(token)
-        if(!udet) throw new BadOpaqueTokenException("Provided token isn't active");
+        UserDetails user = tokenStorageService.loadUserByToken(token)
+        if(!user) throw new BadOpaqueTokenException("Provided token isn't active");
 
         return new DefaultOAuth2AuthenticatedPrincipal(
-            udet.username,
-            [name: udet.username] as Map<String, Object>,
-            [new SimpleGrantedAuthority(AUTHORITY_PREFIX + "admin")] as Collection<GrantedAuthority>
+            user.username,
+            [login: user.username, springUser: user] as Map<String, Object>,
+            null
         )
     }
 

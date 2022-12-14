@@ -60,24 +60,4 @@ class JwtTokenGenerator implements TokenGenerator<Jwt> {
         return jwtEncoder.encode(encodeParams)
     }
 
-    // @Override
-    // Jwt generate(UserDetails principal, Integer expiration) {
-    //     return null
-    // }
-
-    static int getExpiresIn(AbstractOAuth2Token token) {
-        if (token.expiresAt != null) {
-            return ChronoUnit.SECONDS.between(Instant.now(), token.expiresAt).toInteger()
-        }
-        return -1
-    }
-
-    static Map tokenToMap(AbstractOAuth2Token token) {
-        Map body = [
-            token_type: 'Bearer',
-            access_token: token.tokenValue,
-            "expires_in": getExpiresIn(token)
-        ]
-        return body
-    }
 }

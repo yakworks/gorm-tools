@@ -25,4 +25,7 @@ class JwtProperties {
 
     /** Issuer key */
     String issuer = "self"
+
+    /** the prefix of the token if its an opaque one, not applicable to jwt */
+    String tokenPrefix = 'yak_'
 }

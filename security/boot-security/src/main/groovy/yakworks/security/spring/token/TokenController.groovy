@@ -47,7 +47,7 @@ class TokenController {
         Cookie cookie = jwtCookie(request, token)
         response.addCookie(cookie)
         //convert to a Map to render it as json
-        Map body = JwtTokenGenerator.tokenToMap(token)
+        Map body = TokenUtils.tokenToMap(token)
 
         return ResponseEntity.ok()
             .cacheControl(CacheControl.noStore())
@@ -61,7 +61,7 @@ class TokenController {
         Cookie cookie = jwtCookie(request, token)
         response.addCookie(cookie)
         //convert to a Map to render it as json
-        Map body = JwtTokenGenerator.tokenToMap(token)
+        Map body = TokenUtils.tokenToMap(token)
 
         return ResponseEntity.ok()
             .cacheControl(CacheControl.noStore())
@@ -82,7 +82,7 @@ class TokenController {
     protected Cookie jwtCookie(HttpServletRequest request, Jwt token) {
         Cookie jwtCookie = new Cookie( TokenUtils.COOKIE_NAME, token.tokenValue )
         //FIXME some hard coded values to get it working
-        jwtCookie.maxAge = JwtTokenGenerator.getExpiresIn(token)
+        jwtCookie.maxAge = TokenUtils.getExpiresIn(token)
         jwtCookie.path = '/'
         //only works if its https, here so we can dev with normal http
         if ( isHttps(request) ) {

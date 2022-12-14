@@ -39,7 +39,7 @@ import yakworks.security.spring.token.CookieBearerTokenResolver
 import yakworks.security.spring.token.JwtTokenGenerator
 import yakworks.security.spring.token.TokenUtils
 import yakworks.security.spring.token.store.OpaqueTokenStoreAuthProvider
-import yakworks.security.spring.token.store.TokenStorageService
+import yakworks.security.spring.token.store.TokenStore
 
 import static org.springframework.security.config.Customizer.withDefaults
 
@@ -62,7 +62,7 @@ class RallyApiConfiguration {
 
     @Autowired JwtTokenGenerator tokenGenerator
     @Autowired CookieAuthSuccessHandler cookieAuthSuccessHandler
-    @Autowired TokenStorageService tokenStorageService
+    @Autowired TokenStore tokenStorageService
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

@@ -13,7 +13,7 @@ import org.springframework.security.oauth2.server.resource.introspection.OAuth2I
  * Implementations of this interface are responsible to load user information from a token storage system, and to store
  * token information into it.
  */
-interface TokenStorageService {
+interface TokenStore {
 
     /**
      * Returns a principal object given the passed token value
@@ -27,7 +27,7 @@ interface TokenStorageService {
      *
      * @see Authentication#getPrincipal()
      */
-    void storeToken(String tokenValue, UserDetails principal)
+    void storeToken(String username, String tokenValue)
 
     /**
      * Removes a token from the storage.

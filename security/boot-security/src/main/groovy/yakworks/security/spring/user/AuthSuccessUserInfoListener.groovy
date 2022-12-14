@@ -65,14 +65,20 @@ class AuthSuccessUserInfoListener {
     void doIdentityProvided(AbstractAuthenticationToken authentication, Object principal){
         //if its an instance of AuthenticatedPrincipal then use it
         String username
+        //the user info
+        UserDetails springUser = null
+
         //for OIDC
         if(principal instanceof StandardClaimAccessor){
             //if its OIDC then use email
             username = principal.email
         }
-        //Works with github OAuth
+        //Works with github OAuth and our Opaque token
         else if (principal instanceof OAuth2AuthenticatedPrincipal){
             username = principal.getAttribute('login')
+            //if its authed with Opaque then we will already loaded it and put it in the
+            if(principal.getAttribute('springUser')) springUser = principal.getAttribute('springUser')
+
         }
         //SAML ends up here
         else if (principal instanceof AuthenticatedPrincipal) {
@@ -82,12 +88,14 @@ class AuthSuccessUserInfoListener {
             username = authentication.name
         }
 
-        def springUser = userDetailsService.loadUserByUsername(username)
-        if (!springUser) {
+        springUser ?= userDetailsService.loadUserByUsername(username)
+        if (springUser == null) {
             //TODO This is where we can call out to create one if it doesn't exist?
             throw new UsernameNotFoundException("User Not Found username: $username")
         }
+
         if(springUser instanceof SpringUserInfo){
+            //back up the details into
             springUser.setAuditDetails(authentication.details)
         }
         //replace with this springUserInfo

@@ -2,7 +2,7 @@
 * Copyright 2022 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.security.rest.token
+package yakworks.security.gorm.store
 
 import javax.annotation.PostConstruct
 import javax.annotation.Resource
@@ -20,7 +20,7 @@ import org.springframework.security.oauth2.server.resource.introspection.OAuth2I
 import gorm.tools.idgen.IdGenerator
 import grails.gorm.transactions.Transactional
 import yakworks.security.gorm.model.AppUserToken
-import yakworks.security.spring.token.store.TokenStorageService
+import yakworks.security.spring.token.store.TokenStore
 
 /**
  * -- Copied in from grails rest-scurity as a starting point --
@@ -37,7 +37,7 @@ import yakworks.security.spring.token.store.TokenStorageService
  */
 @Slf4j
 @CompileStatic
-class PostgresTokenStorageService implements TokenStorageService {
+class PostgresTokenStore implements TokenStore {
 
     @Autowired UserDetailsService userDetailsService
 
@@ -69,9 +69,9 @@ class PostgresTokenStorageService implements TokenStorageService {
     }
 
     @Transactional
-    void storeToken(String tokenValue, UserDetails principal) {
+    void storeToken(String username, String tokenValue) {
         // log.debug "Storing principal for token: ${tokenValue}"
-        log.debug "Principal: ${principal}"
+        log.debug "Principal: ${username}"
 
         // AppUserToken newTokenObject = new AppUserToken(tokenValue: tokenValue, username: principal.username)
         // newTokenObject.save()
@@ -80,7 +80,7 @@ class PostgresTokenStorageService implements TokenStorageService {
             insert into AppUserToken (id, username, tokenvalue,
                 expiredate,
                 createdDate, createdBy, editedDate, editedBy)
-            values (${id}, '${principal.username}', crypt('${tokenValue}',gen_salt('md5')),
+            values (${id}, '${username}', crypt('${tokenValue}',gen_salt('md5')),
                     now() + interval '${defaultExpires}',
                     now(), 1, now(), 1 )
         """)

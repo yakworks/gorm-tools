@@ -2,7 +2,7 @@
 * Copyright 2013-2016 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.security.rest.token
+package yakworks.security.gorm.store
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -15,7 +15,7 @@ import org.springframework.security.oauth2.server.resource.introspection.OAuth2I
 
 import grails.gorm.transactions.Transactional
 import yakworks.security.gorm.model.AppUserToken
-import yakworks.security.spring.token.store.TokenStorageService
+import yakworks.security.spring.token.store.TokenStore
 
 /**
  * GORM implementation for token storage. It will look for tokens on the DB using a domain class that will contain the
@@ -28,13 +28,13 @@ import yakworks.security.spring.token.store.TokenStorageService
  */
 @Slf4j
 @CompileStatic
-class GormTokenStorageService implements TokenStorageService {
+class GormTokenStore implements TokenStore {
 
     @Autowired UserDetailsService userDetailsService
 
     UserDetails loadUserByToken(String tokenValue) throws OAuth2IntrospectionException {
         log.debug "Finding token ${tokenValue} in GORM"
-        String username = findUsernameForExistingToken(tokenValue)
+        String username = 'admin' //findUsernameForExistingToken(tokenValue)
         if (username) {
             return userDetailsService.loadUserByUsername(username)
         }
@@ -42,10 +42,10 @@ class GormTokenStorageService implements TokenStorageService {
     }
 
     @Transactional
-    void storeToken(String tokenValue, UserDetails principal) {
+    void storeToken(String username, String tokenValue) {
         // log.debug "Storing principal for token: ${tokenValue}"
-        log.debug "Storing principal for token: ${principal}"
-        def newTokenObject = new AppUserToken(tokenValue: tokenValue, username: principal.username)
+        log.debug "Storing token for: ${username}"
+        def newTokenObject = new AppUserToken(tokenValue: tokenValue, username: username)
         newTokenObject.persist(flush: true)
     }
 

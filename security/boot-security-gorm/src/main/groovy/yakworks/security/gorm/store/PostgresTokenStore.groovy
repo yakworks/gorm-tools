@@ -2,7 +2,7 @@
 * Copyright 2022 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.security.rest.token
+package yakworks.security.gorm.store
 
 import javax.annotation.PostConstruct
 import javax.annotation.Resource
@@ -14,12 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.oauth2.core.AbstractOAuth2Token
+import org.springframework.security.oauth2.server.resource.introspection.BadOpaqueTokenException
+import org.springframework.security.oauth2.server.resource.introspection.OAuth2IntrospectionException
 
 import gorm.tools.idgen.IdGenerator
 import grails.gorm.transactions.Transactional
 import yakworks.security.gorm.model.AppUserToken
-import yakworks.security.spring.token.TokenNotFoundException
-import yakworks.security.spring.token.TokenStorageService
+import yakworks.security.spring.token.store.TokenStore
 
 /**
  * -- Copied in from grails rest-scurity as a starting point --
@@ -36,7 +38,7 @@ import yakworks.security.spring.token.TokenStorageService
  */
 @Slf4j
 @CompileStatic
-class PostgresTokenStorageService implements TokenStorageService {
+class PostgresTokenStore implements TokenStore {
 
     @Autowired UserDetailsService userDetailsService
 
@@ -56,7 +58,7 @@ class PostgresTokenStorageService implements TokenStorageService {
         """)
     }
 
-    UserDetails loadUserByToken(String tokenValue) throws TokenNotFoundException {
+    UserDetails loadUserByToken(String tokenValue) throws OAuth2IntrospectionException {
         log.debug "Finding token ${tokenValue} in GORM"
         String username = findUsernameForExistingToken(tokenValue)
 
@@ -64,13 +66,15 @@ class PostgresTokenStorageService implements TokenStorageService {
             return userDetailsService.loadUserByUsername(username)
         }
 
-        throw new TokenNotFoundException("Token ${tokenValue} not found")
+        throw new BadOpaqueTokenException("Token ${tokenValue} not found")
     }
 
     @Transactional
-    void storeToken(String tokenValue, UserDetails principal) {
+    @Override
+    void storeToken(String username, AbstractOAuth2Token oAuthToken) {
+        //FIXME does nothing with the expiration right now.
         // log.debug "Storing principal for token: ${tokenValue}"
-        log.debug "Principal: ${principal}"
+        log.debug "Principal: ${username}"
 
         // AppUserToken newTokenObject = new AppUserToken(tokenValue: tokenValue, username: principal.username)
         // newTokenObject.save()
@@ -79,21 +83,20 @@ class PostgresTokenStorageService implements TokenStorageService {
             insert into AppUserToken (id, username, tokenvalue,
                 expiredate,
                 createdDate, createdBy, editedDate, editedBy)
-            values (${id}, '${principal.username}', crypt('${tokenValue}',gen_salt('md5')),
+            values (${id}, '${username}', crypt('${oAuthToken.tokenValue}',gen_salt('md5')),
                     now() + interval '${defaultExpires}',
                     now(), 1, now(), 1 )
         """)
-
     }
 
     @Transactional
-    void removeToken(String tokenValue) throws TokenNotFoundException {
+    void removeToken(String tokenValue) throws OAuth2IntrospectionException {
         log.debug "Removing token ${tokenValue} from GORM"
         String username = findUsernameForExistingToken(tokenValue)
         if (username) {
             AppUserToken.findWhere(username: username).remove()
         } else {
-            throw new TokenNotFoundException("Token ${tokenValue} not found")
+            throw new BadOpaqueTokenException("Token ${tokenValue} not found")
         }
 
     }

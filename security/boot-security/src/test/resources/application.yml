@@ -1,5 +1,9 @@
 spring.config.import: classpath:./gorm/tools/datasource-test.yml
 
+# setting up dummy user for testing
+#spring.security.user.name: test
+#spring.security.user.password: 1234
+
 logging:
   level:
     root: WARN

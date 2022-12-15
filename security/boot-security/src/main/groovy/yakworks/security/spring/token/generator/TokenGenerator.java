@@ -14,15 +14,15 @@
  * limitations under the License.
  *
  */
-package yakworks.security.spring.token;
+package yakworks.security.spring.token.generator;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.AbstractOAuth2Token;
 
-public interface TokenGenerator<T> {
+public interface TokenGenerator<T extends AbstractOAuth2Token> {
 
-    default T genererate(){
+    default T generate(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return this.generate(authentication);
     }

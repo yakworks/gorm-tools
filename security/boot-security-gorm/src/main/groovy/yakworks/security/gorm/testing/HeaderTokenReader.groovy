@@ -2,7 +2,7 @@
 * Copyright 2013-2016 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.security.rest.token
+package yakworks.security.gorm.testing
 
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletRequest
@@ -12,10 +12,11 @@ import groovy.util.logging.Slf4j
 
 import org.springframework.http.MediaType
 
-import yakworks.security.spring.token.AccessToken
-
+import yakworks.security.spring.token.TokenUtils
 
 /**
+ * NOTE: NOT USED kept for reference
+ * OLD READER
  * Finds the bearer token and if not found tries the for token, like github , for our stored tokens and in Basic
  */
 @Slf4j
@@ -24,7 +25,7 @@ class HeaderTokenReader  {
 
     final static String DEFAULT_COOKIE_NAME = 'jwt'
 
-    String cookieName = DEFAULT_COOKIE_NAME
+    String cookieName = TokenUtils.COOKIE_NAME
 
     /**
      * find access token in header.

@@ -29,7 +29,7 @@ class BootStrap {
             admin.addRole('MANAGER', true)
             //used for github user testing
             // AppUser admin2 = new AppUser([
-            //     id: (Long)9, username: "basejump", email: "basejump@foo.com", orgId: 2
+            //     id: (Long)9, username: "josh2@9ci.com", email: "josh2@9ci.com", orgId: 2
             // ]).persist()
             // admin2.addRole('ADMIN', true)
             // admin2.addRole('MANAGER', true)

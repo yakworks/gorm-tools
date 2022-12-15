@@ -12,7 +12,7 @@ import gorm.tools.job.SyncJobEntity
 import grails.rest.render.RenderContext
 
 /**
- * Rederer for paged list data
+ * SyncJob renderer.
  *
  * @author Joshua Burnett (@basejump)
  * @since 7.0.8

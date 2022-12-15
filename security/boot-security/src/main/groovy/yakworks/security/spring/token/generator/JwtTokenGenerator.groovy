@@ -2,16 +2,14 @@
 * Copyright 2022 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.security.spring.token
+package yakworks.security.spring.token.generator
 
 import java.time.Instant
-import java.time.temporal.ChronoUnit
 
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
-import org.springframework.security.oauth2.core.AbstractOAuth2Token
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.jwt.JwtClaimsSet
 import org.springframework.security.oauth2.jwt.JwtEncoder
@@ -24,7 +22,7 @@ import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet
 import com.nimbusds.jose.jwk.source.JWKSource
 import com.nimbusds.jose.proc.SecurityContext
-import yakworks.security.spring.JwtProperties
+import yakworks.security.spring.token.JwtProperties
 
 /**
  * generates a JWT.
@@ -61,24 +59,12 @@ class JwtTokenGenerator implements TokenGenerator<Jwt> {
         return jwtEncoder.encode(encodeParams)
     }
 
-    // @Override
-    // Jwt generate(UserDetails principal, Integer expiration) {
-    //     return null
-    // }
+    /*
+    /Generating a safe HS256 Secret key
+SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+String secretString = Encoders.BASE64.encode(key.getEncoded());
+logger.info("Secret key: " + secretString);
 
-    static int getExpiresIn(AbstractOAuth2Token token) {
-        if (token.expiresAt != null) {
-            return ChronoUnit.SECONDS.between(Instant.now(), token.expiresAt).toInteger()
-        }
-        return -1
-    }
 
-    static Map tokenToMap(AbstractOAuth2Token token) {
-        Map body = [
-            token_type: 'Bearer',
-            access_token: token.tokenValue,
-            "expires_in": getExpiresIn(token)
-        ]
-        return body
-    }
+     */
 }

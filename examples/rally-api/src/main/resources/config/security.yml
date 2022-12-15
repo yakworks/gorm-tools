@@ -1,6 +1,17 @@
-app.security.jwt.privateKey: classpath:jwt/app.key
-app.security.jwt.publicKey: classpath:jwt/app.pub
+app:
+  security:
+    # default tokenType it either store or jwt
+    tokenType: store
+    jwt:
+      # default jwt type (either HS256 or RS256), NOT USED YET
+      type: RS256
+      # secret for Symmetric HS256 tokens, should be long and random
+      secret: s/9Y3WUi5LkKsR8IZ4DTcX=
+      # for RS256
+      privateKey: classpath:jwt/app.key
+      publicKey: classpath:jwt/app.pub
 
+# Uncomment and tweak to setup SAML with Okta
 #spring.security.saml2.relyingparty.registration.okta.singlelogout.binding: POST
 #spring.security.saml2.relyingparty.registration.okta.singlelogout.response-url: "{baseUrl}/logout/saml2/slo"
 #spring.security.saml2.relyingparty.registration.okta.assertingparty.metadata-uri: https://dev-86352402.okta.com/app/exk7dad4ucR8cUZXE5d7/sso/saml/metadata

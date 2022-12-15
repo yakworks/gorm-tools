@@ -2,7 +2,10 @@
 * Copyright 2013-2016 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.security.rest.token
+package yakworks.security.gorm.store
+
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -10,11 +13,13 @@ import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.oauth2.core.AbstractOAuth2Token
+import org.springframework.security.oauth2.server.resource.introspection.BadOpaqueTokenException
+import org.springframework.security.oauth2.server.resource.introspection.OAuth2IntrospectionException
 
 import grails.gorm.transactions.Transactional
 import yakworks.security.gorm.model.AppUserToken
-import yakworks.security.spring.token.TokenNotFoundException
-import yakworks.security.spring.token.TokenStorageService
+import yakworks.security.spring.token.store.TokenStore
 
 /**
  * GORM implementation for token storage. It will look for tokens on the DB using a domain class that will contain the
@@ -27,44 +32,50 @@ import yakworks.security.spring.token.TokenStorageService
  */
 @Slf4j
 @CompileStatic
-class GormTokenStorageService implements TokenStorageService {
+class GormTokenStore implements TokenStore {
 
     @Autowired UserDetailsService userDetailsService
 
-    UserDetails loadUserByToken(String tokenValue) throws TokenNotFoundException {
+    UserDetails loadUserByToken(String tokenValue) throws OAuth2IntrospectionException {
         log.debug "Finding token ${tokenValue} in GORM"
         String username = findUsernameForExistingToken(tokenValue)
         if (username) {
             return userDetailsService.loadUserByUsername(username)
         }
-
-        throw new TokenNotFoundException("Token ${tokenValue} not found")
+        throw new BadOpaqueTokenException("Token ${tokenValue} not found")
     }
 
-    @Transactional
-    void storeToken(String tokenValue, UserDetails principal) {
-        // log.debug "Storing principal for token: ${tokenValue}"
-        log.debug "Storing principal for token: ${principal}"
-        def newTokenObject = new AppUserToken(tokenValue: tokenValue, username: principal.username)
+    @Override
+    void storeToken(String username, AbstractOAuth2Token oAuthToken) {
+        log.debug "Storing token for AbstractOAuth2Token: ${username}"
+        LocalDateTime expiry = LocalDateTime.ofInstant(oAuthToken.expiresAt, ZoneOffset.UTC)
+        def newTokenObject = new AppUserToken(
+            tokenValue: oAuthToken.tokenValue,
+            username: username,
+            expiresAt: expiry
+        )
         newTokenObject.persist(flush: true)
     }
 
     @Transactional
-    void removeToken(String tokenValue) throws TokenNotFoundException {
+    void removeToken(String tokenValue) throws OAuth2IntrospectionException {
         def existingToken = AppUserToken.findWhere(tokenValue: tokenValue)
         if (existingToken) {
             existingToken.remove()
         } else {
-            throw new TokenNotFoundException("Token not found")
+            throw new BadOpaqueTokenException("Token not found")
         }
 
     }
 
-
     @Transactional
     String findUsernameForExistingToken(String tokenValue) {
         log.debug "Searching in GORM for UserDetails of token"
-        return AppUserToken.findWhere(tokenValue: tokenValue)?.username
+        def appUserToken = AppUserToken.findWhere(tokenValue: tokenValue)
+        if(appUserToken && appUserToken.expiresAt > LocalDateTime.now()){
+            return appUserToken.username
+        }
+        return null
     }
 
 }

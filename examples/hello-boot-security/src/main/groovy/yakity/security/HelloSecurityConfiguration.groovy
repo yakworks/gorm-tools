@@ -33,6 +33,7 @@ import org.springframework.security.web.SecurityFilterChain
 import yakworks.security.audit.AuditStampConfiguration
 import yakworks.security.gorm.SecurityGormConfiguration
 import yakworks.security.spring.DefaultSecurityConfiguration
+import yakworks.security.spring.token.store.TokenStore
 
 import static org.springframework.security.config.Customizer.withDefaults
 
@@ -49,6 +50,7 @@ import static org.springframework.security.config.Customizer.withDefaults
 class HelloSecurityConfiguration {
 
     @Autowired(required = false) Saml2RelyingPartyProperties samlProps
+    @Autowired(required = false) TokenStore tokenStore;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -70,7 +72,7 @@ class HelloSecurityConfiguration {
                 .saml2Logout(withDefaults());
         }
 
-        DefaultSecurityConfiguration.addJsonAuthenticationFilter(http);
+        DefaultSecurityConfiguration.addJsonAuthenticationFilter(http, tokenStore);
         DefaultSecurityConfiguration.applyOauthJwt(http);
 
         return http.build()

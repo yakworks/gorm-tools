@@ -13,16 +13,19 @@ import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
-import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.security.oauth2.core.AbstractOAuth2Token
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler
+
+import yakworks.security.spring.token.generator.TokenGenerator
 
 /**
  * Success handler that will add cookie for token first before doing redirects.
+ * This would get added to the form login controller and a saml or auth.
  */
 @CompileStatic
 class CookieAuthSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler{
 
-    @Autowired JwtTokenGenerator tokenGenerator
+    @Autowired TokenGenerator tokenGenerator
 
     @Override
     void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -32,8 +35,8 @@ class CookieAuthSuccessHandler extends SavedRequestAwareAuthenticationSuccessHan
         // response.characterEncoding = 'UTF-8'
         // response.addHeader 'Cache-Control', 'no-store'
         // response.addHeader 'Pragma', 'no-cache'
-        Jwt token = tokenGenerator.genererate()
-        Cookie cookie = TokenUtils.jwtCookie(request, token)
+        AbstractOAuth2Token token = tokenGenerator.generate()
+        Cookie cookie = TokenUtils.tokenCookie(request, token)
         response.addCookie(cookie)
         super.onAuthenticationSuccess(request, response, authentication);
     }

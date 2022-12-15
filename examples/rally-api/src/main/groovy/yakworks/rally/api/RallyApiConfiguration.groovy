@@ -24,11 +24,11 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Lazy
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 
 import yakworks.openapi.gorm.OpenApiGenerator
 import yakworks.rally.RallyConfiguration
@@ -36,7 +36,10 @@ import yakworks.rest.grails.AppInfoBuilder
 import yakworks.security.spring.DefaultSecurityConfiguration
 import yakworks.security.spring.token.CookieAuthSuccessHandler
 import yakworks.security.spring.token.CookieBearerTokenResolver
-import yakworks.security.spring.token.JwtTokenGenerator
+import yakworks.security.spring.token.TokenUtils
+import yakworks.security.spring.token.generator.JwtTokenGenerator
+import yakworks.security.spring.token.store.OpaqueTokenStoreAuthProvider
+import yakworks.security.spring.token.store.TokenStore
 
 import static org.springframework.security.config.Customizer.withDefaults
 
@@ -59,6 +62,7 @@ class RallyApiConfiguration {
 
     @Autowired JwtTokenGenerator tokenGenerator
     @Autowired CookieAuthSuccessHandler cookieAuthSuccessHandler
+    @Autowired TokenStore tokenStore
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -85,36 +89,55 @@ class RallyApiConfiguration {
                 .requestMatchers(permitAllMatchers as String[]).permitAll()
                 .anyRequest().authenticated()
             )
-            // enable basic auth
+            // http basic auth
             .httpBasic(withDefaults())
             // add default form for testing in browser
-            // .formLogin(withDefaults())
             .formLogin( formLoginCustomizer ->
+                //adds success handler for adding cookie
                 formLoginCustomizer.successHandler(cookieAuthSuccessHandler)
             )
             //make stateless so no session stored on server
             .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             //remove the cookie on logout
-            .logout().deleteCookies(CookieBearerTokenResolver.COOKIE_NAME);
+            .logout().deleteCookies(TokenUtils.COOKIE_NAME);
 
         // Uncomment to enable SAML, will hit the metadata-uri on startup and fail if not found
         // TODO need to find a way to not hit server until its needed instead of on startup
         if(samlProps?.registration?.containsKey('okta')){
+            //adds success handler for adding cookie
             DefaultSecurityConfiguration.applySamlSecurity(http, cookieAuthSuccessHandler)
         }
 
         http.oauth2Login(withDefaults())
 
-        DefaultSecurityConfiguration.addJsonAuthenticationFilter(http);
-        DefaultSecurityConfiguration.applyOauthJwt(http);
+        //tokenLegacy for using username/password json in api/login, forwards to api/tokenLegacy which saves random string in db as token
+        DefaultSecurityConfiguration.addJsonAuthenticationFilter(http, tokenStore)
+        //enables jwt and oauth
+        DefaultSecurityConfiguration.applyOauthJwt(http)
+
+        // AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class)
+        // authenticationManagerBuilder.authenticationProvider(new OpaqueTokenStoreAuthProvider(tokenStore))
 
         return http.build()
     }
+
+    // @Bean
+    // AuthenticationManager authManager(HttpSecurity http) throws Exception {
+    //     AuthenticationManagerBuilder authenticationManagerBuilder =
+    //         http.getSharedObject(AuthenticationManagerBuilder.class);
+    //     authenticationManagerBuilder.authenticationProvider(new CustomAuthenticationProvider());
+    //     return authenticationManagerBuilder.build();
+    // }
 
     @Bean
     CookieBearerTokenResolver bearerTokenResolver(){
         new CookieBearerTokenResolver()
     }
+
+    // @Bean
+    // CustomAuthenticationProvider customAuthenticationProvider(){
+    //     new CustomAuthenticationProvider()
+    // }
 
     // @Bean
     // @Role(BeanDefinition.ROLE_INFRASTRUCTURE)

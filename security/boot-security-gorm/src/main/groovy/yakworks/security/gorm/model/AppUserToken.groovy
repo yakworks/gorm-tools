@@ -4,6 +4,10 @@
 */
 package yakworks.security.gorm.model
 
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -17,8 +21,15 @@ class AppUserToken  implements AuditStampTrait, RepoEntity<AppUserToken>, Serial
 
     String tokenValue
     String username
+    LocalDateTime expiresAt
 
     static mapping =  orm {
         version false
+    }
+
+    /** IssuedAt is createdDate.toInstant*/
+    Instant getIssuedAt(){
+        //Convert to instance, zero offset / UTC+0
+        return createdDate.toInstant(ZoneOffset.UTC)
     }
 }

@@ -137,6 +137,7 @@ trait OkHttpRestTrait {
      */
     String login() {
         if(!OkAuth.BEARER_TOKEN) login(getUsername(), getPassword())
+        return OkAuth.TOKEN
     }
 
     @CompileDynamic

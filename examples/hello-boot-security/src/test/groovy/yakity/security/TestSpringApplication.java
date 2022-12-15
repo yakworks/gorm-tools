@@ -15,6 +15,9 @@
  */
 package yakity.security;
 
+import yakworks.security.gorm.store.GormTokenStore;
+import yakworks.security.spring.token.generator.StoreTokenGenerator;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -53,4 +56,8 @@ public class TestSpringApplication {
         return NoOpPasswordEncoder.getInstance();
     }
 
+    @Bean
+    GormTokenStore tokenStore(){
+        return new GormTokenStore();
+    }
 }

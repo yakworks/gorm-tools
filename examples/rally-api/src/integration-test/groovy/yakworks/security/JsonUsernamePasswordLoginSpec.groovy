@@ -1,19 +1,10 @@
 package yakworks.security
 
-import groovy.transform.CompileDynamic
-
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
-
 import grails.testing.mixin.integration.Integration
-import okhttp3.Credentials
 import okhttp3.Request
-import okhttp3.RequestBody
 import okhttp3.Response
 import spock.lang.Specification
-import yakworks.rest.client.OkAuth
 import yakworks.rest.client.OkHttpRestTrait
-import yakworks.security.spring.token.store.TokenStore
 
 // @Ignore
 @Integration

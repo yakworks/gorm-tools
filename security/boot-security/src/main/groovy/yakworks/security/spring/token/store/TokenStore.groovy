@@ -34,7 +34,7 @@ interface TokenStore {
      * Stores a token from the oAuthToken.
      * Its assumed that the token
      */
-    void storeToken(AbstractOAuth2Token oAuthToken)
+    void storeToken(String username, AbstractOAuth2Token oAuthToken)
 
     /**
      * Removes a token from the storage.

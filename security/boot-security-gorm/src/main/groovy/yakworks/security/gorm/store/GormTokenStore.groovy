@@ -4,6 +4,9 @@
 */
 package yakworks.security.gorm.store
 
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
@@ -51,8 +54,15 @@ class GormTokenStore implements TokenStore {
     }
 
     @Override
-    void storeToken(AbstractOAuth2Token oAuthToken) {
-
+    void storeToken(String username, AbstractOAuth2Token oAuthToken) {
+        log.debug "Storing token for AbstractOAuth2Token: ${username}"
+        LocalDateTime expiry = LocalDateTime.ofInstant(oAuthToken.expiresAt, ZoneOffset.UTC)
+        def newTokenObject = new AppUserToken(
+            tokenValue: oAuthToken.tokenValue,
+            username: username,
+            expiresAt: expiry
+        )
+        newTokenObject.persist(flush: true)
     }
 
     @Transactional

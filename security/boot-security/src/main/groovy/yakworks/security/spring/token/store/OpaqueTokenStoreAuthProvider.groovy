@@ -25,14 +25,14 @@ import org.springframework.security.oauth2.server.resource.introspection.BadOpaq
 class OpaqueTokenStoreAuthProvider implements AuthenticationProvider {
     public static final String AUTHORITY_PREFIX = "SCOPE_";
 
-    TokenStore tokenStorageService
+    TokenStore tokenStore
     /** the prefix of the token if its an opaque one */
-    String tokenPrefix = 'yak_'
+    String tokenPrefix = 'opq_'
 
     OpaqueTokenAuthenticationProvider opaqueTokenAuthenticationProvider
 
-    OpaqueTokenStoreAuthProvider(TokenStore tokenStorageService){
-        this.tokenStorageService = tokenStorageService
+    OpaqueTokenStoreAuthProvider(TokenStore tokenStore){
+        this.tokenStore = tokenStore
         // StoreOpaqueTokenIntrospector introspec = new StoreOpaqueTokenIntrospector()
         opaqueTokenAuthenticationProvider = new OpaqueTokenAuthenticationProvider(this::introspect)
         // opaqueTokenAuthenticationProvider.authenticationConverter = OpaqueTokenStoreAuthProvider::convert
@@ -52,7 +52,7 @@ class OpaqueTokenStoreAuthProvider implements AuthenticationProvider {
     }
 
     OAuth2AuthenticatedPrincipal introspect(String token) {
-        UserDetails user = tokenStorageService.loadUserByToken(token)
+        UserDetails user = tokenStore.loadUserByToken(token)
         if(!user) throw new BadOpaqueTokenException("Provided token isn't active");
 
         return new DefaultOAuth2AuthenticatedPrincipal(

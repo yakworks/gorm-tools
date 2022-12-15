@@ -72,7 +72,7 @@ class TokenControllerSpec extends Specification {
 
         //the mock mvc doesn't do forwards so just check that it sent it over to token on success
         then:
-        result.response.forwardedUrl == "/api/token"
+        result.response.forwardedUrl == "/api/tokenLegacy"
 
     }
 

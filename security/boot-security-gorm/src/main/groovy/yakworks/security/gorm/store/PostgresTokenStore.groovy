@@ -89,7 +89,7 @@ class PostgresTokenStore implements TokenStore {
     }
 
     @Override
-    void storeToken(AbstractOAuth2Token oAuthToken) {
+    void storeToken(String username, AbstractOAuth2Token oAuthToken) {
 
     }
 

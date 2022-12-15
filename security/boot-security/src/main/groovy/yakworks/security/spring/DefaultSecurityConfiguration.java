@@ -11,6 +11,8 @@ import yakworks.security.SecService;
 import yakworks.security.services.PasswordValidator;
 import yakworks.security.spring.token.*;
 import yakworks.security.spring.token.generator.JwtTokenGenerator;
+import yakworks.security.spring.token.generator.OpaqueTokenGenerator;
+import yakworks.security.spring.token.generator.StoreTokenGenerator;
 import yakworks.security.spring.user.AuthSuccessUserInfoListener;
 import yakworks.security.user.CurrentUser;
 import yakworks.security.user.CurrentUserHolder;
@@ -91,7 +93,7 @@ public class DefaultSecurityConfiguration {
         JsonUsernamePasswordLoginFilter jsonUnameFilter = new JsonUsernamePasswordLoginFilter(ctx.getBean(ObjectMapper.class));
         jsonUnameFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/api/login", "POST"));
         //forward over to the token endpoint which will return the standard bearer object.
-        jsonUnameFilter.setAuthenticationSuccessHandler(new ForwardAuthenticationSuccessHandler("/api/token"));
+        jsonUnameFilter.setAuthenticationSuccessHandler(new ForwardAuthenticationSuccessHandler("/api/tokenLegacy"));
         jsonUnameFilter.setAuthenticationManager(ctx.getBean(AuthenticationManager.class));
         http.addFilterAfter(jsonUnameFilter, BasicAuthenticationFilter.class);
     }
@@ -220,6 +222,18 @@ public class DefaultSecurityConfiguration {
         @ConditionalOnMissingBean
         public JwtTokenGenerator tokenGenerator() {
             return new JwtTokenGenerator();
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public OpaqueTokenGenerator opaqueTokenGenerator() {
+            return new OpaqueTokenGenerator();
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public StoreTokenGenerator storeTokenGenerator() {
+            return new StoreTokenGenerator();
         }
 
     }

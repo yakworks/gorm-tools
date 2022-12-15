@@ -19,14 +19,14 @@ class OpaqueRestApiSpec extends Specification implements OkHttpRestTrait {
     String endpoint = "/api/rally/user"
 
     def setup(){
-        OkAuth.TOKEN = "yak_123"
-        OkAuth.BEARER_TOKEN = "Bearer yak_123"
+        OkAuth.TOKEN = "opq_123"
+        OkAuth.BEARER_TOKEN = "Bearer opq_123"
     }
 
     void "test get to make sure display false dont get returned"() {
         setup:
         //add token to the store.
-        tokenStore.storeToken('admin', 'yak_123')
+        tokenStore.storeToken('admin', 'opq_123')
         when:
         def resp = get("$endpoint/1")
         Map body = bodyToMap(resp)

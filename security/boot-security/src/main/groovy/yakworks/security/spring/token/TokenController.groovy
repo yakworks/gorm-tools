@@ -13,12 +13,14 @@ import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.CacheControl
 import org.springframework.http.ResponseEntity
+import org.springframework.security.oauth2.core.AbstractOAuth2Token
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
 
 import yakworks.security.spring.token.generator.JwtTokenGenerator
+import yakworks.security.spring.token.generator.StoreTokenGenerator
 import yakworks.security.user.CurrentUser
 
 /**
@@ -29,7 +31,9 @@ import yakworks.security.user.CurrentUser
 class TokenController {
 
     @Autowired JwtTokenGenerator jwtTokenGenerator
-    // @Autowired OpaqueTokenGenerator opaqueTokenGenerator
+    //used for tokenLegacy right now
+    @Autowired(required=false) StoreTokenGenerator storeTokenGenerator
+
     @Autowired CurrentUser currentUser
 
     // @Value('${grails.serverURL:""}')
@@ -42,8 +46,11 @@ class TokenController {
         return jwtTokenGenerator.generate().tokenValue
     }
 
+    /**
+     * Default generator for token. Follows the oauth standards.
+     */
     @PostMapping("/api/token")
-    ResponseEntity<Map> token(HttpServletRequest request, HttpServletResponse response) {
+    ResponseEntity<Map> token(HttpServletRequest request, HttpServletResponse response ) {
         Jwt token = jwtTokenGenerator.generate()
         //add it as a cookie, there is no security "success handler" after this
         Cookie cookie = TokenUtils.tokenCookie(request, token)
@@ -59,6 +66,28 @@ class TokenController {
     @GetMapping("/api/token/callback")
     ResponseEntity<Map> callback(HttpServletRequest request, HttpServletResponse response) {
         return token(request, response)
+    }
+
+    /**
+     * Basically a url for grant_type=password and storing a user token in the table
+     *
+     * TODO for legacy and possible in future.  JsonUsernamePasswordLogin forwards to this right now
+     * we will sunset this once we move off of having stored tokens as the default when using the login.
+     */
+    @Deprecated
+    @PostMapping("/api/tokenLegacy")
+    ResponseEntity<Map> tokenLegacy(HttpServletRequest request, HttpServletResponse response) {
+
+        AbstractOAuth2Token token = storeTokenGenerator.generate()
+        //add it as a cookie, there is no security "success handler" after this
+        Cookie cookie = TokenUtils.tokenCookie(request, token)
+        response.addCookie(cookie)
+        //convert to a Map to render it as json
+        Map body = TokenUtils.tokenToMap(token)
+
+        return ResponseEntity.ok()
+            .cacheControl(CacheControl.noStore())
+            .body(body)
     }
 
     //returns the current userMap. Will error if not valid token or login

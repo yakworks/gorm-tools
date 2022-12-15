@@ -5,21 +5,18 @@
 package yakworks.security.spring.token.generator
 
 import java.security.SecureRandom
-import java.time.Instant
 
 import groovy.transform.CompileStatic
 
 import org.apache.commons.lang3.RandomStringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
-import org.springframework.security.oauth2.core.AbstractOAuth2Token
 import org.springframework.security.oauth2.core.OAuth2AccessToken
 
-import yakworks.security.spring.token.JwtProperties
 import yakworks.security.spring.token.store.TokenStore
 
 /**
- * generates a JWT.
+ * generates an Opaque (random) token and stores it for lookup.
  */
 @CompileStatic
 class StoreTokenGenerator implements TokenGenerator<OAuth2AccessToken> {
@@ -31,7 +28,7 @@ class StoreTokenGenerator implements TokenGenerator<OAuth2AccessToken> {
     @Override
     OAuth2AccessToken generate(Authentication authentication) {
         OAuth2AccessToken otok = opaqueTokenGenerator.generate(authentication)
-        tokenStore.storeToken(otok)
+        tokenStore.storeToken(authentication.name, otok)
         return otok
     }
 

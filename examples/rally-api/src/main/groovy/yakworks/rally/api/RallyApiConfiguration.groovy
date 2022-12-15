@@ -62,7 +62,7 @@ class RallyApiConfiguration {
 
     @Autowired JwtTokenGenerator tokenGenerator
     @Autowired CookieAuthSuccessHandler cookieAuthSuccessHandler
-    @Autowired TokenStore tokenStorageService
+    @Autowired TokenStore tokenStore
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -89,10 +89,9 @@ class RallyApiConfiguration {
                 .requestMatchers(permitAllMatchers as String[]).permitAll()
                 .anyRequest().authenticated()
             )
-            // enable basic auth
+            // http basic auth
             .httpBasic(withDefaults())
             // add default form for testing in browser
-            // .formLogin(withDefaults())
             .formLogin( formLoginCustomizer ->
                 //adds success handler for adding cookie
                 formLoginCustomizer.successHandler(cookieAuthSuccessHandler)
@@ -111,11 +110,13 @@ class RallyApiConfiguration {
 
         http.oauth2Login(withDefaults())
 
-        DefaultSecurityConfiguration.addJsonAuthenticationFilter(http)
+        //tokenLegacy for using username/password json in api/login, forwards to api/tokenLegacy which saves random string in db as token
+        DefaultSecurityConfiguration.addJsonAuthenticationFilter(http, tokenStore)
+        //enables jwt and oauth
         DefaultSecurityConfiguration.applyOauthJwt(http)
 
-        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class)
-        authenticationManagerBuilder.authenticationProvider(new OpaqueTokenStoreAuthProvider(tokenStorageService))
+        // AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class)
+        // authenticationManagerBuilder.authenticationProvider(new OpaqueTokenStoreAuthProvider(tokenStore))
 
         return http.build()
     }

@@ -13,6 +13,8 @@ import yakworks.security.spring.token.*;
 import yakworks.security.spring.token.generator.JwtTokenGenerator;
 import yakworks.security.spring.token.generator.OpaqueTokenGenerator;
 import yakworks.security.spring.token.generator.StoreTokenGenerator;
+import yakworks.security.spring.token.store.OpaqueTokenStoreAuthProvider;
+import yakworks.security.spring.token.store.TokenStore;
 import yakworks.security.spring.user.AuthSuccessUserInfoListener;
 import yakworks.security.user.CurrentUser;
 import yakworks.security.user.CurrentUserHolder;
@@ -20,6 +22,7 @@ import yakworks.security.user.CurrentUserHolder;
 import java.security.KeyPair;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -31,6 +34,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Role;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -48,6 +52,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration @Lazy
 @EnableConfigurationProperties({JwtProperties.class})
 public class DefaultSecurityConfiguration {
+
+    //@Autowired(required = false) TokenStore tokenStore;
 
     /**
      * Helper to set up HttpSecurity builder with default requestMatchers and forms.
@@ -68,7 +74,7 @@ public class DefaultSecurityConfiguration {
         // )
 
         //add the Filter to pick up RESTful POST calls to /api/login credential passed in the body
-        addJsonAuthenticationFilter(http);
+        //addJsonAuthenticationFilter(http, tokenStore);
     }
 
     /** Example for simple Saml setup. Its largely dealt with in the configuration. */
@@ -85,7 +91,7 @@ public class DefaultSecurityConfiguration {
     /**
      * Legacy, Helper to setup a Filter to pick up POST to /api/login to it can be a REST call instead of just form post.
      */
-    public static void addJsonAuthenticationFilter(HttpSecurity http) throws Exception {
+    public static void addJsonAuthenticationFilter(HttpSecurity http, TokenStore tokenStore) throws Exception {
         //get the 2 beans needed
         ApplicationContext ctx = http.getSharedObject(ApplicationContext.class);
 
@@ -96,6 +102,11 @@ public class DefaultSecurityConfiguration {
         jsonUnameFilter.setAuthenticationSuccessHandler(new ForwardAuthenticationSuccessHandler("/api/tokenLegacy"));
         jsonUnameFilter.setAuthenticationManager(ctx.getBean(AuthenticationManager.class));
         http.addFilterAfter(jsonUnameFilter, BasicAuthenticationFilter.class);
+
+        //adds the OpaqueTokenStoreAuthProvider that will look for Bearer tokens that start with opq_ prefix
+        // will look them up in tokenStore (DB).
+        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder.authenticationProvider(new OpaqueTokenStoreAuthProvider(tokenStore));
     }
 
     /** Sets up the JWT */
@@ -188,6 +199,18 @@ public class DefaultSecurityConfiguration {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public OpaqueTokenGenerator opaqueTokenGenerator() {
+        return new OpaqueTokenGenerator();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public StoreTokenGenerator storeTokenGenerator() {
+        return new StoreTokenGenerator();
+    }
+
     @Configuration
     @Lazy
     @ConditionalOnClass(OAuth2Token.class)
@@ -222,18 +245,6 @@ public class DefaultSecurityConfiguration {
         @ConditionalOnMissingBean
         public JwtTokenGenerator tokenGenerator() {
             return new JwtTokenGenerator();
-        }
-
-        @Bean
-        @ConditionalOnMissingBean
-        public OpaqueTokenGenerator opaqueTokenGenerator() {
-            return new OpaqueTokenGenerator();
-        }
-
-        @Bean
-        @ConditionalOnMissingBean
-        public StoreTokenGenerator storeTokenGenerator() {
-            return new StoreTokenGenerator();
         }
 
     }

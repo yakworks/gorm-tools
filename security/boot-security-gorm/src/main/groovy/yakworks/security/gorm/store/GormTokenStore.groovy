@@ -38,19 +38,11 @@ class GormTokenStore implements TokenStore {
 
     UserDetails loadUserByToken(String tokenValue) throws OAuth2IntrospectionException {
         log.debug "Finding token ${tokenValue} in GORM"
-        String username = 'admin' //findUsernameForExistingToken(tokenValue)
+        String username = findUsernameForExistingToken(tokenValue)
         if (username) {
             return userDetailsService.loadUserByUsername(username)
         }
         throw new BadOpaqueTokenException("Token ${tokenValue} not found")
-    }
-
-    @Transactional
-    void storeToken(String username, String tokenValue) {
-        // log.debug "Storing principal for token: ${tokenValue}"
-        log.debug "Storing token for: ${username}"
-        def newTokenObject = new AppUserToken(tokenValue: tokenValue, username: username)
-        newTokenObject.persist(flush: true)
     }
 
     @Override
@@ -79,7 +71,11 @@ class GormTokenStore implements TokenStore {
     @Transactional
     String findUsernameForExistingToken(String tokenValue) {
         log.debug "Searching in GORM for UserDetails of token"
-        return AppUserToken.findWhere(tokenValue: tokenValue)?.username
+        def appUserToken = AppUserToken.findWhere(tokenValue: tokenValue)
+        if(appUserToken && appUserToken.expiresAt > LocalDateTime.now()){
+            return appUserToken.username
+        }
+        return null
     }
 
 }

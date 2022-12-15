@@ -23,14 +23,6 @@ interface TokenStore {
     UserDetails loadUserByToken(String tokenValue) throws OAuth2IntrospectionException
 
     /**
-     * Stores a token. It receives the principal to store any additional information together with the token,
-     * like the username associated.
-     *
-     * @see Authentication#getPrincipal()
-     */
-    void storeToken(String username, String tokenValue)
-
-    /**
      * Stores a token from the oAuthToken.
      * Its assumed that the token
      */

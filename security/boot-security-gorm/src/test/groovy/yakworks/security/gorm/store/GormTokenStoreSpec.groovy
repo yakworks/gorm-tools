@@ -4,6 +4,7 @@ import java.time.Instant
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.oauth2.core.OAuth2AccessToken
+import org.springframework.security.oauth2.server.resource.introspection.BadOpaqueTokenException
 
 import spock.lang.Specification
 import yakworks.security.gorm.AppUserDetailsService
@@ -26,16 +27,27 @@ class GormTokenStoreSpec extends Specification implements GormHibernateTest, Sec
         passwordValidator(PasswordValidator)
     }}
 
+    OAuth2AccessToken createOAuthToken(String tokenValue, Instant nowTime = Instant.now(), Instant expireAt = Instant.now().plusSeconds(30)){
+        def oat = new OAuth2AccessToken(
+            OAuth2AccessToken.TokenType.BEARER,
+            tokenValue,
+            nowTime,
+            expireAt
+        )
+        return oat
+    }
+
     def "StoreToken and LoadUserByToken"() {
         setup:
         AppUser.create(username: 'admin', email: 'foo@foo.com')
         flush()
 
         when:
-        tokenStore.storeToken("admin", "yak123")
+        def oat = createOAuthToken("yak1234", Instant.now(), Instant.now().plusSeconds(30))
+        tokenStore.storeToken("admin", oat)
 
         then:
-        tokenStore.loadUserByToken("yak123").username == "admin"
+        tokenStore.loadUserByToken("yak1234").username == "admin"
     }
 
     def "StoreToken OAuth"() {
@@ -45,12 +57,13 @@ class GormTokenStoreSpec extends Specification implements GormHibernateTest, Sec
 
         when:
         def now = Instant.parse("2022-12-01T23:59:00.00Z");
-        def oat = new OAuth2AccessToken(
-            OAuth2AccessToken.TokenType.BEARER,
-            "yak1234",
-            now,
-            now.plusSeconds(600)
-        )
+        def oat = createOAuthToken("yak1234", now, Instant.now().plusSeconds(30))
+        // def oat = new OAuth2AccessToken(
+        //     OAuth2AccessToken.TokenType.BEARER,
+        //     "yak1234",
+        //     now,
+        //     now.plusSeconds(600)
+        // )
         tokenStore.storeToken('admin', oat)
 
         // tokenStore.loadUserByToken("yak1234")
@@ -62,17 +75,31 @@ class GormTokenStoreSpec extends Specification implements GormHibernateTest, Sec
 
     def "RemoveToken"() {
         when:
-        tokenStore.storeToken("admin", "yak123")
+        def oat = createOAuthToken("yak1234")
+        tokenStore.storeToken("admin", oat)
 
         then:
-        tokenStore.removeToken("yak123")
+        tokenStore.removeToken("yak1234")
     }
 
     def "FindUsernameForExistingToken"() {
         when:
-        tokenStore.storeToken("admin", "yak123")
+        def oat = createOAuthToken("yak1234")
+        tokenStore.storeToken("admin", oat)
 
-        then:
-        tokenStore.findUsernameForExistingToken("yak123") == 'admin'
+        then: "should find it"
+        tokenStore.findUsernameForExistingToken("yak1234") == 'admin'
+
+        and: "should return null when not found"
+        !tokenStore.findUsernameForExistingToken("yak123456")
+    }
+
+    def "should throw BadOpaqueTokenException when not found"() {
+        when:
+        tokenStore.loadUserByToken("invalid token")
+
+        then: "should fire ex"
+        thrown(BadOpaqueTokenException)
+
     }
 }

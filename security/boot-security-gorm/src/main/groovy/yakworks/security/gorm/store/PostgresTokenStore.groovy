@@ -70,7 +70,9 @@ class PostgresTokenStore implements TokenStore {
     }
 
     @Transactional
-    void storeToken(String username, String tokenValue) {
+    @Override
+    void storeToken(String username, AbstractOAuth2Token oAuthToken) {
+        //FIXME does nothing with the expiration right now.
         // log.debug "Storing principal for token: ${tokenValue}"
         log.debug "Principal: ${username}"
 
@@ -81,16 +83,10 @@ class PostgresTokenStore implements TokenStore {
             insert into AppUserToken (id, username, tokenvalue,
                 expiredate,
                 createdDate, createdBy, editedDate, editedBy)
-            values (${id}, '${username}', crypt('${tokenValue}',gen_salt('md5')),
+            values (${id}, '${username}', crypt('${oAuthToken.tokenValue}',gen_salt('md5')),
                     now() + interval '${defaultExpires}',
                     now(), 1, now(), 1 )
         """)
-
-    }
-
-    @Override
-    void storeToken(String username, AbstractOAuth2Token oAuthToken) {
-
     }
 
     @Transactional

@@ -14,7 +14,7 @@ class JwtSymmetricTokenGeneratorSpec extends Specification {
         setup:
         def auth = new TestingAuthenticationToken("bob", null, "ADMIN")
         def tokenGenerator = new JwtSymmetricTokenGenerator()
-        tokenGenerator.jwtProperties = new JwtProperties()
+        tokenGenerator.jwtProperties = new JwtProperties(secret: "s/9Y3WUi5LkKsR8IZ4DTcXAAFDlkjL12")
 
         when:
         Jwt token = tokenGenerator.generate(auth)

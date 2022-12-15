@@ -20,7 +20,7 @@ class JwtProperties {
     //NOT USED WIP to config the type of JWT. HS256 or RS256
     String type
 
-    //secret for Symmetric HS256 tokens
+    //secret for Symmetric HS256 tokens, about 32+ chars of randomness
     String secret // = "s/9Y3WUi5LkKsR8IZ4DTcX="
 
     // keypair for RS256

@@ -1,10 +1,9 @@
-package yakworks.security.spring
+package yakworks.security.spring.token
 
 import java.time.Instant
 
 import spock.lang.Specification
-import yakworks.security.spring.token.JwtProperties
-import yakworks.security.spring.token.OpaqueTokenGenerator
+import yakworks.security.spring.token.generator.OpaqueTokenGenerator
 
 class OpaqueTokenGeneratorSpec extends Specification {
 

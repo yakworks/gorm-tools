@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.oauth2.core.AbstractOAuth2Token
 import org.springframework.security.oauth2.server.resource.introspection.BadOpaqueTokenException
 import org.springframework.security.oauth2.server.resource.introspection.OAuth2IntrospectionException
 
@@ -84,6 +85,11 @@ class PostgresTokenStore implements TokenStore {
                     now() + interval '${defaultExpires}',
                     now(), 1, now(), 1 )
         """)
+
+    }
+
+    @Override
+    void storeToken(AbstractOAuth2Token oAuthToken) {
 
     }
 

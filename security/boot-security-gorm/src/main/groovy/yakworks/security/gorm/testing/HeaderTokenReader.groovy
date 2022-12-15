@@ -13,8 +13,6 @@ import groovy.util.logging.Slf4j
 import org.springframework.http.MediaType
 
 import yakworks.security.spring.token.TokenUtils
-import yakworks.security.spring.token.store.AccessToken
-
 
 /**
  * NOTE: NOT USED kept for reference

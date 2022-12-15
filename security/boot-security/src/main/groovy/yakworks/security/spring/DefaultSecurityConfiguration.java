@@ -10,6 +10,7 @@ import com.nimbusds.jose.proc.SecurityContext;
 import yakworks.security.SecService;
 import yakworks.security.services.PasswordValidator;
 import yakworks.security.spring.token.*;
+import yakworks.security.spring.token.generator.JwtTokenGenerator;
 import yakworks.security.spring.user.AuthSuccessUserInfoListener;
 import yakworks.security.user.CurrentUser;
 import yakworks.security.user.CurrentUserHolder;

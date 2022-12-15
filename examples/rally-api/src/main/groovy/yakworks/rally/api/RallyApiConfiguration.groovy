@@ -36,8 +36,8 @@ import yakworks.rest.grails.AppInfoBuilder
 import yakworks.security.spring.DefaultSecurityConfiguration
 import yakworks.security.spring.token.CookieAuthSuccessHandler
 import yakworks.security.spring.token.CookieBearerTokenResolver
-import yakworks.security.spring.token.JwtTokenGenerator
 import yakworks.security.spring.token.TokenUtils
+import yakworks.security.spring.token.generator.JwtTokenGenerator
 import yakworks.security.spring.token.store.OpaqueTokenStoreAuthProvider
 import yakworks.security.spring.token.store.TokenStore
 
@@ -94,6 +94,7 @@ class RallyApiConfiguration {
             // add default form for testing in browser
             // .formLogin(withDefaults())
             .formLogin( formLoginCustomizer ->
+                //adds success handler for adding cookie
                 formLoginCustomizer.successHandler(cookieAuthSuccessHandler)
             )
             //make stateless so no session stored on server
@@ -104,6 +105,7 @@ class RallyApiConfiguration {
         // Uncomment to enable SAML, will hit the metadata-uri on startup and fail if not found
         // TODO need to find a way to not hit server until its needed instead of on startup
         if(samlProps?.registration?.containsKey('okta')){
+            //adds success handler for adding cookie
             DefaultSecurityConfiguration.applySamlSecurity(http, cookieAuthSuccessHandler)
         }
 

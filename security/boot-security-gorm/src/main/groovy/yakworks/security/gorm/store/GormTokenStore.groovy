@@ -10,6 +10,7 @@ import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.oauth2.core.AbstractOAuth2Token
 import org.springframework.security.oauth2.server.resource.introspection.BadOpaqueTokenException
 import org.springframework.security.oauth2.server.resource.introspection.OAuth2IntrospectionException
 
@@ -47,6 +48,11 @@ class GormTokenStore implements TokenStore {
         log.debug "Storing token for: ${username}"
         def newTokenObject = new AppUserToken(tokenValue: tokenValue, username: username)
         newTokenObject.persist(flush: true)
+    }
+
+    @Override
+    void storeToken(AbstractOAuth2Token oAuthToken) {
+
     }
 
     @Transactional

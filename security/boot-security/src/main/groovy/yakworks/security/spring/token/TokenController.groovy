@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
 
+import yakworks.security.spring.token.generator.JwtTokenGenerator
 import yakworks.security.user.CurrentUser
 
 /**
@@ -27,7 +28,8 @@ import yakworks.security.user.CurrentUser
 @CompileStatic
 class TokenController {
 
-    @Autowired JwtTokenGenerator tokenGenerator
+    @Autowired JwtTokenGenerator jwtTokenGenerator
+    // @Autowired OpaqueTokenGenerator opaqueTokenGenerator
     @Autowired CurrentUser currentUser
 
     // @Value('${grails.serverURL:""}')
@@ -37,14 +39,14 @@ class TokenController {
     // ex: `$ TOKEN=`http POST admin:123@localhost:8080/token.txt -b`
     @PostMapping("/api/token.txt")
     String tokenTxt() {
-        return tokenGenerator.generate().tokenValue
+        return jwtTokenGenerator.generate().tokenValue
     }
 
     @PostMapping("/api/token")
     ResponseEntity<Map> token(HttpServletRequest request, HttpServletResponse response) {
-        Jwt token = tokenGenerator.generate()
-        //add it as a cookie
-        Cookie cookie = jwtCookie(request, token)
+        Jwt token = jwtTokenGenerator.generate()
+        //add it as a cookie, there is no security "success handler" after this
+        Cookie cookie = TokenUtils.tokenCookie(request, token)
         response.addCookie(cookie)
         //convert to a Map to render it as json
         Map body = TokenUtils.tokenToMap(token)
@@ -56,16 +58,7 @@ class TokenController {
 
     @GetMapping("/api/token/callback")
     ResponseEntity<Map> callback(HttpServletRequest request, HttpServletResponse response) {
-        Jwt token = tokenGenerator.generate()
-        //add it as a cookie
-        Cookie cookie = jwtCookie(request, token)
-        response.addCookie(cookie)
-        //convert to a Map to render it as json
-        Map body = TokenUtils.tokenToMap(token)
-
-        return ResponseEntity.ok()
-            .cacheControl(CacheControl.noStore())
-            .body(body)
+        return token(request, response)
     }
 
     //returns the current userMap. Will error if not valid token or login
@@ -78,31 +71,5 @@ class TokenController {
             .cacheControl(CacheControl.noStore())
             .body(body)
     }
-
-    protected Cookie jwtCookie(HttpServletRequest request, Jwt token) {
-        Cookie jwtCookie = new Cookie( TokenUtils.COOKIE_NAME, token.tokenValue )
-        //FIXME some hard coded values to get it working
-        jwtCookie.maxAge = TokenUtils.getExpiresIn(token)
-        jwtCookie.path = '/'
-        //only works if its https, here so we can dev with normal http
-        if ( isHttps(request) ) {
-            jwtCookie.setHttpOnly(true)
-            jwtCookie.setSecure(true)
-        }
-        jwtCookie
-    }
-
-    /**
-     * Checks to see if base Uri starts with https. if its http then true
-     */
-    protected boolean isHttps(HttpServletRequest request) {
-        // String baseUrl = ServletUriComponentsBuilder.fromRequestUri(request)
-        //     .replacePath(null)
-        //     .build()
-        //     .toUriString();
-        request.getRequestURL().toString().startsWith('https')
-    }
-
-
 
 }

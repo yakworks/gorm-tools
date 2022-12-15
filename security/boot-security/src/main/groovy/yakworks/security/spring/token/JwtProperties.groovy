@@ -17,6 +17,13 @@ import org.springframework.stereotype.Component
 @CompileStatic
 class JwtProperties {
 
+    //WIP to config the type of JWT. HS256 or RS256
+    String type
+
+    //secret for Symmetric HS256 tokens
+    String secret = "s/4KMb61LOrMYYAn4rfaQYSgr+le5SMrsMzKw8G6bXc="
+
+    // keypair for RS256
     RSAPublicKey publicKey
     RSAPrivateKey privateKey
 

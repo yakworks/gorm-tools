@@ -7,7 +7,7 @@ import org.springframework.mock.web.MockHttpServletResponse
 import spock.lang.Issue
 import spock.lang.Specification
 import spock.lang.Unroll
-import yakworks.security.spring.token.store.AccessToken
+import yakworks.security.gorm.testing.AccessToken
 
 //NOTE: NOT USED kept for reference
 class HeaderTokenReaderSpec extends Specification {

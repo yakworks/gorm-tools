@@ -6,6 +6,7 @@ package yakworks.security.spring.token.store
 
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.oauth2.core.AbstractOAuth2Token
 import org.springframework.security.oauth2.server.resource.introspection.BadOpaqueTokenException
 import org.springframework.security.oauth2.server.resource.introspection.OAuth2IntrospectionException
 
@@ -28,6 +29,12 @@ interface TokenStore {
      * @see Authentication#getPrincipal()
      */
     void storeToken(String username, String tokenValue)
+
+    /**
+     * Stores a token from the oAuthToken.
+     * Its assumed that the token
+     */
+    void storeToken(AbstractOAuth2Token oAuthToken)
 
     /**
      * Removes a token from the storage.

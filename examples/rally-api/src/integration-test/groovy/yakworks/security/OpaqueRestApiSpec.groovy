@@ -41,9 +41,9 @@ class OpaqueRestApiSpec extends Specification implements OkHttpRestTrait {
 
     void "test get to make sure display false dont get returned"() {
         setup:
-        AppUserToken.create([username: 'admin', tokenValue: 'opq_123', expiresAt: LocalDateTime.now().plusDays(2)], flush: true)
+        // AppUserToken.create([username: 'admin', tokenValue: 'opq_123', expiresAt: LocalDateTime.now().plusDays(2)], flush: true)
         //add token to the store.
-        def oat = createOAuthToken("yak1234", Instant.now(), Instant.now().plusSeconds(30))
+        def oat = createOAuthToken("opq_123", Instant.now(), Instant.now().plusSeconds(30))
         tokenStore.storeToken('admin', oat)
 
         when:

@@ -21,7 +21,7 @@ class AppUserToken  implements AuditStampTrait, RepoEntity<AppUserToken>, Serial
 
     String tokenValue
     String username
-    LocalDateTime expiresAt
+    LocalDateTime expireDate
 
     static mapping =  orm {
         version false

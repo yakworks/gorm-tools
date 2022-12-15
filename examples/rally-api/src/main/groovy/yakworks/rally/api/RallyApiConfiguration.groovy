@@ -112,35 +112,8 @@ class RallyApiConfiguration {
         //enables jwt and oauth
         DefaultSecurityConfiguration.applyOauthJwt(http)
 
-        // AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class)
-        // authenticationManagerBuilder.authenticationProvider(new OpaqueTokenStoreAuthProvider(tokenStore))
-
         return http.build()
     }
-
-    // @Bean
-    // AuthenticationManager authManager(HttpSecurity http) throws Exception {
-    //     AuthenticationManagerBuilder authenticationManagerBuilder =
-    //         http.getSharedObject(AuthenticationManagerBuilder.class);
-    //     authenticationManagerBuilder.authenticationProvider(new CustomAuthenticationProvider());
-    //     return authenticationManagerBuilder.build();
-    // }
-
-    // @Bean
-    // CookieBearerTokenResolver bearerTokenResolver(){
-    //     new CookieBearerTokenResolver()
-    // }
-
-    // @Bean
-    // CustomAuthenticationProvider customAuthenticationProvider(){
-    //     new CustomAuthenticationProvider()
-    // }
-
-    // @Bean
-    // @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    // KeyPair rsaKeyPair() {
-    //     KeyPairUtils.generateRsaKey()
-    // }
 
     @Bean
     AppInfoBuilder appInfoBuilder() {

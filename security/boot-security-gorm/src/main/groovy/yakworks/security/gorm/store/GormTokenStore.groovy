@@ -52,7 +52,7 @@ class GormTokenStore implements TokenStore {
         def newTokenObject = new AppUserToken(
             tokenValue: oAuthToken.tokenValue,
             username: username,
-            expiresAt: expiry
+            expireDate: expiry
         )
         newTokenObject.persist(flush: true)
     }
@@ -72,7 +72,7 @@ class GormTokenStore implements TokenStore {
     String findUsernameForExistingToken(String tokenValue) {
         log.debug "Searching in GORM for UserDetails of token"
         def appUserToken = AppUserToken.findWhere(tokenValue: tokenValue)
-        if(appUserToken && appUserToken.expiresAt > LocalDateTime.now()){
+        if(appUserToken && appUserToken.expireDate > LocalDateTime.now()){
             return appUserToken.username
         }
         return null

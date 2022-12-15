@@ -24,7 +24,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Lazy
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
@@ -35,10 +34,8 @@ import yakworks.rally.RallyConfiguration
 import yakworks.rest.grails.AppInfoBuilder
 import yakworks.security.spring.DefaultSecurityConfiguration
 import yakworks.security.spring.token.CookieAuthSuccessHandler
-import yakworks.security.spring.token.CookieBearerTokenResolver
 import yakworks.security.spring.token.TokenUtils
 import yakworks.security.spring.token.generator.JwtTokenGenerator
-import yakworks.security.spring.token.store.OpaqueTokenStoreAuthProvider
 import yakworks.security.spring.token.store.TokenStore
 
 import static org.springframework.security.config.Customizer.withDefaults
@@ -129,10 +126,10 @@ class RallyApiConfiguration {
     //     return authenticationManagerBuilder.build();
     // }
 
-    @Bean
-    CookieBearerTokenResolver bearerTokenResolver(){
-        new CookieBearerTokenResolver()
-    }
+    // @Bean
+    // CookieBearerTokenResolver bearerTokenResolver(){
+    //     new CookieBearerTokenResolver()
+    // }
 
     // @Bean
     // CustomAuthenticationProvider customAuthenticationProvider(){

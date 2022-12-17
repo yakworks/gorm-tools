@@ -27,11 +27,11 @@ class GormTokenStoreSpec extends Specification implements GormHibernateTest, Sec
         passwordValidator(PasswordValidator)
     }}
 
-    OAuth2AccessToken createOAuthToken(String tokenValue, Instant nowTime = Instant.now(), Instant expireAt = Instant.now().plusSeconds(30)){
+    OAuth2AccessToken createOAuthToken(String tokenValue, Instant issuedAt = Instant.now(), Instant expireAt = Instant.now().plusSeconds(30)){
         def oat = new OAuth2AccessToken(
             OAuth2AccessToken.TokenType.BEARER,
             tokenValue,
-            nowTime,
+            issuedAt,
             expireAt
         )
         return oat
@@ -56,21 +56,11 @@ class GormTokenStoreSpec extends Specification implements GormHibernateTest, Sec
         flush()
 
         when:
-        def now = Instant.parse("2022-12-01T23:59:00.00Z");
-        def oat = createOAuthToken("yak1234", now, Instant.now().plusSeconds(30))
-        // def oat = new OAuth2AccessToken(
-        //     OAuth2AccessToken.TokenType.BEARER,
-        //     "yak1234",
-        //     now,
-        //     now.plusSeconds(600)
-        // )
+        def oat = createOAuthToken("yak1234")
         tokenStore.storeToken('admin', oat)
-
-        // tokenStore.loadUserByToken("yak1234")
 
         then:
         tokenStore.loadUserByToken("yak1234").username == "admin"
-
     }
 
     def "RemoveToken"() {
@@ -97,6 +87,17 @@ class GormTokenStoreSpec extends Specification implements GormHibernateTest, Sec
     def "should throw BadOpaqueTokenException when not found"() {
         when:
         tokenStore.loadUserByToken("invalid token")
+
+        then: "should fire ex"
+        thrown(BadOpaqueTokenException)
+
+    }
+
+    def "should throw BadOpaqueTokenException when expired"() {
+        when:
+        def issuedAt = Instant.parse("2022-12-01T23:59:00.00Z");
+        def oat = createOAuthToken("opq_1234_expired", issuedAt, issuedAt.plusSeconds(30))
+        tokenStore.loadUserByToken("opq_1234_expired")
 
         then: "should fire ex"
         thrown(BadOpaqueTokenException)

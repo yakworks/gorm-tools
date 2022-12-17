@@ -7,9 +7,22 @@ app:
       type: RS256
       # secret for Symmetric HS256 tokens, should be long and random
       secret: s/9Y3WUi5LkKsR8IZ4DTcX=
-      # for RS256
-      privateKey: classpath:jwt/app.key
-      publicKey: classpath:jwt/app.pub
+
+      # primary for RS256
+#      privateKey: classpath:jwt/rs256-private.pem
+#      publicKey: classpath:jwt/app.pub
+
+      issuers:
+        default:
+          # validates the issuer claim in the jwt matches this.
+          iss: https://greenbill.io
+          rsaPrivateKey: classpath:jwt/rs256-private.pem
+          rsaPublicKey: classpath:jwt/rs256-public.pem
+#          ecPrivateKey: classpath:jwt/private.ec.key
+#          ecPublicKey: classpath:jwt/public.ec.pem
+        erndc:
+          iss: https://erndc.com
+          rsaPublicKey: classpath:jwt/rs256-public.pem
 
 # Uncomment and tweak to setup SAML with Okta
 #spring.security.saml2.relyingparty.registration.okta.singlelogout.binding: POST

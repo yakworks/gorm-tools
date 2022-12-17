@@ -28,10 +28,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.context.annotation.Role;
+import org.springframework.context.annotation.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -41,6 +38,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.server.resource.authentication.JwtIssuerAuthenticationManagerResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.ForwardAuthenticationSuccessHandler;
@@ -50,7 +48,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration @Lazy
-@EnableConfigurationProperties({JwtProperties.class})
+@Import({JwtConfiguration.class})
 public class DefaultSecurityConfiguration {
 
     //@Autowired(required = false) TokenStore tokenStore;
@@ -111,12 +109,15 @@ public class DefaultSecurityConfiguration {
 
     /** Sets up the JWT */
     public static void applyOauthJwt(HttpSecurity http) throws Exception {
+        // JwtIssuerAuthenticationManagerResolver authenticationManagerResolver = new JwtIssuerAuthenticationManagerResolver
+        //     ("https://idp.example.org/issuerOne", "https://idp.example.org/issuerTwo");
         //JWT
         // http.csrf((csrf) -> csrf.ignoringAntMatchers("/token"))
         http.csrf().disable();
-        http.oauth2ResourceServer((oauthServer) ->
-            oauthServer.jwt()
-        );
+        http.oauth2ResourceServer((oauth2) -> {
+            oauth2.jwt();
+            // oauth2.authenticationManagerResolver(authenticationManagerResolver);
+        });
         // .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         // .exceptionHandling((exceptions) -> exceptions
         // 		.authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
@@ -162,7 +163,8 @@ public class DefaultSecurityConfiguration {
         return authConfig.getAuthenticationManager();
     }
 
-    @Bean @Lazy(false)
+    @Bean
+    @Lazy(false) //make sure its done on startup
     public AuthSuccessUserInfoListener authSuccessUserInfoListener() {
         return new AuthSuccessUserInfoListener();
     }
@@ -174,7 +176,8 @@ public class DefaultSecurityConfiguration {
     }
 
     //here just to set the static, never injected so make sure its not Lazy
-    @Bean("${CurrentUserHolder.name}") @Lazy(false)
+    @Bean("${CurrentUserHolder.name}")
+    @Lazy(false) //make sure its done on startup so it can be used
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public CurrentUserHolder CurrentUserHolder() {
         //here just to set the static, there a better way?
@@ -209,43 +212,5 @@ public class DefaultSecurityConfiguration {
     @ConditionalOnMissingBean
     public StoreTokenGenerator storeTokenGenerator() {
         return new StoreTokenGenerator();
-    }
-
-    @Configuration
-    @Lazy
-    @ConditionalOnClass(OAuth2Token.class)
-    public static class JwtTokenConfiguration {
-
-        @Bean @ConditionalOnMissingBean
-        public TokenController tokenController() {
-            return new TokenController();
-        }
-
-        @Bean @ConditionalOnMissingBean
-        @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-        public KeyPair rsaKeyPair(JwtProperties jwtProperties) {
-            return new KeyPair(jwtProperties.getPublicKey(), jwtProperties.getPrivateKey());
-        }
-
-        @Bean @ConditionalOnMissingBean
-        public JwtDecoder jwtDecoder(KeyPair rsaKeyPair) {
-            return NimbusJwtDecoder.withPublicKey((RSAPublicKey) rsaKeyPair.getPublic()).build();
-        }
-
-        @Bean
-        @ConditionalOnMissingBean
-        public JwtEncoder jwtEncoder(KeyPair rsaKeyPair) {
-            JWK jwk = new RSAKey.Builder((RSAPublicKey) rsaKeyPair.getPublic()).privateKey((RSAPrivateKey) rsaKeyPair.getPrivate()).build();
-            JWKSource<SecurityContext> jwks = new ImmutableJWKSet<SecurityContext>(new JWKSet(jwk));
-            NimbusJwtEncoder encoder = new NimbusJwtEncoder(jwks);
-            return encoder;
-        }
-
-        @Bean
-        @ConditionalOnMissingBean
-        public JwtTokenGenerator tokenGenerator() {
-            return new JwtTokenGenerator();
-        }
-
     }
 }

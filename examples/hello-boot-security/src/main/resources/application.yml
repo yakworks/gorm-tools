@@ -1,21 +1,24 @@
 spring.main.lazy-initialization: true
 spring.main.allow-bean-definition-overriding: true
 
-spring:
+# Uncomment and tweak to setup SAML with Okta
+#spring.security.saml2.relyingparty.registration.okta.singlelogout.binding: POST
+#spring.security.saml2.relyingparty.registration.okta.singlelogout.response-url: "{baseUrl}/logout/saml2/slo"
+#spring.security.saml2.relyingparty.registration.okta.assertingparty.metadata-uri: https://dev-86352402.okta.com/app/exk7dad4ucR8cUZXE5d7/sso/saml/metadata
+
+
+#app.security.jwt.privateKey: classpath:jwt/app.key
+#app.security.jwt.publicKey: classpath:jwt/app.pub
+
+app:
   security:
-    saml2:
-      relyingparty:
-        registration:
-          okta:
-            singlelogout:
-              binding: POST
-              response-url: "{baseUrl}/logout/saml2/slo"
-            assertingparty:
-              metadata-uri: https://dev-86352402.okta.com/app/exk7dad4ucR8cUZXE5d7/sso/saml/metadata
-
-
-app.security.jwt.privateKey: classpath:jwt/app.key
-app.security.jwt.publicKey: classpath:jwt/app.pub
+    jwt:
+      issuers:
+        default:
+          # validates the issuer claim in the jwt matches this.
+          iss: https://greenbill.io
+          rsaPrivateKey: classpath:jwt/rs256-private.pem
+          rsaPublicKey: classpath:jwt/rs256-public.pem
 
 logging:
   level:

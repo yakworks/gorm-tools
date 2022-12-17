@@ -30,7 +30,7 @@ import yakworks.security.spring.token.JwtProperties
 
 /**
  * JWT with HS256 symmetric signing. meaning it uses a secret and not a key/pair like RS256 default
- * It makes a JWT that is much smaller, in the 140+ chars long.
+ * It makes a JWT that is much smaller, in the 140+ chars long, vs 450+ chars
  */
 @CompileStatic
 class JwtSymmetricTokenGenerator implements TokenGenerator<Jwt> {

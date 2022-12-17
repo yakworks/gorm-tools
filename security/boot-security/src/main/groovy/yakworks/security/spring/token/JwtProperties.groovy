@@ -4,12 +4,16 @@
 */
 package yakworks.security.spring.token
 
+import java.security.KeyPair
+import java.security.PrivateKey
+import java.security.PublicKey
 import java.security.interfaces.RSAPrivateKey
 import java.security.interfaces.RSAPublicKey
 
 import groovy.transform.CompileStatic
 
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.core.io.Resource
 import org.springframework.stereotype.Component
 
 @Component
@@ -23,16 +27,39 @@ class JwtProperties {
     //secret for Symmetric HS256 tokens, about 32+ chars of randomness
     String secret // = "s/9Y3WUi5LkKsR8IZ4DTcX="
 
-    // keypair for RS256
-    RSAPublicKey publicKey
-    RSAPrivateKey privateKey
-
     /** token expiration seconds, 10 min */
     long expiry = 600L // = 10min
 
-    /** Issuer key */
-    String issuer = "self"
-
     /** the prefix of the token if its an opaque one, not applicable to jwt */
     String tokenPrefix = 'opq_'
+
+    /** TODO Audience should be the api url? */
+    String audience
+
+    Map<String, Issuer> issuers
+
+    Issuer getDefaultIssuer(){
+        // assert issuers['default']
+        return issuers['default']
+    }
+
+    static class Issuer {
+        String type
+        String iss //issuer
+        RSAPublicKey rsaPublicKey
+        RSAPrivateKey rsaPrivateKey
+        Resource ecPublicKey
+        Resource ecPrivateKey
+
+        PublicKey getPublicKey() {
+            return rsaPublicKey //?: ecPublicKey
+        }
+
+        PrivateKey getPrivateKey() {
+            return rsaPrivateKey //?: ecPrivateKey
+        }
+
+        KeyPair getKeyPair(){ return new KeyPair(publicKey, privateKey) }
+    }
+
 }

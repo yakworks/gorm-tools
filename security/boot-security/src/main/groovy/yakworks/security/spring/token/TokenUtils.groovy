@@ -6,6 +6,7 @@ package yakworks.security.spring.token
 
 import java.security.KeyPair
 import java.security.KeyPairGenerator
+import java.security.spec.ECGenParameterSpec
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import javax.servlet.http.Cookie
@@ -36,6 +37,22 @@ class TokenUtils {
             throw new IllegalStateException(ex);
         }
         return keyPair;
+    }
+
+    /**
+     * Generates a keypair for RSA 2048
+     */
+    static KeyPair generateES256Key() {
+        KeyPair keyPair;
+        try {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC")
+            keyPairGenerator.initialize(new ECGenParameterSpec("secp256r1"))
+            keyPair = keyPairGenerator.generateKeyPair()
+        }
+        catch (Exception ex) {
+            throw new IllegalStateException(ex)
+        }
+        return keyPair
     }
 
     /**
@@ -82,4 +99,5 @@ class TokenUtils {
         ]
         return body
     }
+
 }

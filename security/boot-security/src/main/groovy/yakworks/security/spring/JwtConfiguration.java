@@ -58,11 +58,11 @@ public class JwtConfiguration {
                     .findAny()
                     .orElse(null);
                 // var pub = jwtProperties.getMap();
-                return Collections.singletonList(issConfig.getPublicKey());
+                return Collections.singletonList(issConfig.getKeyPair().getPublic());
             }
             //return the default if not found
             //FIXME get rid of this
-            return Collections.singletonList(jwtProperties.getDefaultIssuer().getPublicKey());
+            return Collections.singletonList(jwtProperties.getDefaultIssuer().getKeyPair().getPublic());
         };
     }
 

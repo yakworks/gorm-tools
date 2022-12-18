@@ -16,9 +16,9 @@ app:
       issuers:
         default:
           # validates the issuer claim in the jwt matches this.
-          iss: https://greenbill.io
-          rsaPrivateKey: classpath:jwt/rs256-private.pem
-          rsaPublicKey: classpath:jwt/rs256-public.pem
+          iss: https://yak.works
+          privateKey: classpath:jwt/rs256-private.pem
+          publicKey: classpath:jwt/rs256-public.pem
 
 logging:
   level:

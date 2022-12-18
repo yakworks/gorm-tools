@@ -10,7 +10,7 @@ when adding to a project may also need to add
 ## Gen RSA key pairs
 https://gist.github.com/ygotthilf/baa58da5c3dd1f69fae9
 
-## EC256 Keys
+## ES256 Keys
 https://notes.salrahman.com/generate-es256-es384-es512-private-keys/
 https://connect2id.com/products/nimbus-jose-jwt/openssl-key-generation
 https://gist.github.com/lbalmaceda/9a0c7890c2965826c04119dcfb1a5469

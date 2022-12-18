@@ -49,36 +49,25 @@ class JwtProperties {
     static class Issuer {
         SignatureAlgorithm alg = SignatureAlgorithm.RS256
         String iss //issuer
-        RSAPublicKey rsaPublicKey
-        RSAPrivateKey rsaPrivateKey
-        Resource ecKeyPair
-        Resource ecPublicKey
-        // Resource ecPrivateKey
+        Resource publicKey
+        Resource privateKey
+        Resource pairKey
 
-        PublicKey getPublicKey() {
-            return getKeyPair().public
-        }
-
-        PrivateKey getPrivateKey() {
-            return getKeyPair().private
-        }
+        KeyPair keyPair //cached keyPair
 
         KeyPair getKeyPair(){
-            KeyPair keyPair
-            if(isEC()) {
-                if(this.ecKeyPair) {
-                    keyPair = PemUtils.parseKeyPair(this.ecKeyPair)
-                } else {
-                    //needs at min a public key
-                    keyPair =  new KeyPair(
-                        PemUtils.readPublicKeyFromFile(ecPublicKey, "EC"),
-                        null
-                    )
-                }
+            if(this.keyPair) return this.keyPair
+
+            String rythym = isEC() ? "EC" : "RSA"
+            //keyPair should really only work for EC/ES... keys. RSA will have 2, public and private specified
+            if(pairKey) {
+                this.keyPair = PemUtils.parseKeyPair(pairKey)
             } else {
-                keyPair =  new KeyPair(rsaPublicKey, rsaPrivateKey)
+                PrivateKey priv = this.privateKey?.exists() ? PemUtils.readPrivateKeyFromFile(this.privateKey, rythym) : null
+                PublicKey pub = this.publicKey?.exists()  ? PemUtils.readPublicKeyFromFile(this.publicKey, rythym) : null
+                this.keyPair =  new KeyPair(pub, priv)
             }
-            return keyPair
+            return this.keyPair
         }
 
         /**

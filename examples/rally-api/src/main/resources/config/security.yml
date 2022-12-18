@@ -19,15 +19,15 @@ app:
           alg: ES256
           # iss is looked up.
           iss: https://yak.works
-          ecKeyPair: classpath:jwt/es256-key-pair.pem
+          pairKey: classpath:jwt/es256-key-pair.pem
           # public key not needed with keypair for validation, here so well-known endpoint can display it. may not be needed.
-          ecPublicKey: classpath:jwt/es256-public.pem
+          publicKey: classpath:jwt/es256-public.pem
 
         # test issuer for rs decryption
         testRS:
           alg: RS256
           iss: https://test-rs.com
-          rsaPublicKey: classpath:jwt/rs256-public.pem
+          publicKey: classpath:jwt/rs256-public.pem
           # rsaPrivateKey: classpath:jwt/rs256-private.pem
 
         # test issuer for EC decryption
@@ -35,7 +35,7 @@ app:
           alg: ES256
           iss: https://test-es.com
           # a copy of jwt.io
-          ecPublicKey: classpath:jwt/test-es256-public.pem
+          publicKey: classpath:jwt/test-es256-public.pem
 
 # Uncomment and tweak to setup SAML with Okta
 #spring.security.saml2.relyingparty.registration.okta.singlelogout.binding: POST

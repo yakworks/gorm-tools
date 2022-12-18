@@ -61,7 +61,7 @@ class PemUtilsSpec extends Specification {
 
     def "verify ES256"() {
         when:
-        ECPublicKey publicKey = (ECPublicKey)PemUtils.readPublicKeyFromFile(new ClassPathResource("ES256-public.pem"), "EC")
+        ECPublicKey publicKey = (ECPublicKey)PemUtils.readPublicKeyFromFile(new ClassPathResource("es256-public.pem"), "EC")
         def jwsObject = JWSObject.parse(ES256_JWT)
 
         then:

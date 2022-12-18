@@ -19,11 +19,11 @@ https://www.scottbrady91.com/openssl/creating-elliptical-curve-keys-using-openss
 
 ```bash
 #generate key pair
-openssl ecparam -name prime256v1 -genkey -noout -out ec256-key-pair.pem
+openssl ecparam -name prime256v1 -genkey -noout -out es256-key-pair.pem
 # generate public
-openssl ec -in ec256-key-pair.pem -pubout -out ec256-public.pem
-# generate private only (works in jwt.io)
-openssl pkcs8 -topk8 -inform pem -in ec256-key-pair.pem -outform pem -nocrypt -out ec256-private.pem
+openssl ec -in es256-key-pair.pem -pubout -out es256-public.pem
+# generate private pem only (works in jwt.io)
+openssl pkcs8 -topk8 -inform pem -in es256-key-pair.pem -outform pem -nocrypt -out es256-private.pem
 
 ```
 

@@ -30,16 +30,16 @@ import spock.lang.Specification
 class PemUtilsSpec extends Specification {
 
     static String ES256_JWT="eyJhbGciOiJFUzI1NiJ9.SGVsbG8gd29ybGQh.n4M4kAuOk939Kgh1DLbJU2C18nf3txxpBF82QNEDHHOTlx6evlCTM_-I3fT78eVcebCTPnyNmsMQMKGVH3_gIQ"
-    static String RS256_JWT="eyJhbGciOiJSUzI1NiJ9.SGVsbG8gd29ybGQh.JZI4UTljHIY7K6l1TPkr_42fnxI5lFFw-XtHRpXcvjXzGliEb6TBuBjQLf_lPQoy8GN1itF-ZhfUGPo06uDzz06psmXc955e_oFzPyJCOruPLFF1aemtECPkvw7azCFAAoh7oAnSTg2ObSV2lKJClRJR7RZgC31wjr45-_YIdw0uTusfqRBjsIpq1-vaHZSRd5wb-ZBht2Tdulw9MSo7RvpkVa3OSQ-SBE32defUoqBBbjY5oY0DhQgDTTmXz2fyowHXLSAAso13n35ZvgIBrz-VtdceJc_NB95DvuP759Pi-Cm88xrnTBqQx03YblEj-5JxbBgas0ZmpcuL9oyOHA"
+    static String RS256_JWT="eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlzcyI6Imh0dHBzOi8vdGVzdC1ycy5jb20iLCJpYXQiOjE1MTYyMzkwMjJ9.PDyK0-HW0Z8MyeG1R52LbqtW9_JJWOkhVVDivs7SHRFHk0N0v_a5UypxpKK0pfscYeJjL8nnZCARnXR0m7VSLhQcCmPdkqiTY0u-8t5xJkEeRCwmk4Ze54LCR2XGuwsLX4qfulBOTHKTnmbPZGrNdShHPgSkvZXAD2Cog-lo7-rd6KwbE2e3MTQaAo4ufNpOo_hB10Am17LOSrMZ8lYpeH6tGz3pT-aqiXYpyEqjs59SOndsA6NSCmTTIHDv7UcfdSeSbIHFSdu7gOBymDKuMIviYcYSNI7IFj6L2poYQH8kvLlE4ViHMyGogLputmuQkBSCJ8SwmkimkmpHI8DJcw"
 
     def "GenerateRsaKey"() {
         expect:
         TokenUtils.generateRsaKey()
     }
 
-    def "ec256 keypair"() {
+    def "ES256 keypair"() {
         when:
-        KeyPair keyPair = PemUtils.parseKeyPair(new ClassPathResource("ec256-key-pair.pem"))
+        KeyPair keyPair = PemUtils.parseKeyPair(new ClassPathResource("es256-key-pair.pem"))
 
         // Get private + public EC key
         ECPrivateKey privateKey = (ECPrivateKey)keyPair.getPrivate();
@@ -59,9 +59,9 @@ class PemUtilsSpec extends Specification {
         jwsObject.verify(new ECDSAVerifier(publicKey))
     }
 
-    def "verify ec256"() {
+    def "verify ES256"() {
         when:
-        ECPublicKey publicKey = (ECPublicKey)PemUtils.readPublicKeyFromFile(new ClassPathResource("ec256-public.pem"), "EC")
+        ECPublicKey publicKey = (ECPublicKey)PemUtils.readPublicKeyFromFile(new ClassPathResource("ES256-public.pem"), "EC")
         def jwsObject = JWSObject.parse(ES256_JWT)
 
         then:
@@ -69,7 +69,7 @@ class PemUtilsSpec extends Specification {
 
     }
 
-    def "rs256 keypair"() {
+    def "RS256 keypair"() {
         when:
         PrivateKey privateKey = PemUtils.readPrivateKeyFromFile(new ClassPathResource("rs256-private.pem"), "RSA")
         PublicKey publicKey = PemUtils.readPublicKeyFromFile(new ClassPathResource("rs256-public.pem"), "RSA")
@@ -89,7 +89,7 @@ class PemUtilsSpec extends Specification {
         jwsObject.verify(new RSASSAVerifier(publicKey))
     }
 
-    def "verify ec256"() {
+    def "verify RS256"() {
         when:
         RSAPublicKey publicKey = (RSAPublicKey)PemUtils.readPublicKeyFromFile(new ClassPathResource("rs256-public.pem"), "RSA")
         def jwsObject = JWSObject.parse(RS256_JWT)

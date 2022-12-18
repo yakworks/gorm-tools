@@ -13,18 +13,29 @@ app:
 #      publicKey: classpath:jwt/app.pub
 
       issuers:
+        # default issuer for internal use
         default:
           # validates the issuer claim in the jwt matches this.
           alg: ES256
-          iss: https://greenbill.io
-          ecKeyPair: classpath:jwt/ec256-key-pair.pem
-#          rsaPrivateKey: classpath:jwt/rs256-private.pem
-#          rsaPublicKey: classpath:jwt/rs256-public.pem
-#          ecPrivateKey: classpath:jwt/private.ec.key
-#          ecPublicKey: classpath:jwt/public.ec.pem
-        erndc:
-          iss: https://erndc.com
+          # iss is looked up.
+          iss: https://yak.works
+          ecKeyPair: classpath:jwt/es256-key-pair.pem
+          # public key not needed with keypair for validation, here so well-known endpoint can display it. may not be needed.
+          ecPublicKey: classpath:jwt/es256-public.pem
+
+        # test issuer for rs decryption
+        testRS:
+          alg: RS256
+          iss: https://test-rs.com
           rsaPublicKey: classpath:jwt/rs256-public.pem
+          # rsaPrivateKey: classpath:jwt/rs256-private.pem
+
+        # test issuer for EC decryption
+        testES:
+          alg: ES256
+          iss: https://test-es.com
+          # a copy of jwt.io
+          ecPublicKey: classpath:jwt/test-es256-public.pem
 
 # Uncomment and tweak to setup SAML with Okta
 #spring.security.saml2.relyingparty.registration.okta.singlelogout.binding: POST

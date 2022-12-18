@@ -15,9 +15,11 @@ app:
       issuers:
         default:
           # validates the issuer claim in the jwt matches this.
+          alg: ES256
           iss: https://greenbill.io
-          rsaPrivateKey: classpath:jwt/rs256-private.pem
-          rsaPublicKey: classpath:jwt/rs256-public.pem
+          ecKeyPair: classpath:jwt/ec256-key-pair.pem
+#          rsaPrivateKey: classpath:jwt/rs256-private.pem
+#          rsaPublicKey: classpath:jwt/rs256-public.pem
 #          ecPrivateKey: classpath:jwt/private.ec.key
 #          ecPublicKey: classpath:jwt/public.ec.pem
         erndc:

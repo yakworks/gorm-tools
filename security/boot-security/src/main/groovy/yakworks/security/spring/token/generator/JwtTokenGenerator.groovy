@@ -11,6 +11,8 @@ import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm
+import org.springframework.security.oauth2.jwt.JwsHeader
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.jwt.JwtClaimsSet
 import org.springframework.security.oauth2.jwt.JwtEncoder
@@ -50,7 +52,11 @@ class JwtTokenGenerator implements TokenGenerator<Jwt> {
             .claim("scope", scope)
             .build()
 
-        JwtEncoderParameters encodeParams = JwtEncoderParameters.from(claims)
+        SignatureAlgorithm alg = issuer.isEC() ? SignatureAlgorithm.ES256 : SignatureAlgorithm.RS256
+        JwtEncoderParameters encodeParams = JwtEncoderParameters.from(
+            JwsHeader.with(alg).build(),
+            claims
+        )
 
         return jwtEncoder.encode(encodeParams)
     }

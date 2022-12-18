@@ -1,9 +1,7 @@
 package yakworks.security.spring;
 
 import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.*;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
@@ -16,10 +14,12 @@ import yakworks.security.spring.token.TokenController;
 import yakworks.security.spring.token.generator.JwtTokenGenerator;
 
 import java.security.KeyPair;
+import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -86,9 +86,17 @@ public class JwtConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public JwtEncoder jwtEncoder(JwtProperties jwtProperties) {
-        KeyPair rsaKeyPair = jwtProperties.getDefaultIssuer().getKeyPair();
-        JWK jwk = new RSAKey.Builder((RSAPublicKey) rsaKeyPair.getPublic())
-            .privateKey((RSAPrivateKey) rsaKeyPair.getPrivate()).build();
+        JwtProperties.Issuer issuer = jwtProperties.getDefaultIssuer();
+        KeyPair keyPair = issuer.getKeyPair();
+        JWK jwk;
+        if(issuer.isEC()){
+            jwk = new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic())
+                .privateKey(keyPair.getPrivate()).build();
+        } else {
+            jwk = new RSAKey.Builder((RSAPublicKey) keyPair.getPublic())
+                .privateKey((RSAPrivateKey) keyPair.getPrivate()).build();
+        }
+
         JWKSource<SecurityContext> jwks = new ImmutableJWKSet<SecurityContext>(new JWKSet(jwk));
         NimbusJwtEncoder encoder = new NimbusJwtEncoder(jwks);
         return encoder;

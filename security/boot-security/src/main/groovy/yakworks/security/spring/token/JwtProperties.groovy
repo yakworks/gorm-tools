@@ -13,7 +13,9 @@ import java.security.interfaces.RSAPublicKey
 import groovy.transform.CompileStatic
 
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.Resource
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm
 import org.springframework.stereotype.Component
 
 @Component
@@ -44,22 +46,34 @@ class JwtProperties {
     }
 
     static class Issuer {
-        String type
+        SignatureAlgorithm alg = SignatureAlgorithm.RS256
         String iss //issuer
         RSAPublicKey rsaPublicKey
         RSAPrivateKey rsaPrivateKey
+        Resource ecKeyPair
         Resource ecPublicKey
-        Resource ecPrivateKey
+        // Resource ecPrivateKey
 
         PublicKey getPublicKey() {
-            return rsaPublicKey //?: ecPublicKey
+            return getKeyPair().public
         }
 
         PrivateKey getPrivateKey() {
-            return rsaPrivateKey //?: ecPrivateKey
+            return getKeyPair().private
         }
 
-        KeyPair getKeyPair(){ return new KeyPair(publicKey, privateKey) }
+        KeyPair getKeyPair(){
+            if(isEC()) {
+                KeyPair keyPair = PemUtils.parseKeyPair(this.ecKeyPair)
+                return keyPair
+            } else {
+                return new KeyPair(rsaPublicKey, rsaPrivateKey)
+            }
+        }
+
+        boolean isEC(){
+            return alg?.name?.startsWith("ES")
+        }
     }
 
 }

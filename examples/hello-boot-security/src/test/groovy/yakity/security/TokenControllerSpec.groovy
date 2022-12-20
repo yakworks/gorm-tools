@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.MvcResult
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import spock.lang.Specification
+import yakworks.security.spring.token.JwtProperties
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -40,6 +41,7 @@ class TokenControllerSpec extends Specification {
 
     @Autowired MockMvc mockMvc
     @Autowired ObjectMapper objectMapper
+    @Autowired JwtProperties jwtProperties
 
     // @WithMockUser // mock user should not be needed since we are doing basic auth
     void "Basic auth and bearer auth should give ok status and hello"() {

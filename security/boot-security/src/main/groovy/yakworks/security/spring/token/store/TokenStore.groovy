@@ -4,7 +4,7 @@
 */
 package yakworks.security.spring.token.store
 
-import org.springframework.security.core.Authentication
+
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.oauth2.core.AbstractOAuth2Token
 import org.springframework.security.oauth2.server.resource.introspection.BadOpaqueTokenException

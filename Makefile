@@ -126,6 +126,10 @@ gradle.dependencies:
 	# ./gradlew rally-api:dependencies --configuration compileClasspath
 	#./gradlew rally-security:dependencies --configuration compileClasspath
 
+rally-api.dependencies:
+	./gradlew rally-api:dependencies --configuration compileClasspath
+	#./gradlew rally-security:dependencies --configuration compileClasspath
+
 ## shows spring dependencyManagement, modify to show other projects https://bit.ly/3CpcIls
 spring.dependencyManagement:
 	$(gw) gorm-tools:dependencyManagement

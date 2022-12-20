@@ -4,24 +4,20 @@
 */
 package yakworks.security.spring.token.generator
 
+
 import java.time.Instant
 
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm
+import org.springframework.security.oauth2.jwt.JwsHeader
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.jwt.JwtClaimsSet
 import org.springframework.security.oauth2.jwt.JwtEncoder
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters
-import org.springframework.security.oauth2.jwt.NimbusJwtEncoder
 
-import com.nimbusds.jose.jwk.JWK
-import com.nimbusds.jose.jwk.JWKSet
-import com.nimbusds.jose.jwk.RSAKey
-import com.nimbusds.jose.jwk.source.ImmutableJWKSet
-import com.nimbusds.jose.jwk.source.JWKSource
-import com.nimbusds.jose.proc.SecurityContext
 import yakworks.security.spring.token.JwtProperties
 
 /**
@@ -34,27 +30,33 @@ class JwtTokenGenerator implements TokenGenerator<Jwt> {
     @Autowired JwtProperties jwtProperties
 
     JwtEncoder getJwtEncoder(){
-        if(!this.jwtEncoder) {
-            JWK jwk = new RSAKey.Builder(jwtProperties.publicKey).privateKey(jwtProperties.privateKey).build();
-            JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
-            jwtEncoder = new NimbusJwtEncoder(jwks);
-        }
+        // if(!this.jwtEncoder) {
+        //     JwtProperties.Issuer issuer = jwtProperties.getDefaultIssuer()
+        //     JWK jwk = new RSAKey.Builder(issuer.publicKey as RSAKey).privateKey(issuer.privateKey).build()
+        //     JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk))
+        //     jwtEncoder = new NimbusJwtEncoder(jwks)
+        // }
         return jwtEncoder
     }
 
     @Override
     Jwt generate(Authentication authentication) {
+        JwtProperties.Issuer issuer = jwtProperties.getDefaultIssuer()
         String scope = authentication.authorities.collect { it.authority }.join(' ')
         Instant now = Instant.now()
         JwtClaimsSet claims = JwtClaimsSet.builder()
-            .issuer(jwtProperties.issuer)
+            .issuer(issuer.iss)
             .issuedAt(now)
             .expiresAt(now.plusSeconds(jwtProperties.expiry))
             .subject(authentication.name)
             .claim("scope", scope)
             .build()
 
-        JwtEncoderParameters encodeParams = JwtEncoderParameters.from(claims)
+        SignatureAlgorithm alg = issuer.isEC() ? SignatureAlgorithm.ES256 : SignatureAlgorithm.RS256
+        JwtEncoderParameters encodeParams = JwtEncoderParameters.from(
+            JwsHeader.with(alg).build(),
+            claims
+        )
 
         return jwtEncoder.encode(encodeParams)
     }

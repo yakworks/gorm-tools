@@ -49,30 +49,30 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
         when:
         def qry = Org.query {}
         qry.sum('calc.totalDue').groupBy('type')
-        qry.order('calc_totalDue_sum')
+        qry.order('calc_totalDue')
         def sumbObj = qry.mapList()
 
         then:
         //there are 5 types, one for each type
         sumbObj.size() == 5
         sumbObj[0]['type'] == OrgType.Client
-        sumbObj[0]['calc_totalDue_sum'] < sumbObj[1]['calc_totalDue_sum']
-        sumbObj[1]['calc_totalDue_sum'] < sumbObj[2]['calc_totalDue_sum']
+        sumbObj[0]['calc_totalDue'] < sumbObj[1]['calc_totalDue']
+        sumbObj[1]['calc_totalDue'] < sumbObj[2]['calc_totalDue']
     }
 
     def "sum and groupby methods order desc"() {
         when:
         def qry = Org.query {}
         qry.sum('calc.totalDue').groupBy('type')
-        qry.order('calc_totalDue_sum', 'desc')
+        qry.order('calc_totalDue', 'desc')
         def sumbObj = qry.mapList()
 
         then:
         //there are 5 types, one for each type
         sumbObj.size() == 5
         sumbObj[0]['type'] == OrgType.Customer
-        sumbObj[0]['calc_totalDue_sum'] > sumbObj[1]['calc_totalDue_sum']
-        sumbObj[1]['calc_totalDue_sum'] > sumbObj[2]['calc_totalDue_sum']
+        sumbObj[0]['calc_totalDue'] > sumbObj[1]['calc_totalDue']
+        sumbObj[1]['calc_totalDue'] > sumbObj[2]['calc_totalDue']
     }
 
     def "sum with QueryArgs"() {
@@ -89,16 +89,17 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
 
     def "sum with projections key as string"() {
         when: 'simulate what comes on url query string'
-        def qry = Org.query(projections: "'calc.totalDue':'sum', 'type':'group'", sort:'calc_totalDue_sum:asc')
+        def qry = Org.query(projections: "'calc.totalDue':'sum', 'type':'group'", sort:'calc_totalDue:asc')
         def sumbObj = qry.list()
 
         then:
         //there are 5 types, one for each type
         sumbObj.size() == 5
         sumbObj[0]['type'] == OrgType.Client
-        sumbObj[0]['calc_totalDue_sum'] < sumbObj[1]['calc_totalDue_sum']
-        sumbObj[1]['calc_totalDue_sum'] < sumbObj[2]['calc_totalDue_sum']
+        sumbObj[0]['calc_totalDue'] < sumbObj[1]['calc_totalDue']
+        sumbObj[1]['calc_totalDue'] < sumbObj[2]['calc_totalDue']
     }
+
 
     def "sum association with closure old school"() {
         when:
@@ -118,6 +119,25 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
         sumbObj.size() == 5
         // sumbObj[0][0] == 10
     }
+
+    def "projections with two fields same name should not collide"() {
+        when: "two projections have same propname - eg contact.name and org.name"
+        def qry = Org.query {
+            createAlias('contact', 'contact')
+            createAlias('calc', 'calc')
+            projections {
+                sum('calc.totalDue')
+                groupProperty('contact.name')
+                groupProperty('name')
+            }
+        }
+        def sumbObj = qry.list()
+
+        then:
+        noExceptionThrown()
+        sumbObj.size() == 50
+    }
+
 
     @Ignore
     def "sum and groupby with some hakery to get having to work"() {

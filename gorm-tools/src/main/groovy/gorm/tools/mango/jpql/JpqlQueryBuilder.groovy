@@ -237,7 +237,7 @@ class JpqlQueryBuilder {
                 Query.Projection projection = (Query.Projection) i.next()
                 if (projection instanceof Query.CountProjection) {
                     String projField = "COUNT(${logicalName})"
-                    appendAlias(queryString, projField, logicalName, '_count')
+                    appendAlias(queryString, projField, logicalName, '')
                 }
                 else if (projection instanceof Query.IdProjection) {
                     queryString.append(logicalName)
@@ -248,19 +248,19 @@ class JpqlQueryBuilder {
                     Query.PropertyProjection pp = (Query.PropertyProjection) projection
                     if (projection instanceof Query.AvgProjection) {
                         String projField = "AVG(${logicalName}.${pp.getPropertyName()})"
-                        appendAlias(queryString, projField, pp.getPropertyName(), '_avg')
+                        appendAlias(queryString, projField, pp.getPropertyName(), '')
                     }
                     else if (projection instanceof Query.SumProjection) {
                         String projField = "SUM(${logicalName}.${pp.getPropertyName()})"
-                        appendAlias(queryString, projField, pp.getPropertyName(), '_sum')
+                        appendAlias(queryString, projField, pp.getPropertyName(), '')
                     }
                     else if (projection instanceof Query.MinProjection) {
                         String projField = "MIN(${logicalName}.${pp.getPropertyName()})"
-                        appendAlias(queryString, projField, pp.getPropertyName(), '_min')
+                        appendAlias(queryString, projField, pp.getPropertyName(), '')
                     }
                     else if (projection instanceof Query.MaxProjection) {
                         String projField = "MAX(${logicalName}.${pp.getPropertyName()})"
-                        appendAlias(queryString, projField, pp.getPropertyName(), '_max')
+                        appendAlias(queryString, projField, pp.getPropertyName(), '')
                     }
                     else if (projection instanceof Query.CountDistinctProjection) {
                         queryString.append("COUNT(DISTINCT ")

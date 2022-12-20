@@ -387,11 +387,11 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
             propName = propName.replace('.', '_')
             switch (p) {
                 case Query.SumProjection:
-                    return "${propName}_sum"
+                    return "${propName}"
                 case Query.CountProjection:
-                    return "${propName}_count"
+                    return "${propName}"
                 case Query.AvgProjection:
-                    return "${propName}_avg"
+                    return "${propName}"
                 default:
                     return propName
             }

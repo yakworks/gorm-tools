@@ -18,11 +18,12 @@ https://www.scottbrady91.com/jose/jwts-which-signing-algorithm-should-i-use
 https://www.scottbrady91.com/openssl/creating-elliptical-curve-keys-using-openssl
 
 ```bash
-#generate key pair
+#generate key pair for ES256
 openssl ecparam -name prime256v1 -genkey -noout -out es256-key-pair.pem
 # generate public
 openssl ec -in es256-key-pair.pem -pubout -out es256-public.pem
-# generate private pem only (works in jwt.io)
+
+# IF TESTING WITH jwt.io YOU NEED TO EXPORT PRIVATE KEY FROM KEYPAIR using the following
 openssl pkcs8 -topk8 -inform pem -in es256-key-pair.pem -outform pem -nocrypt -out es256-private.pem
 
 ```

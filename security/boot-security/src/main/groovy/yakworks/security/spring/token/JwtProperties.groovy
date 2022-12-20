@@ -55,6 +55,7 @@ class JwtProperties {
 
         KeyPair keyPair //cached keyPair
 
+        /** gets the keypair using the configured resources for pairKey, publikKey and/or privateKey */
         KeyPair getKeyPair(){
             if(this.keyPair) return this.keyPair
 

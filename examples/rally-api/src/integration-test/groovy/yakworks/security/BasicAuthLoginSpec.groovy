@@ -1,44 +1,46 @@
 package yakworks.security
 
+import groovy.transform.CompileDynamic
+
 import grails.testing.mixin.integration.Integration
+import okhttp3.Credentials
 import okhttp3.Request
+import okhttp3.RequestBody
 import okhttp3.Response
 import spock.lang.Specification
+import yakworks.rest.client.OkAuth
 import yakworks.rest.client.OkHttpRestTrait
 
 /**
  * test the legacy login with post username and password to login endpoint.
  */
 @Integration
-class JsonUsernamePasswordLoginSpec extends Specification implements OkHttpRestTrait {
+class BasicAuthLoginSpec extends Specification implements OkHttpRestTrait {
 
-    String endpoint = "/api/login"
+    //String endpoint = "/api/token"
 
     /** uses the basic auth to login and parse the access_token from response. */
-    Map jsonLogin(String uname, String pwd) {
+    Response basicLogin(String uname, String pwd) {
         //create the basic auth credentials
-        // String basicAuth = Credentials.basic(uname, pwd)
-        String lpath = "http://localhost:${serverPort}/api/login"
+        String basicAuth = Credentials.basic(uname, pwd)
+        String lpath = "http://localhost:${serverPort}/api/token"
         // String lpath = "http://${username}:${password}@localhost:${serverPort}/api/token"
-        Map postBody = [username: uname, password: pwd]
-
         Request request = new Request.Builder()
             .url(lpath)
+            .addHeader("Authorization", basicAuth)
             .addHeader("Content-Type", jsonHeader)
-            .method("POST", getRequestBody("POST", postBody))
+            .method("POST", RequestBody.create("", null))
             .build()
 
         Response resp = getHttpClient().newCall(request).execute()
         assert resp.successful
-        Map body = bodyToMap(resp)
-        // OkAuth.TOKEN = body.access_token
-        // OkAuth.BEARER_TOKEN = "Bearer ${body.access_token}"
-        return body
+        return resp
     }
 
     void "test login with json body"() {
         when:
-        Map body = jsonLogin('admin', '123')
+        def resp = basicLogin('admin', '123')
+        Map body = bodyToMap(resp)
 
         then:
         body.access_token

@@ -1,16 +1,8 @@
 app:
   security:
-    # default tokenType it either store or jwt
-    tokenType: store
     jwt:
-      # default jwt type (either HS256 or RS256), NOT USED YET
-      type: RS256
       # secret for Symmetric HS256 tokens, should be long and random
       secret: s/9Y3WUi5LkKsR8IZ4DTcX=
-
-      # primary for RS256
-#      privateKey: classpath:jwt/rs256-private.pem
-#      publicKey: classpath:jwt/app.pub
 
       issuers:
         # default issuer for internal use

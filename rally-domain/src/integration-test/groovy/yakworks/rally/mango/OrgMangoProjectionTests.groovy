@@ -100,6 +100,23 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
         sumbObj[1]['calc_totalDue'] < sumbObj[2]['calc_totalDue']
     }
 
+    void "test property projection returns maps"() {
+        when:
+        def qry = Org.query {
+            createAlias('contact', 'contact')
+            projections {
+                property("contact.id")
+                property("contact.name")
+            }
+            lte("id", 5)
+        }
+
+        def sumbObj = qry.list()
+
+        then:
+        sumbObj.size() == 5
+        sumbObj[0] instanceof Map
+    }
 
     @Ignore("@Joshua shouldnt this work ! createAliases should setup alias automatically ?")
     void "groupBy should auto setup aliases"() {

@@ -101,6 +101,25 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
     }
 
 
+    @Ignore("@Joshua shouldnt this work ! createAliases should setup alias automatically ?")
+    void "groupBy should auto setup aliases"() {
+        when:
+        def query = Org.query {
+            projections {
+                //shouldnt need to explicitely create aliases
+                sum('calc.totalDue')
+                groupBy("contact.name")
+            }
+            lte("id", 5)
+        }
+        def result = query.list()
+
+        then:
+        noExceptionThrown()
+        result.size() == 5
+    }
+
+
     def "sum association with closure old school"() {
         when:
         def qry = Org.query {

@@ -363,7 +363,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      * for foo and foo.bar
      */
     void ensureAliases(String prop){
-        /* FIXME @Josua this doenst seem to be doing any thing, i commented it, and nothing fails.
+
         // if (!propertyName.contains('.') || propertyName.endsWith('.id'))
         if(prop.count('.') < 1 || (prop.count('.') == 1 && prop.endsWith('.id'))) return
 
@@ -375,7 +375,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         DetachedCriteria currentCriteria = this as DetachedCriteria
         props.each { path ->
             currentCriteria = currentCriteria.createAlias(path, path) as DetachedCriteria
-        }*/
+        }
     }
 
     /******** PROPERTY CRITERIAS ************/

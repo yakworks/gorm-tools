@@ -88,17 +88,11 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
         sumbObj[0]['type'] == OrgType.Customer
     }
 
-    @Issue("https://github.com/yakworks/gorm-tools/issues/609")
     void "test min projection"() {
         setup:
         def query = Org.query {
             createAlias('calc', 'calc')
             createAlias('contact', 'contact')
-            //putting projections here would pass.
-        }
-
-        //fails only when min used with groupBy in query.build {}
-        query = query.build {
             projections {
                 groupBy("orgTypeId")
                 min("calc.totalDue") //this should result in a key calc_totalDue in the result map
@@ -112,6 +106,30 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
         results
         results[0] instanceof Map
         ((Map)(results[0])).containsKey("calc_totalDue")
+    }
+
+
+    @Issue("https://github.com/yakworks/gorm-tools/issues/609")
+    void "test min projection sep build"() {
+        setup:
+        def query = Org.query {
+            createAlias('calc', 'calc')
+            createAlias('contact', 'contact')
+            //putting projections here would pass.
+        }
+
+        //fails only when min used with groupBy in query.build {}
+        query = query.groupBy("orgTypeId").min("calc.totalDue")
+
+        when:
+        def results = query.list()
+        Map row1 = results[0]
+
+        then:
+        results
+        row1 instanceof Map
+        row1.containsKey("orgTypeId")
+        row1.containsKey("calc_totalDue")
     }
 
 

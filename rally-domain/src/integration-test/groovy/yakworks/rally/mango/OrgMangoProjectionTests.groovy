@@ -8,7 +8,6 @@ import org.hibernate.criterion.Projections
 import org.hibernate.type.StandardBasicTypes
 import org.hibernate.type.Type
 import spock.lang.Ignore
-import spock.lang.IgnoreRest
 import spock.lang.Issue
 import spock.lang.Specification
 import yakworks.testing.gorm.integration.DomainIntTest

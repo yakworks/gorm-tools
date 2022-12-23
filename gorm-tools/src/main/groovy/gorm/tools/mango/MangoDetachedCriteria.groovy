@@ -363,6 +363,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      * for foo and foo.bar
      */
     void ensureAliases(String prop){
+
         // if (!propertyName.contains('.') || propertyName.endsWith('.id'))
         if(prop.count('.') < 1 || (prop.count('.') == 1 && prop.endsWith('.id'))) return
 

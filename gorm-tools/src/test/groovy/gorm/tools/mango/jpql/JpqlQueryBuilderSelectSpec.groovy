@@ -1,6 +1,7 @@
 package gorm.tools.mango.jpql
 
 import gorm.tools.mango.jpql.JpqlQueryBuilder
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.unit.GormHibernateTest
@@ -72,6 +73,7 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         def criteria = KitchenSink.query {
             sum('amount')
             groupBy('kind')
+            groupBy("ext.name")
         }
 
         when:"A jpa query is built"
@@ -82,9 +84,9 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         then:"The query is valid"
         query != null
         query == strip("""\
-        SELECT new map( SUM(kitchenSink.amount) as amount_sum,kitchenSink.kind as kind )
+        SELECT new map( SUM(kitchenSink.amount) as amount,kitchenSink.kind as kind,kitchenSink.ext.name as ext_name )
         FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-        GROUP BY kitchenSink.kind
+        GROUP BY kitchenSink.kind,kitchenSink.ext.name
         """)
         //
         // when:
@@ -101,8 +103,8 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
             sum('sinkLink.amount')
             groupBy('kind')
         }
-        criteria.order("sinkLink_amount_sum")
-        criteria.lt("sinkLink_amount_sum", 100.0)
+        criteria.order("sinkLink_amount")
+        criteria.lt("sinkLink_amount", 100.0)
 
         when: "A jpa query is built"
         def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
@@ -112,11 +114,11 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         then: "The query is valid"
         query != null
         query.trim() == strip('''\
-        SELECT new map( SUM(kitchenSink.sinkLink.amount) as sinkLink_amount_sum,kitchenSink.kind as kind )
+        SELECT new map( SUM(kitchenSink.sinkLink.amount) as sinkLink_amount,kitchenSink.kind as kind )
         FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
         GROUP BY kitchenSink.kind
         HAVING (SUM(kitchenSink.sinkLink.amount) < :p1)
-        ORDER BY sinkLink_amount_sum ASC ''')
+        ORDER BY sinkLink_amount ASC ''')
         queryInfo.paramMap == [p1: 100.0]
     }
 
@@ -129,9 +131,9 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
                 'ext.id': 1,
                 'thingId': 2,
                 inactive: true,
-                'sinkLink_amount_sum.$lt':100.0
+                'sinkLink_amount.$lt':100.0
             ],
-            sort:[sinkLink_amount_sum:'asc']
+            sort:[sinkLink_amount:'asc']
         )
 
         when: "A jpa query is built"
@@ -142,12 +144,12 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         then: "The query is valid"
         query != null
         query.trim() == strip('''\
-        SELECT new map( SUM(kitchenSink.sinkLink.amount) as sinkLink_amount_sum,kitchenSink.kind as kind )
+        SELECT new map( SUM(kitchenSink.sinkLink.amount) as sinkLink_amount,kitchenSink.kind as kind )
         FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
         WHERE (kitchenSink.ext.id=:p1 AND kitchenSink.thing.id=:p2 AND kitchenSink.inactive=:p3)
         GROUP BY kitchenSink.kind
         HAVING (SUM(kitchenSink.sinkLink.amount) < :p4)
-        ORDER BY sinkLink_amount_sum ASC''')
+        ORDER BY sinkLink_amount ASC''')
         queryInfo.paramMap == [p1: 1, p2: 2, p3: true, p4: 100]
     }
 

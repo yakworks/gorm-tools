@@ -11,15 +11,29 @@ import groovy.transform.CompileStatic
 import org.springframework.jdbc.core.JdbcTemplate
 
 import yakworks.rally.activity.model.Activity
+import yakworks.rally.activity.model.ActivityContact
+import yakworks.rally.activity.model.ActivityLink
+import yakworks.rally.activity.model.ActivityNote
+import yakworks.rally.activity.model.TaskType
+import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactFlex
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgCalc
+import yakworks.rally.orgs.model.OrgFlex
+import yakworks.rally.orgs.model.OrgInfo
+import yakworks.rally.orgs.model.OrgSource
+import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.rally.tag.model.Tag
+import yakworks.rally.tag.model.TagLink
 import yakworks.security.gorm.model.AppUser
+import yakworks.security.gorm.model.SecRole
+import yakworks.security.gorm.model.SecRolePermission
+import yakworks.security.gorm.model.SecRoleUser
 import yakworks.security.gorm.testing.SecuritySeedData
 import yakworks.spring.AppCtx
 
@@ -28,6 +42,16 @@ import yakworks.spring.AppCtx
 class RallySeedData {
 
     static JdbcTemplate jdbcTemplate
+
+    /** the classes to mock for unit tests */
+    // static List getEntityClasses() {
+    //     return [
+    //         AppUser, SecRole, SecRoleUser, SecRolePermission,
+    //         Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo,
+    //         AttachmentLink, ActivityLink, Activity, TaskType,
+    //         Tag, TagLink, Attachment, ActivityNote, Contact, ActivityContact
+    //     ]
+    // }
 
     static init(){
         jdbcTemplate = AppCtx.get("jdbcTemplate", JdbcTemplate)
@@ -39,6 +63,8 @@ class RallySeedData {
     }
 
     static fullMonty(int count = 100){
+        if(!jdbcTemplate) init()
+
         buildAppUsers()
         createOrgTypeSetups()
         buildClientOrg()

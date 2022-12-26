@@ -7,16 +7,25 @@ package yakworks.rally.testing
 import java.time.LocalDateTime
 
 import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
+import grails.gorm.Entity
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.security.gorm.model.AppUser
+import yakworks.security.gorm.model.SecRole
+import yakworks.security.gorm.model.SecRolePermission
+import yakworks.security.gorm.model.SecRoleUser
 
-@CompileDynamic //ok for testing
+@CompileDynamic
 class MockData {
+
+    /** common entityClasses for base setup */
+    public static List<Class<Entity>> commonEntityClasses = [
+        Org, AppUser, SecRole, SecRoleUser, SecRolePermission ] as List<Class<Entity>>
 
     static Org org(Map dta = [:]) {
         Map vals = [num: 'tsla', name: 'Tesla', type: OrgType.Customer]
@@ -26,7 +35,7 @@ class MockData {
     }
 
     static OrgType orgType(OrgType type = OrgType.Customer) {
-        OrgTypeSetup ots = new OrgTypeSetup(id: type, name: type.name()).persist()
+        OrgTypeSetup ots = new OrgTypeSetup(id: type.id, name: type.name()).persist()
         assert type.typeSetup
         return type
     }
@@ -38,7 +47,7 @@ class MockData {
     }
 
     static Contact contact(Map dta = [:]) {
-        def orgDta = dta?.remove('org') ?: [:]
+        Map orgDta = ( dta?.remove('org') ?: [:] ) as Map
         dta.org = org(orgDta)
         Map vals = [firstName: "Ayne"]
         vals.putAll(dta)
@@ -48,7 +57,7 @@ class MockData {
     }
 
     static AppUser user(Map args = [:]) {
-        Map contactArgs = args?.remove("contact") ?: [:]
+        Map contactArgs = ( args?.remove("contact") ?: [:] )  as Map
         if(!contactArgs.name) contactArgs.name = args.username
         args.contact = contact(contactArgs)
         AppUser user = AppUser.create(username:"karen", password:"karen", repassword:"karen", email:"karen@9ci.com")
@@ -115,7 +124,7 @@ class MockData {
     ]
 
     static Map getCreateOrg() {
-        return baseOrgParams.clone()
+        return baseOrgParams.clone() as Map
     }
 
     static Map getUpdateOrg(){
@@ -138,6 +147,7 @@ class MockData {
         ]
     }
 
+    @CompileDynamic
     Activity createActNote(Long orgId){
         Map params = [
             org:[id: orgId], //org id does not exist

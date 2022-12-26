@@ -7,6 +7,7 @@ package yakworks.testing.gorm.unit
 import groovy.transform.CompileStatic
 
 import org.grails.orm.hibernate.HibernateDatastore
+import org.grails.orm.hibernate.connections.HibernateConnectionSourceFactory
 import org.grails.plugin.hibernate.support.HibernatePersistenceContextInterceptor
 import org.hibernate.Session
 import org.hibernate.SessionFactory
@@ -83,6 +84,7 @@ trait GormHibernateTest implements GrailsAppUnitTest, BaseRepoEntityUnitTest, Re
         List persistentClasses = findEntityClasses()
 
         if (persistentClasses) {
+            HibernateConnectionSourceFactory hibernateConnectionSourceFactory = new HibernateConnectionSourceFactory()
             hibernateDatastore = new HibernateDatastore((PropertyResolver) config, persistentClasses as Class[])
         } else {
             List entityPackages = (PropertyTools.getOrNull(this, 'entityPackages')?:[]) as List

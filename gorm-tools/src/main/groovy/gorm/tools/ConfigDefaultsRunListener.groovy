@@ -47,8 +47,8 @@ class ConfigDefaultsRunListener implements SpringApplicationRunListener  {
     @Override
     void environmentPrepared(ConfigurableBootstrapContext bootstrapContext, ConfigurableEnvironment environment) {
 
-        Map currentProperties = getCurrentConfig(environment)
-        String encoding = environment.getProperty('grails.config.encoding', String, 'UTF-8')
+        // Map currentProperties = getCurrentConfig(environment)
+        // String encoding = environment.getProperty('grails.config.encoding', String, 'UTF-8')
         environment.propertySources.addFirst(ConfigDefaults.propertySource)
     }
 

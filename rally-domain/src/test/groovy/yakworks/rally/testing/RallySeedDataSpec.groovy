@@ -31,7 +31,7 @@ import yakworks.security.gorm.model.SecRoleUser
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
-@Ignore
+@Ignore //see FIXME line 99 in GormHibernateTest
 class RallySeedDataSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [
         AppUser, SecRole, SecRoleUser, SecRolePermission,

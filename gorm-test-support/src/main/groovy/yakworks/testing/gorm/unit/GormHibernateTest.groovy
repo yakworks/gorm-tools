@@ -6,14 +6,19 @@ package yakworks.testing.gorm.unit
 
 import groovy.transform.CompileStatic
 
+import org.grails.datastore.gorm.events.DefaultApplicationEventPublisher
+import org.grails.datastore.gorm.utils.ClasspathEntityScanner
+import org.grails.datastore.mapping.core.DatastoreUtils
+import org.grails.datastore.mapping.core.connections.ConnectionSources
+import org.grails.datastore.mapping.core.connections.ConnectionSourcesInitializer
 import org.grails.orm.hibernate.HibernateDatastore
 import org.grails.orm.hibernate.connections.HibernateConnectionSourceFactory
+import org.grails.orm.hibernate.connections.HibernateConnectionSourceSettings
 import org.grails.plugin.hibernate.support.HibernatePersistenceContextInterceptor
 import org.hibernate.Session
 import org.hibernate.SessionFactory
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
-import org.springframework.core.env.PropertyResolver
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.TransactionStatus
@@ -82,18 +87,39 @@ trait GormHibernateTest implements GrailsAppUnitTest, BaseRepoEntityUnitTest, Re
      */
     void initDatastore(){
         List persistentClasses = findEntityClasses()
-
+        HibernateConnectionSourceFactory hcsf
         if (persistentClasses) {
-            HibernateConnectionSourceFactory hibernateConnectionSourceFactory = new HibernateConnectionSourceFactory()
-            hibernateDatastore = new HibernateDatastore((PropertyResolver) config, persistentClasses as Class[])
+            hcsf = new HibernateConnectionSourceFactory(persistentClasses as Class[])
         } else {
             List entityPackages = (PropertyTools.getOrNull(this, 'entityPackages')?:[]) as List
             List<Package> packagesToScan = entityPackages.collect{ grailsApplication.classLoader.getDefinedPackage(it as String) }
-            hibernateDatastore = new HibernateDatastore((PropertyResolver) config, packagesToScan as Package[])
+            hcsf = new HibernateConnectionSourceFactory(new ClasspathEntityScanner().scan(packagesToScan as Package[]) )
         }
+
+        //FIXME wont work with Environment, but passing in `config` tests are not picking up the naming_strategy
+        // when passing in env then its not picking up the gorm methods like .list() etc..
+        // its the HibernteSettings not getting setup right.
+        // set breakpoint on 228 HibernateConnectionSourceFactory to see problems with config
+
+        // ConfigurableEnvironment env =  this.applicationContext.getEnvironment()
+        //env.propertySources.addFirst(ConfigDefaults.propertySource)
+        // env.propertySources.addFirst(new MapPropertySource("grails", config.getProperties()) )
+        //env.propertySources.addFirst(ConfigDefaults.propertySource)
+
+        //config.put('hibernate.naming_strategy', DefaultNamingStrategy)
+        ConnectionSources<SessionFactory, HibernateConnectionSourceSettings> connectionSources =
+            ConnectionSourcesInitializer.create(hcsf, DatastoreUtils.preparePropertyResolver(config, "dataSource", "hibernate", "grails"))
+        def mapCtx = hcsf.getMappingContext()
+        def daep = new DefaultApplicationEventPublisher()
+        hibernateDatastore = new HibernateDatastore(connectionSources, mapCtx, daep)
+
+        // works fine with the grails config.
+        // hibernateDatastore = new HibernateDatastore(config, hcsf, daep)
+
         transactionManager = hibernateDatastore.getTransactionManager()
         assert transactionManager
     }
+
 
     void registerHibernateBeans(){
         BeanDefinitionRegistry bdr = (BeanDefinitionRegistry)ctx

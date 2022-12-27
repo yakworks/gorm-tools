@@ -43,15 +43,15 @@ class RallySeedData {
 
     static JdbcTemplate jdbcTemplate
 
-    /** the classes to mock for unit tests */
-    // static List getEntityClasses() {
-    //     return [
-    //         AppUser, SecRole, SecRoleUser, SecRolePermission,
-    //         Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo,
-    //         AttachmentLink, ActivityLink, Activity, TaskType,
-    //         Tag, TagLink, Attachment, ActivityNote, Contact, ActivityContact
-    //     ]
-    // }
+    /** the classes to mock for unit tests, NOTE: stackoverflow if this is not specifed with generics */
+    static List<Class<?>> getEntityClasses() {
+        return [
+            AppUser, SecRole, SecRoleUser, SecRolePermission,
+            Org, OrgSource, OrgTypeSetup, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo,
+            ActivityLink, Activity, TaskType, ActivityNote, ActivityContact,
+            Tag, TagLink
+        ] as List<Class<?>>
+    }
 
     static init(){
         jdbcTemplate = AppCtx.get("jdbcTemplate", JdbcTemplate)

@@ -8,17 +8,16 @@ import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.events.DefaultApplicationEventPublisher
 import org.grails.datastore.gorm.utils.ClasspathEntityScanner
-import org.grails.datastore.mapping.core.DatastoreUtils
 import org.grails.datastore.mapping.core.connections.ConnectionSources
 import org.grails.datastore.mapping.core.connections.ConnectionSourcesInitializer
 import org.grails.orm.hibernate.HibernateDatastore
 import org.grails.orm.hibernate.connections.HibernateConnectionSourceFactory
-import org.grails.orm.hibernate.connections.HibernateConnectionSourceSettings
 import org.grails.plugin.hibernate.support.HibernatePersistenceContextInterceptor
 import org.hibernate.Session
 import org.hibernate.SessionFactory
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
+import org.springframework.core.env.PropertyResolver
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.TransactionStatus
@@ -27,6 +26,7 @@ import gorm.tools.jdbc.DbDialectService
 import spock.lang.AutoCleanup
 import spock.lang.Shared
 import yakworks.commons.lang.PropertyTools
+import yakworks.testing.gorm.TestTools
 import yakworks.testing.gorm.support.BaseRepoEntityUnitTest
 import yakworks.testing.gorm.support.RepoTestDataBuilder
 import yakworks.testing.grails.GrailsAppUnitTest
@@ -100,15 +100,20 @@ trait GormHibernateTest implements GrailsAppUnitTest, BaseRepoEntityUnitTest, Re
         // when passing in env then its not picking up the gorm methods like .list() etc..
         // its the HibernteSettings not getting setup right.
         // set breakpoint on 228 HibernateConnectionSourceFactory to see problems with config
+        // see GrailsApplicationPostProcessor L118,
 
-        // ConfigurableEnvironment env =  this.applicationContext.getEnvironment()
-        //env.propertySources.addFirst(ConfigDefaults.propertySource)
+        //ConfigurableEnvironment env =  this.applicationContext.getEnvironment()
+        //TestTools.addEnvConverters(env)
+        // env.propertySources.addFirst(ConfigDefaults.propertySource)
         // env.propertySources.addFirst(new MapPropertySource("grails", config.getProperties()) )
         //env.propertySources.addFirst(ConfigDefaults.propertySource)
 
+        //PropertyResolver propEnv = DatastoreUtils.preparePropertyResolver(env, "dataSource", "hibernate", "grails")
+
+        TestTools.addConfigConverters(config)
+
         //config.put('hibernate.naming_strategy', DefaultNamingStrategy)
-        ConnectionSources<SessionFactory, HibernateConnectionSourceSettings> connectionSources =
-            ConnectionSourcesInitializer.create(hcsf, DatastoreUtils.preparePropertyResolver(config, "dataSource", "hibernate", "grails"))
+        ConnectionSources connectionSources = ConnectionSourcesInitializer.create(hcsf, config as PropertyResolver)
         def mapCtx = hcsf.getMappingContext()
         def daep = new DefaultApplicationEventPublisher()
         hibernateDatastore = new HibernateDatastore(connectionSources, mapCtx, daep)

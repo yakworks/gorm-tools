@@ -5,7 +5,10 @@ import java.nio.file.Path
 import gorm.tools.repository.PersistArgs
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import grails.testing.spock.OnceBefore
 import spock.lang.Specification
+import yakworks.rally.orgs.model.ContactFlex
+import yakworks.rally.orgs.model.Org
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.repo.ActivityRepo
@@ -17,6 +20,14 @@ import yakworks.rally.attachment.model.Attachment
 class ActivityAttachmentTests extends Specification implements DomainIntTest {
     ActivityRepo activityRepo
     AttachmentSupport attachmentSupport
+
+    @OnceBefore
+    void setupData(){
+        Org.list().each { Org org ->
+            def act = Activity.create([id: org.id, org: org, note: [body: 'Test note']], bindId: true)
+        }
+        flushAndClear()
+    }
 
     static Map getNoteParams() {
         return [org: [id: 9], note: [body: 'Todays test note']]

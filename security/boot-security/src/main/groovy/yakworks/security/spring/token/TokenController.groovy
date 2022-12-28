@@ -4,13 +4,13 @@
 */
 package yakworks.security.spring.token
 
+import javax.inject.Inject
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 import groovy.transform.CompileStatic
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.CacheControl
 import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.core.AbstractOAuth2Token
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
 
+import jakarta.annotation.Nullable
 import yakworks.security.spring.token.generator.JwtTokenGenerator
 import yakworks.security.spring.token.generator.StoreTokenGenerator
 import yakworks.security.user.CurrentUser
@@ -30,11 +31,13 @@ import yakworks.security.user.CurrentUser
 @CompileStatic
 class TokenController {
 
-    @Autowired JwtTokenGenerator jwtTokenGenerator
-    //used for tokenLegacy right now
-    @Autowired(required=false) StoreTokenGenerator storeTokenGenerator
+    @Inject JwtTokenGenerator jwtTokenGenerator
 
-    @Autowired CurrentUser currentUser
+    //used for tokenLegacy right now
+    @Inject @Nullable
+    StoreTokenGenerator storeTokenGenerator
+
+    @Inject CurrentUser currentUser
 
     // @Value('${grails.serverURL:""}')
     // String serverURL

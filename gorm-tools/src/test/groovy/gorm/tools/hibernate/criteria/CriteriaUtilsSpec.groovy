@@ -18,7 +18,7 @@ class CriteriaUtilsSpec extends Specification implements GormHibernateTest{
                 someField: value,
                 someField2: value,
                 nestedField: new Test2(someField: value)
-            ).save()
+            ).save(failOnError: true)
         }
     }
 

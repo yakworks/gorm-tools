@@ -6,7 +6,7 @@ package yakworks.rally
 
 import grails.core.GrailsApplication
 import grails.util.Metadata
-import yakworks.rally.testing.RallySeedData
+import yakworks.rally.seed.RallySeed
 
 class BootStrap {
 
@@ -16,8 +16,7 @@ class BootStrap {
         def appName = Metadata.current.getApplicationName()
         //onyl run for this, it will try to run this for projects that depend on this in examples so dont
         if(appName == "rally-domain"){
-            RallySeedData.init()
-            RallySeedData.fullMonty(50)
+            RallySeed.fullMonty(50)
         }
     }
 }

@@ -149,8 +149,9 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
     def "change key contact"() {
         when:
-        assert Org.get(10).contact.num == 'primary10'
+        assert Org.get(10).contact.id == 10
         def c2 = Contact.findByNum('secondary10')
+        assert c2.id != 10
 
         def params = [
             id        : 10,

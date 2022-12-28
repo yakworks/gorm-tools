@@ -15,18 +15,18 @@ import yakworks.security.user.CurrentUser
 @CompileStatic
 class CurrentUserExt {
 
-    static Long getOrgId(CurrentUser self){
-       self.user.orgId as Long
+    static Long getOrgId(CurrentUser self) {
+        self.user.orgId as Long
     }
 
     /**
-    * gets the org from contact for the currently logged in user
-    */
-    static Org getOrg(CurrentUser self){
+     * gets the org from contact for the currently logged in user
+     */
+    static Org getOrg(CurrentUser self) {
         UserInfoExt.getOrg(self.user)
     }
 
-    static boolean isCustomer(CurrentUser self){
+    static boolean isCustomer(CurrentUser self) {
         UserInfoExt.isCustomer(self.user)
     }
 

@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
+import yakworks.rally.orgs.model.ContactFlex
 import yakworks.rally.orgs.model.Org
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
@@ -40,6 +41,9 @@ class RallySeedDataSpec extends Specification implements GormHibernateTest, Secu
         o
         o.name
         Org.count() == 10
+        Org.list().each { Org org ->
+            assert org.contact.id
+        }
     }
 
     void "Contacts"() {

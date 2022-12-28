@@ -61,8 +61,15 @@ class ActivityTests extends Specification implements DomainIntTest {
     }
 
     void "update note"() {
+        setup:
+        //possible another note added one so only do if nothing there.
+        if(!Activity.get(10)){
+            Activity.create([id: 10, org: Org.load(10), note: [body: 'Test note']], bindId: true)
+            flushAndClear()
+        }
+
         when:
-        Map params = [id: 22, note: [body: 'placeholder']]
+        Map params = [id: 10, note: [body: 'placeholder']]
         params.note.body = RandomStringUtils.randomAlphabetic(300)
         Activity result = activityRepo.update(params)
         flushAndClear()

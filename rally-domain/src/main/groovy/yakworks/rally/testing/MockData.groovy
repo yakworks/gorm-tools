@@ -7,7 +7,6 @@ package yakworks.rally.testing
 import java.time.LocalDateTime
 
 import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
 
 import grails.gorm.Entity
 import yakworks.rally.activity.model.Activity

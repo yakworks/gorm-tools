@@ -15,8 +15,8 @@ import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.model.TaskType
-import yakworks.rally.attachment.model.Attachment
-import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.rally.orgs.OrgDimensionService
+import yakworks.rally.orgs.OrgMemberService
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactFlex
 import yakworks.rally.orgs.model.Location
@@ -24,10 +24,12 @@ import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgCalc
 import yakworks.rally.orgs.model.OrgFlex
 import yakworks.rally.orgs.model.OrgInfo
+import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
+import yakworks.rally.orgs.repo.ContactRepo
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
 import yakworks.security.gorm.model.AppUser
@@ -47,11 +49,17 @@ class RallySeedData {
     static List<Class<?>> getEntityClasses() {
         return [
             AppUser, SecRole, SecRoleUser, SecRolePermission,
-            Org, OrgSource, OrgTypeSetup, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo,
+            Org, OrgSource, OrgTypeSetup, OrgTag, OrgMember, OrgFlex, OrgCalc, OrgInfo,
+            Location, Contact,
             ActivityLink, Activity, TaskType, ActivityNote, ActivityContact,
             Tag, TagLink
         ] as List<Class<?>>
     }
+
+    static springBeans = [
+        orgDimensionService: OrgDimensionService,
+        orgMemberService: OrgMemberService
+    ]
 
     static init(){
         jdbcTemplate = AppCtx.get("jdbcTemplate", JdbcTemplate)
@@ -68,7 +76,7 @@ class RallySeedData {
         buildAppUsers()
         createOrgTypeSetups()
         buildClientOrg()
-        buildOrgs(count)
+        buildOrgs(count, true)
         buildTags()
         createIndexes()
     }
@@ -80,25 +88,32 @@ class RallySeedData {
         }
     }
 
-    static void buildOrgs(int count){
+    /**
+     * build the Organizations up to count.
+     * Will create 2 company accounts, 2 brnaches and 2 divisions first.
+     * the rest will be customers.
+     * @param count the count to make
+     * @param createContact if true will generate a default contact for each org as well.
+     */
+    static void buildOrgs(int count, boolean createContact = false){
         Org.withTransaction {
             //createOrgTypeSetups()
             (2..3).each{
-                def company = createOrg(it , OrgType.Company)
+                def company = createOrg(it , OrgType.Company, createContact)
                 company.location.kind = Location.Kind.remittance
                 company.location.persist()
             }
             (4..5).each{
-                def branch = createOrg(it , OrgType.Branch)
+                def branch = createOrg(it , OrgType.Branch, createContact)
                 branch.persist()
             }
             (6..7).each{
-                def division = createOrg(it , OrgType.Division)
+                def division = createOrg(it , OrgType.Division, createContact)
                 division.persist()
             }
             if(count < 7) return
             (8..count).each { id ->
-                def org = createOrg(id, OrgType.Customer)
+                def org = createOrg(id, OrgType.Customer, createContact)
             }
         }
 
@@ -106,17 +121,24 @@ class RallySeedData {
 
     static void buildClientOrg(){
         Org.withTransaction {
-            def client = createOrg(1, OrgType.Client)
+            def client = createOrg(1, OrgType.Client, true)
 
             client.contact.user = AppUser.get(1)
             client.contact.persist(flush: true)
 
             assert Contact.query(id: 1).get()
         }
-
     }
 
-    static Org createOrg(Long id, OrgType type){
+    /**
+     * create an org.
+     *
+     * @param id the id to gen
+     * @param type the org type
+     * @param createContact whether to create the contact
+     * @return the created org
+     */
+    static Org createOrg(Long id, OrgType type, boolean createContact = false){
 
         String value = "Org" + id
         def data = [
@@ -142,31 +164,58 @@ class RallySeedData {
         ]
         def org = Org.create(data, bindId: true)
         org.calc = new OrgCalc(id: org.id, totalDue: id*10.0).persist()
+
         Org.repo.flush()
 
-        def contact = new Contact(
+        if(createContact){
+            Contact contact = makeContact(org, [id: org.id])
+            org.contact = contact
+            org.persist()
+        }
+
+        return org
+    }
+
+    static Contact makeContact(Org org, Map odata = [:]){
+        ContactRepo contactRepo = Contact.repo
+
+        Long id = odata.id as Long
+        //always force an id, so get early if not specified
+        if(!id) id = contactRepo.generateId()
+
+        def data = [
             id: id,
-            num: "primary$id",
+            num: "C$id",
             email    : "jgalt$id@taggart.com",
             firstName: "John$id",
             lastName : "Galt$id",
-            org: org,
-            flex: new ContactFlex(
-                num1: id * 1.0,
-                num2: id * 1.01
-            )
-        )
-        contact.user = AppUser.get(1)
-        contact.persist()
-        Org.repo.flush()
+            org: org
+        ]
+        //override with whatever was passed in
+        data.putAll(odata ?: [:])
+        Map args = odata.id ? [bindId: true] : [:]
 
-        org.contact = contact
-        org.persist()
+        def contact = Contact.repo.create(data, args)
+        return contact
+    }
 
-        // add note
-        def act = Activity.create([id:id, org: org, note: [body: 'Test note']], bindId: true)
-        // assert org.flex.date1.toString() == '2021-04-20'
-        return org
+    static void buildOrgMembers() {
+        //if its a cust then add members
+        Org.list().each { Org org ->
+            if(org.type == OrgType.Customer) {
+                Long id = org.id
+                org.member = new OrgMember(
+                    id: id, org: org,
+                    branch: (id % 2) ? Org.load(4): Org.load(5),
+                    division: (id % 2) ? Org.load(6): Org.load(7)
+                ).persist()
+            }
+        }
+
+    }
+
+    static Activity makeNote(Org org, String note = 'Test note') {
+        return Activity.create(org: org, note: [body: note])
     }
 
     static void buildTags(){
@@ -185,57 +234,7 @@ class RallySeedData {
     static void buildAppUsers(){
         AppUser.withTransaction {
             SecuritySeedData.fullMonty()
-            // AppUser user = new AppUser(id: 1, username: "admin", email: "admin@9ci.com", password:"123Foo", orgId: 2)
-            // user.persist()
-            // assert user.id == 1
-            //
-            // AppUser custUser = new AppUser(id: 2, username: "cust", email: "cust@9ci.com", password:"123Foo", orgId: 2)
-            // custUser.persist()
-            // assert custUser.id == 2
-            //
-            // SecRole admin = new SecRole(id:1, code: SecRole.ADMIN).persist()
-            // adminPermissions(admin)
-            // SecRole power = new SecRole(id:2, code: "MANAGER").persist()
-            // SecRole custRole = new SecRole(id:3, code: "CUSTOMER").persist()
-            // custPermissions(custRole)
-            //
-            // SecRoleUser.create(user, admin, true)
-            // SecRoleUser.create(user, power, true)
-            // SecRoleUser.create(custUser, custRole, true)
-            //
-            // AppUser noRoleUser = AppUser.create([id: 3, username: "noroles", email: "noroles@9ci.com", password:"123Foo", orgId: 3], bindId: true)
-            // assert noRoleUser.id == 3
-            // return
         }
     }
-    //
-    // static void adminPermissions(SecRole role){
-    //
-    //     ['rally:org:*',
-    //      'rally:activityNote:*',
-    //      'rally:company:list,get,post',
-    //      'rally:orgTypeSetup:list,get,post',
-    //      'rally:syncJob:list,get',
-    //      'rally:user:*',
-    //      'rally:role:read',
-    //      'rally:contact:*',
-    //      'rally:activity:*',
-    //      'rally:attachment:*',
-    //      'rally:tag:*'
-    //     ].each{
-    //         SecRolePermission.create(role, it)
-    //     }
-    // }
-    //
-    // static void custPermissions(SecRole role){
-    //     ['rally:org:list,get,post',
-    //      // 'rally:contact:*',
-    //      'rally:activity:list,get',
-    //      'rally:attachment:*',
-    //      'rally:tag:list,get'
-    //     ].each{
-    //         SecRolePermission.create(role, it)
-    //     }
-    // }
 
 }

@@ -29,7 +29,8 @@ class UserInfoExt {
 
     static boolean isCustomer(UserInfo self){
         def org = getOrg(self)
-        return org.type == OrgType.Customer
+        //null check on org so its doesn't fail when unit testing, wont happen in prod
+        return org?.type == OrgType.Customer
     }
 
 }

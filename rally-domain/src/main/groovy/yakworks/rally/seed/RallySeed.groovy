@@ -2,7 +2,7 @@
 * Copyright 2021 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.rally.testing
+package yakworks.rally.seed
 
 import java.time.LocalDate
 
@@ -10,6 +10,7 @@ import groovy.transform.CompileStatic
 
 import org.springframework.jdbc.core.JdbcTemplate
 
+import grails.gorm.transactions.Transactional
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
@@ -41,9 +42,9 @@ import yakworks.spring.AppCtx
 
 @SuppressWarnings('BuilderMethodWithSideEffects')
 @CompileStatic
-class RallySeedData {
+class RallySeed {
 
-    static JdbcTemplate jdbcTemplate
+    JdbcTemplate jdbcTemplate
 
     /** the classes to mock for unit tests, NOTE: stackoverflow if this is not specifed with generics */
     static List<Class<?>> getEntityClasses() {
@@ -62,27 +63,33 @@ class RallySeedData {
         orgMemberService: OrgMemberService
     ]
 
-    static init(){
+    // see good explanation of thread safe static instance stratgey https://stackoverflow.com/a/16106598/6500859
+    @SuppressWarnings('UnusedPrivateField')
+    private static class Holder { private static final RallySeed INSTANCE = new RallySeed().build(); }
+
+    static RallySeed getInstance() {  return Holder.INSTANCE  }
+
+    RallySeed build() {
         jdbcTemplate = AppCtx.get("jdbcTemplate", JdbcTemplate)
-        //gorm creation scripts dont set constraints to not null so we do it here
         Org.withTransaction {
             jdbcTemplate.execute("ALTER TABLE Contact ALTER orgId SET NOT NULL;")
             jdbcTemplate.execute("ALTER TABLE Location ALTER orgId SET NOT NULL;")
         }
+        return this
     }
 
     static fullMonty(int count = 100){
-        if(!jdbcTemplate) init()
-
-        buildAppUsers()
-        createOrgTypeSetups()
-        buildClientOrg()
-        buildOrgs(count, true)
-        buildTags()
-        createIndexes()
+        RallySeed rallySeed = getInstance()
+        rallySeed.buildAppUsers()
+        rallySeed.createOrgTypeSetups()
+        rallySeed.buildClientOrg()
+        rallySeed.buildOrgs(count, true)
+        rallySeed.buildTags()
+        rallySeed.createIndexes()
     }
 
-    static void createOrgTypeSetups(){
+    @Transactional
+    void createOrgTypeSetups(){
         OrgType.values().each {
             String code = it == OrgType.CustAccount ? 'CustAcct': it.name()
             new OrgTypeSetup(id: it.id, code: code, name: it.name()).persist(flush:true)
@@ -96,7 +103,8 @@ class RallySeedData {
      * @param count the count to make
      * @param createContact if true will generate a default contact for each org as well.
      */
-    static void buildOrgs(int count, boolean createContact = false){
+    @Transactional
+    void buildOrgs(int count, boolean createContact = false){
         Org.withTransaction {
             //createOrgTypeSetups()
             (2..3).each{ id ->
@@ -120,7 +128,8 @@ class RallySeedData {
 
     }
 
-    static void buildClientOrg(){
+    @Transactional
+    void buildClientOrg(){
         Org.withTransaction {
             def client = createOrg([id: 1 , type: OrgType.Client], true)
 
@@ -138,7 +147,8 @@ class RallySeedData {
      * @param createContact whether to create the contact
      * @return the created org
      */
-    static Org createOrg(Map odata, boolean createContact = false){
+    @Transactional
+    Org createOrg(Map odata, boolean createContact = false){
         OrgRepo orgRepo = Org.repo
         Long id = odata['id'] as Long
         //always force an id, so get early if not specified
@@ -183,7 +193,8 @@ class RallySeedData {
         return org
     }
 
-    static Contact makeContact(Org org, Map odata = [:]){
+    @Transactional
+    Contact makeContact(Org org, Map odata = [:]){
         ContactRepo contactRepo = Contact.repo
 
         Long id = odata.id as Long
@@ -206,7 +217,8 @@ class RallySeedData {
         return contact
     }
 
-    static void buildOrgMembers() {
+    @Transactional
+    void buildOrgMembers() {
         //if its a cust then add members
         Org.list().each { Org org ->
             if(org.type == OrgType.Customer) {
@@ -221,27 +233,27 @@ class RallySeedData {
 
     }
 
-    static Activity makeNote(Org org, String note = 'Test note') {
+    @Transactional
+    Activity makeNote(Org org, String note = 'Test note') {
         return Activity.create(org: org, note: [body: note])
     }
 
-    static void buildTags(){
-        Tag.withTransaction {
-            def t1 = new Tag(id: 1 as Long, code: "CPG", entityName: 'Customer').persist(flush: true)
-            def t2 = new Tag(id: 2 as Long, code: "MFG", entityName: 'Customer').persist(flush: true)
-        }
+    @Transactional
+    void buildTags(){
+        def t1 = new Tag(id: 1 as Long, code: "CPG", entityName: 'Customer').persist(flush: true)
+        def t2 = new Tag(id: 2 as Long, code: "MFG", entityName: 'Customer').persist(flush: true)
     }
 
-    static void createIndexes(){
+    @Transactional
+    void createIndexes(){
         Tag.withTransaction {
             jdbcTemplate.execute("CREATE UNIQUE INDEX ix_OrgSource_unique on OrgSource(sourceType,sourceId,orgTypeId)")
         }
     }
 
-    static void buildAppUsers(){
-        AppUser.withTransaction {
-            SecuritySeedData.fullMonty()
-        }
+    @Transactional
+    void buildAppUsers(){
+        SecuritySeedData.fullMonty()
     }
 
 }

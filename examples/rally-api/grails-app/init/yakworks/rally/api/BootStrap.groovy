@@ -4,16 +4,13 @@
 */
 package yakworks.rally.api
 
-import yakworks.rally.testing.RallySeedData
+import yakworks.rally.seed.RallySeed
 import yakworks.security.gorm.model.AppUser
-import yakworks.security.gorm.testing.SecuritySeedData
 
 class BootStrap {
 
     def init = { servletContext ->
-
-        RallySeedData.init()
-        RallySeedData.fullMonty()
+        RallySeed.fullMonty()
         addOktaUser()
     }
 

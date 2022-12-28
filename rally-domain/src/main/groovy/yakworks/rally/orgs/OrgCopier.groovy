@@ -4,16 +4,17 @@
 */
 package yakworks.rally.orgs
 
+import javax.inject.Inject
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
 import gorm.tools.utils.GormUtils
 import grails.gorm.transactions.Transactional
+import jakarta.annotation.Nullable
 import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.rally.activity.ActivityCopier
@@ -34,11 +35,12 @@ import yakworks.rally.orgs.repo.OrgTagRepo
 @CompileStatic
 class OrgCopier {
 
-    @Autowired(required=false) ContactRepo contactRepo
-    @Autowired(required=false) OrgTagRepo orgTagRepo
-    @Autowired(required=false) AttachmentLinkRepo attachmentLinkRepo
-    @Autowired(required=false) ActivityRepo activityRepo
-    @Autowired(required=false) ActivityCopier activityCopier
+    @Inject @Nullable ContactRepo contactRepo
+    @Inject @Nullable OrgTagRepo orgTagRepo
+    @Inject @Nullable AttachmentLinkRepo attachmentLinkRepo
+    @Inject @Nullable ActivityRepo activityRepo
+    @Inject @Nullable ActivityCopier activityCopier
+
     /**
      * Copies fields from the one Org entity to another, it copies associations as well.
      *

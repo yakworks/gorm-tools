@@ -8,17 +8,18 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import javax.inject.Inject
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 
+import jakarta.annotation.Nullable
 import yakworks.commons.io.PathTools
 import yakworks.rally.attachment.model.Attachment
 import yakworks.spring.AppResourceLoader
@@ -32,11 +33,8 @@ import yakworks.spring.AppResourceLoader
 class AttachmentSupport {
     public static final String ATTACHMENTS_LOCATION_KEY = "attachments.location"
 
-    @Autowired(required=false)
+    @Inject @Nullable
     AppResourceLoader appResourceLoader
-
-    // @Autowired(required=false)
-    // LinkGenerator grailsLinkGenerator
 
     /**
      * Move a temp file. takes a temp file name that will be in the tempDir locationKey as the

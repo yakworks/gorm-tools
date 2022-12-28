@@ -8,7 +8,6 @@ import javax.inject.Inject
 
 import groovy.transform.CompileStatic
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataRetrievalFailureException
 import org.springframework.validation.Errors
 
@@ -39,16 +38,16 @@ import yakworks.rally.orgs.model.OrgType
 @CompileStatic
 abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
     //Making these nullable makes it easier to wire up for tests.
-    @Autowired(required=false)
+    @Inject @Nullable
     LocationRepo locationRepo
 
-    @Autowired(required=false)
+    @Inject @Nullable
     ContactRepo contactRepo
 
-    @Autowired(required=false)
+    @Inject @Nullable
     OrgTagRepo orgTagRepo
 
-    @Autowired(required=false)
+    @Inject @Nullable
     OrgSourceRepo orgSourceRepo
 
     @Inject @Nullable

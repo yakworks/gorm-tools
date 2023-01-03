@@ -50,7 +50,7 @@ import static org.springframework.security.config.Customizer.withDefaults
 @CompileStatic
 @Configuration
 @Import([RallyConfiguration])
-class RallyApiConfiguration {
+class RallyApiSpringConfig {
 
     @Value('${app.security.enabled:true}')
     boolean securityEnabled
@@ -70,8 +70,8 @@ class RallyApiConfiguration {
             // "/security-tests/error500",
             // "/security-tests/error400",
             "/security-tests/**",
-            "/api/login",
-            "/api/token",
+            "/login*",
+            "/token",
             "/about"]
 
         if(!securityEnabled){
@@ -89,10 +89,12 @@ class RallyApiConfiguration {
             // http basic auth
             .httpBasic(withDefaults())
             // add default form for testing in browser
-            .formLogin( formLoginCustomizer ->
+            .formLogin( form -> {
                 //adds success handler for adding cookie
-                formLoginCustomizer.successHandler(cookieAuthSuccessHandler)
-            )
+                // form.loginPage("/login.html")
+                form.loginProcessingUrl("/perform_login")
+                form.successHandler(cookieAuthSuccessHandler)
+            })
             //make stateless so no session stored on server
             .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             //remove the cookie on logout

@@ -30,9 +30,21 @@ app:
           publicKey: classpath:jwt/test-es256-public.pem
 
 # Uncomment and tweak to setup SAML with Okta
-#spring.security.saml2.relyingparty.registration.okta.singlelogout.binding: POST
-#spring.security.saml2.relyingparty.registration.okta.singlelogout.response-url: "{baseUrl}/logout/saml2/slo"
+spring.security.saml2.relyingparty.registration.okta.singlelogout.binding: POST
+spring.security.saml2.relyingparty.registration.okta.singlelogout.response-url: "{baseUrl}/logout/saml2/slo"
 #spring.security.saml2.relyingparty.registration.okta.assertingparty.metadata-uri: https://dev-86352402.okta.com/app/exk7dad4ucR8cUZXE5d7/sso/saml/metadata
+#spring.security.saml2.relyingparty.registration.okta.assertingparty.metadata-uri: https://dev-86091574.okta.com/app/exk7thvlftsn8yJXF5d7/sso/saml/metadata
+
+spring:
+  security:
+    saml2:
+      relyingparty:
+        registration:
+          okta:
+#            identityprovider:
+#              metadata-uri: https://idp/metadata.php
+            assertingparty:
+              metadata-uri: https://dev-86091574.okta.com/app/exk7thvlftsn8yJXF5d7/sso/saml/metadata
 
 ---
 

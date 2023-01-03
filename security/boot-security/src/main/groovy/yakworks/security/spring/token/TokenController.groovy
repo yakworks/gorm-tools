@@ -44,7 +44,7 @@ class TokenController {
 
     // for dev and testing to make it easier to dump token into variable.
     // ex: `$ TOKEN=`http POST admin:123@localhost:8080/token.txt -b`
-    @PostMapping("/api/token.txt")
+    @PostMapping("/token.txt")
     String tokenTxt() {
         return jwtTokenGenerator.generate().tokenValue
     }
@@ -52,7 +52,7 @@ class TokenController {
     /**
      * Default generator for token. Follows the oauth standards.
      */
-    @PostMapping("/api/token")
+    @PostMapping("/token")
     ResponseEntity<Map> token(HttpServletRequest request, HttpServletResponse response ) {
         Jwt token = jwtTokenGenerator.generate()
         //add it as a cookie, there is no security "success handler" after this
@@ -66,7 +66,7 @@ class TokenController {
             .body(body)
     }
 
-    @GetMapping("/api/token/callback")
+    @GetMapping("/token/callback")
     ResponseEntity<Map> callback(HttpServletRequest request, HttpServletResponse response) {
         return token(request, response)
     }
@@ -78,7 +78,7 @@ class TokenController {
      * we will sunset this once we move off of having stored tokens as the default when using the login.
      */
     @Deprecated
-    @PostMapping("/api/tokenLegacy")
+    @PostMapping("/tokenLegacy")
     ResponseEntity<Map> tokenLegacy(HttpServletRequest request, HttpServletResponse response) {
 
         AbstractOAuth2Token token = storeTokenGenerator.generate()
@@ -94,7 +94,7 @@ class TokenController {
     }
 
     //returns the current userMap. Will error if not valid token or login
-    @GetMapping("/api/validate")
+    @GetMapping("/validate")
     ResponseEntity<Map> validateToken(HttpServletRequest request, HttpServletResponse response) {
         //UserInfo userInfo = currentUser.user
         Map body = currentUser.userMap

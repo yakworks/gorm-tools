@@ -3,16 +3,16 @@
 @base_url = {{host}}/api
 
 ## 404 not found
-GET {{host}}/security-tests/bad
+GET {{base_url}}/security-tests/bad
 
 ## 500 error
-GET {{host}}/security-tests/error500
+GET {{base_url}}/security-tests/error500
 
 ## TODO 400 validation
 # GET {{host}}/security-tests/error400
 
 ## 401 unauth
-GET {{host}}/security-tests/error401
+GET {{base_url}}/security-tests/error401
 
 ### Login
 # @no-cookie-jar
@@ -20,14 +20,12 @@ GET {{host}}/security-tests/error401
 POST http://admin:123@localhost:8080/api/token
 Content-Type: application/json
 
-{"foo":1}
-
 ### error401 will succeed now
 # @no-cookie-jar
 # @ref login
-GET http://localhost:8080/security-tests/error401
+GET http://localhost:8080/api/security-tests/error401
 Authorization: Bearer {{login.access_token}}
 
 ## error403 requires role that is not assigned
-GET {{host}}/security-tests/error403
+GET {{host}}/api/security-tests/error403
 Authorization: Bearer {{login.access_token}}

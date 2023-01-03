@@ -81,6 +81,7 @@ public class DefaultSecurityConfiguration {
         http.saml2Login(saml2 -> {
                 //saml2.defaultSuccessUrl("/saml", true);
                 //saml2.defaultSuccessUrl("/api/token/callback", true);
+                // saml2.loginProcessingUrl("{baseUrl}/api/login/saml2/sso/{registrationId}");
                 saml2.successHandler(successHandler);
             })
             .saml2Logout(Customizer.withDefaults());
@@ -95,9 +96,10 @@ public class DefaultSecurityConfiguration {
 
         //POC for enabling the legacy login with a POST to the /api/login endpoint.ObjMapper for parsing the json in the POST
         JsonUsernamePasswordLoginFilter jsonUnameFilter = new JsonUsernamePasswordLoginFilter(ctx.getBean(ObjectMapper.class));
-        jsonUnameFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/api/login", "POST"));
+        jsonUnameFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/login", "POST"));
+
         //forward over to the token endpoint which will return the standard bearer object.
-        jsonUnameFilter.setAuthenticationSuccessHandler(new ForwardAuthenticationSuccessHandler("/api/tokenLegacy"));
+        jsonUnameFilter.setAuthenticationSuccessHandler(new ForwardAuthenticationSuccessHandler("/tokenLegacy"));
         jsonUnameFilter.setAuthenticationManager(ctx.getBean(AuthenticationManager.class));
         http.addFilterAfter(jsonUnameFilter, BasicAuthenticationFilter.class);
 

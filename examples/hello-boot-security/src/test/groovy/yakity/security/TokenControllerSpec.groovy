@@ -47,7 +47,7 @@ class TokenControllerSpec extends Specification {
     void "Basic auth and bearer auth should give ok status and hello"() {
         when: "we login with basic auth"
         //does asserts too
-        MvcResult result = mockMvc.perform(post("/api/token")
+        MvcResult result = mockMvc.perform(post("/token")
             .with(httpBasic("user", "123")))
             .andExpect(status().isOk())
             .andReturn()
@@ -65,7 +65,7 @@ class TokenControllerSpec extends Specification {
         when: "we login with basic auth"
         //does asserts too
         MvcResult result = mockMvc
-            .perform(post("/api/login")
+            .perform(post("/login2")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content('{ "username": "user", "password": 123 }')
             )
@@ -74,7 +74,7 @@ class TokenControllerSpec extends Specification {
 
         //the mock mvc doesn't do forwards so just check that it sent it over to token on success
         then:
-        result.response.forwardedUrl == "/api/tokenLegacy"
+        result.response.forwardedUrl == "/tokenLegacy"
 
     }
 
@@ -87,7 +87,7 @@ class TokenControllerSpec extends Specification {
 
     void "bad credential gives 401"() {
         expect:
-        this.mockMvc.perform(post("/api/token"))
+        this.mockMvc.perform(post("/token"))
             .andExpect(status().isUnauthorized());
     }
 }

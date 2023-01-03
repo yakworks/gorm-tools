@@ -189,21 +189,21 @@ docker.circle.shell:
 test.token.txt:
 	TOKEN=`http POST admin:123@localhost:8080/api/token.txt -b`
 	echo "$$TOKEN"
-	http localhost:8080 -A bearer -a "$$TOKEN"
+	http localhost:8080/api -A bearer -a "$$TOKEN"
 
 test.token:
 	RESP=`http -b POST admin:123@localhost:8080/api/token`
 	# use awk to parse out the access_token
 	TOKEN=`echo $$RESP | awk -F'"' -v RS="," '/access_token/{ print $$4 }'`
 	echo "$$TOKEN"
-	http localhost:8080 -A bearer -a "$$TOKEN"
+	http localhost:8080/api -A bearer -a "$$TOKEN"
 
 test.token.cookie:
 	RESP=`http -b POST admin:123@localhost:8080/api/token`
 	# use awk to parse out the access_token
 	TOKEN=`echo $$RESP | awk -F'"' -v RS="," '/access_token/{ print $$4 }'`
 	echo "$$TOKEN"
-	http localhost:8080 Cookie:jwt="$$TOKEN"
+	http localhost:8080/api Cookie:jwt="$$TOKEN"
 
 test.hello-post:
 	RESP=`http -b POST localhost:8080/api/login username=admin password=123`

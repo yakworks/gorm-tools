@@ -18,7 +18,7 @@ class JsonUsernamePasswordLoginSpec extends Specification implements OkHttpRestT
     Map jsonLogin(String uname, String pwd) {
         //create the basic auth credentials
         // String basicAuth = Credentials.basic(uname, pwd)
-        String lpath = "http://localhost:${serverPort}/api/login"
+        String lpath = "http://localhost:${serverPort}${endpoint}"
         // String lpath = "http://${username}:${password}@localhost:${serverPort}/api/token"
         Map postBody = [username: uname, password: pwd]
 

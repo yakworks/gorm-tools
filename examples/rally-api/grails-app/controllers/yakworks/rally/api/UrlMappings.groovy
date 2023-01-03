@@ -36,7 +36,7 @@ class UrlMappings {
         // "/api/rally/foo"(resources:'org', namespace: 'rally') {
         //     "/bar"(resources:"contact", namespace: 'rally')
         // }
-        "/api/appConfig/$nspace/$id"(controller: 'appConfig', action: 'get')
+        "/appConfig/$nspace/$id"(controller: 'appConfig', action: 'get')
         // "/api/wtf"(controller: 'appConfig', action: 'wtf')
         // "500"(view: '/error')
         //ShiroGrailsExceptionResolver is setup to map UnauthorizedException to this

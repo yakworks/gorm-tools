@@ -62,9 +62,6 @@ Authorization: Bearer {{login.access_token}}
 GET {{base_url}}/rally/contact/1
 Authorization: Bearer {{login.access_token}}
 
-### Health
-GET {{base_url}}/actuator/health
-
 ### Contact list
 # @ref login
 GET {{base_url}}/rally/role/1
@@ -80,5 +77,14 @@ GET http://localhost:8080/info/urlMappings
 
 ### Contact list
 # @ref login
-GET {{host}}/hazel
+GET {{host}}/api/hazel
 Authorization: {{Authorization}}
+
+### Health
+GET {{host}}/api/actuator/health
+
+### readiness
+GET {{base_url}}/actuator/health/readiness
+
+### liveness
+GET {{base_url}}/actuator/health/liveness

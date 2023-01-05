@@ -82,8 +82,8 @@ trait BulkableRepo<D> {
     Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs) {
         syncJobArgs.entityClass = getEntityClass()
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
-        Supplier supplierFunc = () -> doBulkParallel(dataList, jobContext)
-        return bulk(supplierFunc, jobContext)
+        Supplier doBulkFunc = () -> doBulkParallel(dataList, jobContext)
+        return bulk(doBulkFunc, jobContext)
     }
 
     /**
@@ -91,19 +91,19 @@ trait BulkableRepo<D> {
      * Each call creates a job that stores info for the call and is returned with results
      * if jobContext.args.promiseEnabled = true will return right away
      *
-     * @param supplierFunc the supplier(Promise) that gets passed to asyncService
+     * @param doBulkFunc the supplier(Promise) that gets passed to asyncService
      * @param jobContext the jobContext with jobId created
      * @return Job id
      */
-    Long bulk(Supplier supplierFunc, SyncJobContext jobContext ) {
+    Long bulk(Supplier doBulkFunc, SyncJobContext jobContext ) {
         def asyncArgs = new AsyncArgs(enabled: jobContext.args.promiseEnabled, session: true)
         // This is the promise call. Will return immediately is syncJobArgs.promiseEnabled=true
         asyncService
-            .supplyAsync(asyncArgs, supplierFunc)
+            .supplyAsync(asyncArgs, doBulkFunc)
             .whenComplete { res, ex ->
-                if(ex){ //should never really happen as we should have already handled any errors
+                if(ex){ //should never really happen as we should have already handled any errors in doBulkFunc
                     log.error("BulkableRepo unexpected exception", ex)
-                    jobContext.results << problemHandler.handleUnexpected(ex)
+                    jobContext.updateWithResult( problemHandler.handleUnexpected(ex) )
                 }
                 jobContext.finishJob()
             }

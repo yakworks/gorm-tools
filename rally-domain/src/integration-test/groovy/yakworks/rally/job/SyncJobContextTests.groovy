@@ -10,6 +10,7 @@ import groovy.json.JsonSlurper
 import spock.lang.Specification
 import yakworks.api.ApiResults
 import yakworks.api.Result
+import yakworks.api.problem.Problem
 import yakworks.json.groovy.JsonEngine
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.attachment.model.Attachment
@@ -152,25 +153,33 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
     def "test finish job"() {
         given:
         SyncJobContext jobContext = createJob()
-        List<Map> renderResults = [[ok: true, status: 200, data: ['boo':'foo']] ,
-                                    [ok: true, status: 200, data: ['boo2':'foo2']] ]
-        List<Map> renderErrorResults = [[ok: false, status: 500, detail: 'error detail'] ]
+        def okResults = ApiResults.OK()
+        okResults.add(Result.OK().payload(['boo':'foo']))
+        okResults.add(Result.OK().payload(['boo2':'foo2']))
+
+        //List<Map> renderErrorResults = [[ok: false, status: 500, detail: 'error detail'] ]
+
         when:
-        jobContext.finishJob(renderResults, renderErrorResults)
+        Long time = System.currentTimeMillis()
+        jobContext.updateJobResults(okResults, time)
+        jobContext.updateWithResult(Problem.ofPayload(['bad':'data']).title("Oops"))
+
+        jobContext.finishJob()
 
         then:
         SyncJob job = SyncJob.get(jobContext.jobId)
-        job.errorBytes
+        //job.errorBytes
         List jsonData = parseJson(job.dataToString())
-        jsonData.size() == 2
+        jsonData.size() == 3
         jsonData[0].ok == true
         jsonData[0].status == 200
         jsonData[0].data == ['boo':'foo']
-        List jsonErrors = parseJson(job.errorToString())
-        jsonErrors.size() == 1
-        jsonErrors[0].ok == false
-        jsonErrors[0].status == 500
-        jsonErrors[0].detail == "error detail"
+
+        // List jsonErrors = parseJson(job.errorToString())
+        // jsonErrors.size() == 1
+        // jsonErrors[0].ok == false
+        // jsonErrors[0].status == 500
+        // jsonErrors[0].detail == "error detail"
 
     }
 

@@ -228,7 +228,7 @@ class SyncJobContext {
         }
         return message
     }
-    
+
     /**
      * called from createJob to set the payloads size. which is used to decide whether its stored at file or in db as bytes.
      */

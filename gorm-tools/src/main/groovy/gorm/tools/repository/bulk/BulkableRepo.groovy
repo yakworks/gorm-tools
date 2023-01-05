@@ -82,8 +82,8 @@ trait BulkableRepo<D> {
     Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs) {
         syncJobArgs.entityClass = getEntityClass()
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
-        Supplier supplierFunc = () -> doBulkParallel(dataList, jobContext)
-        return bulk(supplierFunc, jobContext)
+        Supplier doBulkFunc = () -> doBulkParallel(dataList, jobContext)
+        return bulk(doBulkFunc, jobContext)
     }
 
     /**
@@ -91,19 +91,19 @@ trait BulkableRepo<D> {
      * Each call creates a job that stores info for the call and is returned with results
      * if jobContext.args.promiseEnabled = true will return right away
      *
-     * @param supplierFunc the supplier(Promise) that gets passed to asyncService
+     * @param doBulkFunc the supplier(Promise) that gets passed to asyncService
      * @param jobContext the jobContext with jobId created
      * @return Job id
      */
-    Long bulk(Supplier supplierFunc, SyncJobContext jobContext ) {
+    Long bulk(Supplier doBulkFunc, SyncJobContext jobContext ) {
         def asyncArgs = new AsyncArgs(enabled: jobContext.args.promiseEnabled, session: true)
         // This is the promise call. Will return immediately is syncJobArgs.promiseEnabled=true
         asyncService
-            .supplyAsync(asyncArgs, supplierFunc)
+            .supplyAsync(asyncArgs, doBulkFunc)
             .whenComplete { res, ex ->
-                if(ex){ //should never really happen as we should have already handled any errors
+                if(ex){ //should never really happen as we should have already handled any errors in doBulkFunc
                     log.error("BulkableRepo unexpected exception", ex)
-                    jobContext.results << problemHandler.handleUnexpected(ex)
+                    jobContext.updateWithResult( problemHandler.handleUnexpected(ex) )
                 }
                 jobContext.finishJob()
             }
@@ -124,7 +124,7 @@ trait BulkableRepo<D> {
                 withTrx {
                     results = doBulk((List<Map>) dataSlice, jobContext.args)
                 }
-                if(results?.ok) updateJobResults(jobContext, results, startTime)
+                if(results?.ok) jobContext.updateJobResults(results, startTime, false)
                 // ((List<Map>) dataSlice)*.clear() //clear out so mem can be garbage collected
             } catch(Exception e) {
                 //on pass1 we collect the slices that failed and will run through them again with each item in its own trx
@@ -142,8 +142,7 @@ trait BulkableRepo<D> {
                 try {
                     Long startTime = System.currentTimeMillis()
                     ApiResults results = doBulk((List<Map>) dataSlice, jobContext.args, true)
-                    updateJobResults(jobContext, results, startTime)
-                    // ((List<Map>) dataSlice)*.clear() //clear out so mem can be garbage collected
+                    jobContext.updateJobResults(results, startTime, false)
                 } catch(Exception ex) {
                     log.error("BulkableRepo unexpected exception", ex)
                     // just in case, unexpected errors as we should have intercepted them all already in doBulk
@@ -253,22 +252,6 @@ trait BulkableRepo<D> {
     Map createMetaMap(D entityInstance, List<String> includes){
         MetaMap entityMapData = metaMapService.createMetaMap(entityInstance, includes)
         return (Map)entityMapData.clone()
-    }
-
-    /**
-     * calls jobContext.updateJobResults and swallows any unexpected exceptions
-     *
-     * @param jobContext the current jobContext
-     * @param results the results of the current slice
-     * @param startTimeMillis the start time in milliseconds used for logging elapsed time
-     */
-    void updateJobResults(SyncJobContext jobContext, ApiResults results, Long startTimeMillis = null){
-        try {
-            jobContext.updateJobResults(results, startTimeMillis)
-        } catch (e){
-            //ok to swallow thi excep since we dont want to disrupt the flow
-            log.error("Unexpected error during updateJobResults", e)
-        }
     }
 
     /**

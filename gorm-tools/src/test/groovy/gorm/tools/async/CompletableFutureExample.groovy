@@ -35,25 +35,27 @@ class CompletableFutureExample {
     }
 
     static String example1() {
-        CompletableFuture<String> supplyAsync = CompletableFuture.supplyAsync{ doSomeProcess() }
-        supplyAsync.exceptionally{ ex ->
-            println "exceptionally ex is $ex"
-        }
-        supplyAsync.handle{res, ex ->
-            println "handle res is $res"
-            println "handle ex is $ex"
-        }
-
-        supplyAsync.whenComplete{ res, ex ->
-            println "whenComplete res is $res"
-            println "whenComplete ex is $ex"
-        }
+        CompletableFuture supplyAsync = CompletableFuture
+            .supplyAsync( () -> doSomeProcess() )
+            // .exceptionally{ ex ->
+            //     println "exceptionally ex is $ex"
+            // }
+            .handle { res, ex ->
+                println "handle res is $res"
+                println "handle ex is $ex"
+            }
+            .thenAccept((res) -> println(" thenAccept $res ") )
+            // .whenComplete{ res, ex ->
+            //     println "whenComplete res is $res"
+            //     println "whenComplete ex is $ex"
+            // }
     }
 
     static String doSomeProcess() {
         println "doSomeProcess"
+        throw new RuntimeException('some exception')
         // throw new RuntimeException("Example Runtime Foo")
-        return "Hello World"
+        //return "Hello World"
         // return Promises.delay(1000, Math.random() > 0.5 ?
         //     Promise.of("Hello World") :
         //     Promise.ofException(new RuntimeException("Something went wrong")));

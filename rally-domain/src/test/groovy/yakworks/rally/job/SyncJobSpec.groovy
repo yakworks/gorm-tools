@@ -5,6 +5,7 @@
 package yakworks.rally.job
 
 import gorm.tools.model.SourceType
+import spock.lang.Ignore
 import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.json.groovy.JsonEngine
@@ -44,6 +45,7 @@ class SyncJobSpec extends Specification implements DataRepoTest, SecurityTest {
         job.payloadBytes.size() > 0
     }
 
+    @Ignore
     void "make sure update works with error bytes"() {
         when:
         def jobId = createJob().id

@@ -124,7 +124,7 @@ trait BulkableRepo<D> {
                 withTrx {
                     results = doBulk((List<Map>) dataSlice, jobContext.args)
                 }
-                if(results?.ok) updateJobResults(jobContext, results, startTime)
+                if(results?.ok) jobContext.updateJobResults(results, startTime, false)
                 // ((List<Map>) dataSlice)*.clear() //clear out so mem can be garbage collected
             } catch(Exception e) {
                 //on pass1 we collect the slices that failed and will run through them again with each item in its own trx
@@ -142,8 +142,7 @@ trait BulkableRepo<D> {
                 try {
                     Long startTime = System.currentTimeMillis()
                     ApiResults results = doBulk((List<Map>) dataSlice, jobContext.args, true)
-                    updateJobResults(jobContext, results, startTime)
-                    // ((List<Map>) dataSlice)*.clear() //clear out so mem can be garbage collected
+                    jobContext.updateJobResults(results, startTime, false)
                 } catch(Exception ex) {
                     log.error("BulkableRepo unexpected exception", ex)
                     // just in case, unexpected errors as we should have intercepted them all already in doBulk
@@ -253,22 +252,6 @@ trait BulkableRepo<D> {
     Map createMetaMap(D entityInstance, List<String> includes){
         MetaMap entityMapData = metaMapService.createMetaMap(entityInstance, includes)
         return (Map)entityMapData.clone()
-    }
-
-    /**
-     * calls jobContext.updateJobResults and swallows any unexpected exceptions
-     *
-     * @param jobContext the current jobContext
-     * @param results the results of the current slice
-     * @param startTimeMillis the start time in milliseconds used for logging elapsed time
-     */
-    void updateJobResults(SyncJobContext jobContext, ApiResults results, Long startTimeMillis = null){
-        try {
-            jobContext.updateJobResults(results, startTimeMillis)
-        } catch (e){
-            //ok to swallow thi excep since we dont want to disrupt the flow
-            log.error("Unexpected error during updateJobResults", e)
-        }
     }
 
     /**

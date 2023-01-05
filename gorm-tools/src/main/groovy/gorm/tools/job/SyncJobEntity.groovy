@@ -92,7 +92,7 @@ trait SyncJobEntity<D> implements SourceTrait {
     /**
      * if the errors are stored in the column this will be populated
      */
-    byte[] errorBytes
+    // byte[] errorBytes
 
     /**
      * The data is a response of resources that were successfully and unsuccessfully updated or created after processing.
@@ -107,9 +107,9 @@ trait SyncJobEntity<D> implements SourceTrait {
         return payloadBytes ? new String(payloadBytes, "UTF-8") : '[]'
     }
 
-    String errorToString(){
-        return errorBytes ? new String(errorBytes, "UTF-8") : '[]'
-    }
+    // String errorToString(){
+    //     return errorBytes ? new String(errorBytes, "UTF-8") : '[]'
+    // }
 
     static constraintsMap = [
         state:[ d: 'State of the job', nullable: false],

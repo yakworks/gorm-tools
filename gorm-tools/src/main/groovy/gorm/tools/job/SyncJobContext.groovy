@@ -121,19 +121,26 @@ class SyncJobContext {
      *
      * @param apiResults the ApiResults
      * @param startTimeMillis the start time in millis, used to deduce time elapsed
+     * @param throwEx if false then only does log.error and will not throw on an exception so flow is not disrupted if this flakes out
      */
-    void updateJobResults(ApiResults apiResults, Long startTimeMillis = null) {
-        if(!apiResults.ok) {
-            ok.set(false)
-            //if not ok then update the problemCount
-            problemCount.addAndGet(apiResults.getProblems().size())
+    void updateJobResults(ApiResults apiResults, Long startTimeMillis = null, boolean throwEx = true) {
+        try {
+            if(!apiResults.ok) {
+                ok.set(false)
+                //if not ok then update the problemCount
+                problemCount.addAndGet(apiResults.getProblems().size())
+            }
+            //increment the processedCount
+            processedCount.addAndGet(apiResults.list.size())
+
+            String message = getJobUpdateMessage(apiResults.ok, startTimeMillis)
+
+            updateJob(apiResults, [id: jobId, ok: ok.get(), message: message])
+        } catch (e) {
+            //ok to swallow this excep since we dont want to disrupt the flow
+            log.error("Unexpected error during updateJobResults", e)
+            if(throwEx) throw e
         }
-        //increment the processedCount
-        processedCount.addAndGet(apiResults.list.size())
-
-        String message = getJobUpdateMessage(apiResults.ok, startTimeMillis)
-
-        updateJob(apiResults, [id: jobId, ok: ok.get(), message: message])
     }
 
     /**
@@ -221,6 +228,7 @@ class SyncJobContext {
         }
         return message
     }
+    
     /**
      * called from createJob to set the payloads size. which is used to decide whether its stored at file or in db as bytes.
      */

@@ -45,6 +45,15 @@ class SyncJobRepo extends LongIdGormRepo<SyncJob> {
         }
     }
 
+    byte[] getPayload(SyncJob job){
+        if(job.payloadId){
+            def istream = attachmentRepo.get(job.payloadId).inputStream
+            return FileCopyUtils.copyToByteArray(istream)
+        } else {
+            return job.payloadBytes
+        }
+    }
+
     String dataToString(SyncJob job){
         job.dataId ? attachmentRepo.get(job.dataId).getText() : getJsonString(job.dataBytes)
     }

@@ -25,6 +25,10 @@ class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity<SyncJob>,  AuditStam
         getRepo().getData(this)
     }
 
+    byte[] getPayload(){
+        getRepo().getPayload(this)
+    }
+
     @Override
     String dataToString(){
         getRepo().dataToString(this)
@@ -45,5 +49,10 @@ class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity<SyncJob>,  AuditStam
     static mapping = {
         state column: 'state', enumType: 'identity'
     }
+
+    static constraintsMap = [
+        payload:[ d: 'The payload this job was sent to process'],
+        data: [d: 'The result data json, will normally be an array with items for errors.']
+    ]
 
 }

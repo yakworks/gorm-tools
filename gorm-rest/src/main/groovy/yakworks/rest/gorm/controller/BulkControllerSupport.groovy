@@ -17,7 +17,6 @@ import gorm.tools.job.SyncJobService
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.DataOp
-import grails.util.TypeConvertingMap
 import grails.web.servlet.mvc.GrailsParameterMap
 import yakworks.etl.csv.CsvToMapTransformer
 import yakworks.gorm.api.IncludesConfig
@@ -71,9 +70,13 @@ class BulkControllerSupport<D> {
         SyncJobArgs syncJobArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludes, errorIncludes: bulkErrorIncludes,
             sourceId: sourceKey, source: params.jobSource, params: params)
         //Can override payload storage or turn off with 'NONE' if not needed for big loads
+        syncJobArgs.asyncEnabled = params.boolean('asyncEnabled', true)
+        //promiseEnabled is false by default, when this is true then runs in background and returns job immediately.
         syncJobArgs.promiseEnabled = params.boolean('promiseEnabled', false)
+        //savePayload is true by default
         syncJobArgs.savePayload = params.boolean('savePayload', true)
-        syncJobArgs.saveDataAsFile = params.boolean('saveDataAsFile')
+        //data is always saved, but can force it be in a file if passes. will get set to true if payload.size() > 1000 no matter what is set
+        // syncJobArgs.saveDataAsFile = params.boolean('saveDataAsFile')
 
         Long jobId
         if(syncJobArgs.params.attachmentId) {
@@ -100,18 +103,21 @@ class BulkControllerSupport<D> {
      * @return the jobId
      */
     Long doBulkCsv(SyncJobArgs syncJobArgs){
-        if(!syncJobArgs.asyncEnabled == null) syncJobArgs.asyncEnabled  = true //enable by default
         //params will have already been set in syncJobArgs and for CSV we have different defaults
-        TypeConvertingMap params = syncJobArgs.params as TypeConvertingMap
+        Map params = syncJobArgs.params
         //default to true for CSV unless explicitely disabled in params
-        syncJobArgs.promiseEnabled = params.boolean('promiseEnabled', true)
-        //dont save payload by default, and if done, save to file not db.
-        syncJobArgs.savePayload = params.boolean('savePayload', false)
-        syncJobArgs.saveDataAsFile = params.boolean('saveDataAsFile', true)
+        syncJobArgs.promiseEnabled = params.getBoolean('promiseEnabled', true)
+        //dont save payload by default, but if its true then save to file not db.
+        // TODO above comment is not true, its setting saveDataAsFile not pload
+        syncJobArgs.savePayload = params.getBoolean('savePayload', false)
+        //always save the data as file and not in the syncJob row
+        //TODO why do we do this? why not let it be automated like elsewhere?
+        syncJobArgs.saveDataAsFile = params.getBoolean('saveDataAsFile', true)
 
         List<Map> dataList = transformCsvToBulkList(params)
         return getRepo().bulk(dataList, syncJobArgs)
     }
+
 
     /**
      * transform csv to list of maps using csvToMapTransformer.

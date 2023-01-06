@@ -6,7 +6,7 @@ package yakworks.rest.gorm.mapping
 
 import groovy.transform.CompileDynamic
 
-@SuppressWarnings(['Indentation'])
+@SuppressWarnings(['Indentation', 'UnnecessarySelfAssignment'])
 @CompileDynamic
 class UrlMappingsHelper {
     static String rootPath = '/api'
@@ -20,13 +20,13 @@ class UrlMappingsHelper {
         String apiPath = "${apiPathBase}/${ctrl}"
 
         Closure getPath = { String suffix ->
-            if(!suffix) suffix =''
+            if(!suffix) suffix = ''
             return "${apiPath}${suffix}(.$format)?"
         }
         if(baseResource){
             //override the getPath for nested.
             getPath = { String suffix ->
-                if(!suffix) suffix =''
+                if(!suffix) suffix = ''
                 //register the var
                 String entityIdWild = getProperty("${baseResource}Id")
                 String nestedPath = "${apiPathBase}/${baseResource}/${entityIdWild}/${ctrl}"

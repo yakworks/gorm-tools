@@ -4,28 +4,23 @@
 */
 package yakworks.rest.client
 
-import java.net.http.HttpClient
+
 import java.nio.charset.StandardCharsets
 import java.time.Duration
-import java.util.concurrent.TimeUnit
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.io.buffer.DefaultDataBufferFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.http.client.reactive.ClientHttpConnector
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
-import org.springframework.web.reactive.function.client.DefaultWebClient
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.util.UriUtils
 
-import reactor.core.publisher.Mono
 import reactor.netty.http.client.HttpClient
 import yakworks.commons.lang.EnumUtils
 import yakworks.json.groovy.JsonEngine

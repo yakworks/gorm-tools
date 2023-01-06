@@ -92,14 +92,14 @@ class SyncJobArgs {
 
     /**
      * Allows override for the default async from gorm.tools.async.enabled
-     * whether it should run async with a CompletableFuture and return the job immediately
-     * or run in a standard blocking synchronous
+     * This is passed to the ParallelTools when it slices and processes. if false then will not run in parallel and will be single threaded
+     * Not normally used unless for testing and debugging, or if encountering deadlocks.
      */
     Boolean asyncEnabled
 
     /**
-     * Whether it should run async with a CompletableFuture and return the job immediately
-     * or run in a standard blocking synchronous
+     * Whether it should run in asynchronous background thread with a CompletableFuture and return the job immediately.
+     * when false (default) run in a standard blocking synchronous thread and return when job is done
      */
     Boolean promiseEnabled = false
 

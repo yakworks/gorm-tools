@@ -1,7 +1,7 @@
 ---
 api:
   defaultPackage: yakworks.rally.api
-  namespaces: {rally: 'Core / Rally'}
+  namespaces: {'': 'Root', rally: 'Core / Rally'}
   paths:
     /kitchen:
       entityClass: yakworks.testing.gorm.model.KitchenSink

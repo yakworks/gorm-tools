@@ -95,31 +95,23 @@ class OpenApiGenerator implements ConfigAware {
 
     //iterate over the restapi keys and add setup the yaml
     void spinThroughRestApi(Map api, List namespaceList){
-        Map restApiPaths = apiConfig.paths.sort{ it.key }
-
         List tags = (List)api.tags
         Map<String, List> newTagGroups = [:]
 
         Map namespaces = apiConfig.namespaces ?: [:]
+        Map groupedPaths = apiConfig.paths.groupBy { it.value.namespace }
 
-        for(entry in restApiPaths){
-            // if(namespaces.containsKey(entry.key)){
-            //     String namespace = entry.key
-            //     if(namespaceList && !namespaceList.contains(namespace)) continue
-            //     for(epoint in (Map)entry.value){
-            //         String endpoint = (String)epoint.key
-            //         processEndpoint(api, endpoint, namespace, (Map)epoint.value, newTagGroups, tags)
-            //     }
-            // }
-            // else { //normal not namespaced or may have slash like 'foo/bar' as key
-            PathItem pathItem = (PathItem)entry.value
-            String endpoint = pathItem.name
-            String namespace = pathItem.namespace
-            if(namespace && namespaceList && !namespaceList.contains(namespace)) continue
-            processEndpoint(api, endpoint, namespace, pathItem, newTagGroups, tags)
-            //}
-
+        for(ns in namespaces){
+            Map sortedPathz = groupedPaths[ns.key].sort{ it.key }
+            for(entry in sortedPathz){
+                PathItem pathItem = (PathItem)entry.value
+                String endpoint = pathItem.name
+                String namespace = pathItem.namespace
+                if(namespace && namespaceList && !namespaceList.contains(namespace)) continue
+                processEndpoint(api, endpoint, namespace, pathItem, newTagGroups, tags)
+            }
         }
+
         api.tags = tags
 
         mergeTagGroups(api, namespaces, newTagGroups)

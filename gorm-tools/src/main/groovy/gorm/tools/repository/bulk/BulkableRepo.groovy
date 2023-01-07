@@ -115,7 +115,7 @@ trait BulkableRepo<D> {
         List<Collection<Map>> sliceErrors = Collections.synchronizedList([] as List<Collection<Map>> )
 
         AsyncArgs pconfig = AsyncArgs.of(getDatastore())
-        pconfig.enabled = jobContext.args.asyncEnabled //same as above, ability to override through params
+        pconfig.enabled = jobContext.args.parallel //same as above, ability to override through params
         // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
         parallelTools.eachSlice(pconfig, dataList) { dataSlice ->
             Long startTime = System.currentTimeMillis()
@@ -137,7 +137,7 @@ trait BulkableRepo<D> {
         // this time run each item in the slice in its own transaction
         if(sliceErrors.size()) {
             AsyncArgs asynArgsNoTrx = AsyncArgs.of(getDatastore())
-            asynArgsNoTrx.enabled = jobContext.args.asyncEnabled
+            asynArgsNoTrx.enabled = jobContext.args.parallel
             parallelTools.each(asynArgsNoTrx, sliceErrors) { dataSlice ->
                 try {
                     Long startTime = System.currentTimeMillis()

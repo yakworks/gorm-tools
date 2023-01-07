@@ -13,7 +13,6 @@ import spock.lang.Specification
 import testing.TestSyncJob
 import testing.TestSyncJobService
 import yakworks.commons.map.PathKeyMap
-import yakworks.meta.MetaMap
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.testing.gorm.model.SinkExt
@@ -30,7 +29,7 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
     @Autowired KitchenSinkRepo kitchenSinkRepo
 
     SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
-        return new SyncJobArgs(asyncEnabled: false, op: op, source: "test", sourceId: "test",
+        return new SyncJobArgs(parallel: false, op: op, source: "test", sourceId: "test",
             includes: ["id", "name", "ext.name"])
     }
 

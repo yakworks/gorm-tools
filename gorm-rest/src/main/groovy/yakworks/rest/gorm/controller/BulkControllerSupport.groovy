@@ -69,8 +69,9 @@ class BulkControllerSupport<D> {
 
         SyncJobArgs syncJobArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludes, errorIncludes: bulkErrorIncludes,
             sourceId: sourceKey, source: params.jobSource, params: params)
-        //Can override payload storage or turn off with 'NONE' if not needed for big loads
-        syncJobArgs.asyncEnabled = params.boolean('asyncEnabled', true)
+        //FIXME remove asyncEnabled once verified its not needed
+        if(params.asyncEnabled) syncJobArgs.parallel = params.boolean('asyncEnabled')
+        if(params.parallel) syncJobArgs.parallel = params.boolean('parallel')
         //promiseEnabled is false by default, when this is true then runs in background and returns job immediately.
         syncJobArgs.promiseEnabled = params.boolean('promiseEnabled', false)
         //savePayload is true by default

@@ -73,7 +73,7 @@ trait BulkableRepo<D> {
 
     /**
      * creates a supplier to wrap doBulkParallel and calls bulk
-     * if syncJobArgs.promiseEnabled = true will return right away
+     * if syncJobArgs.async = true will return right away
      *
      * @param dataList the list of data maps to create
      * @param syncJobArgs the args object to pass on to doBulk
@@ -89,15 +89,15 @@ trait BulkableRepo<D> {
     /**
      * Allows to pass in bulk of records at once, for example /api/book/bulk
      * Each call creates a job that stores info for the call and is returned with results
-     * if jobContext.args.promiseEnabled = true will return right away
+     * if jobContext.args.async = true will return right away
      *
      * @param doBulkFunc the supplier(Promise) that gets passed to asyncService
      * @param jobContext the jobContext with jobId created
      * @return Job id
      */
     Long bulk(Supplier doBulkFunc, SyncJobContext jobContext ) {
-        def asyncArgs = new AsyncArgs(enabled: jobContext.args.promiseEnabled, session: true)
-        // This is the promise call. Will return immediately is syncJobArgs.promiseEnabled=true
+        def asyncArgs = new AsyncArgs(enabled: jobContext.args.async, session: true)
+        // This is the promise call. Will return immediately if syncJobArgs.async=true
         asyncService
             .supplyAsync(asyncArgs, doBulkFunc)
             .whenComplete { res, ex ->

@@ -102,7 +102,7 @@ class SyncJobArgs {
      * Essentially makes the job a sort of Promise or Future.
      * when false (default) run in a standard blocking synchronous thread and return when job is done
      */
-    Boolean promiseEnabled = false
+    Boolean async = false
 
     /**
      * the args, such as flush:true etc.., to pass down to the repo methods

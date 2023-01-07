@@ -58,26 +58,8 @@ class BulkControllerSupport<D> {
     }
 
     SyncJobEntity process(DataOp dataOp, List<Map> dataList, GrailsWebRequest webRequest) {
-        // List dataList = bodyAsList() as List<Map>
-        HttpServletRequest req = webRequest.currentRequest
-        GrailsParameterMap params = webRequest.params
-        String sourceKey = "${req.method} ${req.requestURI}?${req.queryString}"
 
-        Map includesMap = includesConfig.getIncludes(entityClass)
-        List bulkIncludes = IncludesConfig.getFieldIncludes(includesMap, [IncludesKey.bulk.name()])
-        List bulkErrorIncludes = includesMap['bulkError'] as List<String>
-
-        SyncJobArgs syncJobArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludes, errorIncludes: bulkErrorIncludes,
-            sourceId: sourceKey, source: params.jobSource, params: params)
-        //FIXME remove asyncEnabled once verified its not needed
-        if(params.asyncEnabled) syncJobArgs.parallel = params.boolean('asyncEnabled')
-        if(params.parallel) syncJobArgs.parallel = params.boolean('parallel')
-        //promiseEnabled is false by default, when this is true then runs in background and returns job immediately.
-        syncJobArgs.promiseEnabled = params.boolean('promiseEnabled', false)
-        //savePayload is true by default
-        syncJobArgs.savePayload = params.boolean('savePayload', true)
-        //data is always saved, but can force it be in a file if passes. will get set to true if payload.size() > 1000 no matter what is set
-        // syncJobArgs.saveDataAsFile = params.boolean('saveDataAsFile')
+        SyncJobArgs syncJobArgs = setupSyncJobArgs(dataOp, webRequest)
 
         Long jobId
         if(syncJobArgs.params.attachmentId) {
@@ -107,7 +89,9 @@ class BulkControllerSupport<D> {
         //params will have already been set in syncJobArgs and for CSV we have different defaults
         Map params = syncJobArgs.params
         //default to true for CSV unless explicitely disabled in params
-        syncJobArgs.promiseEnabled = params.getBoolean('promiseEnabled', true)
+        syncJobArgs.async = params.getBoolean('async', true)
+        //TODO support for legacy param, remove once we know no one is using it
+        if(params.promiseEnabled != null) syncJobArgs.async = params.getBoolean('promiseEnabled', true)
         //dont save payload by default, but if its true then save to file not db.
         // TODO above comment is not true, its setting saveDataAsFile not pload
         syncJobArgs.savePayload = params.getBoolean('savePayload', false)
@@ -117,6 +101,42 @@ class BulkControllerSupport<D> {
 
         List<Map> dataList = transformCsvToBulkList(params)
         return getRepo().bulk(dataList, syncJobArgs)
+    }
+
+    /**
+     * sets up the SyncJobArgs from whats passed in from params
+     */
+    SyncJobArgs setupSyncJobArgs(DataOp dataOp, GrailsWebRequest webRequest){
+        HttpServletRequest req = webRequest.currentRequest
+        GrailsParameterMap params = webRequest.params
+        String sourceKey = "${req.method} ${req.requestURI}?${req.queryString}"
+
+        Map includesMap = includesConfig.getIncludes(entityClass)
+        List bulkIncludes = IncludesConfig.getFieldIncludes(includesMap, [IncludesKey.bulk.name()])
+        List bulkErrorIncludes = includesMap['bulkError'] as List<String>
+
+        SyncJobArgs syncJobArgs = new SyncJobArgs(
+            op: dataOp,
+            includes: bulkIncludes,
+            errorIncludes: bulkErrorIncludes,
+            sourceId: sourceKey,
+            source: params.jobSource,
+            params: params
+        )
+
+        //FIXME remove asyncEnabled once verified its not needed
+        if(params.asyncEnabled != null) syncJobArgs.parallel = params.boolean('asyncEnabled')
+        if(params.parallel != null) syncJobArgs.parallel = params.boolean('parallel')
+        //async is false by default, when this is true then runs "non-blocking" in background and will job immediately with state=running
+        if(params.async != null) syncJobArgs.async = params.boolean('async')
+        //TODO support for legacy param, remove once we know no one is using it
+        if(params.promiseEnabled != null) syncJobArgs.async = params.boolean('promiseEnabled')
+
+        //savePayload is true by default
+        if(params.savePayload != null) syncJobArgs.savePayload = params.boolean('savePayload')
+        //data is always saved, but can force it be in a file if passes. will get set to true if payload.size() > 1000 no matter what is set
+        // syncJobArgs.saveDataAsFile = params.boolean('saveDataAsFile')
+        return syncJobArgs
     }
 
 

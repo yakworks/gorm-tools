@@ -98,17 +98,7 @@ trait BulkableRepo<D> {
     Long bulk(Supplier doBulkFunc, SyncJobContext jobContext ) {
         def asyncArgs = new AsyncArgs(enabled: jobContext.args.async, session: true)
         // This is the promise call. Will return immediately if syncJobArgs.async=true
-        asyncService
-            .supplyAsync(asyncArgs, doBulkFunc)
-            .whenComplete { res, ex ->
-                if(ex){ //should never really happen as we should have already handled any errors in doBulkFunc
-                    log.error("BulkableRepo unexpected exception", ex)
-                    jobContext.updateWithResult( problemHandler.handleUnexpected(ex) )
-                }
-                jobContext.finishJob()
-            }
-
-        return jobContext.jobId
+        return asyncService.runJob(asyncArgs, jobContext, doBulkFunc)
     }
 
     void doBulkParallel(List<Map> dataList, SyncJobContext jobContext){

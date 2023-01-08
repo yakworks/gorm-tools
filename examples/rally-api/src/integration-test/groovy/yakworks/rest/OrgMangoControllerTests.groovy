@@ -34,6 +34,24 @@ class OrgMangoControllerTests extends RestIntTest {
         data[1]['calc_totalDue'] < data[2]['calc_totalDue']
     }
 
+    void "list mango full monty"() {
+        when:
+        controller.params << [
+            projections:'"calc.totalDue as Balance":"sum","calc.totalDue as MaxDue":"max","type":"group"',
+            sort:'Balance:asc'
+        ]
+        controller.list()
+        Map body = response.bodyToMap()
+        List data = body.data
+
+        then:
+        response.status == 200
+        data.size() == 5
+        data[0].type.name == 'Client'
+        data[0]['Balance'] < data[1]['Balance']
+        data[1]['Balance'] < data[2]['Balance']
+    }
+
     void "paging in projections "() {
         when:
         controller.params << [

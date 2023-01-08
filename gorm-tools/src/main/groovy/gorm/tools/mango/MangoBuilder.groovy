@@ -119,6 +119,14 @@ class MangoBuilder {
                 criteria.sum(k)
             } else if (v == 'group'){
                 criteria.groupBy(k)
+            } else if (v == 'avg'){
+                criteria.avg(k)
+            } else if (v == 'count'){
+                criteria.countDistinct(k)
+            } else if (v == 'min'){
+                criteria.min(k)
+            } else if (v == 'max'){
+                criteria.max(k)
             }
         }
     }

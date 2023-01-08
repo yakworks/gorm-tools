@@ -19,6 +19,7 @@ import org.springframework.core.convert.ConversionService
 import org.springframework.core.convert.support.GenericConversionService
 import org.springframework.dao.InvalidDataAccessResourceUsageException
 
+import gorm.tools.mango.MangoDetachedCriteria
 import grails.gorm.DetachedCriteria
 
 /**
@@ -62,6 +63,7 @@ class JpqlQueryBuilder {
     boolean hibernateCompatible
     boolean aliasToMap
     Map<String, String> projectionAliases = [:]
+    Map<String, String> propertyAliases = [:]
 
     List<String> groupByList = []
 
@@ -103,11 +105,12 @@ class JpqlQueryBuilder {
     }
 
 
-    static JpqlQueryBuilder of(DetachedCriteria crit){
+    static JpqlQueryBuilder of(MangoDetachedCriteria crit){
         def jqb = new JpqlQueryBuilder(crit.persistentEntity, crit.criteria)
         jqb.initHandlers()
         List<Query.Criterion> criteria = crit.getCriteria()
         jqb.criteria = new Query.Conjunction(criteria)
+        jqb.propertyAliases = crit.propertyAliases
 
         List<Query.Projection> projections = crit.getProjections()
         for (Query.Projection projection : projections) {
@@ -216,7 +219,7 @@ class JpqlQueryBuilder {
     }
 
     void appendAlias( StringBuilder queryString, String projField, String name, String append){
-        String propalias = name.replace('.', '_')
+        String propalias = propertyAliases.containsKey(name) ? propertyAliases[name] : name.replace('.', '_')
         propalias = "${propalias}${append}"
         queryString
             .append(projField)

@@ -19,6 +19,10 @@ check: lint
 	# $(gradlew) check --max-workers=3
 	$(gradlew) check
 
+clean.all:
+	rm -rf .build-cache/
+	$(MAKE) clean
+
 # should run vault.decrypt before this,
 # sets up github, kubernetes and docker login
 # sets up github, kubernetes and docker login, commented out # kubectl.config dockerhub.login

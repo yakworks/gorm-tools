@@ -1,8 +1,10 @@
 package gorm.tools.mango.jpql
 
+import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.jpql.JpqlQueryBuilder
 import spock.lang.IgnoreRest
 import spock.lang.Specification
+import testing.Cust
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.unit.GormHibernateTest
 
@@ -151,6 +153,34 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         HAVING (SUM(kitchenSink.sinkLink.amount) < :p4)
         ORDER BY sinkLink_amount ASC''')
         queryInfo.paramMap == [p1: 1, p2: 2, p3: true, p4: 100]
+    }
+
+    void "Test projections simple with aliases"() {
+        given:"Some criteria"
+        def criteria = KitchenSink.query {
+            sum('amount as x')
+            groupBy('kind as y')
+            groupBy("ext.name as name")
+        }
+
+        when:"A jpa query is built"
+        def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
+        def queryInfo = builder.buildSelect()
+        def query = queryInfo.query
+
+        then:"The query is valid"
+        query != null
+        query == strip("""\
+        SELECT new map( SUM(kitchenSink.amount) as x,kitchenSink.kind as y,kitchenSink.ext.name as name )
+        FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
+        GROUP BY kitchenSink.kind,kitchenSink.ext.name
+        """)
+        //
+        // when:
+        // List res = KitchenSink.executeQuery(query)
+        //
+        // then:
+        // res.size() == 2
     }
 
 }

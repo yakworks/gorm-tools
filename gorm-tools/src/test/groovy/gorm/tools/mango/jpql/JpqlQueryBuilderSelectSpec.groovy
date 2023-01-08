@@ -183,4 +183,34 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         // res.size() == 2
     }
 
+    void "Test projections with others"() {
+        given:"Some criteria"
+        def criteria = KitchenSink.query {
+            max('amount as maxam')
+            min('amount as minam')
+            avg('amount as avgam')
+            groupBy('kind as y')
+            groupBy("ext.name as name")
+        }
+
+        when:"A jpa query is built"
+        def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
+        def queryInfo = builder.buildSelect()
+        def query = queryInfo.query
+
+        then:"The query is valid"
+        query != null
+        query == strip("""\
+        SELECT new map( MAX(kitchenSink.amount) as maxam,MIN(kitchenSink.amount) as minam,AVG(kitchenSink.amount) as avgam,kitchenSink.kind as y,kitchenSink.ext.name as name )
+        FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
+        GROUP BY kitchenSink.kind,kitchenSink.ext.name
+        """)
+        //
+        // when:
+        // List res = KitchenSink.executeQuery(query)
+        //
+        // then:
+        // res.size() == 2
+    }
+
 }

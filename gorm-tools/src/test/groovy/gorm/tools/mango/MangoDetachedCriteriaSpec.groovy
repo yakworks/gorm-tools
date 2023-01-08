@@ -17,13 +17,13 @@ class MangoDetachedCriteriaSpec extends Specification implements GormHibernateTe
     void "parse parseAlias"() {
         when:
         def crit = new MangoDetachedCriteria(KitchenSink)
-        def prop = crit.parseAlias(" foo.x as  bar ")
+        def prop = crit.parseAlias(" foo.x as  bar ", "")
         then:
         prop == "foo.x"
-        crit.propertyAliases["foo.x"] == "bar"
+        crit.propertyAliases["_foo.x"] == "bar"
 
         when:
-        prop = crit.parseAlias("foo.x")
+        prop = crit.parseAlias("foo.x", "")
         then:
         prop == "foo.x"
     }

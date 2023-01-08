@@ -165,7 +165,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      */
     @Override
     MangoDetachedCriteria<T> sum(String property) {
-        property = parseAlias(property)
+        property = parseAlias(property, "SUM")
         ensureAliases(property)
         projectionList.sum(property)
         return this
@@ -178,7 +178,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      */
     @Override
     MangoDetachedCriteria<T> avg(String property) {
-        property = parseAlias(property)
+        property = parseAlias(property, "AVG")
         ensureAliases(property)
         projectionList.avg(property)
         return this
@@ -186,7 +186,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
     @Override
     MangoDetachedCriteria<T> min(String property) {
-        property = parseAlias(property)
+        property = parseAlias(property, "MIN")
         ensureAliases(property)
         projectionList.min(property)
         return this
@@ -194,7 +194,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
     @Override
     MangoDetachedCriteria<T> max(String property) {
-        property = parseAlias(property)
+        property = parseAlias(property, "MAX")
         ensureAliases(property)
         projectionList.max(property)
         return this
@@ -207,7 +207,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      * @return This criteria instance
      */
     MangoDetachedCriteria<T> groupBy(String property) {
-        property = parseAlias(property)
+        property = parseAlias(property, "")
         ensureAliases(property)
         projectionList.groupProperty(property)
         return this
@@ -220,7 +220,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      * @return This criteria instance
      */
     MangoDetachedCriteria<T> countDistinct(String property) {
-        property = parseAlias(property)
+        property = parseAlias(property, "COUNT")
         ensureAliases(property)
         projectionList.countDistinct(property)
         return this
@@ -415,12 +415,13 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         }
     }
 
-    String parseAlias(String p) {
+    String parseAlias(String p, String key) {
         String prop = p.trim()
         if(!prop.contains(" as ")) return p
         String[] parts = prop.split(/\sas\s/)
         p = parts[0].trim()
-        propertyAliases[p] = parts[1].trim()
+        String aliasKey = "${key}_${p}"
+        propertyAliases[aliasKey] = parts[1].trim()
         return p
     }
 

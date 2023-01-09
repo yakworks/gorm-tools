@@ -15,6 +15,8 @@ import org.grails.datastore.mapping.core.Datastore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.TransactionStatus
 
+import gorm.tools.job.SyncJobContext
+import gorm.tools.problem.ProblemHandler
 import gorm.tools.transaction.TrxService
 import grails.persistence.support.PersistenceContextInterceptor
 import yakworks.gorm.config.AsyncConfig
@@ -37,6 +39,8 @@ class AsyncService {
     @Autowired
     TrxService trxService
 
+    @Autowired
+    ProblemHandler problemHandler
     // static cheater to get the bean, use sparingly if at all
     // static AsyncService getBean(){
     //     AppCtx.get('asyncService', this)
@@ -208,4 +212,27 @@ class AsyncService {
         return newcon
     }
 
+    /**
+     * Standard pattern to run a function asynchrons (assuming asyncArgs is setup that way).
+     * Will call the finish job when its done.  Supplier can be anything really.
+     * @param asyncArgs the async args to pass to supplyAsync
+     * @param jobContext the active jobContext
+     * @param supplier the supplier function to run
+     * @return the job id from the jobContext.jobId
+     */
+    Long runJob(AsyncArgs asyncArgs, SyncJobContext jobContext, Supplier supplier) {
+        //process each glbatch in async
+        this
+            .supplyAsync(asyncArgs, supplier)
+            .whenComplete { res, ex ->
+                if (ex) {
+                    //ideally should not happen as the pattern here is that all exceptions should be handled in supplierFunc
+                    log.error("runJob unexpected exception in supplyAsync", ex)
+                    jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
+                }
+                jobContext.finishJob()
+            }
+
+        return jobContext.jobId
+    }
 }

@@ -227,7 +227,7 @@ class AsyncService {
             .whenComplete { res, ex ->
                 if (ex) {
                     //ideally should not happen as the pattern here is that all exceptions should be handled in supplierFunc
-                    log.error("unexpected exception", ex)
+                    log.error("runJob unexpected exception in supplyAsync", ex)
                     jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
                 }
                 jobContext.finishJob()

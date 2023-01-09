@@ -203,9 +203,10 @@ class SyncJobContext {
                     detail: r.detail,
                 ])
                 if(r.violations) map["errors"] = r.violations //put errors only if violations are not empty
-            } else {
-                map.data = r.payload as Map
             }
+            // else {
+            //     map.data = r.payload as Map
+            // }
             ret << map
         }
         return ret

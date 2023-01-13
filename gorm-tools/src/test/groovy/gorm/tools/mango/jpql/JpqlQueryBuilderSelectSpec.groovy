@@ -124,6 +124,28 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         queryInfo.paramMap == [p1: 100.0]
     }
 
+    void "projections having with alias"() {
+        given:
+        def criteria = KitchenSink.query("createdByJobId":1)
+            .groupBy('sinkLink.createdByJobId as createdByJobId')
+            .groupBy("kind")
+
+
+        when:
+        def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
+        def queryInfo = builder.buildSelect()
+        def query = queryInfo.query
+
+        then:
+        query.trim() == strip("""
+        SELECT new map( kitchenSink.sinkLink.createdByJobId as createdByJobId,kitchenSink.kind as kind )
+        FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
+        GROUP BY kitchenSink.sinkLink.createdByJobId,kitchenSink.kind
+        HAVING (kitchenSink.sinkLink.createdByJobId=:p1)
+        """)
+        queryInfo.paramMap == [p1: 1]
+    }
+
     void "projections having criteria map"() {
         given: "Some criteria"
 

@@ -145,7 +145,7 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
     }
 
     @PendingFeature
-    void "criteria restriction projections projection property with alias"() {
+    void "criteria restriction on projection property with alias"() {
         given:
         def criteria = KitchenSink.query("sinkLink.createdByJobId":1)
             .groupBy('sinkLink.createdByJobId as createdByJobId')

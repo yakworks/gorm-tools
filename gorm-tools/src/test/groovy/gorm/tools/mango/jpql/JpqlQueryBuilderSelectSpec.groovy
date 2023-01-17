@@ -1,10 +1,8 @@
 package gorm.tools.mango.jpql
 
 import gorm.tools.mango.MangoDetachedCriteria
-import gorm.tools.mango.jpql.JpqlQueryBuilder
-import spock.lang.IgnoreRest
+import spock.lang.PendingFeature
 import spock.lang.Specification
-import testing.Cust
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.unit.GormHibernateTest
 
@@ -142,6 +140,25 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
         GROUP BY kitchenSink.sinkLink.createdByJobId,kitchenSink.kind
         HAVING (kitchenSink.sinkLink.createdByJobId=:p1)
+        """)
+        queryInfo.paramMap == [p1: 1]
+    }
+
+    @PendingFeature
+    //verify, that when we have a restriction on an alias - eg link.createdByJobId instead of sinkLink.createdByJobId
+    void "criteria restriction on alias"() {
+        given:
+        MangoDetachedCriteria criteria = KitchenSink.query("link.createdByJobId":1)
+        criteria.createAlias("sinkLink", "link")
+
+        when:
+        def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
+        def queryInfo = builder.buildSelect()
+        def query = queryInfo.query
+
+        then:
+        query.trim() == strip("""
+            SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE (kitchenSink.sinkLink.createdByJobId=:p1)
         """)
         queryInfo.paramMap == [p1: 1]
     }

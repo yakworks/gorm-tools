@@ -58,6 +58,17 @@ trait QueryMangoEntityApi<D> {
     }
 
     /**
+     * Queries a single instance based on the criteria and criteria closure
+
+     * @param params  mango language criteria map
+     * @param closure additional restriction for criteria
+     * @return instance
+     */
+    D find(Map params = [:], @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
+        MangoDetachedCriteria<D> dcrit = query(params, closure)
+        return dcrit.get()
+    }
+    /**
      * List of entities restricted by mango map and criteria closure
      *
      * @param params mango language criteria map

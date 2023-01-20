@@ -73,7 +73,7 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
 
         then:
         SyncJob job = SyncJob.get(jobContext.jobId)
-        job.errorBytes
+        job.problemsBytes
     }
 
     void "test update job and save data to file generates valid json"() {
@@ -173,7 +173,7 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         jsonData.size() == 2
         jsonData[0] == ['boo':'foo']
 
-        List jsonErrors = parseJson(job.errorToString())
+        List jsonErrors = parseJson(job.problemsToString())
         jsonErrors.size() == 1
         jsonErrors[0].ok == false
         jsonErrors[0].status == 400

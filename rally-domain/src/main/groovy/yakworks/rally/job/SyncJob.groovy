@@ -35,7 +35,7 @@ class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity<SyncJob>,  AuditStam
     }
 
      @Override
-     String errorToString(){
+     String problemsToString(){
          getRepo().errorToString(this)
      }
 

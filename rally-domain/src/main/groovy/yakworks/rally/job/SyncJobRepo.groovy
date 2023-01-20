@@ -63,7 +63,7 @@ class SyncJobRepo extends LongIdGormRepo<SyncJob> {
     }
 
      String errorToString(SyncJob job){
-         getJsonString(job.errorBytes)
+         getJsonString(job.problemsBytes)
      }
 
     String getJsonString(byte[] bytes){

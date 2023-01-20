@@ -9,65 +9,65 @@ import groovy.transform.CompileStatic
 @CompileStatic
 trait BaseArScoreCard {
 
-    BigDecimal aging1
-    BigDecimal aging2
-    BigDecimal aging3
-    BigDecimal aging4
-    BigDecimal aging5
-    BigDecimal aging6
-    BigDecimal aging7
-    BigDecimal aging8
-    BigDecimal aging9
-    BigDecimal aging10
+    BigDecimal aging1 = BigDecimal.ZERO
+    BigDecimal aging2 = BigDecimal.ZERO
+    BigDecimal aging3 = BigDecimal.ZERO
+    BigDecimal aging4 = BigDecimal.ZERO
+    BigDecimal aging5 = BigDecimal.ZERO
+    BigDecimal aging6 = BigDecimal.ZERO
+    BigDecimal aging7 = BigDecimal.ZERO
+    BigDecimal aging8 = BigDecimal.ZERO
+    BigDecimal aging9 = BigDecimal.ZERO
+    BigDecimal aging10 = BigDecimal.ZERO
 
     //Performance metrics /KPI's
-    BigDecimal avgDaysBt //avg days paid late / avg days beyond terms
-    BigDecimal adp // avg days to pay
-    BigDecimal adpWtd // weighted average days to pay
-    BigDecimal cei //collection effectiveness index
-    BigDecimal ddo //days deductions and disputes outstanding
-    BigDecimal dso //day sales outstanding
-    BigDecimal dsoad // DSO add back
-    BigDecimal dsobp //DSO best possible
-    BigDecimal dso12 //DSO using the last 12 month average
+    BigDecimal avgDaysBt = BigDecimal.ZERO //avg days paid late / avg days beyond terms
+    BigDecimal adp = BigDecimal.ZERO // avg days to pay
+    BigDecimal adpWtd = BigDecimal.ZERO // weighted average days to pay
+    BigDecimal cei = BigDecimal.ZERO //collection effectiveness index
+    BigDecimal ddo = BigDecimal.ZERO //days deductions and disputes outstanding
+    BigDecimal dso = BigDecimal.ZERO //day sales outstanding
+    BigDecimal dsoad = BigDecimal.ZERO // DSO add back
+    BigDecimal dsobp = BigDecimal.ZERO //DSO best possible
+    BigDecimal dso12 = BigDecimal.ZERO //DSO using the last 12 month average
 
     String glPostPeriod
 
     //balance due fields
-    BigDecimal curBal // whats not due yet
-    BigDecimal maxDue // max totalDue in this month and last 12 months
-    String maxDuePer // period the highest balance occured in the last 12 months
-    BigDecimal pastDue //balance past due
-    BigDecimal totalDue // total due, sum of all open items. will be the ending balance when month is closed
+    BigDecimal curBal = BigDecimal.ZERO // whats not due yet
+    BigDecimal maxDue = BigDecimal.ZERO // max totalDue in this month and last 12 months
+    String maxDuePer = BigDecimal.ZERO // period the highest balance occured in the last 12 months
+    BigDecimal pastDue = BigDecimal.ZERO //balance past due
+    BigDecimal totalDue = BigDecimal.ZERO // total due, sum of all open items. will be the ending balance when month is closed
 
     //sales trending
-    BigDecimal grossProfit// gross profit
-    BigDecimal grossProfitPct// gross profit percent
-    BigDecimal salesRolling12
+    BigDecimal grossProfit = BigDecimal.ZERO// gross profit
+    BigDecimal grossProfitPct = BigDecimal.ZERO// gross profit percent
+    BigDecimal salesRolling12 = BigDecimal.ZERO
     // rolling 12 months of sales, TODO does this include current period?, is this just invoices?
-    BigDecimal salesYtd //YTD sales
+    BigDecimal salesYtd = BigDecimal.ZERO //YTD sales
 
     //open trans docType
-    BigDecimal openCM
-    BigDecimal openDD
-    BigDecimal openDM
-    BigDecimal openIN
-    BigDecimal openPA
+    BigDecimal openCM = BigDecimal.ZERO
+    BigDecimal openDD = BigDecimal.ZERO
+    BigDecimal openDM = BigDecimal.ZERO
+    BigDecimal openIN = BigDecimal.ZERO
+    BigDecimal openPA = BigDecimal.ZERO
     //openTotal is the same as totalDue
 
     //Roll forward measures
-    BigDecimal beginBal //totalDue from prior period
+    BigDecimal beginBal = BigDecimal.ZERO //totalDue from prior period
     //created trans
-    BigDecimal newCM
-    BigDecimal newDD
-    BigDecimal newDM
-    BigDecimal newIN
-    BigDecimal newPA
-    BigDecimal newTotal //shortcut calc for the sum of the above
+    BigDecimal newCM = BigDecimal.ZERO
+    BigDecimal newDD = BigDecimal.ZERO
+    BigDecimal newDM = BigDecimal.ZERO
+    BigDecimal newIN = BigDecimal.ZERO
+    BigDecimal newPA = BigDecimal.ZERO
+    BigDecimal newTotal = BigDecimal.ZERO //shortcut calc for the sum of the above
 
     //adjustments. used for roll forward
-    BigDecimal adjusterAmt //the sum of origAmount of the ArAdjust.arTran
-    BigDecimal adjustedTotal //the sum of arAdjustLine.amount
+    BigDecimal adjusterAmt = BigDecimal.ZERO //the sum of origAmount of the ArAdjust.arTran
+    BigDecimal adjustedTotal = BigDecimal.ZERO //the sum of arAdjustLine.amount
     /* maybe for future?
     BigDecimal adjustedCM
     BigDecimal adjustedDD
@@ -77,12 +77,12 @@ trait BaseArScoreCard {
     */
 
     //flex fields for other open stats
-    BigDecimal num1
-    BigDecimal num2
-    BigDecimal num3
-    BigDecimal num4
-    BigDecimal num5
-    BigDecimal num6
+    BigDecimal num1 = BigDecimal.ZERO
+    BigDecimal num2 = BigDecimal.ZERO
+    BigDecimal num3 = BigDecimal.ZERO
+    BigDecimal num4 = BigDecimal.ZERO
+    BigDecimal num5 = BigDecimal.ZERO
+    BigDecimal num6 = BigDecimal.ZERO
 
     static constraintsMap = [
         aging1: [d: 'Aging bucket 1', format: 'money'],
@@ -112,7 +112,6 @@ trait BaseArScoreCard {
         dsoad: [d: 'DSO add back', format: 'decimal(9,1)'],
         dsobp: [d: 'DSO best possible', format: 'decimal(9,1)'],
         dso12: [d: 'DSO using the last 12 month average', format: 'decimal(9,1)'],
-
     ]
 
 }

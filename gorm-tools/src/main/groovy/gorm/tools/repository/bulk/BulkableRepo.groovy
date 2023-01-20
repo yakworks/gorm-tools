@@ -4,7 +4,6 @@
 */
 package gorm.tools.repository.bulk
 
-import java.util.function.Supplier
 
 import groovy.transform.CompileStatic
 
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
 import gorm.tools.async.AsyncArgs
-import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
@@ -50,9 +48,6 @@ trait BulkableRepo<D> {
     ParallelTools parallelTools
 
     @Autowired
-    AsyncService asyncService
-
-    @Autowired
     MetaMapService metaMapService
 
     @Autowired
@@ -82,23 +77,10 @@ trait BulkableRepo<D> {
     Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs) {
         syncJobArgs.entityClass = getEntityClass()
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
-        Supplier doBulkFunc = () -> doBulkParallel(dataList, jobContext)
-        return bulk(doBulkFunc, jobContext)
-    }
-
-    /**
-     * Allows to pass in bulk of records at once, for example /api/book/bulk
-     * Each call creates a job that stores info for the call and is returned with results
-     * if jobContext.args.async = true will return right away
-     *
-     * @param doBulkFunc the supplier(Promise) that gets passed to asyncService
-     * @param jobContext the jobContext with jobId created
-     * @return Job id
-     */
-    Long bulk(Supplier doBulkFunc, SyncJobContext jobContext ) {
-        def asyncArgs = new AsyncArgs(enabled: jobContext.args.async, session: true)
+        //FIXME why are we setting session: true here? explain. should it be default?
+        def asyncArgs = jobContext.args.asyncArgs.session(true)
         // This is the promise call. Will return immediately if syncJobArgs.async=true
-        return asyncService.runJob(asyncArgs, jobContext, doBulkFunc)
+        return syncJobService.runJob(asyncArgs, jobContext, () -> doBulkParallel(dataList, jobContext))
     }
 
     void doBulkParallel(List<Map> dataList, SyncJobContext jobContext){
@@ -108,13 +90,12 @@ trait BulkableRepo<D> {
         pconfig.enabled = jobContext.args.parallel //same as above, ability to override through params
         // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
         parallelTools.eachSlice(pconfig, dataList) { dataSlice ->
-            Long startTime = System.currentTimeMillis()
             ApiResults results
             try {
                 withTrx {
                     results = doBulk((List<Map>) dataSlice, jobContext.args)
                 }
-                if(results?.ok) jobContext.updateJobResults(results, startTime, false)
+                if(results?.ok) jobContext.updateJobResults(results, false)
                 // ((List<Map>) dataSlice)*.clear() //clear out so mem can be garbage collected
             } catch(Exception e) {
                 //on pass1 we collect the slices that failed and will run through them again with each item in its own trx
@@ -130,9 +111,8 @@ trait BulkableRepo<D> {
             asynArgsNoTrx.enabled = jobContext.args.parallel
             parallelTools.each(asynArgsNoTrx, sliceErrors) { dataSlice ->
                 try {
-                    Long startTime = System.currentTimeMillis()
                     ApiResults results = doBulk((List<Map>) dataSlice, jobContext.args, true)
-                    jobContext.updateJobResults(results, startTime, false)
+                    jobContext.updateJobResults(results, false)
                 } catch(Exception ex) {
                     log.error("BulkableRepo unexpected exception", ex)
                     jobContext.updateWithResult(problemHandler.handleUnexpected(ex))

@@ -10,6 +10,7 @@ import groovy.transform.ToString
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
+import gorm.tools.async.AsyncArgs
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp
 
@@ -145,5 +146,8 @@ class SyncJobArgs {
         new SyncJobArgs(args)
     }
 
+    AsyncArgs getAsyncArgs() {
+        return new AsyncArgs(enabled: async)
+    }
 
 }

@@ -7,8 +7,6 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import groovy.json.JsonException
 import groovy.json.JsonSlurper
-
-import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.api.ApiResults
 import yakworks.api.Result
@@ -153,7 +151,7 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
     def "test finish job"() {
         given:
         List payload = [1,2,3,4]
-        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', saveErrorsSeparate: true)
+        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', useErrorsField: true)
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, payload)
 
         def okResults = ApiResults.OK()

@@ -180,8 +180,8 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
          List jsonErrors = parseJson(job.errorToString())
          jsonErrors.size() == 1
          jsonErrors[0].ok == false
-         jsonErrors[0].status == 500
-         jsonErrors[0].detail == "error detail"
+         jsonErrors[0].status == 400
+         jsonErrors[0].title == "Oops"
     }
 
 }

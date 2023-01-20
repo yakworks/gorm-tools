@@ -148,10 +148,10 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
 
     }
 
-    def "test finish job"() {
+    def "test finish job dataFormat is Payload"() {
         given:
         List payload = [1,2,3,4]
-        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', useErrorsField: true)
+        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', dataFormat: SyncJobArgs.DataFormat.Payload)
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, payload)
 
         def okResults = ApiResults.OK()
@@ -171,15 +171,13 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
 
 
         jsonData.size() == 2
-        jsonData[0].ok == true
-        jsonData[0].status == 200
-        jsonData[0].data == ['boo':'foo']
+        jsonData[0] == ['boo':'foo']
 
-         List jsonErrors = parseJson(job.errorToString())
-         jsonErrors.size() == 1
-         jsonErrors[0].ok == false
-         jsonErrors[0].status == 400
-         jsonErrors[0].title == "Oops"
+        List jsonErrors = parseJson(job.errorToString())
+        jsonErrors.size() == 1
+        jsonErrors[0].ok == false
+        jsonErrors[0].status == 400
+        jsonErrors[0].title == "Oops"
     }
 
 }

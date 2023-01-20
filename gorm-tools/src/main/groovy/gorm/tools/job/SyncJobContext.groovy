@@ -29,6 +29,8 @@ import yakworks.json.groovy.JsonStreaming
 import yakworks.message.spi.MsgService
 import yakworks.spring.AppCtx
 
+import static gorm.tools.job.SyncJobArgs.DataFormat
+
 /**
  * Holds the basic state and primary action methods for a Bulk job.
  * Creates and updates the job status as it progresses and finalizes its results when finished.
@@ -54,6 +56,9 @@ class SyncJobContext {
 
     /** The master results object */
     ApiResults results
+
+    /** The problems will be populated if dataFormat="payload", then this will be where they are stored */
+    List<Problem> problems = [] as List<Problem>
 
     /** Payload input data used for job operations */
     Object payload
@@ -172,19 +177,14 @@ class SyncJobContext {
         } else {
             // if NOT saveDataAsFile then we need to write out the results to dataBytes since results have not been written out yet.
             List<Map> renderResults = transformResults(results)
-
-            if(args.useErrorsField) {
-                //success results may not have ok:true at all in some cases - eg glExport scanerio, but failed always have ok:false
-                List<Map> errors = renderResults.findAll { it.containsKey('ok') && it.ok == false}
-                if(errors) {
-                    data.errorBytes = JsonEngine.toJson(errors).bytes
-                    renderResults = renderResults - errors
-                }
-            }
-
             data.dataBytes = JsonEngine.toJson(renderResults).bytes
             data.ok = ok.get()
         }
+        //if dataFormat is payload then we need to save the problems.
+        if(args.dataFormat == DataFormat.Payload && problems.size() > 0) {
+            data.errorBytes = JsonEngine.toJson(problems).bytes
+        }
+
         SyncJobEntity entity = syncJobService.updateJob(data)
         AppCtx.publishEvent(SyncJobFinishedEvent.of(this))
         return entity
@@ -200,12 +200,16 @@ class SyncJobContext {
         if(transformResultsClosure) {
             return transformResultsClosure.call(resultToTransform) as List<Map>
         }
-
         List<Result> resultList = (resultToTransform instanceof ApiResults) ? resultToTransform.list : [ resultToTransform ]
+        List<Map> ret = args.dataFormat == DataFormat.Payload ? transformResultPayloads(resultList) : transformResultToMap(resultList)
+        return ret
+    }
+
+    List<Map> transformResultToMap(List<Result> resultList) {
         MsgService msgService = syncJobService.messageSource
-        List<Map> ret = []
-        boolean ok = true
+        List<Map> resMapList = []
         for (Result r : resultList) {
+            //these are common across both problems and success results.
             def map = [ok: r.ok, status: r.status.code, data: r.payload] as Map<String, Object>
             //do the failed
             if (r instanceof Problem) {
@@ -216,12 +220,26 @@ class SyncJobContext {
                 ])
                 if(r.violations) map["errors"] = r.violations //put errors only if violations are not empty
             }
-            // else {
-            //     map.data = r.payload as Map
-            // }
-            ret << map
+            resMapList <<  map
         }
-        return ret
+        return resMapList
+    }
+
+    /**
+     * When useErrorsField this will remove any errors from the list and put them into the errors list.
+     * and if success just return the "data" of the result which is stored in result.payload
+     * @return the "data", which is the list or payloads for the successful results.
+     */
+    List<Map> transformResultPayloads(List<Result> resultList) {
+        List<Map> resMapList = []
+        for (Result r : resultList) {
+            if (r instanceof Problem) {
+                problems.add(r)
+            } else {
+                resMapList.add( r.payload as Map)
+            }
+        }
+        return resMapList
     }
 
     /**

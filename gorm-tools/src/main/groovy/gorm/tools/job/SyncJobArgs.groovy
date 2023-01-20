@@ -13,6 +13,7 @@ import groovy.transform.builder.SimpleStrategy
 import gorm.tools.async.AsyncArgs
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp
+import yakworks.commons.lang.NameUtils
 
 /**
  * Value Object are better than using a Map to store arguments and parameters.
@@ -25,6 +26,8 @@ import gorm.tools.repository.model.DataOp
 @ToString
 @CompileStatic
 class SyncJobArgs {
+    public static final DATA_FORMAT_RESULT = "result"
+    public static final DATA_FORMAT_PAYLOAD = "payload"
 
     SyncJobArgs() { this([:])}
 
@@ -55,10 +58,19 @@ class SyncJobArgs {
     Boolean saveDataAsFile = false
 
     /**
-     * If errors should be stored separate from result data.
-     * If true, syncjob.errorBytes will be populated with error results
+     * If dataFormat=Payload then errors should be stored separate from result data.
+     * If dataFormat=Result then errors are mixed in and the syncJob.data is just a rendered list of the results.
+     * When dataFormat=Payload then the rendering of the data is only list of whats in each results paload.
+     * as opposed to a list of Results objects when dataFormat=Result
+     * For example if processing export then instead of getting syncJob.data as a list of results objects it will be a list of what
+     * the requested export is, such as Invoices. would look as if the call was made to the rest endpoint for a list synchronously
+     * Since data can only support a list of entities then any issues or errors get stored in a separate errors field,
+     * syncjob.errorBytes will be populated with error results
      */
-    Boolean useErrorsField = false
+    DataFormat dataFormat = DataFormat.Result
+
+    @CompileStatic
+    static enum DataFormat { Result, Payload }
 
     /**
      * the operation to perform, Used in bulk and limited to add and update right now.

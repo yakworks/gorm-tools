@@ -55,7 +55,8 @@ class SyncJobArgs {
     Boolean saveDataAsFile = false
 
     /**
-     * If errors should be stored separately then result data
+     * If errors should be stored separate from result data.
+     * If true, syncjob.errorBytes will be populated with error results
      * XXX: Currently it doesnt work with `saveDataAsFile`. saves errors to `errorBytes` field of `SyncJob`.
      */
     Boolean saveErrorsSeparate = false

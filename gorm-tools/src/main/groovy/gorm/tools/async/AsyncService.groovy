@@ -15,7 +15,6 @@ import org.grails.datastore.mapping.core.Datastore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.TransactionStatus
 
-import gorm.tools.job.SyncJobContext
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.transaction.TrxService
 import grails.persistence.support.PersistenceContextInterceptor

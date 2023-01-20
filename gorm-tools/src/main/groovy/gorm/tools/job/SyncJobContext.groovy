@@ -5,7 +5,6 @@
 package gorm.tools.job
 
 import java.nio.file.Path
-import java.text.DecimalFormat
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -17,7 +16,6 @@ import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 import groovy.util.logging.Slf4j
 
-import gorm.tools.async.AsyncArgs
 import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.utils.BenchmarkHelper
 import yakworks.api.ApiResults

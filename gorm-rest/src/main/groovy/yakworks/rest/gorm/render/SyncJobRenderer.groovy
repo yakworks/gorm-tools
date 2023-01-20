@@ -26,18 +26,22 @@ class SyncJobRenderer implements JsonRendererTrait<SyncJobEntity> {
         setContentType(context)
 
         // gets the raw json string and use the unescaped to it just dumps it to writer without any round robin conversion
-        String dataString = job.dataToString()
-        JsonOutput.JsonUnescaped rawDataJson = JsonOutput.unescaped(dataString)
+        JsonOutput.JsonUnescaped rawDataJson = JsonOutput.unescaped(job.dataToString())
 
-        jsonBuilder(context).call {
-            id job.id
-            ok job.ok
-            state job.state.name()
-            source job.source
-            sourceId job.sourceId
-            data rawDataJson
+        Map response = [
+            id: job.id,
+            ok: job.ok,
+            state: job.state.name(),
+            source: job.source,
+            sourceId: job.sourceId,
+            data: rawDataJson
+        ]
+
+        if(job.errorBytes) {
+            response['errors'] = JsonOutput.unescaped(job.errorToString())
         }
 
+        jsonBuilder(context).call(response)
     }
 
 }

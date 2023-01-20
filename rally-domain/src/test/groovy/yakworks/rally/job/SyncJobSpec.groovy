@@ -45,7 +45,6 @@ class SyncJobSpec extends Specification implements DataRepoTest, SecurityTest {
         job.payloadBytes.size() > 0
     }
 
-    @Ignore
     void "make sure update works with error bytes"() {
         when:
         def jobId = createJob().id
@@ -56,7 +55,6 @@ class SyncJobSpec extends Specification implements DataRepoTest, SecurityTest {
         job
         job.errorBytes.size() > 0
     }
-
 
     void "convert json to byte array"() {
         setup:
@@ -76,11 +74,5 @@ class SyncJobSpec extends Specification implements DataRepoTest, SecurityTest {
         j
         res.bytes == j.payloadBytes
         res == j.payloadToString()
-
     }
-
-
-
-
-
 }

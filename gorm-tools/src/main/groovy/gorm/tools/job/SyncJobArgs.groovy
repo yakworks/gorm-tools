@@ -55,6 +55,12 @@ class SyncJobArgs {
     Boolean saveDataAsFile = false
 
     /**
+     * If errors should be stored separately then result data
+     * XXX: Currently it doesnt work with `saveDataAsFile`. saves errors to `errorBytes` field of `SyncJob`.
+     */
+    Boolean saveErrorsSeparate = false
+
+    /**
      * the operation to perform, Used in bulk and limited to add and update right now.
      */
     DataOp op

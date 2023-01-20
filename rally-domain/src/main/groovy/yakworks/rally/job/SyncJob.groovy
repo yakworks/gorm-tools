@@ -34,10 +34,10 @@ class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity<SyncJob>,  AuditStam
         getRepo().dataToString(this)
     }
 
-    // @Override
-    // String errorToString(){
-    //     getRepo().errorToString(this)
-    // }
+     @Override
+     String errorToString(){
+         getRepo().errorToString(this)
+     }
 
     @Override
     String payloadToString(){

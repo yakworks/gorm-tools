@@ -92,7 +92,7 @@ trait SyncJobEntity<D> implements SourceTrait {
     /**
      * if the errors are stored in the column this will be populated
      */
-    // byte[] errorBytes
+     byte[] errorBytes
 
     /**
      * The data is a response of resources that were successfully and unsuccessfully updated or created after processing.
@@ -107,9 +107,9 @@ trait SyncJobEntity<D> implements SourceTrait {
         return payloadBytes ? new String(payloadBytes, "UTF-8") : '[]'
     }
 
-    // String errorToString(){
-    //     return errorBytes ? new String(errorBytes, "UTF-8") : '[]'
-    // }
+     String errorToString(){
+         return errorBytes ? new String(errorBytes, "UTF-8") : '[]'
+     }
 
     static constraintsMap = [
         state:[ d: 'State of the job', nullable: false],
@@ -119,6 +119,7 @@ trait SyncJobEntity<D> implements SourceTrait {
                        maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
         dataId: [d: 'If data is saved as attahchment file this is the id', oapi: "NO"],
         dataBytes: [d: 'The result data stored as bytes', maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
+        errorBytes: [d: 'The error data stored as bytes', maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
         sourceId:[ d: 'the unique id from the outside source for the scheduled job', nullable: true]
     ]
 }

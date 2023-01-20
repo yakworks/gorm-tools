@@ -174,6 +174,14 @@ class SyncJobContext {
         } else {
             // if NOT saveDataAsFile then we need to write out the results to dataBytes since results have not been written out yet.
             List<Map> renderResults = transformResults(results)
+
+            if(args.saveErrorsSeparate) {
+                //success results may not have ok:true at all in some cases - eg glExport scanerio, but failed always have ok:false
+                List<Map> errors = renderResults.findAll { it.containsKey('ok') && it.ok == false}
+                data.errorBytes =  JsonEngine.toJson(errors).bytes
+                renderResults = renderResults - errors
+            }
+
             data.dataBytes = JsonEngine.toJson(renderResults).bytes
             data.ok = ok.get()
         }

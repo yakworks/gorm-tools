@@ -17,6 +17,7 @@ import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 import groovy.util.logging.Slf4j
 
+import gorm.tools.async.AsyncArgs
 import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.utils.BenchmarkHelper
 import yakworks.api.ApiResults
@@ -41,22 +42,22 @@ import yakworks.spring.AppCtx
 @Slf4j
 @CompileStatic
 class SyncJobContext {
-
+    /** Thread safe state tracking, any problem will update this to false. */
     AtomicBoolean ok = new AtomicBoolean(true)
 
     //reference back to the syncJobService that created this.
     SyncJobService syncJobService
 
+    /** Arguments for this job.*/
     SyncJobArgs args
 
-    /**
-     * The master results object
-     */
+    /** Tracks the start time of the job to use in logging updates*/
+    Long startTime
+
+    /** The master results object */
     ApiResults results
 
-    /**
-     * Payload input data used for job operations
-     */
+    /** Payload input data used for job operations */
     Object payload
 
     int payloadSize
@@ -123,17 +124,20 @@ class SyncJobContext {
      * @param startTimeMillis the start time in millis, used to deduce time elapsed
      * @param throwEx if false then only does log.error and will not throw on an exception so flow is not disrupted if this flakes out
      */
-    void updateJobResults(ApiResults apiResults, Long startTimeMillis = null, boolean throwEx = true) {
+    void updateJobResults(Result apiResults, boolean throwEx = true) {
         try {
+
             if(!apiResults.ok) {
                 ok.set(false)
                 //if not ok then update the problemCount
-                problemCount.addAndGet(apiResults.getProblems().size())
+                int probCnt = (apiResults instanceof ApiResults) ? apiResults.getProblems().size() : 1
+                problemCount.addAndGet(probCnt)
             }
             //increment the processedCount
-            processedCount.addAndGet(apiResults.list.size())
+            int processedCnt = (apiResults instanceof ApiResults) ? apiResults.list.size() : 1
+            processedCount.addAndGet(processedCnt)
 
-            String message = getJobUpdateMessage(apiResults.ok, startTimeMillis)
+            String message = getJobUpdateMessage(apiResults.ok)
 
             updateJob(apiResults, [id: jobId, ok: ok.get(), message: message])
         } catch (e) {
@@ -215,8 +219,8 @@ class SyncJobContext {
     /**
      * builds a status message to update the job
      */
-    protected String getJobUpdateMessage(boolean resOk, Long startTimeMillis){
-        String timing = startTimeMillis ? " | ${BenchmarkHelper.elapsedTime(startTimeMillis)}" : ''
+    protected String getJobUpdateMessage(boolean resOk){
+        String timing = startTime ? " | ${BenchmarkHelper.elapsedTime(startTime)}" : ''
         String mem = " | used mem: ${BenchmarkHelper.getUsedMem()}"
 
         String message = "slice ok: ${resOk} | processed ${processedCount.get()} of ${payloadSize}${timing}${mem}"

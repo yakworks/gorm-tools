@@ -86,13 +86,12 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         jobContext.args.saveDataAsFile = true
 
         when:
-        Long time = System.currentTimeMillis()
         ApiResults apiRes = ApiResults.OK()
         (1..20).each {
             apiRes << Result.OK().payload([id:it, num:"num-$it", name: "name-$it"])
         }
 
-        jobContext.updateJobResults(apiRes, time)
+        jobContext.updateJobResults(apiRes)
         jobContext.finishJob()
 
         then:
@@ -163,8 +162,7 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         //List<Map> renderErrorResults = [[ok: false, status: 500, detail: 'error detail'] ]
 
         when:
-        Long time = System.currentTimeMillis()
-        jobContext.updateJobResults(okResults, time)
+        jobContext.updateJobResults(okResults)
         jobContext.updateWithResult(Problem.ofPayload(['bad':'data']).title("Oops"))
 
         jobContext.finishJob()

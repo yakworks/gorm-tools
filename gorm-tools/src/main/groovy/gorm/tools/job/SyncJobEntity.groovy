@@ -93,6 +93,7 @@ trait SyncJobEntity<D> implements SourceTrait {
      * if the errors are stored in the column this will be populated
      */
     byte[] problemsBytes
+    List<Map> problems
 
     /**
      * The data is a response of resources that were successfully and unsuccessfully updated or created after processing.

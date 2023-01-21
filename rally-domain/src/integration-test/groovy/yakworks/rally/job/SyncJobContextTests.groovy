@@ -173,11 +173,11 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         jsonData.size() == 2
         jsonData[0] == ['boo':'foo']
 
-        List jsonErrors = parseJson(job.problemsToString())
-        jsonErrors.size() == 1
-        jsonErrors[0].ok == false
-        jsonErrors[0].status == 400
-        jsonErrors[0].title == "Oops"
+        List probs = parseJson(job.problemsToString())
+        probs.size() == 1
+        probs[0].ok == false
+        probs[0].status == 400
+        probs[0].title == "Oops"
     }
 
 }

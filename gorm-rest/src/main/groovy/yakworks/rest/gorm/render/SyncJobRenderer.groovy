@@ -37,8 +37,8 @@ class SyncJobRenderer implements JsonRendererTrait<SyncJobEntity> {
             data: rawDataJson
         ]
 
-        if(job.problemsBytes) {
-            response['errors'] = JsonOutput.unescaped(job.problemsToString())
+        if(job.problems) {
+            response['problems'] = JsonOutput.unescaped(job.problemsToString())
         }
 
         jsonBuilder(context).call(response)

@@ -9,65 +9,65 @@ import groovy.transform.CompileStatic
 @CompileStatic
 trait BaseArScoreCard {
 
-    BigDecimal aging1
-    BigDecimal aging2
-    BigDecimal aging3
-    BigDecimal aging4
-    BigDecimal aging5
-    BigDecimal aging6
-    BigDecimal aging7
-    BigDecimal aging8
-    BigDecimal aging9
-    BigDecimal aging10
+    BigDecimal aging1 = 0.0
+    BigDecimal aging2 = 0.0
+    BigDecimal aging3 = 0.0
+    BigDecimal aging4 = 0.0
+    BigDecimal aging5 = 0.0
+    BigDecimal aging6 = 0.0
+    BigDecimal aging7 = 0.0
+    BigDecimal aging8 = 0.0
+    BigDecimal aging9 = 0.0
+    BigDecimal aging10 = 0.0
 
     //Performance metrics /KPI's
-    BigDecimal avgDaysBt //avg days paid late / avg days beyond terms
-    BigDecimal adp // avg days to pay
-    BigDecimal adpWtd // weighted average days to pay
-    BigDecimal cei //collection effectiveness index
-    BigDecimal ddo //days deductions and disputes outstanding
-    BigDecimal dso //day sales outstanding
-    BigDecimal dsoad // DSO add back
-    BigDecimal dsobp //DSO best possible
-    BigDecimal dso12 //DSO using the last 12 month average
+    BigDecimal avgDaysBt = 0.0 //avg days paid late / avg days beyond terms
+    BigDecimal adp = 0.0 // avg days to pay
+    BigDecimal adpWtd = 0.0 // weighted average days to pay
+    BigDecimal cei = 0.0 //collection effectiveness index
+    BigDecimal ddo = 0.0 //days deductions and disputes outstanding
+    BigDecimal dso = 0.0 //day sales outstanding
+    BigDecimal dsoad = 0.0 // DSO add back
+    BigDecimal dsobp = 0.0 //DSO best possible
+    BigDecimal dso12 = 0.0 //DSO using the last 12 month average
 
     String glPostPeriod
 
     //balance due fields
-    BigDecimal curBal // whats not due yet
-    BigDecimal maxDue // max totalDue in this month and last 12 months
-    String maxDuePer // period the highest balance occured in the last 12 months
-    BigDecimal pastDue //balance past due
-    BigDecimal totalDue // total due, sum of all open items. will be the ending balance when month is closed
+    BigDecimal curBal = 0.0 // whats not due yet
+    BigDecimal maxDue = 0.0 // max totalDue in this month and last 12 months
+    String maxDuePer = 0.0 // period the highest balance occured in the last 12 months
+    BigDecimal pastDue = 0.0 //balance past due
+    BigDecimal totalDue = 0.0 // total due, sum of all open items. will be the ending balance when month is closed
 
     //sales trending
-    BigDecimal grossProfit// gross profit
-    BigDecimal grossProfitPct// gross profit percent
-    BigDecimal salesRolling12
+    BigDecimal grossProfit = 0.0// gross profit
+    BigDecimal grossProfitPct = 0.0// gross profit percent
+    BigDecimal salesRolling12 = 0.0
     // rolling 12 months of sales, TODO does this include current period?, is this just invoices?
-    BigDecimal salesYtd //YTD sales
+    BigDecimal salesYtd = 0.0 //YTD sales
 
     //open trans docType
-    BigDecimal openCM
-    BigDecimal openDD
-    BigDecimal openDM
-    BigDecimal openIN
-    BigDecimal openPA
+    BigDecimal openCM = 0.0
+    BigDecimal openDD = 0.0
+    BigDecimal openDM = 0.0
+    BigDecimal openIN = 0.0
+    BigDecimal openPA = 0.0
     //openTotal is the same as totalDue
 
     //Roll forward measures
-    BigDecimal beginBal //totalDue from prior period
+    BigDecimal beginBal = 0.0 //totalDue from prior period
     //created trans
-    BigDecimal newCM
-    BigDecimal newDD
-    BigDecimal newDM
-    BigDecimal newIN
-    BigDecimal newPA
-    BigDecimal newTotal //shortcut calc for the sum of the above
+    BigDecimal newCM = 0.0
+    BigDecimal newDD = 0.0
+    BigDecimal newDM = 0.0
+    BigDecimal newIN = 0.0
+    BigDecimal newPA = 0.0
+    BigDecimal newTotal = 0.0 //shortcut calc for the sum of the above
 
     //adjustments. used for roll forward
-    BigDecimal adjusterAmt //the sum of origAmount of the ArAdjust.arTran
-    BigDecimal adjustedTotal //the sum of arAdjustLine.amount
+    BigDecimal adjusterAmt = 0.0 //the sum of origAmount of the ArAdjust.arTran
+    BigDecimal adjustedTotal = 0.0 //the sum of arAdjustLine.amount
     /* maybe for future?
     BigDecimal adjustedCM
     BigDecimal adjustedDD
@@ -77,12 +77,12 @@ trait BaseArScoreCard {
     */
 
     //flex fields for other open stats
-    BigDecimal num1
-    BigDecimal num2
-    BigDecimal num3
-    BigDecimal num4
-    BigDecimal num5
-    BigDecimal num6
+    BigDecimal num1 = 0.0
+    BigDecimal num2 = 0.0
+    BigDecimal num3 = 0.0
+    BigDecimal num4 = 0.0
+    BigDecimal num5 = 0.0
+    BigDecimal num6 = 0.0
 
     static constraintsMap = [
         aging1: [d: 'Aging bucket 1', format: 'money'],
@@ -112,7 +112,6 @@ trait BaseArScoreCard {
         dsoad: [d: 'DSO add back', format: 'decimal(9,1)'],
         dsobp: [d: 'DSO best possible', format: 'decimal(9,1)'],
         dso12: [d: 'DSO using the last 12 month average', format: 'decimal(9,1)'],
-
     ]
 
 }

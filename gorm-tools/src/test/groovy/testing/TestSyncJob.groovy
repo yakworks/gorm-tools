@@ -4,6 +4,11 @@
 */
 package testing
 
+import groovy.transform.CompileDynamic
+
+import org.grails.datastore.mapping.config.MappingDefinition
+
+import gorm.tools.hibernate.type.JsonType
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.RepoEntity
@@ -11,6 +16,7 @@ import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 
+import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 import static yakworks.json.groovy.JsonEngine.parseJson
 
 @IdEqualsHashCode
@@ -42,5 +48,7 @@ class TestSyncJob implements RepoEntity<TestSyncJob>, SyncJobEntity<TestSyncJob>
         state column: 'state', enumType: 'identity'
         payloadBytes sqlType: 'BLOB'
         dataBytes sqlType: 'BLOB'
+        //intelij show this as an error but it works fine
+        problems type: JsonType, params: [type: ArrayList]
     }
 }

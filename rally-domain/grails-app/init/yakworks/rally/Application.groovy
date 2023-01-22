@@ -15,7 +15,9 @@ import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
 import grails.plugins.metadata.PluginSource
 
-/** NOTE: Reminder, this Application class is used mainly for Grails integration tests, not really for deploy */
+/** NOTE: Reminder, this Application class is used mainly for Grails integration tests,
+ * not really for deploy
+ */
 @Import([RallyConfiguration])
 //@ComponentScan(['yakworks.rally']) //scan and pick up all
 @PluginSource

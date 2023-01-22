@@ -39,7 +39,6 @@ import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.config.AsyncConfig
 import yakworks.gorm.config.GormConfig
 import yakworks.gorm.config.IdGeneratorConfig
-import yakworks.spring.AppCtx
 
 @Configuration(proxyBeanMethods = false)
 @Lazy
@@ -49,7 +48,8 @@ class GormToolsConfiguration {
 
     // see https://zetcode.com/spring/beanfactorypostprocessor/ for lambda BeanFactoryPostProcessor
     @Bean
-    @DependsOn(["grailsDomainClassMappingContext", "appCtx"]) //important here, if we dont do DependsOn then it eagerly instantiates the DataSource before its ready.
+    //important here, if we dont do DependsOn then it eagerly instantiates the DataSource before its ready.
+    @DependsOn(["grailsDomainClassMappingContext", "appCtx"])
     static GormRepoBeanFactoryPostProcessor gormRepoBeanFactoryPostProcessor(AbstractMappingContext grailsDomainClassMappingContext) {
         return new GormRepoBeanFactoryPostProcessor(grailsDomainClassMappingContext)
     }

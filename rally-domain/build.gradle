@@ -27,6 +27,7 @@ dependencies {
   testRuntimeOnly "org.springframework.boot:spring-boot-autoconfigure"
   testRuntimeOnly "org.springframework.boot:spring-boot-starter-tomcat"
   //testImplementation "io.micronaut.spring:micronaut-spring:4.2.2"
+  testImplementation project(":gorm-test-domain")
 }
 
 test {

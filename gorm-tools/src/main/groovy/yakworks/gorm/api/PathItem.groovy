@@ -4,6 +4,9 @@
 */
 package yakworks.gorm.api
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class PathItem {
     /**
      * A resource refers to one or more nouns being served, represented in namespaced fashion, because it is easy for humans to comprehend:

@@ -7,6 +7,8 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import groovy.json.JsonException
 import groovy.json.JsonSlurper
+
+import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.api.ApiResults
 import yakworks.api.Result
@@ -63,17 +65,19 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         SyncJob.get(jobContext.jobId)
     }
 
-    void "test update job with errors"() {
+    void "test update job with problems"() {
         given:
         SyncJobContext jobContext = createJob()
 
         when:
         def apiRes = ApiResults.ofPayload("foo")
-        jobContext.updateJob(apiRes, [id:jobContext.jobId , errorBytes: JsonEngine.toJson(apiRes).bytes ])
+        jobContext.updateJob(apiRes, [id: jobContext.jobId , problems: [[ok:false, title:"oops1"], [ok:false, title:"oops2"]] ])
 
         then:
         SyncJob job = SyncJob.get(jobContext.jobId)
-        job.problemsBytes
+        job.problems.size() == 2
+        job.problems[0].title == "oops1"
+        job.problems[1].title == "oops2"
     }
 
     void "test update job and save data to file generates valid json"() {
@@ -161,8 +165,9 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         when:
         jobContext.updateJobResults(okResults)
         jobContext.updateJobResults(Problem.ofPayload(['bad':'data']).title("Oops"))
-
+        jobContext.updateJobResults(Problem.ofPayload(['bad':'data2']).title("Oops2"))
         jobContext.finishJob()
+        flushAndClear()
 
         then:
         SyncJob job = SyncJob.get(jobContext.jobId)
@@ -173,8 +178,10 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         jsonData.size() == 2
         jsonData[0] == ['boo':'foo']
 
-        List probs = parseJson(job.problemsToString())
-        probs.size() == 1
+
+        // List probs = parseJson(job.problemsToString())
+        List probs = job.problems
+        probs.size() == 2
         probs[0].ok == false
         probs[0].status == 400
         probs[0].title == "Oops"

@@ -29,15 +29,17 @@ class JsonSample implements UuidRepoEntity<JsonSample, UuidGormRepo<JsonSample>>
     Addy addy
 
     // @CompileDynamic
-    static MappingDefinition getMapping(){
-        orm {
-            id generator: "assigned"
+    // static MappingDefinition getMapping(){
+    //     orm {
+    //         id generator: "assigned"
             //version false
-            columns(
-                json: property(type: JsonType, typeParams: [type: Map]),
-                someList: property(type: JsonType, typeParams: [type: ArrayList]),
-                addy: property(type: JsonType, typeParams: [type: Addy])
-            )
+
+            // columns(
+            //     json: property(type: JsonType, typeParams: [type: Map]),
+            //     someList: property(type: JsonType, typeParams: [type: ArrayList]),
+            //     addy: property(type: JsonType, typeParams: [type: Addy])
+            // )
+
             // someList = property {
             //     type JsonType
             //     typeParams([type: ArrayList.name] as Properties)
@@ -46,16 +48,16 @@ class JsonSample implements UuidRepoEntity<JsonSample, UuidGormRepo<JsonSample>>
             //     type JsonType
             //     typeParams([type: Addy.name] as Properties)
             // }
-        }
-    }
+    //     }
+    // }
 
-    // @CompileDynamic
-    // static Closure getMapping(){ { ->
-    //     id generator: "assigned"
-    //     json type: JsonType, params: [type: Map]
-    //     someList type: JsonType, params: [type: ArrayList]
-    //     addy type: JsonType, params: [type: Addy]
-    // }}
+    @CompileDynamic
+    static Closure getMapping(){ { ->
+        id generator: "assigned"
+        json type: JsonType, params: [type: Map]
+        someList type: JsonType, params: [type: ArrayList]
+        addy type: JsonType, params: [type: Addy]
+    }}
 
     static constraints = {
         name nullable: false

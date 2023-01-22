@@ -44,15 +44,39 @@ class SyncJobSpec extends Specification implements DataRepoTest, SecurityTest {
         job.payloadBytes.size() > 0
     }
 
-    void "make sure update works with error bytes"() {
+    void "check that problems save properly"() {
         when:
-        def jobId = createJob().id
-        def errorList = ["ok":false,"tile":"bad stuff here"]
-        def job = SyncJob.repo.update(id:jobId, errorBytes:errorList.toString().bytes)
+        // def errorList = ["ok":false,"tile":"bad stuff here"]
+        def job = new SyncJob(problems: [["ok":false,"title":"error"]]).persist()
+        def jobId = job.id
+        // job.problems = [["ok":false,"title":"error"]]
+        // job.persist(flush:true)
+        flushAndClear()
+
+        def job1 = SyncJob.get(jobId)
 
         then:
-        job
-        job.problemsBytes.size() > 0
+        job1
+        job1.problems.size() == 1
+        job1.problems[0].ok == false
+        job1.problems[0].title == "error"
+    }
+
+    void "problems update"() {
+        when:
+        def job = new SyncJob().persist()
+        def jobId = job.id
+        flushAndClear()
+        SyncJob.repo.update([id: jobId, problems: [["ok":false,"title":"error"]]])
+        flushAndClear()
+
+        def job1 = SyncJob.get(jobId)
+
+        then:
+        job1
+        job1.problems.size() == 1
+        job1.problems[0].ok == false
+        job1.problems[0].title == "error"
     }
 
     void "convert json to byte array"() {

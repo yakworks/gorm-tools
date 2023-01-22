@@ -33,6 +33,8 @@ class SyncJobRepo extends LongIdGormRepo<SyncJob> {
             // default to RestApi
             if(!data.sourceType) job.sourceType = SourceType.RestApi
         }
+        //bind doesnt seem to work on the problems list so manaully set it here
+        if(data.problems)  job.problems = data.problems as List
     }
 
 
@@ -62,9 +64,9 @@ class SyncJobRepo extends LongIdGormRepo<SyncJob> {
         job.payloadId ? attachmentRepo.get(job.payloadId).getText() : getJsonString(job.payloadBytes)
     }
 
-     String errorToString(SyncJob job){
-         getJsonString(job.problemsBytes)
-     }
+     // String errorToString(SyncJob job){
+     //     getJsonString(job.problemsBytes)
+     // }
 
     String getJsonString(byte[] bytes){
         return bytes ? new String(bytes, "UTF-8") : '[]'

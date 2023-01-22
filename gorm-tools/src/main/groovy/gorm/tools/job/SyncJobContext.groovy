@@ -182,7 +182,8 @@ class SyncJobContext {
         }
         //if dataFormat is payload then we need to save the problems.
         if(args.dataFormat == DataFormat.Payload && problems.size() > 0) {
-            data.errorBytes = JsonEngine.toJson(problems).bytes
+            //data.errorBytes = JsonEngine.toJson(problems).bytes
+            data.problems = problems*.asMap()
         }
 
         SyncJobEntity entity = syncJobService.updateJob(data)

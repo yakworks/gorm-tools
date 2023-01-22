@@ -4,12 +4,20 @@
 */
 package yakworks.rally.job
 
+import groovy.transform.CompileDynamic
+
+import org.grails.datastore.mapping.config.MappingDefinition
+
+import gorm.tools.hibernate.type.JsonType
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.annotation.Entity
 import yakworks.security.audit.AuditStampTrait
+
+import static grails.gorm.hibernate.mapping.MappingBuilder.orm
+
 
 /**
  * An instance created right away when "any job" in 9ci is called.
@@ -20,6 +28,8 @@ import yakworks.security.audit.AuditStampTrait
 @Entity
 @GrailsCompileStatic
 class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity<SyncJob>,  AuditStampTrait, Serializable {
+
+    // List<Map> problems
 
     byte[] getData(){
         getRepo().getData(this)
@@ -34,10 +44,10 @@ class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity<SyncJob>,  AuditStam
         getRepo().dataToString(this)
     }
 
-     @Override
-     String problemsToString(){
-         getRepo().errorToString(this)
-     }
+     // @Override
+     // String problemsToString(){
+     //     getRepo().errorToString(this)
+     // }
 
     @Override
     String payloadToString(){
@@ -46,8 +56,12 @@ class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity<SyncJob>,  AuditStam
 
     static SyncJobRepo getRepo() { RepoLookup.findRepo(this) as SyncJobRepo }
 
-    static mapping = {
-        state column: 'state', enumType: 'identity'
+    @CompileDynamic
+    static MappingDefinition getMapping() {
+        orm { columns(
+            state: property(enumType: 'identity'),
+            problems: property(type: JsonType, typeParams: [type: ArrayList])
+        ) }
     }
 
     static constraintsMap = [

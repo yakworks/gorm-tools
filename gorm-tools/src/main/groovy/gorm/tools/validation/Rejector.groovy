@@ -82,6 +82,9 @@ class Rejector {
         addError(propName, val, mmk)
     }
 
+    /**
+     * Transform the MsgKey into a FieldError.
+     */
     void addError(String propName, Object val, MsgKey msgKey){
         def targetClass = target.class
         String simpleName = targetClass.simpleName
@@ -95,12 +98,13 @@ class Rejector {
         // newCodes.add("${propName}.${code}".toString())
         List newCodes
         String defaultMsg
+        String fallbackMsg = msgKey.fallbackMessage
         if(msgKey instanceof MsgMultiKey){
             newCodes = msgKey.codes
-            defaultMsg = newCodes.last()
+            defaultMsg = fallbackMsg ?: newCodes.last()
         } else {
             newCodes = [msgKey.code]
-            defaultMsg = msgKey.code
+            defaultMsg = fallbackMsg ?: msgKey.code
         }
 
         FieldError error = new FieldError(

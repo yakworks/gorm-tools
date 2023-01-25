@@ -27,7 +27,7 @@ class CurrentUserExt {
     }
 
     static boolean isCustomer(CurrentUser self) {
-        UserInfoExt.isCustomer(self.user)
+        self.isLoggedIn() && UserInfoExt.isCustomer(self.user)
     }
 
 }

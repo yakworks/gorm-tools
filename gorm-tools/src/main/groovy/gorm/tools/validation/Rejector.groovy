@@ -93,26 +93,33 @@ class Rejector {
         if(!errors) errors = target.errors
         Object[] args = msgKey.args.isMap() ? [msgKey.args.asMap()] as Object[] : msgKey.args.toArray()
 
-        // newCodes.add("${targetClass.getName()}.${propName}.${code}".toString())
-        // newCodes.add("${classShortName}.${propName}.${code}".toString())
-        // newCodes.add("${propName}.${code}".toString())
-        List newCodes
+        List msgCodes
+        String baseCode
         String defaultMsg
         String fallbackMsg = msgKey.fallbackMessage
         if(msgKey instanceof MsgMultiKey){
-            newCodes = msgKey.codes
-            defaultMsg = fallbackMsg ?: newCodes.last()
+            msgCodes = msgKey.codes
+            defaultMsg = fallbackMsg ?: msgCodes.last()
+            baseCode = msgCodes.last()
         } else {
-            newCodes = [msgKey.code]
+            msgCodes = [msgKey.code]
             defaultMsg = fallbackMsg ?: msgKey.code
+            baseCode = msgKey.code
         }
+
+        List codesList = [
+            //"${targetClass.getName()}.${propName}.${baseCode}".toString(),
+            "${classShortName}.${propName}.${baseCode}".toString(),
+            "${propName}.${baseCode}".toString()
+        ]
+        codesList.addAll(msgCodes)
 
         FieldError error = new FieldError(
             errors.objectName,
             errors.nestedPath + propName,
             val, //reject value
             false, //bind failure
-            newCodes as String[],
+            codesList as String[],
             args,
             defaultMsg
         )

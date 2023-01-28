@@ -301,13 +301,16 @@ On a put or post `replace` is the default
 # Authentication
 
 9ci supports Bearer based token authentication.
-Using `curl`
 
+Using `curl`
 ```bash
+# using curl
 curl -H 'Content-Type: application/json' -X POST \
 		-d '{\"username\":\"someUser\",\"password\":\"secret_knock\"}' \
 		https://rcm-api.9ci.io/api/login
 
+# using httpie
+http -b POST admin:123@localhost:8080/api/token
 #would return something like
 {
     "username": "someUser",

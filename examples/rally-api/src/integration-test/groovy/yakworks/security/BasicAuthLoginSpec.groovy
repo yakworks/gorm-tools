@@ -12,7 +12,7 @@ import yakworks.rest.client.OkAuth
 import yakworks.rest.client.OkHttpRestTrait
 
 /**
- * test the legacy login with post username and password to login endpoint.
+ * Uses basic auth to login
  */
 @Integration
 class BasicAuthLoginSpec extends Specification implements OkHttpRestTrait {
@@ -37,7 +37,7 @@ class BasicAuthLoginSpec extends Specification implements OkHttpRestTrait {
         return resp
     }
 
-    void "test login with json body"() {
+    void "test login with basic auth"() {
         when:
         def resp = basicLogin('admin', '123')
         Map body = bodyToMap(resp)

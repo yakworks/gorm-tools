@@ -102,7 +102,7 @@ trait WebClientTrait {
         WebClient.RequestBodySpec  reqSpec  = webClient
             .method(method)
             .uri(URI.create("${getBaseUrl()}${uriPath}"))
-            .header("Authorization", OkAuth.BEARER_TOKEN)
+            .header("Authorization", "Bearer ${OkAuth.TOKEN}")
 
         return reqSpec
     }
@@ -201,7 +201,6 @@ trait WebClientTrait {
             .retrieve().bodyToMono(Map).block();
 
         OkAuth.TOKEN = resp.access_token
-        OkAuth.BEARER_TOKEN = "Bearer ${resp.access_token}"
         return resp.access_token as String
     }
 

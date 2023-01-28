@@ -26,7 +26,7 @@ class OpaqueRestApiSpec extends Specification implements OkHttpRestTrait {
 
     def setup(){
         OkAuth.TOKEN = "opq_123"
-        OkAuth.BEARER_TOKEN = "Bearer opq_123"
+        //OkAuth.BEARER_TOKEN = "Bearer opq_123"
     }
 
     OAuth2AccessToken createOAuthToken(String tokenValue, Instant nowTime, Instant expireAt){

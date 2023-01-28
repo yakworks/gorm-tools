@@ -83,7 +83,7 @@ trait OkHttpRestTrait {
             .url(getUrl(uriPath))
             .addHeader("Content-Type", jsonHeader)
 
-        if(OkAuth.BEARER_TOKEN) bldr.addHeader("Authorization", OkAuth.BEARER_TOKEN)
+        if(OkAuth.TOKEN) bldr.addHeader("Authorization", "Bearer ${OkAuth.TOKEN}")
 
         return bldr
     }
@@ -136,7 +136,7 @@ trait OkHttpRestTrait {
      * login with @Value injected username and password if not already
      */
     String login() {
-        if(!OkAuth.BEARER_TOKEN) login(getUsername(), getPassword())
+        if(!OkAuth.TOKEN) login(getUsername(), getPassword())
         return OkAuth.TOKEN
     }
 
@@ -158,7 +158,6 @@ trait OkHttpRestTrait {
         assert resp.successful
         Map body = bodyToMap(resp)
         OkAuth.TOKEN = body.access_token
-        OkAuth.BEARER_TOKEN = "Bearer ${body.access_token}"
         return body.access_token as String
     }
 

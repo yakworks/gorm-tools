@@ -6,9 +6,14 @@ package yakworks.rest.client
 
 import groovy.transform.CompileStatic
 
-//static holder for testing, NOT meant for multiple threads making changes.
+/**
+ * FOR TESTING, static holder for testing, NOT meant for multiple threads making changes.
+ * Used in OkHttpRestTrait for login
+ */
 @CompileStatic
 class OkAuth {
-    public static String BEARER_TOKEN
     public static String TOKEN
+    static String getBEARER_TOKEN(){
+        "Bearer ${TOKEN}"
+    }
 }

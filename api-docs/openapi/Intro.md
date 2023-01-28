@@ -310,7 +310,7 @@ curl -H 'Content-Type: application/json' -X POST \
 		https://rcm-api.9ci.io/api/login
 
 # using httpie
-http -b POST admin:123@localhost:8080/api/token
+http -b POST admin:123@localhost:8080/api/oauth/token
 #would return something like
 {
     "username": "someUser",

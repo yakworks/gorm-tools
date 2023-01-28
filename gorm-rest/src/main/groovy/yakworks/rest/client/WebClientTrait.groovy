@@ -196,7 +196,7 @@ trait WebClientTrait {
 
         Map resp = webClient
             .post()
-            .uri("/api/token")
+            .uri("/api/oauth/token")
             .headers(h -> h.setBasicAuth(uname, pwd))
             .retrieve().bodyToMono(Map).block();
 

@@ -14,7 +14,7 @@ Content-Type: application/json
 
 ### basic auth
 # @name login
-POST http://admin:123@localhost:8080/api/token
+POST http://admin:123@localhost:8080/api/oauth/token
 Content-Type: application/json
 
 ### VALIDATE WTF

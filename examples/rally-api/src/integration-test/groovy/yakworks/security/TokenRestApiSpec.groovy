@@ -29,7 +29,7 @@ class TokenRestApiSpec extends Specification implements OkHttpRestTrait {
         }
         RequestBody formBody = builder.build();
         Request request = new Request.Builder()
-            .url(getUrl("/api/token"))
+            .url(getUrl("/api/oauth/token"))
             .addHeader("Authorization", "Bearer ${OkAuth.TOKEN}")
             .post(formBody)
             .build();

@@ -191,19 +191,19 @@ docker.circle.shell:
 	#	-v ~/.gradle_docker:/root/.gradle \
 
 test.token.txt:
-	TOKEN=`http POST admin:123@localhost:8080/api/token.txt -b`
+	TOKEN=`http POST admin:123@localhost:8080/api/oauth/token.txt -b`
 	echo "$$TOKEN"
 	http localhost:8080/api -A bearer -a "$$TOKEN"
 
 test.token:
-	RESP=`http -a admin:123 -b POST http://localhost:8080/api/token`
+	RESP=`http -a admin:123 -b POST http://localhost:8080/api/oauth/token`
 	# use awk to parse out the access_token
 	TOKEN=`echo $$RESP | awk -F'"' -v RS="," '/access_token/{ print $$4 }'`
 	echo "$$TOKEN"
 	http localhost:8080/api -A bearer -a "$$TOKEN"
 
 test.token-exchange:
-	RESP=`http -a admin:123 -b POST http://localhost:8080/api/token`
+	RESP=`http -a admin:123 -b POST http://localhost:8080/api/oauth/token`
 	# use awk to parse out the access_token
 	TOKEN=`echo $$RESP | awk -F'"' -v RS="," '/access_token/{ print $$4 }'`
 	echo "$$TOKEN"
@@ -211,17 +211,17 @@ test.token-exchange:
 	echo "curl -X POST -H 'Authorization: Bearer $$TOKEN' \
       -d requested_subject=developers@9ci.com \
       -d grant_type=urn:ietf:params:oauth:grant-type:token-exchange \
-      http://localhost:8080/api/token"
+      http://localhost:8080/api/oauth/token"
 	sleep 1
 
 	curl -X POST -H 'Authorization: Bearer $$TOKEN' \
 	-d requested_subject=developers@9ci.com \
 	-d grant_type=urn:ietf:params:oauth:grant-type:token-exchange \
-	http://localhost:8080/api/token-exchange
+	http://localhost:8080/api/oauth/token
 	# http localhost:8080/api -A bearer -a "$$TOKEN"
 
 test.token.cookie:
-	RESP=`http -b POST admin:123@localhost:8080/api/token`
+	RESP=`http -b POST admin:123@localhost:8080/api/oauth/token`
 	# use awk to parse out the access_token
 	TOKEN=`echo $$RESP | awk -F'"' -v RS="," '/access_token/{ print $$4 }'`
 	echo "$$TOKEN"

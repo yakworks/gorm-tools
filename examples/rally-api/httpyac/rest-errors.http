@@ -17,7 +17,7 @@ GET {{base_url}}/security-tests/error401
 ### Login
 # @no-cookie-jar
 # @name login
-POST http://admin:123@localhost:8080/api/token
+POST http://admin:123@localhost:8080/api/oauth/token
 Content-Type: application/json
 
 ### error401 will succeed now

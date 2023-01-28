@@ -48,7 +48,7 @@ class TokenController {
 
     // for dev and testing to make it easier to dump token into variable.
     // ex: `$ TOKEN=`http POST admin:123@localhost:8080/token.txt -b`
-    @PostMapping("/token.txt")
+    @PostMapping("/oauth/token.txt")
     String tokenTxt() {
         return jwtTokenGenerator.generate().tokenValue
     }
@@ -56,7 +56,7 @@ class TokenController {
     /**
      * Default generator for token. Follows the oauth standards.
      */
-    @PostMapping("/token")
+    @PostMapping("/oauth/token")
     ResponseEntity<Map> token(HttpServletRequest request, HttpServletResponse response, @RequestParam Map<String,String> params) {
         Map body
         //will pick up urn:ietf:params:oauth:grant-type:token-exchange or just token-exchange
@@ -91,7 +91,7 @@ class TokenController {
         return body
     }
 
-    @GetMapping("/token/callback")
+    @GetMapping("/oauth/token/callback")
     ResponseEntity<Map> callback(HttpServletRequest request, HttpServletResponse response, @RequestParam Map<String,String> params ) {
         return token(request, response, params)
     }

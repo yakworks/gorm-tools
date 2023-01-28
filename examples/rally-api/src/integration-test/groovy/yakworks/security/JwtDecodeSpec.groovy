@@ -22,7 +22,6 @@ class JwtDecodeSpec extends Specification implements OkHttpRestTrait {
     void "test ES256_DEFAULT_JWT"() {
         setup:
         OkAuth.TOKEN = ES256_DEFAULT_JWT
-        OkAuth.BEARER_TOKEN = "Bearer ${ES256_DEFAULT_JWT}"
 
         when:
         def resp = get("/api/validate")
@@ -34,7 +33,6 @@ class JwtDecodeSpec extends Specification implements OkHttpRestTrait {
     void "test TEST_RS256_JWT"() {
         setup:
         OkAuth.TOKEN = TEST_RS256_JWT
-        OkAuth.BEARER_TOKEN = "Bearer ${TEST_RS256_JWT}"
 
         when:
         def resp = get("/api/validate")
@@ -46,7 +44,6 @@ class JwtDecodeSpec extends Specification implements OkHttpRestTrait {
     void "test TEST_ES256_JWT"() {
         setup:
         OkAuth.TOKEN = TEST_ES256_JWT
-        OkAuth.BEARER_TOKEN = "Bearer ${TEST_ES256_JWT}"
 
         when:
         def resp = get("/api/validate")

@@ -48,7 +48,7 @@ class TokenControllerSpec extends Specification {
     void "Basic auth and bearer auth should give ok status and hello"() {
         when: "we login with basic auth"
         //does asserts too
-        MvcResult result = mockMvc.perform(post("/token")
+        MvcResult result = mockMvc.perform(post("/oauth/token")
             .with(httpBasic("user", "123")))
             .andExpect(status().isOk())
             .andReturn()

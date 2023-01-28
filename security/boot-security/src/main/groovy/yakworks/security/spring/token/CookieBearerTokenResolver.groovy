@@ -14,8 +14,9 @@ import org.springframework.security.oauth2.server.resource.web.DefaultBearerToke
 
 /**
  * Injected in BearerTokenAuthenticationFilter,
- * Wraps the DefaultBearerTokenResolver that only checks the Authorization header by default.
- * If default check in auth header is null then will look for cookie too.
+ * Wraps the DefaultBearerTokenResolver which only checks the Authorization header by default.
+ * If default check in the Authorization header is null then will then look for the cookie too and return that
+ * NOTE: this only looks for token and returns it, does nothing with validating it (
  */
 @CompileStatic
 class CookieBearerTokenResolver implements BearerTokenResolver {

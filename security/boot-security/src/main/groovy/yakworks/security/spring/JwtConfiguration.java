@@ -11,6 +11,7 @@ import com.nimbusds.jwt.proc.JWTClaimsSetAwareJWSKeySelector;
 import com.nimbusds.jwt.proc.JWTProcessor;
 import yakworks.security.spring.token.JwtProperties;
 import yakworks.security.spring.token.TokenController;
+import yakworks.security.spring.token.generator.JwtTokenExchanger;
 import yakworks.security.spring.token.generator.JwtTokenGenerator;
 
 import java.security.KeyPair;
@@ -118,6 +119,12 @@ public class JwtConfiguration {
     @ConditionalOnMissingBean
     public JwtTokenGenerator tokenGenerator() {
         return new JwtTokenGenerator();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public JwtTokenExchanger jwtTokenExchanger() {
+        return new JwtTokenExchanger();
     }
 
     // @Bean

@@ -15,11 +15,14 @@ import org.springframework.http.CacheControl
 import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.core.AbstractOAuth2Token
 import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.ui.ModelMap
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 import jakarta.annotation.Nullable
+import yakworks.security.spring.token.generator.JwtTokenExchanger
 import yakworks.security.spring.token.generator.JwtTokenGenerator
 import yakworks.security.spring.token.generator.StoreTokenGenerator
 import yakworks.security.user.CurrentUser
@@ -32,6 +35,7 @@ import yakworks.security.user.CurrentUser
 class TokenController {
 
     @Inject JwtTokenGenerator jwtTokenGenerator
+    @Inject JwtTokenExchanger jwtTokenExchanger
 
     //used for tokenLegacy right now
     @Inject @Nullable
@@ -44,7 +48,7 @@ class TokenController {
 
     // for dev and testing to make it easier to dump token into variable.
     // ex: `$ TOKEN=`http POST admin:123@localhost:8080/token.txt -b`
-    @PostMapping("/token.txt")
+    @PostMapping("/oauth/token.txt")
     String tokenTxt() {
         return jwtTokenGenerator.generate().tokenValue
     }
@@ -52,23 +56,44 @@ class TokenController {
     /**
      * Default generator for token. Follows the oauth standards.
      */
-    @PostMapping("/token")
-    ResponseEntity<Map> token(HttpServletRequest request, HttpServletResponse response ) {
+    @PostMapping("/oauth/token")
+    ResponseEntity<Map> token(HttpServletRequest request, HttpServletResponse response, @RequestParam Map<String,String> params) {
+        Map body
+        //will pick up urn:ietf:params:oauth:grant-type:token-exchange or just token-exchange
+        if(params?.grant_type?.endsWith("token-exchange")){
+            body = exchangeToken(params)
+        } else {
+            //grant_type is password by default and the only other one supported right now
+            body = generateToken(request, response)
+        }
+        return ResponseEntity.ok()
+            .cacheControl(CacheControl.noStore())
+            .body(body)
+    }
+
+    Map generateToken(HttpServletRequest request, HttpServletResponse response){
         Jwt token = jwtTokenGenerator.generate()
         //add it as a cookie, there is no security "success handler" after this
         Cookie cookie = TokenUtils.tokenCookie(request, token)
         response.addCookie(cookie)
         //convert to a Map to render it as json
         Map body = TokenUtils.tokenToMap(token)
-
-        return ResponseEntity.ok()
-            .cacheControl(CacheControl.noStore())
-            .body(body)
+        return body
     }
 
-    @GetMapping("/token/callback")
-    ResponseEntity<Map> callback(HttpServletRequest request, HttpServletResponse response) {
-        return token(request, response)
+    Map exchangeToken(Map<String,String> params ){
+        String requested_subject = params.requested_subject
+        assert requested_subject
+        Jwt token = jwtTokenExchanger.exchange(requested_subject)
+        Map body = TokenUtils.tokenToMap(token)
+        //add sub to rep as well so its obvious its an exchange for new subject
+        body.sub = requested_subject
+        return body
+    }
+
+    @GetMapping("/oauth/token/callback")
+    ResponseEntity<Map> callback(HttpServletRequest request, HttpServletResponse response, @RequestParam Map<String,String> params ) {
+        return token(request, response, params)
     }
 
     /**

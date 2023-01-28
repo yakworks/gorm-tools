@@ -1,6 +1,5 @@
 package yakworks.security
 
-import groovy.transform.CompileDynamic
 
 import grails.testing.mixin.integration.Integration
 import okhttp3.Credentials
@@ -8,11 +7,10 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.Response
 import spock.lang.Specification
-import yakworks.rest.client.OkAuth
 import yakworks.rest.client.OkHttpRestTrait
 
 /**
- * test the legacy login with post username and password to login endpoint.
+ * Uses basic auth to login
  */
 @Integration
 class BasicAuthLoginSpec extends Specification implements OkHttpRestTrait {
@@ -23,7 +21,7 @@ class BasicAuthLoginSpec extends Specification implements OkHttpRestTrait {
     Response basicLogin(String uname, String pwd) {
         //create the basic auth credentials
         String basicAuth = Credentials.basic(uname, pwd)
-        String lpath = "http://localhost:${serverPort}/api/token"
+        String lpath = "http://localhost:${serverPort}/api/oauth/token"
         // String lpath = "http://${username}:${password}@localhost:${serverPort}/api/token"
         Request request = new Request.Builder()
             .url(lpath)
@@ -37,7 +35,7 @@ class BasicAuthLoginSpec extends Specification implements OkHttpRestTrait {
         return resp
     }
 
-    void "test login with json body"() {
+    void "test login with basic auth"() {
         when:
         def resp = basicLogin('admin', '123')
         Map body = bodyToMap(resp)

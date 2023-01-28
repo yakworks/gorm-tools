@@ -207,6 +207,7 @@ test.token-exchange:
 	# use awk to parse out the access_token
 	TOKEN=`echo $$RESP | awk -F'"' -v RS="," '/access_token/{ print $$4 }'`
 	echo "$$TOKEN"
+
 	echo "curl -X POST -H 'Authorization: Bearer $$TOKEN' \
       -d requested_subject=developers@9ci.com \
       -d grant_type=urn:ietf:params:oauth:grant-type:token-exchange \

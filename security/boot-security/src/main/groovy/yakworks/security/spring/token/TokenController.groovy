@@ -58,7 +58,14 @@ class TokenController {
      */
     @PostMapping("/token")
     ResponseEntity<Map> token(HttpServletRequest request, HttpServletResponse response, @RequestParam Map<String,String> params) {
-        Map body = generateToken(request, response)
+        Map body
+        //will pick up urn:ietf:params:oauth:grant-type:token-exchange or just token-exchange
+        if(params?.grant_type?.endsWith("token-exchange")){
+            body = exchangeToken(params)
+        } else {
+            //grant_type is access_token, only these 2 are supported right now
+            body = generateToken(request, response)
+        }
         return ResponseEntity.ok()
             .cacheControl(CacheControl.noStore())
             .body(body)
@@ -82,17 +89,6 @@ class TokenController {
         //add sub to rep as well so its obvious its an exchange for new subject
         body.sub = requested_subject
         return body
-    }
-
-    /**
-     * Default generator for token. Follows the oauth standards.
-     */
-    @PostMapping("/token-exchange")
-    ResponseEntity<Map> tokenExchange(@RequestParam Map<String,String> params ) {
-        Map body = exchangeToken(params)
-        return ResponseEntity.ok()
-            .cacheControl(CacheControl.noStore())
-            .body(body)
     }
 
     @GetMapping("/token/callback")

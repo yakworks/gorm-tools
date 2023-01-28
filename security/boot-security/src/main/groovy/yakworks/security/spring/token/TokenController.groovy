@@ -63,7 +63,7 @@ class TokenController {
         if(params?.grant_type?.endsWith("token-exchange")){
             body = exchangeToken(params)
         } else {
-            //grant_type is access_token, only these 2 are supported right now
+            //grant_type is password by default and the only other one supported right now
             body = generateToken(request, response)
         }
         return ResponseEntity.ok()

@@ -81,7 +81,7 @@ public class DefaultSecurityConfiguration {
     }
 
     /** Example for simple Saml setup. Its largely dealt with in the configuration. */
-    public static void applySamlSecurity(HttpSecurity http, AuthenticationSuccessHandler successHandler, String frontendCallbackUrl) throws Exception {
+    public static void applySamlSecurity(HttpSecurity http, AuthenticationSuccessHandler successHandler) throws Exception {
 
         http.saml2Login(saml2 -> {
                 //saml2.defaultSuccessUrl("/saml", true);
@@ -159,6 +159,18 @@ public class DefaultSecurityConfiguration {
     @Bean
     CookieAuthSuccessHandler cookieSuccessHandler(JwtTokenGenerator tokenGenerator){
         CookieAuthSuccessHandler handler = new CookieAuthSuccessHandler();
+        handler.setTokenGenerator(tokenGenerator);
+        handler.setDefaultTargetUrl("/");
+        // handler.setAlwaysUseDefaultTargetUrl(true);
+        return handler;
+    }
+
+    /**
+     * Success handler that adds cookie for token
+     */
+    @Bean
+    CookieUrlTokenSuccessHandler cookieUrlTokenSuccessHandler(JwtTokenGenerator tokenGenerator){
+        CookieUrlTokenSuccessHandler handler = new CookieUrlTokenSuccessHandler();
         handler.setTokenGenerator(tokenGenerator);
         handler.setDefaultTargetUrl(frontendCallbackUrl);
         // handler.setAlwaysUseDefaultTargetUrl(true);

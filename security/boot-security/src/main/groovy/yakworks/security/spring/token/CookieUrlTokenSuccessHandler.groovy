@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
@@ -23,6 +24,7 @@ import yakworks.security.spring.token.generator.TokenGenerator
  * Also add token to end of url when it ends with an =, legacy to get rcm-ui working
  * see app.security.frontendCallbackUrl
  */
+@Slf4j
 @CompileStatic
 class CookieUrlTokenSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler{
 
@@ -34,10 +36,10 @@ class CookieUrlTokenSuccessHandler extends SavedRequestAwareAuthenticationSucces
         AbstractOAuth2Token token = tokenGenerator.generate()
         Cookie cookie = TokenUtils.tokenCookie(request, token)
         response.addCookie(cookie)
-        // if(defaultTargetUrl.endsWith("=")){
-        //
-        // }
+
         String targetUrl = defaultTargetUrl
+        log.debug("😀saml success token generated and redirecting to ${targetUrl}")
+
         if(targetUrl.endsWith("=")){
             targetUrl = "${targetUrl}${token.tokenValue}"
         }

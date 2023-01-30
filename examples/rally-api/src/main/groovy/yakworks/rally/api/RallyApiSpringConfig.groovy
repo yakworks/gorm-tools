@@ -55,6 +55,9 @@ class RallyApiSpringConfig {
     @Value('${app.security.enabled:true}')
     boolean securityEnabled
 
+    @Value('${app.security.frontendCallbackUrl:""}')
+    String frontendCallbackUrl
+
     @Autowired(required = false) Saml2RelyingPartyProperties samlProps
 
     @Autowired JwtTokenGenerator tokenGenerator
@@ -98,13 +101,15 @@ class RallyApiSpringConfig {
             //make stateless so no session stored on server
             .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             //remove the cookie on logout
-            .logout().deleteCookies(TokenUtils.COOKIE_NAME);
+            .logout()
+                .deleteCookies(TokenUtils.COOKIE_NAME)
+                .clearAuthentication(true).invalidateHttpSession(true)
 
         // Uncomment to enable SAML, will hit the metadata-uri on startup and fail if not found
         // TODO need to find a way to not hit server until its needed instead of on startup
         if(samlProps?.registration?.containsKey('okta')){
             //adds success handler for adding cookie
-            DefaultSecurityConfiguration.applySamlSecurity(http, cookieAuthSuccessHandler)
+            DefaultSecurityConfiguration.applySamlSecurity(http, cookieAuthSuccessHandler, frontendCallbackUrl)
         }
 
         http.oauth2Login(withDefaults())

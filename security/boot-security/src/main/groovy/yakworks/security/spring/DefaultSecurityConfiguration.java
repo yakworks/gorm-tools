@@ -18,6 +18,7 @@ import yakworks.security.spring.token.store.TokenStore;
 import yakworks.security.spring.user.AuthSuccessUserInfoListener;
 import yakworks.security.user.CurrentUser;
 import yakworks.security.user.CurrentUserHolder;
+import yakworks.util.StringUtils;
 
 import java.security.KeyPair;
 import java.security.interfaces.RSAPrivateKey;
@@ -76,13 +77,17 @@ public class DefaultSecurityConfiguration {
     }
 
     /** Example for simple Saml setup. Its largely dealt with in the configuration. */
-    public static void applySamlSecurity(HttpSecurity http, AuthenticationSuccessHandler successHandler) throws Exception {
+    public static void applySamlSecurity(HttpSecurity http, AuthenticationSuccessHandler successHandler, String frontendCallbackUrl) throws Exception {
 
         http.saml2Login(saml2 -> {
                 //saml2.defaultSuccessUrl("/saml", true);
                 //saml2.defaultSuccessUrl("/api/token/callback", true);
                 // saml2.loginProcessingUrl("{baseUrl}/api/login/saml2/sso/{registrationId}");
-                saml2.successHandler(successHandler);
+                saml2.successHandler(successHandler)
+                    .defaultSuccessUrl(frontendCallbackUrl);
+                // if(!StringUtils.hasLength(frontendCallbackUrl)){
+                //     saml2.defaultSuccessUrl(frontendCallbackUrl);
+                // }
             })
             .saml2Logout(Customizer.withDefaults());
     }

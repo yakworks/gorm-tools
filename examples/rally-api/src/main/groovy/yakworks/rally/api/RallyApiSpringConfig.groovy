@@ -75,7 +75,9 @@ class RallyApiSpringConfig {
             "/security-tests/**",
             "/login*",
             "/token",
-            "/about"]
+            "/about",
+            "/samlSuccess"
+        ]
 
         if(!securityEnabled){
             //permit all wildcard

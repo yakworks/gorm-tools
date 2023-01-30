@@ -86,11 +86,11 @@ public class DefaultSecurityConfiguration {
 
                 //THIS WORKS
                 saml2.successHandler(successHandler);
-                //THIS DOES NOT AUTH
+                // THIS DOES NOT AUTH
                 // saml2.successHandler(successHandler)
                 //     .defaultSuccessUrl("/samlSuccess");
-
-                // if(!StringUtils.hasLength(frontendCallbackUrl)){
+                // THIS DOES NOT put cookie on browser
+                // if(StringUtils.hasLength(frontendCallbackUrl)){
                 //     saml2.defaultSuccessUrl(frontendCallbackUrl);
                 // }
             })

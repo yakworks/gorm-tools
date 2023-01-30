@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.core.log.LogMessage
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.core.AbstractOAuth2Token
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler

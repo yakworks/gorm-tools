@@ -7,13 +7,10 @@ package yakworks.security.spring.token
 import java.security.KeyPair
 import java.security.PrivateKey
 import java.security.PublicKey
-import java.security.interfaces.RSAPrivateKey
-import java.security.interfaces.RSAPublicKey
 
 import groovy.transform.CompileStatic
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.Resource
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm
 import org.springframework.stereotype.Component

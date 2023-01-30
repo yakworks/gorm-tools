@@ -1,15 +1,11 @@
 package yakworks.security.spring;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
-import com.nimbusds.jose.jwk.source.JWKSource;
-import com.nimbusds.jose.proc.SecurityContext;
 import yakworks.security.SecService;
 import yakworks.security.services.PasswordValidator;
-import yakworks.security.spring.token.*;
+import yakworks.security.spring.token.CookieAuthSuccessHandler;
+import yakworks.security.spring.token.CookieBearerTokenResolver;
+import yakworks.security.spring.token.CookieUrlTokenSuccessHandler;
 import yakworks.security.spring.token.generator.JwtTokenGenerator;
 import yakworks.security.spring.token.generator.OpaqueTokenGenerator;
 import yakworks.security.spring.token.generator.StoreTokenGenerator;
@@ -18,17 +14,10 @@ import yakworks.security.spring.token.store.TokenStore;
 import yakworks.security.spring.user.AuthSuccessUserInfoListener;
 import yakworks.security.user.CurrentUser;
 import yakworks.security.user.CurrentUserHolder;
-import yakworks.util.StringUtils;
 
-import java.security.KeyPair;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,9 +27,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.OAuth2Token;
-import org.springframework.security.oauth2.jwt.*;
-import org.springframework.security.oauth2.server.resource.authentication.JwtIssuerAuthenticationManagerResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.ForwardAuthenticationSuccessHandler;

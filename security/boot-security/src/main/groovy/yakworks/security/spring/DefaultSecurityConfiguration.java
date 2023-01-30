@@ -83,8 +83,13 @@ public class DefaultSecurityConfiguration {
                 //saml2.defaultSuccessUrl("/saml", true);
                 //saml2.defaultSuccessUrl("/api/token/callback", true);
                 // saml2.loginProcessingUrl("{baseUrl}/api/login/saml2/sso/{registrationId}");
-                saml2.successHandler(successHandler)
-                    .defaultSuccessUrl(frontendCallbackUrl);
+
+                //THIS WORKS
+                saml2.successHandler(successHandler);
+                //THIS DOES NOT AUTH
+                // saml2.successHandler(successHandler)
+                //     .defaultSuccessUrl("/samlSuccess");
+
                 // if(!StringUtils.hasLength(frontendCallbackUrl)){
                 //     saml2.defaultSuccessUrl(frontendCallbackUrl);
                 // }

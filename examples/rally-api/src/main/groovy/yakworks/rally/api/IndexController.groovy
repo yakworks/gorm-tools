@@ -64,4 +64,9 @@ class IndexController {
         return secContext.authentication.details as UserInfo
     }
 
+    @GetMapping("/samlSuccess")
+    @ResponseBody String samlSuccess(ModelMap model) {
+        model.addAttribute('info', 'test info')
+        "samlSuccess"
+    }
 }

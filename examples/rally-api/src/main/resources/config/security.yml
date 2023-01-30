@@ -1,5 +1,7 @@
 app:
   security:
+    # the redirect url for successful saml
+    frontendCallbackUrl: http://localhost:8080/api/samlSuccess?token=
     jwt:
       # secret for Symmetric HS256 tokens, should be long and random
       secret: s/9Y3WUi5LkKsR8IZ4DTcX=

@@ -34,6 +34,7 @@ import yakworks.rally.RallyConfiguration
 import yakworks.rest.grails.AppInfoBuilder
 import yakworks.security.spring.DefaultSecurityConfiguration
 import yakworks.security.spring.token.CookieAuthSuccessHandler
+import yakworks.security.spring.token.CookieUrlTokenSuccessHandler
 import yakworks.security.spring.token.TokenUtils
 import yakworks.security.spring.token.generator.JwtTokenGenerator
 import yakworks.security.spring.token.store.TokenStore
@@ -55,10 +56,14 @@ class RallyApiSpringConfig {
     @Value('${app.security.enabled:true}')
     boolean securityEnabled
 
+    @Value('${app.security.frontendCallbackUrl:""}')
+    String frontendCallbackUrl
+
     @Autowired(required = false) Saml2RelyingPartyProperties samlProps
 
     @Autowired JwtTokenGenerator tokenGenerator
     @Autowired CookieAuthSuccessHandler cookieAuthSuccessHandler
+    @Autowired CookieUrlTokenSuccessHandler cookieUrlTokenSuccessHandler
     @Autowired TokenStore tokenStore
 
     @Bean
@@ -72,7 +77,8 @@ class RallyApiSpringConfig {
             "/security-tests/**",
             "/login*",
             "/token",
-            "/about"]
+            "/about"
+        ]
 
         if(!securityEnabled){
             //permit all wildcard
@@ -98,13 +104,15 @@ class RallyApiSpringConfig {
             //make stateless so no session stored on server
             .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             //remove the cookie on logout
-            .logout().deleteCookies(TokenUtils.COOKIE_NAME);
+            .logout()
+                .deleteCookies(TokenUtils.COOKIE_NAME)
+                .clearAuthentication(true).invalidateHttpSession(true)
 
         // Uncomment to enable SAML, will hit the metadata-uri on startup and fail if not found
         // TODO need to find a way to not hit server until its needed instead of on startup
         if(samlProps?.registration?.containsKey('okta')){
             //adds success handler for adding cookie
-            DefaultSecurityConfiguration.applySamlSecurity(http, cookieAuthSuccessHandler)
+            DefaultSecurityConfiguration.applySamlSecurity(http, cookieUrlTokenSuccessHandler)
         }
 
         http.oauth2Login(withDefaults())

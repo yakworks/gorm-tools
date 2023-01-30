@@ -24,6 +24,7 @@ import java.security.KeyPair;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -53,6 +54,9 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class DefaultSecurityConfiguration {
 
     //@Autowired(required = false) TokenStore tokenStore;
+
+    @Value("${app.security.frontendCallbackUrl:''}")
+    String frontendCallbackUrl;
 
     /**
      * Helper to set up HttpSecurity builder with default requestMatchers and forms.
@@ -156,7 +160,7 @@ public class DefaultSecurityConfiguration {
     CookieAuthSuccessHandler cookieSuccessHandler(JwtTokenGenerator tokenGenerator){
         CookieAuthSuccessHandler handler = new CookieAuthSuccessHandler();
         handler.setTokenGenerator(tokenGenerator);
-        handler.setDefaultTargetUrl("/");
+        handler.setDefaultTargetUrl(frontendCallbackUrl);
         // handler.setAlwaysUseDefaultTargetUrl(true);
         return handler;
     }

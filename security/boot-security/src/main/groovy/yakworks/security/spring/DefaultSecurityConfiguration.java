@@ -55,7 +55,7 @@ public class DefaultSecurityConfiguration {
 
     //@Autowired(required = false) TokenStore tokenStore;
 
-    @Value("${app.security.frontendCallbackUrl:''}")
+    @Value("${app.security.frontendCallbackUrl:'/'}")
     String frontendCallbackUrl;
 
     /**

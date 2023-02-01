@@ -50,7 +50,7 @@ import static org.springframework.security.config.Customizer.withDefaults
 @EnableWebSecurity //(debug = true)
 @CompileStatic
 @Configuration
-@Import([RallyConfiguration])
+@Import([RallyConfiguration, RallyApiSessionConfig])
 class RallyApiSpringConfig {
 
     @Value('${app.security.enabled:true}')

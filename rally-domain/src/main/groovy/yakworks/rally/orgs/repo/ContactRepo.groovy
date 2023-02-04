@@ -79,7 +79,11 @@ class ContactRepo extends LongIdGormRepo<Contact> {
         String sourceId = Maps.value(data, 'sourceId')
         if(sourceId) {
             List contactForSourceId = ContactSource.findAllWhere(sourceId: sourceId)
-            contact = contactForSourceId[0].contact
+            if(contactForSourceId?.size() == 1) {
+                contact = contactForSourceId[0].contact
+            } else if (contactForSourceId?.size() > 1) {
+                throw new DataRetrievalFailureException("Multiple Contacts found for sourceId: ${sourceId}, lookup key must return a unique Contact")
+            }
         } else if (data.num) {
             String num = Maps.value(data, 'num')
             List contactForNum = Contact.findAllWhere(num:num)

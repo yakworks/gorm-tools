@@ -5,9 +5,11 @@
 package yakworks.rally.orgs.model
 
 import gorm.tools.model.SourceTrait
+import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import yakworks.rally.orgs.repo.ContactSourceRepo
 import yakworks.security.audit.AuditStamp
 
 @Entity
@@ -28,4 +30,6 @@ class ContactSource implements SourceTrait, RepoEntity<ContactSource>, Serializa
         sourceVersion:[ nullable: true],
         contact:[ nullable: false]
     ]
+
+    static ContactSourceRepo getRepo() { RepoLookup.findRepo(this) as ContactSourceRepo }
 }

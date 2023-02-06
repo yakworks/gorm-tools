@@ -78,7 +78,7 @@ class ContactRepo extends LongIdGormRepo<Contact> {
 
         String sourceId = Maps.value(data, 'sourceId')
         if(sourceId) {
-            List contactForSourceId = ContactSource.findAllWhere(sourceId: sourceId)
+            ContactSource source = ContactSource.findWhere(sourceId: sourceId)
             if(contactForSourceId?.size() == 1) {
                 contact = contactForSourceId[0].contact
             } else if (contactForSourceId?.size() > 1) {

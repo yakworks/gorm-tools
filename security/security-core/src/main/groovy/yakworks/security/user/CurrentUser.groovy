@@ -40,14 +40,28 @@ trait CurrentUser {
     abstract void logout()
 
     /**
-     * Returns true if this Subject has the specified role
+     * Returns true if current user has any of the specified roles
+     * See fixme note in CurrentSpringUser, this is a temp hack as spring auth object doesnt have our roles when its a BearereAuthToken
+     *
      */
-    abstract boolean hasRole(String role)
+    boolean hasAnyRole(Collection<String> roles){
+        Set<String> roleSet = getUser().roles as Set<String>
+        for (String role : roles) {
+            //String defaultedRole = getRoleWithDefaultPrefix(prefix, role);
+            if (roleSet.contains(role)) {
+                return true
+            }
+        }
+        return false
+    }
 
     /**
-     * Returns true if current user has any of the specified roles
+     * Returns true if this Subject has the specified role
      */
-    abstract boolean hasAnyRole(Collection<String> roles)
+    boolean hasRole(String role){
+        // getSecurityOperations().hasRole(role)
+        hasAnyRole([role])
+    }
 
     /**
      * Returns true if current user has any of roles in comma seperated list

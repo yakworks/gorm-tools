@@ -219,7 +219,7 @@ class MangoBuilder {
         //     applyFieldMap(criteria, field, fieldVal)
         // }
         //I think we should not blow up an error if some field isnt in domain, just add message to log
-        log.info "No match in applyField for [field:$field, entity:${getTargetClass(criteria).name}, fieldVal: $fieldVal, fieldVal.class: ${fieldVal?.class}"
+        log.debug "No match in applyField for [field:$field, entity:${getTargetClass(criteria).name}, fieldVal: $fieldVal, fieldVal.class: ${fieldVal?.class}"
 
     }
 

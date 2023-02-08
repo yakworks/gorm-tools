@@ -1,25 +1,16 @@
-//It all starts here
-buildscript {
-  repositories {
-    mavenLocal()
-    maven { url "https://plugins.gradle.org/m2/" }
-    maven { url "https://repo.grails.org/grails/core" }
-  }
-  dependencies {
-    classpath "org.grails:grails-gradle-plugin:$grailsGradlePluginVersion"
-    classpath "org.grails.plugins:hibernate5:$vGormHibernate"
-    classpath "org.yakworks:gradle-plugins:$vShipyak"
-    classpath "io.github.gradle-nexus:publish-plugin:$vMavenNexus"
-    // classpath "org.grails.plugins:views-gradle:2.2.1"
-    classpath "org.grails.plugins:views-gradle:$vViews"
-  }
+plugins {
+  id "yakworks.shipyak"
+  id "io.github.gradle-nexus.publish-plugin"
+  // the transative dep when applying shipyak gets goofy if we dont do this, these are included but not applied to root
+  id "org.grails.grails-web" apply false
+  id 'org.grails.grails-plugin' apply false
 }
 
 group = "org.yakworks"
 
 //our opinionated defaults for gradle groovy & grails projects
-apply plugin: 'yakworks.shipyak'
-apply plugin: "io.github.gradle-nexus.publish-plugin"
+// apply plugin: 'yakworks.shipyak'
+// apply plugin: "io.github.gradle-nexus.publish-plugin"
 
 if(!isSnapshot) {
   nexusPublishing {
@@ -29,14 +20,13 @@ if(!isSnapshot) {
   }
 }
 
-subprojects { subprj ->
-
-  group = "org.yakworks"
-
+allprojects {
   repositories {
     mavenLocal()
     mavenCentral()
     maven { url "https://repo.grails.org/grails/core" }
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://build.shibboleth.net/nexus/content/repositories/releases/" } //for opensaml
     maven {
       url "http://repo.9ci.com/oss-snapshots"
       allowInsecureProtocol = true
@@ -45,7 +35,25 @@ subprojects { subprj ->
       }
     }
     maven { url "http://repo.9ci.com/public-libs"; allowInsecureProtocol = true }
+    // maven { url "https://repo.spring.io/milestone" mavenContent { snapshotsOnly() } }
+
   }
+
+  //info task to show version overrides that be ovveridden for spring/grails bom
+  tasks.register('dependencyManagementProperties') {
+    doLast {
+      dependencyManagement
+        .importedProperties
+        .toSorted()
+        .each { property -> println property }
+    }
+  }
+
+}
+subprojects { subprj ->
+
+  group = "org.yakworks"
+
   // get prop with default if null, converts to boolean
   Closure getProp = { pname, defualtv -> (subprj.findProperty(pname) ?: defualtv).toBoolean() }
 
@@ -55,29 +63,13 @@ subprojects { subprj ->
     isGormLibrary = getProp('isGormLibrary', true)
     isExample = getProp('isExample', false)
   }
-
-  apply from: "${rootProject.projectDir}/gradle/compile.gradle"
-
-  // if its a lib then setup gpg signing, see signing.gnupg.keyName
-  if (isPublishable){
-    apply from: "${rootProject.projectDir}/gradle/publish.gradle"
-  }
-  if (isGormLibrary) {
-    apply from: "${rootProject.projectDir}/gradle/gorm-lib.gradle"
-  }
-  if (isExample) {
-    apply from: "${rootProject.projectDir}/gradle/example.gradle"
-  }
-
-  apply from: "${rootProject.projectDir}/gradle/test-unit.gradle"
-
-  configurations {
-    //includes the compileOnly in tests too so we don't have to list twice
-    testImplementation.extendsFrom compileOnly
-    all {
-      resolutionStrategy.cacheChangingModulesFor 1, 'seconds' //when changing = true this sets the cache time
-    }
-  }
+  apply plugin: 'groovy'
+  // apply from: "${rootDir}/gradle/compile.gradle"
+  //
+  // // if its a lib then setup gpg signing, see signing.gnupg.keyName
+  // if (isPublishable){
+  //   apply from: "${rootDir}/gradle/publish.gradle"
+  // }
 }
 
 ext.codenarcRuleset= '''
@@ -87,5 +79,7 @@ ext.codenarcRuleset= '''
   getRule('SynchronizedMethod').enabled = false
   getRule('UnnecessaryDotClass').enabled = false
   getRule('ExplicitCallToEqualsMethod').enabled = false
-
+  getRule('ExplicitHashSetInstantiation').enabled = false
+  getRule('AssignmentToStaticFieldFromInstanceMethod').enabled = false
+  getRule('UnnecessaryCollectCall').enabled = false
 '''

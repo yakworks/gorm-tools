@@ -10,8 +10,10 @@ import groovy.transform.ToString
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
+import gorm.tools.async.AsyncArgs
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp
+import yakworks.commons.lang.NameUtils
 
 /**
  * Value Object are better than using a Map to store arguments and parameters.
@@ -24,6 +26,8 @@ import gorm.tools.repository.model.DataOp
 @ToString
 @CompileStatic
 class SyncJobArgs {
+    public static final DATA_FORMAT_RESULT = "result"
+    public static final DATA_FORMAT_PAYLOAD = "payload"
 
     SyncJobArgs() { this([:])}
 
@@ -52,6 +56,21 @@ class SyncJobArgs {
      * resulting data is always saved but can force it to save to file instead of bytes in column
      */
     Boolean saveDataAsFile = false
+
+    /**
+     * If dataFormat=Payload then errors should be stored separate from result data.
+     * If dataFormat=Result then errors are mixed in and the syncJob.data is just a rendered list of the results.
+     * When dataFormat=Payload then the rendering of the data is only list of whats in each results paload.
+     * as opposed to a list of Results objects when dataFormat=Result
+     * For example if processing export then instead of getting syncJob.data as a list of results objects it will be a list of what
+     * the requested export is, such as Invoices. would look as if the call was made to the rest endpoint for a list synchronously
+     * Since data can only support a list of entities then any issues or errors get stored in a separate errors field,
+     * syncjob.errorBytes will be populated with error results
+     */
+    DataFormat dataFormat = DataFormat.Result
+
+    @CompileStatic
+    static enum DataFormat { Result, Payload }
 
     /**
      * the operation to perform, Used in bulk and limited to add and update right now.
@@ -91,17 +110,18 @@ class SyncJobArgs {
     boolean transactional = false
 
     /**
-     * Allows override for the default async from gorm.tools.async.enabled
-     * whether it should run async with a CompletableFuture and return the job immediately
-     * or run in a standard blocking synchronous
+     * Normally used for testing and debugging, or when encountering deadlocks.
+     * Allows to override and turn off the AsyncArgs.enabled passed to ParallelTools
+     * When the processes slices it will parallelize and run them async. If false then will not run in parallel and will be single threaded
      */
-    Boolean asyncEnabled
+    Boolean parallel
 
     /**
-     * Whether it should run async with a CompletableFuture and return the job immediately
-     * or run in a standard blocking synchronous
+     * Whether it should run in async background thread and return the job immediately.
+     * Essentially makes the job a sort of Promise or Future.
+     * when false (default) run in a standard blocking synchronous thread and return when job is done
      */
-    Boolean promiseEnabled = false
+    Boolean async = false
 
     /**
      * the args, such as flush:true etc.., to pass down to the repo methods
@@ -144,5 +164,8 @@ class SyncJobArgs {
         new SyncJobArgs(args)
     }
 
+    AsyncArgs getAsyncArgs() {
+        return new AsyncArgs(enabled: async)
+    }
 
 }

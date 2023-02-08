@@ -14,6 +14,10 @@ class BadUrlSpec extends Specification implements OkHttpRestTrait {
 
     String path = "/api/this/is/no/good"
 
+    def setup(){
+        login()
+    }
+
     void "good url"() {
         when:
         Response resp = get('/api/rally/org')
@@ -32,7 +36,8 @@ class BadUrlSpec extends Specification implements OkHttpRestTrait {
         then:
         resp.code() == HttpStatus.NOT_FOUND.value()
         Map body = new JsonSlurper().parseText(bodyString) as Map
-        body.error == 404
+        body.status == 404
+        // body.error == 404
     }
 
 }

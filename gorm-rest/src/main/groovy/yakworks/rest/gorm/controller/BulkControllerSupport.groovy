@@ -11,17 +11,16 @@ import groovy.transform.CompileStatic
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.beans.factory.annotation.Autowired
 
-import gorm.tools.api.IncludesConfig
-import gorm.tools.api.IncludesKey
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.DataOp
-import grails.util.TypeConvertingMap
 import grails.web.servlet.mvc.GrailsParameterMap
 import yakworks.etl.csv.CsvToMapTransformer
+import yakworks.gorm.api.IncludesConfig
+import yakworks.gorm.api.IncludesKey
 import yakworks.spring.AppCtx
 
 /**
@@ -59,21 +58,8 @@ class BulkControllerSupport<D> {
     }
 
     SyncJobEntity process(DataOp dataOp, List<Map> dataList, GrailsWebRequest webRequest) {
-        // List dataList = bodyAsList() as List<Map>
-        HttpServletRequest req = webRequest.currentRequest
-        GrailsParameterMap params = webRequest.params
-        String sourceKey = "${req.method} ${req.requestURI}?${req.queryString}"
 
-        Map includesMap = includesConfig.getIncludes(entityClass)
-        List bulkIncludes = IncludesConfig.getFieldIncludes(includesMap, [IncludesKey.bulk.name()])
-        List bulkErrorIncludes = includesMap['bulkError'] as List<String>
-
-        SyncJobArgs syncJobArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludes, errorIncludes: bulkErrorIncludes,
-            sourceId: sourceKey, source: params.jobSource, params: params)
-        //Can override payload storage or turn off with 'NONE' if not needed for big loads
-        syncJobArgs.promiseEnabled = params.boolean('promiseEnabled', false)
-        syncJobArgs.savePayload = params.boolean('savePayload', true)
-        syncJobArgs.saveDataAsFile = params.boolean('saveDataAsFile')
+        SyncJobArgs syncJobArgs = setupSyncJobArgs(dataOp, webRequest)
 
         Long jobId
         if(syncJobArgs.params.attachmentId) {
@@ -100,18 +86,59 @@ class BulkControllerSupport<D> {
      * @return the jobId
      */
     Long doBulkCsv(SyncJobArgs syncJobArgs){
-        if(!syncJobArgs.asyncEnabled == null) syncJobArgs.asyncEnabled  = true //enable by default
         //params will have already been set in syncJobArgs and for CSV we have different defaults
-        TypeConvertingMap params = syncJobArgs.params as TypeConvertingMap
+        Map params = syncJobArgs.params
         //default to true for CSV unless explicitely disabled in params
-        syncJobArgs.promiseEnabled = params.boolean('promiseEnabled', true)
-        //dont save payload by default, and if done, save to file not db.
-        syncJobArgs.savePayload = params.boolean('savePayload', false)
-        syncJobArgs.saveDataAsFile = params.boolean('saveDataAsFile', true)
+        syncJobArgs.async = params.getBoolean('async', true)
+        //TODO support for legacy param, remove once we know no one is using it
+        if(params.promiseEnabled != null) syncJobArgs.async = params.getBoolean('promiseEnabled', true)
+        //dont save payload by default, but if its true then save to file not db.
+        // TODO above comment is not true, its setting saveDataAsFile not pload
+        syncJobArgs.savePayload = params.getBoolean('savePayload', false)
+        //always save the data as file and not in the syncJob row
+        //TODO why do we do this? why not let it be automated like elsewhere?
+        syncJobArgs.saveDataAsFile = params.getBoolean('saveDataAsFile', true)
 
         List<Map> dataList = transformCsvToBulkList(params)
         return getRepo().bulk(dataList, syncJobArgs)
     }
+
+    /**
+     * sets up the SyncJobArgs from whats passed in from params
+     */
+    SyncJobArgs setupSyncJobArgs(DataOp dataOp, GrailsWebRequest webRequest){
+        HttpServletRequest req = webRequest.currentRequest
+        GrailsParameterMap params = webRequest.params
+        String sourceKey = "${req.method} ${req.requestURI}?${req.queryString}"
+
+        Map includesMap = includesConfig.getIncludes(entityClass)
+        List bulkIncludes = IncludesConfig.getFieldIncludes(includesMap, [IncludesKey.bulk.name()])
+        List bulkErrorIncludes = includesMap['bulkError'] as List<String>
+
+        SyncJobArgs syncJobArgs = new SyncJobArgs(
+            op: dataOp,
+            includes: bulkIncludes,
+            errorIncludes: bulkErrorIncludes,
+            sourceId: sourceKey,
+            source: params.jobSource,
+            params: params
+        )
+
+        //FIXME remove asyncEnabled once verified its not needed
+        if(params.asyncEnabled != null) syncJobArgs.parallel = params.boolean('asyncEnabled')
+        if(params.parallel != null) syncJobArgs.parallel = params.boolean('parallel')
+        //async is false by default, when this is true then runs "non-blocking" in background and will job immediately with state=running
+        if(params.async != null) syncJobArgs.async = params.boolean('async')
+        //TODO support for legacy param, remove once we know no one is using it
+        if(params.promiseEnabled != null) syncJobArgs.async = params.boolean('promiseEnabled')
+
+        //savePayload is true by default
+        if(params.savePayload != null) syncJobArgs.savePayload = params.boolean('savePayload')
+        //data is always saved, but can force it be in a file if passes. will get set to true if payload.size() > 1000 no matter what is set
+        // syncJobArgs.saveDataAsFile = params.boolean('saveDataAsFile')
+        return syncJobArgs
+    }
+
 
     /**
      * transform csv to list of maps using csvToMapTransformer.

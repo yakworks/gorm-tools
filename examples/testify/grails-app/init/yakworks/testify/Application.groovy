@@ -1,17 +1,29 @@
 package yakworks.testify
 
 import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.Import
 
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
 import grails.plugins.metadata.PluginSource
+import yakworks.rally.RallyConfiguration
 
-@ComponentScan(['yakworks.testify', 'yakworks.security', 'yakworks.rally', 'yakworks.testing.gorm.model'])
+/** NOTE: Reminder, this Application class is used mainly for Grails integration tests, not really for deploy */
+@ComponentScan(['yakworks.testify', 'yakworks.testing.gorm.model'])
+@Import([RallyConfiguration])
 @PluginSource
 class Application extends GrailsAutoConfiguration {
 
     static void main(String[] args) {
         GrailsApp.run(Application, args)
+    }
+
+    /**
+     * add packages here where the other grails artifacts exist such as domains marked with @Entity
+     */
+    @Override
+    Collection<String> packageNames() {
+        super.packageNames() + RallyConfiguration.entityScanPackages + ['yakworks.testing.gorm.model']
     }
 
     /**
@@ -21,12 +33,5 @@ class Application extends GrailsAutoConfiguration {
     @Override
     protected boolean limitScanningToApplication() { false }
 
-    /**
-     * add packages here where the other grails artifacts exist such as domains marked with @Entity
-     */
-    @Override
-    Collection<String> packageNames() {
-        super.packageNames() + ['yakworks.security', 'yakworks.rally', 'yakworks.testing.gorm.model']
-    }
 
 }

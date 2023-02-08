@@ -12,7 +12,7 @@ import gorm.tools.job.SyncJobEntity
 import grails.rest.render.RenderContext
 
 /**
- * Rederer for paged list data
+ * SyncJob renderer.
  *
  * @author Joshua Burnett (@basejump)
  * @since 7.0.8
@@ -26,18 +26,22 @@ class SyncJobRenderer implements JsonRendererTrait<SyncJobEntity> {
         setContentType(context)
 
         // gets the raw json string and use the unescaped to it just dumps it to writer without any round robin conversion
-        String dataString = job.dataToString()
-        JsonOutput.JsonUnescaped rawDataJson = JsonOutput.unescaped(dataString)
+        JsonOutput.JsonUnescaped rawDataJson = JsonOutput.unescaped(job.dataToString())
 
-        jsonBuilder(context).call {
-            id job.id
-            ok job.ok
-            state job.state.name()
-            source job.source
-            sourceId job.sourceId
-            data rawDataJson
+        Map response = [
+            id: job.id,
+            ok: job.ok,
+            state: job.state.name(),
+            source: job.source,
+            sourceId: job.sourceId,
+            data: rawDataJson
+        ]
+
+        if(job.problems) {
+            response['problems'] = job.problems
         }
 
+        jsonBuilder(context).call(response)
     }
 
 }

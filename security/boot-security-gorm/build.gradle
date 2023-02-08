@@ -1,0 +1,24 @@
+plugins {
+  // id 'org.springframework.boot'
+  // id 'io.spring.dependency-management'
+  id 'yakworks.groovy-lib'
+}
+
+apply from: "${rootDir}/gradle/gorm-lib.gradle"
+
+dependencies {
+  compileOnly "org.grails:grails-web-common:$grailsVersion"
+  compileOnly "javax.servlet:javax.servlet-api:4.0.1"
+
+  api project(":boot-security")
+
+  compileOnly project(":gorm-tools")
+  compileOnly project(":gorm-audit")
+}
+
+// bootJar {
+//   enabled = false
+// }
+// jar {
+//   enabled = true
+// }

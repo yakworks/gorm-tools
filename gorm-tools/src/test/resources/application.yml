@@ -2,6 +2,8 @@
 
 spring.config.import: classpath:./gorm/tools/datasource-test.yml
 
+api.config.import: classpath:/api.yml,classpath*:/api/**/*.yml
+
 hibernate.jdbc.batch_size: 50
 
 ---
@@ -27,15 +29,3 @@ gorm:
       foo: bar
     idGenerator:
       startValue: 1
-
----
-
-
-# add some api configs for testing
-api:
-  paths:
-    security:
-      sinkExt:
-        entityClass: 'yakworks.testing.gorm.model.SinkExt'
-        includes:
-          getCustom: ['id', 'name', 'thing.$stamp' ]

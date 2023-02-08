@@ -1,5 +1,7 @@
 package yakworks.rest
 
+import yakworks.rally.orgs.model.ContactFlex
+import yakworks.rally.orgs.model.OrgFlex
 import yakworks.rest.gorm.controller.RestRepoApiController
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
@@ -79,7 +81,16 @@ class OrgControllerTests extends RestIntTest {
         body.tags[0].id == tag1.id
     }
 
-    void "list sort"() {
+    void "list sort 3rd level nested object"() {
+        setup:
+        Org.list().each { Org org ->
+            //some other test is not cleaning up so only set if it has a contact
+            if(!org.contact) return
+            Long id = org.contact.id
+            org.contact.flex = new ContactFlex(id: id, num1: id * 1.5).persist()
+            org.contact.persist()
+        }
+        flushAndClear()
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:
         controller.params << [max:20, sort:'contact.flex.num1', order:'desc']

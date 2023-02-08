@@ -13,6 +13,10 @@ import yakworks.json.groovy.JsonEngine
 @Integration
 class AppConfigRestApiSpec extends Specification implements OkHttpRestTrait {
 
+    def setup(){
+        login()
+    }
+
     void "test config values"() {
         when:
         Response resp = get('/api/appConfig/rally/org')

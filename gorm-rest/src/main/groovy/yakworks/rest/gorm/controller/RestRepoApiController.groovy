@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.http.HttpStatus
 
-import gorm.tools.api.IncludesKey
 import gorm.tools.beans.Pager
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.GormRepo
@@ -21,6 +20,7 @@ import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.DataOp
 import grails.web.Action
 import yakworks.api.problem.Problem
+import yakworks.gorm.api.IncludesKey
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.MULTI_STATUS

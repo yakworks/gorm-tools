@@ -11,12 +11,12 @@ import groovy.util.logging.Slf4j
 import org.grails.orm.hibernate.HibernateDatastore
 import org.springframework.context.MessageSource
 
-import gorm.tools.boot.GormToolsConfiguration
 import gorm.tools.jdbc.DbDialectService
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.validation.RepoValidatorRegistry
 import grails.core.ArtefactHandler
 import grails.plugins.Plugin
+import yakworks.gorm.boot.GormToolsConfiguration
 
 /**
  * @author Joshua Burnett (@basejump)
@@ -26,7 +26,8 @@ import grails.plugins.Plugin
 @Slf4j
 class GormToolsGrailsPlugin extends Plugin {
 
-    def loadAfter = ['hibernate', 'datasources']
+    def loadAfter = ['hibernate', 'datasources', 'grails-kit']
+
     //make sure we load before controllers as might be creating rest controllers
     def loadBefore = ['controllers']
 

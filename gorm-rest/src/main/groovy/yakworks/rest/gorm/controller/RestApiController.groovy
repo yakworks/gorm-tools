@@ -67,6 +67,10 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
         respond(apiError)
     }
 
+    // void respondWith(Object value, Map args = [:]) {
+    //     internalRegistryRender value, args
+    // }
+
     //*** RestResponder Overrides to use the RestRegistryResponder.respondWith
     @Generated @Override
     def respond(Object obj) { respondWith obj, [:] }

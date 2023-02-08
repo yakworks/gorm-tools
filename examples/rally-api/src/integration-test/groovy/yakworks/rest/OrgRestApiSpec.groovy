@@ -22,6 +22,10 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
     Map postData = [num:'foo1', name: "foo", type: 'Customer']
     Map putData = [name: "updated foo1"]
 
+    def setup(){
+        login()
+    }
+
     void "get picklist"() {
         when:
         Response resp = get("$path/picklist")
@@ -154,7 +158,7 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
 
         List<Map> phones = [[kind: "kind", num: "123"]]
         List<Map> emails = [[kind: "kind", address: "test@9ci.com"]]
-        List<Map> sources = [[source: "source", sourceType: "RestApi", sourceId: "1"]]
+        List<Map> sources = [[source: "source", sourceType: "RestApi", sourceId: "11"]]
 
         List<Map> contacts = [
             [name: "C1", firstName: "C1", phones: phones, emails:emails, sources: sources],
@@ -257,7 +261,7 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
 
     void "testing put"() {
         when:
-        Response resp = put(path, [name: "9Galt"], 1)
+        Response resp = put(path, [name: "9Galt"], 67)
 
         Map body = bodyToMap(resp)
 

@@ -1,60 +1,44 @@
-apply plugin: "yakworks.grails-plugin"
-
+plugins {
+  id "yakworks.grails-plugin"
+}
 // sourceSets.test.resources.srcDirs += [project(':gorm-test-support').sourceSets.main.resources]
+apply from: "${rootDir}/gradle/gorm-lib.gradle"
 
 dependencies {
-  console "org.grails:grails-console"
 
+  compileOnly "org.springframework.boot:spring-boot-autoconfigure"
   // api project(":commons")
   // TODO use this standard for json converters
   // api "jakarta.json.bind:jakarta.json.bind-api:2.0.0"
 
+  //GRAILS
+  api "org.grails:grails-databinding:$grailsVersion"
+
   api "org.yakworks:hibernate-groovy-proxy:$vHibernateGroovy"
   api "org.yakworks:hibernate-groovy-db:$vHibernateGroovy"
 
-  api "org.yakworks:grails-kit:$vSpringGrailsKit"
-
+  api ("org.yakworks:grails-kit:$vSpringGrailsKit")
   api "org.yakworks:grails-icu4j:$vYakICU4J"
-  api "org.yakworks:api-messages:$vGroovyCommons"
   api "org.yakworks:groovy-commons:$vGroovyCommons"
 
   // see https://github.com/f4b6a3/uuid-creator
   api "com.github.f4b6a3:uuid-creator:$vUuidCreator"
-  // api "com.vladmihalcea:hibernate-types-52:$vHibTypes"
+  //add the hibernate types for json fields.
   api "com.vladmihalcea:$vHibTypes"
 
-  implementation "org.codehaus.groovy:groovy-sql:$groovyVersion"
-  // compileOnly "org.codehaus.gpars:gpars:$vGpars"
+  api "jakarta.annotation:jakarta.annotation-api:$vJakartaAnn"
 
-  // implementation "org.apache.commons:commons-lang3:$vCommonsLang3"
+  api "org.codehaus.groovy:groovy-sql:$groovyVersion"
 
-  //used for json parsing but require it to be added to project that uses this
-  // compileOnly("org.grails.plugins:views-json:$vViews") {
-  //   //exclude controllers since it messes with the domain compile and map constructor
-  //   exclude group:"org.grails", module: "grails-plugin-controllers"
-  // }
-  // compileOnly "org.grails.plugins:views-json-templates:$vViews"
-
-  // compileOnly("org.grails:grails-web-common"){
-  //   exclude group: 'org.grails', module: 'grails-web-databinding'
-  // }
-  // compileOnly("org.grails:grails-web"){
-  //   exclude group: 'org.grails', module: 'grails-web-databinding'
-  // }
-  // compileOnly("org.grails:grails-plugin-mimetypes"){
-  //   exclude group: 'org.grails', module: 'grails-web'
-  //   exclude group: 'org.grails', module: 'grails-web-common'
-  // }
-
-  //gets rid of the 'warning: unknown enum constant When.MAYBE' until we can figure out where it comes from
+  //FIXME gets rid of the 'warning: unknown enum constant When.MAYBE' until we can figure out where it comes from
   compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
 
-  testImplementation "org.slf4j:slf4j-simple:${vSlf4j}"
+  //gets rid of the "Failed to load class "org.slf4j.impl.StaticLoggerBinder"."
+  testImplementation "ch.qos.logback:logback-classic:1.2.11"
+
   testImplementation project(":gorm-test-domain")
-  testImplementation project(":gorm-security")
-  //
-  // testImplementation "com.vladmihalcea:hibernate-types-52:$vHibTypes"
-  //
+  testImplementation project(":boot-security")
+
 }
 
 test {

@@ -21,9 +21,9 @@ class RepoUtilsSpec extends Specification implements DataRepoTest {
         mockDomains MockDomain
     }
 
-    void 'instanceControllersDomainBindingApi'() {
+    void 'No instanceControllersDomainBindingApi'() {
         expect:
-        ReflectionUtils.findField(Cust, 'instanceControllersDomainBindingApi')
+        !ReflectionUtils.findField(Cust, 'instanceControllersDomainBindingApi')
         //Org.hasProperty('instanceControllersDomainBindingApi')
     }
 

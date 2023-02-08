@@ -24,7 +24,8 @@ import yakworks.rest.gorm.controller.RestRepoApiController
 @CompileStatic
 class RepoApiMappingsService {
     //the root/base dir for the paths TODO get this from config
-    String contextPath = '/api'
+    // String contextPath = '/api'
+    String contextPath = ''
 
     //FIXME see note in GormRestGrailsPlugin, Autowired not working. Might be being picked up to early in the game with dev.
     @Autowired ConstraintRegistry urlMappingsConstraintRegistry

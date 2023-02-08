@@ -19,6 +19,7 @@ import org.springframework.core.convert.ConversionService
 import org.springframework.core.convert.support.GenericConversionService
 import org.springframework.dao.InvalidDataAccessResourceUsageException
 
+import gorm.tools.mango.MangoDetachedCriteria
 import grails.gorm.DetachedCriteria
 
 /**
@@ -62,6 +63,7 @@ class JpqlQueryBuilder {
     boolean hibernateCompatible
     boolean aliasToMap
     Map<String, String> projectionAliases = [:]
+    Map<String, String> propertyAliases = [:]
 
     List<String> groupByList = []
 
@@ -103,11 +105,12 @@ class JpqlQueryBuilder {
     }
 
 
-    static JpqlQueryBuilder of(DetachedCriteria crit){
+    static JpqlQueryBuilder of(MangoDetachedCriteria crit){
         def jqb = new JpqlQueryBuilder(crit.persistentEntity, crit.criteria)
         jqb.initHandlers()
         List<Query.Criterion> criteria = crit.getCriteria()
         jqb.criteria = new Query.Conjunction(criteria)
+        jqb.propertyAliases = crit.propertyAliases
 
         List<Query.Projection> projections = crit.getProjections()
         for (Query.Projection projection : projections) {
@@ -215,9 +218,10 @@ class JpqlQueryBuilder {
 
     }
 
-    void appendAlias( StringBuilder queryString, String projField, String name, String append){
-        String propalias = name.replace('.', '_')
-        propalias = "${propalias}${append}"
+    void appendAlias( StringBuilder queryString, String projField, String name, String aliasPrefix){
+        String aliasKey = "${aliasPrefix}_${name}"
+        String propalias = propertyAliases.containsKey(aliasKey) ? propertyAliases[aliasKey] : name.replace('.', '_')
+        propalias = "${propalias}"
         queryString
             .append(projField)
             .append(' as ')
@@ -237,7 +241,7 @@ class JpqlQueryBuilder {
                 Query.Projection projection = (Query.Projection) i.next()
                 if (projection instanceof Query.CountProjection) {
                     String projField = "COUNT(${logicalName})"
-                    appendAlias(queryString, projField, logicalName, '_count')
+                    appendAlias(queryString, projField, logicalName, 'COUNT')
                 }
                 else if (projection instanceof Query.IdProjection) {
                     queryString.append(logicalName)
@@ -248,19 +252,19 @@ class JpqlQueryBuilder {
                     Query.PropertyProjection pp = (Query.PropertyProjection) projection
                     if (projection instanceof Query.AvgProjection) {
                         String projField = "AVG(${logicalName}.${pp.getPropertyName()})"
-                        appendAlias(queryString, projField, pp.getPropertyName(), '_avg')
+                        appendAlias(queryString, projField, pp.getPropertyName(), 'AVG')
                     }
                     else if (projection instanceof Query.SumProjection) {
                         String projField = "SUM(${logicalName}.${pp.getPropertyName()})"
-                        appendAlias(queryString, projField, pp.getPropertyName(), '_sum')
+                        appendAlias(queryString, projField, pp.getPropertyName(), 'SUM')
                     }
                     else if (projection instanceof Query.MinProjection) {
                         String projField = "MIN(${logicalName}.${pp.getPropertyName()})"
-                        appendAlias(queryString, projField, pp.getPropertyName(), '_min')
+                        appendAlias(queryString, projField, pp.getPropertyName(), 'MIN')
                     }
                     else if (projection instanceof Query.MaxProjection) {
                         String projField = "MAX(${logicalName}.${pp.getPropertyName()})"
-                        appendAlias(queryString, projField, pp.getPropertyName(), '_max')
+                        appendAlias(queryString, projField, pp.getPropertyName(), 'MAX')
                     }
                     else if (projection instanceof Query.CountDistinctProjection) {
                         queryString.append("COUNT(DISTINCT ")

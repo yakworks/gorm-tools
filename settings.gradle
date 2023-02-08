@@ -1,30 +1,73 @@
+// This sets up and allows the normal gradle plugin dsl with grails.
+pluginManagement {
+  repositories {
+    mavenLocal() //try local first for dev with local snapshots
+    gradlePluginPortal()
+    maven { url "https://repo.grails.org/grails/core" }
+    maven { url 'https://repo.spring.io/milestone' }
+    maven { url 'https://repo.spring.io/snapshot' }
+  }
+  plugins {
+    id 'org.springframework.boot'               version "${springBootVersion}"
+    id 'io.spring.dependency-management'        version "${springDependencyVersion}"
+    id "io.github.gradle-nexus.publish-plugin"  version "${vMavenNexus}"
+    id "org.grails.grails-web"                  version "${grailsGradlePluginVersion}"
+  }
+  resolutionStrategy {
+    eachPlugin {
+      if (requested.id.namespace == 'org.grails') {
+        useModule("org.grails:grails-gradle-plugin:$grailsGradlePluginVersion")
+      }
+      if (requested.id.namespace == 'yakworks') {
+        useModule("org.yakworks:gradle-plugins:$vShipyak")
+      }
+    }
+  }
+}
+
 rootProject.name = 'gorm-tools-root'
 //the releasable plugins
 include 'gorm-tools'
 // findProject(':plugin').name = 'gorm-tools' // the name that will be published
-include 'gorm-security'
+
 include 'gorm-rest'
 include 'gorm-openapi'
 include 'gorm-etl'
 include 'rally-domain'
-include 'rally-security'
 // include 'commons'
 include 'gorm-test-support'
 include 'gorm-test-domain'
-//findProject(':security').name = 'gorm-security' // the name that will be published
+include 'gorm-audit'
+
+include "security/boot-security"
+findProject(':security/boot-security').name = 'boot-security'
+
+include "security/boot-security-gorm"
+findProject(':security/boot-security-gorm').name = 'boot-security-gorm'
+
+// include "security/boot-security-shiro"
+// findProject(':security/boot-security-shiro').name = 'boot-security-shiro'
+
+include "security/security-core"
+findProject(':security/security-core').name = 'security-core'
 
 // tests will be included in main runs but not deploy tasks and doc tasks
 include "examples/testify"
-include 'examples/restify'
-include 'examples/benchmarks'
-include 'examples/rally-api'
-
 findProject(':examples/testify').name = 'testify'
+
+include 'examples/restify'
 findProject(':examples/restify').name = 'restify'
+
+include 'examples/benchmarks'
 findProject(':examples/benchmarks').name = 'benchmarks'
+
+include 'examples/rally-api'
 findProject(':examples/rally-api').name = 'rally-api'
 
-//project(':testify').projectDir = new File('examples/testify')
+include 'examples/hello-boot-security'
+findProject(':examples/hello-boot-security').name = 'hello-boot-security'
+
+// project(':testify').projectDir = new File('examples/testify')
 
 buildCache {
   local {

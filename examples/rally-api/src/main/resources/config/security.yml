@@ -1,0 +1,82 @@
+app:
+  security:
+    # the redirect url for successful saml
+    frontendCallbackUrl: http://localhost:8080/api/samlSuccess?token=
+    jwt:
+      # secret for Symmetric HS256 tokens, should be long and random
+      secret: s/9Y3WUi5LkKsR8IZ4DTcX=
+
+      issuers:
+        # default issuer for internal use
+        default:
+          # validates the issuer claim in the jwt matches this.
+          alg: ES256
+          # iss is looked up.
+          iss: https://yak.works
+          pairKey: classpath:jwt/es256-key-pair.pem
+          # public key not needed with keypair for validation, here so well-known endpoint can display it. may not be needed.
+          publicKey: classpath:jwt/es256-public.pem
+
+        # test issuer for rs decryption
+        testRS:
+          alg: RS256
+          iss: https://test-rs.com
+          publicKey: classpath:jwt/rs256-public.pem
+          # rsaPrivateKey: classpath:jwt/rs256-private.pem
+
+        # test issuer for EC decryption
+        testES:
+          alg: ES256
+          iss: https://test-es.com
+          # a copy of jwt.io
+          publicKey: classpath:jwt/test-es256-public.pem
+
+# Uncomment and tweak to setup SAML with Okta
+spring.security.saml2.relyingparty.registration.okta.singlelogout.binding: POST
+spring.security.saml2.relyingparty.registration.okta.singlelogout.response-url: "{baseUrl}/logout/saml2/slo"
+#spring.security.saml2.relyingparty.registration.okta.assertingparty.metadata-uri: https://dev-86352402.okta.com/app/exk7dad4ucR8cUZXE5d7/sso/saml/metadata
+#spring.security.saml2.relyingparty.registration.okta.assertingparty.metadata-uri: https://dev-86091574.okta.com/app/exk7thvlftsn8yJXF5d7/sso/saml/metadata
+
+spring:
+  security:
+    saml2:
+      relyingparty:
+        registration:
+          okta:
+#            identityprovider:
+#              metadata-uri: https://idp/metadata.php
+            assertingparty:
+              metadata-uri: https://dev-86091574.okta.com/app/exk7thvlftsn8yJXF5d7/sso/saml/metadata
+
+---
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+#          login-client:
+#            provider: spring
+#            client-id: login-client
+#            client-secret: openid-connect
+#            client-authentication-method: client_secret_basic
+#            authorization-grant-type: authorization_code
+#            redirect-uri: http://127.0.0.1:8080/login/oauth2/code/login-client
+#            scope: openid,profile
+#            client-name: Spring
+          github:
+            client-id: b8d2...
+            client-secret: 387e...
+          okta:
+            client-id: 0o...
+            client-secret: JxSy...
+        provider:
+          okta:
+            authorization-uri: https://dev-86091574.okta.com/oauth2/v1/authorize
+            token-uri: https://dev-86091574.okta.com/oauth2/v1/token
+            user-info-uri: https://dev-86091574.okta.com/oauth2/v1/userinfo
+            jwk-set-uri: https://dev-86091574.okta.com/oauth2/v1/keys
+#          spring:
+#            authorization-uri: http://localhost:9000/oauth2/authorize
+#            token-uri: http://localhost:9000/oauth2/token
+#            jwk-set-uri: http://localhost:9000/oauth2/jwks

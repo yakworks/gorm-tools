@@ -4,9 +4,10 @@
 */
 package yakworks.rally.orgs.repo
 
+import javax.inject.Inject
+
 import groovy.transform.CompileStatic
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataRetrievalFailureException
 import org.springframework.validation.Errors
 
@@ -21,7 +22,9 @@ import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
+import gorm.tools.utils.GormMetaUtils
 import gorm.tools.validation.Rejector
+import jakarta.annotation.Nullable
 import yakworks.rally.orgs.OrgMemberService
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
@@ -35,19 +38,19 @@ import yakworks.rally.orgs.model.OrgType
 @CompileStatic
 abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
     //Making these nullable makes it easier to wire up for tests.
-    @Autowired(required=false)
+    @Inject @Nullable
     LocationRepo locationRepo
 
-    @Autowired(required=false)
+    @Inject @Nullable
     ContactRepo contactRepo
 
-    @Autowired(required=false)
+    @Inject @Nullable
     OrgTagRepo orgTagRepo
 
-    @Autowired(required=false)
+    @Inject @Nullable
     OrgSourceRepo orgSourceRepo
 
-    @Autowired(required=false)
+    @Inject @Nullable
     OrgMemberService orgMemberService
 
     @RepoListener
@@ -76,7 +79,8 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         Map data = args.data
         if (args.bindAction == BindAction.Create) {
             verifyNumAndOrgSource(org, data)
-            orgMemberService.setupMember(org, data.remove('member') as Map)
+            //orgMemberService is nullable so its easier to mock for testing
+            if(orgMemberService?.isOrgMemberEnabled()) orgMemberService.setupMember(org, data.remove('member') as Map)
         }
         // we do primary location and contact here before persist so we persist org only once with contactId it is created
         if(data.location) createOrUpdatePrimaryLocation(org, data.location as Map)
@@ -100,8 +104,8 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
     @Override
     void persistToOneAssociations(Org org, List<String> associations){
         super.persistToOneAssociations(org, associations)
-        if(org.location?.isNewOrDirty()) org.location.persist() //FIXME is this already validated?
-        if(org.contact?.isNewOrDirty()) org.contact.persist()
+        if(GormMetaUtils.isNewOrDirty(org.location)) org.location.persist() //FIXME is this already validated?
+        if(GormMetaUtils.isNewOrDirty(org.contact)) org.contact.persist()
     }
 
     /**
@@ -225,7 +229,6 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
      * where we have unique num. Search by sourceId is used when there is no org or org.id; for example to assign org on contact
      * @param data (num or source with sourceId and orgType)
      */
-    //FIXME this needs its own test
     @Override
     Org lookup(Map data) {
         Org org

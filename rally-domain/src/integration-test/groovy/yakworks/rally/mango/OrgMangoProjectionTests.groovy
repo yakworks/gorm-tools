@@ -8,6 +8,7 @@ import org.hibernate.criterion.Projections
 import org.hibernate.type.StandardBasicTypes
 import org.hibernate.type.Type
 import spock.lang.Ignore
+import spock.lang.Issue
 import spock.lang.Specification
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.orgs.model.Org
@@ -49,30 +50,30 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
         when:
         def qry = Org.query {}
         qry.sum('calc.totalDue').groupBy('type')
-        qry.order('calc_totalDue_sum')
+        qry.order('calc_totalDue')
         def sumbObj = qry.mapList()
 
         then:
         //there are 5 types, one for each type
         sumbObj.size() == 5
         sumbObj[0]['type'] == OrgType.Client
-        sumbObj[0]['calc_totalDue_sum'] < sumbObj[1]['calc_totalDue_sum']
-        sumbObj[1]['calc_totalDue_sum'] < sumbObj[2]['calc_totalDue_sum']
+        sumbObj[0]['calc_totalDue'] < sumbObj[1]['calc_totalDue']
+        sumbObj[1]['calc_totalDue'] < sumbObj[2]['calc_totalDue']
     }
 
     def "sum and groupby methods order desc"() {
         when:
         def qry = Org.query {}
         qry.sum('calc.totalDue').groupBy('type')
-        qry.order('calc_totalDue_sum', 'desc')
+        qry.order('calc_totalDue', 'desc')
         def sumbObj = qry.mapList()
 
         then:
         //there are 5 types, one for each type
         sumbObj.size() == 5
         sumbObj[0]['type'] == OrgType.Customer
-        sumbObj[0]['calc_totalDue_sum'] > sumbObj[1]['calc_totalDue_sum']
-        sumbObj[1]['calc_totalDue_sum'] > sumbObj[2]['calc_totalDue_sum']
+        sumbObj[0]['calc_totalDue'] > sumbObj[1]['calc_totalDue']
+        sumbObj[1]['calc_totalDue'] > sumbObj[2]['calc_totalDue']
     }
 
     def "sum with QueryArgs"() {
@@ -87,18 +88,100 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
         sumbObj[0]['type'] == OrgType.Customer
     }
 
+    void "test min projection"() {
+        setup:
+        def query = Org.query {
+            createAlias('calc', 'calc')
+            createAlias('contact', 'contact')
+            projections {
+                groupBy("orgTypeId")
+                min("calc.totalDue") //this should result in a key calc_totalDue in the result map
+            }
+        }
+
+        when:
+        def results = query.list()
+
+        then:
+        results
+        results[0] instanceof Map
+        ((Map)(results[0])).containsKey("calc_totalDue")
+    }
+
+
+    @Issue("https://github.com/yakworks/gorm-tools/issues/609")
+    void "test min projection sep build"() {
+        setup:
+        def query = Org.query {
+            createAlias('calc', 'calc')
+            createAlias('contact', 'contact')
+            //putting projections here would pass.
+        }
+
+        //fails only when min used with groupBy in query.build {}
+        query = query.groupBy("orgTypeId").min("calc.totalDue")
+
+        when:
+        def results = query.list()
+        Map row1 = results[0]
+
+        then:
+        results
+        row1 instanceof Map
+        row1.containsKey("orgTypeId")
+        row1.containsKey("calc_totalDue")
+    }
+
+
     def "sum with projections key as string"() {
         when: 'simulate what comes on url query string'
-        def qry = Org.query(projections: "'calc.totalDue':'sum', 'type':'group'", sort:'calc_totalDue_sum:asc')
+        def qry = Org.query(projections: "'calc.totalDue':'sum', 'type':'group'", sort:'calc_totalDue:asc')
         def sumbObj = qry.list()
 
         then:
         //there are 5 types, one for each type
         sumbObj.size() == 5
         sumbObj[0]['type'] == OrgType.Client
-        sumbObj[0]['calc_totalDue_sum'] < sumbObj[1]['calc_totalDue_sum']
-        sumbObj[1]['calc_totalDue_sum'] < sumbObj[2]['calc_totalDue_sum']
+        sumbObj[0]['calc_totalDue'] < sumbObj[1]['calc_totalDue']
+        sumbObj[1]['calc_totalDue'] < sumbObj[2]['calc_totalDue']
     }
+
+    void "test property projection returns maps"() {
+        when:
+        def qry = Org.query {
+            createAlias('contact', 'contact')
+            projections {
+                property("contact.id")
+                property("contact.name")
+            }
+            lte("id", 5)
+        }
+
+        def sumbObj = qry.list()
+
+        then:
+        sumbObj.size() == 5
+        sumbObj[0] instanceof Map
+    }
+
+    @Ignore("@Joshua shouldnt this work ! createAliases should setup alias automatically ?")
+    void "groupBy should auto setup aliases"() {
+        when:
+        def query = Org.query {
+            projections {
+                //shouldnt need to explicitely create aliases
+                sum('calc.totalDue')
+                groupBy("contact.name")
+            }
+            lte("id", 5)
+        }
+        def result = query.list()
+
+        then:
+        noExceptionThrown()
+        result.size() == 5
+    }
+
 
     def "sum association with closure old school"() {
         when:
@@ -118,6 +201,25 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
         sumbObj.size() == 5
         // sumbObj[0][0] == 10
     }
+
+    def "projections with two fields same name should not collide"() {
+        when: "two projections have same propname - eg contact.name and org.name"
+        def qry = Org.query {
+            createAlias('contact', 'contact')
+            createAlias('calc', 'calc')
+            projections {
+                sum('calc.totalDue')
+                groupProperty('contact.name')
+                groupProperty('name')
+            }
+        }
+        def sumbObj = qry.list()
+
+        then:
+        noExceptionThrown()
+        sumbObj.size() == 50
+    }
+
 
     @Ignore
     def "sum and groupby with some hakery to get having to work"() {

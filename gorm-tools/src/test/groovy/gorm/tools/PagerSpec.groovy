@@ -48,7 +48,7 @@ class PagerSpec extends Specification implements GormHibernateTest{
 
     def "test setting params"() {
         when:
-        Pager pager = new Pager([page: 3, max: 20])
+        Pager pager = Pager.of(page: 3, max: 20)
 
         then:
         pager.max == 20

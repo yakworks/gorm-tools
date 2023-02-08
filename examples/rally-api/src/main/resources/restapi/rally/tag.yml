@@ -1,0 +1,19 @@
+api:
+  paths:
+    /rally/tag:
+      gridOptions:
+        colModel:
+          - { name: id, hidden: true }
+          - { name: name, width: 40, formatter: editActionLink }
+          - { name: entityName, width: 40 }
+          - { name: description, width: 80 }
+
+      editForm:
+        name:
+          required: true
+        description: {}
+        entityName:
+          type: select
+          selectOptions:
+            useDataObject: false
+            data: [ArTran, Customer, CustAccount]

@@ -1,7 +1,6 @@
 apply plugin: "yakworks.grails-plugin"
 
-//shared resources to pick up the Gorm defaults from application.groovy, as well as simple logback
-// sourceSets.test.resources.srcDirs += [project(':gorm-test-support').sourceSets.main.resources]
+apply from: "${rootDir}/gradle/gorm-lib.gradle"
 
 dependencies {
   console "org.grails:grails-console"
@@ -10,12 +9,11 @@ dependencies {
 
   // compileOnly "org.grails:grails-plugin-rest"
   api "com.opencsv:opencsv:$vOpenCsv"
+  api "org.apache.poi:poi-ooxml:$vPoi"
 
   //see http://spreadsheet.dsl.builders/ and https://guides.grails.org/grails-file-download-excel/guide/index.html
-  implementation "builders.dsl:spreadsheet-builder-poi:$vExcelBuilder"
-  implementation "builders.dsl:spreadsheet-builder-groovy:$vExcelBuilder"
-
-  api "org.apache.poi:poi-ooxml:$vPoi"
+  compileOnly "builders.dsl:spreadsheet-builder-poi:$vExcelBuilder"
+  compileOnly "builders.dsl:spreadsheet-builder-groovy:$vExcelBuilder"
 
   // compileOnly "org.apache.poi:poi:$vPoi"
   // compileOnly "org.apache.poi:poi-ooxml:$vPoi"
@@ -23,4 +21,6 @@ dependencies {
   compileOnly project(":gorm-tools")
 
   testImplementation project(":gorm-test-domain")
+  // not sure why this is need but stops the error "ERROR StatusLogger Log4j2 could not find a logging implementation"
+  testImplementation "org.apache.logging.log4j:log4j-to-slf4j:$vLog4j"
 }

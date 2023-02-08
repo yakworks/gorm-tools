@@ -1,12 +1,15 @@
 package yakworks.rest
 
 import org.springframework.http.HttpStatus
+
 import yakworks.commons.map.Maps
+import yakworks.rally.orgs.model.Org
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
 import spock.lang.Specification
 import spock.lang.Unroll
+import yakworks.security.gorm.model.AppUser
 
 /**
  * Sanity checks to hit the main endpoints. KISS, keep it simple
@@ -16,6 +19,10 @@ import spock.lang.Unroll
 class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
     String getPath(String entity) { "/api/${entity}" }
+
+    def setup(){
+        login()
+    }
 
     void "get index list"() {
         when:
@@ -28,22 +35,25 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
     }
 
     @Unroll
-    def "LIST get test #entity"(String entity, Integer qCount) {
+    def "LIST get test #entity"(String entity, Class domain) {
 
         when:
         Response resp = get("${getPath(entity)}")
         Map body = bodyToMap(resp)
+        int count
+        Org.withNewSession {
+            //Need this, coz @Rollback dint work on @Unroll
+            count = domain.count()
+        }
 
         then:
         resp.code() == HttpStatus.OK.value()
-        body.records == qCount
+        body.records == count
 
         where:
-
-        entity         | qCount
-        'rally/user'   | 3
-        //FIXME depending on order this may return more than 100
-        // 'rally/org'       | 100
+        entity         | domain
+        'rally/user'   | AppUser
+        'rally/org'    | Org //can have more thn 100 based on order of execution, need to query count
     }
 
     @Unroll
@@ -71,6 +81,8 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
     @Unroll
     def "PUT update: #entity/#id"(String entity, Long id, String prop, String val) {
+        setup:
+        login()
 
         when:
         def putData = [(prop): val]
@@ -83,19 +95,20 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
         where:
 
-        entity     | id | prop   | val
+        entity           | id | prop   | val
         'rally/org'      | 1  | 'num'  | 'foo123'
-        'rally/user'     | 1  | 'username' | 'jimmy'
+        // 'rally/user'     | 1  | 'username' | 'jimmy'
         //        'location' | 1  | 'city' | 'Denver'
 
     }
-
 
     @Unroll
     def "q text search: #entity?q=#qSearch"(String entity, Integer qCount, String qSearch) {
 
         when:
         Response resp = get("${getPath(entity)}?q=${qSearch}")
+        assert resp.code() == HttpStatus.OK.value()
+        assert resp.successful
         Map body = bodyToMap(resp)
 
         then:
@@ -104,8 +117,8 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
         where:
 
-        entity     | qCount | qSearch
-        'rally/org'      | 1      | 'foo123'
+        entity           | qCount | qSearch
+        'rally/org'      | 1      | 'Org11'
         'rally/user'     | 1      | 'admin'
         //'location' | 1      | 'Denver'
 

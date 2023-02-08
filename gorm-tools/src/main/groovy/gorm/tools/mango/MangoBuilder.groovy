@@ -15,13 +15,14 @@ import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.api.QueryableCriteria
 import org.springframework.beans.factory.annotation.Autowired
 
-import gorm.tools.api.IncludesConfig
-import gorm.tools.api.IncludesKey
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryArgs
 import grails.gorm.DetachedCriteria
+import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.EnumUtils
 import yakworks.commons.model.IdEnum
+import yakworks.gorm.api.IncludesConfig
+import yakworks.gorm.api.IncludesKey
 
 import static gorm.tools.mango.MangoOps.CompareOp
 import static gorm.tools.mango.MangoOps.ExistOp
@@ -118,6 +119,14 @@ class MangoBuilder {
                 criteria.sum(k)
             } else if (v == 'group'){
                 criteria.groupBy(k)
+            } else if (v == 'avg'){
+                criteria.avg(k)
+            } else if (v == 'count'){
+                criteria.countDistinct(k)
+            } else if (v == 'min'){
+                criteria.min(k)
+            } else if (v == 'max'){
+                criteria.max(k)
             }
         }
     }
@@ -210,7 +219,7 @@ class MangoBuilder {
         //     applyFieldMap(criteria, field, fieldVal)
         // }
         //I think we should not blow up an error if some field isnt in domain, just add message to log
-        log.info "MangoBuilder applyField domain ${getTargetClass(criteria).name} doesnt contains field $field"
+        log.info "No match in applyField for [field:$field, entity:${getTargetClass(criteria).name}, fieldVal: $fieldVal, fieldVal.class: ${fieldVal?.class}"
 
     }
 
@@ -402,14 +411,14 @@ class MangoBuilder {
                 v = parsedVal
             }
             else if (typeToConvertTo.isEnum()) {
-                v = getEnum(typeToConvertTo, v)
+                v = EnumUtils.getEnum(typeToConvertTo, (String)v)
             }
 
         }
         else if (typeToConvertTo?.isEnum() && (v instanceof Number || v instanceof Map)){
             def idVal = v //assume its a number
             if(v instanceof Map) idVal = v['id']
-            v = getEnumWithGet(typeToConvertTo, v as Number)
+            v = getEnumWithGet(typeToConvertTo, idVal as Number)
         }
         else {
             v = v.asType(typeToConvertTo)
@@ -418,16 +427,7 @@ class MangoBuilder {
         return v
     }
 
-    //FIXME clean this up so its a compile static
-    @CompileDynamic
-    static getEnum(Class typeToConvertTo, Object val){
-        return EnumUtils.getEnum(typeToConvertTo, val)
-    }
-
-    //FIXME clean this up so its a compile static
-    @CompileDynamic
     static getEnumWithGet(Class<?> enumClass, Number id){
-        //See the repoEvents code, we can use ReflectionUtils and cache the the get method, then use CompileStatic
-        return enumClass.get(id)
+        return ClassUtils.callStaticMethod(enumClass, 'get', id)
     }
 }

@@ -4,17 +4,36 @@
 */
 package yakworks.rally.api
 
-import yakworks.rally.testing.RallySeedData
+import yakworks.rally.seed.RallySeed
+import yakworks.security.gorm.model.AppUser
 
 class BootStrap {
 
     def init = { servletContext ->
-        RallySeedData.init()
-        RallySeedData.fullMonty()
+        RallySeed.fullMonty()
+        addOktaUser()
+    }
+
+    //add the developers@9ci.com so saml works
+    void addOktaUser(){
+        //add one that maps to our Okta dev
+        AppUser.withTransaction {
+            AppUser.repo.flush()
+            AppUser admin = new AppUser([
+                id: (Long)6, username: "developers@9ci.com", email: "developers@9ci.com", orgId: 2
+            ]).persist()
+            admin.addRole('ADMIN', true)
+            admin.addRole('MANAGER', true)
+            //used for github user testing
+            // AppUser admin2 = new AppUser([
+            //     id: (Long)9, username: "josh2@9ci.com", email: "josh2@9ci.com", orgId: 2
+            // ]).persist()
+            // admin2.addRole('ADMIN', true)
+            // admin2.addRole('MANAGER', true)
+        }
     }
 
     def destroy = {
     }
-
 
 }

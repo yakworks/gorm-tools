@@ -13,6 +13,10 @@ import yakworks.json.groovy.JsonEngine
 class RestErrorsSpec extends Specification implements OkHttpRestTrait {
     JdbcTemplate jdbcTemplate
 
+    def setup(){
+        login()
+    }
+
     void "entity not found"() {
 
         when:

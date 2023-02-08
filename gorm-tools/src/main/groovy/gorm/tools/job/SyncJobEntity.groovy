@@ -92,32 +92,36 @@ trait SyncJobEntity<D> implements SourceTrait {
     /**
      * if the errors are stored in the column this will be populated
      */
-    byte[] errorBytes
+    //byte[] problemsBytes
+
+    List problems
 
     /**
      * The data is a response of resources that were successfully and unsuccessfully updated or created after processing.
      * gets the data as byte array, either from attachment file or resultData byte array
      * If no data then returns string representation of json empty array which is '[]'
      */
-    String dataToString(){
+    String dataToString() {
         return dataBytes ? new String(dataBytes, "UTF-8") : '[]'
     }
 
-    String payloadToString(){
+    String payloadToString() {
         return payloadBytes ? new String(payloadBytes, "UTF-8") : '[]'
     }
 
-    String errorToString(){
-        return errorBytes ? new String(errorBytes, "UTF-8") : '[]'
-    }
+    // String problemsToString() {
+    //     return problemsBytes ? new String(problemsBytes, "UTF-8") : '[]'
+    // }
 
     static constraintsMap = [
-        state:[ d: 'State of the job', nullable: false],
-        message:[ d: 'Status message or log'],
-        payloadId:[ d: 'If payload is stored as attahcment file this is the id'],
-        payloadBytes:[ d: 'Json payload data (stored as byte array) that is passed in, for example list of items to bulk create', maxSize: MAX_MEG_IN_BYTES],
-        dataId: [d: 'If data is saved as attahchment file this is the id'],
-        dataBytes: [d: 'The result data stored as bytes', maxSize: MAX_MEG_IN_BYTES],
-        sourceId:[ d: 'the unique id from the outside source for the scheduled job', nullable: true]
+        state       : [d: 'State of the job', nullable: false],
+        message     : [d: 'Status message or log'],
+        payloadId   : [d: 'If payload is stored as attahcment file this is the id', oapi: "NO"],
+        payloadBytes: [d      : 'Json payload data (stored as byte array) that is passed in, for example list of items to bulk create',
+                       maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
+        dataId      : [d: 'If data is saved as attahchment file this is the id', oapi: "NO"],
+        dataBytes   : [d: 'The result data stored as bytes', maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
+        //errorBytes  : [d: 'The error data stored as bytes', maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
+        sourceId    : [d: 'the unique id from the outside source for the scheduled job', nullable: true]
     ]
 }

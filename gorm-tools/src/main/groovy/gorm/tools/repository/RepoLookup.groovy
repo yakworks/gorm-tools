@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import grails.util.Environment
 import yakworks.commons.lang.NameUtils
 import yakworks.spring.AppCtx
@@ -23,6 +22,7 @@ import yakworks.spring.AppCtx
 @CompileStatic
 @SuppressWarnings(["FieldName"])
 class RepoLookup {
+    public static final String SUFFIX = "Repo"
 
     private static final Map<String, GormRepo> REPO_CACHE = new ConcurrentHashMap<String, GormRepo>()
     //set to false when doing unit tests so it doesnt cache old ones
@@ -53,7 +53,7 @@ class RepoLookup {
     }
 
     static String getRepoBeanName(Class domainClass) {
-        RepositoryArtefactHandler.getRepoBeanName(domainClass)
+        return "${NameUtils.getPropertyName(domainClass.name)}$SUFFIX"
     }
 
     /**

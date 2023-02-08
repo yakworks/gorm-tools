@@ -53,7 +53,7 @@ class BulkCsvSpec  extends RestIntTest {
 
         when:
         controller.params.attachmentId = attachment.id
-        controller.params['promiseEnabled'] = false //disable promise for test
+        controller.params['async'] = false //disable promise for test
         controller.params['dataFilename'] = "contact.csv"
         controller.params['saveDataAsFile'] = true //write to file
 

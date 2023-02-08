@@ -147,23 +147,6 @@ class EntityJsonSpec extends Specification implements GormHibernateTest {
         result == '[{"name":"name"},{"name":"name"}]'
     }
 
-    @Ignore //See https://github.com/yakworks/gorm-tools/issues/475
-    void "test buildJson excludes"() {
-        when:
-        def org = build(includes: '*')
-        //FIXME it should automtically exclude the ext.org since its the other side of the association
-        def result =  toJson(org, [excludes:['ext.org']])
-
-        def expected = '''{
-            id:1, name:'name', ext:[id:1, text1:'text1'],
-            date:'2018-01-26T01:36:02Z', inactive:false, locDateTime:'2018-01-01T01:01:01',
-            amount2:0, locDate:'2018-01-25', amount:0, name2:'name2'}'''
-
-        then:
-        assertThatJson(res).isEqualTo(expected)
-
-    }
-
 }
 
 @Entity @GrailsCompileStatic

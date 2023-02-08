@@ -131,7 +131,6 @@ class ProblemHandler {
      * Returns list of errors in the format [{field:name, message:error}]
      * @param errs the erros object to convert
      */
-    //FIXME #339 see errormessageService, do we need some of that logic?
     List<Violation> transateErrorsToViolations(Errors errs) {
         List<ViolationFieldError> errors = []
         if(!errs?.allErrors) return errors as List<Violation>

@@ -4,14 +4,10 @@
 */
 package yakworks.openapi.gorm
 
-import java.lang.reflect.ParameterizedType
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import org.codehaus.groovy.reflection.CachedMethod
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
@@ -96,7 +92,7 @@ class ApiSchemaEntity {
         //def sortedProps = propsMap.sort()
         def p = [:]
         p.putAll(propsMap.sort())
-        //FIXME be smarter about this
+        //TODO be smarter about this
         if(kind == CruType.Read){
             p.putAll(idVerMap)
         }
@@ -160,9 +156,17 @@ class ApiSchemaEntity {
             Class returnType = constrainedProp.propertyType
             if(Collection.isAssignableFrom(returnType)){
                 Class genClass =(Class) PropertyTools.findGenericTypeForCollection(entityClass, propName)
-                // Class genClass = findGenericClassForCollection(entityClass, propName)
-                //println "  ${propName} collection of type ${genClass.simpleName}"
-                Map propsToAdd = setupAssociationObject(type, apiProp, genClass.simpleName, constrainedProp, null)
+                //if its primitive or Object collection then just do the the typ
+                Map propsToAdd
+                if(ClassUtils.isBasicType(genClass)){
+                    propsToAdd = OapiUtils.getJsonType(genClass)
+                }
+                else if(genClass == Object){
+                    propsToAdd = [type: 'object']
+                }
+                else {
+                    propsToAdd = setupAssociationObject(type, apiProp, genClass.simpleName, constrainedProp, null)
+                }
                 apiProp['type'] = 'array'
                 apiProp['items'] = propsToAdd
             } else {

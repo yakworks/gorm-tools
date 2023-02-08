@@ -4,6 +4,8 @@
 */
 package gorm.tools.repository.model
 
+import groovy.json.JsonParserType
+import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
@@ -24,12 +26,12 @@ import static gorm.tools.utils.GormUtils.listToIdMap
  * XRef Repo for linking 2 entities. Also called a join table in hibernate.
  * One class is designated as the main and the other as related.
  * The 'main' is the first part the name, and related the second.
- * So for example: ActivityContact xref table, the Activity is the 'main' and the Contact is the 'related'
- * Its really arbitraty but need way to grok it
+ * So for example: ActivityContact xref table, the Activity is the 'primary' or 'main' and the Contact is the 'related'
+ * Its really arbitrary, Contact could be primary and it would be functionaly the same. It just provides a way to grok it
  *
- * @param <X> the cross ref domain
- * @param <P> the the main entity that will have the items as "children"
- * @param <L> the related entity
+ * @param <X> the cross ref domain this Repo is for
+ * @param <P> the the Primary or main entity that will have the items as "children"
+ * @param <R> the Related entity
  */
 @Slf4j
 @CompileStatic
@@ -37,6 +39,8 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     Class<P> mainClass
     Class<R> relatedClass
     List<String> propNames
+
+    JsonSlurper jsonSlurper
 
     /** the criteria remover can be customized, useful for replacing in tests */
     CriteriaRemover criteriaRemover
@@ -46,6 +50,7 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
         relatedClass= relatedClazz
         propNames = propKeys
         criteriaRemover = new CriteriaRemover()
+        jsonSlurper = new JsonSlurper().setType(JsonParserType.LAX)
     }
 
     /**
@@ -78,7 +83,7 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     }
 
     /**
-     * this is the map that makes the composite key across the 3 fields.
+     * this is the map that makes the composite key with the fields.
      */
     Map getKeyMap(P main, R related){
         [ (mainPropName): main, (relatedPropName): related ]
@@ -177,8 +182,8 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     /**
      * query by the composite key
      */
-    MangoDetachedCriteria<X> queryFor(Persistable linkedEntity, R related){
-        queryByMain(linkedEntity).eq(relatedPropName, related)
+    MangoDetachedCriteria<X> queryFor(Persistable main, R related){
+        queryByMain(main).eq(relatedPropName, related)
     }
 
 
@@ -201,7 +206,12 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
      */
     List<X> addOrRemove(P main, Object itemParams){
         if(!itemParams) return []
-        Long mainId = main['id'] as Long
+
+        //handle if it's a json array in string, largely for CSV support and the binding that occurs during that process, such as creating orgs with tags
+        if(itemParams instanceof String) {
+            Validate.isTrue(itemParams.trim().startsWith('['), "bind data of type string must be a json array")
+            itemParams = jsonSlurper.parseText(itemParams) as List
+        }
 
         Validate.isTrue(itemParams instanceof List || itemParams instanceof Map, "bind data must be map or list: %s", itemParams.class)
 

@@ -24,7 +24,7 @@ import grails.web.mime.MimeType
 import grails.web.servlet.mvc.GrailsParameterMap
 
 /**
- * Grails RestResponder but without the magic stuff that keeps having errors picked up
+ * Copy of Grails RestResponder but without the magic stuff that keeps having errors picked up
  *
  */
 @CompileStatic

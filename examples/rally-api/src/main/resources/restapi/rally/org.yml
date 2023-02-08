@@ -1,0 +1,29 @@
+api:
+  paths:
+    /rally/org:
+      includes:
+        get: [ '*', calc.totalDue, tags, contact.$*, contact.flex.num1  ]
+#          get: [ '*', info.*, location.id, tags, contact.$*, contact.flex.num1 ]
+        bulk: ['id', 'num', 'name', 'source.sourceId']
+        bulkError: ['num', 'name']
+      gridOptions:
+        colModel:
+          - {name: id, width: 10, hidden: true }
+          - {name: num, width: 40, formatter: editActionLink}
+          - {name: name, width: 80}
+          - {name: type.name, label: Type, width: 40}
+          - {name: calc.totalDue, label: TotalDue, width: 40, formatter: currency}
+        # shrinkToFit: true
+        contextMenu: true
+
+      searchForm:
+        column1:
+          - key: num
+            type: input-list
+        column2:
+          - key: name
+            type: input-wildcard
+        column3:
+          - key: type
+            type: select
+            dataApiKey: rally/orgType

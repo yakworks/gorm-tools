@@ -15,11 +15,10 @@ import org.grails.datastore.mapping.core.Datastore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.TransactionStatus
 
-import gorm.tools.config.AsyncConfig
-import gorm.tools.config.GormConfig
+import gorm.tools.problem.ProblemHandler
 import gorm.tools.transaction.TrxService
 import grails.persistence.support.PersistenceContextInterceptor
-import yakworks.grails.support.ConfigAware
+import yakworks.gorm.config.AsyncConfig
 
 /**
  * Support service for aysnc to wrap session, transaction, etc...
@@ -29,7 +28,7 @@ import yakworks.grails.support.ConfigAware
  */
 @Slf4j
 @CompileStatic
-class AsyncService implements ConfigAware  {
+class AsyncService {
 
     @Autowired AsyncConfig asyncConfig
 
@@ -39,9 +38,8 @@ class AsyncService implements ConfigAware  {
     @Autowired
     TrxService trxService
 
-    @Autowired(required = false)
-    GormConfig gormConfig
-
+    @Autowired
+    ProblemHandler problemHandler
     // static cheater to get the bean, use sparingly if at all
     // static AsyncService getBean(){
     //     AppCtx.get('asyncService', this)
@@ -54,8 +52,8 @@ class AsyncService implements ConfigAware  {
      * @param runnable the runnable closure
      * @return the CompletableFuture
      */
-    CompletableFuture<Void> runAsync(AsyncArgs asyncArgs, Closure runnable){
-        return supplyAsync( asyncArgs, runnable as Supplier<Void>)
+    CompletableFuture<Void> runAsync(AsyncArgs asyncArgs, Runnable runnable){
+        return supplyAsync( asyncArgs, (Supplier<Void>)( () -> runnable.run() ))
     }
 
     /**

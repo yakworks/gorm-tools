@@ -45,6 +45,7 @@ import yakworks.commons.lang.NameUtils
 @GrailsCompileStatic
 class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
+    Map<String, String> propertyAliases = [:]
 
     /**
      * Constructs a DetachedCriteria instance target the given class and alias for the name
@@ -164,8 +165,38 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      */
     @Override
     MangoDetachedCriteria<T> sum(String property) {
+        property = parseAlias(property, "SUM")
         ensureAliases(property)
         projectionList.sum(property)
+        return this
+    }
+
+    /**
+     * Adds a avg projection
+     * @param property The property to sum by
+     * @return This criteria instance
+     */
+    @Override
+    MangoDetachedCriteria<T> avg(String property) {
+        property = parseAlias(property, "AVG")
+        ensureAliases(property)
+        projectionList.avg(property)
+        return this
+    }
+
+    @Override
+    MangoDetachedCriteria<T> min(String property) {
+        property = parseAlias(property, "MIN")
+        ensureAliases(property)
+        projectionList.min(property)
+        return this
+    }
+
+    @Override
+    MangoDetachedCriteria<T> max(String property) {
+        property = parseAlias(property, "MAX")
+        ensureAliases(property)
+        projectionList.max(property)
         return this
     }
 
@@ -176,18 +207,20 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      * @return This criteria instance
      */
     MangoDetachedCriteria<T> groupBy(String property) {
+        property = parseAlias(property, "")
         ensureAliases(property)
         projectionList.groupProperty(property)
         return this
     }
 
     /**
-     * Adds a groupBy projection
+     * Adds a countDistinct projection
      *
      * @param property The property to sum by
      * @return This criteria instance
      */
     MangoDetachedCriteria<T> countDistinct(String property) {
+        property = parseAlias(property, "COUNT")
         ensureAliases(property)
         projectionList.countDistinct(property)
         return this
@@ -230,7 +263,9 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
     @Override
     protected MangoDetachedCriteria<T> clone() {
-        return (MangoDetachedCriteria)super.clone()
+        AbstractDetachedCriteria criteria = (MangoDetachedCriteria)super.clone()
+        criteria.propertyAliases = propertyAliases
+        return criteria
     }
 
     /**
@@ -359,10 +394,13 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     }
 
     /**
-     * For props with dots in them, for example foo.bar.baz. Will ensure the nested aliases are setup
-     * for foo and foo.bar
+     * For props with dots in them, for example foo.bar.baz. Will ensure the nested aliases are setup for foo and foo.bar
+     * also checks to see if prop is in form "name as alias" for example "foo.bar.baz as baz" so it can track and setup the property
+     * alias if its sent to JpqlQueryBuilder and its an aliasToMap
+     * @return the property to use. will be same as whats passed in unless it has " as " will only return first portion
      */
     void ensureAliases(String prop){
+
         // if (!propertyName.contains('.') || propertyName.endsWith('.id'))
         if(prop.count('.') < 1 || (prop.count('.') == 1 && prop.endsWith('.id'))) return
 
@@ -375,6 +413,16 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         props.each { path ->
             currentCriteria = currentCriteria.createAlias(path, path) as DetachedCriteria
         }
+    }
+
+    String parseAlias(String p, String key) {
+        String prop = p.trim()
+        if(!prop.contains(" as ")) return p
+        String[] parts = prop.split(/\sas\s/)
+        p = parts[0].trim()
+        String aliasKey = "${key}_${p}"
+        propertyAliases[aliasKey] = parts[1].trim()
+        return p
     }
 
     /******** PROPERTY CRITERIAS ************/
@@ -725,4 +773,5 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         ensureAliases(propertyName)
         return (MangoDetachedCriteria<T>)super.leAll(propertyName, propertyValue)
     }
+
 }

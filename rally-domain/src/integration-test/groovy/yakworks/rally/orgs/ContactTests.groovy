@@ -46,7 +46,7 @@ class ContactTests extends Specification implements DomainIntTest {
     def testDeleteFailure_ForLoggedInUserContact(){
 
         expect:
-        secService.userId == 1
+        currentUser.userId == 1
 
         when:
         Contact contact = Contact.get(1)
@@ -87,11 +87,12 @@ class ContactTests extends Specification implements DomainIntTest {
         when:
         contactRepo.remove(contact)
         flushAndClear()
-        l.refresh()
 
         then:
-        l.contact == null
         Contact.get(contact.id) == null
+        Location.get(l.id) == null
+
+        //following associations should have been deleted through cascade as per mapping.
         ContactEmail.get(email.id) == null
         ContactFlex.get(flex.id) == null
         ContactPhone.get(phone.id) == null
@@ -130,6 +131,56 @@ class ContactTests extends Specification implements DomainIntTest {
         then:
         contact.org.num == "foo"
 
+    }
+
+    void "update contact with source"() {
+        setup:
+        jdbcTemplate.execute("CREATE UNIQUE INDEX ix_contactsource_sourceid_uniq ON ContactSource(sourceId)")
+        Map data = [
+            "num": "num",
+            "name": "name",
+            "email": "test@9ci.com",
+            "companyId": 2,
+            "orgId":2,
+            "sources": [
+                ["sourceId":"123"]
+            ]
+        ]
+
+        when:
+        Contact contact = Contact.create(data)
+        flush()
+
+        then:
+        noExceptionThrown()
+        contact.num == "num"
+        contact.firstName == "name"
+        contact.name == "name"
+        contact.email == "test@9ci.com"
+
+        when:
+        List<ContactSource> sources = ContactSource.findAllByContact(contact)
+
+        then:
+        sources.size() == 1
+        sources[0].sourceId == "123"
+
+        when:"update contact"
+        data.firstName = "name2"
+        data.email = "dev@9ci.com"
+        contact = Contact.update(data)
+        flush()
+
+        then:
+        noExceptionThrown()
+        contact.name == "name2"
+        contact.email == "dev@9ci.com"
+
+        and:
+        ContactSource.countByContact(contact) == 1
+
+        cleanup:
+        jdbcTemplate.execute("DROP index ix_contactsource_sourceid_uniq")
     }
 
 }

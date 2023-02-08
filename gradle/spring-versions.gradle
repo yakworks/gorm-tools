@@ -1,0 +1,15 @@
+// here so we can lock spring versions in transitive deps
+configurations.all {
+  resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+    // if (details.requested.group == 'org.springframework' && details.requested.name == 'some-library') {
+    if (details.requested.group == 'org.springframework') {
+      details.useVersion project['spring.version']
+    }
+    if (details.requested.group == 'org.springframework.boot') {
+      details.useVersion project['springBootVersion']
+    }
+    if (details.requested.group == 'org.springframework.security') {
+      details.useVersion project['spring-security.version']
+    }
+  }
+}

@@ -1,7 +1,7 @@
 package gorm.tools.repository
 
 import gorm.tools.async.AsyncService
-import gorm.tools.config.AsyncConfig
+import yakworks.gorm.config.AsyncConfig
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobState
 import gorm.tools.problem.ValidationProblem
@@ -29,7 +29,7 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
     @Autowired KitchenSinkRepo kitchenSinkRepo
 
     SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
-        return new SyncJobArgs(asyncEnabled: false, op: op, source: "test", sourceId: "test",
+        return new SyncJobArgs(parallel: false, op: op, source: "test", sourceId: "test",
             includes: ["id", "name", "ext.name"])
     }
 
@@ -317,4 +317,26 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
         }
     }
 
+    void "test buildErrorMap"() {
+        setup:
+        Map data = [name:"cust-1", num:"cust-1", id:1]
+
+        expect: "when no includes"
+        kitchenSinkRepo.buildErrorMap(data, null) == data
+
+        and: "when includes provided"
+        kitchenSinkRepo.buildErrorMap(data, ["id", "num"]) == [id:1, num: "cust-1"]
+    }
+
+    void "test buildSuccessMap"() {
+        setup:
+        KitchenSink kitchenSink = new KitchenSink(name: "name", secret: "secret", ext: new SinkExt(name:"ext-name", textMax: "test"))
+
+        when: "when includes provided"
+        Map result = kitchenSinkRepo.buildSuccessMap(kitchenSink, ["name", "ext.name"])
+
+        then:
+        result.size() == 2
+        result == [name: "name", ext:[name: "ext-name"]]
+    }
 }

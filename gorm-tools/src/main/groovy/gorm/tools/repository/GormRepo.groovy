@@ -22,13 +22,13 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.model.Lookupable
-import gorm.tools.model.Persistable
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.PersistableRepoEntity
 import gorm.tools.transaction.TrxStaticApi
+import gorm.tools.utils.GormMetaUtils
 import grails.core.support.proxy.ProxyHandler
 import grails.validation.ValidationException
 import yakworks.api.problem.data.NotFoundProblem
@@ -450,19 +450,16 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * @param associations the list of association names to do persist first if set
      */
     void persistToOneAssociations(D entity, List<String> assoctiations){
-        for(String fld: assoctiations){
-            def assoc = entity[fld]
-
+        for(String assocName: assoctiations){
+            def assoc = entity[assocName]
             //use the getAssociationId as it deals with proxies and it doesn't hydrate the proxy
             if (assoc) {
-                PersistableRepoEntity pentity = (PersistableRepoEntity)entity
-                GormEntity gentity = (GormEntity)entity
-
                 //if its a proxy then its already setup and not new
-                if(!proxyHandler.isProxy(assoc) && !gentity.getAssociationId(fld)){
+                //so check that its not a proxy and that it doesnt have an id for it already
+                if(!proxyHandler.isProxy(assoc) && !((GormEntity)entity).getAssociationId(assocName)){
                     PersistableRepoEntity assocEntity = assoc as PersistableRepoEntity
-                    assocEntity.id = pentity.getId()
-                    assocEntity.persist(validate: false, insert: true)
+                    assocEntity.id = ((PersistableRepoEntity)entity).getId()
+                    assocEntity.persist(new PersistArgs(validate:false, insert: true))
                 }
                 // TODO, after benchmark checks might need to also check if dirty and persist here.
             }
@@ -577,12 +574,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * checks if its new or if its dirty
      */
     boolean isNewOrDirty(D entity) {
-        // if its a proxy then its can't be new or dirty
-        if(proxyHandler.isProxy(entity)){
-            return false
-        } else {
-            return gormInstanceApi().isDirty(entity) || ((Persistable)entity).isNew()
-        }
+        GormMetaUtils.isNewOrDirty((GormEntity)entity)
 
     }
 

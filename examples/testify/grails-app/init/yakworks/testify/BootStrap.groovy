@@ -1,13 +1,12 @@
 package yakworks.testify
 
-import yakworks.rally.testing.RallySeedData
+import yakworks.rally.seed.RallySeed
 import yakworks.testing.gorm.model.KitchenSink
 
 class BootStrap {
 
     def init = { servletContext ->
-        RallySeedData.init()
-        RallySeedData.fullMonty()
+        RallySeed.fullMonty()
         buildKitchen()
     }
 

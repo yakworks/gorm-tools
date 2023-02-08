@@ -8,12 +8,10 @@ import groovy.transform.CompileStatic
 
 import org.springframework.dao.OptimisticLockingFailureException
 
-import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.transaction.TrxService
 import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.api.problem.data.NotFoundProblem
-import yakworks.grails.GrailsHolder
 
 /**
  * A bunch of statics to support the repositories.
@@ -22,18 +20,19 @@ import yakworks.grails.GrailsHolder
  * @author Joshua Burnett (@basejump)
  * @since 1.0
  */
-@SuppressWarnings(['FieldName'])
 @CompileStatic
 @SuppressWarnings(["FieldName"])
 class RepoUtil {
+    public static final String SUFFIX = "Repo"
 
-    static List<Class> getRepoClasses(){
-        GrailsHolder.grailsApplication.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz
-    }
+    // static List<Class> getRepoClasses(){
+    //     GrailsHolder.grailsApplication.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz
+    // }
 
-    static String getRepoBeanName(Class domainClass) {
-        RepositoryArtefactHandler.getRepoBeanName(domainClass)
-    }
+    // Deprecated, moved to RepoLookup
+    // static String getRepoBeanName(Class domainClass) {
+    //     return "${NameUtils.getPropertyName(domainClass.name)}$SUFFIX"
+    // }
 
     /**
      * checks the passed in version with the version on the entity (entity.version)

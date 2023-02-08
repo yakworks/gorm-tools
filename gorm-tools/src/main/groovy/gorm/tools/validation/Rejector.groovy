@@ -16,7 +16,7 @@ import org.springframework.validation.AbstractBindingResult
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 
-import yakworks.commons.beans.PropertyTools
+import yakworks.commons.beans.BeanTools
 import yakworks.message.MsgArgs
 import yakworks.message.MsgKey
 import yakworks.message.MsgMultiKey
@@ -60,7 +60,7 @@ class Rejector {
     }
 
     void withError(String propName, List<String> codes, Map args = [:], String fallbackMessage = ''){
-        withError(propName, PropertyTools.value(target, propName), codes, args, fallbackMessage)
+        withError(propName, BeanTools.value(target, propName), codes, args, fallbackMessage)
     }
 
     void withError(String propName, String code, Map args = [:], String fallbackMessage = ''){
@@ -68,7 +68,7 @@ class Rejector {
     }
 
     void withError(String propName, ValidationCode valCode, Map args = [:], String fallbackMessage = ''){
-        withError(propName, PropertyTools.value(target, propName), [valCode.jakartaCode, valCode.name()], args, fallbackMessage)
+        withError(propName, BeanTools.value(target, propName), [valCode.jakartaCode, valCode.name()], args, fallbackMessage)
     }
 
     void withError(String propName, Object val, String code, Map args = [:], String fallbackMessage = ''){
@@ -82,6 +82,9 @@ class Rejector {
         addError(propName, val, mmk)
     }
 
+    /**
+     * Transform the MsgKey into a FieldError.
+     */
     void addError(String propName, Object val, MsgKey msgKey){
         def targetClass = target.class
         String simpleName = targetClass.simpleName
@@ -90,25 +93,33 @@ class Rejector {
         if(!errors) errors = target.errors
         Object[] args = msgKey.args.isMap() ? [msgKey.args.asMap()] as Object[] : msgKey.args.toArray()
 
-        // newCodes.add("${targetClass.getName()}.${propName}.${code}".toString())
-        // newCodes.add("${classShortName}.${propName}.${code}".toString())
-        // newCodes.add("${propName}.${code}".toString())
-        List newCodes
+        List msgCodes
+        String baseCode
         String defaultMsg
+        String fallbackMsg = msgKey.fallbackMessage
         if(msgKey instanceof MsgMultiKey){
-            newCodes = msgKey.codes
-            defaultMsg = newCodes.last()
+            msgCodes = msgKey.codes
+            defaultMsg = fallbackMsg ?: msgCodes.last()
+            baseCode = msgCodes.last()
         } else {
-            newCodes = [msgKey.code]
-            defaultMsg = msgKey.code
+            msgCodes = [msgKey.code]
+            defaultMsg = fallbackMsg ?: msgKey.code
+            baseCode = msgKey.code
         }
+
+        List codesList = [
+            //"${targetClass.getName()}.${propName}.${baseCode}".toString(),
+            "${classShortName}.${propName}.${baseCode}".toString(),
+            "${propName}.${baseCode}".toString()
+        ]
+        codesList.addAll(msgCodes)
 
         FieldError error = new FieldError(
             errors.objectName,
             errors.nestedPath + propName,
             val, //reject value
             false, //bind failure
-            newCodes as String[],
+            codesList as String[],
             args,
             defaultMsg
         )

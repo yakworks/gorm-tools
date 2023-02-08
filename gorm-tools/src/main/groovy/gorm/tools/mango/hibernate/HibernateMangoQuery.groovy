@@ -46,12 +46,13 @@ import grails.orm.RlikeExpression
 
 /**
  * Extends to overrides the myriad of issues with how the DetachedCriteria was translating to the
- * the HibernateQuery. Mostly around the nested and aliases. For example ordering by something like
- * foo.bar.baz was not working at all. Also made it so we can take advantage of being able to specify the
- * ordering for nulls so we can keep postgress consistent with mysql and mssql etc..
+ * the HibernateQuery.
+ * Enhancments over what HibernateQuery was not doing properly
+ * - around the nested and aliases. For example ordering by something like foo.bar.baz.
+ * - take advantage of being able to specify the ordering for nulls so we can keep postgress consistent with mysql and mssql etc..
+ * - working on adding json querying.
  *
  * many of the overrides are here so we can use our HibernateAliasProjectionList
- *
  */
 @CompileStatic
 class HibernateMangoQuery extends AbstractHibernateQuery  {
@@ -387,11 +388,11 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
             propName = propName.replace('.', '_')
             switch (p) {
                 case Query.SumProjection:
-                    return "${propName}_sum"
+                    return "${propName}"
                 case Query.CountProjection:
-                    return "${propName}_count"
+                    return "${propName}"
                 case Query.AvgProjection:
-                    return "${propName}_avg"
+                    return "${propName}"
                 default:
                     return propName
             }

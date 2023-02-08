@@ -4,7 +4,6 @@
 */
 package gorm.tools.repository.bulk
 
-import java.util.function.Supplier
 
 import groovy.transform.CompileStatic
 
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
 import gorm.tools.async.AsyncArgs
-import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
@@ -50,9 +48,6 @@ trait BulkableRepo<D> {
     ParallelTools parallelTools
 
     @Autowired
-    AsyncService asyncService
-
-    @Autowired
     MetaMapService metaMapService
 
     @Autowired
@@ -73,7 +68,7 @@ trait BulkableRepo<D> {
 
     /**
      * creates a supplier to wrap doBulkParallel and calls bulk
-     * if syncJobArgs.promiseEnabled = true will return right away
+     * if syncJobArgs.async = true will return right away
      *
      * @param dataList the list of data maps to create
      * @param syncJobArgs the args object to pass on to doBulk
@@ -82,49 +77,25 @@ trait BulkableRepo<D> {
     Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs) {
         syncJobArgs.entityClass = getEntityClass()
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
-        Supplier supplierFunc = () -> doBulkParallel(dataList, jobContext)
-        return bulk(supplierFunc, jobContext)
-    }
-
-    /**
-     * Allows to pass in bulk of records at once, for example /api/book/bulk
-     * Each call creates a job that stores info for the call and is returned with results
-     * if jobContext.args.promiseEnabled = true will return right away
-     *
-     * @param supplierFunc the supplier(Promise) that gets passed to asyncService
-     * @param jobContext the jobContext with jobId created
-     * @return Job id
-     */
-    Long bulk(Supplier supplierFunc, SyncJobContext jobContext ) {
-        def asyncArgs = new AsyncArgs(enabled: jobContext.args.promiseEnabled, session: true)
-        // This is the promise call. Will return immediately is syncJobArgs.promiseEnabled=true
-        asyncService
-            .supplyAsync(asyncArgs, supplierFunc)
-            .whenComplete { res, ex ->
-                if(ex){ //should never really happen as we should have already handled any errors
-                    log.error("BulkableRepo unexpected exception", ex)
-                    jobContext.results << problemHandler.handleUnexpected(ex)
-                }
-                jobContext.finishJob()
-            }
-
-        return jobContext.jobId
+        //FIXME why are we setting session: true here? explain. should it be default?
+        def asyncArgs = jobContext.args.asyncArgs.session(true)
+        // This is the promise call. Will return immediately if syncJobArgs.async=true
+        return syncJobService.runJob(asyncArgs, jobContext, () -> doBulkParallel(dataList, jobContext))
     }
 
     void doBulkParallel(List<Map> dataList, SyncJobContext jobContext){
         List<Collection<Map>> sliceErrors = Collections.synchronizedList([] as List<Collection<Map>> )
 
         AsyncArgs pconfig = AsyncArgs.of(getDatastore())
-        pconfig.enabled = jobContext.args.asyncEnabled //same as above, ability to override through params
+        pconfig.enabled = jobContext.args.parallel //same as above, ability to override through params
         // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
         parallelTools.eachSlice(pconfig, dataList) { dataSlice ->
-            Long startTime = System.currentTimeMillis()
             ApiResults results
             try {
                 withTrx {
                     results = doBulk((List<Map>) dataSlice, jobContext.args)
                 }
-                if(results?.ok) updateJobResults(jobContext, results, startTime)
+                if(results?.ok) jobContext.updateJobResults(results, false)
                 // ((List<Map>) dataSlice)*.clear() //clear out so mem can be garbage collected
             } catch(Exception e) {
                 //on pass1 we collect the slices that failed and will run through them again with each item in its own trx
@@ -137,17 +108,14 @@ trait BulkableRepo<D> {
         // this time run each item in the slice in its own transaction
         if(sliceErrors.size()) {
             AsyncArgs asynArgsNoTrx = AsyncArgs.of(getDatastore())
-            asynArgsNoTrx.enabled = jobContext.args.asyncEnabled
+            asynArgsNoTrx.enabled = jobContext.args.parallel
             parallelTools.each(asynArgsNoTrx, sliceErrors) { dataSlice ->
                 try {
-                    Long startTime = System.currentTimeMillis()
                     ApiResults results = doBulk((List<Map>) dataSlice, jobContext.args, true)
-                    updateJobResults(jobContext, results, startTime)
-                    // ((List<Map>) dataSlice)*.clear() //clear out so mem can be garbage collected
+                    jobContext.updateJobResults(results, false)
                 } catch(Exception ex) {
                     log.error("BulkableRepo unexpected exception", ex)
-                    // just in case, unexpected errors as we should have intercepted them all already in doBulk
-                    jobContext.results << problemHandler.handleException(ex)
+                    jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
                 }
             }
         }
@@ -253,22 +221,6 @@ trait BulkableRepo<D> {
     Map createMetaMap(D entityInstance, List<String> includes){
         MetaMap entityMapData = metaMapService.createMetaMap(entityInstance, includes)
         return (Map)entityMapData.clone()
-    }
-
-    /**
-     * calls jobContext.updateJobResults and swallows any unexpected exceptions
-     *
-     * @param jobContext the current jobContext
-     * @param results the results of the current slice
-     * @param startTimeMillis the start time in milliseconds used for logging elapsed time
-     */
-    void updateJobResults(SyncJobContext jobContext, ApiResults results, Long startTimeMillis = null){
-        try {
-            jobContext.updateJobResults(results, startTimeMillis)
-        } catch (e){
-            //ok to swallow thi excep since we dont want to disrupt the flow
-            log.error("Unexpected error during updateJobResults", e)
-        }
     }
 
     /**

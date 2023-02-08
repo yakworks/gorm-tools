@@ -1,35 +1,33 @@
 apply plugin: "yakworks.grails-plugin"
 
-apply from: "${rootProject.projectDir}/gradle/test-integration.gradle"
-
-//shared resources to pick up the Gorm defaults from application.groovy, as well as simple logback
-// sourceSets.test.resources.srcDirs += [project(':gorm-test-support').sourceSets.main.resources]
+apply from: "${rootDir}/gradle/gorm-lib.gradle"
+apply from: "${rootDir}/gradle/test-integration.gradle"
 
 dependencies {
 
-  console "org.grails:grails-console"
-  profile "org.grails.profiles:rest-api"
+  compileOnly "org.springframework.boot:spring-boot-starter-web"
+  //transitive spring security
+  //compileOnly "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
 
   api project(":gorm-tools")
-  api project(":gorm-security")
+  api project(":gorm-audit")
+  api project(":boot-security-gorm")
   api project(":gorm-etl")
-  api "org.yakworks:grails-kit:$vSpringGrailsKit"
+
   api "org.yakworks:grails-external-config:$vSpringGrailsKit"
-  //api "dk.glasius:external-config:$vExternalConfig"
   api 'jakarta.annotation:jakarta.annotation-api:2.1.0'
 
-  // for the mock and seed data
-  compileOnly("io.github.longwa:build-test-data:$vBuildTestData"){
-    exclude group:"org.grails", module: "grails-gorm-testing-support"
-  }
+  //lock the compatible hibernate version here
+  api "org.grails:grails-datastore-gorm-hibernate5:$vGormHibernate"
+  api "org.grails.plugins:hibernate5:$vGormHibernate"
+  api "org.hibernate:hibernate-core:$vHibernate"
 
-  implementation "org.springframework.boot:spring-boot-starter-logging"
-  implementation "org.springframework.boot:spring-boot-autoconfigure"
-  implementation "org.grails:grails-core"
-  implementation "org.springframework.boot:spring-boot-starter-tomcat"
+  compileOnly "org.grails:grails-core"
 
-  implementation "org.grails:grails-web-boot"
-  implementation "org.grails:grails-plugin-services"
+  testRuntimeOnly "org.springframework.boot:spring-boot-autoconfigure"
+  testRuntimeOnly "org.springframework.boot:spring-boot-starter-tomcat"
+  //testImplementation "io.micronaut.spring:micronaut-spring:4.2.2"
+  testImplementation project(":gorm-test-domain")
 }
 
 test {
@@ -88,5 +86,13 @@ tasks.register("verifyNoSnapshots") {
     if (!snapshotsList.isEmpty()) {
       throw new GradleException("Please get rid of snapshots for following dependencies before releasing $snapshotsList")
     }
+  }
+}
+
+processResources {
+  filesMatching('**/org.codehaus.groovy.runtime.ExtensionModule') {
+    expand([
+      moduleVersion: version
+    ])
   }
 }

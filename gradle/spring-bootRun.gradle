@@ -1,0 +1,12 @@
+//common bootRun for spring so we are not copy pasting it all over
+bootRun {
+  //  ignoreExitValue true
+  jvmArgs('-Dspring.output.ansi.enabled=always', '-noverify', '-XX:TieredStopAtLevel=1', '-Xmx1024m')
+  sourceResources sourceSets.main
+  String springProfilesActive = 'spring.profiles.active'
+  String profileVal = System.getProperty(springProfilesActive) //?: 'dev'
+  systemProperty springProfilesActive, profileVal
+  //set the sys properties so BuildSupport statics can see them. Should not really be used or needed in prod
+  systemProperty "project.rootProjectDir", rootProject.projectDir.absolutePath
+  systemProperty "project.projectDir", project.projectDir.absolutePath
+}

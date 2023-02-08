@@ -1,0 +1,16 @@
+api:
+  paths:
+    /rally/orgTypeSetup:
+      gridOptions:
+        colModel:
+          - { name: id, hidden: true }
+          - { name: name, formatter: editActionLink }
+          - { name: description, width: 100 }
+        pager: false
+        toolbar:
+          leftButtons:
+            create: { class: hidden }
+
+      editForm:
+        name: { disabled: true }
+        description: {}

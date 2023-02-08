@@ -30,7 +30,7 @@ import yakworks.testing.gorm.unit.GormHibernateTest
 
 class GormRepoSpec extends Specification implements GormHibernateTest {
 
-static entityClasses = [Cust, CustExt, TestTrxRollback, KitchenSink, SinkExt, SinkItem]
+    static entityClasses = [Cust, CustExt, TestTrxRollback, KitchenSink, SinkExt, SinkItem]
 
     def "assert proper repos are setup"() {
         expect:

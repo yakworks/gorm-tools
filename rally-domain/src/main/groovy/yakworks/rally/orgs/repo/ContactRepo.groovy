@@ -59,17 +59,15 @@ class ContactRepo extends LongIdGormRepo<Contact> {
             Map refArgs = [stamp: "Contact: ${contact.name}, id: ${contact.id}", other: hasRefName]
             throw DataProblemCodes.ReferenceKey.withArgs(refArgs).toException()
         }
-        //remove
+
         TagLink.remove(contact)
 
-        // XXX why are we keeping the locations around?
-        // if its a location for a contact it should be deleted along with the contact right?
-        Location.executeUpdate("update Location set contact = null where contact = :contact", [contact: contact]) //set contact to null
+        // ContactSource.query(contact: contact).deleteAll() - deleted with cascade as per domain mapping.
+        Location.query(contact: contact).deleteAll()
 
-        // XXX we are not deleting Location or CSource? Why
-        // something like this should be run no?
-        // Location.query(contact: contact).deleteAll()
-        // ContactSource.query(contact: contact).deleteAll()
+        //NOTE: This was here for CED but it was removed as logic is faulty to keep the location around for the contact if the contact is deleted.
+        // I think the idea was to keep its location info even if contact was removed since contacts could be some kind of job.
+        //Location.executeUpdate("update Location set contact = null where contact = :contact", [contact: contact]) //set contact to null
     }
 
     /** lookup by num or ContactSource */
@@ -80,8 +78,8 @@ class ContactRepo extends LongIdGormRepo<Contact> {
 
         String sourceId = Maps.value(data, 'sourceId')
         if(sourceId) {
-            List contactForSourceId = ContactSource.findAllWhere(sourceId: sourceId)
-            contact = contactForSourceId[0].contact
+            ContactSource source = ContactSource.findWhere(sourceId: sourceId)
+            return source?.contact
         } else if (data.num) {
             String num = Maps.value(data, 'num')
             List contactForNum = Contact.findAllWhere(num:num)

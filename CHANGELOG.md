@@ -1,3 +1,14 @@
+### v7.3.30
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.29...v7.3.30)
+- release [link](https://github.com/yakworks/gorm-tools/commit/ace07cca0e99b39aeefe60f9c4cd41b88fdbb25e)
+- Merge pull request #634 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/73ae2d646747fb20a068d58a27ca8c6ecf32c8c8)
+- Merge pull request #633 from yakworks/fix_hasRoles [link](https://github.com/yakworks/gorm-tools/commit/9038f27bbcc38c35fb1da4fa3933a0a3f542923c)
+- fix log noise in mango and bump timeout for testing in config [link](https://github.com/yakworks/gorm-tools/commit/1ef86090f57628aa5d7cafec778e7a798764e7fb)
+- dont use springs hasRoles [link](https://github.com/yakworks/gorm-tools/commit/7916d60ab66494d3b157fffafc46005af77e983a)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/2d84a4e840d697f2fbfcbf4237c370dffe7de114)
+- back to release=false [link](https://github.com/yakworks/gorm-tools/commit/932688691c34b5cc6b21f0ec4f9f1c09a7e86da8)
+
 ### v7.3.29
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.27...v7.3.29)

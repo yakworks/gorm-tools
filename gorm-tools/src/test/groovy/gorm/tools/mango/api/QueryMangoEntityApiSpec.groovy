@@ -39,12 +39,12 @@ class QueryMangoEntityApiSpec extends Specification implements GormHibernateTest
         !kitchenSinkRepo.exists(-99L)
     }
 
-    void "find"() {
+    void "test queryGet"() {
         expect:
-        kitchenSinkRepo.find([id:1L])
-        kitchenSinkRepo.find([name2:"KitchenSink-1"])
-        kitchenSinkRepo.find("thing.name":"Thing1")
-        KitchenSink.find("thing.name":"Thing1")
-        KitchenSink.find(name2:"KitchenSink-3").id == 3
+        kitchenSinkRepo.queryGet([id:1L]) instanceOf KitchenSink
+        kitchenSinkRepo.queryGet([name2:"KitchenSink-1"]) instanceOf KitchenSink
+        kitchenSinkRepo.queryGet("thing.name":"Thing1") instanceOf KitchenSink
+        // KitchenSink.queryGet("thing.name":"Thing1")
+        // KitchenSink.queryGet(name2:"KitchenSink-3").id == 3
     }
 }

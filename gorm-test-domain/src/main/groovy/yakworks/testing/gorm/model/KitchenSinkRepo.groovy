@@ -116,6 +116,7 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
         Map data = generateData(id) as Map<String, Object>
         data.putAll([
             id: id,
+            name2:"KitchenSink-$id",
             thing: [id: id],
             sinkItems: [[name: "red"], [name: "blue"]]
         ])

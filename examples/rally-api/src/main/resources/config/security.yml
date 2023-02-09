@@ -5,6 +5,7 @@ app:
     jwt:
       # secret for Symmetric HS256 tokens, should be long and random
       secret: s/9Y3WUi5LkKsR8IZ4DTcX=
+      expiry: 10800 # 3 hours = 60*60*3
 
       issuers:
         # default issuer for internal use

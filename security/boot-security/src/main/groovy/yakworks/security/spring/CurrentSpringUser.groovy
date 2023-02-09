@@ -75,18 +75,18 @@ class CurrentSpringUser implements CurrentUser {
         return (authentication != null && !(authentication instanceof AnonymousAuthenticationToken))
     }
 
-    /**
-     * Check if current user has any of the specified roles
-     */
-    @Override
-    boolean hasAnyRole(Collection<String> roles){
-        getSecurityOperations().hasAnyRole(roles as String[])
-    }
+    //FIXME using springs does not work as in many cases the Authentication doesnt have the roles.
+    // this will be a problem if we move to using the annotations so this is a temp hack.
+    // can see problem by setting breakpoint in AuthSuccessUserInfoListener and inspecting the Authentication objects authorities.
 
-    @Override
-    boolean hasRole(String role){
-        getSecurityOperations().hasRole(role)
-    }
+    // @Override
+    // boolean hasAnyRole(Collection<String> roles){
+    //     getSecurityOperations().hasAnyRole(roles as String[])
+    // }
+    // @Override
+    // boolean hasRole(String role){
+    //     getSecurityOperations().hasRole(role)
+    // }
 
     /**
      * Logout current user programmatically

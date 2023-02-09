@@ -199,21 +199,29 @@ class ContactRepo extends LongIdGormRepo<Contact> {
         GormUtils.copyDomain(toContat, from)
         toContat.flex = GormUtils.copyDomain(ContactFlex, ContactFlex.get(from.flexId as Long), [contact: toContat])
 
-        from.phones.each { ContactPhone p ->
-            toContat.addToPhones(GormUtils.copyDomain(ContactPhone, p, [contact: toContat]))
+        if(from.phones) {
+            from.phones.each { ContactPhone p ->
+                toContat.addToPhones(GormUtils.copyDomain(ContactPhone, p, [contact: toContat]))
+            }
         }
 
-        from.emails.each { ContactEmail e ->
-            toContat.addToEmails(GormUtils.copyDomain(ContactEmail, e, [contact: toContat]))
+        if(from.emails) {
+            from.emails.each { ContactEmail e ->
+                toContat.addToEmails(GormUtils.copyDomain(ContactEmail, e, [contact: toContat]))
+            }
+        }
+        if(from.sources) {
+            from.sources.each { ContactSource s ->
+                toContat.addToSources(GormUtils.copyDomain(ContactSource, s, [contact: toContat]))
+            }
+        }
+        if(from.locations) {
+            from.locations.each { Location l ->
+                Location c = GormUtils.copyDomain(Location, l, [org: toContat.org, contact: toContat])
+                c.persist()
+            }
         }
 
-        from.sources.each { ContactSource s ->
-            toContat.addToSources(GormUtils.copyDomain(ContactSource, s, [contact: toContat]))
-        }
-        from.locations.each { Location l ->
-            Location c = GormUtils.copyDomain(Location, l, [org: toContat.org, contact: toContat])
-            c.persist()
-        }
         return toContat.persist()
     }
 

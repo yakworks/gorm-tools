@@ -119,21 +119,22 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         assocRepo.createOrUpdate(assocList)
     }
 
+    /**
+     * Checks if org can be deleted (sourceType != ERP)
+     * And Deletes associated org domains
+     */
     @RepoListener
     void beforeRemove(Org org, BeforeRemoveEvent e) {
         if (org.source?.sourceType == SourceType.ERP) { //might be more in future
             def args = [name: "Org: ${org.name}, source:${SourceType.ERP}"]
-            throw ValidationProblem.of("error.delete.externalSource", args)
-                .entity(org).toException()
+            throw ValidationProblem.of("error.delete.externalSource", args).entity(org).toException()
         }
-        //remove tags
         orgTagRepo.remove(org)
-        //remove contacts
         contactRepo.removeAll(org)
     }
 
     /**
-     * deletes org and all associated persons or users but only if is doesn't have invoices
+     * Deleted associated domains of org
      *
      * @param org the org domain object
      * @throws ValidationProblem.Exception if a spring DataIntegrityViolationException is thrown

@@ -1,6 +1,10 @@
 package yakworks.rally.orgs
 
 import yakworks.commons.map.Maps
+import yakworks.rally.orgs.model.Location
+import yakworks.rally.orgs.model.OrgCalc
+import yakworks.rally.orgs.model.OrgFlex
+import yakworks.rally.orgs.model.OrgInfo
 import yakworks.rally.orgs.model.OrgMember
 
 import java.time.LocalDate
@@ -279,7 +283,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         orgDimensionService.testInit(null)
     }
 
-    def "delete should fail when source is ERP"() {
+    void "delete should fail when source is ERP"() {
         when:
         def org = Org.get(9)
         org.source.sourceType = SourceType.ERP
@@ -291,25 +295,45 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         e.code == 'error.delete.externalSource'
     }
 
-    void "delete contact with org"() {
+    void "delete associated domains with org"() {
         when:
-        def org = Org.get(9)
-        def contact = Contact.get(9)
-        def contact2 = Contact.findWhere(num: 'secondary9')
+        Org org = Org.get(9)
+        Contact contact = Contact.get(9)
+        Contact contact2 = Contact.findWhere(num: 'secondary9')
+        OrgCalc calc = new OrgCalc(id:org.id).persist()
+        org.calc = calc
+        org.member = OrgMember.make(org).persist()
+        org.persist(flush:true)
 
         then:
         contact
         contact2
         org.contact == contact
+        contact2.org == org
+        org.flex != null
+        org.info != null
+        OrgInfo.get(org.id) != null
+        OrgCalc.get(org.id) != null
+        OrgSource.findByOrgId(org.id) != null
+        org.source != null
+        OrgMember.get(org.id) != null
+        org.location != null
 
         when:
         org.remove()  // orgRepo.remove or orgRepo.removeById is not removing either
+       // flush()
 
         then:
         !Org.get(9)
         !Contact.exists(9)
         !Contact.findWhere(num: 'secondary9')
         !Contact.findAllByOrg(org)
+        !OrgFlex.get(org.id)
+        !OrgCalc.get(9)
+        !OrgSource.findByOrgId(org.id)
+        !OrgMember.get(org.id)
+        !OrgInfo.get(org.id)
+        !Location.findAllByOrg(org)
     }
 
     def "test create Org different orgType same sourceId"() {

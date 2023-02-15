@@ -1,6 +1,7 @@
 package gorm.tools.mango.jpql
 
 import gorm.tools.mango.MangoDetachedCriteria
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.jpql.JpqlQueryBuilder
 import spock.lang.IgnoreRest
 import spock.lang.Specification
@@ -122,6 +123,22 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         HAVING (SUM(kitchenSink.sinkLink.amount) < :p1)
         ORDER BY sinkLink_amount ASC ''')
         queryInfo.paramMap == [p1: 100.0]
+    }
+
+    @IgnoreRest
+    void "projections having with criteria case 2"() {
+        setup:
+        QueryArgs args = QueryArgs.of(q:[kind:['CLIENT', 'VENDOR'], amount:['$gte':100], status:'Active'], projections: [status:'group', kind:'group'])
+
+        when:
+        MangoDetachedCriteria criteria = KitchenSink.repo.query(args)
+        def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
+        def queryInfo = builder.buildSelect()
+        def query = queryInfo.query
+
+        then:
+        false
+
     }
 
     void "projections having criteria map"() {

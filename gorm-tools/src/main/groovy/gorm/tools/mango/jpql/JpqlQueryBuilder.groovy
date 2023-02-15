@@ -458,9 +458,12 @@ class JpqlQueryBuilder {
                 Query.IsNull isNull = (Query.IsNull) criterion
                 final String name = isNull.getProperty()
                 validateProperty(entity, name, Query.IsNull)
-                whereClause.append(logicalName)
-                           .append(DOT)
-                           .append(name)
+
+                if(logicalName){
+                    whereClause.append(logicalName).append(DOT)
+                }
+
+                whereClause.append(name)
                            .append(" IS NULL ")
 
                 return position
@@ -472,9 +475,11 @@ class JpqlQueryBuilder {
                 Query.IsNotNull isNotNull = (Query.IsNotNull) criterion
                 final String name = isNotNull.getProperty()
                 validateProperty(entity, name, Query.IsNotNull)
-                whereClause.append(logicalName)
-                           .append(DOT)
-                           .append(name)
+
+                if(logicalName){
+                    whereClause.append(logicalName).append(DOT)
+                }
+                whereClause.append(name)
                            .append(" IS NOT NULL ")
 
                 return position
@@ -486,9 +491,12 @@ class JpqlQueryBuilder {
                 Query.IsEmpty isEmpty = (Query.IsEmpty) criterion
                 final String name = isEmpty.getProperty()
                 validateProperty(entity, name, Query.IsEmpty)
-                whereClause.append(logicalName)
-                           .append(DOT)
-                           .append(name)
+
+                if(logicalName){
+                    whereClause.append(logicalName).append(DOT)
+                }
+
+                whereClause.append(name)
                            .append(" IS EMPTY ")
 
                 return position
@@ -500,9 +508,12 @@ class JpqlQueryBuilder {
                 Query.IsNotEmpty isNotEmpty = (Query.IsNotEmpty) criterion
                 final String name = isNotEmpty.getProperty()
                 validateProperty(entity, name, Query.IsNotEmpty)
-                whereClause.append(logicalName)
-                           .append(DOT)
-                           .append(name)
+
+                if(logicalName){
+                    whereClause.append(logicalName).append(DOT)
+                }
+
+                whereClause.append(name)
                            .append(" IS EMPTY ")
 
                 return position
@@ -514,9 +525,12 @@ class JpqlQueryBuilder {
                 Query.IsNotNull isNotNull = (Query.IsNotNull) criterion
                 final String name = isNotNull.getProperty()
                 validateProperty(entity, name, Query.IsNotNull)
-                whereClause.append(logicalName)
-                           .append(DOT)
-                           .append(name)
+
+                if(logicalName){
+                    whereClause.append(logicalName).append(DOT)
+                }
+
+                whereClause.append(name)
                            .append(" IS NOT NULL ")
 
                 return position
@@ -572,7 +586,7 @@ class JpqlQueryBuilder {
                 final String name = between.getProperty()
                 PersistentProperty prop = validateProperty(entity, name, Query.Between)
                 Class propType = prop.getType()
-                final String qualifiedName = logicalName + DOT + name
+                final String qualifiedName = logicalName ? logicalName + DOT + name : name
                 whereClause.append(OPEN_BRACKET)
                            .append(qualifiedName)
                            .append(" >= ")
@@ -611,9 +625,14 @@ class JpqlQueryBuilder {
                 final String name = eq.getProperty()
                 PersistentProperty prop = validateProperty(entity, name, Query.ILike)
                 Class propType = prop.getType()
+
                 whereClause.append("lower(")
-                 .append(logicalName)
-                 .append(DOT)
+
+                if(logicalName){
+                    whereClause.append(logicalName).append(DOT)
+                }
+
+                whereClause
                  .append(name)
                  .append(")")
                  .append(" like lower(")
@@ -631,10 +650,12 @@ class JpqlQueryBuilder {
                 final String name = inQuery.getProperty()
                 PersistentProperty prop = validateProperty(entity, name, Query.In)
                 Class propType = prop.getType()
-                whereClause.append(logicalName)
-                           .append(DOT)
-                           .append(name)
-                           .append(" IN (")
+
+                if(logicalName){
+                    whereClause.append(logicalName).append(DOT)
+                }
+
+                whereClause.append(name).append(" IN (")
                 QueryableCriteria subquery = inQuery.getSubquery()
                 if(subquery != null) {
                     buildSubQuery(q, whereClause, position, parameters, conversionService, allowJoins, subquery)

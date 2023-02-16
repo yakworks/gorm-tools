@@ -463,8 +463,8 @@ class JpqlQueryBuilder {
                     whereClause.append(logicalName).append(DOT)
                 }
 
-                whereClause.append(name)
-                           .append(" IS NULL ")
+                String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
+                whereClause.append(propName).append(" IS NULL ")
 
                 return position
             }
@@ -479,8 +479,9 @@ class JpqlQueryBuilder {
                 if(logicalName){
                     whereClause.append(logicalName).append(DOT)
                 }
-                whereClause.append(name)
-                           .append(" IS NOT NULL ")
+
+                String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
+                whereClause.append(propName).append(" IS NOT NULL ")
 
                 return position
             }
@@ -496,7 +497,8 @@ class JpqlQueryBuilder {
                     whereClause.append(logicalName).append(DOT)
                 }
 
-                whereClause.append(name)
+                String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
+                whereClause.append(propName)
                            .append(" IS EMPTY ")
 
                 return position
@@ -513,7 +515,8 @@ class JpqlQueryBuilder {
                     whereClause.append(logicalName).append(DOT)
                 }
 
-                whereClause.append(name)
+                String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
+                whereClause.append(propName)
                            .append(" IS EMPTY ")
 
                 return position
@@ -530,7 +533,8 @@ class JpqlQueryBuilder {
                     whereClause.append(logicalName).append(DOT)
                 }
 
-                whereClause.append(name)
+                String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
+                whereClause.append(propName)
                            .append(" IS NOT NULL ")
 
                 return position
@@ -586,7 +590,10 @@ class JpqlQueryBuilder {
                 final String name = between.getProperty()
                 PersistentProperty prop = validateProperty(entity, name, Query.Between)
                 Class propType = prop.getType()
-                final String qualifiedName = logicalName ? logicalName + DOT + name : name
+
+                String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
+
+                final String qualifiedName = logicalName ? logicalName + DOT + propName : propName
                 whereClause.append(OPEN_BRACKET)
                            .append(qualifiedName)
                            .append(" >= ")
@@ -632,8 +639,9 @@ class JpqlQueryBuilder {
                     whereClause.append(logicalName).append(DOT)
                 }
 
+                String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
                 whereClause
-                 .append(name)
+                 .append(propName)
                  .append(")")
                  .append(" like lower(")
                  .append(PARAMETER_PREFIX)
@@ -655,7 +663,8 @@ class JpqlQueryBuilder {
                     whereClause.append(logicalName).append(DOT)
                 }
 
-                whereClause.append(name).append(" IN (")
+                String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
+                whereClause.append(propName).append(" IN (")
                 QueryableCriteria subquery = inQuery.getSubquery()
                 if(subquery != null) {
                     buildSubQuery(q, whereClause, position, parameters, conversionService, allowJoins, subquery)

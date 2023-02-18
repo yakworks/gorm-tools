@@ -1,12 +1,12 @@
 package gorm.tools.mango.jpql
 
 import gorm.tools.mango.MangoDetachedCriteria
-import gorm.tools.mango.jpql.JpqlQueryBuilder
-import spock.lang.IgnoreRest
+import gorm.tools.mango.api.QueryArgs
 import spock.lang.Specification
-import testing.Cust
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.unit.GormHibernateTest
+
+import java.time.LocalDate
 
 /**
  * Test for JPA builder
@@ -122,6 +122,70 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         HAVING (SUM(kitchenSink.sinkLink.amount) < :p1)
         ORDER BY sinkLink_amount ASC ''')
         queryInfo.paramMap == [p1: 100.0]
+    }
+
+    void "projections having with in"() {
+        setup:
+        QueryArgs args = QueryArgs.of(q:[kind:['CLIENT', 'VENDOR'], amount:['$gte':100]], projections: [kind:'group', amount:'sum'])
+
+        when: "having with in"
+        MangoDetachedCriteria criteria = KitchenSink.repo.query(args)
+        def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
+        def queryInfo = builder.buildSelect()
+        def query = queryInfo.query
+
+        then:
+        query
+        query.trim() == strip('''
+            SELECT new map( kitchenSink.kind as kind,SUM(kitchenSink.amount) as amount )
+            FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
+            GROUP BY kitchenSink.kind
+            HAVING (kitchenSink.kind IN (:p1,:p2) AND SUM(kitchenSink.amount) >= :p3)
+        ''')
+
+    }
+
+    void "projections having with is not null"() {
+        setup:
+        QueryArgs args = QueryArgs.of(q:[kind:'$isNotNull'], projections: [kind:'group', amount:'sum'])
+
+        when: "having with in"
+        MangoDetachedCriteria criteria = KitchenSink.repo.query(args)
+        def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
+        def queryInfo = builder.buildSelect()
+        def query = queryInfo.query
+
+        then:
+        query
+        query.trim() == strip('''
+            SELECT new map( kitchenSink.kind as kind,SUM(kitchenSink.amount) as amount )
+            FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
+            GROUP BY kitchenSink.kind
+            HAVING (kitchenSink.kind IS NOT NULL )
+        ''')
+
+    }
+
+    void "projections having with between"() {
+        setup:
+        LocalDate now = LocalDate.now()
+        QueryArgs args = QueryArgs.of(q:[localDate:['$between':[now, now.plusDays(7) ]]], projections: [localDate:'group', amount:'sum'])
+
+        when: "having with in"
+        MangoDetachedCriteria criteria = KitchenSink.repo.query(args)
+        def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
+        def queryInfo = builder.buildSelect()
+        def query = queryInfo.query
+
+        then:
+        query
+        query.trim() == strip('''
+            SELECT new map( kitchenSink.localDate as localDate,SUM(kitchenSink.amount) as amount )
+            FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
+            GROUP BY kitchenSink.localDate
+            HAVING ((kitchenSink.localDate >= :p1 AND kitchenSink.localDate <= :p2))
+        ''')
+
     }
 
     void "projections having criteria map"() {

@@ -25,6 +25,7 @@ import grails.gorm.DetachedCriteria
 /**
  * Builds JPQL String-based queries from the DetachedCriteria.
  * Used for projections and aggregate based queries as the criteria interface is limited there
+ * Based on org.grails.datastore.mapping.query.jpa.JpaQueryBuilder
  *
  * @author Joshua Burnett (@basejump)
  * @since 7.0.8
@@ -228,6 +229,7 @@ class JpqlQueryBuilder {
             .append(propalias)
         projectionAliases[propalias] = projField
     }
+
     void buildSelect(StringBuilder queryString, List<Query.Projection> projectionList, String logicalName, PersistentEntity entity) {
         if (projectionList.isEmpty()) {
             queryString.append(DISTINCT_CLAUSE)
@@ -350,7 +352,8 @@ class JpqlQueryBuilder {
                 Query.Junction associationCriteria = aq.getCriteria()
                 List<Query.Criterion> associationCriteriaList = associationCriteria.getCriteria()
 
-                return handleAssociationCriteria(q, whereClause, logicalName, position, parameters, conversionService, allowJoins, association, associationCriteria, associationCriteriaList)
+                return handleAssociationCriteria(q, whereClause, logicalName, position, parameters, conversionService, allowJoins,
+                    association, associationCriteria, associationCriteriaList)
             }
         })
 
@@ -363,7 +366,8 @@ class JpqlQueryBuilder {
                            .append(OPEN_BRACKET)
 
                 final Query.Negation negation = (Query.Negation)criterion
-                position = buildWhereClauseForCriterion(entity, negation, q, whereClause, logicalName, negation.getCriteria(), position, parameters, conversionService, allowJoins)
+                position = buildWhereClauseForCriterion(entity, negation, q, whereClause, logicalName, negation.getCriteria(), position,
+                    parameters, conversionService, allowJoins)
                 whereClause.append(CLOSE_BRACKET)
 
                 return position
@@ -377,7 +381,8 @@ class JpqlQueryBuilder {
                 whereClause.append(OPEN_BRACKET)
 
                 final Query.Conjunction conjunction = (Query.Conjunction)criterion
-                position = buildWhereClauseForCriterion(entity, conjunction, q, whereClause, logicalName, conjunction.getCriteria(), position, parameters, conversionService, allowJoins)
+                position = buildWhereClauseForCriterion(entity, conjunction, q, whereClause, logicalName, conjunction.getCriteria(),
+                    position, parameters, conversionService, allowJoins)
                 whereClause.append(CLOSE_BRACKET)
 
                 return position
@@ -391,7 +396,8 @@ class JpqlQueryBuilder {
                 whereClause.append(OPEN_BRACKET)
 
                 final Query.Disjunction disjunction = (Query.Disjunction)criterion
-                position = buildWhereClauseForCriterion(entity, disjunction, q, whereClause,  logicalName, disjunction.getCriteria(), position, parameters, conversionService, allowJoins)
+                position = buildWhereClauseForCriterion(entity, disjunction, q, whereClause,  logicalName, disjunction.getCriteria(),
+                    position, parameters, conversionService, allowJoins)
                 whereClause.append(CLOSE_BRACKET)
 
                 return position
@@ -399,14 +405,16 @@ class JpqlQueryBuilder {
         })
 
         queryHandlers.put(Query.Equals, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.Equals eq = (Query.Equals) criterion
                 return handlePropParam(entity, eq, logicalName, "=", position, whereClause, parameters)
             }
         })
 
         queryHandlers.put(Query.EqualsProperty, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.EqualsProperty eq = (Query.EqualsProperty) criterion
                 handlePropCompare(entity, eq, logicalName, "=", whereClause)
                 return position
@@ -414,7 +422,8 @@ class JpqlQueryBuilder {
         })
 
         queryHandlers.put(Query.NotEqualsProperty, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.NotEqualsProperty eq = (Query.NotEqualsProperty) criterion
                 handlePropCompare(entity, eq, logicalName, "!=", whereClause)
                 return position
@@ -422,7 +431,8 @@ class JpqlQueryBuilder {
         })
 
         queryHandlers.put(Query.GreaterThanProperty, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.GreaterThanProperty eq = (Query.GreaterThanProperty) criterion
                 handlePropCompare(entity, eq, logicalName, ">", whereClause)
                 return position
@@ -430,7 +440,8 @@ class JpqlQueryBuilder {
         })
 
         queryHandlers.put(Query.GreaterThanEqualsProperty, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.GreaterThanEqualsProperty eq = (Query.GreaterThanEqualsProperty) criterion
                 handlePropCompare(entity, eq, logicalName, ">=", whereClause)
                 return position
@@ -438,7 +449,8 @@ class JpqlQueryBuilder {
         })
 
         queryHandlers.put(Query.LessThanProperty, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.LessThanProperty eq = (Query.LessThanProperty) criterion
                 handlePropCompare(entity, eq, logicalName, "<", whereClause)
                 return position
@@ -446,7 +458,8 @@ class JpqlQueryBuilder {
         })
 
         queryHandlers.put(Query.LessThanEqualsProperty, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.LessThanEqualsProperty eq = (Query.LessThanEqualsProperty) criterion
                 handlePropCompare(entity, eq, logicalName, "<=", whereClause)
                 return position
@@ -454,7 +467,8 @@ class JpqlQueryBuilder {
         })
 
         queryHandlers.put(Query.IsNull, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.IsNull isNull = (Query.IsNull) criterion
                 final String name = isNull.getProperty()
                 validateProperty(entity, name, Query.IsNull)
@@ -471,7 +485,8 @@ class JpqlQueryBuilder {
         })
 
         queryHandlers.put(Query.IsNotNull, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.IsNotNull isNotNull = (Query.IsNotNull) criterion
                 final String name = isNotNull.getProperty()
                 validateProperty(entity, name, Query.IsNotNull)
@@ -488,7 +503,8 @@ class JpqlQueryBuilder {
         })
 
         queryHandlers.put(Query.IsEmpty, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.IsEmpty isEmpty = (Query.IsEmpty) criterion
                 final String name = isEmpty.getProperty()
                 validateProperty(entity, name, Query.IsEmpty)
@@ -506,7 +522,8 @@ class JpqlQueryBuilder {
         })
 
         queryHandlers.put(Query.IsNotEmpty, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.IsNotEmpty isNotEmpty = (Query.IsNotEmpty) criterion
                 final String name = isNotEmpty.getProperty()
                 validateProperty(entity, name, Query.IsNotEmpty)
@@ -517,14 +534,15 @@ class JpqlQueryBuilder {
 
                 String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
                 whereClause.append(propName)
-                           .append(" IS EMPTY ")
+                           .append(" IS NOT EMPTY ")
 
                 return position
             }
         })
 
         queryHandlers.put(Query.IsNotNull, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.IsNotNull isNotNull = (Query.IsNotNull) criterion
                 final String name = isNotNull.getProperty()
                 validateProperty(entity, name, Query.IsNotNull)
@@ -542,7 +560,8 @@ class JpqlQueryBuilder {
         })
 
         queryHandlers.put(Query.IdEquals, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.IdEquals eq = (Query.IdEquals) criterion
                 PersistentProperty prop = entity.getIdentity()
                 Class propType = prop.getType()
@@ -554,35 +573,40 @@ class JpqlQueryBuilder {
 
 
         queryHandlers.put(Query.NotEquals, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.NotEquals eq = (Query.NotEquals) criterion
                 return handlePropParam(entity, eq, logicalName, " != ", position, whereClause, parameters)
             }
         })
 
         queryHandlers.put(Query.GreaterThan, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.GreaterThan eq = (Query.GreaterThan) criterion
                 return handlePropParam(entity, eq, logicalName, " > ", position, whereClause, parameters)
             }
         })
 
         queryHandlers.put(Query.LessThanEquals, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.LessThanEquals eq = (Query.LessThanEquals) criterion
                 return handlePropParam(entity, eq, logicalName, " <= ", position, whereClause, parameters)
             }
         })
 
         queryHandlers.put(Query.GreaterThanEquals, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.GreaterThanEquals eq = (Query.GreaterThanEquals) criterion
                 return handlePropParam(entity, eq, logicalName, " >= ", position, whereClause, parameters)
             }
         })
 
         queryHandlers.put(Query.Between, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.Between between = (Query.Between) criterion
                 final Object from = between.getFrom()
                 final Object to = between.getTo()
@@ -613,21 +637,24 @@ class JpqlQueryBuilder {
         })
 
         queryHandlers.put(Query.LessThan, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.LessThan eq = (Query.LessThan) criterion
                 return handlePropParam(entity, eq, logicalName, " < ", position, whereClause, parameters)
             }
         })
 
         queryHandlers.put(Query.Like, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.Like eq = (Query.Like) criterion
                 return handlePropParam(entity, eq, logicalName, " like ", position, whereClause, parameters)
             }
         })
 
         queryHandlers.put(Query.ILike, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.ILike eq = (Query.ILike) criterion
                 final String name = eq.getProperty()
                 PersistentProperty prop = validateProperty(entity, name, Query.ILike)
@@ -653,7 +680,8 @@ class JpqlQueryBuilder {
         })
 
         queryHandlers.put(Query.In, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.In inQuery = (Query.In) criterion
                 final String name = inQuery.getProperty()
                 PersistentProperty prop = validateProperty(entity, name, Query.In)
@@ -687,96 +715,119 @@ class JpqlQueryBuilder {
         })
 
         queryHandlers.put(Query.NotIn, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.NotIn notIn = (Query.NotIn) criterion
                 String comparisonExpression = " NOT IN ("
-                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins, notIn, comparisonExpression)
+                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins,
+                    notIn, comparisonExpression)
             }
         })
 
         queryHandlers.put(Query.EqualsAll, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.EqualsAll equalsAll = (Query.EqualsAll) criterion
                 String comparisonExpression = " = ALL ("
-                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins, equalsAll, comparisonExpression)
+                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins,
+                    equalsAll, comparisonExpression)
             }
         })
 
         queryHandlers.put(Query.NotEqualsAll, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.SubqueryCriterion equalsAll = (Query.SubqueryCriterion) criterion
                 String comparisonExpression = " != ALL ("
-                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins, equalsAll, comparisonExpression)
+                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins,
+                    equalsAll, comparisonExpression)
             }
         })
 
         queryHandlers.put(Query.GreaterThanAll, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.SubqueryCriterion equalsAll = (Query.SubqueryCriterion) criterion
                 String comparisonExpression = " > ALL ("
-                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins, equalsAll, comparisonExpression)
+                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins,
+                    equalsAll, comparisonExpression)
             }
         })
 
         queryHandlers.put(Query.GreaterThanSome, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.SubqueryCriterion equalsAll = (Query.SubqueryCriterion) criterion
                 String comparisonExpression = " > SOME ("
-                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins, equalsAll, comparisonExpression)
+                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins,
+                    equalsAll, comparisonExpression)
             }
         })
 
         queryHandlers.put(Query.GreaterThanEqualsAll, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.SubqueryCriterion equalsAll = (Query.SubqueryCriterion) criterion
                 String comparisonExpression = " >= ALL ("
-                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins, equalsAll, comparisonExpression)
+                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins,
+                    equalsAll, comparisonExpression)
             }
         })
 
         queryHandlers.put(Query.GreaterThanEqualsSome, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.SubqueryCriterion equalsAll = (Query.SubqueryCriterion) criterion
                 String comparisonExpression = " >= SOME ("
-                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins, equalsAll, comparisonExpression)
+                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins,
+                    equalsAll, comparisonExpression)
             }
         })
 
         queryHandlers.put(Query.LessThanAll, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.SubqueryCriterion subqueryCriterion = (Query.SubqueryCriterion) criterion
                 String comparisonExpression = " < ALL ("
-                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins, subqueryCriterion, comparisonExpression)
+                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins,
+                    subqueryCriterion, comparisonExpression)
             }
         })
 
         queryHandlers.put(Query.LessThanSome, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.SubqueryCriterion subqueryCriterion = (Query.SubqueryCriterion) criterion
                 String comparisonExpression = " < SOME ("
-                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins, subqueryCriterion, comparisonExpression)
+                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins,
+                    subqueryCriterion, comparisonExpression)
             }
         })
 
         queryHandlers.put(Query.LessThanEqualsAll, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.SubqueryCriterion subqueryCriterion = (Query.SubqueryCriterion) criterion
                 String comparisonExpression = " <= ALL ("
-                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins, subqueryCriterion, comparisonExpression)
+                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins,
+                    subqueryCriterion, comparisonExpression)
             }
         })
 
         queryHandlers.put(Query.LessThanEqualsSome, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
                 Query.SubqueryCriterion subqueryCriterion = (Query.SubqueryCriterion) criterion
                 String comparisonExpression = " <= SOME ("
-                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins, subqueryCriterion, comparisonExpression)
+                return handleSubQuery(entity, q, whereClause, logicalName, position, parameters, conversionService, allowJoins,
+                    subqueryCriterion, comparisonExpression)
             }
         })
 
     }
 
-    int handleSubQuery(PersistentEntity entity, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins, Query.SubqueryCriterion equalsAll, String comparisonExpression) {
+    int handleSubQuery(PersistentEntity entity, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters,
+                       ConversionService conversionService, boolean allowJoins, Query.SubqueryCriterion equalsAll, String comparisonExpression) {
         final String name = equalsAll.getProperty()
         validateProperty(entity, name, Query.In)
         QueryableCriteria subquery = equalsAll.getValue()
@@ -789,7 +840,8 @@ class JpqlQueryBuilder {
         return position
     }
 
-    void buildSubQuery(StringBuilder q, StringBuilder whereClause, int position, List parameters, ConversionService conversionService, boolean allowJoins, QueryableCriteria subquery) {
+    void buildSubQuery(StringBuilder q, StringBuilder whereClause, int position, List parameters, ConversionService conversionService,
+                       boolean allowJoins, QueryableCriteria subquery) {
         PersistentEntity associatedEntity = subquery.getPersistentEntity()
         String associatedEntityName = associatedEntity.getName()
         String associatedEntityLogicalName = associatedEntity.getDecapitalizedName() + position
@@ -803,15 +855,19 @@ class JpqlQueryBuilder {
         List<Query.Criterion> criteria = subquery.getCriteria()
         for (Query.Criterion subCriteria : criteria) {
             QueryHandler queryHandler = queryHandlers.get(subCriteria.getClass())
-            queryHandler.handle(associatedEntity, subCriteria, q, whereClause, associatedEntityLogicalName, position, parameters, conversionService, allowJoins)
+            queryHandler.handle(associatedEntity, subCriteria, q, whereClause, associatedEntityLogicalName, position, parameters,
+                conversionService, allowJoins)
         }
     }
 
-    int handleAssociationCriteria(StringBuilder query, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins, Association<?> association, Query.Junction associationCriteria, List<Query.Criterion> associationCriteriaList) {
+    int handleAssociationCriteria(StringBuilder query, StringBuilder whereClause, String logicalName, int position, List parameters,
+                                  ConversionService conversionService, boolean allowJoins, Association<?> association,
+                                  Query.Junction associationCriteria, List<Query.Criterion> associationCriteriaList) {
         if (association instanceof ToOne) {
             final String associationName = association.getName()
             logicalName = logicalName + DOT + associationName
-            return buildWhereClauseForCriterion(association.getAssociatedEntity(), associationCriteria, query, whereClause, logicalName, associationCriteriaList, position, parameters, conversionService, allowJoins)
+            return buildWhereClauseForCriterion(association.getAssociatedEntity(), associationCriteria, query, whereClause, logicalName,
+                associationCriteriaList, position, parameters, conversionService, allowJoins)
         }
 
         if (association != null) {
@@ -825,7 +881,8 @@ class JpqlQueryBuilder {
              .append(SPACE)
              .append(associationName)
 
-            return buildWhereClauseForCriterion(association.getAssociatedEntity(), associationCriteria, query, whereClause, associationName, associationCriteriaList, position, parameters, conversionService, allowJoins)
+            return buildWhereClauseForCriterion(association.getAssociatedEntity(), associationCriteria, query, whereClause, associationName,
+                associationCriteriaList, position, parameters, conversionService, allowJoins)
         }
 
         return position
@@ -841,7 +898,9 @@ class JpqlQueryBuilder {
         while (iterator.hasNext()) {
             String propertyName = iterator.next()
             PersistentProperty prop = entity.getPropertyByName(propertyName)
-            if (prop == null) throw new InvalidDataAccessResourceUsageException("Property '"+propertyName+"' of class '"+entity.getName()+"' specified in update does not exist")
+            if (prop == null) throw new InvalidDataAccessResourceUsageException("""\
+                Property '${propertyName}' of class '${entity.getName()}' specified in update does not exist
+            """.stripIndent())
 
             parameters.add(propertiesToUpdate.get(propertyName))
             queryString.append(SPACE).append(logicalName).append(DOT).append(propertyName).append('=')
@@ -852,7 +911,8 @@ class JpqlQueryBuilder {
         }
     }
 
-    private static void appendPropertyComparison(StringBuilder q, String logicalName, String propertyName, String otherProperty, String operator) {
+    private static void appendPropertyComparison(StringBuilder q, String logicalName, String propertyName, String otherProperty,
+                                                 String operator) {
         q.append(logicalName)
          .append(DOT)
          .append(propertyName)
@@ -890,15 +950,18 @@ class JpqlQueryBuilder {
     }
 
     private static interface QueryHandler {
-        public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins)
+        public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                          String logicalName, int position, List parameters, ConversionService conversionService, boolean allowJoins)
     }
 
-    private List buildWhereClause(PersistentEntity entity, Query.Junction criteria, StringBuilder q, StringBuilder whereClause, String logicalName, boolean allowJoins) {
+    private List buildWhereClause(PersistentEntity entity, Query.Junction criteria, StringBuilder q, StringBuilder whereClause,
+                                  String logicalName, boolean allowJoins) {
         List parameters = []
         return buildWhereClause(entity, criteria, q, whereClause, logicalName, allowJoins, parameters)
     }
 
-    private List buildWhereClause(PersistentEntity entity, Query.Junction criteria, StringBuilder q, StringBuilder whereClause, String logicalName, boolean allowJoins, List parameters) {
+    private List buildWhereClause(PersistentEntity entity, Query.Junction criteria, StringBuilder q, StringBuilder whereClause,
+                                  String logicalName, boolean allowJoins, List parameters) {
         if (!criteria.isEmpty()) {
             int position = parameters.size()
             final List<Query.Criterion> criterionList = criteria.getCriteria()
@@ -924,7 +987,8 @@ class JpqlQueryBuilder {
         return parameters
     }
 
-    private List buildHavingClause(PersistentEntity entity, Query.Junction criteria, StringBuilder q, String logicalName, boolean allowJoins, List parameters) {
+    private List buildHavingClause(PersistentEntity entity, Query.Junction criteria, StringBuilder q, String logicalName,
+                                   boolean allowJoins, List parameters) {
         if (!criteria.isEmpty() && projectionAliases) {
             int position = parameters.size()
             final List<Query.Criterion> criterionList = criteria.getCriteria()
@@ -961,9 +1025,9 @@ class JpqlQueryBuilder {
         }
     }
 
-    int buildWhereClauseForCriterion(PersistentEntity entity,
-                                            Query.Junction criteria, StringBuilder q, StringBuilder whereClause, String logicalName,
-                                            final List<Query.Criterion> criterionList, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+    int buildWhereClauseForCriterion(PersistentEntity entity, Query.Junction criteria, StringBuilder q, StringBuilder whereClause,
+                                     String logicalName, final List<Query.Criterion> criterionList, int position, List parameters,
+                                     ConversionService conversionService, boolean allowJoins) {
 
         Map clauseTokens = [:] as Map<String,String>
 
@@ -992,10 +1056,12 @@ class JpqlQueryBuilder {
                 AssociationCriteria ac = (AssociationCriteria) criterion
                 Association association = ac.getAssociation()
                 List<Query.Criterion> associationCriteriaList = ac.getCriteria()
-                handleAssociationCriteria(q, tempWhereClause, logicalName, position, parameters, conversionService, allowJoins, association, new Query.Conjunction(), associationCriteriaList)
+                handleAssociationCriteria(q, tempWhereClause, logicalName, position, parameters, conversionService, allowJoins, association,
+                    new Query.Conjunction(), associationCriteriaList)
             }
             else {
-                throw new InvalidDataAccessResourceUsageException("Queries of type "+criterion.getClass().getSimpleName()+" are not supported by this implementation")
+                throw new InvalidDataAccessResourceUsageException("Queries of type "+
+                    criterion.getClass().getSimpleName()+" are not supported by this implementation")
             }
 
             String toStringWhere = tempWhereClause
@@ -1015,9 +1081,9 @@ class JpqlQueryBuilder {
         return position
     }
 
-    int buildHavingClauseForCriterion(PersistentEntity entity,
-                                     Query.Junction criteria, StringBuilder q, StringBuilder whereClause, String logicalName,
-                                     final List<Query.Criterion> criterionList, int position, List parameters, ConversionService conversionService, boolean allowJoins) {
+    int buildHavingClauseForCriterion(PersistentEntity entity, Query.Junction criteria, StringBuilder q, StringBuilder whereClause,
+                                      String logicalName, final List<Query.Criterion> criterionList, int position, List parameters,
+                                      ConversionService conversionService, boolean allowJoins) {
 
         Map clauseTokens = [:] as Map<String,String>
 
@@ -1050,10 +1116,12 @@ class JpqlQueryBuilder {
                 AssociationCriteria ac = (AssociationCriteria) criterion
                 Association association = ac.getAssociation()
                 List<Query.Criterion> associationCriteriaList = ac.getCriteria()
-                handleAssociationCriteria(q, tempWhereClause, logicalName, position, parameters, conversionService, allowJoins, association, new Query.Conjunction(), associationCriteriaList)
+                handleAssociationCriteria(q, tempWhereClause, logicalName, position, parameters, conversionService, allowJoins, association,
+                    new Query.Conjunction(), associationCriteriaList)
             }
             else {
-                throw new InvalidDataAccessResourceUsageException("Queries of type "+criterion.getClass().getSimpleName()+" are not supported by this implementation")
+                throw new InvalidDataAccessResourceUsageException("Queries of type "+
+                    criterion.getClass().getSimpleName()+" are not supported by this implementation")
             }
 
             String toStringWhere = tempWhereClause

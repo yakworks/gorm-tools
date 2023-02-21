@@ -70,7 +70,7 @@ class JpqlQueryBuilder {
 
     List<String> groupByList = []
     boolean allowJoins = true
-    
+
     // JpqlQueryBuilder(QueryableCriteria criteria) {
     //     this(criteria.getPersistentEntity(), criteria.getCriteria())
     // }
@@ -154,7 +154,7 @@ class JpqlQueryBuilder {
         List parameters = []
         buildUpdateStatement(queryString, propertiesToUpdate, parameters)
         StringBuilder whereClause = new StringBuilder()
-        buildWhereClause(entity, criteria, queryString, whereClause, logicalName, parameters)
+        buildWhereClause(criteria, queryString, whereClause, logicalName, parameters)
         return new JpqlQueryInfo(queryString.toString(), parameters)
     }
 
@@ -167,7 +167,7 @@ class JpqlQueryBuilder {
         StringBuilder queryString = new StringBuilder(DELETE_CLAUSE).append(entity.getName()).append(SPACE).append(logicalName)
         StringBuilder whereClause = new StringBuilder()
         allowJoins = false
-        List parameters = buildWhereClause(entity, criteria, queryString, whereClause, logicalName)
+        List parameters = buildWhereClause(criteria, queryString, whereClause, logicalName)
         return new JpqlQueryInfo(queryString.toString(), parameters)
     }
 
@@ -184,7 +184,7 @@ class JpqlQueryBuilder {
         StringBuilder whereClause= new StringBuilder()
         List parameters = []
         if (!criteria.isEmpty()) {
-            parameters = buildWhereClause(entity, criteria, queryString, whereClause, logicalName, parameters)
+            parameters = buildWhereClause(criteria, queryString, whereClause, logicalName, parameters)
         }
 
         buildGroup(queryString)
@@ -950,13 +950,13 @@ class JpqlQueryBuilder {
     //                       String logicalName, int position, List parameters, ConversionService conversionService)
     // }
 
-    private List buildWhereClause(PersistentEntity entity, Query.Junction criteria, StringBuilder q, StringBuilder whereClause,
+    private List buildWhereClause(Query.Junction criteria, StringBuilder q, StringBuilder whereClause,
                                   String logicalName) {
         List parameters = []
-        return buildWhereClause(entity, criteria, q, whereClause, logicalName, parameters)
+        return buildWhereClause(criteria, q, whereClause, logicalName, parameters)
     }
 
-    private List buildWhereClause(PersistentEntity entity, Query.Junction criteria, StringBuilder q, StringBuilder whereClause,
+    private List buildWhereClause(Query.Junction criteria, StringBuilder q, StringBuilder whereClause,
                                   String logicalName, List parameters) {
         if (!criteria.isEmpty()) {
             int position = parameters.size()

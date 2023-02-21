@@ -1,3 +1,16 @@
+### v7.3.31
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.30...v7.3.31)
+- trigger release [link](https://github.com/yakworks/gorm-tools/commit/f33d753c59cf700b69e67590a005aea0abca86e3)
+- JpqlQueryBuilder #638 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/5433c92c83fa62345882b2be2b812309e7734f27)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/8def5bfdb54f521293cefe6637b1f084c392f4fa)
+- lint fix [link](https://github.com/yakworks/gorm-tools/commit/ea562c8ec803b18ef036a0b10f4e6f3bd1378db0)
+- Jpql query builder (#637) [link](https://github.com/yakworks/gorm-tools/commit/e96b8bd6bc21a81d1e0c89ee13e7dd31c346a424)
+- Fix jpql  (#636) [link](https://github.com/yakworks/gorm-tools/commit/d88c86d66f6deb5893e5e19f40fee6b7bceab3d7)
+- Add queryGet method to repos and entity (#621) [link](https://github.com/yakworks/gorm-tools/commit/dcba6d50b54cac1ffde3724fab1c1993ccc76df5)
+- Add a test for restrictions on a projection with alias (#619) [link](https://github.com/yakworks/gorm-tools/commit/377b27a7a6ef01b47ee78f183f12198d04bfbcb7)
+- Fix some XXX (#632) [link](https://github.com/yakworks/gorm-tools/commit/08fc7c4975d931eed91968af6cf2112509546c4d)
+
 ### v7.3.30
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.29...v7.3.30)

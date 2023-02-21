@@ -6,7 +6,9 @@ package gorm.tools.mango.jpql
 
 import groovy.transform.CompileStatic
 
-
+/**
+ * The result of the JpqlQueryBuilder
+ */
 @CompileStatic
 @SuppressWarnings("rawtypes")
 class JpqlQueryInfo {

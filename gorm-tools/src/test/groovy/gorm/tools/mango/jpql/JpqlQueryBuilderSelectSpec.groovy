@@ -1,10 +1,12 @@
 package gorm.tools.mango.jpql
 
 import gorm.tools.mango.MangoDetachedCriteria
-import spock.lang.PendingFeature
+import gorm.tools.mango.api.QueryArgs
 import spock.lang.Specification
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.unit.GormHibernateTest
+
+import java.time.LocalDate
 
 /**
  * Test for JPA builder
@@ -122,70 +124,69 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         queryInfo.paramMap == [p1: 100.0]
     }
 
-    void "projections having with alias"() {
-        given:
-        def criteria = KitchenSink.query("createdByJobId":1)
-            .groupBy('sinkLink.createdByJobId as createdByJobId')
-            .groupBy("kind")
+    void "projections having with in"() {
+        setup:
+        QueryArgs args = QueryArgs.of(q:[kind:['CLIENT', 'VENDOR'], amount:['$gte':100]], projections: [kind:'group', amount:'sum'])
 
-
-        when:
+        when: "having with in"
+        MangoDetachedCriteria criteria = KitchenSink.repo.query(args)
         def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
         def queryInfo = builder.buildSelect()
         def query = queryInfo.query
 
         then:
-        query.trim() == strip("""
-        SELECT new map( kitchenSink.sinkLink.createdByJobId as createdByJobId,kitchenSink.kind as kind )
-        FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-        GROUP BY kitchenSink.sinkLink.createdByJobId,kitchenSink.kind
-        HAVING (kitchenSink.sinkLink.createdByJobId=:p1)
-        """)
-        queryInfo.paramMap == [p1: 1]
+        query
+        query.trim() == strip('''
+            SELECT new map( kitchenSink.kind as kind,SUM(kitchenSink.amount) as amount )
+            FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
+            GROUP BY kitchenSink.kind
+            HAVING (kitchenSink.kind IN (:p1,:p2) AND SUM(kitchenSink.amount) >= :p3)
+        ''')
+
     }
 
-    @PendingFeature
-    void "criteria restriction on projection property with alias"() {
-        given:
-        def criteria = KitchenSink.query("sinkLink.createdByJobId":1)
-            .groupBy('sinkLink.createdByJobId as createdByJobId')
-            .groupBy("kind")
+    void "projections having with is not null"() {
+        setup:
+        QueryArgs args = QueryArgs.of(q:[kind:'$isNotNull'], projections: [kind:'group', amount:'sum'])
 
-
-        when:
+        when: "having with in"
+        MangoDetachedCriteria criteria = KitchenSink.repo.query(args)
         def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
         def queryInfo = builder.buildSelect()
         def query = queryInfo.query
 
         then:
-        query.trim() == strip("""
-        SELECT new map( kitchenSink.sinkLink.createdByJobId as createdByJobId,kitchenSink.kind as kind )
-        FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-        GROUP BY kitchenSink.sinkLink.createdByJobId,kitchenSink.kind
-        HAVING (kitchenSink.sinkLink.createdByJobId=:p1)
-        """)
-        queryInfo.paramMap == [p1: 1]
+        query
+        query.trim() == strip('''
+            SELECT new map( kitchenSink.kind as kind,SUM(kitchenSink.amount) as amount )
+            FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
+            GROUP BY kitchenSink.kind
+            HAVING (kitchenSink.kind IS NOT NULL )
+        ''')
+
     }
 
-    @PendingFeature
-    //verify, that when we have a restriction on an alias - eg link.createdByJobId instead of sinkLink.createdByJobId
-    void "criteria restriction on alias"() {
-        given:
-        MangoDetachedCriteria criteria = KitchenSink.query("link.createdByJobId":1)
-        criteria.createAlias("sinkLink", "link")
+    void "projections having with between"() {
+        setup:
+        LocalDate now = LocalDate.now()
+        QueryArgs args = QueryArgs.of(q:[localDate:['$between':[now, now.plusDays(7) ]]], projections: [localDate:'group', amount:'sum'])
 
-        when:
+        when: "having with in"
+        MangoDetachedCriteria criteria = KitchenSink.repo.query(args)
         def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
         def queryInfo = builder.buildSelect()
         def query = queryInfo.query
 
         then:
-        query.trim() == strip("""
-            SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE (kitchenSink.sinkLink.createdByJobId=:p1)
-        """)
-        queryInfo.paramMap == [p1: 1]
-    }
+        query
+        query.trim() == strip('''
+            SELECT new map( kitchenSink.localDate as localDate,SUM(kitchenSink.amount) as amount )
+            FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
+            GROUP BY kitchenSink.localDate
+            HAVING ((kitchenSink.localDate >= :p1 AND kitchenSink.localDate <= :p2))
+        ''')
 
+    }
 
     void "projections having criteria map"() {
         given: "Some criteria"

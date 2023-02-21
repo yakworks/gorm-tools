@@ -30,6 +30,9 @@ trait QueryMangoEntityApi<D> {
     //cached instance of the query for id to keep it fast
     KeyExistsQuery idExistsQuery
 
+    //implemented by GormRepo
+    abstract public <D> D withTrx(Closure<D> callable)
+
     /**
      * Primary method. Builds detached criteria for repository's domain based on mango criteria language and additional criteria
      * Override this one in repo for any special handling
@@ -58,7 +61,23 @@ trait QueryMangoEntityApi<D> {
     }
 
     /**
+     * Queries a single instance based on the criteria and criteria closure
+     * Wraps it in a Transaction. <br>
+     * NOTE: If already in a transaction its better to call the query(...).get() instead of this
+     * @param params  mango language criteria map
+     * @param closure additional restriction for criteria
+     * @return instance
+     */
+    D queryGet(Map params = [:], @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
+        withTrx {
+            MangoDetachedCriteria<D> dcrit = query(params, closure)
+            return dcrit.get()
+        }
+    }
+    /**
      * List of entities restricted by mango map and criteria closure
+     * Wraps it in a Transaction. <br>
+     * NOTE: If already in a transaction its better to call the query(...).list() instead of this
      *
      * @param params mango language criteria map
      * @param closure additional restriction for criteria
@@ -68,9 +87,19 @@ trait QueryMangoEntityApi<D> {
         queryList(QueryArgs.of(params), closure)
     }
 
+    /**
+     * List of entities restricted by mango map and criteria closure
+     * Wraps it in a Transaction. <br>
+     * NOTE: If already in a transaction its better to call the query(QueryArgs.of(params)).list() instead of this
+     * @param params mango language criteria map
+     * @param closure additional restriction for criteria
+     * @return query of entities restricted by mango params
+     */
     List<D> queryList(QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
-        MangoDetachedCriteria<D> dcrit = query(qargs, closure)
-        getMangoQuery().list(dcrit, qargs.pager)
+        withTrx {
+            MangoDetachedCriteria<D> dcrit = query(qargs, closure)
+            return getMangoQuery().list(dcrit, qargs.pager)
+        }
     }
 
     /**

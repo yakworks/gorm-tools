@@ -154,7 +154,7 @@ class JpqlQueryBuilder {
         List parameters = []
         buildUpdateStatement(queryString, propertiesToUpdate, parameters)
         StringBuilder whereClause = new StringBuilder()
-        buildWhereClause(criteria, queryString, whereClause, logicalName, parameters)
+        buildWhereClause(queryString, whereClause, logicalName, parameters)
         return new JpqlQueryInfo(queryString.toString(), parameters)
     }
 
@@ -167,7 +167,7 @@ class JpqlQueryBuilder {
         StringBuilder queryString = new StringBuilder(DELETE_CLAUSE).append(entity.getName()).append(SPACE).append(logicalName)
         StringBuilder whereClause = new StringBuilder()
         allowJoins = false
-        List parameters = buildWhereClause(criteria, queryString, whereClause, logicalName)
+        List parameters = buildWhereClause(queryString, whereClause, logicalName)
         return new JpqlQueryInfo(queryString.toString(), parameters)
     }
 
@@ -184,7 +184,7 @@ class JpqlQueryBuilder {
         StringBuilder whereClause= new StringBuilder()
         List parameters = []
         if (!criteria.isEmpty()) {
-            parameters = buildWhereClause(criteria, queryString, whereClause, logicalName, parameters)
+            parameters = buildWhereClause(queryString, whereClause, logicalName, parameters)
         }
 
         buildGroup(queryString)
@@ -950,14 +950,7 @@ class JpqlQueryBuilder {
     //                       String logicalName, int position, List parameters, ConversionService conversionService)
     // }
 
-    private List buildWhereClause(Query.Junction criteria, StringBuilder q, StringBuilder whereClause,
-                                  String logicalName) {
-        List parameters = []
-        return buildWhereClause(criteria, q, whereClause, logicalName, parameters)
-    }
-
-    private List buildWhereClause(Query.Junction criteria, StringBuilder q, StringBuilder whereClause,
-                                  String logicalName, List parameters) {
+    private List buildWhereClause(StringBuilder q, StringBuilder whereClause, String logicalName, List parameters = []) {
         if (!criteria.isEmpty()) {
             int position = parameters.size()
             final List<Query.Criterion> criterionList = criteria.getCriteria()

@@ -40,10 +40,12 @@ trait RestRepoApiController<D> extends RestApiController {
     static picklistMax = 50
 
     static allowedMethods = [
-        post: "POST", put: ["PUT", "POST"], bulkUpdate: "POST", bulkCreate: "POST", delete: "DELETE"] //patch: "PATCH",
+        post: "POST", put: ["PUT", "POST"], bulkUpdate: "POST", bulkCreate: "POST", delete: "DELETE"
+    ] //patch: "PATCH",
 
     //Need it to access log and still compile static in trait (See https://issues.apache.org/jira/browse/GROOVY-7439)
-    final private static Logger log = LoggerFactory.getLogger(RestRepoApiController)
+    //final private static Logger log = LoggerFactory.getLogger(this.class)
+    static Logger log = LoggerFactory.getLogger(this.class)
 
     @Autowired(required = false)
     EntityResponder<D> entityResponder
@@ -69,6 +71,7 @@ trait RestRepoApiController<D> extends RestApiController {
 
     EntityResponder<D> getEntityResponder(){
         if (!entityResponder) this.entityResponder = EntityResponder.of(getEntityClass())
+        entityResponder.debugEnabled = log.isDebugEnabled()
         return entityResponder
     }
 
@@ -159,7 +162,8 @@ trait RestRepoApiController<D> extends RestApiController {
     @Action
     def list() {
         try {
-            Pager pager = getEntityResponder().pagedQuery(params, [IncludesKey.list.name()])
+            log.debug("list with params ${getParams()}")
+            Pager pager = getEntityResponder().pagedQuery(getParams(), [IncludesKey.list.name()])
             respondWith pager
         } catch (Exception e) {
             handleException(e)

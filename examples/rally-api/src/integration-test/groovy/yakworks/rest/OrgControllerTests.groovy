@@ -93,7 +93,7 @@ class OrgControllerTests extends RestIntTest {
         flushAndClear()
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:
-        controller.params << [max:20, sort:'contact.flex.num1', order:'desc']
+        controller.params << [q:"*", max:20, sort:'contact.flex.num1', order:'desc']
         controller.list()
         Map body = response.bodyToMap()
         List data = body.data
@@ -106,7 +106,7 @@ class OrgControllerTests extends RestIntTest {
     void "list CSV"() {
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:
-        controller.params << [format:'csv']
+        controller.params << [q:"*", format:'csv']
         controller.list()
         // Map body = response.bodyToMap()
         // List data = body.data
@@ -122,7 +122,7 @@ class OrgControllerTests extends RestIntTest {
     void "sanity check XLSX"() {
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:
-        controller.params << [format:'xlsx']
+        controller.params << [q:"*", format:'xlsx']
         controller.list()
         // Map body = response.bodyToMap()
         // List data = body.data
@@ -136,7 +136,7 @@ class OrgControllerTests extends RestIntTest {
     void "list with includes"() {
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:
-        controller.params << [includes:"id,num"]
+        controller.params << [q:"*", includes:"id,num"]
         controller.list()
         Map body = response.bodyToMap()
         List data = body.data
@@ -149,7 +149,7 @@ class OrgControllerTests extends RestIntTest {
     void "list with includesKey"() {
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:
-        controller.params << [includesKey:'bulk']
+        controller.params << [q:"*", includesKey:'bulk']
         controller.list()
         Map body = response.bodyToMap()
         List data = body.data

@@ -29,6 +29,7 @@ dependencies {
   // implementation "org.grails:grails-plugin-i18n"
   implementation "org.grails:grails-plugin-rest"
   implementation "org.grails:grails-plugin-url-mappings"
+  implementation "org.grails:grails-logging"
   // implementation "org.grails:grails-plugin-codecs"
   implementation "org.grails:grails-plugin-interceptors"
   implementation "org.grails:grails-web-boot"

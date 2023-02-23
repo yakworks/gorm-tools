@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.problem.ValidationProblem
 import spock.lang.Specification
+import yakworks.api.problem.data.DataProblemException
 
 class QueryArgsSpec extends Specification {
 
@@ -166,7 +167,8 @@ class QueryArgsSpec extends Specification {
         qargs.validateQ()
 
         then: 'should throw error'
-        thrown(IllegalArgumentException)
+        def ex = thrown(DataProblemException)
+        ex.status.code == 418
         qargs.criteria == ['$sort': ['foo':'asc']]
 
     }

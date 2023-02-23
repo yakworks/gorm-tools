@@ -14,6 +14,10 @@ import groovy.util.logging.Slf4j
 import gorm.tools.beans.Pager
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.MangoOps
+import yakworks.api.HttpStatus
+import yakworks.api.problem.data.DataProblem
+import yakworks.api.problem.data.DataProblemCodes
+import yakworks.api.problem.data.DataProblemException
 import yakworks.commons.map.Maps
 
 import static gorm.tools.mango.MangoOps.CRITERIA
@@ -233,10 +237,14 @@ class QueryArgs {
      * Throws IllegalArgumentException if qRequired is true.
      * This forces it to pick up the q params in case it accidentally or inadvertantly dropped off.
      * Can bypass this by passing in q=* or qSearch=*
+     * @throws DataProblemException
      */
     void validateQ(){
-        if(qRequired && !qCriteria)
-            throw new IllegalArgumentException("q or qSearch parameter restriction is required ")
+        if(qRequired && !qCriteria){
+            throw DataProblem.of('error.data.qRequired')
+                .status(HttpStatus.I_AM_A_TEAPOT) //TODO 418 error for now so its easy to add to retry as it gets droppped sometimes
+                .title("q or qSearch parameter restriction is required").toException()
+        }
     }
 
     /**

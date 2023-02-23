@@ -115,6 +115,20 @@ class OrgControllerTests extends RestIntTest {
         data[0].name == 'Org10'
     }
 
+    void "list fail no q"() {
+        when:
+        controller.params << [max:20, sort:'contact.flex.num1', order:'desc']
+        controller.list()
+        Map body = response.bodyToMap()
+
+        then:
+        response.status == 418
+        !body.ok
+        body.code == "error.data.qRequired"
+
+        //data[0].name == 'Org10'
+    }
+
     void "list CSV"() {
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:

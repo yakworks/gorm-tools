@@ -5,6 +5,7 @@
 package gorm.tools.mango
 
 import groovy.transform.CompileDynamic
+import groovy.util.logging.Slf4j
 
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormStaticApi
@@ -41,6 +42,7 @@ import yakworks.commons.lang.NameUtils
  *
  * ilike('invoice.customer.name', 'foo')
  */
+@Slf4j
 @SuppressWarnings(['MethodCount']) //ok for this
 @GrailsCompileStatic
 class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
@@ -83,6 +85,9 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     @Override
     List<T> list(Map args = Collections.emptyMap(), @DelegatesTo(DetachedCriteria) Closure additionalCriteria = null) {
         (List)withQueryInstance(args, additionalCriteria) { Query query ->
+            if(log.debugEnabled){
+                log.debug("Query criteria: ${query.criteria}")
+            }
             if (args?.max) {
                 return new PagedResultList(query)
             }

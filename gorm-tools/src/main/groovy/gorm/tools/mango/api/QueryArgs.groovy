@@ -60,7 +60,7 @@ class QueryArgs {
     /**
      * Criteria map to pass to the MangoBuilder. when QueryArgs is built from query params, then this is the q=...
      */
-    private Map<String, Object> qCriteria = [:] as Map<String, Object>
+    Map<String, Object> qCriteria = [:] as Map<String, Object>
 
     /**
      * The Pager instance for paged list queries

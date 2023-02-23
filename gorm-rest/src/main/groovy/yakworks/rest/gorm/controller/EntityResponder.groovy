@@ -117,7 +117,7 @@ class EntityResponder<D> {
         qargs = qargs.build(parms)
         qargs.validateQ()
         if(debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.criteria}")
-        ((QueryMangoEntityApi)getRepo()).queryList(qargs)
+        ((QueryMangoEntityApi)getRepo()).queryList(qargs, null, debugEnabled ? log : null)
     }
 
     /**

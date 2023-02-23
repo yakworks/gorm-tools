@@ -45,7 +45,7 @@ trait RestRepoApiController<D> extends RestApiController {
 
     //Need it to access log and still compile static in trait (See https://issues.apache.org/jira/browse/GROOVY-7439)
     //final private static Logger log = LoggerFactory.getLogger(this.class)
-    static Logger log = LoggerFactory.getLogger(this.class)
+    Logger log = LoggerFactory.getLogger(this.class)
 
     @Autowired(required = false)
     EntityResponder<D> entityResponder

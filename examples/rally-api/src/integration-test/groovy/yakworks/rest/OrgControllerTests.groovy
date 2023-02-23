@@ -103,6 +103,18 @@ class OrgControllerTests extends RestIntTest {
         data[0].contact.flex.num1 > data[1].contact.flex.num1
     }
 
+    void "list filter"() {
+        when:
+        controller.params << [q:'{"name":"Org10"}']
+        controller.list()
+        Map body = response.bodyToMap()
+        List data = body.data
+
+        then:
+        response.status == 200
+        data[0].name == 'Org10'
+    }
+
     void "list CSV"() {
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:

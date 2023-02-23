@@ -29,7 +29,6 @@ import static gorm.tools.mango.MangoOps.ExistOp
 import static gorm.tools.mango.MangoOps.JunctionOp
 import static gorm.tools.mango.MangoOps.OverrideOp
 import static gorm.tools.mango.MangoOps.PropertyOp
-import static gorm.tools.mango.MangoOps.Q
 import static gorm.tools.mango.MangoOps.QSEARCH
 import static gorm.tools.mango.MangoOps.SORT
 
@@ -80,7 +79,7 @@ class MangoBuilder {
             clonedClosure.setResolveStrategy(Closure.DELEGATE_FIRST)
             mangoCriteria.with(clonedClosure)
         }
-
+        //$sort was probably on the criteria as its added in QueryArgs?? but if not then use the property
         if(qargs.sort && !criteria.containsKey(SORT)){
             order(mangoCriteria, qargs.sort)
         }
@@ -156,7 +155,7 @@ class MangoBuilder {
                 continue
             }
 
-            if(key == QSEARCH || key == Q) {
+            if(key == QSEARCH ) {
                 qSearch(criteria, val)
                 continue
             }

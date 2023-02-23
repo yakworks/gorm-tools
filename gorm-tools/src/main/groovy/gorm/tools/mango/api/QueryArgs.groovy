@@ -14,9 +14,15 @@ import groovy.util.logging.Slf4j
 import gorm.tools.beans.Pager
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.MangoOps
+import yakworks.api.HttpStatus
+import yakworks.api.problem.data.DataProblem
+import yakworks.api.problem.data.DataProblemCodes
+import yakworks.api.problem.data.DataProblemException
 import yakworks.commons.map.Maps
 
 import static gorm.tools.mango.MangoOps.CRITERIA
+import static gorm.tools.mango.MangoOps.QSEARCH
+import static gorm.tools.mango.MangoOps.SORT
 
 /**
  * Builder arguments for a query to pass from controllers etc to the MangoQuery
@@ -36,6 +42,8 @@ import static gorm.tools.mango.MangoOps.CRITERIA
 @CompileStatic
 class QueryArgs {
 
+    List<String> ignoreKeys = ['controller', 'action', 'format', 'nd', '_search', 'includes', 'includesKey' ]
+
     /**
      * extra closure that can be passed to MangoCriteria
      */
@@ -49,9 +57,14 @@ class QueryArgs {
     boolean isStrict = false
 
     /**
-     * Criteria map to pass to the MangoBuilder
+     * when true, then criteria is required.
      */
-    Map<String, Object> criteria = [:] as Map<String, Object>
+    boolean qRequired = false
+
+    /**
+     * Criteria map to pass to the MangoBuilder. when QueryArgs is built from query params, then this is the q=...
+     */
+    Map<String, Object> qCriteria = [:] as Map<String, Object>
 
     /**
      * The Pager instance for paged list queries
@@ -106,10 +119,10 @@ class QueryArgs {
     /**
      * Construct with a criteria map as is.
      */
-    static QueryArgs withCriteria(Map<String, Object> crit){
-        def qa = new QueryArgs()
-        return qa.criteria(crit)
-    }
+    // static QueryArgs withCriteria(Map<String, Object> crit){
+    //     def qa = new QueryArgs()
+    //     return qa._criteria(crit)
+    // }
 
     /**
      * Intelligent defaults to setup the criteria and pager from the controller style params map
@@ -144,7 +157,7 @@ class QueryArgs {
 
         //remove the fields that grails adds for controller and action
         // FIXME this is done in EntityResponder now but if thats no uses, call this
-        params.removeAll {it.key in ['controller', 'action', 'format', 'nd', '_search'] }
+        params.removeAll {it.key in ignoreKeys }
 
         // pull out the max, page and offset and assume the rest is criteria,
         // if pager is already set then we do nothing with the pagerMap
@@ -155,7 +168,7 @@ class QueryArgs {
         // if no pager was set then use what we just removed to set one up
         if(!pager) pager = Pager.of(pagerMap)
 
-        //sorts
+        //sorts and orderBy
         String orderBy = params.remove('order') ?: 'asc'
         def sortField = params.remove('sort')
         if(sortField) sort = buildSort(sortField, orderBy)
@@ -176,33 +189,62 @@ class QueryArgs {
                 //if the q param start with { then assume its json and parse it
                 //the parsed map will be set to the criteria.
                 if (qString.trim().startsWith('{')) {
-                    criteria = parseJson(qString)
+                    qCriteria = parseJson(qString)
                 } else {
-                    criteria[MangoOps.QSEARCH] = qString
+                    //if its just a string then its assumed its a quick search, see below as it can be explicitely passed too
+                    qCriteria[QSEARCH] = qString
                 }
             }
             //as is, mostly for testing and programtic stuff
             else if(qParam instanceof Map) {
-                criteria = qParam as Map
+                qCriteria = qParam as Map
             }
         }
         //if no q was passed in then use whatever is left in the params as the criteria if strict is false
         else if(!isStrict){
-            criteria = params
+            qCriteria = params
         }
 
         //now check if qSearch was passed as a separate param and its doesn't already exists in the criteria
         String qSearchParam = params.remove('qSearch')
-        if(qSearchParam && !criteria.containsKey(MangoOps.QSEARCH)){
-            criteria[MangoOps.QSEARCH] = qSearchParam
+        if(qSearchParam && !qCriteria.containsKey(QSEARCH)){
+            qCriteria[QSEARCH] = qSearchParam
         }
 
         // if sort was populated, add it to the criteria with the $sort if its doesn't exist
-        if(sort && !criteria.containsKey('$sort') ) {
-            criteria['$sort'] = sort
-        }
+        // if(sort && !criteria.containsKey(MangoOps.SORT) ) {
+        //     criteria[MangoOps.SORT] = sort
+        // }
 
         return this
+    }
+
+    /**
+     * Returns the qCrieria merged with sort if it exists.
+     */
+    Map<String, Object> getCriteria(){
+        Map<String, Object> criterium = qCriteria
+        // if sort was populated, add it to the criteria with the $sort if its doesn't exist
+        if(sort && !qCriteria.containsKey(SORT) ) {
+            criterium = qCriteria + ([(SORT): sort] as Map<String, Object>)
+        }
+        //remove the sSearch=* if its been passed in.
+        if(criterium.containsKey(QSEARCH) && criterium[QSEARCH] == "*") criterium.remove(QSEARCH)
+        return criterium
+    }
+
+    /**
+     * Throws IllegalArgumentException if qRequired is true.
+     * This forces it to pick up the q params in case it accidentally or inadvertantly dropped off.
+     * Can bypass this by passing in q=* or qSearch=*
+     * @throws DataProblemException
+     */
+    void validateQ(){
+        if(qRequired && !qCriteria){
+            throw DataProblem.of('error.data.qRequired')
+                .status(HttpStatus.I_AM_A_TEAPOT) //TODO 418 error for now so its easy to add to retry as it gets droppped sometimes
+                .title("q or qSearch parameter restriction is required").toException()
+        }
     }
 
     /**

@@ -40,4 +40,8 @@ class PathItem {
      * Is bulk endpoint enabled for this resource.
      */
     boolean bulkOps
+    /**
+     * when true, q is required when doing a GET list.
+     */
+    boolean qRequired
 }

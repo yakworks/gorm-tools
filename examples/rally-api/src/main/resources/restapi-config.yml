@@ -22,6 +22,7 @@ api:
     /rally/org:
       entityClass: yakworks.rally.orgs.model.Org
       bulkOps: true
+      qRequired: true
     /rally/orgTypeSetup:
       entityClass: yakworks.rally.orgs.model.OrgTypeSetup
       allowedOps: [ update ]

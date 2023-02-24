@@ -25,4 +25,12 @@ app:
     tempDir: "./build/rootLocation/tempDir"
     attachments.location: 'attachments'
 
+  # see MailConfig class
+  mail:
+    enabled: true
+    default-domain: m.greenbill.io
+    mailgun:
+      enabled: true
+      private-api-key: "f8b...."
+      default-domain: m.greenbill.io
 

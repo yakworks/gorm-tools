@@ -22,6 +22,9 @@ dependencies {
   api "org.grails.plugins:hibernate5:$vGormHibernate"
   api "org.hibernate:hibernate-core:$vHibernate"
 
+  //mailgun
+  api 'com.mailgun:mailgun-java:1.0.7'
+
   compileOnly "org.grails:grails-core"
 
   testRuntimeOnly "org.springframework.boot:spring-boot-autoconfigure"

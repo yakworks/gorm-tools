@@ -1,0 +1,48 @@
+/*
+* Copyright 2023 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
+* You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+*/
+package yakworks.rally.mail
+
+import javax.inject.Inject
+
+import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
+
+import yakworks.api.Result
+import yakworks.rally.mail.config.MailConfig
+
+/**
+ * Basic service for MailGun.
+ * works for a basic send, recomended to use the mailgunMessagesApi for anything outside of a simple send
+ * and use the mailgunEventsApi for filtering  anything outside of a basic event calls, here for baseline examples of what can be done
+ */
+@Slf4j
+@CompileStatic
+abstract class MailService {
+
+    @Inject MailConfig mailConfig
+
+    /**
+     * calls mailgunMessagesApi.sendMessage
+     */
+    abstract Result send(String domain, MailMsg mailMsg)
+
+    /**
+     * calls mailgunMessagesApi.sendMessage using the MailgunConfig.defaultDomain
+     */
+    Result send(MailMsg mailMsg){
+        return send(mailConfig.defaultDomain, mailMsg)
+    }
+
+    /**
+     * calls mailgunMessagesApi.sendMessage using the MailgunConfig.defaultDomain
+     */
+    Result sendMessages(List<MailMsg> msgList){
+        for(MailMsg mailMsg : msgList){
+            send(mailMsg)
+        }
+        return Result.OK()
+    }
+
+}

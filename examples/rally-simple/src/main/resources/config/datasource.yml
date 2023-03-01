@@ -1,0 +1,28 @@
+---
+hibernate:
+  generate_statistics: true
+  format_sql: false
+  schema_management_tool: 'yakworks.hibernate.schema.SimpleSchemaManagementTool'
+  naming_strategy: 'org.hibernate.cfg.DefaultNamingStrategy'
+  dialect: 'yakworks.hibernate.h2.ExtendedH2Dialect'
+  show_sql: false
+  cache:
+    queries: false
+    use_second_level_cache: false
+    use_query_cache: false
+  jdbc:
+    time_zone: 'UTC'
+
+dataSource:
+  pooled: true
+  jmxExport: true
+  driverClassName: org.h2.Driver
+  username: sa
+  password:
+  type: com.zaxxer.hikari.HikariDataSource
+  dbCreate: create-drop
+  url: jdbc:h2:mem:devDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+#  url: jdbc:h2:./prodDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+#  properties:
+#    defaultTransactionIsolation: 2 # Connection.TRANSACTION_READ_COMMITTED
+#    transactionIsolation: "TRANSACTION_READ_COMMITTED" # Hikari needs this

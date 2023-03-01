@@ -19,19 +19,13 @@ import javax.servlet.http.HttpServletResponse
 
 import groovy.transform.CompileStatic
 
-import org.grails.web.servlet.mvc.GrailsWebRequest
-import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.annotation.CurrentSecurityContext
 import org.springframework.security.core.context.SecurityContext
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal
 import org.springframework.stereotype.Controller
-import org.springframework.ui.Model
 import org.springframework.ui.ModelMap
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.context.request.RequestContextHolder
 
 import yakworks.security.user.UserInfo
 
@@ -52,11 +46,6 @@ class IndexController {
         "index"
     }
 
-    @GetMapping("/spring")
-    String spring() {
-        "spring/index.html"
-    }
-
     @GetMapping("/about")
     @ResponseBody String about(ModelMap model) {
         model.addAttribute('info', 'test info')
@@ -74,9 +63,4 @@ class IndexController {
         return secContext.authentication.details as UserInfo
     }
 
-    @GetMapping("/samlSuccess")
-    @ResponseBody String samlSuccess(ModelMap model) {
-        model.addAttribute('info', 'test info')
-        "samlSuccess"
-    }
 }

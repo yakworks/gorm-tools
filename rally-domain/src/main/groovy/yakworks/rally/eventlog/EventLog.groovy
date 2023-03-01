@@ -19,21 +19,37 @@ class EventLog implements RepoEntity<EventLog>, Serializable {
     public final static int INFO_INT = 20000
     public final static int DEBUG_INT = 10000
 
-    String action      // Status of the job at the time of the log event
-    String appName     // rcm, arApi, gbApi, ...
-    String component   // The process the app was called from
-    LocalDateTime createdDate  // the date row was created
-    BigDecimal controlAmount
-    Long controlCount
-    Boolean isPrimaryJob = false
-    String jobName     // Master unit of work -- importCorrectionPost
-    String jobParams   // Params sent to the job.
-    Long linkedId    // Long value linking all rows of a specific job together.
-    String message     // What needs to be said.
+    /** State of the job at the time of the log event */
+    String action //FIXME make this anEnum and rename to state
+    /** rcm, arApi, gbApi, ... */
+    String appName
+    /** The service.method this was called from. just a decription to tie it down further */
+    String component
+    /** the date row was created */
+    LocalDateTime createdDate
+
+    //XXX remove from table and get in sync
+    // BigDecimal controlAmount
+    // Long controlCount
+
+    /** if this is a log for primaryJob */
+    Boolean isPrimaryJob = false //FIXME remove?
+    /** Master unit of work -- importCorrectionPost */
+    String jobName
+    /**  Params sent to the job.*/
+    String jobParams
+    /** Long value linking all rows of a specific job together. */
+    Long linkedId //FIXME if we are going to keep this then need both linkedId and linkedEntity
+    /**  What needs to be said. */
+    String message
+    /** the priority lever */
     Integer priority = ERROR_INT
-    String source      // deprecated?
-    String stackTrace  // Stack trace if it's present.
-    Long userId      // The user ID if there is one, otherwise 0.
+
+    //String source      // deprecated?
+    /** Stack trace dump, not common to use*/
+    String stackTrace
+    /** The user ID if whatever is logging this is from specifc user */
+    Long userId
 
     static mapping = {
         //cache true

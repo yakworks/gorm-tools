@@ -11,12 +11,13 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Lazy
 
+import yakworks.rally.mail.MailSpringConfig
 import yakworks.security.audit.AuditStampConfiguration
 import yakworks.security.gorm.SecurityGormConfiguration
 import yakworks.security.spring.DefaultSecurityConfiguration
 
 @Configuration @Lazy
-@Import([DefaultSecurityConfiguration, SecurityGormConfiguration, AuditStampConfiguration])
+@Import([DefaultSecurityConfiguration, SecurityGormConfiguration, AuditStampConfiguration, MailSpringConfig])
 //@ComponentScan(['yakworks.rally']) //scan and pick up all
 @ComponentScan(['yakworks.security.gorm', 'yakworks.rally'])
 @CompileStatic

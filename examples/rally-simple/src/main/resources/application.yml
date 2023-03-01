@@ -1,8 +1,9 @@
 #debug: true
 spring.main.lazy-initialization: true
 spring.main.allow-bean-definition-overriding: true
+
 #server.port: 8081
-server.servlet.context-path: /api
+#server.servlet.context-path: /api
 
 spring.config.import: classpath:config/grails.yml, classpath:config/datasource.yml
 

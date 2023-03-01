@@ -168,7 +168,7 @@ class EventLogSpec extends Specification implements DataRepoTest {
         when:
         EventLog eventLog = new EventLog([
             action:'testAct1',component:'testComp1',jobName:'testName1',message:'testMsg1',
-             priority:'3',source:'test',userId:9
+            priority:'3',userId:9
         ])
         eventLog.save(flush:true)
         eventLog.createdDate = LocalDateTime.now().minusDays(100)
@@ -176,7 +176,7 @@ class EventLogSpec extends Specification implements DataRepoTest {
 
         eventLog = new EventLog([
             action:'testAct2',component:'testComp2', jobName:'testName2',message:'testMsg2',
-            priority:'3',source:'test', userId:9
+            priority:'3', userId:9
         ])
         eventLog.createdDate= LocalDateTime.now()
         eventLog.save(flush:true)

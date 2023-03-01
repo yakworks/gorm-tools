@@ -20,7 +20,7 @@ class EventLog implements RepoEntity<EventLog>, Serializable {
     public final static int DEBUG_INT = 10000
 
     /** State of the job at the time of the log event */
-    String action //FIXME make this Enum and rename to state
+    String action //FIXME make this anEnum and rename to state
     /** rcm, arApi, gbApi, ... */
     String appName
     /** The service.method this was called from. just a decription to tie it down further */
@@ -46,7 +46,7 @@ class EventLog implements RepoEntity<EventLog>, Serializable {
     Integer priority = ERROR_INT
 
     //String source      // deprecated?
-    /** Stack trace if it's present. */
+    /** Stack trace dump, not common to use*/
     String stackTrace
     /** The user ID if whatever is logging this is from specifc user */
     Long userId

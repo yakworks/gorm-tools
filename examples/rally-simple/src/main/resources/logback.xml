@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+  <!-- use yakworks's base that adds colors and method with line num, compatible with spring boot -->
+  <include resource="yakworks/spring/logback/base.xml"/>
+  <!-- Use application.yml to configure logging level-->
+</configuration>

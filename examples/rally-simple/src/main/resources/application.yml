@@ -1,0 +1,86 @@
+#debug: true
+spring.main.lazy-initialization: true
+spring.main.allow-bean-definition-overriding: true
+#server.port: 8081
+server.servlet.context-path: /api
+
+spring.config.import: classpath:config/grails.yml, classpath:config/datasource.yml
+
+api.config.import: classpath:/restapi-config.yml,classpath*:/restapi/**/*.yml
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    org.hibernate.orm.deprecation: OFF # turns off deprecation notices
+    org.springframework.security: DEBUG
+
+    yakworks.rally.api.rally.OrgController: DEBUG
+    yakworks.rest.gorm.controller.EntityResponder: DEBUG
+    gorm.tools.mango.MangoDetachedCriteria: DEBUG
+
+#    gorm.tools.mango.MangoBuilder: DEBUG
+    org.hibernate: OFF # turns off all
+    # org.springframework.security.web: TRACE
+    # org.springframework.security.authentication: TRACE
+    # grails.plugins.DefaultGrailsPluginManager: ERROR
+    # TURN ON for benchmarks
+    # org.hibernate: INFO
+    # for stats and sql logging
+    # org.hibernate.stat: DEBUG
+    org.hibernate.SQL: ERROR
+    # this one is very noisy but if neede will show the values passed to sql statements
+    # org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    yakity.security: TRACE
+
+---
+
+grails:
+  profile: rest-api
+  cache:
+    enabled: false
+  # NOTE: reminder that anything in config.locations wins and ovewrites whats in this config
+  config:
+    locations:
+      - "classpath:restapi-config.yml"
+      - "classpath*:restapi/rally/*.yml"
+
+info:
+  app:
+    name: '@info.app.name@'
+    version: '@info.app.version@'
+    grailsVersion: '@info.app.grailsVersion@'
+
+
+management:
+  endpoints:
+    enabled-by-default: true
+    web:
+      base-path: /actuator
+      exposure:
+        include: '*'
+#        include: health,info,liveness,metrics,caches
+  jmx:
+    enabled: true
+
+management.info.env.enabled: true
+management.endpoint.metrics.enabled: true
+
+# enables readiness and liveness
+management.endpoint.health.probes.enabled: true
+management.endpoint.health.show-details: when-authorized
+management.endpoint.health.show-components: when-authorized
+
+---
+
+app:
+  resources:
+    # project.rootProjectDir comes from project.rootProjectDir system prop setup in gradle or defaults to . if not set and running from intellij
+    rootLocation: "${project.rootProjectDir}/examples/resources"
+    tempDir: "./build/rootLocation/tempDir"
+    attachments.location: 'attachments'
+
+# enable multiple views resolvers by removing suffix and restricting viewNames so it flows through to hbs or mustache
+# uncomment starter in build.gradle to activate handlebars
+# handlebars.enabled: true
+# handlebars.failOnMissingFile: false

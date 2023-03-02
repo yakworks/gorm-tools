@@ -282,10 +282,10 @@ class ActivitySpec extends Specification implements GormHibernateTest, SecurityT
         Activity act = build(Activity, [org:org])
         act.repo.addNote(act, "test body")
         act.persist(flush: true)
-
+        flushAndClear()
         then:
         act.note?.id != null
-        def act2 = Activity.findById(act.id)
+        def act2 = Activity.get(act.id)
         act2.note != null
         "test body" == act2.note.body
         "plain" == act2.note.contentType

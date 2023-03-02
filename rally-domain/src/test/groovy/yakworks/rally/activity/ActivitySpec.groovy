@@ -13,6 +13,7 @@ import yakworks.rally.activity.model.TaskType
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
@@ -27,7 +28,7 @@ import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 
 class ActivitySpec extends Specification implements GormHibernateTest, SecurityTest {
     static entityClasses = [
-        AttachmentLink, ActivityLink, Activity, TaskType, Org, OrgTag,
+        AttachmentLink, ActivityLink, Activity, MailMessage, TaskType, Org, OrgTag,
         Tag, TagLink, Attachment, ActivityNote, Contact, ActivityContact
     ]
     static springBeans = [

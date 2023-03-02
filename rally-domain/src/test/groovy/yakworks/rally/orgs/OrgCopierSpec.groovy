@@ -1,6 +1,8 @@
 package yakworks.rally.orgs
 
 import org.springframework.beans.factory.annotation.Autowired
+
+import yakworks.rally.mail.model.MailMessage
 import yakworks.testing.gorm.RepoTestData
 import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.DataRepoTest
@@ -27,7 +29,7 @@ import yakworks.rally.orgs.model.OrgTypeSetup
 class OrgCopierSpec extends Specification implements DataRepoTest, SecurityTest {
     static List entityClasses = [
         Org, Contact, OrgFlex, OrgMember, OrgCalc, OrgSource, OrgTag, OrgInfo, OrgTypeSetup, Location, ContactPhone,
-        ContactEmail, ContactSource, ContactFlex, Activity, ActivityLink, AttachmentLink]
+        ContactEmail, ContactSource, ContactFlex, Activity, ActivityLink, AttachmentLink, MailMessage]
 
     @Autowired OrgCopier orgCopier
 

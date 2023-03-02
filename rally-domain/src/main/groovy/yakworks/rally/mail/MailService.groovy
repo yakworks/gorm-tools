@@ -26,20 +26,20 @@ abstract class MailService {
     /**
      * calls mailgunMessagesApi.sendMessage
      */
-    abstract Result send(String domain, MailMsg mailMsg)
+    abstract Result send(String domain, MailTo mailMsg)
 
     /**
      * calls mailgunMessagesApi.sendMessage using the MailgunConfig.defaultDomain
      */
-    Result send(MailMsg mailMsg){
+    Result send(MailTo mailMsg){
         return send(mailConfig.defaultDomain, mailMsg)
     }
 
     /**
      * calls mailgunMessagesApi.sendMessage using the MailgunConfig.defaultDomain
      */
-    Result sendMessages(List<MailMsg> msgList){
-        for(MailMsg mailMsg : msgList){
+    Result sendMessages(List<MailTo> msgList){
+        for(MailTo mailMsg : msgList){
             send(mailMsg)
         }
         return Result.OK()

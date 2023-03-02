@@ -1,6 +1,8 @@
 package yakworks.rally.activity
 
 import org.springframework.beans.factory.annotation.Autowired
+
+import yakworks.rally.mail.model.MailMessage
 import yakworks.security.gorm.model.AppUser
 import yakworks.testing.gorm.unit.DataRepoTest
 import yakworks.testing.gorm.RepoTestData
@@ -23,7 +25,7 @@ import yakworks.rally.testing.MockData
 
 class TaskSpec extends Specification implements DataRepoTest, SecurityTest { //implements SecuritySpecUnitTestHelper{
     static List<Class> entityClasses = [
-        AttachmentLink, ActivityLink, Activity, Task, TaskType, TaskStatus,
+        MailMessage, AttachmentLink, ActivityLink, Activity, Task, TaskType, TaskStatus,
         Org, AppUser, ActivityNote, Contact, ActivityContact
     ]
 

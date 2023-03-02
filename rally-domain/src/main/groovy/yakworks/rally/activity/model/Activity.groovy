@@ -15,6 +15,7 @@ import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.model.Attachable
 import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Taggable
@@ -31,12 +32,16 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
     // Org is here to speed up search arTran activities for customer or custAccount -Activity.findAllByOrg(fromOrg.org)
     // If activity is on org level activityLink has org id as well.
     Org org
+
     //the parent note that this is a comment for.
     // Long parentId
 
-    // a 255 char string summary of the activity. Will be the title if its a task and if note it will ends with ... if there is more to the note.
+    /**
+     * a 255 char string summary of the activity. This is the subject when its an email
+     * Will be the title if its a task and if note it will ends with ... if there is more to the note.
+     * don't set this, it will just get overriden during save for taks and notes
+     */
     String name
-    //don't set this, it will just get overriden during save
 
     //if this note has a todo task that needs to be /or was/ accomplished
     Task task
@@ -45,6 +50,8 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
     Attachment template
 
     ActivityNote note
+
+    MailMessage mailMessage
 
     VisibleTo visibleTo = VisibleTo.Everyone
 
@@ -141,4 +148,7 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
     //     links:[ description: 'links for this', validate: false]
     // ]
 
+    static Activity createNote(Long orgId, String note){
+        getRepo().createNote(orgId, note)
+    }
 }

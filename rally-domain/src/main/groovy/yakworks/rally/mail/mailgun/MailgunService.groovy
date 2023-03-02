@@ -21,8 +21,8 @@ import feign.FeignException
 import yakworks.api.Result
 import yakworks.api.problem.Problem
 import yakworks.api.problem.data.DataProblem
-import yakworks.rally.mail.MailMsg
 import yakworks.rally.mail.MailService
+import yakworks.rally.mail.MailTo
 
 /**
  * Basic service for MailGun.
@@ -36,7 +36,7 @@ class MailgunService extends MailService {
     private MailgunMessagesApi _mailgunMessagesApi
     private MailgunEventsApi _mailgunEventsApi
 
-    Message mailMsgToMessage(MailMsg mailMsg){
+    Message mailMsgToMessage(MailTo mailMsg){
         Message.MessageBuilder bldr = Message.builder()
         bldr
             .from(mailMsg.from)
@@ -58,10 +58,10 @@ class MailgunService extends MailService {
      * calls mailgunMessagesApi.sendMessage
      */
     @Override
-    Result send(String domain, MailMsg mailMsg){
+    Result send(String domain, MailTo mailMsg){
         try{
             Message message = mailMsgToMessage(mailMsg)
-            MessageResponse resp = mailgunMessagesApi.sendMessage(domain, message)
+            MessageResponse resp = sendMessage(domain, message)
             return Result.OK().payload(resp)
         } catch(FeignException e){
             if(e.status() == 401) return new DataProblem().title("Unauthorized or bad domain").status(e.status())
@@ -74,15 +74,24 @@ class MailgunService extends MailService {
 
     }
 
+    /**
+     * calls mailgunMessagesApi.sendMessage
+     */
+    MessageResponse sendMessage(String domain, Message message){
+        MessageResponse resp = mailgunMessagesApi.sendMessage(domain, message)
+        return resp
+    }
+
+
     EventsResponse getEvents(String domain, EventsQueryOptions queryOptions){
         return mailgunEventsApi.getEvents(domain, queryOptions)
     }
 
     EventsResponse getEvents(EventsQueryOptions queryOptions = null){
-        if(!queryOptions){
-            return mailgunEventsApi.getAllEvents(mailConfig.defaultDomain);
-        } else {
+        if(queryOptions){
             return mailgunEventsApi.getEvents(mailConfig.defaultDomain, queryOptions)
+        } else {
+            return mailgunEventsApi.getAllEvents(mailConfig.defaultDomain);
         }
     }
 

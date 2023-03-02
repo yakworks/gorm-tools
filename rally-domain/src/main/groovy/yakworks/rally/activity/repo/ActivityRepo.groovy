@@ -251,6 +251,15 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
     }
 
     /**
+     * quick easy way to create a Note
+     */
+    static Activity createNote(Long orgId, String note){
+        def params = [orgId: orgId, note:[body: 'foo'], linkedId: 1, linkedEntity:'Contact']
+        Activity activity = Activity.create(params)
+        return activity
+    }
+
+    /**
      * quick easy way to create a Todo activity
      */
     @Transactional

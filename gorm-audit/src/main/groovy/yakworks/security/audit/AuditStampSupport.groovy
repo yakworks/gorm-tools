@@ -35,6 +35,8 @@ class AuditStampSupport {
 
     Map<String, FieldProps> fieldProps
     final Set<String> auditStampedEntities = [] as Set
+    //the ones with only created stamp
+    final Set<String> auditStampCreateEntities = [] as Set
 
     @PostConstruct
     void init() {
@@ -42,6 +44,7 @@ class AuditStampSupport {
         if(!fieldProps) fieldProps = FieldProps.buildFieldMap([:])
         for (PersistentEntity persistentEntity : grailsDomainClassMappingContext.getPersistentEntities()) {
             if (isClassAuditStamped(persistentEntity.javaClass)) auditStampedEntities << persistentEntity.name
+            if (isClassAuditCreateStamped(persistentEntity.javaClass)) auditStampCreateEntities << persistentEntity.name
         }
         USER_RESOLVER = auditUserResolver
         //initCurrentUserClosure()
@@ -56,8 +59,14 @@ class AuditStampSupport {
 
     //check if the given domain class should be audit stamped.
     boolean isClassAuditStamped(Class domainClass) {
-        return ( AuditStampTrait.isAssignableFrom(domainClass) || AnnotationUtils.findAnnotation(domainClass, AuditStamp)) &&
+        return ( AuditStampTrait.isAssignableFrom(domainClass) ||
+            AnnotationUtils.findAnnotation(domainClass, AuditStamp) ) &&
             !isAuditStampDisabled(domainClass)
+    }
+
+    //check if the given domain class should be audit stamped.
+    boolean isClassAuditCreateStamped(Class domainClass) {
+        return AuditCreatedTrait.isAssignableFrom(domainClass) && !isAuditStampDisabled(domainClass)
     }
 
     boolean isAuditStampDisabled(Class clazz) {
@@ -68,12 +77,16 @@ class AuditStampSupport {
         return auditStampedEntities.contains(GormMetaUtils.unwrapIfProxy(name))
     }
 
+    boolean isAuditCreateStamped(String name){
+        return auditStampCreateEntities.contains(GormMetaUtils.unwrapIfProxy(name))
+    }
+
     /**
      * initialize stamp fields if need be
      */
     void stampIfNew(Object entity, Class<?> dateTimeClass = LocalDateTime) {
         // TODO temp fix for bad data, see ensureEditedDate
-        if (hasCreatedDate(entity)){
+        if (entity instanceof AuditStampTrait && hasCreatedDate(entity) ){
             //if it has createDate then its not new but might have bad data
             ensureEditedDate(entity)
         } else {
@@ -93,16 +106,22 @@ class AuditStampSupport {
 
     void stampDefaults(Object entity, Class<?> dateTimeClass = LocalDateTime) {
         Object timestamp = createTimestamp(dateTimeClass)
-        //assume its a new entity
-        [FieldProps.CREATED_DATE_KEY, FieldProps.EDITED_DATE_KEY].each { key ->
-            String datePropName = fieldProps[key].name
-            entity[datePropName] = timestamp
-        }
         Serializable uid = getCurrentUserId()
-        [FieldProps.CREATED_BY_KEY, FieldProps.EDITED_BY_KEY].each { key ->
-            String userPropName = fieldProps[key].name
-            entity[userPropName] =  uid
+
+        //created
+        String datePropName = fieldProps[FieldProps.CREATED_DATE_KEY].name
+        entity[datePropName] = timestamp
+        String userPropName = fieldProps[FieldProps.CREATED_BY_KEY].name
+        entity[userPropName] =  uid
+
+        if(entity instanceof AuditStampTrait ){
+            //edited
+            String edatePropName = fieldProps[FieldProps.EDITED_DATE_KEY].name
+            entity[edatePropName] = timestamp
+            String euserPropName = fieldProps[FieldProps.EDITED_BY_KEY].name
+            entity[euserPropName] =  uid
         }
+
     }
 
     void stampUpdate(Object entity, Class<?> dateTimeClass = LocalDateTime) {
@@ -129,7 +148,7 @@ class AuditStampSupport {
      * Checks if the given domain instance is new
      *
      * it first checks for the createdDate property, if property exists and is not null, returns false, true if null
-     * else If createdDate property is not defined, it checks if the domain is attached to session and exists in persistence context.
+     * NOT ENABLED: else If createdDate property is not defined, it checks if the domain is attached to session and exists in persistence context.
      */
     boolean hasCreatedDate(Object entity) {
         String createdDateFieldName = fieldProps[FieldProps.CREATED_DATE_KEY].name

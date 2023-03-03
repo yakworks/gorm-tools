@@ -12,13 +12,12 @@ import gorm.tools.repository.model.UuidRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
-import yakworks.security.audit.AuditStamp
+import yakworks.security.audit.AuditCreatedTrait
 
 @Entity
-@AuditStamp
 @IdEqualsHashCode
 @GrailsCompileStatic
-class MailMessage implements UuidRepoEntity<MailMessage, UuidGormRepo<MailMessage>>, Serializable {
+class MailMessage implements UuidRepoEntity<MailMessage, UuidGormRepo<MailMessage>>, AuditCreatedTrait, Serializable {
     // static belongsTo = [Activity]
     UUID id
     /** the state of the Mail */
@@ -95,6 +94,12 @@ class MailMessage implements UuidRepoEntity<MailMessage, UuidGormRepo<MailMessag
     //@CompileDynamic
     static mapping = {
         id generator: "assigned"
+        sendTo sqlType:'TEXT'
+        cc sqlType:'TEXT'
+        bcc sqlType:'TEXT'
+        subject sqlType:'TEXT'
+        body sqlType:'TEXT'
+        subject sqlType:'TEXT'
         attachmentIds type: JsonType, params: [type: ArrayList]
         inlineIds type: JsonType, params: [type: ArrayList]
         tags type: JsonType, params: [type: ArrayList]
@@ -110,9 +115,9 @@ class MailMessage implements UuidRepoEntity<MailMessage, UuidGormRepo<MailMessag
         ],
         cc:[ d: 'cc addys, see `sendTo` for format'],
         bcc:[ d: 'bcc addys'],
-        sendFrom:[ d: 'who its from'],
-        replyTo:[ d: 'what to show for replyTo in email'],
-        source:[ d: 'any special source indicator', nullable: false],
+        sendFrom:[ d: 'who its from', maxSize: 255],
+        replyTo:[ d: 'what to show for replyTo in email', maxSize: 255],
+        source:[ d: 'any special source indicator', maxSize: 255],
         state:[ d: 'the state of the message', nullable: false],
         subject:[ d: 'email message subject'],
         body:[ d: 'body of message'],

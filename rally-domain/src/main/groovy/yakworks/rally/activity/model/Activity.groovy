@@ -126,8 +126,9 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
         note: [
             d: 'A note for this activity. Name will be built from this'
         ],
+        //FIXME update db data and make this nullable false.
         level: [
-            d: 'The priority level generally for an Alert or Log, but can be used for other Activity Kinds', nullable: false, default: "Info"
+            d: 'The priority level generally for an Alert or Log, but can be used for other Activity Kinds', nullable: true, default: "Info"
         ],
         org: [
             d: 'The Org this activity belongs to',

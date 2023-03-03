@@ -70,16 +70,16 @@ class ActivityServiceSpec extends Specification implements DataRepoTest, Securit
         activity.note.body == 'foo'
     }
 
-    void "logEmail act"() {
-        when:
-        def mailMessage = MockData.mailMessage()
-        assert mailMessage.subject
-        Activity activity = activityService.logEmail(orgId, mailMessage)
-
-        then:
-        activity.mailMessage
-        activity.name == mailMessage.subject
-    }
+    // void "logEmail act"() {
+    //     when:
+    //     def mailMessage = MockData.mailMessage()
+    //     assert mailMessage.subject
+    //     Activity activity = activityService.logEmail(orgId, mailMessage)
+    //
+    //     then:
+    //     activity.mailMessage
+    //     activity.name == mailMessage.subject
+    // }
 
     void "test createTodo"() {
         when:

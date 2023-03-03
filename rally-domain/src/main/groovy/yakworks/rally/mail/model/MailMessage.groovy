@@ -4,6 +4,8 @@
 */
 package yakworks.rally.mail.model
 
+import java.time.LocalDate
+
 import groovy.transform.CompileDynamic
 
 import gorm.tools.hibernate.type.JsonType
@@ -71,10 +73,17 @@ class MailMessage implements UuidRepoEntity<MailMessage, UuidGormRepo<MailMessag
     /** Tags string for mailgun*/
     List<String> tags
 
+    /** The last response or error message from the mail processor.  */
+    String msgResponse
+
+    /** The send date, always in Zulu to match server time */
+    LocalDate sendDate
+
     @CompileDynamic
     static enum MsgState {
-        Queued, //Queued in our system, to be sent
+        Queued, //Queued in the system, ready to be sent to mail processor
         Sent, //sent from here vai mailgun or smtp
+        Error, //an error occured and message failed
         Delivered, // if using something like mailgun and we interface, Mailgun sent the email and it was accepted by the recipient email server.
         Opened, // When using something like mailgun with Open tracking enabled
         Complained //The email recipient clicked on the spam complaint button within their email client.
@@ -123,5 +132,7 @@ class MailMessage implements UuidRepoEntity<MailMessage, UuidGormRepo<MailMessag
         body:[ d: 'body of message'],
         attachmentIds:[ d: 'ids list of attachments', default: 'plain'],
         inlineIds:[ d: 'plain, html or markdown for whats in body', default: 'plain'],
+        sendDate: [ d: 'The last response or error message from the mail processor when availiable.' ],
+        msgResponse: [ d: 'The last response or error message from the mail processor when availiable.' ],
     ]
 }

@@ -47,7 +47,7 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
     Task task
 
     //the template that was or will be used to generate this note or the todo's email/fax/letter/report,etc..
-    Attachment template
+    // Attachment template
 
     ActivityNote note
 
@@ -58,15 +58,24 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
     //the id of the role that can see this note if visibleTo is Role
     Long visibleId
 
+    /** The priority level generally for an Alert or Log, but can be used for other Activity Kinds */
+    AlertLevel level = AlertLevel.Info
+
     //
     @CompileDynamic
     static enum Kind {
-        Note, //User Note
-        Log, // General information on something that occured for audit or history tracking
-        Alert, // something that requires attention. can be a log that is an error and requires attention.
-        Promise, // A Promised Activity such as a Promise to Pay
-        Email, // Email will have a linked MailMessage
-        Todo(true), Call(true), Meeting(true), Parcel(true)
+        /** user or collector entered note */
+        Note,
+        /** something that needs attention, perhaps cust exceed credit limit, triggered high balance KPI, statement sent to bad email, etc */
+        Alert,
+        /** general info logging for audit trail or history tracking that something was done, when certain fields change etc..*/
+        Log,
+        /** A Promised Activity such as a Promise to Pay */
+        //Promise,
+        /** Email sent and will have a linked MailMessage */
+        Email,
+        //these are synced with a Task kind
+        Todo(true), Call(true), Meeting(true) //, Parcel(true)
 
         boolean isTaskKind
 
@@ -79,15 +88,25 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
     }
 
     @CompileDynamic
+    static enum AlertLevel {
+        Info, // informational, this is the default
+        Urgent, // something that requires attention. normally this will be an Alert kind, not a log
+        Error, // Something went wrong, example would be if an email is bad, this should be an Alert not a Log but can also be on Emails
+        Warn, // A warning, not an error. can either be a Log or an Alert
+        Resolved // closed/completed/resolved, action has been taken dont notify about it anymore. This is updated by user generally
+    }
+
+    @CompileDynamic
     enum VisibleTo { Company, Everyone, Owner, Role }
 
     static mapping = {
         name column: 'summary' //FIXME rename column
         note column: 'noteId'
         org column: 'orgId'
-        template column: 'templateId'
+        //template column: 'templateId'
         task column: 'taskId'
-        // source column: 'sourceEntity' //FIXME why are we mapping this like this
+        mailMessage column: 'mailMessageId'
+        // source column: 'sourceEntity'
     }
 
     static Map constraintsMap = [
@@ -106,6 +125,9 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
         ],
         note: [
             d: 'A note for this activity. Name will be built from this'
+        ],
+        level: [
+            d: 'The priority level generally for an Alert or Log, but can be used for other Activity Kinds', nullable: false, default: "Info"
         ],
         org: [
             d: 'The Org this activity belongs to',
@@ -126,9 +148,9 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
         task: [
             d: 'The task info if this is a task kind'
         ],
-        template: [
-            d: 'The template that was or will be used to generate this note or the tasks email/fax/letter/report,etc..'
-        ],
+        // template: [
+        //     d: 'The template that was or will be used to generate this note or the tasks email/fax/letter/report,etc..'
+        // ],
         visibleId: [
             d: 'The id fo the role or group this is visible to if set to role',
         ],

@@ -12,11 +12,10 @@ import com.mailgun.model.message.MessageResponse
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
-import spock.lang.PendingFeature
 import spock.lang.Specification
 import yakworks.api.Result
 import yakworks.commons.util.BuildSupport
-import yakworks.rally.mail.MailMsg
+import yakworks.rally.mail.MailTo
 import yakworks.rally.mail.config.MailConfig
 import yakworks.testing.gorm.integration.DataIntegrationTest
 
@@ -61,7 +60,7 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
     @Ignore
     def "simple with min required fields"() {
         when:
-        MailMsg mailMsg = new MailMsg(
+        MailTo mailMsg = new MailTo(
             from: "Yakworks Account Services <rndc@greenbill.io>",
             to: ["josh2@9ci.com"],
             text: 'foo',
@@ -79,11 +78,11 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
     def "MailService html email with attachments"() {
         when:
         def testAttach = Paths.get(BuildSupport.rootProjectDir, 'examples/resources/test.txt')
-        MailMsg mailMsg = new MailMsg(
+        MailTo mailMsg = new MailTo(
             from: "Yakworks Account Services <rndc@greenbill.io>",
             replyTo: "billing@rndc.com",
             //to: ["josh2@9ci.com, joshua@9ci.com"],
-            to: ["josh2@9ci.com"],
+            to: ['josh2@9ci.com, "Blow, Joe" <joshua@9ci.com>'],
             subject: "RNDC Test Statement xx",
             tags: ["statements"],
             html: htmlBody,
@@ -104,7 +103,7 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
             .from("RNDC Account Services <rndc@greenbill.io>")
             .replyTo("billing@rndc.com")
             //.to(["joshua@9ci.com","Kuhn, John <jkuhn@9ci.com>", 'Dabal, Joanna <joanna@9ci.com>'])
-            .to("josh2@9ci.com, anotherone@9ci.com")
+            .to('josh2@9ci.com, "Blow, Joe" <joshua@9ci.com>')
             .subject("RNDC Test Statement")
             //.text("foo") //text only
             .tag("statements") //sets and o:tag to segregate
@@ -120,7 +119,7 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
 
     def "missing from "() {
         when:
-        MailMsg mailMsg = new MailMsg(
+        MailTo mailMsg = new MailTo(
             //from: "Yakworks Account Services <rndc@greenbill.io>",
             to: ["josh2@9ci.com"],
             text: 'foo'
@@ -135,7 +134,7 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
 
     def "MailService html bad to format"() {
         when:
-        MailMsg mailMsg = new MailMsg(
+        MailTo mailMsg = new MailTo(
             from: "RNDC Account Services <rndc@greenbill.io>",
             replyTo: "billing@rndc.com",
             to: ["josh2@9ci.com, adfasdfasdf"],
@@ -153,7 +152,7 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
 
     def "MailService bad domain in mailgun"() {
         when:
-        MailMsg mailMsg = new MailMsg(
+        MailTo mailMsg = new MailTo(
             from: "RNDC Account Services <rndc@greenbill.io>",
             replyTo: "billing@rndc.com",
             to: ["josh2@9ci.com, adfasdfasdf"],

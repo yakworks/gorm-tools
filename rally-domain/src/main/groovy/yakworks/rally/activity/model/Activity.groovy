@@ -15,6 +15,7 @@ import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.model.Attachable
 import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Taggable
@@ -31,31 +32,50 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
     // Org is here to speed up search arTran activities for customer or custAccount -Activity.findAllByOrg(fromOrg.org)
     // If activity is on org level activityLink has org id as well.
     Org org
+
     //the parent note that this is a comment for.
     // Long parentId
 
-    // a 255 char string summary of the activity. Will be the title if its a task and if note it will ends with ... if there is more to the note.
+    /**
+     * a 255 char string summary of the activity. This is the subject when its an email
+     * Will be the title if its a task and if note it will ends with ... if there is more to the note.
+     * don't set this, it will just get overriden during save for taks and notes
+     */
     String name
-    //don't set this, it will just get overriden during save
 
     //if this note has a todo task that needs to be /or was/ accomplished
     Task task
 
     //the template that was or will be used to generate this note or the todo's email/fax/letter/report,etc..
-    Attachment template
+    // Attachment template
 
     ActivityNote note
+
+    MailMessage mailMessage
 
     VisibleTo visibleTo = VisibleTo.Everyone
 
     //the id of the role that can see this note if visibleTo is Role
     Long visibleId
 
+    /** The priority level generally for an Alert or Log, but can be used for other Activity Kinds */
+    AlertLevel level = AlertLevel.Info
+
     //
     @CompileDynamic
     static enum Kind {
-        Note, Promise,
-        Todo(true), Call(true), Meeting(true), Email(true), Parcel(true)
+        /** user or collector entered note */
+        Note,
+        /** something that needs attention, perhaps cust exceed credit limit, triggered high balance KPI, statement sent to bad email, etc */
+        Alert,
+        /** general info logging for audit trail or history tracking that something was done, when certain fields change etc..*/
+        Log,
+        /** A Promised Activity such as a Promise to Pay */
+        //Promise,
+        /** Email sent and will have a linked MailMessage */
+        Email,
+        //these are synced with a Task kind
+        Todo(true), Call(true), Meeting(true) //, Parcel(true)
 
         boolean isTaskKind
 
@@ -68,15 +88,25 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
     }
 
     @CompileDynamic
+    static enum AlertLevel {
+        Info, // informational, this is the default
+        Urgent, // something that requires attention. normally this will be an Alert kind, not a log
+        Error, // Something went wrong, example would be if an email is bad, this should be an Alert not a Log but can also be on Emails
+        Warn, // A warning, not an error. can either be a Log or an Alert
+        Resolved // closed/completed/resolved, action has been taken dont notify about it anymore. This is updated by user generally
+    }
+
+    @CompileDynamic
     enum VisibleTo { Company, Everyone, Owner, Role }
 
     static mapping = {
         name column: 'summary' //FIXME rename column
         note column: 'noteId'
         org column: 'orgId'
-        template column: 'templateId'
+        //template column: 'templateId'
         task column: 'taskId'
-        // source column: 'sourceEntity' //FIXME why are we mapping this like this
+        mailMessage column: 'mailMessageId'
+        // source column: 'sourceEntity'
     }
 
     static Map constraintsMap = [
@@ -95,6 +125,9 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
         ],
         note: [
             d: 'A note for this activity. Name will be built from this'
+        ],
+        level: [
+            d: 'The priority level generally for an Alert or Log, but can be used for other Activity Kinds', nullable: false, default: "Info"
         ],
         org: [
             d: 'The Org this activity belongs to',
@@ -115,9 +148,9 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
         task: [
             d: 'The task info if this is a task kind'
         ],
-        template: [
-            d: 'The template that was or will be used to generate this note or the tasks email/fax/letter/report,etc..'
-        ],
+        // template: [
+        //     d: 'The template that was or will be used to generate this note or the tasks email/fax/letter/report,etc..'
+        // ],
         visibleId: [
             d: 'The id fo the role or group this is visible to if set to role',
         ],
@@ -135,10 +168,5 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
     List<Contact> getContacts() {
         ActivityContact.listContacts(this)
     }
-
-    // SEE activityApi
-    // static constraintsMap = [
-    //     links:[ description: 'links for this', validate: false]
-    // ]
 
 }

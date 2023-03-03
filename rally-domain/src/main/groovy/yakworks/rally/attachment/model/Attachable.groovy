@@ -12,7 +12,7 @@ import gorm.tools.model.Persistable
 @CompileStatic
 trait Attachable {
 
-    // cached version so we can avoid hitting db in events
+    // cached version so we can avoid multiple hits to db , especially in events
     private Boolean _hasAttachments
 
     boolean hasAttachments() {

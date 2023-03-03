@@ -11,11 +11,9 @@ import groovy.transform.CompileStatic
  */
 
 @CompileStatic
-class MailMsg {
+class MailTo {
 
-    /**
-     * Email address for From header.
-     */
+    /** Email address for From header */
     String from
 
     /**
@@ -36,46 +34,28 @@ class MailMsg {
      */
     List<String> bcc
 
-    /**
-     * Message subject.
-     */
+    /** Message subject.*/
     String subject
 
-    /**
-     * Body of the message. (text version)
-     */
+    /** Body of the message. (text version) */
     String text
 
-    /**
-     * Body of the message. (HTML version)
-     */
+    /** Body of the message. (HTML version) */
     String html
 
-    /**
-     * File attachment.
-     */
+    /** File attachment */
     List<File> attachments;
 
-    /**
-     * Attachment with inline disposition.
-     */
+    /** Attachment with inline disposition. */
     List<File> inline;
 
-    /**
-     * Name of a template stored via template API.
-     */
+    /** Name of a template stored via template API */
     String template;
 
-    /**
-     * Tag string.
-     *
-     * @see <a href="https://documentation.mailgun.com/en/latest/user_manual.html#tagging-1">Tagging</a>
-     */
+    /** Tag string for mailgun*/
     List<String> tags;
 
-    /**
-     * Specify Reply-To address
-     */
+    /** Specify Reply-To address */
     String replyTo;
 
 }

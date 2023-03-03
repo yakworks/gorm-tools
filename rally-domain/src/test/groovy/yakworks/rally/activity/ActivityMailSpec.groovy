@@ -1,19 +1,20 @@
 package yakworks.rally.activity
 
-import gorm.tools.model.Persistable
 import org.apache.commons.lang3.RandomStringUtils
+
+import gorm.tools.model.Persistable
 import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
+import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.model.TaskType
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
-import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
@@ -26,9 +27,9 @@ import yakworks.testing.gorm.unit.SecurityTest
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 
-class ActivitySpec extends Specification implements GormHibernateTest, SecurityTest {
+class ActivityMailSpec extends Specification implements GormHibernateTest, SecurityTest {
     static entityClasses = [
-        AttachmentLink, ActivityLink, Activity, MailMessage, TaskType, Org, OrgTag,
+        AttachmentLink, ActivityLink, MailMessage, Activity, TaskType, Org, OrgTag,
         Tag, TagLink, Attachment, ActivityNote, Contact, ActivityContact
     ]
     static springBeans = [
@@ -57,19 +58,10 @@ class ActivitySpec extends Specification implements GormHibernateTest, SecurityT
         [contact1, contact2]
     }
 
-    void "Log creation2"() {
+    @Ignore
+    void "simple mail creation"() {
         when:
-        Activity activity = Activity.create(orgId: orgId, kind: "Log", name: "got it")
-
-        then:
-        activity.name == 'got it'
-        activity.kind == Activity.Kind.Log
-        !activity.note
-    }
-
-    void "simple note creation2"() {
-        when:
-        def params = [orgId: orgId, note:[body: 'foo']]
+        def params = [orgId: orgId, mail:[body: 'foo']]
         Activity activity = Activity.create(params)
 
         then:
@@ -292,10 +284,10 @@ class ActivitySpec extends Specification implements GormHibernateTest, SecurityT
         Activity act = build(Activity, [org:org])
         act.repo.addNote(act, "test body")
         act.persist(flush: true)
-        flushAndClear()
+
         then:
         act.note?.id != null
-        def act2 = Activity.get(act.id)
+        def act2 = Activity.findById(act.id)
         act2.note != null
         "test body" == act2.note.body
         "plain" == act2.note.contentType

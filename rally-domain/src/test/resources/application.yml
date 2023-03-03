@@ -31,6 +31,6 @@ app:
     default-domain: m.greenbill.io
     mailgun:
       enabled: true
-      private-api-key: "f8b...."
+      private-api-key: f8b47859c3b2410c228d9126a3564b9a-ca9eeb88-c3148c4f
       default-domain: m.greenbill.io
 

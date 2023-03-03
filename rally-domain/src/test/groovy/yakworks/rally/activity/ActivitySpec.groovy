@@ -57,7 +57,17 @@ class ActivitySpec extends Specification implements GormHibernateTest, SecurityT
         [contact1, contact2]
     }
 
-    void "simple note creation"() {
+    void "Log creation2"() {
+        when:
+        Activity activity = Activity.create(orgId: orgId, kind: "Log", name: "got it")
+
+        then:
+        activity.name == 'got it'
+        activity.kind == Activity.Kind.Log
+        !activity.note
+    }
+
+    void "simple note creation2"() {
         when:
         def params = [orgId: orgId, note:[body: 'foo']]
         Activity activity = Activity.create(params)

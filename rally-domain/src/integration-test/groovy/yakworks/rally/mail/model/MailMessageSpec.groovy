@@ -24,7 +24,7 @@ class MailMessageSpec extends Specification implements DomainIntTest {
     void "test create"() {
         when:
         def msg = new MailMessage(
-            state: MailMessage.MailState.Queued,
+            state: MailMessage.MsgState.Queued,
             sendTo: 'josh2@9ci.com, "Blow, Joe" <joshua@9ci.com>',
             sendFrom: "Yakworks Account Services <rndc@greenbill.io>",
             replyTo: "billing@rndc.com",

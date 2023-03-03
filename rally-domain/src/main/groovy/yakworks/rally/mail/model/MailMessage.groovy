@@ -21,7 +21,7 @@ class MailMessage implements UuidRepoEntity<MailMessage, UuidGormRepo<MailMessag
     // static belongsTo = [Activity]
     UUID id
     /** the state of the Mail */
-    MailState state
+    MsgState state
 
     /** used to store tracking key to pick up and run again*/
     String source
@@ -72,7 +72,7 @@ class MailMessage implements UuidRepoEntity<MailMessage, UuidGormRepo<MailMessag
     List<String> tags
 
     @CompileDynamic
-    static enum MailState {
+    static enum MsgState {
         Queued, //Queued in our system, to be sent
         Sent, //sent from here vai mailgun or smtp
         Delivered, // if using something like mailgun and we interface, Mailgun sent the email and it was accepted by the recipient email server.

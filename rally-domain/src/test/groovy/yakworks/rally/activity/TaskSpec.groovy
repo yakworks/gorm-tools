@@ -80,21 +80,4 @@ class TaskSpec extends Specification implements DataRepoTest, SecurityTest { //i
         act.note.body == 'test note'
     }
 
-    void "test createTodo"() {
-        when:
-        def contact = MockData.createContactWithUser()
-        Activity activity = activityRepo.createTodo(contact.org, contact.user.id, "Task Summary")
-
-        then:
-        activity != null
-        activity.org == contact.org
-        activity.name == "Task Summary"
-        activity.kind == Activity.Kind.Todo
-        activity.task != null
-        activity.task.taskType == TaskType.TODO
-        activity.task.userId == contact.user.id
-        activity.task.dueDate != null
-        activity.task.status == TaskStatus.getOPEN()
-    }
-
 }

@@ -10,6 +10,7 @@ import groovy.transform.CompileDynamic
 
 import grails.gorm.Entity
 import yakworks.rally.activity.model.Activity
+import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
@@ -167,5 +168,19 @@ class MockData {
                 taskType: [id: 1]
             ]
         ]
+    }
+
+    static MailMessage mailMessage(){
+        def msg = new MailMessage(
+            state: MailMessage.MsgState.Queued,
+            sendTo: 'joe@9ci.com, "Blow, Joe" <joeb@9ci.com>',
+            sendFrom: "Yakworks Account Services <rndc@greenbill.io>",
+            replyTo: "billing@company.com",
+            subject: "Test Email",
+            tags: ["statements"],
+            body: "email body",
+            // attachmentIds: [1,2,3]
+        ).persist()
+        return msg
     }
 }

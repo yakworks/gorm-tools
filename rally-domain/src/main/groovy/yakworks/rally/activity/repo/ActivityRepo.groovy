@@ -4,7 +4,7 @@
 */
 package yakworks.rally.activity.repo
 
-import java.time.LocalDateTime
+
 import javax.persistence.criteria.JoinType
 
 import groovy.transform.CompileStatic
@@ -26,13 +26,10 @@ import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.ReadOnly
-import grails.gorm.transactions.Transactional
-import yakworks.commons.lang.Validate
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
-import yakworks.rally.activity.model.Task
 import yakworks.rally.activity.model.TaskStatus
 import yakworks.rally.activity.model.TaskType
 import yakworks.rally.attachment.model.Attachment
@@ -239,50 +236,6 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
         act.note.body = body
         act.note.contentType = contentType
         return act.note
-    }
-
-    void completeTask(Task task, Long completedById) {
-        Validate.notNull(completedById, "[completedById]")
-        task.bind(status: TaskStatus.COMPLETE,
-                state: TaskStatus.COMPLETE.id as Integer,
-                completedDate: LocalDateTime.now(),
-                completedBy: completedById)
-
-    }
-
-    /**
-     * quick easy way to create a Note
-     */
-    static Activity createNote(Long orgId, String note){
-        def params = [orgId: orgId, note:[body: 'foo'], linkedId: 1, linkedEntity:'Contact']
-        Activity activity = Activity.create(params)
-        return activity
-    }
-
-    /**
-     * quick easy way to create a Todo activity
-     */
-    @Transactional
-    Activity createTodo(Org org, Long userId, String name, String linkedEntity = null,
-                        List<Long> linkedIds = null, LocalDateTime dueDate = LocalDateTime.now()) {
-
-        Activity activity = create(org: org, name: name, kind : Activity.Kind.Todo)
-
-        if(linkedIds){
-            for(Long linkedId: linkedIds){
-                ActivityLink activityLink = new ActivityLink(activity: activity, linkedId: linkedId, linkedEntity: linkedEntity)
-                activityLink.persist()
-            }
-        }
-
-        activity.task = new Task(
-            taskType: TaskType.TODO,
-            userId  : userId,
-            dueDate : dueDate,
-            status  : TaskStatus.OPEN
-        )
-        activity.persist()
-        return activity
     }
 
     void fixUpTaskParams(Map params) {

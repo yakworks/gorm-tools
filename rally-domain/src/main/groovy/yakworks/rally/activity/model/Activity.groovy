@@ -61,8 +61,12 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
     //
     @CompileDynamic
     static enum Kind {
-        Note, Promise,
-        Todo(true), Call(true), Meeting(true), Email(true), Parcel(true)
+        Note, //User Note
+        Log, // General information on something that occured for audit or history tracking
+        Alert, // something that requires attention. can be a log that is an error and requires attention.
+        Promise, // A Promised Activity such as a Promise to Pay
+        Email, // Email will have a linked MailMessage
+        Todo(true), Call(true), Meeting(true), Parcel(true)
 
         boolean isTaskKind
 
@@ -143,12 +147,4 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
         ActivityContact.listContacts(this)
     }
 
-    // SEE activityApi
-    // static constraintsMap = [
-    //     links:[ description: 'links for this', validate: false]
-    // ]
-
-    static Activity createNote(Long orgId, String note){
-        getRepo().createNote(orgId, note)
-    }
 }

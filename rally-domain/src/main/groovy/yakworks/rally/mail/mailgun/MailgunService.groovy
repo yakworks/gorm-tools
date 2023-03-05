@@ -7,8 +7,6 @@ package yakworks.rally.mail.mailgun
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.springframework.context.annotation.Bean
-
 import com.mailgun.api.v3.MailgunEventsApi
 import com.mailgun.api.v3.MailgunMessagesApi
 import com.mailgun.client.MailgunClient
@@ -95,7 +93,6 @@ class MailgunService extends MailService {
         }
     }
 
-    @Bean
     MailgunMessagesApi getMailgunMessagesApi() {
         if(!_mailgunMessagesApi) {
             _mailgunMessagesApi = MailgunClient.config(mailConfig.mailgun.privateApiKey)
@@ -104,7 +101,6 @@ class MailgunService extends MailService {
         return _mailgunMessagesApi
     }
 
-    @Bean
     MailgunEventsApi getMailgunEventsApi() {
         if(!_mailgunEventsApi) {
             _mailgunEventsApi = MailgunClient.config(mailConfig.mailgun.privateApiKey)

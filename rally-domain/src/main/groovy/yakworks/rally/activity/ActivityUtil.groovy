@@ -7,7 +7,6 @@ package yakworks.rally.activity
 import groovy.transform.CompileStatic
 
 import yakworks.rally.activity.model.Activity
-import yakworks.rally.mail.model.MailMessage
 
 /**
  * Static helpers for Activity

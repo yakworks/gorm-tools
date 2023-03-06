@@ -139,7 +139,7 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         query.trim() == strip('''
             SELECT new map( SUM(kitchenSink.amount) as amount )
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-            WHERE kitchenSink.amount >= :p1
+            WHERE (kitchenSink.SUM(kitchenSink.amount) >= :p1)
         ''')
     }
 

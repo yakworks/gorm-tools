@@ -1022,9 +1022,13 @@ class JpqlQueryBuilder {
         for (Iterator<Query.Criterion> iterator = criterionList.iterator(); iterator.hasNext();) {
             StringBuilder tempWhereClause = new StringBuilder()
             Query.Criterion criterion = iterator.next()
-            //TODO if its a projection alias then skip for now
+
+            //TODO handle it for situations like below
+            //select sum(amount) as amount from artran where amount> 100 group by trantypeid ; VS
+            //select sum(amount) as amount from artran group by trantypeid having sum(amount) > 100;
             if(criterion instanceof Query.PropertyNameCriterion){
-                if(projectionAliases.containsKey(criterion.getProperty())){
+                //FIXME for now, check if there's atleast one groupBy thn only put it in having instead of where
+                if(projectionAliases.containsKey(criterion.getProperty()) && projectionAliases.values().any({ it.contains("GROUP")})){
                     continue
                 }
             }
@@ -1081,7 +1085,9 @@ class JpqlQueryBuilder {
             //skip if its anything but a projection alias
             boolean isPropCrit = criterion instanceof Query.PropertyNameCriterion
             if(isPropCrit){
-                boolean hasAlias = projectionAliases.containsKey((criterion as Query.PropertyNameCriterion).getProperty())
+                String prop = (criterion as Query.PropertyNameCriterion).getProperty()
+                //TODO FIX for now, put it in having only if there's atleast one groupby
+                boolean hasAlias = projectionAliases.containsKey(prop) && projectionAliases.values().any { it.contains('GROUP')}
                 if(!hasAlias){
                     continue
                 }

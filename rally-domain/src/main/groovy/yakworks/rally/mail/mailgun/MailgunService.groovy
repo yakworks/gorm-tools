@@ -7,8 +7,6 @@ package yakworks.rally.mail.mailgun
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.springframework.context.annotation.Bean
-
 import com.mailgun.api.v3.MailgunEventsApi
 import com.mailgun.api.v3.MailgunMessagesApi
 import com.mailgun.client.MailgunClient
@@ -21,7 +19,7 @@ import feign.FeignException
 import yakworks.api.Result
 import yakworks.api.problem.Problem
 import yakworks.api.problem.data.DataProblem
-import yakworks.rally.mail.MailService
+import yakworks.rally.mail.EmailService
 import yakworks.rally.mail.MailTo
 
 /**
@@ -31,7 +29,7 @@ import yakworks.rally.mail.MailTo
  */
 @Slf4j
 @CompileStatic
-class MailgunService extends MailService {
+class MailgunService extends EmailService {
 
     private MailgunMessagesApi _mailgunMessagesApi
     private MailgunEventsApi _mailgunEventsApi
@@ -56,13 +54,17 @@ class MailgunService extends MailService {
 
     /**
      * calls mailgunMessagesApi.sendMessage
+     * The return Result has a payload Map with id and message
+     * @param domain the mailgun domain name
+     * @param mailMsg the MailTo message to send.
+     * @return The result with payload
      */
     @Override
     Result send(String domain, MailTo mailMsg){
         try{
             Message message = mailMsgToMessage(mailMsg)
             MessageResponse resp = sendMessage(domain, message)
-            return Result.OK().payload(resp)
+            return Result.OK().payload([id: resp.id, message: resp.message])
         } catch(FeignException e){
             if(e.status() == 401) return new DataProblem().title("Unauthorized or bad domain").status(e.status())
             Map msgData =  ObjectMapperUtil.getObjectMapper().readValue(e.contentUTF8(), Map)
@@ -95,7 +97,6 @@ class MailgunService extends MailService {
         }
     }
 
-    @Bean
     MailgunMessagesApi getMailgunMessagesApi() {
         if(!_mailgunMessagesApi) {
             _mailgunMessagesApi = MailgunClient.config(mailConfig.mailgun.privateApiKey)
@@ -104,7 +105,6 @@ class MailgunService extends MailService {
         return _mailgunMessagesApi
     }
 
-    @Bean
     MailgunEventsApi getMailgunEventsApi() {
         if(!_mailgunEventsApi) {
             _mailgunEventsApi = MailgunClient.config(mailConfig.mailgun.privateApiKey)

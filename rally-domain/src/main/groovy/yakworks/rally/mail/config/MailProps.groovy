@@ -13,7 +13,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
  */
 @ConfigurationProperties(prefix="app.mail")
 @CompileStatic
-class MailConfig {
+class MailProps {
 
     /** whether the mailer is enabled */
     boolean enabled = true

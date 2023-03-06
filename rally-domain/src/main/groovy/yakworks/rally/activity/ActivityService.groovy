@@ -5,6 +5,7 @@
 package yakworks.rally.activity
 
 import java.time.LocalDateTime
+import javax.inject.Inject
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -13,13 +14,19 @@ import org.apache.commons.lang3.StringUtils
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
+import gorm.tools.repository.RepoUtil
 import grails.gorm.transactions.Transactional
+import jakarta.annotation.Nullable
+import yakworks.api.Result
+import yakworks.api.problem.Problem
+import yakworks.api.problem.data.NotFoundProblem
 import yakworks.commons.lang.Validate
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.Task
 import yakworks.rally.activity.model.TaskStatus
 import yakworks.rally.activity.model.TaskType
+import yakworks.rally.mail.MailMessageSender
 import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.orgs.model.Org
 import yakworks.spring.AppCtx
@@ -31,6 +38,8 @@ import yakworks.spring.AppCtx
 @Slf4j
 @CompileStatic
 class ActivityService {
+
+    @Inject @Nullable MailMessageSender mailMessageSender
 
     /** static helper for ActivityUtils */
     static ActivityService bean(){
@@ -105,5 +114,27 @@ class ActivityService {
             completedBy: completedById)
     }
 
+    /**
+     * Sends the email with mailMessageSender. Update act to leve:Error if anything goes wrong.
+     * Will update the mailMessage to sent via mailMessageSender.send
+     * Throws NotFoundPropblem is the activity doesn't have a mailMessage, or throws if persist fails.<br>
+     * So this needs to wrap in try catch as well as check the result for status.
+     * @param actId the id of the activity
+     * @return the activity it operated on
+     * @throw NotFoundProblem if it not found
+     */
+    @Transactional
+    Result sendEmail(Long actId){
+        Activity act = Activity.get(actId)
+        MailMessage msg = act?.mailMessage
+        //safety check to throw notFound if either act or mailMessage are null.
+        RepoUtil.checkFound(msg, actId, 'Activity MailMessage')
 
+        Result result = mailMessageSender.send(msg)
+        if(result instanceof Problem){
+            act.level = Activity.AlertLevel.Error
+            act.persist()
+        }
+        return result
+    }
 }

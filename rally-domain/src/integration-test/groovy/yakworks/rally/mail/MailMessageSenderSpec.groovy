@@ -35,7 +35,7 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
         return mailMsg
     }
 
-    void "smoke test"() {
+    void "smoke test mail message"() {
         when:
         MailMessage mailMsg = MockData.mailMessage()
         flushAndClear()
@@ -87,6 +87,8 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
         mailMessageSender.send(mailMsg)
 
         then:
+        mailMsg.state == MailMessage.MsgState.Sent
+        mailMsg.messageId
         emailService.sentMail.size() == 1
     }
 
@@ -97,6 +99,8 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
         mailMessageSender.send(mailMsg)
 
         then:
+        mailMsg.state == MailMessage.MsgState.Sent
+        mailMsg.messageId
         emailService.sentMail.size() == 1
     }
 
@@ -113,6 +117,7 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
         then:
         emailService.sentMail.size() == 0
         !res.ok
+        !mailMsg.messageId
         mailMsg.state == MailMessage.MsgState.Error
         mailMsg.msgResponse == "bad mail"
     }
@@ -130,6 +135,7 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
         then:
         emailService.sentMail.size() == 0
         !res.ok
+        !mailMsg.messageId
         mailMsg.state == MailMessage.MsgState.Error
         mailMsg.msgResponse.contains("does not exist")
     }

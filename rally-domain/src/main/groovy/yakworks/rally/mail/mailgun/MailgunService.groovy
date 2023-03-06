@@ -54,13 +54,17 @@ class MailgunService extends EmailService {
 
     /**
      * calls mailgunMessagesApi.sendMessage
+     * The return Result has a payload Map with id and message
+     * @param domain the mailgun domain name
+     * @param mailMsg the MailTo message to send.
+     * @return The result with payload
      */
     @Override
     Result send(String domain, MailTo mailMsg){
         try{
             Message message = mailMsgToMessage(mailMsg)
             MessageResponse resp = sendMessage(domain, message)
-            return Result.OK().payload(resp)
+            return Result.OK().payload([id: resp.id, message: resp.message])
         } catch(FeignException e){
             if(e.status() == 401) return new DataProblem().title("Unauthorized or bad domain").status(e.status())
             Map msgData =  ObjectMapperUtil.getObjectMapper().readValue(e.contentUTF8(), Map)

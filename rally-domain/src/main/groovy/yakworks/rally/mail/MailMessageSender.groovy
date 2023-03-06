@@ -52,6 +52,7 @@ class MailMessageSender {
 
     /**
      * updates and persists the mailMessage.state based on results.
+     * Will assign the messageId and state=Sent on success
      */
     @Transactional
     protected void updateMessageState(MailMessage mailMessage, Result result){
@@ -59,6 +60,8 @@ class MailMessageSender {
             mailMessage.state = MailMessage.MsgState.Error
             mailMessage.msgResponse = result.detail
         } else {
+            Map payload = (Map) result.payload
+            mailMessage.messageId = payload.id
             mailMessage.state = MailMessage.MsgState.Sent
         }
         mailMessage.persist()

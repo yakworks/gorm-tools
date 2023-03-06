@@ -29,7 +29,7 @@ import yakworks.testing.gorm.integration.DataIntegrationTest
 @Rollback
 class MailgunServiceTest extends Specification implements DataIntegrationTest  {
 
-    @Autowired MailgunService mailService
+    @Autowired MailgunService emailService
     //@Autowired MailgunEventsApi mailgunEventsApi
     @Autowired MailProps mailConfig
 
@@ -47,9 +47,9 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
 
     def "sanity check config"() {
         expect:
-        mailService
-        mailService.mailgunEventsApi
-        mailService.mailgunMessagesApi
+        emailService
+        emailService.mailgunEventsApi
+        emailService.mailgunMessagesApi
         //mailgunEventsApi
         mailConfig.enabled
         mailConfig.defaultDomain
@@ -68,7 +68,7 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
             //subject: "RNDC Test Statement xx",
         )
 
-        Result res = mailService.send(mailMsg)
+        Result res = emailService.send(mailMsg)
 
         then:
         res.ok
@@ -89,7 +89,7 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
             attachments: [testAttach.toFile()]
         )
 
-        Result res = mailService.send(mailMsg)
+        Result res = emailService.send(mailMsg)
         //Response messageResponse = mailgunService.mailgunMessagesApi.sendMessageFeignResponse(DOMAIN, message)
         then:
         res.ok
@@ -110,7 +110,7 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
             .html(htmlBody)
             .attachment(testAttach.toFile())
             .build()
-        MessageResponse messageResponse = mailService.sendMessage(mailConfig.defaultDomain, message)
+        MessageResponse messageResponse = emailService.sendMessage(mailConfig.defaultDomain, message)
 
         then:
         messageResponse
@@ -125,7 +125,7 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
             text: 'foo'
         )
 
-        Result res = mailService.send(mailMsg)
+        Result res = emailService.send(mailMsg)
 
         then:
         !res.ok
@@ -142,7 +142,7 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
             html: htmlBody
         )
 
-        Result res = mailService.send(mailMsg)
+        Result res = emailService.send(mailMsg)
         //Response messageResponse = mailgunService.mailgunMessagesApi.sendMessageFeignResponse(DOMAIN, message)
         then:
         !res.ok
@@ -160,7 +160,7 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
             html: htmlBody
         )
 
-        Result res = mailService.send("bad-domain.com", mailMsg)
+        Result res = emailService.send("bad-domain.com", mailMsg)
         //Response messageResponse = mailgunService.mailgunMessagesApi.sendMessageFeignResponse(DOMAIN, message)
         then:
         !res.ok
@@ -170,7 +170,7 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
 
     def "get all events"() {
         when:
-        EventsResponse result = mailService.getEvents()
+        EventsResponse result = emailService.getEvents()
 
         then:
         result
@@ -186,7 +186,7 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
             .end(ZonedDateTime.now().minusDays(1))
             .build();
 
-        EventsResponse result = mailService.getEvents()
+        EventsResponse result = emailService.getEvents()
 
         then:
         result

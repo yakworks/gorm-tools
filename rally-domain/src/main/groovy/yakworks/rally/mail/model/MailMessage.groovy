@@ -25,8 +25,11 @@ class MailMessage implements UuidRepoEntity<MailMessage, UuidGormRepo<MailMessag
     /** the state of the Mail */
     MsgState state
 
-    /** used to store tracking key to pick up and run again*/
+    /** used to store source such as the statments date/time, tracking key to pick up and run again*/
     String source
+
+    /** when using something like mailgun this is the id returned from the send submit */
+    String messageId
 
     /** Specify Reply-To address */
     String replyTo

@@ -30,7 +30,9 @@ class TestMailService extends EmailService {
             return new DataProblem().title("Send Failure").detail("bad mail").status(401)
         }
         sentMail.add([domain: domain, mailMsg: mailTo])
-        return Result.OK()
+        //simulate payload with id and message like we get from MailGun
+        Map payload = [id: "<${UUID.randomUUID().toString()}@example.com>", message: "Queued. Thank you."]
+        return Result.OK().payload(payload)
     }
 
 }

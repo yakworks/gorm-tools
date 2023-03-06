@@ -135,5 +135,6 @@ class MailMessage implements UuidRepoEntity<MailMessage, UuidGormRepo<MailMessag
         inlineIds:[ d: 'plain, html or markdown for whats in body', default: 'plain'],
         sendDate: [ d: 'The last response or error message from the mail processor when availiable.' ],
         msgResponse: [ d: 'The last response or error message from the mail processor when availiable.' ],
+        messageId: [ d: 'When using something like mailgun this is the id returned from the send submit', maxSize: 255 ]
     ]
 }

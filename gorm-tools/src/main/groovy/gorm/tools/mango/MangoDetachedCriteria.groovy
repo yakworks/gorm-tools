@@ -149,17 +149,21 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      */
     @Override
     boolean asBoolean(@DelegatesTo(DetachedCriteria) Closure additionalCriteria = null) {
-        (Boolean)withQueryInstance(Collections.emptyMap(), additionalCriteria) { Query query ->
-            query.projections().count()
-            ((Number)query.singleResult()) > 0
-        }
+        // (Boolean)withQueryInstance(Collections.emptyMap(), additionalCriteria) { Query query ->
+        //     query.projections().count()
+        //     ((Number)query.singleResult()) > 0
+        // }
+        throw new UnsupportedOperationException("Truthy check is not supported, use null check instead")
     }
 
     /**
      * uses the count to check if its greater than 0.
      */
     boolean exists() {
-        return asBoolean()
+        return (Boolean)withQueryInstance(Collections.emptyMap(), null) { Query query ->
+            query.projections().count()
+            ((Number)query.singleResult()) > 0
+        }
     }
 
     /**

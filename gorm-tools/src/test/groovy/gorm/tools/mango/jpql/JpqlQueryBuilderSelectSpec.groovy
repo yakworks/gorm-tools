@@ -97,7 +97,7 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         // then:
         // res.size() == 2
     }
-    
+
     void "projections having"() {
         given: "Some criteria"
 

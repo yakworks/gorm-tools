@@ -9,7 +9,7 @@ import groovy.util.logging.Slf4j
 
 import yakworks.api.Result
 import yakworks.api.problem.data.DataProblem
-import yakworks.rally.mail.MailService
+import yakworks.rally.mail.EmailService
 import yakworks.rally.mail.MailTo
 
 /**
@@ -17,7 +17,7 @@ import yakworks.rally.mail.MailTo
  */
 @Slf4j
 @CompileStatic
-class TestMailService extends MailService {
+class TestMailService extends EmailService {
 
     List sentMail = []
 

@@ -9,6 +9,7 @@ import javax.inject.Inject
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import grails.gorm.transactions.Transactional
 import yakworks.api.Result
 import yakworks.api.problem.Problem
 import yakworks.rally.attachment.model.Attachment
@@ -22,33 +23,46 @@ import yakworks.rally.mail.model.MailMessage
 @CompileStatic
 class MailMessageSender {
 
-    @Inject MailService mailService
+    @Inject EmailService emailService
 
     /**
      * calls mailgunMessagesApi.sendMessage using the MailgunConfig.defaultDomain
+     *
      */
     Result send(MailMessage mailMessage){
         MailTo mailTo
         Result result
         try {
             mailTo = convertMailMessage(mailMessage)
-            // mailService.send should never throw ex and shoudl return result
-            result = mailService.send(mailTo)
+            // mailService.send should never throw ex and should return result
+            result = emailService.send(mailTo)
         } catch(ex){
             //in convertMailMessage might throw an ex if the attachmentId is bad or not found
             result = Problem.of(ex)
         }
 
+        try{
+            updateMessageState(mailMessage, result)
+        }catch(pex){
+            //should not happen, unexpected
+            result = Problem.of(pex)
+        }
+        return result
+    }
+
+    /**
+     * updates and persists the mailMessage.state based on results.
+     */
+    @Transactional
+    protected void updateMessageState(MailMessage mailMessage, Result result){
         if(result instanceof Problem){
             mailMessage.state = MailMessage.MsgState.Error
             mailMessage.msgResponse = result.detail
         } else {
             mailMessage.state = MailMessage.MsgState.Sent
         }
-        return result
+        mailMessage.persist()
     }
-
-
 
     MailTo convertMailMessage(MailMessage mailMessage){
         MailTo mailTo = new MailTo(

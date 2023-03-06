@@ -21,6 +21,12 @@ import yakworks.rally.mail.testing.TestMailService
 @CompileStatic
 class MailSpringConfig {
 
+    @Profile("test")
+    @Bean
+    EmailService emailService() {
+        return new TestMailService()
+    }
+
     //@Autowired MailConfig mailConfig
     @Bean
     MailMessageSender mailMessageSender() {
@@ -30,10 +36,16 @@ class MailSpringConfig {
     @Configuration @Lazy
     static class MailgunBeans {
 
+        @Profile("!test")
         @Bean
-        MailService mailService() {
+        EmailService emailService() {
             return new MailgunService()
         }
+
+        // @Bean
+        // MailService emailService() {
+        //     return new MailgunService()
+        // }
 
         // @Bean
         // MailgunMessagesApi mailgunMessagesApi(MailConfig mailConfig) {
@@ -48,9 +60,4 @@ class MailSpringConfig {
         // }
     }
 
-    @Profile("test")
-    @Bean
-    MailService mailService() {
-        return new TestMailService()
-    }
 }

@@ -10,7 +10,7 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import yakworks.api.Result
-import yakworks.rally.mail.config.MailConfig
+import yakworks.rally.mail.config.MailProps
 
 /**
  * Basic service for MailGun.
@@ -19,9 +19,9 @@ import yakworks.rally.mail.config.MailConfig
  */
 @Slf4j
 @CompileStatic
-abstract class MailService {
+abstract class EmailService {
 
-    @Inject MailConfig mailConfig
+    @Inject MailProps mailConfig
 
     /**
      * calls mailgunMessagesApi.sendMessage

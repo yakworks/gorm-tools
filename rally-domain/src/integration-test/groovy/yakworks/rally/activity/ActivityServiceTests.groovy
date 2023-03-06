@@ -1,36 +1,25 @@
 package yakworks.rally.activity
 
-import java.nio.file.Files
 
-import org.apache.commons.lang3.RandomStringUtils
 import org.springframework.beans.factory.annotation.Autowired
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import spock.lang.Ignore
 import spock.lang.Specification
+import yakworks.api.Result
 import yakworks.rally.activity.model.Activity
-import yakworks.rally.activity.repo.ActivityRepo
-import yakworks.rally.attachment.AttachmentSupport
-import yakworks.rally.attachment.model.Attachment
-import yakworks.rally.attachment.model.AttachmentLink
-import yakworks.rally.attachment.repo.AttachmentRepo
-import yakworks.rally.mail.MailService
 import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.mail.testing.TestMailService
-import yakworks.rally.orgs.model.Org
-import yakworks.rally.tag.model.Tag
 import yakworks.rally.testing.MockData
 import yakworks.testing.gorm.integration.DomainIntTest
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKind
-import static yakworks.rally.activity.model.Activity.VisibleTo
 
 @Integration
 @Rollback
 class ActivityServiceTests extends Specification implements DomainIntTest {
     @Autowired ActivityService activityService
-    @Autowired TestMailService mailService
+    @Autowired TestMailService emailService
 
     void "buildEmail"() {
         setup:
@@ -55,15 +44,17 @@ class ActivityServiceTests extends Specification implements DomainIntTest {
         flushAndClear()
 
         when:
-        Activity sentAct = activityService.sendEmail(act.id)
+        Result res = activityService.sendEmail(act.id)
+        Activity sentAct = Activity.get(act.id)
 
         then: "sanity check act"
+        res.ok
         sentAct
         sentAct.name == "Test Email"
         sentAct.kind == ActKind.Email
 
         and: "check the testMailService"
-        mailService.sentMail.size() == 1
+        emailService.sentMail.size() == 1
         sentAct.mailMessage.state == MailMessage.MsgState.Sent
     }
 

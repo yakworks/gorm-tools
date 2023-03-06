@@ -17,10 +17,10 @@ import yakworks.testing.gorm.integration.DomainIntTest
 class MailMessageSenderSpec extends Specification implements DomainIntTest {
 
     @Autowired MailMessageSender mailMessageSender
-    @Autowired TestMailService mailService
+    @Autowired TestMailService emailService
 
     void setup() {
-        mailService.sentMail = []
+        emailService.sentMail = []
     }
 
     MailMessage mailMessageWithAttachment(){
@@ -87,7 +87,7 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
         mailMessageSender.send(mailMsg)
 
         then:
-        mailService.sentMail.size() == 1
+        emailService.sentMail.size() == 1
     }
 
     void "send with attachment"() {
@@ -97,7 +97,7 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
         mailMessageSender.send(mailMsg)
 
         then:
-        mailService.sentMail.size() == 1
+        emailService.sentMail.size() == 1
     }
 
     void "send with bad email"() {
@@ -111,7 +111,7 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
         mailMsg.refresh()
 
         then:
-        mailService.sentMail.size() == 0
+        emailService.sentMail.size() == 0
         !res.ok
         mailMsg.state == MailMessage.MsgState.Error
         mailMsg.msgResponse == "bad mail"
@@ -128,7 +128,7 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
         mailMsg.refresh()
 
         then:
-        mailService.sentMail.size() == 0
+        emailService.sentMail.size() == 0
         !res.ok
         mailMsg.state == MailMessage.MsgState.Error
         mailMsg.msgResponse.contains("does not exist")

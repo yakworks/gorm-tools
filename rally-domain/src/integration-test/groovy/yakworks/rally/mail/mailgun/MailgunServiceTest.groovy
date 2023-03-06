@@ -16,7 +16,7 @@ import spock.lang.Specification
 import yakworks.api.Result
 import yakworks.commons.util.BuildSupport
 import yakworks.rally.mail.MailTo
-import yakworks.rally.mail.config.MailConfig
+import yakworks.rally.mail.config.MailProps
 import yakworks.testing.gorm.integration.DataIntegrationTest
 
 /**
@@ -31,7 +31,7 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
 
     @Autowired MailgunService mailService
     //@Autowired MailgunEventsApi mailgunEventsApi
-    @Autowired MailConfig mailConfig
+    @Autowired MailProps mailConfig
 
     String htmlBody = """
         <html><body>

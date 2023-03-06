@@ -115,23 +115,26 @@ class ActivityService {
     }
 
     /**
-     * Sends the email with mailMessageSender and marks it with Error if anythign goes wrong.
+     * Sends the email with mailMessageSender. Update act to leve:Error if anything goes wrong.
      * Will update the mailMessage to sent via mailMessageSender.send
-     * Throws NotFoundPropblem is the activity doesn't have a mailMessage
+     * Throws NotFoundPropblem is the activity doesn't have a mailMessage, or throws if persist fails.<br>
+     * So this needs to wrap in try catch as well as check the result for status.
      * @param actId the id of the activity
      * @return the activity it operated on
      * @throw NotFoundProblem if it not found
      */
     @Transactional
-    protected Activity sendEmail(Long actId){
+    Result sendEmail(Long actId){
         Activity act = Activity.get(actId)
         MailMessage msg = act?.mailMessage
+        //safety check to throw notFound if either act or mailMessage are null.
         RepoUtil.checkFound(msg, actId, 'Activity MailMessage')
 
         Result result = mailMessageSender.send(msg)
         if(result instanceof Problem){
             act.level = Activity.AlertLevel.Error
+            act.persist()
         }
-        return act
+        return result
     }
 }

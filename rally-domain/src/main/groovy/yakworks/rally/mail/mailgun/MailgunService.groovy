@@ -19,7 +19,7 @@ import feign.FeignException
 import yakworks.api.Result
 import yakworks.api.problem.Problem
 import yakworks.api.problem.data.DataProblem
-import yakworks.rally.mail.MailService
+import yakworks.rally.mail.EmailService
 import yakworks.rally.mail.MailTo
 
 /**
@@ -29,7 +29,7 @@ import yakworks.rally.mail.MailTo
  */
 @Slf4j
 @CompileStatic
-class MailgunService extends MailService {
+class MailgunService extends EmailService {
 
     private MailgunMessagesApi _mailgunMessagesApi
     private MailgunEventsApi _mailgunEventsApi

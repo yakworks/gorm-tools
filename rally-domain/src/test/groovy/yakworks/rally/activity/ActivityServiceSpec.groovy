@@ -11,10 +11,12 @@ import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.model.Task
 import yakworks.rally.activity.model.TaskStatus
 import yakworks.rally.activity.model.TaskType
-import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.rally.mail.MailMessageSender
+import yakworks.rally.mail.config.MailProps
 import yakworks.rally.mail.model.MailMessage
+import yakworks.rally.mail.testing.TestMailService
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.testing.MockData
@@ -36,6 +38,9 @@ class ActivityServiceSpec extends Specification implements DataRepoTest, Securit
         activityService(ActivityService)
         appResourceLoader(AppResourceLoader)
         attachmentSupport(AttachmentSupport)
+        mailMessageSender(MailMessageSender)
+        emailService(TestMailService)
+        mailConfig(MailProps)
     }}
 
     @Shared Long orgId

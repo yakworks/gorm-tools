@@ -10,8 +10,10 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
+import org.springframework.context.annotation.Profile
 
 import yakworks.rally.mail.mailgun.MailgunService
+import yakworks.rally.mail.testing.TestMailService
 
 @Configuration @Lazy
 @ConfigurationPropertiesScan([ "yakworks.rally.mail.config" ])
@@ -19,15 +21,31 @@ import yakworks.rally.mail.mailgun.MailgunService
 @CompileStatic
 class MailSpringConfig {
 
+    @Profile("test")
+    @Bean
+    EmailService emailService() {
+        return new TestMailService()
+    }
+
     //@Autowired MailConfig mailConfig
+    @Bean
+    MailMessageSender mailMessageSender() {
+        return new MailMessageSender()
+    }
 
     @Configuration @Lazy
     static class MailgunBeans {
 
+        @Profile("!test")
         @Bean
-        MailgunService mailService() {
+        EmailService emailService() {
             return new MailgunService()
         }
+
+        // @Bean
+        // MailService emailService() {
+        //     return new MailgunService()
+        // }
 
         // @Bean
         // MailgunMessagesApi mailgunMessagesApi(MailConfig mailConfig) {
@@ -41,4 +59,5 @@ class MailSpringConfig {
         //         .createApi(MailgunEventsApi.class)
         // }
     }
+
 }

@@ -124,6 +124,25 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         queryInfo.paramMap == [p1: 100.0]
     }
 
+    void "test aggreagate without group"() {
+        setup:
+        QueryArgs args = QueryArgs.of(amount:['$gte':100], projections: [amount:'sum'])
+
+        when: "aggregate without having"
+        MangoDetachedCriteria criteria = KitchenSink.repo.query(args)
+        def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
+        def queryInfo = builder.buildSelect()
+        def query = queryInfo.query
+
+        then:
+        query
+        query.trim() == strip('''
+            SELECT new map( SUM(kitchenSink.amount) as amount )
+            FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
+            WHERE kitchenSink.amount >= :p1
+        ''')
+    }
+
     void "projections having with in"() {
         setup:
         QueryArgs args = QueryArgs.of(q:[kind:['CLIENT', 'VENDOR'], amount:['$gte':100]], projections: [kind:'group', amount:'sum'])

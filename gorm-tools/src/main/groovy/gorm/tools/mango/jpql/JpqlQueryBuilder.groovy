@@ -1028,7 +1028,7 @@ class JpqlQueryBuilder {
             //select sum(amount) as amount from artran group by trantypeid having sum(amount) > 100;
             if(criterion instanceof Query.PropertyNameCriterion){
                 //FIXME for now, check if there's atleast one groupBy thn only put it in having instead of where
-                if(projectionAliases.containsKey(criterion.getProperty()) && projectionAliases.values().any({ it.contains("GROUP")})){
+                if(projectionAliases.containsKey(criterion.getProperty()) && groupByList){
                     continue
                 }
             }
@@ -1087,7 +1087,7 @@ class JpqlQueryBuilder {
             if(isPropCrit){
                 String prop = (criterion as Query.PropertyNameCriterion).getProperty()
                 //TODO FIX for now, put it in having only if there's atleast one groupby
-                boolean hasAlias = projectionAliases.containsKey(prop) && projectionAliases.values().any { it.contains('GROUP')}
+                boolean hasAlias = (projectionAliases.containsKey(prop) && groupByList)
                 if(!hasAlias){
                     continue
                 }

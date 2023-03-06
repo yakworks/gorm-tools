@@ -28,9 +28,6 @@ class MailMessage implements UuidRepoEntity<MailMessage, UuidGormRepo<MailMessag
     /** used to store source such as the statments date/time, tracking key to pick up and run again*/
     String source
 
-    /** when using something like mailgun this is the id returned from the send submit */
-    String messageId
-
     /** Specify Reply-To address */
     String replyTo
 
@@ -78,7 +75,8 @@ class MailMessage implements UuidRepoEntity<MailMessage, UuidGormRepo<MailMessag
 
     /** The last response or error message from the mail processor.  */
     String msgResponse
-
+    /** when using something like mailgun this is the id returned from the send submit */
+    String messageId
     /** The send date, always in Zulu to match server time */
     LocalDate sendDate
 

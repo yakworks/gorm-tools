@@ -23,7 +23,7 @@ class JsonSample implements UuidRepoEntity<JsonSample, UuidGormRepo<JsonSample>>
     String name
 
     Map json = [:]
-    List someList = []
+    List<Integer> someList = []
 
     //json mapped to pogo
     Addy addy

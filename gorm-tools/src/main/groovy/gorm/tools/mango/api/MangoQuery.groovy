@@ -38,9 +38,6 @@ interface MangoQuery {
     /**
      * shortcut to call query and then list with the pager fields in params
      */
-    // public <D> List<D> queryList(Class<D> entityClass, Map params, Closure closure)
-    //
-    // public <D> List<D> queryList(Class<D> entityClass, QueryArgs qargs, Closure closure)
-
     public <D> List<D> list(MangoDetachedCriteria<D> criteria, Pager pager)
+
 }

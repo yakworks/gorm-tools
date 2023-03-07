@@ -1,5 +1,6 @@
 package yakworks.rally.mango
 
+import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
@@ -10,6 +11,8 @@ import org.hibernate.type.Type
 import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Specification
+import yakworks.commons.model.SimplePagedList
+import yakworks.rally.orgs.model.OrgCalc
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
@@ -33,6 +36,100 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
         sumbObj[0]['type'] == OrgType.Customer
     }
 
+    def "sum simple mango projection"() {
+        when:
+        MangoDetachedCriteria qry = Org.query([
+            projections: ['calc.totalDue':'sum'],
+        ])
+        def sumbObj = qry.list()
+
+        then:
+        sumbObj.size() == 1
+    }
+
+    def "sum projections with type groupBy"() {
+        when:
+        MangoDetachedCriteria qry = Org.query([
+            projections: ['calc.totalDue':'sum', 'type': 'group']
+        ])
+
+        List sumbObj = qry.mapList()
+
+        then:
+        sumbObj.size() == 5
+    }
+
+    def "sum projections with groupBy to test paging"() {
+        when:
+        //baseline should be same
+        int rowCount = Org.query([
+            q: [ 'calc.totalDue.$gt': 100.0]
+        ]).count()
+        assert rowCount == 40
+
+        MangoDetachedCriteria qry = Org.query([
+            //num is unique so wont group anything
+            projections: ['calc.totalDue':'sum', 'num': 'group'],
+            q: [
+                'calc.totalDue.$gt': 100.0
+            ]
+        ])
+
+        SimplePagedList sumbObj = qry.mapList(max:10)
+
+        then:
+        sumbObj.size() == 10
+        sumbObj.totalCount == rowCount
+    }
+
+    def "sum projections with type groupBy having on sum"() {
+        when:
+        MangoDetachedCriteria qry = Org.query([
+            projections: ['calc.totalDue':'sum', 'type': 'group'],
+            q: [
+                'calc_totalDue_sum': ['$gt': 50.0]
+            ],
+            sort: ['calc_totalDue_sum': 'asc']
+        ])
+
+        List sumbObj = qry.mapList()
+
+        then:
+        sumbObj.size() == 3
+    }
+
+    def "sum projections with type groupBy where on group"() {
+        when:
+        MangoDetachedCriteria qry = Org.query([
+            projections: ['calc.totalDue':'sum', 'type': 'group'],
+            q: [
+                'type': ['Customer', 'Company']
+            ]
+        ])
+
+        List sumbObj = qry.mapList()
+
+        then:
+        sumbObj.size() == 2
+    }
+
+    def "sum projections using mapList same table"() {
+        //HERE BE DRAGONS
+        when:
+        MangoDetachedCriteria qry = OrgCalc.query([
+            projections: ['totalDue':'sum'],
+            q: [
+                'totalDue.$gt': 100
+            ]
+        ])
+
+        List sumbObj = qry.mapList()
+
+        then:
+        sumbObj.size() == 1
+        sumbObj[0]['totalDue'] == 12200.0
+    }
+
     def "sum association sum method"() {
         when:
         def qry = Org.query {
@@ -50,7 +147,7 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
         when:
         def qry = Org.query {}
         qry.sum('calc.totalDue').groupBy('type')
-        qry.order('calc_totalDue')
+        qry.order('calc_totalDue_sum')
         def sumbObj = qry.mapList()
 
         then:
@@ -65,7 +162,7 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
         when:
         def qry = Org.query {}
         qry.sum('calc.totalDue').groupBy('type')
-        qry.order('calc_totalDue', 'desc')
+        qry.order('calc_totalDue_sum', 'desc')
         def sumbObj = qry.mapList()
 
         then:

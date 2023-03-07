@@ -48,7 +48,7 @@ class ActivityCopier {
         GormUtils.copyDomain(toAct, fromAct, [createdBy: fromAct['createdBy'], editedBy: fromAct['editedBy']])
         toAct.note = GormUtils.copyDomain(ActivityNote, fromAct.note, [activity: toAct], false)
         toAct.task = GormUtils.copyDomain(Task, fromAct.task, [activity: toAct], false)
-        if(fromAct.template) toAct.template = attachmentRepo.copy(fromAct.template)
+        //if(fromAct.template) toAct.template = attachmentRepo.copy(fromAct.template)
         if(!toAct.id) toAct.id = Activity.repo.generateId()
 
         //actCopy.persist()

@@ -13,6 +13,7 @@ import yakworks.rally.activity.model.TaskType
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
@@ -27,7 +28,7 @@ import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 
 class ActivitySpec extends Specification implements GormHibernateTest, SecurityTest {
     static entityClasses = [
-        AttachmentLink, ActivityLink, Activity, TaskType, Org, OrgTag,
+        AttachmentLink, ActivityLink, Activity, MailMessage, TaskType, Org, OrgTag,
         Tag, TagLink, Attachment, ActivityNote, Contact, ActivityContact
     ]
     static springBeans = [
@@ -56,7 +57,17 @@ class ActivitySpec extends Specification implements GormHibernateTest, SecurityT
         [contact1, contact2]
     }
 
-    void "simple note creation"() {
+    void "Log creation2"() {
+        when:
+        Activity activity = Activity.create(orgId: orgId, kind: "Log", name: "got it")
+
+        then:
+        activity.name == 'got it'
+        activity.kind == Activity.Kind.Log
+        !activity.note
+    }
+
+    void "simple note creation2"() {
         when:
         def params = [orgId: orgId, note:[body: 'foo']]
         Activity activity = Activity.create(params)
@@ -281,10 +292,10 @@ class ActivitySpec extends Specification implements GormHibernateTest, SecurityT
         Activity act = build(Activity, [org:org])
         act.repo.addNote(act, "test body")
         act.persist(flush: true)
-
+        flushAndClear()
         then:
         act.note?.id != null
-        def act2 = Activity.findById(act.id)
+        def act2 = Activity.get(act.id)
         act2.note != null
         "test body" == act2.note.body
         "plain" == act2.note.contentType

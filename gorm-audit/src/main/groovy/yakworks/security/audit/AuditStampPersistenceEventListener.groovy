@@ -42,13 +42,13 @@ class AuditStampPersistenceEventListener implements GenericApplicationListener {
 
             //if (event.eventType == EventType.PreInsert || event.eventType == EventType.Validation) {
             if (event.eventType == EventType.PreInsert) {
-                if(isAuditStamped(event.entity.name)){
+                if(isAuditStamped(event.entity.name) || auditStampSupport.isAuditCreateStamped(event.entity.name)){
                     auditStampSupport.stampIfNew(event.entityObject)
                     //auditStampSupport.stampPreUpdateEvent(event.entityAccess)
                 }
             }
             else if (event.eventType == EventType.PreUpdate) {
-                if(isAuditStamped(event.entity.name)){
+                if(isAuditStamped(event.entity.name) ){
                     auditStampSupport.stampPreUpdateEvent(event.entityAccess)
                 }
             }

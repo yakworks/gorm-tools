@@ -24,7 +24,7 @@ class AuditStampBeforeValidateListener {// implements ApplicationListener<Before
     @EventListener
     void beforeValidate(BeforeValidateEvent event) {
         // println "AuditStampEventListener beforeValidate"
-        if(isAuditStamped(event.entity))
+        if(isAuditStamped(event.entity) || auditStampSupport.isAuditCreateStamped(event.entity.class.name))
             auditStampSupport.stampIfNew(event.entity)
     }
 

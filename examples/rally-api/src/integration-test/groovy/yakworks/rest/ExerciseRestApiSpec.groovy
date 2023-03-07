@@ -26,7 +26,7 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
     void "get index list"() {
         when:
-        Response resp = get(getPath('rally/org'))
+        Response resp = get(getPath('rally/org?q=*'))
         assert resp.code() == HttpStatus.OK.value()
         Map pageMap = bodyToMap(resp)
 
@@ -53,7 +53,7 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
         where:
         entity         | domain
         'rally/user'   | AppUser
-        'rally/org'    | Org //can have more thn 100 based on order of execution, need to query count
+        'rally/org?q=*'    | Org //can have more thn 100 based on order of execution, need to query count
     }
 
     @Unroll

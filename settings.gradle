@@ -64,6 +64,9 @@ findProject(':examples/benchmarks').name = 'benchmarks'
 include 'examples/rally-api'
 findProject(':examples/rally-api').name = 'rally-api'
 
+include 'examples/rally-simple'
+findProject(':examples/rally-simple').name = 'rally-simple'
+
 include 'examples/hello-boot-security'
 findProject(':examples/hello-boot-security').name = 'hello-boot-security'
 

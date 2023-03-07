@@ -5,6 +5,7 @@
 package yakworks.rest.gorm.controller
 
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -17,7 +18,9 @@ import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
 import grails.web.api.WebAttributes
 import yakworks.commons.map.Maps
+import yakworks.gorm.api.ApiConfig
 import yakworks.gorm.api.IncludesConfig
+import yakworks.gorm.api.PathItem
 import yakworks.meta.MetaMap
 import yakworks.meta.MetaMapList
 import yakworks.spring.AppCtx
@@ -26,6 +29,7 @@ import yakworks.spring.AppCtx
  * Helpers for a Restfull api type controller.
  * see grails-core/grails-plugin-rest/src/main/groovy/grails/artefact/controller/RestResponder.groovy
  */
+@Slf4j
 @CompileStatic
 class EntityResponder<D> {
     //common valida param keys to remove so that will not be considered a filter //TODO move this to external config
@@ -35,11 +39,18 @@ class EntityResponder<D> {
     IncludesConfig includesConfig
 
     @Autowired(required = false)
+    ApiConfig apiConfig
+
+    @Autowired(required = false)
     MetaMapService metaMapService
 
     Class<D> entityClass
-    String logicalName
-    String namespace
+    // String logicalName
+    // String namespace
+    /** the path item */
+    PathItem pathItem
+    //allows it to be turned on and off for controller
+    boolean debugEnabled = false
 
     EntityResponder(Class<D> entityClass){
         this.entityClass = entityClass
@@ -54,6 +65,7 @@ class EntityResponder<D> {
     public static <D> EntityResponder<D> of(Class<D> entityClass){
         def erInstance = new EntityResponder(entityClass)
         AppCtx.autowire(erInstance)
+        erInstance.pathItem = erInstance.apiConfig.pathsByEntity[entityClass.name]
         return erInstance
     }
 
@@ -86,7 +98,7 @@ class EntityResponder<D> {
         return emap
     }
 
-    Pager pagedQuery(Map params, List<String> includesKeys) {
+    Pager pagedQuery(Map params, List<String> includesKeys, boolean requireQ = false) {
         Pager pager = Pager.of(params)
         List dlist = query(pager, params)
         List<String> incs = findIncludes(params, includesKeys)
@@ -95,11 +107,17 @@ class EntityResponder<D> {
     }
 
     List<D> query(Pager pager, Map parms) {
-        Map pclone = Maps.clone(parms) as Map<String, Object>
+        // Map pclone = Maps.clone(parms) as Map<String, Object>
         //remove the fields that grails adds for controller and action
-        pclone.removeAll {it.key in whitelistKeys }
-        QueryArgs qargs = QueryArgs.of(pager).build(pclone)
-        ((QueryMangoEntityApi)getRepo()).queryList(qargs)
+        // pclone.removeAll {it.key in whitelistKeys }
+
+        QueryArgs qargs = QueryArgs.of(pager)
+        //require q if its set
+        if(pathItem?.qRequired) qargs.qRequired = true
+        qargs = qargs.build(parms)
+        qargs.validateQ()
+        if(debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.criteria}")
+        ((QueryMangoEntityApi)getRepo()).queryList(qargs, null, debugEnabled ? log : null)
     }
 
     /**

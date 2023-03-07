@@ -4,8 +4,12 @@
 */
 package gorm.tools.mango
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException
+
 import gorm.tools.mango.api.QueryArgs
+import gorm.tools.problem.ValidationProblem
 import spock.lang.Specification
+import yakworks.api.problem.data.DataProblemException
 
 class QueryArgsSpec extends Specification {
 
@@ -131,5 +135,43 @@ class QueryArgsSpec extends Specification {
         qargs.buildProjections('name:"group", amount: "sum"') == [name: "group", amount: "sum"]
         qargs.buildProjections('{name:"group", amount: "sum"}') == [name: 'group', amount: 'sum']
     }
+
+    def "validate success with q"() {
+        when:
+        def qjson = "{id: 1, name: 'joe'}"
+        def qargs = new QueryArgs(qRequired: true).build(q: qjson, sort:"foo:asc")
+        qargs.validateQ()
+
+        then:
+        noExceptionThrown()
+        qargs.criteria == [id: 1, name: 'joe', '$sort': ['foo':'asc']]
+
+    }
+
+    def "validate success with qSearch quick search"() {
+        when:
+        def qargs = new QueryArgs(qRequired: true).build(qSearch:'foo', sort:"foo:asc")
+        qargs.validateQ()
+
+        then:
+        noExceptionThrown()
+        qargs.criteria == ['$qSearch': 'foo', '$sort': ['foo':'asc']]
+
+    }
+
+    def "validateQ fails"() {
+
+        when: 'no q or qsearch'
+        QueryArgs qargs = new QueryArgs(qRequired: true).build(max: 10, sort:'foo:asc')
+            //QueryArgs.of(max: 10, sort:'foo:asc').qRequired(true)
+        qargs.validateQ()
+
+        then: 'should throw error'
+        def ex = thrown(DataProblemException)
+        ex.status.code == 418
+        qargs.criteria == ['$sort': ['foo':'asc']]
+
+    }
+
 
 }

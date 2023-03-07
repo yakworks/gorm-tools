@@ -61,7 +61,7 @@ class RepoUtil {
      * @param entity - the domain object the check
      * @param id - the identifier use when trying to find it. Will be used to construct the exception message
      * @param domainClassName - the name of the domain that will be used to build error message if thrown
-     * @throws NotFoundProblem if it not found
+     * @throw NotFoundProblem if it not found
      */
     static void checkFound(Object entity, Serializable id, String domainClassName) {
         if (!entity) {

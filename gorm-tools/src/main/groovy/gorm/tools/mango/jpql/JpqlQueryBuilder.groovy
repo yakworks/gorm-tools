@@ -64,6 +64,7 @@ class JpqlQueryBuilder {
     private String logicalName
     private ConversionService conversionService = new GenericConversionService()
     boolean hibernateCompatible
+    //wraps the SELECT in a new map( ...) when true
     boolean aliasToMap
     Map<String, String> projectionAliases = [:]
     Map<String, String> propertyAliases = [:]
@@ -125,6 +126,9 @@ class JpqlQueryBuilder {
         return jqb
     }
 
+    /**
+     * wraps the SELECT in a new map( ...)
+     */
     JpqlQueryBuilder aliasToMap(boolean val){
         this.aliasToMap = val
         return this
@@ -297,18 +301,32 @@ class JpqlQueryBuilder {
         }
     }
 
-    public int appendCriteriaForOperator(StringBuilder q, String logicalName, final String name, int position, String operator) {
-        if(logicalName){
-            q.append(logicalName).append(DOT)
-        }
+    int appendCriteriaForOperator(StringBuilder q, String logicalName, final String name, int position, String operator) {
         //if its a projectionAlias then use it
-        String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
+        String propName = buildPropName(name, logicalName)
 
         q.append(propName)
          .append(operator)
          .append(PARAMETER_PREFIX)
          .append(++position)
         return position
+    }
+
+    /**
+     * Build a property name like kitchenSink.amount for 'amount'
+     * Will use the projection alias if exists
+     */
+    String buildPropName(String name, String logicalName) {
+        String propName
+        if(projectionAliases.containsKey(name)) {
+            propName = projectionAliases[name]
+        } else if(logicalName && !name.startsWith(logicalName + DOT)) {
+            propName = logicalName + DOT + name
+        }
+        else {
+            propName = name
+        }
+        return propName
     }
 
     //common used in handlers
@@ -473,11 +491,7 @@ class JpqlQueryBuilder {
                 final String name = isNull.getProperty()
                 validateProperty(entity, name, Query.IsNull)
 
-                if(logicalName){
-                    whereClause.append(logicalName).append(DOT)
-                }
-
-                String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
+                String propName = buildPropName(name, logicalName)
                 whereClause.append(propName).append(" IS NULL ")
 
                 return position
@@ -491,11 +505,7 @@ class JpqlQueryBuilder {
                 final String name = isNotNull.getProperty()
                 validateProperty(entity, name, Query.IsNotNull)
 
-                if(logicalName){
-                    whereClause.append(logicalName).append(DOT)
-                }
-
-                String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
+                String propName = buildPropName(name, logicalName)
                 whereClause.append(propName).append(" IS NOT NULL ")
 
                 return position
@@ -509,11 +519,7 @@ class JpqlQueryBuilder {
                 final String name = isEmpty.getProperty()
                 validateProperty(entity, name, Query.IsEmpty)
 
-                if(logicalName){
-                    whereClause.append(logicalName).append(DOT)
-                }
-
-                String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
+                String propName = buildPropName(name, logicalName)
                 whereClause.append(propName)
                            .append(" IS EMPTY ")
 
@@ -528,11 +534,7 @@ class JpqlQueryBuilder {
                 final String name = isNotEmpty.getProperty()
                 validateProperty(entity, name, Query.IsNotEmpty)
 
-                if(logicalName){
-                    whereClause.append(logicalName).append(DOT)
-                }
-
-                String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
+                String propName = buildPropName(name, logicalName)
                 whereClause.append(propName)
                            .append(" IS NOT EMPTY ")
 
@@ -547,13 +549,8 @@ class JpqlQueryBuilder {
                 final String name = isNotNull.getProperty()
                 validateProperty(entity, name, Query.IsNotNull)
 
-                if(logicalName){
-                    whereClause.append(logicalName).append(DOT)
-                }
-
-                String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
-                whereClause.append(propName)
-                           .append(" IS NOT NULL ")
+                String propName = buildPropName(name, logicalName)
+                whereClause.append(propName).append(" IS NOT NULL ")
 
                 return position
             }
@@ -615,16 +612,15 @@ class JpqlQueryBuilder {
                 PersistentProperty prop = validateProperty(entity, name, Query.Between)
                 Class propType = prop.getType()
 
-                String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
+                String propName = buildPropName(name, logicalName)
 
-                final String qualifiedName = logicalName ? logicalName + DOT + propName : propName
                 whereClause.append(OPEN_BRACKET)
-                           .append(qualifiedName)
+                           .append(propName)
                            .append(" >= ")
                            .append(PARAMETER_PREFIX)
                            .append(++position)
                 whereClause.append(" AND ")
-                           .append(qualifiedName)
+                           .append(propName)
                            .append(" <= ")
                            .append(PARAMETER_PREFIX)
                            .append(++position)
@@ -662,11 +658,8 @@ class JpqlQueryBuilder {
 
                 whereClause.append("lower(")
 
-                if(logicalName){
-                    whereClause.append(logicalName).append(DOT)
-                }
+                String propName = buildPropName(name, logicalName)
 
-                String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
                 whereClause
                  .append(propName)
                  .append(")")
@@ -687,11 +680,8 @@ class JpqlQueryBuilder {
                 PersistentProperty prop = validateProperty(entity, name, Query.In)
                 Class propType = prop.getType()
 
-                if(logicalName){
-                    whereClause.append(logicalName).append(DOT)
-                }
+                String propName = buildPropName(name, logicalName)
 
-                String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
                 whereClause.append(propName).append(" IN (")
                 QueryableCriteria subquery = inQuery.getSubquery()
                 if(subquery != null) {
@@ -1022,9 +1012,14 @@ class JpqlQueryBuilder {
         for (Iterator<Query.Criterion> iterator = criterionList.iterator(); iterator.hasNext();) {
             StringBuilder tempWhereClause = new StringBuilder()
             Query.Criterion criterion = iterator.next()
-            //TODO if its a projection alias then skip for now
+
+            //TODO handle it for situations like below
+            //select sum(amount) as amount from artran where amount> 100 group by trantypeid ; VS
+            //select sum(amount) as amount from artran group by trantypeid having sum(amount) > 100;
             if(criterion instanceof Query.PropertyNameCriterion){
-                if(projectionAliases.containsKey(criterion.getProperty())){
+                String prop = criterion.getProperty()
+                String groupProp = logicalName ? "${logicalName}.${prop}" : prop
+                if(projectionAliases.containsKey(prop) && !groupByList.contains(groupProp)){
                     continue
                 }
             }
@@ -1081,8 +1076,13 @@ class JpqlQueryBuilder {
             //skip if its anything but a projection alias
             boolean isPropCrit = criterion instanceof Query.PropertyNameCriterion
             if(isPropCrit){
-                boolean hasAlias = projectionAliases.containsKey((criterion as Query.PropertyNameCriterion).getProperty())
-                if(!hasAlias){
+                //skip if its a groupby or it has an alias
+                String prop = (criterion as Query.PropertyNameCriterion).getProperty()
+                String groupProp = logicalName ? "${logicalName}.${prop}" : prop
+                boolean isGrouped = groupByList.contains(groupProp)
+                boolean hasAlias = projectionAliases.containsKey(prop)
+
+                if(isGrouped || !hasAlias){
                     continue
                 }
             } else {

@@ -4,8 +4,6 @@
 */
 package gorm.tools.mango.api
 
-import org.slf4j.Logger
-
 import gorm.tools.beans.Pager
 import gorm.tools.mango.MangoDetachedCriteria
 

@@ -15,13 +15,14 @@ import org.hibernate.ScrollableResults
 import org.hibernate.Session
 import org.hibernate.query.Query
 
+import gorm.tools.mango.hibernate.AliasProjectionResultTransformer
 import yakworks.commons.model.SimplePagedList
 
 /**
  * Helper to get the hibernate template and query so we can do scrollable to add totalCount logic with JPAQL.
- * We do this as projection and aggregate queries, especially with having clauses, are not easy to simply add count substition.
+ * Primarily for our projection and aggregate queries, especially with having clauses, are not easy to simply add count substition.
  *
- * If performance will be an issue with Scrollable then alternaitive is to wrap the query as and do a select count(*) on it
+ * TODO If performance will be an issue with Scrollable then alternaitive is to wrap the query as and do a select count(*) on it
  * But that will be tricky with HQL.
  */
 @CompileStatic
@@ -29,10 +30,16 @@ class SimplePagedQuery {
     // org.hibernate.query.Query query
     HibernateGormStaticApi staticApi
     GrailsHibernateTemplate hibernateTemplate
+    List<String> systemAliases = [] as List<String>
 
     SimplePagedQuery(GormStaticApi staticApi) {
         this.staticApi = (HibernateGormStaticApi)staticApi;
         hibernateTemplate = this.staticApi.getHibernateTemplate()
+    }
+
+    SimplePagedQuery(GormStaticApi staticApi, List<String> systemAliases) {
+        this(staticApi)
+        this.systemAliases = systemAliases
     }
 
     Integer countQuery(CharSequence queryString, Map params){
@@ -64,26 +71,34 @@ class SimplePagedQuery {
     public SimplePagedList<Map> list(CharSequence queryString, Map params, Map args) {
         def template = hibernateTemplate
         args = new HashMap(args)
+        Integer maxCount = args.max as Integer
         params = new HashMap(params)
 
         if(queryString instanceof GString) {
             queryString = buildNamedParameterQueryFromGString((GString) queryString, params)
         }
 
-        int rowCount = countQuery(queryString, params)
-
-        return (SimplePagedList<Map>) template.execute { Session session ->
+        List dataList = template.execute { Session session ->
             Query q = (Query) session.createQuery(queryString.toString())
             template.applySettings(q)
 
             populateQueryArguments(q, params)
             populateQueryArguments(q, args)
             populateQueryWithNamedArguments(q, params)
+            //sets the transformer to remove the _sum, _avg, etc..
+            //TODO make this smarter so it only removes the system created projections
+            q.setResultTransformer(AliasProjectionResultTransformer.INSTANCE)
 
-            def list = createHqlQuery(session, q).list()
-            SimplePagedList<Map> pagedList = new SimplePagedList<Map>(list, rowCount)
-            return pagedList
+            def qry = createHqlQuery(session, q)
+            def list = qry.list()
+            return list
         }
+        int rowCount = dataList.size()
+        if(rowCount > 1 && maxCount && rowCount >= maxCount){
+            rowCount = countQuery(queryString, params)
+        }
+        SimplePagedList<Map> pagedList = new SimplePagedList<Map>(dataList, rowCount)
+        return pagedList
     }
 
     @CompileDynamic //get around the protected

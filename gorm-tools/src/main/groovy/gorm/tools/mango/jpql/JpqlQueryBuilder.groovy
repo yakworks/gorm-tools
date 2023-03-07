@@ -473,9 +473,9 @@ class JpqlQueryBuilder {
                 final String name = isNull.getProperty()
                 validateProperty(entity, name, Query.IsNull)
 
-                if(logicalName){
-                    whereClause.append(logicalName).append(DOT)
-                }
+                // if(logicalName){
+                //     whereClause.append(logicalName).append(DOT)
+                // }
 
                 String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
                 whereClause.append(propName).append(" IS NULL ")
@@ -491,9 +491,9 @@ class JpqlQueryBuilder {
                 final String name = isNotNull.getProperty()
                 validateProperty(entity, name, Query.IsNotNull)
 
-                if(logicalName){
-                    whereClause.append(logicalName).append(DOT)
-                }
+                // if(logicalName){
+                //     whereClause.append(logicalName).append(DOT)
+                // }
 
                 String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
                 whereClause.append(propName).append(" IS NOT NULL ")
@@ -509,9 +509,9 @@ class JpqlQueryBuilder {
                 final String name = isEmpty.getProperty()
                 validateProperty(entity, name, Query.IsEmpty)
 
-                if(logicalName){
-                    whereClause.append(logicalName).append(DOT)
-                }
+                // if(logicalName){
+                //     whereClause.append(logicalName).append(DOT)
+                // }
 
                 String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
                 whereClause.append(propName)
@@ -528,9 +528,9 @@ class JpqlQueryBuilder {
                 final String name = isNotEmpty.getProperty()
                 validateProperty(entity, name, Query.IsNotEmpty)
 
-                if(logicalName){
-                    whereClause.append(logicalName).append(DOT)
-                }
+                // if(logicalName){
+                //     whereClause.append(logicalName).append(DOT)
+                // }
 
                 String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
                 whereClause.append(propName)
@@ -547,9 +547,9 @@ class JpqlQueryBuilder {
                 final String name = isNotNull.getProperty()
                 validateProperty(entity, name, Query.IsNotNull)
 
-                if(logicalName){
-                    whereClause.append(logicalName).append(DOT)
-                }
+                // if(logicalName){
+                //     whereClause.append(logicalName).append(DOT)
+                // }
 
                 String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
                 whereClause.append(propName)
@@ -618,6 +618,7 @@ class JpqlQueryBuilder {
                 String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
 
                 final String qualifiedName = logicalName ? logicalName + DOT + propName : propName
+
                 whereClause.append(OPEN_BRACKET)
                            .append(qualifiedName)
                            .append(" >= ")
@@ -662,9 +663,9 @@ class JpqlQueryBuilder {
 
                 whereClause.append("lower(")
 
-                if(logicalName){
-                    whereClause.append(logicalName).append(DOT)
-                }
+                // if(logicalName){
+                //     whereClause.append(logicalName).append(DOT)
+                // }
 
                 String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
                 whereClause

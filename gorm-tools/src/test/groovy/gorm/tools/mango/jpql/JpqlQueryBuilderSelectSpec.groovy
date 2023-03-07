@@ -163,7 +163,7 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         query.trim() == strip('''
             SELECT new map( kitchenSink.kind as kind,SUM(kitchenSink.amount) as amount_sum )
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-            WHERE (kitchenSink.kitchenSink.kind IN (:p1,:p2) AND kitchenSink.amount >= :p3)
+            WHERE (kitchenSink.kind IN (:p1,:p2) AND kitchenSink.amount >= :p3)
             GROUP BY kitchenSink.kind
         ''')
 
@@ -184,19 +184,22 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         query.trim() == strip('''
             SELECT new map( kitchenSink.kind as kind,SUM(kitchenSink.amount) as amount_sum )
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-            WHERE (kitchenSink.kitchenSink.kind IS NOT NULL )
+            WHERE (kitchenSink.kind IS NOT NULL )
             GROUP BY kitchenSink.kind
         ''')
 
     }
 
     void "projections having with between"() {
-        setup:
-        LocalDate now = LocalDate.now()
-        QueryArgs args = QueryArgs.of(q:[localDate:['$between':[now, now.plusDays(7) ]]], projections: [localDate:'group', amount:'sum'])
-
         when: "having with in"
-        MangoDetachedCriteria criteria = KitchenSink.repo.query(args)
+        LocalDate now = LocalDate.now()
+        MangoDetachedCriteria criteria = KitchenSink.repo.query(
+            projections: [localDate:'group', amount:'sum'],
+            q:[
+                localDate:['$between':[ "2023-01-01", "2023-01-07" ]],
+                localDateTime:['$between':[ "2023-01-01", "2023-01-07" ]]
+            ]
+        )
         def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
         def queryInfo = builder.buildSelect()
         def query = queryInfo.query
@@ -206,7 +209,8 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         query.trim() == strip('''
             SELECT new map( kitchenSink.localDate as localDate,SUM(kitchenSink.amount) as amount_sum )
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-            WHERE ((kitchenSink.kitchenSink.localDate >= :p1 AND kitchenSink.kitchenSink.localDate <= :p2))
+            WHERE ((kitchenSink.localDate >= :p1 AND kitchenSink.localDate <= :p2)
+            AND (kitchenSink.localDateTime >= :p3 AND kitchenSink.localDateTime <= :p4))
             GROUP BY kitchenSink.localDate
         ''')
 

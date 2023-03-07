@@ -328,6 +328,28 @@ class JpqlQueryBuilder {
         appendPropertyComparison(whereClause, logicalName, propertyName, otherProperty, operator)
     }
 
+    QueryHandler getCompareQueryHandler(String compareOp){
+        return new QueryHandler() {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters) {
+                Query.PropertyCriterion opCriterion = (Query.PropertyCriterion) criterion
+                return handlePropParam(entity, opCriterion, logicalName, compareOp, position, whereClause, parameters)
+            }
+        }
+    }
+
+    //Property compares
+    QueryHandler getPropertyCompareQueryHandler(String compareOp){
+        new QueryHandler() {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters) {
+                Query.PropertyComparisonCriterion opCriterion = (Query.PropertyComparisonCriterion) criterion
+                handlePropCompare(entity, opCriterion, logicalName, compareOp,  whereClause)
+                return position
+            }
+        }
+    }
+
     void initHandlers(){
 
         queryHandlers.put(AssociationQuery, new QueryHandler() {
@@ -390,67 +412,22 @@ class JpqlQueryBuilder {
             }
         })
 
-        queryHandlers.put(Query.Equals, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
-                              String logicalName, int position, List parameters) {
-                Query.Equals eq = (Query.Equals) criterion
-                return handlePropParam(entity, eq, logicalName, "=", position, whereClause, parameters)
-            }
-        })
+        //Normal compares
+        queryHandlers.put(Query.Equals, getCompareQueryHandler("="))
+        queryHandlers.put(Query.NotEquals, getCompareQueryHandler(" != "))
+        queryHandlers.put(Query.GreaterThan, getCompareQueryHandler(" > "))
+        queryHandlers.put(Query.LessThan, getCompareQueryHandler(" < "))
+        queryHandlers.put(Query.LessThanEquals, getCompareQueryHandler(" <= "))
+        queryHandlers.put(Query.GreaterThanEquals, getCompareQueryHandler(" >= "))
+        queryHandlers.put(Query.Like, getCompareQueryHandler(" like "))
 
-        queryHandlers.put(Query.EqualsProperty, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
-                              String logicalName, int position, List parameters) {
-                Query.EqualsProperty eq = (Query.EqualsProperty) criterion
-                handlePropCompare(entity, eq, logicalName, "=", whereClause)
-                return position
-            }
-        })
-
-        queryHandlers.put(Query.NotEqualsProperty, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
-                              String logicalName, int position, List parameters) {
-                Query.NotEqualsProperty eq = (Query.NotEqualsProperty) criterion
-                handlePropCompare(entity, eq, logicalName, "!=", whereClause)
-                return position
-            }
-        })
-
-        queryHandlers.put(Query.GreaterThanProperty, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
-                              String logicalName, int position, List parameters) {
-                Query.GreaterThanProperty eq = (Query.GreaterThanProperty) criterion
-                handlePropCompare(entity, eq, logicalName, ">", whereClause)
-                return position
-            }
-        })
-
-        queryHandlers.put(Query.GreaterThanEqualsProperty, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
-                              String logicalName, int position, List parameters) {
-                Query.GreaterThanEqualsProperty eq = (Query.GreaterThanEqualsProperty) criterion
-                handlePropCompare(entity, eq, logicalName, ">=", whereClause)
-                return position
-            }
-        })
-
-        queryHandlers.put(Query.LessThanProperty, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
-                              String logicalName, int position, List parameters) {
-                Query.LessThanProperty eq = (Query.LessThanProperty) criterion
-                handlePropCompare(entity, eq, logicalName, "<", whereClause)
-                return position
-            }
-        })
-
-        queryHandlers.put(Query.LessThanEqualsProperty, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
-                              String logicalName, int position, List parameters) {
-                Query.LessThanEqualsProperty eq = (Query.LessThanEqualsProperty) criterion
-                handlePropCompare(entity, eq, logicalName, "<=", whereClause)
-                return position
-            }
-        })
+        //Property compares
+        queryHandlers.put(Query.EqualsProperty, getPropertyCompareQueryHandler(" = "))
+        queryHandlers.put(Query.NotEqualsProperty, getPropertyCompareQueryHandler(" != "))
+        queryHandlers.put(Query.GreaterThanProperty, getPropertyCompareQueryHandler(" > "))
+        queryHandlers.put(Query.LessThanProperty, getPropertyCompareQueryHandler(" < "))
+        queryHandlers.put(Query.LessThanEqualsProperty, getPropertyCompareQueryHandler(" <= "))
+        queryHandlers.put(Query.GreaterThanEqualsProperty, getPropertyCompareQueryHandler(" >= "))
 
         queryHandlers.put(Query.IsNull, new QueryHandler() {
             public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
@@ -536,39 +513,6 @@ class JpqlQueryBuilder {
             }
         })
 
-
-        queryHandlers.put(Query.NotEquals, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
-                              String logicalName, int position, List parameters) {
-                Query.NotEquals eq = (Query.NotEquals) criterion
-                return handlePropParam(entity, eq, logicalName, " != ", position, whereClause, parameters)
-            }
-        })
-
-        queryHandlers.put(Query.GreaterThan, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
-                              String logicalName, int position, List parameters) {
-                Query.GreaterThan eq = (Query.GreaterThan) criterion
-                return handlePropParam(entity, eq, logicalName, " > ", position, whereClause, parameters)
-            }
-        })
-
-        queryHandlers.put(Query.LessThanEquals, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
-                              String logicalName, int position, List parameters) {
-                Query.LessThanEquals eq = (Query.LessThanEquals) criterion
-                return handlePropParam(entity, eq, logicalName, " <= ", position, whereClause, parameters)
-            }
-        })
-
-        queryHandlers.put(Query.GreaterThanEquals, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
-                              String logicalName, int position, List parameters) {
-                Query.GreaterThanEquals eq = (Query.GreaterThanEquals) criterion
-                return handlePropParam(entity, eq, logicalName, " >= ", position, whereClause, parameters)
-            }
-        })
-
         queryHandlers.put(Query.Between, new QueryHandler() {
             public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
                               String logicalName, int position, List parameters) {
@@ -597,22 +541,6 @@ class JpqlQueryBuilder {
                 parameters.add(conversionService.convert( from, propType ))
                 parameters.add(conversionService.convert( to, propType ))
                 return position
-            }
-        })
-
-        queryHandlers.put(Query.LessThan, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
-                              String logicalName, int position, List parameters) {
-                Query.LessThan eq = (Query.LessThan) criterion
-                return handlePropParam(entity, eq, logicalName, " < ", position, whereClause, parameters)
-            }
-        })
-
-        queryHandlers.put(Query.Like, new QueryHandler() {
-            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
-                              String logicalName, int position, List parameters) {
-                Query.Like eq = (Query.Like) criterion
-                return handlePropParam(entity, eq, logicalName, " like ", position, whereClause, parameters)
             }
         })
 

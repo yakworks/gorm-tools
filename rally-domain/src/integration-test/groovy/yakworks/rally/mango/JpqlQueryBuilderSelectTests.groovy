@@ -24,8 +24,8 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
             sum('calc.totalDue')
             groupBy('type')
         }
-        criteria.order("calc_totalDue")
-        criteria.lt("calc_totalDue", 100.0)
+        criteria.order("calc_totalDue_sum")
+        criteria.lt("calc_totalDue_sum", 100.0)
 
         when:"A jpa query is built"
         def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
@@ -35,11 +35,11 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         then:"The query is valid"
         query != null
         query.trim() == strip('''
-            SELECT new map( SUM(org.calc.totalDue) as calc_totalDue,org.type as type )
+            SELECT new map( SUM(org.calc.totalDue) as calc_totalDue_sum,org.type as type )
             FROM yakworks.rally.orgs.model.Org AS org
             GROUP BY org.type
             HAVING (SUM(org.calc.totalDue) < :p1)
-            ORDER BY calc_totalDue ASC
+            ORDER BY calc_totalDue_sum ASC
         ''')
         queryInfo.paramMap == [p1: 100.0]
 
@@ -57,8 +57,8 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         then:
         res.size() == 3
         res[0]['type'] == OrgType.Client
-        res[0]['calc_totalDue'] < res[1]['calc_totalDue']
-        res[1]['calc_totalDue'] < res[2]['calc_totalDue']
+        res[0]['calc_totalDue_sum'] < res[1]['calc_totalDue_sum']
+        res[1]['calc_totalDue_sum'] < res[2]['calc_totalDue_sum']
     }
 
     def "sum with QueryArgs"() {
@@ -67,9 +67,9 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
             projections: ['calc.totalDue':'sum', 'type':'group'],
             q: [
                 inactive:false,
-                'calc_totalDue.$lt':100.0
+                'calc_totalDue_sum.$lt':100.0
             ],
-            sort:[calc_totalDue:'asc']
+            sort:[calc_totalDue_sum:'asc']
         )
 
         when: "A jpa query is built"
@@ -81,12 +81,12 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         queryInfo.paramMap == [p1: false, p2: 100]
         query != null
         query.trim() == strip('''
-            SELECT new map( SUM(org.calc.totalDue) as calc_totalDue,org.type as type )
+            SELECT new map( SUM(org.calc.totalDue) as calc_totalDue_sum,org.type as type )
             FROM yakworks.rally.orgs.model.Org AS org
             WHERE (org.inactive=:p1)
             GROUP BY org.type
             HAVING (SUM(org.calc.totalDue) < :p2)
-            ORDER BY calc_totalDue ASC
+            ORDER BY calc_totalDue_sum ASC
         ''')
 
         when:
@@ -96,8 +96,8 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         then:
         res.size() == 4
         res[0]['type'] == OrgType.Client
-        res[0]['calc_totalDue'] < res[1]['calc_totalDue']
-        res[1]['calc_totalDue'] < res[2]['calc_totalDue']
+        res[0]['calc_totalDue_sum'] < res[1]['calc_totalDue_sum']
+        res[1]['calc_totalDue_sum'] < res[2]['calc_totalDue_sum']
     }
 
 }

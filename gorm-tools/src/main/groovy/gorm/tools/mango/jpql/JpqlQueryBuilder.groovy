@@ -687,9 +687,9 @@ class JpqlQueryBuilder {
                 PersistentProperty prop = validateProperty(entity, name, Query.In)
                 Class propType = prop.getType()
 
-                if(logicalName){
-                    whereClause.append(logicalName).append(DOT)
-                }
+                // if(logicalName){
+                //     whereClause.append(logicalName).append(DOT)
+                // }
 
                 String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
                 whereClause.append(propName).append(" IN (")
@@ -1027,8 +1027,9 @@ class JpqlQueryBuilder {
             //select sum(amount) as amount from artran where amount> 100 group by trantypeid ; VS
             //select sum(amount) as amount from artran group by trantypeid having sum(amount) > 100;
             if(criterion instanceof Query.PropertyNameCriterion){
-                //FIXME for now, check if there's atleast one groupBy thn only put it in having instead of where
-                if(projectionAliases.containsKey(criterion.getProperty()) && groupByList){
+                String prop = criterion.getProperty()
+                String groupProp = logicalName ? "${logicalName}.${prop}" : prop
+                if(projectionAliases.containsKey(prop) && !groupByList.contains(groupProp)){
                     continue
                 }
             }
@@ -1085,10 +1086,13 @@ class JpqlQueryBuilder {
             //skip if its anything but a projection alias
             boolean isPropCrit = criterion instanceof Query.PropertyNameCriterion
             if(isPropCrit){
+                //skip if its a groupby or it has an alias
                 String prop = (criterion as Query.PropertyNameCriterion).getProperty()
-                //TODO FIX for now, put it in having only if there's atleast one groupby
-                boolean hasAlias = (projectionAliases.containsKey(prop) && groupByList)
-                if(!hasAlias){
+                String groupProp = logicalName ? "${logicalName}.${prop}" : prop
+                boolean isGrouped = groupByList.contains(groupProp)
+                boolean hasAlias = projectionAliases.containsKey(prop)
+
+                if(isGrouped || !hasAlias){
                     continue
                 }
             } else {

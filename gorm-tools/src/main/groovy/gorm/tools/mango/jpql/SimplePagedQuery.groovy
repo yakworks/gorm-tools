@@ -19,9 +19,9 @@ import yakworks.commons.model.SimplePagedList
 
 /**
  * Helper to get the hibernate template and query so we can do scrollable to add totalCount logic with JPAQL.
- * We do this as projection and aggregate queries, especially with having clauses, are not easy to simply add count substition.
+ * Primarily for our projection and aggregate queries, especially with having clauses, are not easy to simply add count substition.
  *
- * If performance will be an issue with Scrollable then alternaitive is to wrap the query as and do a select count(*) on it
+ * TODO If performance will be an issue with Scrollable then alternaitive is to wrap the query as and do a select count(*) on it
  * But that will be tricky with HQL.
  */
 @CompileStatic
@@ -64,15 +64,14 @@ class SimplePagedQuery {
     public SimplePagedList<Map> list(CharSequence queryString, Map params, Map args) {
         def template = hibernateTemplate
         args = new HashMap(args)
+        Integer maxCount = args.max as Integer
         params = new HashMap(params)
 
         if(queryString instanceof GString) {
             queryString = buildNamedParameterQueryFromGString((GString) queryString, params)
         }
 
-        int rowCount = countQuery(queryString, params)
-
-        return (SimplePagedList<Map>) template.execute { Session session ->
+        List dataList = template.execute { Session session ->
             Query q = (Query) session.createQuery(queryString.toString())
             template.applySettings(q)
 
@@ -81,9 +80,14 @@ class SimplePagedQuery {
             populateQueryWithNamedArguments(q, params)
 
             def list = createHqlQuery(session, q).list()
-            SimplePagedList<Map> pagedList = new SimplePagedList<Map>(list, rowCount)
-            return pagedList
+            return list
         }
+        int rowCount = dataList.size()
+        if(rowCount > 1 && maxCount && rowCount >= maxCount){
+            rowCount = countQuery(queryString, params)
+        }
+        SimplePagedList<Map> pagedList = new SimplePagedList<Map>(dataList, rowCount)
+        return pagedList
     }
 
     @CompileDynamic //get around the protected

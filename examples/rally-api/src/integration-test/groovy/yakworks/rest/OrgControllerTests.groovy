@@ -105,14 +105,17 @@ class OrgControllerTests extends RestIntTest {
 
     void "list filter"() {
         when:
-        controller.params << [q:'{"name":"Org10"}']
+        controller.params << [q:'{"name":"Org1*"}']
         controller.list()
         Map body = response.bodyToMap()
         List data = body.data
 
         then:
         response.status == 200
-        data[0].name == 'Org10'
+        body.page == 1
+        body.total == 1
+        body.records == 12
+        data[0].name == 'Org1'
     }
 
     void "list fail no q"() {

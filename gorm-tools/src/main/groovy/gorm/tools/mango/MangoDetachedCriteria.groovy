@@ -97,7 +97,8 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
     /**
      * Lists all records matching the criterion contained within this DetachedCriteria instance
-     * Uses the JpqlQueryBuilder to build jpql with map projections
+     * Uses the JpqlQueryBuilder to build jpql with map projections.
+     * Forces the results to be in a map even if its only 1 column like a count.
      *
      * @return A list of matching instances
      */
@@ -107,8 +108,6 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         def api = currentGormStaticApi()
         //use SimplePagedQuery so it can attach the totalCount
         SimplePagedQuery hq = new SimplePagedQuery(api)
-        //FIXME do some logic about so that if builder only has 1 sum or 1 count then its already expected that it
-        //will have a single result and there is no need to fire count in the SimplePagedQuery
         def list = hq.list(queryInfo.query, queryInfo.paramMap, args)
         return list
     }
@@ -426,11 +425,19 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
     String parseAlias(String p, String key) {
         String prop = p.trim()
-        if(!prop.contains(" as ")) return p
-        String[] parts = prop.split(/\sas\s/)
-        p = parts[0].trim()
         String aliasKey = "${key}_${p}"
-        propertyAliases[aliasKey] = parts[1].trim()
+        if(prop.contains(" as ")) {
+            String[] parts = prop.split(/\sas\s/)
+            p = parts[0].trim()
+            aliasKey = "${key}_${p}"
+            propertyAliases[aliasKey] = parts[1].trim()
+        } else {
+            //if no key its groupby so just return it
+            if(!key) return p
+            String alas = p.replace('.', '_')
+            alas = "${alas}_${key.toLowerCase()}"
+            propertyAliases[aliasKey] = alas
+        }
         return p
     }
 

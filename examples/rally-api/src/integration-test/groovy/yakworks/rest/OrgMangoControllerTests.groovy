@@ -21,7 +21,7 @@ class OrgMangoControllerTests extends RestIntTest {
         controller.params << [
             q:"*",
             projections:'calc.totalDue:"sum",type:"group"',
-            sort:'calc_totalDue:asc'
+            sort:'calc_totalDue_sum:asc'
         ]
         controller.list()
         Map body = response.bodyToMap()
@@ -31,8 +31,8 @@ class OrgMangoControllerTests extends RestIntTest {
         response.status == 200
         data.size() == 5
         data[0].type.name == 'Client'
-        data[0]['calc_totalDue'] < data[1]['calc_totalDue']
-        data[1]['calc_totalDue'] < data[2]['calc_totalDue']
+        data[0]['calc_totalDue_sum'] < data[1]['calc_totalDue_sum']
+        data[1]['calc_totalDue_sum'] < data[2]['calc_totalDue_sum']
     }
 
     void "list mango full monty"() {
@@ -78,7 +78,7 @@ class OrgMangoControllerTests extends RestIntTest {
         controller.params << [
             q:"*",
             projections:'calc.totalDue:"sum",type:"group"',
-            sort:'calc_totalDue:asc',
+            sort:'calc_totalDue_sum:asc',
             format:'csv'
         ]
         controller.list()
@@ -86,7 +86,7 @@ class OrgMangoControllerTests extends RestIntTest {
         // List data = body.data
 
         then:
-        response.contentAsString.startsWith('"type.id","type.name","calc_totalDue"')
+        response.contentAsString.startsWith('"type.id","type.name","calc_totalDue_sum"')
         response.status == 200
         response.header("Content-Type").contains("text/csv")
 
@@ -99,7 +99,7 @@ class OrgMangoControllerTests extends RestIntTest {
         controller.params << [
             q:"*",
             projections:'calc.totalDue:"sum",type:"group"',
-            sort:'calc_totalDue:asc',
+            sort:'calc_totalDue_sum:asc',
             format:'xlsx'
         ]
         controller.list()

@@ -2,7 +2,6 @@ package gorm.tools.mango.jpql
 
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.unit.GormHibernateTest
@@ -171,7 +170,7 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
 
     void "projections having with is not null"() {
         setup:
-        QueryArgs args = QueryArgs.of(q:[kind:'$isNotNull'], projections: [kind:'group', amount:'sum'])
+        QueryArgs args = QueryArgs.of(q:[kind:'$isNotNull', amount:'$isNotNull'], projections: [kind:'group', amount:'sum'])
 
         when: "having with in"
         MangoDetachedCriteria criteria = KitchenSink.repo.query(args)
@@ -184,7 +183,7 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         query.trim() == strip('''
             SELECT new map( kitchenSink.kind as kind,SUM(kitchenSink.amount) as amount_sum )
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-            WHERE (kitchenSink.kind IS NOT NULL )
+            WHERE (kitchenSink.kind IS NOT NULL  AND kitchenSink.amount IS NOT NULL )
             GROUP BY kitchenSink.kind
         ''')
 

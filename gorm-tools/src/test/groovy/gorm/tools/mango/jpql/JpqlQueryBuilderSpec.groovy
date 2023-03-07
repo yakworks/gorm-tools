@@ -1,6 +1,5 @@
 package gorm.tools.mango.jpql
 
-import gorm.tools.mango.jpql.JpqlQueryBuilder
 import grails.gorm.DetachedCriteria
 import org.springframework.dao.InvalidDataAccessResourceUsageException
 import spock.lang.Specification
@@ -17,7 +16,6 @@ class JpqlQueryBuilderSpec extends Specification implements GormHibernateTest  {
     String strip(String val){
         val.stripIndent().replace('\n',' ').trim()
     }
-
 
     void "Test update query with ilike criterion"() {
         given:"Some criteria"
@@ -36,7 +34,6 @@ class JpqlQueryBuilderSpec extends Specification implements GormHibernateTest  {
         WHERE (kitchenSink.amount=:p2 AND lower(kitchenSink.name) like lower(:p3))
         ''')
     }
-
 
     void "Test update query with subquery"() {
         given:"Some criteria"

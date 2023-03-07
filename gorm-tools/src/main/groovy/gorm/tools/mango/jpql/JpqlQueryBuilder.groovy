@@ -300,40 +300,21 @@ class JpqlQueryBuilder {
         return propName
     }
 
-    //common used in handlers
-    int handlePropParam(PersistentEntity entity, Query.PropertyCriterion criterion, String logicalName, String operator, int position,
-                        StringBuilder whereClause, List parameters){
-
-        String name = criterion.getProperty()
-        PersistentProperty prop = validateProperty(entity, name, criterion.class.simpleName)
-        int newPosition = appendCriteriaForOperator(whereClause, logicalName, name, position, operator)
-        if(prop){
-            Class propType = prop.getType()
-            parameters.add(conversionService.convert( criterion.getValue(), propType ))
-        } else {
-            parameters.add(criterion.getValue())
-        }
-        return newPosition
-    }
-
-    //common used in handlers
-    void handlePropCompare(PersistentEntity entity, Query.PropertyComparisonCriterion criterion, String logicalName, String operator,
-                           StringBuilder whereClause){
-
-        String propertyName = criterion.getProperty()
-        String otherProperty = criterion.getOtherProperty()
-
-        validateProperty(entity, propertyName, criterion.class.simpleName)
-        validateProperty(entity, otherProperty, criterion.class.simpleName)
-        appendPropertyComparison(whereClause, logicalName, propertyName, otherProperty, operator)
-    }
-
     QueryHandler getCompareQueryHandler(String compareOp){
         return new QueryHandler() {
             public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
                               String logicalName, int position, List parameters) {
                 Query.PropertyCriterion opCriterion = (Query.PropertyCriterion) criterion
-                return handlePropParam(entity, opCriterion, logicalName, compareOp, position, whereClause, parameters)
+                String name = opCriterion.getProperty()
+                PersistentProperty prop = validateProperty(entity, name, opCriterion.class.simpleName)
+                int newPosition = appendCriteriaForOperator(whereClause, logicalName, name, position, compareOp)
+                if(prop){
+                    Class propType = prop.getType()
+                    parameters.add(conversionService.convert( opCriterion.getValue(), propType ))
+                } else {
+                    parameters.add(opCriterion.getValue())
+                }
+                return newPosition
             }
         }
     }
@@ -344,7 +325,14 @@ class JpqlQueryBuilder {
             public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
                               String logicalName, int position, List parameters) {
                 Query.PropertyComparisonCriterion opCriterion = (Query.PropertyComparisonCriterion) criterion
-                handlePropCompare(entity, opCriterion, logicalName, compareOp,  whereClause)
+                //handlePropCompare(entity, opCriterion, logicalName, compareOp,  whereClause)
+                String propertyName = opCriterion.getProperty()
+                String otherProperty = opCriterion.getOtherProperty()
+
+                validateProperty(entity, propertyName, criterion.class.simpleName)
+                validateProperty(entity, otherProperty, criterion.class.simpleName)
+                appendPropertyComparison(whereClause, logicalName, propertyName, otherProperty, compareOp)
+
                 return position
             }
         }

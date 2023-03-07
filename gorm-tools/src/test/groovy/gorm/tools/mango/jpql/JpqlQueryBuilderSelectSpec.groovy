@@ -2,11 +2,11 @@ package gorm.tools.mango.jpql
 
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.unit.GormHibernateTest
 
-import java.time.LocalDate
 
 /**
  * Test for JPA builder
@@ -192,7 +192,6 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
 
     void "projections having with between"() {
         when: "having with in"
-        LocalDate now = LocalDate.now()
         MangoDetachedCriteria criteria = KitchenSink.repo.query(
             projections: [localDate:'group', amount:'sum'],
             q:[
@@ -213,7 +212,6 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
             AND (kitchenSink.localDateTime >= :p3 AND kitchenSink.localDateTime <= :p4))
             GROUP BY kitchenSink.localDate
         ''')
-
     }
 
     void "projections having criteria map"() {

@@ -13,10 +13,8 @@ import groovy.util.logging.Slf4j
 
 import gorm.tools.beans.Pager
 import gorm.tools.mango.MangoDetachedCriteria
-import gorm.tools.mango.MangoOps
 import yakworks.api.HttpStatus
 import yakworks.api.problem.data.DataProblem
-import yakworks.api.problem.data.DataProblemCodes
 import yakworks.api.problem.data.DataProblemException
 import yakworks.commons.map.Maps
 

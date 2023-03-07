@@ -615,17 +615,20 @@ class JpqlQueryBuilder {
                 PersistentProperty prop = validateProperty(entity, name, Query.Between)
                 Class propType = prop.getType()
 
-                String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
+                String propName
 
-                final String qualifiedName = logicalName ? logicalName + DOT + propName : propName
+                //builds a propname like kitchenSink.amount
+                if(projectionAliases.containsKey(name)) { propName = projectionAliases[name]}
+                else if(logicalName) { propName =  logicalName + DOT + name }
+                else { propName = name }
 
                 whereClause.append(OPEN_BRACKET)
-                           .append(qualifiedName)
+                           .append(propName)
                            .append(" >= ")
                            .append(PARAMETER_PREFIX)
                            .append(++position)
                 whereClause.append(" AND ")
-                           .append(qualifiedName)
+                           .append(propName)
                            .append(" <= ")
                            .append(PARAMETER_PREFIX)
                            .append(++position)
@@ -663,11 +666,12 @@ class JpqlQueryBuilder {
 
                 whereClause.append("lower(")
 
-                // if(logicalName){
-                //     whereClause.append(logicalName).append(DOT)
-                // }
+                String propName
 
-                String propName = projectionAliases.containsKey(name) ? projectionAliases[name] : name
+                if(projectionAliases.containsKey(name)) { propName = projectionAliases[name]}
+                else if(logicalName) { propName =  logicalName + DOT + name }
+                else { propName = name }
+
                 whereClause
                  .append(propName)
                  .append(")")

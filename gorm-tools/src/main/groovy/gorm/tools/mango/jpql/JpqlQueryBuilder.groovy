@@ -314,9 +314,14 @@ class JpqlQueryBuilder {
      */
     String buildPropName(String name, String logicalName) {
         String propName
-        if(projectionAliases.containsKey(name)) propName = projectionAliases[name]
-        else if(logicalName && !name.startsWith(logicalName + DOT)) propName = logicalName + DOT + name
-        else { propName = name }
+        if(projectionAliases.containsKey(name)) {
+            propName = projectionAliases[name]
+        } else if(logicalName && !name.startsWith(logicalName + DOT)) {
+            propName = logicalName + DOT + name
+        }
+        else {
+            propName = name
+        }
         return propName
     }
 

@@ -8,17 +8,14 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormStaticApi
-import org.grails.orm.hibernate.AbstractHibernateSession
 import org.grails.orm.hibernate.GrailsHibernateTemplate
 import org.grails.orm.hibernate.HibernateGormStaticApi
 import org.grails.orm.hibernate.query.HibernateHqlQuery
 import org.hibernate.ScrollableResults
 import org.hibernate.Session
-import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.query.Query
 
 import gorm.tools.mango.hibernate.AliasProjectionResultTransformer
-import gorm.tools.mango.hibernate.HibernateMangoQuery
 import yakworks.commons.model.SimplePagedList
 
 /**

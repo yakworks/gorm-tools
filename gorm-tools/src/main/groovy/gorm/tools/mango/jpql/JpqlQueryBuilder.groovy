@@ -64,6 +64,7 @@ class JpqlQueryBuilder {
     private String logicalName
     private ConversionService conversionService = new GenericConversionService()
     boolean hibernateCompatible
+    //wraps the SELECT in a new map( ...) when true
     boolean aliasToMap
     Map<String, String> projectionAliases = [:]
     Map<String, String> propertyAliases = [:]
@@ -125,6 +126,9 @@ class JpqlQueryBuilder {
         return jqb
     }
 
+    /**
+     * wraps the SELECT in a new map( ...)
+     */
     JpqlQueryBuilder aliasToMap(boolean val){
         this.aliasToMap = val
         return this

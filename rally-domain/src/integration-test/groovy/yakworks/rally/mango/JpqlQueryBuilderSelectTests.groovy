@@ -17,7 +17,7 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         val.stripIndent().replace('\n',' ').trim()
     }
 
-    void "Test projections simple"() {
+    void "Test projections simple no aliasToMap"() {
         given:"Some criteria"
 
         def criteria = Org.query {
@@ -44,21 +44,16 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         queryInfo.paramMap == [p1: 100.0]
 
         when:
-
-        // query = strip("""
-        //     SELECT SUM(org.calc.totalDue) as calc_totalDue_sum , org.type as type
-        //     FROM yakworks.rally.orgs.model.Org AS org
-        //     GROUP BY org.type
-        //     HAVING (SUM(org.calc.totalDue) < :p1
-        //     ORDER BY calc.totalDue_sum ASC
-        // """)
+        //NOTE: This runs the query as is. Without the .aliasToMap(true) it returns a
+        // list of arrays since its not going through the Transformer
         List res = Org.executeQuery(query, queryInfo.paramMap)
 
         then:
         res.size() == 3
-        res[0]['type'] == OrgType.Client
-        res[0]['calc_totalDue'] < res[1]['calc_totalDue']
-        res[1]['calc_totalDue'] < res[2]['calc_totalDue']
+        //see note above on why its arrays
+        res[0][1] == OrgType.Client
+        res[0][0] < res[1][0]
+        res[1][0] < res[2][0]
     }
 
     def "sum with QueryArgs"() {

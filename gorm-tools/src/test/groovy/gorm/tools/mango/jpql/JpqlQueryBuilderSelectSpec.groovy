@@ -161,7 +161,7 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         then:
         query
         query.trim() == strip('''
-            SELECT new map( kitchenSink.kind as kind,SUM(kitchenSink.amount) as amount_sum )
+            SELECT new map( kitchenSink.kind as kind_grouping,SUM(kitchenSink.amount) as amount_sum )
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
             WHERE (kitchenSink.kind IN (:p1,:p2) AND kitchenSink.amount >= :p3)
             GROUP BY kitchenSink.kind

@@ -48,6 +48,8 @@ import yakworks.commons.lang.NameUtils
 class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
     Map<String, String> propertyAliases = [:]
+    //auto system created aliases, tracked so we can remove the _sum, _avg, etc.. suffixes in the result transformer
+    List<String> systemAliases = [] as List<String>
 
     /**
      * Constructs a DetachedCriteria instance target the given class and alias for the name
@@ -103,11 +105,12 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      * @return A list of matching instances
      */
     List<Map> mapList(Map args = Collections.emptyMap()) {
-        def builder = JpqlQueryBuilder.of(this).aliasToMap(true)
+        def builder = JpqlQueryBuilder.of(this) //.aliasToMap(true)
         JpqlQueryInfo queryInfo = builder.buildSelect()
         def api = currentGormStaticApi()
         //use SimplePagedQuery so it can attach the totalCount
-        SimplePagedQuery hq = new SimplePagedQuery(api)
+        SimplePagedQuery hq = new SimplePagedQuery(api, this.systemAliases)
+        //def list = hq.list(queryInfo.query, queryInfo.paramMap, args)
         def list = hq.list(queryInfo.query, queryInfo.paramMap, args)
         return list
     }
@@ -215,7 +218,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      * @return This criteria instance
      */
     MangoDetachedCriteria<T> groupBy(String property) {
-        property = parseAlias(property, "")
+        property = parseAlias(property, "GROUPING")
         ensureAliases(property)
         projectionList.groupProperty(property)
         return this
@@ -437,6 +440,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
             String alas = p.replace('.', '_')
             alas = "${alas}_${key.toLowerCase()}"
             propertyAliases[aliasKey] = alas
+            systemAliases << alas
         }
         return p
     }

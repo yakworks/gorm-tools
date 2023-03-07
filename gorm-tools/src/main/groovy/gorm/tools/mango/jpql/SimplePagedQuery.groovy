@@ -8,13 +8,17 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormStaticApi
+import org.grails.orm.hibernate.AbstractHibernateSession
 import org.grails.orm.hibernate.GrailsHibernateTemplate
 import org.grails.orm.hibernate.HibernateGormStaticApi
 import org.grails.orm.hibernate.query.HibernateHqlQuery
 import org.hibernate.ScrollableResults
 import org.hibernate.Session
+import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.query.Query
 
+import gorm.tools.mango.hibernate.AliasProjectionResultTransformer
+import gorm.tools.mango.hibernate.HibernateMangoQuery
 import yakworks.commons.model.SimplePagedList
 
 /**
@@ -29,10 +33,16 @@ class SimplePagedQuery {
     // org.hibernate.query.Query query
     HibernateGormStaticApi staticApi
     GrailsHibernateTemplate hibernateTemplate
+    List<String> systemAliases = [] as List<String>
 
     SimplePagedQuery(GormStaticApi staticApi) {
         this.staticApi = (HibernateGormStaticApi)staticApi;
         hibernateTemplate = this.staticApi.getHibernateTemplate()
+    }
+
+    SimplePagedQuery(GormStaticApi staticApi, List<String> systemAliases) {
+        this(staticApi)
+        this.systemAliases = systemAliases
     }
 
     Integer countQuery(CharSequence queryString, Map params){
@@ -78,8 +88,12 @@ class SimplePagedQuery {
             populateQueryArguments(q, params)
             populateQueryArguments(q, args)
             populateQueryWithNamedArguments(q, params)
+            //sets the transformer to remove the _sum, _avg, etc..
+            //TODO make this smarter so it only removes the system created projections
+            q.setResultTransformer(AliasProjectionResultTransformer.INSTANCE)
 
-            def list = createHqlQuery(session, q).list()
+            def qry = createHqlQuery(session, q)
+            def list = qry.list()
             return list
         }
         int rowCount = dataList.size()
@@ -93,6 +107,12 @@ class SimplePagedQuery {
     @CompileDynamic //get around the protected
     HibernateHqlQuery createHqlQuery(Session session, Query q)  {
         return staticApi.createHqlQuery(session, q)
+    }
+
+    @CompileDynamic
+    HibernateMangoQuery createHibernateMango(Session session, Query q)  {
+        def query = HibernateMangoQuery.createQuery( (AbstractHibernateSession)session, staticApi.persistentEntity, null)
+        return query
     }
 
     @CompileDynamic //get around the protected

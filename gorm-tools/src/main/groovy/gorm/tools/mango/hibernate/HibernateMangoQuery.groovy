@@ -197,6 +197,20 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
 
     }
 
+    /**
+     * uses our custom hibernateAliasProjectionList
+     */
+    List listWithTransformer() {
+        def criteria = getHibernateCriteria()
+        if(criteria == null) throw new IllegalStateException("Cannot execute query using a detached criteria instance");
+
+        // int projectionLength = initProjections()
+        criteria.setResultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+        //this fires Pre and PostQueryEvent, TODO might want to skip this if firing the events hurt performance
+        return listForCriteria()
+
+    }
+
     Boolean getHasJoins(){
         (Boolean)hasJoinsField.get(this)
     }

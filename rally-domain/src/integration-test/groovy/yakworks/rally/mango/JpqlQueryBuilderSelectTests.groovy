@@ -28,14 +28,14 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         criteria.lt("calc_totalDue_sum", 100.0)
 
         when:"A jpa query is built"
-        def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
+        def builder = JpqlQueryBuilder.of(criteria) //.aliasToMap(true)
         def queryInfo = builder.buildSelect()
         def query = queryInfo.query
 
         then:"The query is valid"
         query != null
         query.trim() == strip('''
-            SELECT new map( SUM(org.calc.totalDue) as calc_totalDue_sum,org.type as type )
+            SELECT SUM(org.calc.totalDue) as calc_totalDue_sum,org.type as type
             FROM yakworks.rally.orgs.model.Org AS org
             GROUP BY org.type
             HAVING (SUM(org.calc.totalDue) < :p1)
@@ -57,8 +57,8 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         then:
         res.size() == 3
         res[0]['type'] == OrgType.Client
-        res[0]['calc_totalDue_sum'] < res[1]['calc_totalDue_sum']
-        res[1]['calc_totalDue_sum'] < res[2]['calc_totalDue_sum']
+        res[0]['calc_totalDue'] < res[1]['calc_totalDue']
+        res[1]['calc_totalDue'] < res[2]['calc_totalDue']
     }
 
     def "sum with QueryArgs"() {

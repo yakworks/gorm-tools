@@ -109,12 +109,6 @@ class SimplePagedQuery {
         return staticApi.createHqlQuery(session, q)
     }
 
-    @CompileDynamic
-    HibernateMangoQuery createHibernateMango(Session session, Query q)  {
-        def query = HibernateMangoQuery.createQuery( (AbstractHibernateSession)session, staticApi.persistentEntity, null)
-        return query
-    }
-
     @CompileDynamic //get around the protected
     void populateQueryArguments(Query q, Map args)  {
         staticApi.populateQueryArguments(q, args)

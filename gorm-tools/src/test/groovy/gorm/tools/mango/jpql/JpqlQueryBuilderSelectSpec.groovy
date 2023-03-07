@@ -69,7 +69,7 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
 
     }
 
-    void "Test projections simple"() {
+    void "Test projections simple aliasToMap"() {
         given:"Some criteria"
         def criteria = KitchenSink.query {
             sum('amount')
@@ -108,14 +108,14 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         criteria.lt("sinkLink_amount_sum", 100.0)
 
         when: "A jpa query is built"
-        def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
+        def builder = JpqlQueryBuilder.of(criteria) // .aliasToMap(true)
         def queryInfo = builder.buildSelect()
         def query = queryInfo.query
 
         then: "The query is valid"
         query != null
         query.trim() == strip('''\
-        SELECT new map( SUM(kitchenSink.sinkLink.amount) as sinkLink_amount_sum,kitchenSink.kind as kind )
+        SELECT SUM(kitchenSink.sinkLink.amount) as sinkLink_amount_sum,kitchenSink.kind as kind
         FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
         GROUP BY kitchenSink.kind
         HAVING (SUM(kitchenSink.sinkLink.amount) < :p1)
@@ -131,14 +131,14 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
                 'amount': ['$gte': 100.0]
             ]
         )
-        def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
+        def builder = JpqlQueryBuilder.of(criteria) //.aliasToMap(true)
         def queryInfo = builder.buildSelect()
         def query = queryInfo.query
 
         then:
         query
         query.trim() == strip('''
-            SELECT new map( SUM(kitchenSink.amount) as amount_sum )
+            SELECT SUM(kitchenSink.amount) as amount_sum
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
             WHERE (kitchenSink.amount >= :p1)
         ''')
@@ -153,14 +153,14 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
                 amount:['$gte':100]
             ]
         )
-        def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
+        def builder = JpqlQueryBuilder.of(criteria) //.aliasToMap(true)
         def queryInfo = builder.buildSelect()
         def query = queryInfo.query
 
         then:
         query
         query.trim() == strip('''
-            SELECT new map( kitchenSink.kind as kind_grouping,SUM(kitchenSink.amount) as amount_sum )
+            SELECT kitchenSink.kind as kind,SUM(kitchenSink.amount) as amount_sum
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
             WHERE (kitchenSink.kind IN (:p1,:p2) AND kitchenSink.amount >= :p3)
             GROUP BY kitchenSink.kind
@@ -174,14 +174,14 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
 
         when: "having with in"
         MangoDetachedCriteria criteria = KitchenSink.repo.query(args)
-        def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
+        def builder = JpqlQueryBuilder.of(criteria) //.aliasToMap(true)
         def queryInfo = builder.buildSelect()
         def query = queryInfo.query
 
         then:
         query
         query.trim() == strip('''
-            SELECT new map( kitchenSink.kind as kind,SUM(kitchenSink.amount) as amount_sum )
+            SELECT kitchenSink.kind as kind,SUM(kitchenSink.amount) as amount_sum
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
             WHERE (kitchenSink.kind IS NOT NULL  AND kitchenSink.amount IS NOT NULL )
             GROUP BY kitchenSink.kind
@@ -198,14 +198,14 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
                 localDateTime:['$between':[ "2023-01-01", "2023-01-07" ]]
             ]
         )
-        def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
+        def builder = JpqlQueryBuilder.of(criteria) //.aliasToMap(true)
         def queryInfo = builder.buildSelect()
         def query = queryInfo.query
 
         then:
         query
         query.trim() == strip('''
-            SELECT new map( kitchenSink.localDate as localDate,SUM(kitchenSink.amount) as amount_sum )
+            SELECT kitchenSink.localDate as localDate,SUM(kitchenSink.amount) as amount_sum
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
             WHERE ((kitchenSink.localDate >= :p1 AND kitchenSink.localDate <= :p2)
             AND (kitchenSink.localDateTime >= :p3 AND kitchenSink.localDateTime <= :p4))
@@ -228,14 +228,14 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         )
 
         when: "A jpa query is built"
-        def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
+        def builder = JpqlQueryBuilder.of(criteria) //.aliasToMap(true)
         def queryInfo = builder.buildSelect()
         def query = queryInfo.query
 
         then: "The query is valid"
         query != null
         query.trim() == strip('''\
-        SELECT new map( SUM(kitchenSink.sinkLink.amount) as sinkLink_amount_sum,kitchenSink.kind as kind )
+        SELECT SUM(kitchenSink.sinkLink.amount) as sinkLink_amount_sum,kitchenSink.kind as kind
         FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
         WHERE (kitchenSink.ext.id=:p1 AND kitchenSink.thing.id=:p2 AND kitchenSink.inactive=:p3)
         GROUP BY kitchenSink.kind
@@ -253,14 +253,14 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         }
 
         when:"A jpa query is built"
-        def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
+        def builder = JpqlQueryBuilder.of(criteria) //.aliasToMap(true)
         def queryInfo = builder.buildSelect()
         def query = queryInfo.query
 
         then:"The query is valid"
         query != null
         query == strip("""\
-        SELECT new map( SUM(kitchenSink.amount) as x,kitchenSink.kind as y,kitchenSink.ext.name as name )
+        SELECT SUM(kitchenSink.amount) as x,kitchenSink.kind as y,kitchenSink.ext.name as name
         FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
         GROUP BY kitchenSink.kind,kitchenSink.ext.name
         """)
@@ -283,14 +283,14 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         }
 
         when:"A jpa query is built"
-        def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
+        def builder = JpqlQueryBuilder.of(criteria) //.aliasToMap(true)
         def queryInfo = builder.buildSelect()
         def query = queryInfo.query
 
         then:"The query is valid"
         query != null
         query == strip("""\
-        SELECT new map( MAX(kitchenSink.amount) as maxam,MIN(kitchenSink.amount) as minam,AVG(kitchenSink.amount) as avgam,kitchenSink.kind as y,kitchenSink.ext.name as name )
+        SELECT MAX(kitchenSink.amount) as maxam,MIN(kitchenSink.amount) as minam,AVG(kitchenSink.amount) as avgam,kitchenSink.kind as y,kitchenSink.ext.name as name
         FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
         GROUP BY kitchenSink.kind,kitchenSink.ext.name
         """)

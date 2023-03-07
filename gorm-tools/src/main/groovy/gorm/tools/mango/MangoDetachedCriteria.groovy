@@ -218,7 +218,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      * @return This criteria instance
      */
     MangoDetachedCriteria<T> groupBy(String property) {
-        property = parseAlias(property, "GROUPING")
+        property = parseAlias(property, "")
         ensureAliases(property)
         projectionList.groupProperty(property)
         return this

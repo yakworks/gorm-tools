@@ -127,7 +127,7 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
 
         then:
         sumbObj.size() == 1
-        sumbObj[0]['totalDue_sum'] == 12200.0
+        sumbObj[0]['totalDue'] == 12200.0
     }
 
     def "sum association sum method"() {
@@ -154,8 +154,8 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
         //there are 5 types, one for each type
         sumbObj.size() == 5
         sumbObj[0]['type'] == OrgType.Client
-        sumbObj[0]['calc_totalDue_sum'] < sumbObj[1]['calc_totalDue_sum']
-        sumbObj[1]['calc_totalDue_sum'] < sumbObj[2]['calc_totalDue_sum']
+        sumbObj[0]['calc_totalDue'] < sumbObj[1]['calc_totalDue']
+        sumbObj[1]['calc_totalDue'] < sumbObj[2]['calc_totalDue']
     }
 
     def "sum and groupby methods order desc"() {
@@ -169,8 +169,8 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
         //there are 5 types, one for each type
         sumbObj.size() == 5
         sumbObj[0]['type'] == OrgType.Customer
-        sumbObj[0]['calc_totalDue_sum'] > sumbObj[1]['calc_totalDue_sum']
-        sumbObj[1]['calc_totalDue_sum'] > sumbObj[2]['calc_totalDue_sum']
+        sumbObj[0]['calc_totalDue'] > sumbObj[1]['calc_totalDue']
+        sumbObj[1]['calc_totalDue'] > sumbObj[2]['calc_totalDue']
     }
 
     def "sum with QueryArgs"() {

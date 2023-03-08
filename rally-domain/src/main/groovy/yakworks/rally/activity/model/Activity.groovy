@@ -7,6 +7,7 @@ package yakworks.rally.activity.model
 import groovy.transform.CompileDynamic
 
 import gorm.tools.model.NamedEntity
+import gorm.tools.model.Persistable
 import gorm.tools.model.SourceTrait
 import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
@@ -162,10 +163,17 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
         ]
     ]
 
+    /** creates an ActivityLink for the entity */
+    ActivityLink link(Persistable linkedEntity) {
+        ActivityLink.create(linkedEntity, this)
+    }
+
+    /** gets the linked entities */
     List<ActivityLink> getLinks() {
         ActivityLink.list(this)
     }
 
+    /** gets the contacts for this activity*/
     List<Contact> getContacts() {
         ActivityContact.listContacts(this)
     }

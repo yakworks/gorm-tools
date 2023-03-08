@@ -15,9 +15,9 @@ class RallySeedSpec extends Specification implements GormHibernateTest, Security
     static List entityClasses = RallySeed.entityClasses
 
     //RallySeedData.entityClasses
-    static springBeans = [
-        activityService: ActivityService
-    ]
+    // static springBeans = [
+    //     activityService: ActivityService
+    // ]
 
     @Autowired JdbcTemplate jdbcTemplate
 

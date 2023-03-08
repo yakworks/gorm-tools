@@ -60,8 +60,8 @@ class OrgRepo extends AbstractOrgRepo {
      */
     @Override
     MangoDetachedCriteria<Org> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure = null) {
-        List critTags = queryArgs.criteria.remove('tags') as List
-        List critTagIds = queryArgs.criteria.remove('tagIds') as List
+        List critTags = queryArgs.qCriteria.remove('tags') as List
+        List critTagIds = queryArgs.qCriteria.remove('tagIds') as List
 
         DetachedCriteria<Org> detCrit = getMangoQuery().query(Org, queryArgs, closure)
 

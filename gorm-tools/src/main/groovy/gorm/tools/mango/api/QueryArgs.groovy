@@ -218,7 +218,7 @@ class QueryArgs {
     }
 
     /**
-     * Returns the qCrieria merged with sort if it exists.
+     * Returns a COPY of qCrieria merged with sort if it exists.
      */
     Map<String, Object> getCriteria(){
         Map<String, Object> criterium = qCriteria

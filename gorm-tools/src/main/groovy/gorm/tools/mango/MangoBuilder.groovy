@@ -70,7 +70,7 @@ class MangoBuilder {
 
     public <D> MangoDetachedCriteria<D> buildWithQueryArgs(Class<D> clazz, QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
         MangoDetachedCriteria<D> mangoCriteria = new MangoDetachedCriteria<D>(clazz)
-        Map criteria = qargs.criteria
+        Map criteria = qargs.criteria //will be copy if sort exists
         def tidyMap = MangoTidyMap.tidy(criteria)
         applyMapOrList(mangoCriteria, tidyMap)
 

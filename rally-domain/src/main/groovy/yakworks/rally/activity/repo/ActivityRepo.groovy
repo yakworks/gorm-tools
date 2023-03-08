@@ -137,7 +137,7 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
      */
     @Override
     MangoDetachedCriteria<Activity> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
-        Map crit = queryArgs.criteria
+        Map crit = queryArgs.qCriteria
         DetachedCriteria tagExistsCrit
         DetachedCriteria actLinkExists
         if(crit.tags || crit.tagIds) {

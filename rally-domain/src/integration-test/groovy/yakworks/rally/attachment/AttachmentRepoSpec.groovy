@@ -77,8 +77,9 @@ class AttachmentRepoSpec extends Specification implements DomainIntTest {
 
     def testInsert_works() {
         when:
-        Map params = [name:'hello.txt', subject:'greetings']
-        params.bytes = 'blah blah blah'.getBytes()
+        Map params = [
+            name:'hello.txt', subject:'greetings', bytes: 'blah blah blah'.getBytes()
+        ]
         Attachment attachment = attachmentRepo.create(params)
 
         then:

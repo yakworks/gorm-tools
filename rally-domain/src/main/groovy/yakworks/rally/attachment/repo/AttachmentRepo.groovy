@@ -144,8 +144,8 @@ class AttachmentRepo extends LongIdGormRepo<Attachment> {
      */
     @Override
     MangoDetachedCriteria<Attachment> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
-        Map criteriaMap = queryArgs.criteria
-        //if its has tags keys then this returns something to add to exists, will remove the keys as well
+        Map criteriaMap = queryArgs.qCriteria
+        //if its has tags keys then this returns something to add to exists, REMOVES the keys as well so work off qCriteria
         DetachedCriteria tagExistsCrit = TagLink.getExistsCriteria(criteriaMap, Attachment, 'attachment_.id')
 
         MangoDetachedCriteria<Attachment> detCrit = getMangoQuery().query(Attachment, queryArgs, closure)

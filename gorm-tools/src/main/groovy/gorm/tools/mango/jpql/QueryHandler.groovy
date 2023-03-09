@@ -12,7 +12,12 @@ import org.springframework.core.convert.ConversionService
  * simple interface to be implemented for each Query. type
  */
 interface QueryHandler {
+    @SuppressWarnings(['ParameterCount'])
     int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
-                      String logicalName, int position, List parameters, ConversionService conversionService)
+                      String logicalName, int position, List parameters)
 
+    // default int handle(JpqlQueryBuilder queryBuilder, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+    //            String logicalName, int position, List parameters){
+    //     return handle(queryBuilder.entity, criterion, q, whereClause, logicalName, position, parameters)
+    // }
 }

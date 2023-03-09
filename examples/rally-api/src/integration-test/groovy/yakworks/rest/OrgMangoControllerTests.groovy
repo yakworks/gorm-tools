@@ -18,10 +18,11 @@ class OrgMangoControllerTests extends RestIntTest {
 
     void "list mango sum groupby"() {
         when:
-        controller.params << [
+        request.addParameters(
+            q:"*",
             projections:'calc.totalDue:"sum",type:"group"',
-            sort:'calc_totalDue:asc'
-        ]
+            sort:'calc_totalDue_sum:asc'
+        )
         controller.list()
         Map body = response.bodyToMap()
         List data = body.data
@@ -37,6 +38,7 @@ class OrgMangoControllerTests extends RestIntTest {
     void "list mango full monty"() {
         when:
         controller.params << [
+            q:"*",
             projections:'"calc.totalDue as Balance":"sum","calc.totalDue as MaxDue":"max","type":"group"',
             sort:'Balance:asc'
         ]
@@ -54,10 +56,11 @@ class OrgMangoControllerTests extends RestIntTest {
 
     void "paging in projections "() {
         when:
-        controller.params << [
+        request.addParameters(
+            q:"*",
             projections: 'calc.totalDue:"sum",num:"group"',
             max        : '5'
-        ]
+        )
         controller.list()
         Map body = response.bodyToMap()
         List data = body.data
@@ -72,17 +75,18 @@ class OrgMangoControllerTests extends RestIntTest {
     void "list CSV"() {
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:
-        controller.params << [
+        request.addParameters(
+            q:"*",
             projections:'calc.totalDue:"sum",type:"group"',
-            sort:'calc_totalDue:asc',
+            sort:'calc_totalDue_sum:asc',
             format:'csv'
-        ]
+        )
         controller.list()
         // Map body = response.bodyToMap()
         // List data = body.data
 
         then:
-        response.contentAsString.startsWith('"type.id","type.name","calc_totalDue"')
+        response.contentAsString.startsWith('"type.id","type.name","calc_totalDue')
         response.status == 200
         response.header("Content-Type").contains("text/csv")
 
@@ -93,8 +97,9 @@ class OrgMangoControllerTests extends RestIntTest {
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:
         controller.params << [
+            q:"*",
             projections:'calc.totalDue:"sum",type:"group"',
-            sort:'calc_totalDue:asc',
+            sort:'calc_totalDue_sum:asc',
             format:'xlsx'
         ]
         controller.list()

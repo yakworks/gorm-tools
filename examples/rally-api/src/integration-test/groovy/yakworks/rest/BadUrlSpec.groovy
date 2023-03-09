@@ -20,7 +20,7 @@ class BadUrlSpec extends Specification implements OkHttpRestTrait {
 
     void "good url"() {
         when:
-        Response resp = get('/api/rally/org')
+        Response resp = get('/api/rally/org?q=*')
         String bodyString = resp.body().string()
 
         then:

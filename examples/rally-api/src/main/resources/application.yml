@@ -14,6 +14,13 @@ logging:
     org.springframework: INFO
     org.hibernate.orm.deprecation: OFF # turns off deprecation notices
     org.springframework.security: DEBUG
+
+    yakworks.rally.api.rally.OrgController: DEBUG
+    yakworks.rest.gorm.controller.EntityResponder: DEBUG
+    gorm.tools.mango.MangoDetachedCriteria: DEBUG
+
+#    gorm.tools.mango.MangoBuilder: DEBUG
+    org.hibernate: OFF # turns off all
     # org.springframework.security.web: TRACE
     # org.springframework.security.authentication: TRACE
     # grails.plugins.DefaultGrailsPluginManager: ERROR

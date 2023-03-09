@@ -17,7 +17,8 @@ import yakworks.rest.client.WebClientTrait
 import static yakworks.json.groovy.JsonEngine.parseJson
 
 /**
- * Uses WebClient for testing instead of OkHttp
+ * POC that Uses WebClient for testing instead of OkHttp
+ * Requires
  */
 @Integration
 class OrgWebApiSpec extends Specification implements WebClientTrait {
@@ -35,7 +36,7 @@ class OrgWebApiSpec extends Specification implements WebClientTrait {
 
     void "get picklist"() {
         when:
-        ResponseEntity resp = get("$path/picklist")
+        ResponseEntity resp = get("$path/picklist?q=*")
         Map body = resp.body
 
         then:
@@ -49,7 +50,7 @@ class OrgWebApiSpec extends Specification implements WebClientTrait {
 
     void "get picklist mono pager"() {
         when:
-        Pager pager = getBody("$path/picklist", Pager)
+        Pager pager = getBody("$path/picklist?q=*", Pager)
 
         then:
         pager.data.size() == 50
@@ -61,7 +62,7 @@ class OrgWebApiSpec extends Specification implements WebClientTrait {
 
     void "smoke test csv"() {
         when:
-        ResponseEntity resp = getBytes("${path}?format=csv")
+        ResponseEntity resp = getBytes("${path}?q=*&format=csv")
         // Map body = bodyToMap(resp)
 
         then:
@@ -71,7 +72,7 @@ class OrgWebApiSpec extends Specification implements WebClientTrait {
 
     void "smoke test xlsx"() {
         when:
-        ResponseEntity resp = getBytes("${path}?format=xlsx")
+        ResponseEntity resp = getBytes("${path}?q=*&format=xlsx")
 
         then:
         resp.statusCode == HttpStatus.OK
@@ -119,7 +120,7 @@ class OrgWebApiSpec extends Specification implements WebClientTrait {
 
     void "test sorting"() {
         when: "sort asc"
-        def resp = get("${path}?sort=id&order=asc")
+        def resp = get("${path}?q=*&sort=id&order=asc")
         Map body = resp.getBody()
 
         then:
@@ -128,7 +129,7 @@ class OrgWebApiSpec extends Specification implements WebClientTrait {
         body.data[0].id < body.data[1].id
 
         when: "sort desc"
-        resp = get("${path}?sort=id&order=desc")
+        resp = get("${path}?q=*&sort=id&order=desc")
         body = resp.getBody()
 
         then: "The response is correct"

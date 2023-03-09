@@ -1,0 +1,78 @@
+apply plugin:"war"
+apply plugin:"org.grails.grails-web"
+// apply plugin:"org.grails.plugins.views-json"
+
+apply from: "${rootDir}/gradle/compile.gradle"
+apply from: "${rootDir}/gradle/hibernate.gradle"
+apply from: "${rootDir}/gradle/test-unit.gradle"
+apply from: "${rootDir}/gradle/test-integration.gradle"
+
+dependencies {
+  console "org.grails:grails-console"
+  profile "org.grails.profiles:rest-api"
+
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  // implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+  implementation 'org.springframework.boot:spring-boot-starter-mustache'
+
+  // === GRAILS ===
+  implementation "org.grails:grails-plugin-rest"
+  implementation "org.grails:grails-plugin-url-mappings"
+  implementation "org.grails:grails-logging"
+  implementation "org.grails:grails-plugin-interceptors"
+  implementation "org.grails:grails-web-boot"
+  implementation "org.grails.plugins:async"
+
+  // === Gorm Hibernate ===
+  implementation "org.grails.plugins:hibernate5:$vGormHibernate"
+  implementation "org.hibernate:hibernate-core:$vHibernate"
+
+  // === Yakworks plugins ===
+  implementation project(":gorm-rest")
+  implementation project(":rally-domain")
+  implementation project(":gorm-test-domain")
+
+  runtimeOnly "com.h2database:h2:$vH2"
+  runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"
+  runtimeOnly "com.zaxxer:HikariCP:$vHikari"
+
+  //for original rest api testing, WebClient uses the spring stuff
+  testImplementation "com.squareup.okhttp3:okhttp:$vOkhttp"
+  //testImplementation "org.jetbrains.kotlin:kotlin-stdlib:$vKotlin" //okhttp3 needs this
+
+  testImplementation project(":gorm-test-support")
+  testImplementation "org.grails:grails-web-testing-support:$vGrailsTesting"
+
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'org.springframework.security:spring-security-test'
+
+  testImplementation("org.spockframework:spock-core:${vSpock}")
+  testImplementation("org.spockframework:spock-spring:${vSpock}")
+
+  //for the OrgWebApiSpec, POC alternative for OkHttp
+  testImplementation "org.springframework.boot:spring-boot-starter-webflux"
+}
+
+bootRun {
+  //  ignoreExitValue true
+  jvmArgs('-Dspring.output.ansi.enabled=always', '-noverify', '-XX:TieredStopAtLevel=1', '-Xmx1024m')
+  sourceResources sourceSets.main
+  String springProfilesActive = 'spring.profiles.active'
+  systemProperty springProfilesActive, System.getProperty(springProfilesActive)
+  //fix hazel cast Not supported: "http://javax.xml.XMLConstants/property/accessExternalDTD"
+  // TODO the pac4j dependency adds some XML lib that is screwing this up
+  // systemProperty 'hazelcast.ignoreXxeProtectionFailures', true
+  //set the sys properties so BuildSupport statics can see them. Should not really be used or needed in prod
+  systemProperty "project.rootProjectDir", rootProject.projectDir.absolutePath
+  systemProperty "project.projectDir", project.projectDir.absolutePath
+}
+
+bootJar.enabled = true
+bootJar.archiveFileName = 'restify.jar'
+
+integrationTest.doFirst {
+  //fix hazel cast Not supported: "http://javax.xml.XMLConstants/property/accessExternalDTD"
+  // TODO the pac4j dependency adds some XML lib that is screwing this up
+  systemProperty 'hazelcast.ignoreXxeProtectionFailures', true
+}

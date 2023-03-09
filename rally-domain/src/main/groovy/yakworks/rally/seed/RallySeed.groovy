@@ -11,6 +11,7 @@ import groovy.transform.CompileStatic
 import org.springframework.jdbc.core.JdbcTemplate
 
 import grails.gorm.transactions.Transactional
+import yakworks.rally.activity.ActivityUtil
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
@@ -189,7 +190,9 @@ class RallySeed {
             org.contact = contact
             org.persist()
         }
-
+        Activity act = Activity.create([kind: Activity.Kind.Log, orgId: id, name: "created Org ${id}"])
+        //add link to test
+        act.link(org)
         return org
     }
 

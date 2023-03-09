@@ -22,6 +22,12 @@ dependencies {
   api "org.grails.plugins:hibernate5:$vGormHibernate"
   api "org.hibernate:hibernate-core:$vHibernate"
 
+  //mailgun
+  api 'com.mailgun:mailgun-java:1.0.7'
+  //to use the InternetAddress for validating emails
+  api "javax.mail:javax.mail-api:1.6.2"
+  api "com.sun.mail:javax.mail:1.6.2"
+
   compileOnly "org.grails:grails-core"
 
   testRuntimeOnly "org.springframework.boot:spring-boot-autoconfigure"

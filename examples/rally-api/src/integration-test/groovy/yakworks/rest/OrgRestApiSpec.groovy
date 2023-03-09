@@ -28,7 +28,7 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
 
     void "get picklist"() {
         when:
-        Response resp = get("$path/picklist")
+        Response resp = get("$path/picklist?q=*")
         Map body = bodyToMap(resp)
 
         then:
@@ -42,7 +42,7 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
 
     void "test csv"() {
         when:
-        Response resp = get("${path}?format=csv")
+        Response resp = get("${path}?q=*&format=csv")
         // Map body = bodyToMap(resp)
 
         then:
@@ -52,7 +52,7 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
 
     void "test xlsx"() {
         when:
-        Response resp = get("${path}?format=xlsx")
+        Response resp = get("${path}?q=*&format=xlsx")
 
         then:
         resp.code() == HttpStatus.OK.value()
@@ -108,7 +108,7 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
 
     void "test sorting"() {
         when: "sort asc"
-        def resp = get("${path}?sort=id&order=asc")
+        def resp = get("${path}?q=*&sort=id&order=asc")
         Map body = bodyToMap(resp)
 
         then:
@@ -117,7 +117,7 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         body.data[0].id < body.data[1].id
 
         when: "sort desc"
-        resp = get("${path}?sort=id&order=desc")
+        resp = get("${path}?q=*&sort=id&order=desc")
         body = bodyToMap(resp)
 
         then: "The response is correct"

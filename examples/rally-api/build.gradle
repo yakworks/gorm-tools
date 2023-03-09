@@ -17,19 +17,27 @@ dependencies {
 
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
-  implementation 'org.springframework.boot:spring-boot-starter-security'
-  implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+  // implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
   implementation 'org.springframework.boot:spring-boot-starter-mustache'
 
+  // === Spring Sec ===
+  implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
   implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
+   //SAML and OAUTH
+  implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+  implementation 'org.springframework.security:spring-security-saml2-service-provider'
+  constraints {
+    implementation "org.opensaml:opensaml-core:4.1.1"
+    implementation "org.opensaml:opensaml-saml-api:4.1.1"
+    implementation "org.opensaml:opensaml-saml-impl:4.1.1"
+  }
+  // === END Spring Sec ===
 
-  implementation "org.springframework.boot:spring-boot-starter-webflux"
-
-  // implementation "org.grails:grails-plugin-i18n"
+  // === GRAILS ===
   implementation "org.grails:grails-plugin-rest"
   implementation "org.grails:grails-plugin-url-mappings"
-  // implementation "org.grails:grails-plugin-codecs"
+  implementation "org.grails:grails-logging"
   implementation "org.grails:grails-plugin-interceptors"
   implementation "org.grails:grails-web-boot"
   // implementation "org.grails:grails-web-url-mappings"
@@ -47,16 +55,6 @@ dependencies {
   runtimeOnly "com.hazelcast:hazelcast-hibernate53:$vHazelcastHib"
   runtimeOnly "com.hazelcast:hazelcast:$vHazelcast"
   runtimeOnly "com.hazelcast:hazelcast-spring:$vHazelcast"
-
-  //SAML and OAUTH
-  implementation 'org.springframework.security:spring-security-saml2-service-provider'
-  implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
-  // implementation 'org.springframework.security:spring-security-oauth2-authorization-server:0.3.1'
-  constraints {
-    implementation "org.opensaml:opensaml-core:4.1.1"
-    implementation "org.opensaml:opensaml-saml-api:4.1.1"
-    implementation "org.opensaml:opensaml-saml-impl:4.1.1"
-  }
 
   runtimeOnly "com.h2database:h2:$vH2"
   runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"
@@ -78,6 +76,9 @@ dependencies {
 
   testImplementation("org.spockframework:spock-core:${vSpock}")
   testImplementation("org.spockframework:spock-spring:${vSpock}")
+
+  //for the OrgWebApiSpec, POC alternative for OkHttp
+  testImplementation "org.springframework.boot:spring-boot-starter-webflux"
 }
 
 bootRun {
@@ -89,6 +90,9 @@ bootRun {
   //fix hazel cast Not supported: "http://javax.xml.XMLConstants/property/accessExternalDTD"
   // TODO the pac4j dependency adds some XML lib that is screwing this up
   // systemProperty 'hazelcast.ignoreXxeProtectionFailures', true
+  //set the sys properties so BuildSupport statics can see them. Should not really be used or needed in prod
+  systemProperty "project.rootProjectDir", rootProject.projectDir.absolutePath
+  systemProperty "project.projectDir", project.projectDir.absolutePath
 }
 
 bootJar.enabled = true

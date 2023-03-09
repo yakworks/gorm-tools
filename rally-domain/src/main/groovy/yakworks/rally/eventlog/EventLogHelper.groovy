@@ -33,7 +33,8 @@ class EventLogHelper {
     String jobParams     // The params passed into the  process
     Long userId        // The current user
 
-    /** Constructs the helper in the case where params should have jobName.
+    /**
+     * Constructs the helper in the case where params should have jobName.
      * @param component The service/method called
      * @param jobParams The parameters used in the call
      * @param isPrimaryJob true if this is a job the customer is interested in hearing about every day.
@@ -46,7 +47,8 @@ class EventLogHelper {
         }
     }
 
-    /** Constructs the helper.
+    /**
+     * Constructs the helper.
      * @param jobName The master unit of work as recognized by a customer
      * @param component The service/method called
      * @param jobParams The parameters used in the call
@@ -60,7 +62,8 @@ class EventLogHelper {
         }
     }
 
-    /** Constructs the helper.
+    /**
+     * Constructs the helper.
      * @param jobName The master unit of work as recognized by a customer
      * @param component The service/method called
      * @param jobParams The parameters used in the call
@@ -78,14 +81,6 @@ class EventLogHelper {
     EventLogHelper(Map params) {
         this((String) (params.component), (String) (params.jobName), (params.jobParams as String), (Boolean) (params.isPrimaryJob))
     }
-
-/*    *//** If we're not logged in, login as system user. *//*
-    void checkLogin() {
-        if (!secService.isLoggedIn()) {
-            SecService.loginAsSystemUser()
-        }
-        this.userId = secService.userId
-    }*/
 
     @SuppressWarnings('ConfusingMethodName')
     String error(Map params) {
@@ -112,7 +107,8 @@ class EventLogHelper {
         return p.message
     }
 
-    /** getFinishMessage calculates the message based on available arguments and initial ScriptUtils
+    /**
+     * getFinishMessage calculates the message based on available arguments and initial ScriptUtils
      * configuration. This script exists so a controller can get the same message that went to eventLogger
      * and log4j.
      * @param params A map with zero or more of:
@@ -145,7 +141,8 @@ class EventLogHelper {
         return "${jobName} started${msg}"
     }
 
-    /** debugStart is a convenience method that prints that the script is starting.
+    /**
+     * debugStart is a convenience method that prints that the script is starting.
      *  All information necessary to generate the message already exists in the ScriptUtils object.
      *  This method is for convenience and consistency.
      */
@@ -153,7 +150,8 @@ class EventLogHelper {
         debug(action: STARTED, message: getStartMessage(message))
     }
 
-    /** debugFinish is a convenience method that prints that the script is finished.
+    /**
+     * debugFinish is a convenience method that prints that the script is finished.
      * All information necessary to generate the message already exists in the ScriptUtils object.
      * This method is for convenience and consistency.
      * @param message An optional string to be appended to the message.
@@ -163,7 +161,8 @@ class EventLogHelper {
         debug(action: FINISHED, message: getFinishMessage(message: message))
     }
 
-    /** infoStart is a convenience method that prints that the script is starting.
+    /**
+     * infoStart is a convenience method that prints that the script is starting.
      *  All information necessary to generate the message already exists in the ScriptUtils object.
      *  This method is for convenience and consistency.
      */
@@ -191,7 +190,8 @@ class EventLogHelper {
         warn(action: WARNING, message: getFinishMessage(message: message))
     }
 
-    /** warnFinish is a convenience method that prints that the script is finished.
+    /**
+     * warnFinish is a convenience method that prints that the script is finished.
      * All information necessary to generate the message already exists in the ScriptUtils object.
      * This method is for convenience and consistency.
      * @param message An optional string to be appended to the message.
@@ -201,7 +201,8 @@ class EventLogHelper {
         warn(action: TERMINATED, message: getFinishMessage(message: message))
     }
 
-    /** errorFinish is a convenience method that prints that the script is finished.
+    /**
+     * errorFinish is a convenience method that prints that the script is finished.
      * All information necessary to generate the message already exists in the ScriptUtils object.
      * This method is for convenience and consistency.
      * @param err An optional Throwable related to the call.

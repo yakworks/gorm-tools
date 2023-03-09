@@ -93,7 +93,7 @@ class OrgControllerTests extends RestIntTest {
         flushAndClear()
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:
-        controller.params << [max:20, sort:'contact.flex.num1', order:'desc']
+        controller.params << [q:"*", max:20, sort:'contact.flex.num1', order:'desc']
         controller.list()
         Map body = response.bodyToMap()
         List data = body.data
@@ -103,10 +103,39 @@ class OrgControllerTests extends RestIntTest {
         data[0].contact.flex.num1 > data[1].contact.flex.num1
     }
 
+    void "list filter"() {
+        when:
+        controller.params << [q:'{"name":"Org1*"}']
+        controller.list()
+        Map body = response.bodyToMap()
+        List data = body.data
+
+        then:
+        response.status == 200
+        body.page == 1
+        body.total == 1
+        body.records == 12
+        data[0].name == 'Org1'
+    }
+
+    void "list fail no q"() {
+        when:
+        controller.params << [max:20, sort:'contact.flex.num1', order:'desc']
+        controller.list()
+        Map body = response.bodyToMap()
+
+        then:
+        response.status == 418
+        !body.ok
+        body.code == "error.data.qRequired"
+
+        //data[0].name == 'Org10'
+    }
+
     void "list CSV"() {
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:
-        controller.params << [format:'csv']
+        controller.params << [q:"*", format:'csv']
         controller.list()
         // Map body = response.bodyToMap()
         // List data = body.data
@@ -122,7 +151,7 @@ class OrgControllerTests extends RestIntTest {
     void "sanity check XLSX"() {
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:
-        controller.params << [format:'xlsx']
+        controller.params << [q:"*", format:'xlsx']
         controller.list()
         // Map body = response.bodyToMap()
         // List data = body.data
@@ -136,7 +165,7 @@ class OrgControllerTests extends RestIntTest {
     void "list with includes"() {
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:
-        controller.params << [includes:"id,num"]
+        controller.params << [q:"*", includes:"id,num"]
         controller.list()
         Map body = response.bodyToMap()
         List data = body.data
@@ -149,7 +178,7 @@ class OrgControllerTests extends RestIntTest {
     void "list with includesKey"() {
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:
-        controller.params << [includesKey:'bulk']
+        controller.params << [q:"*", includesKey:'bulk']
         controller.list()
         Map body = response.bodyToMap()
         List data = body.data

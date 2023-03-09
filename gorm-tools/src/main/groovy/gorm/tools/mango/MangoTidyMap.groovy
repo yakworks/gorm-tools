@@ -83,7 +83,7 @@ class MangoTidyMap {
                     result[key] = (val as List).collect { v -> tidy(['$and': v]) }
                 }
             }
-            else if (val instanceof Map && key != MangoOps.SORT && key != MangoOps.Q && key != MangoOps.QSEARCH) {
+            else if (val instanceof Map && key != MangoOps.SORT && key != MangoOps.QSEARCH) {
                 toMangoOperator(val as Map, result[key] as Map)
             }
             else {

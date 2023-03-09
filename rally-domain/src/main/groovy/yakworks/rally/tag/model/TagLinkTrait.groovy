@@ -18,9 +18,9 @@ import gorm.tools.repository.model.AbstractLinkedEntityRepo
 
 /**
  * common trait that a concrete composite entity can implement if the stock TagLink will not suffice
- * for example, Org has its own OrgTag lining table
+ * for example, Org has its own OrgTag linking table
  *
- * @param <X> the LinkXRef entity
+ * @param <X> the LinkXRef entity (OrgTag for example)
  */
 @CompileStatic
 trait TagLinkTrait<X> implements LinkedEntity {

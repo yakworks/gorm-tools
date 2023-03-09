@@ -15,7 +15,7 @@ logging:
 #    org.hibernate.orm.deprecation: INFO # turns on deprecation notices
     # uncomment to turn on sql logging
 #    org.hibernate.stat: DEBUG
-    org.hibernate.SQL: DEBUG
+#    org.hibernate.SQL: DEBUG
 #     shows the sql parameters
 #    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
@@ -25,4 +25,12 @@ app:
     tempDir: "./build/rootLocation/tempDir"
     attachments.location: 'attachments'
 
+  # see MailConfig class
+  mail:
+    enabled: true
+    default-domain: m.greenbill.io
+    mailgun:
+      enabled: true
+      private-api-key: f8b47859c3b2410c228d9126a3564b9a-ca9eeb88-c3148c4f
+      default-domain: m.greenbill.io
 

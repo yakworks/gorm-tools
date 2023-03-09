@@ -6,6 +6,7 @@ package gorm.tools.mango.api
 
 import groovy.transform.CompileStatic
 
+import org.slf4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
@@ -95,9 +96,17 @@ trait QueryMangoEntityApi<D> {
      * @param closure additional restriction for criteria
      * @return query of entities restricted by mango params
      */
-    List<D> queryList(QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
+    List<D> queryList(QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure closure = null, Logger log = null) {
         withTrx {
             MangoDetachedCriteria<D> dcrit = query(qargs, closure)
+
+            if(log){
+                log.debug("mangoCriteria criteriaSize: ${dcrit.criteria.size()}")
+                dcrit.criteria?.each{
+                    log.debug("mangoCriteria criteria: ${it}")
+                }
+            }
+
             return getMangoQuery().list(dcrit, qargs.pager)
         }
     }

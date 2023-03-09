@@ -15,8 +15,11 @@
  */
 package yakworks.rally.api
 
+import javax.servlet.http.HttpServletResponse
+
 import groovy.transform.CompileStatic
 
+import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.annotation.CurrentSecurityContext
 import org.springframework.security.core.context.SecurityContext
@@ -28,6 +31,7 @@ import org.springframework.ui.ModelMap
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.context.request.RequestContextHolder
 
 import yakworks.security.user.UserInfo
 
@@ -57,6 +61,12 @@ class IndexController {
     @ResponseBody String about(ModelMap model) {
         model.addAttribute('info', 'test info')
         "just a string"
+    }
+
+    @GetMapping("/test")
+    void test(HttpServletResponse response) {
+        response.setContentType("text/csv")
+        response.writer.write("it works")
     }
 
     @RequestMapping("/user-info")

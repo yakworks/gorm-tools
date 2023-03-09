@@ -1,3 +1,8 @@
+### v7.3.33
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.31...v7.3.33)
+- qRequire, Jasper, Mailgun, JPAQL Builder fix and tests (#644) [link](https://github.com/yakworks/gorm-tools/commit/3847dbf2b10219d7ee145509e49019fa772def53)
+
 ### v7.3.31
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.30...v7.3.31)

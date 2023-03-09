@@ -38,6 +38,8 @@ trait RestRegistryResponder {
     //will get implemented by normal controller and WebAttributes
     abstract GrailsParameterMap getParams()
 
+    abstract GrailsParameterMap getGrailsParams()
+
     @Generated
     @Autowired(required = false)
     void setRendererRegistry(RendererRegistry rendererRegistry) {

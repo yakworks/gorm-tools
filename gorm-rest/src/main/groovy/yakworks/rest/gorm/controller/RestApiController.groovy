@@ -15,6 +15,7 @@ import grails.artefact.controller.RestResponder
 import grails.artefact.controller.support.ResponseRenderer
 import grails.util.GrailsNameUtils
 import grails.web.api.ServletAttributes
+import grails.web.servlet.mvc.GrailsParameterMap
 import yakworks.api.problem.Problem
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.NameUtils
@@ -65,6 +66,15 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
     void handleException(Exception e) {
         Problem apiError = problemHandler.handleException(e)
         respond(apiError)
+    }
+
+    /**
+     * Returns a new params for Request to see if this prevents them from being dropped
+     * @return a new copy of the grails params
+     */
+    GrailsParameterMap getGrailsParams() {
+        new GrailsParameterMap(getRequest())
+        //getParams()
     }
 
     // void respondWith(Object value, Map args = [:]) {

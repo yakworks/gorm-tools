@@ -278,20 +278,37 @@ class QueryArgs {
             //make sure its trimmed
             String sortText = sortObj.trim()
             Map sortMap = [:] as Map<String, String>
-            //if its starts with { its json and we take it as it is
-            if (sortText.startsWith('{')) {
-                sortMap = parseJson(sortText) as Map<String, String>
-            } else if (sortText.contains(':')) {
-                //will only be one item in list if no ',' token
-                List sortList = sortText.tokenize(',')*.trim() as List<String>
-                for (String sortEntry : sortList) {
+            //sort just looks like json in case api programmer wants to be consistent.
+            //but its a query param and we really expect it in the format like
+            // sort=foo:asc,bar:desc
+            // so we convert something passes as json like  q={"foo":"asc","bar":"desc"} by simply stripping out the " and the {
+            sortText = sortText.replaceAll(/[}{'"]/, "")
+            //will only be one item in list if no ',' token
+            List sortList = sortText.tokenize(',')*.trim() as List<String>
+            for (String sortEntry : sortList) {
+                if (sortText.contains(':')) {
                     List sortTokens = sortEntry.tokenize(':')*.trim() as List<String>
                     sortMap[sortTokens[0]] = sortTokens[1]
+                } else {
+                    //its should just a field name
+                    sortMap[sortEntry] = orderBy
                 }
-            } else {
-                //its just a field name
-                sortMap[sortText] = orderBy
             }
+
+            // if (sortText.startsWith('{')) {
+            //     sortMap = parseJson(sortText) as Map<String, String>
+            // } else
+            // if (sortText.contains(':')) {
+            //     //will only be one item in list if no ',' token
+            //     List sortList = sortText.tokenize(',')*.trim() as List<String>
+            //     for (String sortEntry : sortList) {
+            //         List sortTokens = sortEntry.tokenize(':')*.trim() as List<String>
+            //         sortMap[sortTokens[0]] = sortTokens[1]
+            //     }
+            // } else {
+            //     //its just a field name
+            //     sortMap[sortText] = orderBy
+            // }
 
             return sortMap
         } else {

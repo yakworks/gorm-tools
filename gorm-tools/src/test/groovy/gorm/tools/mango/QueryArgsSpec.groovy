@@ -214,4 +214,12 @@ class QueryArgsSpec extends Specification {
         keys.size() == 1
         qargs.criteria == ['$sort': ['foo':'asc']]
     }
+
+    def "parJson sanity check"() {
+        when:
+        QueryArgs qargs = new QueryArgs()
+        Map res = qargs.parseJson('{str: bar*, num: 1, bool: false, dec: 1.01, dlr: $isNotNull, list: [x,y,z,1,2], dot1.dot2.dot3: dot4.dot5 }')
+        then:
+        res == [str:"bar*", num:1, bool:false, dec: 1.01, dlr: '$isNotNull', list: ["x","y","z",1,2], 'dot1.dot2.dot3': 'dot4.dot5']
+    }
 }

@@ -115,14 +115,6 @@ class QueryArgs {
     }
 
     /**
-     * Construct with a criteria map as is.
-     */
-    // static QueryArgs withCriteria(Map<String, Object> crit){
-    //     def qa = new QueryArgs()
-    //     return qa._criteria(crit)
-    // }
-
-    /**
      * Intelligent defaults to setup the criteria and pager from the controller style params map
      *
      *  - looks for q param and parse if json object (starts with {)
@@ -265,7 +257,7 @@ class QueryArgs {
      *  - simple field name such as 'name'
      *  - field seperated by : such as 'name:desc'
      *  - multiple fields seperated by comma, ex: 'num:asc, name:desc'
-     *  - json in same format as above, ex '{num:"asc", name:"desc"}'
+     *  - json in same format as above, ex '{num:"asc", name:"desc"}' but parses simply by stripping out the { and "
      *
      * @param sortObj see above for valid options
      * @param orderBy only relevant if sortText is a single sort string with field name
@@ -279,9 +271,9 @@ class QueryArgs {
             String sortText = sortObj.trim()
             Map sortMap = [:] as Map<String, String>
             //sort just looks like json in case api programmer wants to be consistent.
-            //but its a query param and we really expect it in the format like
-            // sort=foo:asc,bar:desc
+            //but its a query param and we really expect it in the format like  sort=foo:asc,bar:desc
             // so we convert something passes as json like  q={"foo":"asc","bar":"desc"} by simply stripping out the " and the {
+            // We DONT use json pareser since it messes up the order, and the order matters here.
             sortText = sortText.replaceAll(/[}{'"]/, "")
             //will only be one item in list if no ',' token
             List sortList = sortText.tokenize(',')*.trim() as List<String>
@@ -294,21 +286,6 @@ class QueryArgs {
                     sortMap[sortEntry] = orderBy
                 }
             }
-
-            // if (sortText.startsWith('{')) {
-            //     sortMap = parseJson(sortText) as Map<String, String>
-            // } else
-            // if (sortText.contains(':')) {
-            //     //will only be one item in list if no ',' token
-            //     List sortList = sortText.tokenize(',')*.trim() as List<String>
-            //     for (String sortEntry : sortList) {
-            //         List sortTokens = sortEntry.tokenize(':')*.trim() as List<String>
-            //         sortMap[sortTokens[0]] = sortTokens[1]
-            //     }
-            // } else {
-            //     //its just a field name
-            //     sortMap[sortText] = orderBy
-            // }
 
             return sortMap
         } else {
@@ -350,6 +327,7 @@ class QueryArgs {
         this.closure = closure
         return this
     }
+
     /**
      * looks for the qsearch fields for this entity and returns the map
      * like [text: "foo", 'fields': ['name', 'num']]

@@ -93,7 +93,7 @@ class OrgControllerTests extends RestIntTest {
         flushAndClear()
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:
-        controller.params << [q:"*", max:20, sort:'contact.flex.num1', order:'desc']
+        controller.params << [q:"*", max:20, sort:'{contact.flex.num1: desc}']
         controller.list()
         Map body = response.bodyToMap()
         List data = body.data
@@ -101,6 +101,7 @@ class OrgControllerTests extends RestIntTest {
         then:
         response.status == 200
         data[0].contact.flex.num1 > data[1].contact.flex.num1
+        data[1].contact.flex.num1 > data[2].contact.flex.num1
     }
 
     void "list filter"() {

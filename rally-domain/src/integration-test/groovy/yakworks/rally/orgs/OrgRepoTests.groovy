@@ -79,8 +79,9 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         org.contact.org
         org.contact.org == org
         org.contact.firstName == params.contact.firstName
-        org.contact.locations.size() == 1
-        org.contact.locations[0].zipCode == "12345"
+        org.contact.location.city == 'Gulch'
+        org.contact.locations.size() == 2
+        org.contact.locations[1].zipCode == "12345"
 
         org.flex
         org.flex.id == org.id

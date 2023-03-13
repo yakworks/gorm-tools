@@ -2,7 +2,7 @@ api:
   paths:
     /rally/org:
       includes:
-        get: [ '*', calc.totalDue, tags, contact.$*, contact.flex.num1  ]
+        get: [ '*', calc.totalDue, contact.$*, tags, contact.flex.num1  ]
 #          get: [ '*', info.*, location.id, tags, contact.$*, contact.flex.num1 ]
         bulk: ['id', 'num', 'name', 'source.sourceId']
         bulkError: ['num', 'name']

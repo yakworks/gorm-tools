@@ -67,7 +67,7 @@ class QueryArgsSpec extends Specification {
 
         when: 'not using q'
         //when not using q then it pulls out the sort, order and pager info and leaves the rest as is
-        QueryArgs qargs = QueryArgs.of(id: 123, name: 'joe', max: 10, sort:'foo:asc,bar:desc')
+        QueryArgs qargs = QueryArgs.of(id: 123, name: 'joe', max: 10, sort:'bar:desc,foo:asc')
 
         then:
         qargs.criteria == [id: 123, name: 'joe', '$sort': ['foo':'asc', bar:'desc']]
@@ -173,5 +173,53 @@ class QueryArgsSpec extends Specification {
 
     }
 
+    def "sorts that looks like JSON"() {
+        when:
+        QueryArgs qargs = QueryArgs.of(sort:'"bar\':"desc" , foo:"asc"')
+        Set keys = qargs.sort.keySet()
+        then:
+        //should keep the order
+        keys[0] == "bar"
+        keys[1] == "foo"
+        qargs.criteria == ['$sort': ['foo':'asc', bar:'desc']]
 
+        when:
+        qargs = QueryArgs.of(sort:'{"xxx\': "desc", zzz: "asc"}')
+        keys = qargs.sort.keySet()
+        then:
+        //should keep the order
+        keys[0] == "xxx"
+        keys[1] == "zzz"
+        qargs.criteria == ['$sort': ['xxx':'desc', zzz:'asc']]
+    }
+
+    def "sorts with only comma separted list of fields"() {
+        when:
+        QueryArgs qargs = QueryArgs.of(sort:"foo,bar,baz")
+        Set keys = qargs.sort.keySet()
+
+        then:"should keep same order and have asc as default"
+        //should keep the order
+        keys[0] == "foo"
+        keys[1] == "bar"
+        keys[2] == "baz"
+        qargs.criteria == ['$sort': ['foo':'asc', bar:'asc', baz:'asc']]
+
+        when: "sanity check a single sort"
+        qargs = QueryArgs.of(sort:"foo")
+        keys = qargs.sort.keySet()
+        then:
+        //should keep the order
+        keys[0] == "foo"
+        keys.size() == 1
+        qargs.criteria == ['$sort': ['foo':'asc']]
+    }
+
+    def "parJson sanity check"() {
+        when:
+        QueryArgs qargs = new QueryArgs()
+        Map res = qargs.parseJson('{str: bar*, num: 1, bool: false, dec: 1.01, dlr: $isNotNull, list: [x,y,z,1,2], dot1.dot2.dot3: dot4.dot5 }')
+        then:
+        res == [str:"bar*", num:1, bool:false, dec: 1.01, dlr: '$isNotNull', list: ["x","y","z",1,2], 'dot1.dot2.dot3': 'dot4.dot5']
+    }
 }

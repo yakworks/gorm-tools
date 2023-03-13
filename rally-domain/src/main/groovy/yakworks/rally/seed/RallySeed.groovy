@@ -173,7 +173,8 @@ class RallySeed {
                 num: "secondary$id",
                 email    : "secondary$id@taggart.com",
                 firstName: "firstName$id",
-                lastName : "lastName$id"
+                lastName : "lastName$id",
+                location: [city: "second City$id"]
             ]]
         ]
         //override with whatever was passed in
@@ -210,6 +211,7 @@ class RallySeed {
             email    : "jgalt$id@taggart.com",
             firstName: "John$id",
             lastName : "Galt$id",
+            location: [city: "City$id"],
             org: org
         ]
         //override with whatever was passed in
@@ -217,6 +219,9 @@ class RallySeed {
         Map args = odata.id ? [bindId: true] : [:]
 
         def contact = Contact.repo.create(data, args)
+        // def loc = new Location(contact: contact, city: "City$id").persist()
+        // contact.location = loc
+        // contact.persist()
         return contact
     }
 

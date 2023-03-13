@@ -267,6 +267,13 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         return this
     }
 
+    /**
+     * allows to do a nested association without compile dynamic
+     *
+     * @param assoc the nested association
+     * @param args the closiure to call on it
+     * @return the object reply of the super.invokeMethod
+     */
     @CompileDynamic
     def assoc(String assoc, Closure args) {
         super.invokeMethod(assoc, args)

@@ -33,7 +33,7 @@ import static gorm.tools.mango.MangoOps.QSEARCH
 import static gorm.tools.mango.MangoOps.SORT
 
 /**
- * the main builder to turn Mango QL maps and json into DetachedCriteria for Gorm
+ * the main builder to turn Mango QL Maps or json into DetachedCriteria for Gorm
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.1

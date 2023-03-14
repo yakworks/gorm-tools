@@ -18,7 +18,7 @@ class MailProps {
     /** whether the mailer is enabled */
     boolean enabled = true
 
-    /** the default domain that set up in mailgun to use */
+    /** the default domain that set up in mailgun to use, should be one for System stuff and another for AR/Collections stuff*/
     String defaultDomain
 
     Mailgun mailgun = new Mailgun()
@@ -27,7 +27,5 @@ class MailProps {
         /** the private api key for sdk */
         String privateApiKey
 
-        /** whether the mailer is enabled */
-        boolean enabled = false
     }
 }

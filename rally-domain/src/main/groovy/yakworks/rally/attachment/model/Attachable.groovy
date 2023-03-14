@@ -20,6 +20,10 @@ trait Attachable {
         return _hasAttachments
     }
 
+    // boolean getHasAttachments() {
+    //     return hasAttachments()
+    // }
+
     void setHasAttachments(boolean val) {
         this._hasAttachments = val
     }

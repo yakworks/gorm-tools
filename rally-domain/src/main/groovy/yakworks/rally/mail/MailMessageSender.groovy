@@ -90,6 +90,7 @@ class MailMessageSender {
                 if(!attach) throw new IllegalArgumentException("Attachment id:[$id] does not exist")
                 attachFiles.add(attach.resource.getFile())
             }
+            if(attachFiles) mailTo.attachments = attachFiles
         }
         //TODO do inline
         return mailTo

@@ -5,6 +5,7 @@
 package yakworks.rally.mail.model
 
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 import groovy.transform.CompileDynamic
 
@@ -78,7 +79,7 @@ class MailMessage implements UuidRepoEntity<MailMessage, UuidGormRepo<MailMessag
     /** when using something like mailgun this is the id returned from the send submit */
     String messageId
     /** The send date, always in Zulu to match server time */
-    LocalDate sendDate
+    LocalDateTime sendDate
 
     @CompileDynamic
     static enum MsgState {

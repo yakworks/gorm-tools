@@ -4,6 +4,7 @@
 */
 package yakworks.rally.mail
 
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 import groovy.transform.CompileStatic
@@ -62,6 +63,7 @@ class MailMessageSender {
         } else {
             Map payload = (Map) result.payload
             mailMessage.messageId = payload.id
+            mailMessage.sendDate = LocalDateTime.now()
             mailMessage.state = MailMessage.MsgState.Sent
         }
         mailMessage.persist()

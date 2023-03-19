@@ -161,7 +161,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
     Contact createOrUpdatePrimaryContact(Org org, Map data){
         if(!data) return //exit fast if no data
 
-        // if org has a contact then its and update or replace
+        // if org has a contact then its an update or replace
         if(org.contact) {
             //if data has id
             Long cid = data.id as Long

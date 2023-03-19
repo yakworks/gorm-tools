@@ -4,6 +4,7 @@
 */
 package yakworks.rally.mail
 
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 import groovy.transform.CompileStatic
@@ -62,6 +63,7 @@ class MailMessageSender {
         } else {
             Map payload = (Map) result.payload
             mailMessage.messageId = payload.id
+            mailMessage.sendDate = LocalDateTime.now()
             mailMessage.state = MailMessage.MsgState.Sent
         }
         mailMessage.persist()
@@ -90,6 +92,7 @@ class MailMessageSender {
                 if(!attach) throw new IllegalArgumentException("Attachment id:[$id] does not exist")
                 attachFiles.add(attach.resource.getFile())
             }
+            if(attachFiles) mailTo.attachments = attachFiles
         }
         //TODO do inline
         return mailTo

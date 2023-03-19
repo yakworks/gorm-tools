@@ -218,26 +218,45 @@ class MangoSpec extends Specification {
 
     def "Filter with `or` on low level"() {
         when:
-        List list = Org.queryList([q: [location: ['$or': ["city": "City3", "id": 1000]]], max: 150])
+        def crit = Org.query(q: [location: ['$or': ["city": "City3", "id": 1000]]])
+        //crit.select('location')
+        List list = crit.list(max: 150)
         then:
-        list.size() == 2
+        //should only be 1, id 100 does not exist
+        list.size() == 1
     }
 
     def "Filter with several `or` on one level"() {
         when:
-        List list = Org.queryList('$or': [
-            ["location.city": "City3"],
-            ["name": "Org4", "location.city": "City4"]
-        ])
-
+        def crit = Org.query(
+            '$or': [
+                ["location.city": "City3"],
+                ["name": "Org4", "location.city": "City4"]
+            ],
+            sort: "contact.location.city"
+        )
+        List list = crit.list()
         then:
         list.size() == 2
     }
 
-    def "Filter with several `or` on one level2"() {
+    def "location alias on org and on contact works"() {
+        //this was broken since Org has location alias and so does contact on the sort
         when:
-        List list = Org.queryList('$or': [["location.id": 1000], ["location.id": 1001]])
+        def crit = Org.query(
+            "location.city":["City10"],
+            sort: "contact.location.city"
+        )
+        List list = crit.list()
         then:
+        list.size() == 1
+    }
+
+    def "Filter with several `or` on same level as root using id"() {
+        when:
+        List list = Org.queryList('$or': [["contact.id": 10], ["contact.id": 11], ["location.id": -999]])
+        then:
+        //should only be 2, -999 does not exist
         list.size() == 2
     }
 

@@ -55,6 +55,7 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
 
         then:
         mailTo
+        mailTo
     }
 
     void "convertMailMessage with attachment"() {
@@ -66,6 +67,7 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
 
         then:
         mailTo
+        mailTo.attachments.size() == 1
     }
 
     void "convertMailMessage bad attachment"() {

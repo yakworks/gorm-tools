@@ -4,10 +4,13 @@
 */
 package yakworks.rally.orgs.repo
 
+import javax.inject.Inject
+
 import groovy.transform.CompileStatic
 
 import org.springframework.dao.DataRetrievalFailureException
 
+import gorm.tools.databinding.BindAction
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.GormRepository
@@ -20,6 +23,7 @@ import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.utils.GormUtils
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
+import jakarta.annotation.Nullable
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.commons.map.Maps
 import yakworks.rally.activity.model.ActivityContact
@@ -36,6 +40,10 @@ import yakworks.security.gorm.model.AppUser
 @GormRepository
 @CompileStatic
 class ContactRepo extends LongIdGormRepo<Contact> {
+
+    //Making this nullable makes it easier to wire up for tests.
+    @Inject @Nullable
+    LocationRepo locationRepo
 
     @RepoListener
     void beforeValidate(Contact contact) {
@@ -68,6 +76,14 @@ class ContactRepo extends LongIdGormRepo<Contact> {
         //NOTE: This was here for CED but it was removed as logic is faulty to keep the location around for the contact if the contact is deleted.
         // I think the idea was to keep its location info even if contact was removed since contacts could be some kind of job.
         //Location.executeUpdate("update Location set contact = null where contact = :contact", [contact: contact]) //set contact to null
+    }
+
+
+    @Override
+    void doBeforePersistWithData(Contact contact, PersistArgs args) {
+        Map data = args.data
+        // we do primary location and contact here before persist so we persist org only once with contactId it is created
+        if(data.location) createOrUpdateLocation(contact, data.location as Map)
     }
 
     /** lookup by num or ContactSource */
@@ -177,6 +193,15 @@ class ContactRepo extends LongIdGormRepo<Contact> {
         }
     }
 
+    Location createOrUpdateLocation(Contact contact, Map data){
+        if(!data) return
+        //make sure params has org key
+        data.orgId = contact.orgId
+        data.contact = contact
+        // if it had an op of remove then will return null and this set primary location to null
+        contact.location = locationRepo.createOrUpdateItem(data)
+        return contact.location
+    }
     /*
     * build a User domain object from a contact if it does not exist.
     */

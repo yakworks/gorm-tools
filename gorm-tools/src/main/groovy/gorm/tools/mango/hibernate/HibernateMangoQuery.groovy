@@ -5,11 +5,13 @@
 package gorm.tools.mango.hibernate
 
 import java.lang.reflect.Field
+import javax.persistence.criteria.JoinType
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.finders.DynamicFinder
+import org.grails.datastore.gorm.query.criteria.DetachedAssociationCriteria
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.query.Query
@@ -45,8 +47,8 @@ import grails.orm.HibernateCriteriaBuilder
 import grails.orm.RlikeExpression
 
 /**
- * Extends to overrides the myriad of issues with how the DetachedCriteria was translating to the
- * the HibernateQuery.
+ * Replaces org.grails.orm.hibernate.query.HibernateQuery since there was a myriad of issues with the DetachedCriteria
+ *
  * Enhancments over what HibernateQuery was not doing properly
  * - around the nested and aliases. For example ordering by something like foo.bar.baz.
  * - take advantage of being able to specify the ordering for nulls so we can keep postgress consistent with mysql and mssql etc..
@@ -88,28 +90,28 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
         return super.@criteria
     }
 
-    @Override
+    @Override //implements abstract
     protected AbstractHibernateCriterionAdapter createHibernateCriterionAdapter() {
         return HIBERNATE_CRITERION_ADAPTER
     }
 
-    @Override
+    @Override //implements abstract
     protected org.hibernate.criterion.Criterion createRlikeExpression(String propertyName, String value) {
         return new RlikeExpression(propertyName, value);
     }
 
-    @Override
+    @Override //implements abstract
     protected void setDetachedCriteriaValue(QueryableCriteria value, PropertyCriterion pc) {
         DetachedCriteria hibernateDetachedCriteria = HibernateCriteriaBuilder.getHibernateDetachedCriteria(this, value);
         pc.setValue(hibernateDetachedCriteria);
     }
 
-    @Override
+    @Override //implements abstract
     protected String render(BasicType basic, List<String> columns, SessionFactory sessionFactory, SQLFunction sqlFunction) {
         return sqlFunction.render(basic, columns, (SessionFactoryImplementor) sessionFactory);
     }
 
-    @Override
+    @Override //implements abstract
     protected PropertyMapping getEntityPersister(String name, SessionFactory sessionFactory) {
         return (PropertyMapping) ((SessionFactoryImplementor) sessionFactory).getEntityPersister(name);
     }
@@ -126,7 +128,7 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
         return ((SessionFactoryImplementor) sessionFactory).getDialect();
     }
 
-    @Override
+    @Override //overrides to fix
     Query order(Order order) {
         if (order != null) {
             orderBy.add(order);
@@ -160,6 +162,84 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
         else {
             return super.order(order)
         }
+    }
+
+    @Override
+    protected CriteriaAndAlias getCriteriaAndAlias(DetachedAssociationCriteria associationCriteria) {
+        String associationPath = associationCriteria.getAssociationPath();
+        String alias = associationCriteria.getAlias();
+
+        if(associationPath == null) {
+            associationPath = associationCriteria.getAssociation().getName();
+        }
+        return getOrCreateAlias(associationPath, alias);
+    }
+
+    @Override
+    protected CriteriaAndAlias getOrCreateAlias(String associationName, String alias) {
+        CriteriaAndAlias subCriteria = null;
+        String associationPath = getAssociationPath(associationName);
+        Criteria parentCriteria = getHibernateCriteria();
+        if(alias == null) {
+            alias = generateAlias(associationName);
+        }
+        // else {
+        //     //CriteriaAndAlias criteriaAndAlias = createdAssociationPaths.get(associationPath);
+        //     CriteriaAndAlias criteriaAndAlias = createdAssociationPaths.get(alias);
+        //     if(criteriaAndAlias != null) {
+        //         parentCriteria = getCriteriaOnAlias(criteriaAndAlias);
+        //         if(parentCriteria != null) {
+        //
+        //             alias = associationName + '_' + alias;
+        //             associationPath = getCriteriaAndAliasAssociationPath(criteriaAndAlias) + '.' + associationPath;
+        //         }
+        //     }
+        // }
+
+        if (createdAssociationPaths.containsKey(associationPath)) { //this was using associationName as the key
+            subCriteria = createdAssociationPaths.get(associationPath);
+        }
+        else {
+            JoinType joinType = joinTypes.get(associationName);
+            if(parentCriteria != null) {
+                Criteria sc = parentCriteria.createAlias(associationPath, alias, resolveJoinType(joinType));
+                //nasty hack for groovy and inner classes, need to pass in the instance to newInstance first which is "this"
+                subCriteria = AbstractHibernateQuery.CriteriaAndAlias.newInstance(this, sc, alias, associationPath)
+            }
+            else if(detachedCriteria != null) {
+                DetachedCriteria sc = detachedCriteria.createAlias(associationPath, alias, resolveJoinType(joinType));
+                subCriteria = AbstractHibernateQuery.CriteriaAndAlias.newInstance(this, sc, alias, associationPath)
+            }
+            if(subCriteria != null) {
+
+                createdAssociationPaths.put(associationPath, subCriteria);
+                createdAssociationPaths.put(alias, subCriteria);
+            }
+        }
+        return subCriteria;
+    }
+
+    /**
+     * direct copy of resolveJoinType since its private and we cant override  getOrCreateAlias since it calls it
+     */
+    org.hibernate.sql.JoinType resolveJoinType(JoinType joinType) {
+        if(joinType  == null) {
+            return org.hibernate.sql.JoinType.INNER_JOIN;
+        }
+        switch (joinType) {
+            case JoinType.LEFT:
+                return org.hibernate.sql.JoinType.LEFT_OUTER_JOIN;
+            case JoinType.RIGHT:
+                return org.hibernate.sql.JoinType.RIGHT_OUTER_JOIN;
+            default:
+                return org.hibernate.sql.JoinType.INNER_JOIN;
+        }
+    }
+
+    //these are compiledynamic hacks to work around permissions
+    @CompileDynamic //so we can access protected
+    String getCriteriaAndAliasAssociationPath(CriteriaAndAlias criteriaAndAlias){
+        return criteriaAndAlias.associationPath
     }
 
     @CompileDynamic //so we can access protected

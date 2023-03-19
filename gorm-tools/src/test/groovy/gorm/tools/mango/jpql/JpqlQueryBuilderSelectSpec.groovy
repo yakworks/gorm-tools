@@ -2,6 +2,7 @@ package gorm.tools.mango.jpql
 
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
+import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.unit.GormHibernateTest
@@ -26,7 +27,7 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
 
         when:"A jpa query is built"
         def builder = JpqlQueryBuilder.of(criteria)
-        builder.hibernateCompatible = true
+        //builder.hibernateCompatible = true
         def query = builder.buildSelect().query
 
         then:"The query is valid"
@@ -334,4 +335,20 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         // res.size() == 2
     }
 
+    @Ignore
+    void "Test distinct on property"() {
+        given:"Some criteria"
+        def criteria = KitchenSink.query(
+            'name': 'Bob'
+        ).distinct("ext.kitchenParent.thing.name")
+
+        when:"A jpa query is built"
+        def builder = JpqlQueryBuilder.of(criteria)
+        //builder.hibernateCompatible = true
+        def query = builder.buildSelect().query
+
+        then:"The query is valid"
+        query != null
+        query == 'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE (kitchenSink.name=:p1)'
+    }
 }

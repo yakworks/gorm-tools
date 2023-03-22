@@ -4,7 +4,6 @@
 */
 package yakworks.rally.activity.repo
 
-
 import javax.persistence.criteria.JoinType
 
 import groovy.transform.CompileStatic
@@ -35,6 +34,7 @@ import yakworks.rally.activity.model.TaskType
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.repo.AttachmentRepo
+import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.TagLink
 import yakworks.security.user.CurrentUser
@@ -210,6 +210,10 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
             //activity.note.persist() Dont save it here, it will be cascaded
         }
 
+        if(data.mailMessage) {
+            addMailMessage(activity, data.mailMessage as Map)
+        }
+
     }
 
     // This adds the realted and children entities from the params to the Activity
@@ -236,6 +240,15 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
         act.note.body = body
         act.note.contentType = contentType
         return act.note
+    }
+
+    MailMessage addMailMessage(Activity act, Map msgData) {
+        if (!act.mailMessage) {
+            act.mailMessage = new MailMessage()
+            MailMessage.getRepo().generateId(act.mailMessage) //FIXME: should run before persist
+        }
+        act.mailMessage.bind(msgData)
+        return act.mailMessage
     }
 
     void fixUpTaskParams(Map params) {

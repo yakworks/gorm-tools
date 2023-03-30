@@ -1,6 +1,8 @@
 package gorm.tools.repository
 
 import gorm.tools.async.AsyncService
+import yakworks.api.problem.data.DataProblem
+import yakworks.api.problem.data.DataProblemException
 import yakworks.gorm.config.AsyncConfig
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobState
@@ -338,5 +340,21 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
         then:
         result.size() == 2
         result == [name: "name", ext:[name: "ext-name"]]
+    }
+
+    void "test empty data"() {
+        when:
+        Long jobId = kitchenSinkRepo.bulk(null, setupSyncJobArgs())
+
+        then:
+        DataProblemException ex = thrown()
+        ex.code == 'error.data.emptyPayload'
+
+        when:
+        jobId = kitchenSinkRepo.bulk([], setupSyncJobArgs())
+
+        then:
+        DataProblemException ex2 = thrown()
+        ex2.code == 'error.data.emptyPayload'
     }
 }

@@ -27,6 +27,7 @@ import gorm.tools.repository.events.BeforeBulkSaveEntityEvent
 import gorm.tools.repository.events.RepoEventPublisher
 import yakworks.api.ApiResults
 import yakworks.api.Result
+import yakworks.api.problem.data.DataProblem
 import yakworks.commons.map.Maps
 import yakworks.commons.map.PathKeyMap
 import yakworks.meta.MetaMap
@@ -75,6 +76,9 @@ trait BulkableRepo<D> {
      * @return Job id
      */
     Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs) {
+        //If dataList is empty then error right away.
+        if(dataList == null || dataList.isEmpty()) throw DataProblem.of('error.data.emptyPayload').detail("Bulk Data is Empty").toException()
+
         syncJobArgs.entityClass = getEntityClass()
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
         //FIXME why are we setting session: true here? explain. should it be default?

@@ -9,7 +9,7 @@ import groovy.transform.CompileStatic
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 /**
- * Config from application.yml properteis.
+ * Config from application.yml properties.
  */
 @ConfigurationProperties(prefix="app.mail")
 @CompileStatic
@@ -24,8 +24,19 @@ class MailProps {
     Mailgun mailgun = new Mailgun()
 
     static class Mailgun {
+        boolean enabled = false
         /** the private api key for sdk */
         String privateApiKey
 
     }
+
+    //boxes are general setups that can be used for sending emails.
+    // Map<String, MailConfig> boxes = [:]
+    //
+    // static class MailConfig {
+    //     /** default from email address */
+    //     String from
+    //     /** default reply to address */
+    //     String replyTo
+    // }
 }

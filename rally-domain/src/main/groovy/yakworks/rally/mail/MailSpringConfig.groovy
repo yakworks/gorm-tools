@@ -6,6 +6,7 @@ package yakworks.rally.mail
 
 import groovy.transform.CompileStatic
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -21,7 +22,7 @@ import yakworks.rally.mail.testing.TestMailService
 @CompileStatic
 class MailSpringConfig {
 
-    @Profile("test")
+    @ConditionalOnProperty(value="app.mail.mailgun.enabled", havingValue = "false", matchIfMissing = true)
     @Bean
     EmailService emailService() {
         return new TestMailService()
@@ -33,19 +34,15 @@ class MailSpringConfig {
         return new MailMessageSender()
     }
 
-    @Configuration @Lazy
+    @Configuration
+    @ConditionalOnProperty(value="app.mail.mailgun.enabled", havingValue = "true")
     static class MailgunBeans {
 
-        @Profile("!test")
+        //@Profile("!test")
         @Bean
         EmailService emailService() {
             return new MailgunService()
         }
-
-        // @Bean
-        // MailService emailService() {
-        //     return new MailgunService()
-        // }
 
         // @Bean
         // MailgunMessagesApi mailgunMessagesApi(MailConfig mailConfig) {

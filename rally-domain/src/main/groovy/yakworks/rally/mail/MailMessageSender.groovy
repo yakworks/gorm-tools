@@ -14,6 +14,7 @@ import grails.gorm.transactions.Transactional
 import yakworks.api.Result
 import yakworks.api.problem.Problem
 import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.mail.model.ContentType
 import yakworks.rally.mail.model.MailMessage
 
 /**
@@ -76,7 +77,7 @@ class MailMessageSender {
             to: [mailMessage.sendTo],
             subject: mailMessage.subject
         )
-        if(mailMessage.contentType == MailMessage.ContentType.html){
+        if(mailMessage.contentType == ContentType.html){
             mailTo.html = mailMessage.body
         } else {
             mailTo.text = mailMessage.body

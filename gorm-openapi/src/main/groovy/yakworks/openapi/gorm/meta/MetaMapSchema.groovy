@@ -32,7 +32,7 @@ class MetaMapSchema implements Serializable {
     OapiSupport oapiSupport
 
     MetaMapSchema(){
-        this.oapiSupport = OapiSupport.instance()
+        this.oapiSupport = OapiSupport.instance
     }
 
     static MetaMapSchema of(MetaEntity mentity){

@@ -7,6 +7,7 @@ import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.api.Result
 import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.mail.mailgun.MailgunService
 import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.mail.testing.TestMailService
 import yakworks.rally.testing.MockData
@@ -17,7 +18,7 @@ import yakworks.testing.gorm.integration.DomainIntTest
 class MailMessageSenderSpec extends Specification implements DomainIntTest {
 
     @Autowired MailMessageSender mailMessageSender
-    @Autowired TestMailService emailService
+    @Autowired EmailService emailService
 
     void setup() {
         emailService.sentMail = []
@@ -37,6 +38,7 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
 
     void "smoke test mail message"() {
         when:
+        //assert emailService instanceof MailgunService
         MailMessage mailMsg = MockData.mailMessage()
         flushAndClear()
         assert MailMessage.get(mailMsg.id)

@@ -37,7 +37,7 @@ class SchemaView {
     OapiSupport oapiSupport
 
     SchemaView(){
-        oapiSupport = OapiSupport.instance()
+        oapiSupport = OapiSupport.instance
     }
 
     List getRequired(){

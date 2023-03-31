@@ -24,7 +24,7 @@ import yakworks.openapi.gorm.OapiSupport
 class MetaEntitySchemaService extends MetaEntityService {
 
     OapiSupport getOapiSupport(){
-        return OapiSupport.instance()
+        return OapiSupport.instance
     }
 
     /**

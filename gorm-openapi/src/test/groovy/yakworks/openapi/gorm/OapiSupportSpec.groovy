@@ -14,12 +14,12 @@ class OapiSupportSpec extends Specification {
         return getOapiSupport().getSchema(name)
     }
     OapiSupport getOapiSupport(){
-        return OapiSupport.instance()
+        return OapiSupport.instance
     }
 
     void "parse it sandbox"() {
         when:
-        def oapiService = new OapiSupport()
+        def oapiService = new OapiSupport().build()
         // OpenAPI openAPI = new OpenAPIV3Parser().read('oapi.yaml')
         // Schema contact = openAPI.getComponents().schemas['Contact']
         Schema contact = oapiService.getSchema('Contact')

@@ -4,7 +4,6 @@
 */
 package yakworks.rally.mail.model
 
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 import groovy.transform.CompileDynamic
@@ -91,10 +90,6 @@ class MailMessage implements UuidRepoEntity<MailMessage, UuidGormRepo<MailMessag
         Complained //The email recipient clicked on the spam complaint button within their email client.
     }
 
-    @CompileDynamic
-    static enum ContentType {
-        plain, html, markdown
-    }
 
 
     // static mapping = {

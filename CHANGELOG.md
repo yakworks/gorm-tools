@@ -1,3 +1,20 @@
+### v7.3.36
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.34...v7.3.36)
+- release [link](https://github.com/yakworks/gorm-tools/commit/228d2fd9d368336272a80b2fbca562306aada185)
+- Merge pull request #657 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/333cee5c8ed313b56c4c283cc98b14197cec3aee)
+- DataProblemException is bulk data is empty (#656) [link](https://github.com/yakworks/gorm-tools/commit/1db7e66310f804ff4b38a938b6ecc3a39542eb0a)
+- fix version [link](https://github.com/yakworks/gorm-tools/commit/6fdd231ebd67b76161b54ea31123c4b1124f421d)
+- mail configs (#655) [link](https://github.com/yakworks/gorm-tools/commit/58e802563e0695b5cb750ba57b0ff7610038a44e)
+- Grails 5.3.2 and spring-boot 2.7.9 [link](https://github.com/yakworks/gorm-tools/commit/2b7a169e2f180729420e9041da4dfb3337a07d83)
+- change the OapiSupport to thread safe instance strategy [link](https://github.com/yakworks/gorm-tools/commit/663c061db88a0316189813eb65fe93f13a8f1764)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/b522f1e1cd5fdd60f37a7deaf0b393617553e6c2)
+- prep for release [link](https://github.com/yakworks/gorm-tools/commit/c188e2a68fc37e7f79e3df0c89487c0b0eba2f22)
+- update sendDate when mailMessage is sent [link](https://github.com/yakworks/gorm-tools/commit/87f3bdb7eea221b84759f597a1b7b667f293a916)
+- fix attachment and test in convertMailMessage [link](https://github.com/yakworks/gorm-tools/commit/503aabba3a3f1bb197552f56a9b258b2ae8c314a)
+- mailgun config (#651) [link](https://github.com/yakworks/gorm-tools/commit/fb6533138a8afefc9d28ac3197cff700da4a463d)
+- Mango sort fixes (#650) [link](https://github.com/yakworks/gorm-tools/commit/0aa6b1028632214267bf02094118036aa1c53aee)
+
 ### v7.3.34
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.33...v7.3.34)

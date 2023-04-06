@@ -98,7 +98,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         Map data = args.data
         if(data.locations) persistToManyWithOrgId(org, Location.repo, data.locations as List<Map>)
         if(data.contacts) persistToManyWithOrgId(org, Contact.repo, data.contacts as List<Map>)
-        if(data.tags) orgTagRepo.addOrRemove((Persistable)org, data.tags)
+        if(data.tags != null) orgTagRepo.addOrRemove((Persistable)org, data.tags)
     }
 
     @Override

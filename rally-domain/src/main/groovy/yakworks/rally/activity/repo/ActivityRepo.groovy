@@ -119,8 +119,8 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
     void doAfterPersistWithData(Activity activity, PersistArgs args) {
         Map data = args.data
         if(data.attachments) doAttachments(activity, data.attachments)
-        if(data.contacts) ActivityContact.addOrRemove(activity, data.contacts)
-        if(data.tags) TagLink.addOrRemoveTags(activity, data.tags)
+        if(data.contacts != null) ActivityContact.addOrRemove(activity, data.contacts)
+        if(data.tags != null) TagLink.addOrRemoveTags(activity, data.tags)
 
         if(args.bindAction?.isCreate()){
             if(data.linkedId && data.linkedEntity) {

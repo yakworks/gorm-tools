@@ -5,10 +5,13 @@ import java.time.ZonedDateTime
 
 import org.springframework.beans.factory.annotation.Autowired
 
+import com.mailgun.api.v4.MailgunEmailVerificationApi
+import com.mailgun.client.MailgunClient
 import com.mailgun.model.events.EventsQueryOptions
 import com.mailgun.model.events.EventsResponse
 import com.mailgun.model.message.Message
 import com.mailgun.model.message.MessageResponse
+import com.mailgun.model.verification.AddressValidationResponse
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
@@ -20,7 +23,6 @@ import yakworks.rally.mail.config.MailProps
 import yakworks.testing.gorm.integration.DataIntegrationTest
 
 /**
- * Tests for mailgun, many are marked @PendingFeature which can be removed to test
  * This sends real emails so dont want it running every time test suite is run
  * add the app.mail.mailgun.private-api-key to test/resources/application.yml and these will work
  */
@@ -57,15 +59,15 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
         mailConfig.mailgun.enabled
     }
 
-    @Ignore
+    //@Ignore
     def "simple with min required fields"() {
         when:
         MailTo mailMsg = new MailTo(
-            from: "Yakworks Account Services <rndc@greenbill.io>",
+            from: "9ci Account Services <rndc@greenbill.io>",
             to: ["josh2@9ci.com"],
-            text: 'foo',
+            text: 'Testing',
             //subject can be empty but obviously not recomended
-            //subject: "RNDC Test Statement xx",
+            subject: "Testing",
         )
 
         Result res = emailService.send(mailMsg)
@@ -192,6 +194,18 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
         result
         result.items
         result.paging
+    }
+
+    def "Validation"() {
+        when:
+        MailgunEmailVerificationApi mgunVerify = MailgunClient.config(mailConfig.mailgun.privateApiKey)
+            .createApi(MailgunEmailVerificationApi.class)
+
+        AddressValidationResponse result = mgunVerify.validateAddress("canderson@marczyk.com")
+
+        then:
+        result.result == "undeliverable" || result.result == "do_not_send"
+        result.reason
     }
 
 }

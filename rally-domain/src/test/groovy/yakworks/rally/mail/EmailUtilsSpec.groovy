@@ -10,6 +10,8 @@ class EmailUtilsSpec extends Specification {
     void "validate emails"() {
         expect:
         EmailUtils.validateEmail('jim@joe.com')
+        //simple comma sep list
+        EmailUtils.validateEmail('jim@joe.com, bob@emaple.com')
         EmailUtils.validateEmail('Account Services <rndc@greenbill.io>, "Blow, Joe" <josh2@yak.com>,joe@email.com')
     }
 
@@ -35,6 +37,7 @@ class EmailUtilsSpec extends Specification {
         when:
         def iaddy = new InternetAddress('"Blow, Joe" <josh2@9ci.com>')
         InternetAddress[] listAddy = InternetAddress.parse('Account Services <rndc@greenbill.io>, "Blow, Joe" <josh2@9ci.com>,jim@joe.com');
+
         then:
         iaddy.address == "josh2@9ci.com"
         iaddy.validate()
@@ -58,4 +61,41 @@ class EmailUtilsSpec extends Specification {
         listAddy[2].personal == null
 
     }
+
+    void "InternetAddress simple list"() {
+        when:
+        InternetAddress[] listAddy = InternetAddress.parse('rndc@greenbill.io, josh2@9ci.com, jim@joe.com')
+
+        then:
+        listAddy.size() === 3
+        listAddy.each {
+            it.validate()
+            assert it.address
+        }
+    }
+
+    void "InternetAddress single item"() {
+        when:
+        InternetAddress[] listAddy = InternetAddress.parse('jim@joe.com')
+
+        then:
+        listAddy.size() === 1
+        listAddy[0].address == 'jim@joe.com'
+        listAddy.each {
+            it.validate()
+            assert it.address
+        }
+    }
+
+    // void "InternetAddress single bad item"() {
+    //     when:
+    //     InternetAddress[] listAddy = InternetAddress.parse('jimjoe.com')
+    //
+    //     then:
+    //     listAddy.size() === 1
+    //     listAddy.each {
+    //         it.validate()
+    //         assert it.address
+    //     }
+    // }
 }

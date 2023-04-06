@@ -198,14 +198,18 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
      *
      * If itemParams is an object and has op=update then it will spin through and look for the op field in each object
      *  - if no op field in data then its assumed to be an add and will add if not exists
-     *  - if op=delete then removes
+     *  - if op=remove then removes
+     *
+     * NOTE: Good tests in TagLinkSpec and TagDataOpSpec
      *
      * @param main the primary entity, or linkedEntity if its a linkedEntityRepo
      * @param itemParams the List or Map data
      * @return the list or created or updated
      */
     List<X> addOrRemove(P main, Object itemParams){
-        if(!itemParams) return []
+
+        //check specifically for null, to support empty list which should remove all refs.
+        if(itemParams == null) return []
 
         //handle if it's a json array in string, largely for CSV support and the binding that occurs during that process, such as creating orgs with tags
         if(itemParams instanceof String) {
@@ -240,11 +244,8 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
      * This should NOT normally be called directly, use addOrRemove
      */
     List<X> addOrRemoveList(P main, List<Map> dataList){
-        //if its passing in an empty list on update then clear it out
-        if(dataList.isEmpty()) {
-            remove(main)
-            return []
-        }
+        //if its passing in null on update that means make no changes
+        if(dataList == null)  return []
 
         List xlist = [] as List<X>
         for (Map relatedItem : dataList) {
@@ -255,9 +256,9 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     }
 
     List<X> replaceList(P main, List<Map> dataList){
-        def itemList = dataList as List<Map>
-        // if its empty, then remove all
+        // if empty list came in, clear all tags.
         if(dataList.isEmpty()) {
+            remove(main)
             return []
         } else {
             //list of existing related items
@@ -265,13 +266,17 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
             List<Long> currentLinkIds = collectLongIds(currentLinkList, "${relatedPropName}Id")
             List<Long> dataIds = collectLongIds(dataList)
 
+            //first remove which ever existing ids are not in incoming list
+            //this will preserve existing tags which are already in incoming list
+            List<Long> itemsToRemove = currentLinkIds - dataIds
+            remove(main, itemsToRemove)
 
+            //add new tags
             List<Long> itemsToAdd = dataIds - currentLinkIds
             List<Map> itemsToAddMap = listToIdMap(itemsToAdd)
             List xlist = addOrRemoveList(main, itemsToAddMap)
 
-            List<Long> itemsToRemove = currentLinkIds - dataIds
-            remove(main, itemsToRemove)
+
             return xlist
         }
 

@@ -98,14 +98,14 @@ class TagLinkSpec extends Specification implements DataRepoTest, SecurityTest {
         thrown IllegalArgumentException
     }
 
-    void "test add remove - list"() {
+    void "test add remove - replace is the default"() {
         setup:
         Attachment att = new Attachment(name: 'foo', location: 'foo').persist()
         Tag t1 = Tag.create(name: 't1', code:'t1', entityName: 'Attachment')
         Tag t2 = Tag.create(name: 't2', code:'t2', entityName: 'Attachment')
         Tag t3 = Tag.create(name: 't3', code:'t3', entityName: 'Attachment')
 
-        when:
+        when: "add t1 t2"
         TagLink.addOrRemoveTags(att, [[id:t1.id], [id:t2.id]])
 
         then:
@@ -113,7 +113,7 @@ class TagLinkSpec extends Specification implements DataRepoTest, SecurityTest {
         TagLink.exists(att, t2)
         !TagLink.exists(att, t3)
 
-        when:
+        when: "remove t1 add t3"
         TagLink.addOrRemoveTags(att, [[id:t2.id], [id:t3.id]])
         flushAndClear()
 
@@ -123,6 +123,80 @@ class TagLinkSpec extends Specification implements DataRepoTest, SecurityTest {
         TagLink.exists(att, t2)
         TagLink.exists(att, t3)
         !att.tags.contains(t1)
+
+        when: "no change"
+        TagLink.addOrRemoveTags(att, [[id:t2.id], [id:t3.id]])
+
+        then:
+        TagLink.count() == 2
+        !TagLink.exists(att, t1)
+        TagLink.exists(att, t2)
+        TagLink.exists(att, t3)
+        !att.tags.contains(t1)
+
+        when: "null"
+        TagLink.addOrRemoveTags(att, null)
+
+        then: "Should do nothing"
+        TagLink.count() == 2
+
+        when: "Empty"
+        TagLink.addOrRemoveTags(att, [])
+
+        then: "Should remove all"
+        TagLink.count() == 0
+    }
+
+    void "test add remove - map with data ops"() {
+        setup:
+        Attachment att = new Attachment(name: 'foo', location: 'foo').persist()
+        Tag t1 = Tag.create(name: 't1', code:'t1', entityName: 'Attachment')
+        Tag t2 = Tag.create(name: 't2', code:'t2', entityName: 'Attachment')
+        Tag t3 = Tag.create(name: 't3', code:'t3', entityName: 'Attachment')
+
+        when: "add t1 t2"
+        TagLink.addOrRemoveTags(att, [[id:t1.id], [id:t2.id]])
+
+        then:
+        TagLink.count() == 2
+        TagLink.exists(att, t1)
+        TagLink.exists(att, t2)
+
+        when: "Add one more"
+        TagLink.addOrRemoveTags(att, [op:"update", data:[[id:t3.id]]])
+
+        then:
+        TagLink.count() == 3
+        TagLink.exists(att, t3)
+
+        when: "update - keep t2,t3, remove t1"
+        TagLink.addOrRemoveTags(att, [op:"update", data:[[op:"remove", id:t1.id]]])
+        flushAndClear()
+
+        then:
+        TagLink.count() == 2
+        !TagLink.exists(att, t1)
+        TagLink.exists(att, t2)
+        TagLink.exists(att, t3)
+        !att.tags.contains(t1)
+
+        when: "no change - same as existing"
+        TagLink.addOrRemoveTags(att, [op:"update", data:[[id:t1.id],[id:t2.id],[id:t3.id]]])
+
+        then: "should keep em all"
+        TagLink.count() == 3
+        TagLink.exists(att, t1)
+        TagLink.exists(att, t2)
+        TagLink.exists(att, t3)
+
+        when: "update - empty"
+        TagLink.addOrRemoveTags(att, [op:"update", data:[]])
+
+        then: "Should do nothing"
+        TagLink.count() == 3
+        TagLink.exists(att, t1)
+        TagLink.exists(att, t2)
+        TagLink.exists(att, t3)
     }
 
     void "test add remove - loose json string "() {
@@ -132,7 +206,7 @@ class TagLinkSpec extends Specification implements DataRepoTest, SecurityTest {
         Tag t2 = Tag.create(name: 't2', code:'t2', entityName: 'Attachment')
         Tag t3 = Tag.create(name: 't3', code:'t3', entityName: 'Attachment')
 
-        when:
+        when: "add 1,2"
         TagLink.addOrRemoveTags(att, '[{id:1}, {id:2}]')
 
         then:
@@ -140,7 +214,7 @@ class TagLinkSpec extends Specification implements DataRepoTest, SecurityTest {
         TagLink.exists(att, t2)
         !TagLink.exists(att, t3)
 
-        when:
+        when: "add 2,3 remove 1"
         TagLink.addOrRemoveTags(att, '[{id:2}, {id:3}]')
         flushAndClear()
 

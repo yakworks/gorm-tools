@@ -98,8 +98,9 @@ class ActivityContactOpTests extends Specification implements DataIntegrationTes
 
     }
 
-    void "test op:update with empty array to remove all"() {
+    void "test op:update with empty array does nothing"() {
         when:
+        assert ActivityContact.list().isEmpty()
         def att = setupData()
         flushAndClear()
 
@@ -111,9 +112,27 @@ class ActivityContactOpTests extends Specification implements DataIntegrationTes
             ]
         ]
         def updatedAtt = Activity.update(dta)
+        flush()
 
         then:
-        !updatedAtt.hasTags()
+        ActivityContact.list(updatedAtt).size() == 3
+    }
+
+    void "test op:replace with empty array removes them"() {
+        when:
+        assert ActivityContact.list().isEmpty()
+        def att = setupData()
+        flushAndClear()
+
+        def id = att.id
+        def dta = [
+            id: att.id,
+            contacts: []
+        ]
+        def updatedAtt = Activity.update(dta)
+        flush()
+
+        then:
         ActivityContact.list(updatedAtt).size() == 0
     }
 

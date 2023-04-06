@@ -98,7 +98,7 @@ class TagLinkSpec extends Specification implements DataRepoTest, SecurityTest {
         thrown IllegalArgumentException
     }
 
-    void "test add remove - list"() {
+    void "test add remove - replace is the default"() {
         setup:
         Attachment att = new Attachment(name: 'foo', location: 'foo').persist()
         Tag t1 = Tag.create(name: 't1', code:'t1', entityName: 'Attachment')
@@ -133,6 +133,12 @@ class TagLinkSpec extends Specification implements DataRepoTest, SecurityTest {
         TagLink.exists(att, t2)
         TagLink.exists(att, t3)
         !att.tags.contains(t1)
+
+        when: "null"
+        TagLink.addOrRemoveTags(att, null)
+
+        then: "Should do nothing"
+        TagLink.count() == 2
 
         when: "Empty"
         TagLink.addOrRemoveTags(att, [])

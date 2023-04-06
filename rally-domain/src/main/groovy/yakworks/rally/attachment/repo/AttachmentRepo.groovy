@@ -72,7 +72,7 @@ class AttachmentRepo extends LongIdGormRepo<Attachment> {
     @Override
     void doAfterPersistWithData(Attachment attachment, PersistArgs args) {
         Map data = args.data
-        if(data.tags) TagLink.addOrRemoveTags(attachment, data.tags)
+        if(data.tags != null) TagLink.addOrRemoveTags(attachment, data.tags)
     }
 
     /**

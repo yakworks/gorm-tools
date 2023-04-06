@@ -103,7 +103,7 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
 
     }
 
-    void "test op:update with empty array to remove all"() {
+    void "test op:update with empty array does nothing"() {
         when:
         def att = setupAnAttachmentWithTags()
         flushAndClear()
@@ -117,7 +117,24 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
         ]
         def updatedAtt = Attachment.update(dta)
 
-        then:
+        then: "still has them"
+        updatedAtt.hasTags()
+        TagLink.list(updatedAtt).size() == 3
+    }
+
+    void "test op:replace deafult with empty list"() {
+        when:
+        def att = setupAnAttachmentWithTags()
+        flushAndClear()
+
+        def id = att.id
+        def dta = [
+            id: att.id,
+            tags: []
+        ]
+        def updatedAtt = Attachment.update(dta)
+
+        then: "still has them"
         !updatedAtt.hasTags()
         TagLink.list(updatedAtt).size() == 0
     }

@@ -198,7 +198,9 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
      *
      * If itemParams is an object and has op=update then it will spin through and look for the op field in each object
      *  - if no op field in data then its assumed to be an add and will add if not exists
-     *  - if op=delete then removes
+     *  - if op=remove then removes
+     *
+     * NOTE: Good tests in TagLinkSpec and TagDataOpSpec
      *
      * @param main the primary entity, or linkedEntity if its a linkedEntityRepo
      * @param itemParams the List or Map data
@@ -242,8 +244,8 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
      * This should NOT normally be called directly, use addOrRemove
      */
     List<X> addOrRemoveList(P main, List<Map> dataList){
-        //if its passing in an empty list on update that means make no changes
-        if(!dataList)  return []
+        //if its passing in null on update that means make no changes
+        if(dataList == null)  return []
 
         List xlist = [] as List<X>
         for (Map relatedItem : dataList) {

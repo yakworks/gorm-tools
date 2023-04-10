@@ -230,8 +230,11 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
             if(op == DataOp.update) {
                 xlist =  addOrRemoveList(main, dataList as List)
             }
+            else if(op == DataOp.remove){
+                removeList(main, dataList as List)
+            }
             else {
-                throw new UnsupportedOperationException("op=update is currently the only supported operation when passing a map for associations")
+                throw new UnsupportedOperationException("op=update and op=remove are currently the only supported operation when passing a map for associations")
             }
         } else { //its a list
             xlist = replaceList(main, itemParams as List)
@@ -240,7 +243,18 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     }
 
     /**
-     * iterates over list and calls the createOrRemove
+     * remove just whats in the list
+     */
+    void removeList(P main, List<Map> dataList){
+        //if the top level op is remove then remove the whole list
+        for (Map relatedItem : dataList) {
+            R related = (R)lookup(relatedClass, relatedItem)
+            remove(main, related)
+        }
+    }
+
+    /**
+     * Called if top level op:update, iterates over list and calls the createOrRemove
      * This should NOT normally be called directly, use addOrRemove
      */
     List<X> addOrRemoveList(P main, List<Map> dataList){
@@ -249,6 +263,7 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
 
         List xlist = [] as List<X>
         for (Map relatedItem : dataList) {
+            //if the top level op is remove then remove the whole list
             X xref = createOrRemove(main, relatedItem)
             if(xref) xlist.add(xref)
         }

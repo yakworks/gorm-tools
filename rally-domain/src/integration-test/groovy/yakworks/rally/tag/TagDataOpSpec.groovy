@@ -139,6 +139,33 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
         TagLink.list(updatedAtt).size() == 0
     }
 
+    void "test op:remove with list"() {
+        setup:
+        def att = setupAnAttachmentWithTags()
+        def tag1Id = att.tags[0].id
+        assert tag1Id
+        //starts with 3
+        att.getTags().size() == 3
+        flushAndClear()
+
+        when:
+        //def id = att.id
+        def dta = [
+            id: att.id,
+            tags: [
+                op:'remove', data: [
+                    [id: tag1Id]
+                ]
+            ]
+        ]
+        def updatedAtt = Attachment.update(dta)
+        flushAndClear()
+        updatedAtt.refresh()
+
+        then:
+        updatedAtt.tags.size() == 2
+    }
+
     void "test op:remove on one"() {
         when:
         def att = setupAnAttachmentWithTags()

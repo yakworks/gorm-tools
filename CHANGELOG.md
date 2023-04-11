@@ -1,3 +1,13 @@
+### v7.3.37
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.36...v7.3.37)
+- release [link](https://github.com/yakworks/gorm-tools/commit/82f76ad9a0116f7a4df0e45594be1145bf705e73)
+- trigger release [link](https://github.com/yakworks/gorm-tools/commit/a62d937213e712f04a42ba2d2d3a8a71b9f0464b)
+- fix op:remove on crossRef items, add test for it. (#660) [link](https://github.com/yakworks/gorm-tools/commit/0dba63c31852dbe395b04ae04d442f17666561cb)
+- Fix tags handling domain9#1708 (#658) [link](https://github.com/yakworks/gorm-tools/commit/504bae5c1151ac280dd063cb31234fd882a7ed63)
+- Merge pull request #659 from yakworks/mailgun-utils [link](https://github.com/yakworks/gorm-tools/commit/78b2cb6c64a491f15f9f6a919894deb163d1c921)
+- mail utils [link](https://github.com/yakworks/gorm-tools/commit/9d6138b9f5fa61301941bf6daa782862ae2f8904)
+
 ### v7.3.36
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.34...v7.3.36)

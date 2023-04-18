@@ -140,12 +140,17 @@ trait OkHttpRestTrait {
         return OkAuth.TOKEN
     }
 
+    //can override to change the path for getting the oauth token
+    String getLoginTokenPath(){
+        "api/oauth/token"
+    }
+
     @CompileDynamic
     /** uses the basic auth to login and parse the access_token from response. */
     String login(String uname, String pwd) {
         //create the basic auth credentials
         String basicAuth = Credentials.basic(uname, pwd)
-        String lpath = "http://localhost:${serverPort}/api/oauth/token"
+        String lpath = "http://localhost:${serverPort}/${getTokenPath()}"
         Request request = new Request.Builder()
             .url(lpath)
             .addHeader("Authorization", basicAuth)

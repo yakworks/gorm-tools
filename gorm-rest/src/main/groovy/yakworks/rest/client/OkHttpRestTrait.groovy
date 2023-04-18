@@ -150,7 +150,7 @@ trait OkHttpRestTrait {
     String login(String uname, String pwd) {
         //create the basic auth credentials
         String basicAuth = Credentials.basic(uname, pwd)
-        String lpath = "http://localhost:${serverPort}/${getTokenPath()}"
+        String lpath = "http://localhost:${serverPort}/${getLoginTokenPath()}"
         Request request = new Request.Builder()
             .url(lpath)
             .addHeader("Authorization", basicAuth)

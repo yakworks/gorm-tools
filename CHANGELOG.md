@@ -1,3 +1,9 @@
+### v7.3.38
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.37...v7.3.38)
+- Oktrait (#662) [link](https://github.com/yakworks/gorm-tools/commit/c88af829d166c23f59aea1c6d5b0ac1f0e487e1a)
+- add ablity to change the getLoginTokenPath [link](https://github.com/yakworks/gorm-tools/commit/957cc4d3571e3f31e7670853c3754ef7b1cef3cb)
+
 ### v7.3.37
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.36...v7.3.37)

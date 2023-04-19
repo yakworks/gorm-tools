@@ -1,3 +1,8 @@
+### v7.3.39
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.38...v7.3.39)
+- deep sanitize stack traces to try and make them more managable [link](https://github.com/yakworks/gorm-tools/commit/83c0c8d98aae2f7cc5e1555cdeb926dfded4dbde)
+
 ### v7.3.38
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.37...v7.3.38)

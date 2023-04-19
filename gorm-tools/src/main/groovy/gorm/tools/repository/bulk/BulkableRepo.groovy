@@ -118,7 +118,7 @@ trait BulkableRepo<D> {
                     ApiResults results = doBulk((List<Map>) dataSlice, jobContext.args, true)
                     jobContext.updateJobResults(results, false)
                 } catch(Exception ex) {
-                    log.error("BulkableRepo unexpected exception", ex)
+                    //log.error("BulkableRepo unexpected exception", ex)
                     jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
                 }
             }

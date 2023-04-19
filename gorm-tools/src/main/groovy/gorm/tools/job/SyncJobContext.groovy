@@ -16,6 +16,8 @@ import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 import groovy.util.logging.Slf4j
 
+import org.codehaus.groovy.runtime.StackTraceUtils
+
 import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.utils.BenchmarkHelper
 import yakworks.api.ApiResults
@@ -145,7 +147,7 @@ class SyncJobContext {
             updateJob(apiResults, [id: jobId, ok: ok.get(), message: message])
         } catch (e) {
             //ok to swallow this excep since we dont want to disrupt the flow
-            log.error("Unexpected error during updateJobResults", e)
+            log.error("Unexpected error during updateJobResults", StackTraceUtils.deepSanitize(e))
             if(throwEx) throw e
         }
     }

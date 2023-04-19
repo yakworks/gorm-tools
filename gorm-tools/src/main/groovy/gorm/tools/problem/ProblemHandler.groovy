@@ -7,6 +7,7 @@ package gorm.tools.problem
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.codehaus.groovy.runtime.StackTraceUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSourceResolvable
 import org.springframework.dao.DataAccessException
@@ -90,7 +91,7 @@ class ProblemHandler {
                 String rootMessage = e.rootCause?.getMessage()
                 String msgInfo = "===  message: ${e.message} \n === rootMessage: ${rootMessage} "
 
-                log.error("MAYBE UNEXPECTED? Data Access Exception ${msgInfo}", e)
+                log.error("MAYBE UNEXPECTED? Data Access Exception ${msgInfo}", StackTraceUtils.deepSanitize(e))
                 return DataProblem.of(e)
             }
         } else {
@@ -99,7 +100,7 @@ class ProblemHandler {
     }
 
     GenericProblem handleUnexpected(Throwable e){
-        log.error("UNEXPECTED Internal Server Error ${e.message}", e)
+        log.error("UNEXPECTED Internal Server Error ${e.message}", StackTraceUtils.deepSanitize(e))
         if (e instanceof GenericProblem) {
             return (GenericProblem) e
         }

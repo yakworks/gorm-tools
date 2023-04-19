@@ -26,6 +26,7 @@ import gorm.tools.utils.GormMetaUtils
 import gorm.tools.validation.Rejector
 import jakarta.annotation.Nullable
 import yakworks.rally.orgs.OrgMemberService
+import yakworks.rally.orgs.model.Company
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
@@ -60,9 +61,24 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         }
     }
 
+    /**
+     * makes sure org has a company on it, and sets it self if its a company
+     */
+    void verifyCompany(Org org){
+        if (org.companyId == null) {
+            if (org.type == OrgType.Company){
+                org.companyId = org.id
+            } else {
+                org.companyId = Company.DEFAULT_COMPANY_ID
+            }
+        }
+    }
+
+
     @RepoListener
     void beforeBind(Org org, Map data, BeforeBindEvent be) {
         if (be.isBindCreate()) {
+            verifyCompany(org)
             org.type = getOrgTypeFromData(data)
             //bind id early or generate one as we use it in afterBind
             if(data.id) {

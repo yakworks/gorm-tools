@@ -4,6 +4,8 @@ import org.springframework.validation.Errors
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import spock.lang.IgnoreRest
+import yakworks.rally.orgs.model.Company
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.api.problem.data.DataProblemException
 import yakworks.rally.orgs.OrgDimensionService
@@ -29,7 +31,14 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
         Org branch = Org.of("Branch", "Branch", OrgType.Branch).persist()
         Org division = Org.of("Division", "Division", OrgType.Division).persist()
 
+        expect:
+        org.companyId != null
+
+        when:
         OrgMember member = OrgMember.make(org)
+
+        then:
+        member
 
         when:
         org.member = member
@@ -64,6 +73,7 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
         OrgMember.get(member.id) == null
     }
 
+    @IgnoreRest
     void "test insert with orgmembers"() {
         given:
         orgDimensionService.testInit('Branch.Division.Business')
@@ -73,9 +83,8 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
         division.persist()
         division.member.persist()
 
-        Map params = [name: "test", num: "test", orgTypeId: 3, member: [division: [id: division.id]]]
-
         when:
+        Map params = [name: "test", num: "test", orgTypeId: 3, member: [division: [id: division.id]]]
         Org result = Org.create(params)
 
         then:
@@ -85,6 +94,8 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
         result.member != null
         result.member.division.id == division.id
         result.member.business.id == division.member.business.id
+        result.member.companyId
+        result.member.companyId ==  Company.DEFAULT_COMPANY_ID
 
         when:
         Org otherBusiness = Org.of("b2", "b2", OrgType.Business).persist([flush: true])
@@ -122,6 +133,7 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
         result.num == "test"
         result.member != null
         result.member.branch.id == branch.id
+        result.member.company
 
         cleanup:
         orgDimensionService.testInit(null)

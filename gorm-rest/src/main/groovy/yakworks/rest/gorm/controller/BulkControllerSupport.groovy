@@ -57,9 +57,9 @@ class BulkControllerSupport<D> {
         return bcs
     }
 
-    SyncJobEntity process(DataOp dataOp, List<Map> dataList, GrailsWebRequest webRequest) {
+    SyncJobEntity process(List<Map> dataList, SyncJobArgs syncJobArgs) {
 
-        SyncJobArgs syncJobArgs = setupSyncJobArgs(dataOp, webRequest)
+        //SyncJobArgs syncJobArgs = setupSyncJobArgs(dataOp, webRequest.params, webRequest.currentRequest)
 
         Long jobId
         if(syncJobArgs.params.attachmentId) {
@@ -106,10 +106,10 @@ class BulkControllerSupport<D> {
     /**
      * sets up the SyncJobArgs from whats passed in from params
      */
-    SyncJobArgs setupSyncJobArgs(DataOp dataOp, GrailsWebRequest webRequest){
-        HttpServletRequest req = webRequest.currentRequest
-        GrailsParameterMap params = webRequest.params
-        String sourceKey = "${req.method} ${req.requestURI}?${req.queryString}"
+    SyncJobArgs setupSyncJobArgs(DataOp dataOp, GrailsParameterMap params, String sourceId){
+        // HttpServletRequest req = webRequest.currentRequest
+        // GrailsParameterMap params = webRequest.params
+        // String sourceKey = "${req.method} ${req.requestURI}?${req.queryString}"
 
         Map includesMap = includesConfig.getIncludes(entityClass)
         List bulkIncludes = IncludesConfig.getFieldIncludes(includesMap, [IncludesKey.bulk.name()])
@@ -119,7 +119,7 @@ class BulkControllerSupport<D> {
             op: dataOp,
             includes: bulkIncludes,
             errorIncludes: bulkErrorIncludes,
-            sourceId: sourceKey,
+            sourceId: sourceId,
             source: params.jobSource,
             params: params
         )

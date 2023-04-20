@@ -67,11 +67,16 @@ trait RestRegistryResponder {
      * Changes so it does do anything for Errors objects
      */
     @Generated
-    void respondWith(Object value, Map args = [:]) {
+    void respondWith(Object value) {
+        internalRegistryRender value, [:]
+    }
+
+    @Generated
+    void respondWith(Object value, Map args) {
         internalRegistryRender value, args
     }
 
-    void internalRegistryRender(Object value, Map args=[:]) {
+    void internalRegistryRender(Object value, Map args) {
         // BenchmarkHelper.startTime()
         Integer statusCode
         if (args.status) {
@@ -130,8 +135,8 @@ trait RestRegistryResponder {
                 throw new IllegalArgumentException("Houston we have a problem, renderer can't be found for fallback json format and ${value.class}")
         }
 
-        //put params into arguments so we can access them from a Renderer
-        args.params = getParams()
+        //put params into arguments so we can access them from a Renderer, used for the excel renderer for example
+        if(!args.params) args.params = getParams()
 
         final ServletRenderContext context = new ServletRenderContext(webRequest, args)
         if(statusCode != null) context.status = HttpStatus.valueOf(statusCode)

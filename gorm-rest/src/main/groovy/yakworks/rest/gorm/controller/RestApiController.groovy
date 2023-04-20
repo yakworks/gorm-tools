@@ -69,12 +69,20 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
     }
 
     /**
-     * Returns a new params for Request to see if this prevents them from being dropped
+     * Sometimes the stock getParams will loose the query params that are passed in. Its not clear why.
+     * It will still contain the items from urlMapping such as id and the controller and action,
+     * which is done in AbstractUrlMappingInfo.populateParamsForMapping.
+     * This creates a new instance from the request which will then copy in the standard getParams().
+     * 9999 out of 10000 when its not confused it results in the exact same Map, but when the params is missing the user query params it
+     * will end up with the missing ones.
      * @return a new copy of the grails params
      */
     GrailsParameterMap getGrailsParams() {
-        new GrailsParameterMap(getRequest())
-        //getParams()
+        Map gParams = new GrailsParameterMap(getRequest())
+        Map dispatchParams = getParams()
+        //if the main params "dropped" then they will now be in gParams. if they exists in both then no real change, just puts them all in again
+        gParams.putAll(dispatchParams)
+        return gParams
     }
 
     // void respondWith(Object value, Map args = [:]) {
@@ -100,7 +108,7 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
     /**
      * looks in params for value and converts to boolean, returning the defaultValue if not found
      */
-    boolean paramBoolean(String key, boolean defaultVal){
-        return params.boolean(key, defaultVal)
-    }
+    // boolean paramBoolean(String key, boolean defaultVal){
+    //     return params.boolean(key, defaultVal)
+    // }
 }

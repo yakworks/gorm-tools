@@ -19,6 +19,7 @@ import grails.web.servlet.mvc.GrailsParameterMap
 import yakworks.api.problem.Problem
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.NameUtils
+import yakworks.gorm.config.GormConfig
 
 /**
  * Marker trait with common helpers for a Restfull api type controller.
@@ -27,8 +28,9 @@ import yakworks.commons.lang.NameUtils
 @CompileStatic
 trait RestApiController implements RequestJsonSupport, RestResponder, RestRegistryResponder, ServletAttributes {
 
-    @Autowired
-    ProblemHandler problemHandler
+    @Autowired ProblemHandler problemHandler
+
+    @Autowired GormConfig gormConfig
 
     //default responseFormats should be just json
     static List getResponseFormats() {
@@ -65,7 +67,7 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
 
     void handleException(Exception e) {
         Problem apiError = problemHandler.handleException(e)
-        respond(apiError)
+        respondWith(apiError)
     }
 
     /**
@@ -78,11 +80,16 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
      * @return a new copy of the grails params
      */
     GrailsParameterMap getGrailsParams() {
-        Map gParams = new GrailsParameterMap(getRequest())
-        Map dispatchParams = getParams()
-        //if the main params "dropped" then they will now be in gParams. if they exists in both then no real change, just puts them all in again
-        gParams.putAll(dispatchParams)
-        return gParams
+        if(gormConfig.enableGrailsParams) {
+            Map gParams = new GrailsParameterMap(getRequest())
+            Map dispatchParams = getParams()
+            // if the main params "dropped" then they will now be in gParams.
+            // if they exists in both then no real change, just puts them all in again
+            gParams.putAll(dispatchParams)
+            return gParams
+        } else {
+            return getParams()
+        }
     }
 
     // void respondWith(Object value, Map args = [:]) {

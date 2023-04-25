@@ -18,7 +18,7 @@ class LocationController implements RestRepoApiController<Location> {
         Map q = bodyAsMap()
         q.street = q.street == null ? null : "foo street"
         Location instance = getRepo().create(q)
-        respond instance, [status: CREATED] //201
+        respondWith instance, [status: CREATED] //201
     }
 
 }

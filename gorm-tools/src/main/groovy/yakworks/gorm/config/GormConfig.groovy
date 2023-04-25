@@ -19,6 +19,8 @@ class GormConfig {
     boolean enabled = true
     String hello
 
+    boolean enableGrailsParams = false
+
     @Autowired
     AsyncConfig async
 

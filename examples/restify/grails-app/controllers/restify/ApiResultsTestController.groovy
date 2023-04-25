@@ -15,7 +15,7 @@ class ApiResultsTestController implements RestRepoApiController<Org> {
 
     @Override
     def get() {
-        respond(ApiResults.OK())
+        respondWith(ApiResults.OK())
     }
 
 }

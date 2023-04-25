@@ -17,7 +17,7 @@ import groovy.transform.CompileStatic
 import org.springframework.security.oauth2.core.AbstractOAuth2Token
 
 /**
- * helpers to generate key pairs, RSA right now.
+ * helpers to generate key pairs for RSA and EC ES256
  */
 @CompileStatic
 class TokenUtils {

@@ -44,13 +44,23 @@ class JwtProperties {
     }
 
     static class Issuer {
+        /** RS256 or ES256 supported and tested */
         SignatureAlgorithm alg = SignatureAlgorithm.RS256
-        String iss //issuer
+        /** issuer in form "http://yakworks.org" */
+        String iss
+        /** the public RSA key */
         Resource publicKey
+        /** the private RSA key */
         Resource privateKey
+
+        /**
+         * For EC ES256, has a single key with both private and public by default
+         * Can also generate a single RSA pem and assign it here as well.
+         */
         Resource pairKey
 
-        KeyPair keyPair //cached keyPair
+        /** cached keyPair */
+        KeyPair keyPair
 
         /** gets the keypair using the configured resources for pairKey, publikKey and/or privateKey */
         KeyPair getKeyPair(){

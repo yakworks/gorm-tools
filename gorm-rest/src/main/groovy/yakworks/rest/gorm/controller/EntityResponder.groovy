@@ -81,7 +81,7 @@ class EntityResponder<D> {
      */
     void respondWith(RestRegistryResponder ctrl, D instance, Map params, HttpStatus status = HttpStatus.OK){
         MetaMap entityMap = createEntityMap(instance, params)
-        ctrl.respondWith(entityMap, [status: status])
+        ctrl.respondWith(entityMap, [status: status, params: params])
     }
 
     /**

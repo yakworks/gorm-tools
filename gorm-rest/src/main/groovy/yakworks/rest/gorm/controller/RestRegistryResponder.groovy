@@ -33,12 +33,11 @@ trait RestRegistryResponder {
     private String PROPERTY_RESPONSE_FORMATS = "responseFormats"
 
     private RendererRegistry rendererRegistry
-    private ProxyHandler proxyHandler
 
     //will get implemented by normal controller and WebAttributes
     abstract GrailsParameterMap getParams()
 
-    abstract GrailsParameterMap getGrailsParams()
+    //abstract GrailsParameterMap getGrailsParams()
 
     @Generated
     @Autowired(required = false)
@@ -49,17 +48,6 @@ trait RestRegistryResponder {
     @Generated
     RendererRegistry getRendererRegistry() {
         return this.rendererRegistry
-    }
-
-    @Generated
-    @Autowired(required = false)
-    void setProxyHandler(ProxyHandler proxyHandler) {
-        this.proxyHandler = proxyHandler
-    }
-
-    @Generated
-    ProxyHandler getProxyHandler() {
-        return this.proxyHandler
     }
 
     /**

@@ -65,7 +65,7 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
 
     void handleException(Exception e) {
         Problem apiError = problemHandler.handleException(e)
-        respond(apiError)
+        respondWith(apiError)
     }
 
     /**
@@ -80,7 +80,8 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
     GrailsParameterMap getGrailsParams() {
         Map gParams = new GrailsParameterMap(getRequest())
         Map dispatchParams = getParams()
-        //if the main params "dropped" then they will now be in gParams. if they exists in both then no real change, just puts them all in again
+        // if the main params "dropped" then they will now be in gParams.
+        // if they exists in both then no real change, just puts them all in again
         gParams.putAll(dispatchParams)
         return gParams
     }

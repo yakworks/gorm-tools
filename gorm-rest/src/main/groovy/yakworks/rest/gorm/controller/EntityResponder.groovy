@@ -79,9 +79,9 @@ class EntityResponder<D> {
     /**
      * respond with instance, calls ctrl.respondWith after it creates and entityMap
      */
-    void respondWith(RestRegistryResponder ctrl, D instance, HttpStatus status = HttpStatus.OK){
-        MetaMap entityMap = createEntityMap(instance, (ctrl as WebAttributes).params)
-        ctrl.respondWith(entityMap, [status: status])
+    void respondWith(RestRegistryResponder ctrl, D instance, Map params, HttpStatus status = HttpStatus.OK){
+        MetaMap entityMap = createEntityMap(instance, params)
+        ctrl.respondWith(entityMap, [status: status, params: params])
     }
 
     /**

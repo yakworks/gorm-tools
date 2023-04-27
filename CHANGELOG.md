@@ -1,3 +1,8 @@
+### v7.3.40
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.39...v7.3.40)
+- fixes for jpa and nested memebers (#668) [link](https://github.com/yakworks/gorm-tools/commit/060b098d066478e2179753da18aa83d39fed4d34)
+
 ### v7.3.39
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.38...v7.3.39)

@@ -29,21 +29,9 @@ class OrgRepo extends AbstractOrgRepo {
     void beforeValidate(Org org, Errors errors) {
         super.beforeValidate(org, errors)
         wireOrgMember(org)
-        verifyCompany(org)
+        //verifyCompany(org)
     }
 
-    /**
-     * makes sure org has a company on it, and sets it self if its a company
-     */
-    void verifyCompany(Org org){
-        if (org.companyId == null) {
-            if (org.type == OrgType.Company){
-                org.companyId = org.id
-            } else {
-                org.companyId = Company.DEFAULT_COMPANY_ID
-            }
-        }
-    }
 
     /**
      * Org member needs org set for validation

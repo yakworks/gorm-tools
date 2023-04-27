@@ -20,6 +20,7 @@ import org.springframework.core.convert.support.GenericConversionService
 import org.springframework.dao.InvalidDataAccessResourceUsageException
 
 import gorm.tools.mango.MangoDetachedCriteria
+import gorm.tools.utils.GormMetaUtils
 
 /**
  * Builds JPQL String-based queries from the DetachedCriteria.
@@ -652,9 +653,8 @@ class JpqlQueryBuilder {
     }
 
     PersistentProperty validateProperty(PersistentEntity entity, String name, String whatItChecks) {
-        if(name.endsWith('.id') && name.count('.') == 1){
-            String assoc = name.tokenize('.')[0]
-            return (entity.getPropertyByName(assoc) as Association).getAssociatedEntity().getIdentity()
+        if(name.endsWith('.id') && name.count('.') >= 1){
+            return GormMetaUtils.getPersistentProperty(entity, name)
         }
 
         PersistentProperty identity = entity.getIdentity()
@@ -774,7 +774,7 @@ class JpqlQueryBuilder {
                 AssociationCriteria ac = (AssociationCriteria) criterion
                 Association association = ac.getAssociation()
                 List<Query.Criterion> associationCriteriaList = ac.getCriteria()
-                handleAssociationCriteria(q, tempWhereClause, logicalName, position, parameters, association,
+                position = handleAssociationCriteria(q, tempWhereClause, logicalName, position, parameters, association,
                     new Query.Conjunction(), associationCriteriaList)
             }
             else {
@@ -836,7 +836,7 @@ class JpqlQueryBuilder {
                 AssociationCriteria ac = (AssociationCriteria) criterion
                 Association association = ac.getAssociation()
                 List<Query.Criterion> associationCriteriaList = ac.getCriteria()
-                handleAssociationCriteria(q, tempWhereClause, logicalName, position, parameters, association,
+                position = handleAssociationCriteria(q, tempWhereClause, logicalName, position, parameters, association,
                     new Query.Conjunction(), associationCriteriaList)
             }
             else {

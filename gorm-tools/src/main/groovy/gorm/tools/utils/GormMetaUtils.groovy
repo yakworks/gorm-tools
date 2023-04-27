@@ -204,6 +204,21 @@ class GormMetaUtils {
 
     }
 
+    /** get PersistentProperty for path */
+    @CompileDynamic
+    static PersistentProperty getPersistentProperty(PersistentEntity domain, String property) {
+        Closure getPerProperty
+        getPerProperty = { PersistentEntity domainClass, List path ->
+            PersistentProperty prop = domainClass?.getPropertyByName(path[0].toString())
+            if (path.size() > 1 && prop) {
+                getPerProperty(prop.associatedEntity, path.tail())
+            } else {
+                prop
+            }
+        }
+        getPerProperty(domain, property.split("[.]") as List)
+    }
+
     /**
      * Returns persistent properties for persistent entity(finds by name)
      * Adds composite identeties, which are not in persistent properties by default

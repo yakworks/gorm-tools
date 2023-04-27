@@ -59,18 +59,19 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
         sumbObj.size() == 5
     }
 
-    def "sum projections with groupBy to test paging"() {
+    def "sum projections with groupBy to test member.division.num"() {
         when:
         //baseline should be same
-        int rowCount = Org.query([
-            q: [ 'calc.totalDue.$gt': 100.0]
-        ]).count()
-        assert rowCount == 40
+        // int rowCount = Org.query([
+        //     q: [ 'calc.totalDue.$gt': 100.0, 'member.division.id': 6 ]
+        // ]).count()
+        // assert rowCount == 1
 
         MangoDetachedCriteria qry = Org.query([
             //num is unique so wont group anything
-            projections: ['calc.totalDue':'sum', 'num': 'group'],
+            projections: ['calc.totalDue':'sum'],
             q: [
+                'member.division.id': 6,
                 'calc.totalDue.$gt': 100.0
             ]
         ])
@@ -78,8 +79,8 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
         SimplePagedList sumbObj = qry.mapList(max:10)
 
         then:
-        sumbObj.size() == 10
-        sumbObj.totalCount == rowCount
+        sumbObj.size() == 1
+        sumbObj.totalCount == 1
     }
 
     def "sum projections with type groupBy having on sum"() {

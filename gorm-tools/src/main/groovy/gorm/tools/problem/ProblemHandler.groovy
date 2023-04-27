@@ -70,11 +70,11 @@ class ProblemHandler {
             valProblem.violations(transateErrorsToViolations(valProblem.errors))
             return valProblem
         }
-        else if (e instanceof GenericProblem) {
-            return (GenericProblem) e
-        }
         else if (e instanceof ThrowableProblem) {
             return (GenericProblem) e.problem
+        }
+        else if (e instanceof GenericProblem) {
+            return (GenericProblem) e
         }
         else if (e instanceof grails.validation.ValidationException
             || e instanceof org.grails.datastore.mapping.validation.ValidationException) {

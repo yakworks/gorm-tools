@@ -95,4 +95,65 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         res[1]['calc_totalDue_sum'] < res[2]['calc_totalDue_sum']
     }
 
+    def "sum with member and multiples on member"() {
+        given:
+        def qry = Org.query(
+            projections: ['calc.totalDue':'sum', 'type':'group'],
+            q: [
+                'member.division.id': 6,
+                'contact.id': 10
+            ]
+        )
+
+        when: "A jpa query is built"
+        def builder = JpqlQueryBuilder.of(qry).aliasToMap(true)
+        def queryInfo = builder.buildSelect()
+        def query = queryInfo.query
+
+        then:"The query is valid"
+        queryInfo.paramMap['p1'] == 6
+        query != null
+        query.trim() == strip('''
+            SELECT new map( SUM(org.calc.totalDue) as calc_totalDue_sum,org.type as type )
+            FROM yakworks.rally.orgs.model.Org AS org
+            WHERE (org.member.division.id=:p1 AND org.contact.id=:p2)
+            GROUP BY org.type
+        ''')
+
+        // when:
+        //
+        // List res = Org.executeQuery(query, queryInfo.paramMap)
+        //
+        // then:
+        // res.size() == 4
+        // res[0]['type'] == OrgType.Client
+        // res[0]['calc_totalDue_sum'] < res[1]['calc_totalDue_sum']
+        // res[1]['calc_totalDue_sum'] < res[2]['calc_totalDue_sum']
+    }
+
+    def "sum with member and multiples on member.div.num"() {
+        given:
+        def qry = Org.query(
+            projections: ['calc.totalDue': 'sum', 'type': 'group'],
+            q: [
+                'member.division.num': "6",
+                'contact.id'         : 10
+            ]
+        )
+
+        when: "A jpa query is built"
+        def builder = JpqlQueryBuilder.of(qry).aliasToMap(true)
+        def queryInfo = builder.buildSelect()
+        def query = queryInfo.query
+
+        then: "The query is valid"
+        queryInfo.paramMap['p1'] == "6"
+        query != null
+        query.trim() == strip('''
+            SELECT new map( SUM(org.calc.totalDue) as calc_totalDue_sum,org.type as type )
+            FROM yakworks.rally.orgs.model.Org AS org
+            WHERE (org.member.division.num=:p1 AND org.contact.id=:p2)
+            GROUP BY org.type
+        ''')
+    }
 }

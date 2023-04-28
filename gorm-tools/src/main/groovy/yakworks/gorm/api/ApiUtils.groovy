@@ -38,7 +38,7 @@ class ApiUtils {
     /**
      * Parses name=xyz&size=123 query string into a map
      * @param queryString
-     * @return
+     * @return Map<String,String>
      */
     static Map parseQueryParams(String queryString) {
         if(!queryString) return [:]

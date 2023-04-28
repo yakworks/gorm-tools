@@ -19,6 +19,7 @@ import grails.web.servlet.mvc.GrailsParameterMap
 import yakworks.api.problem.Problem
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.NameUtils
+import yakworks.gorm.api.ApiUtils
 import yakworks.gorm.config.GormConfig
 
 /**
@@ -81,7 +82,12 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
      */
     GrailsParameterMap getGrailsParams() {
         if(gormConfig.enableGrailsParams) {
-            Map gParams = new GrailsParameterMap(getRequest())
+            def request = getRequest()
+            Map parsedParams = [:]
+            if(!request.getParameterMap() && request.queryString) {
+                parsedParams = ApiUtils.parseQueryParams(request.queryString)
+            }
+            Map gParams = new GrailsParameterMap(parsedParams, request)
             Map dispatchParams = getParams()
             // if the main params "dropped" then they will now be in gParams.
             // if they exists in both then no real change, just puts them all in again

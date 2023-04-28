@@ -22,4 +22,17 @@ class ApiUtilsSpec extends Specification implements GrailsAppUnitTest {
         ApiUtils.splitPath("/bar") == [name: 'bar', namespace: '']
     }
 
+    def "parse query params"() {
+        expect:
+        ApiUtils.parseQueryParams("") == [:]
+        ApiUtils.parseQueryParams(null) == [:]
+
+        ApiUtils.parseQueryParams("name=abc.zip") == [name:"abc.zip"]
+        ApiUtils.parseQueryParams("na%20me=ab%20c.zip") == ["na me":"ab c.zip"]
+        ApiUtils.parseQueryParams("name=abc.zip&size=111") == [name:"abc.zip", size:"111"]
+        ApiUtils.parseQueryParams("name=") == [name:""]
+        ApiUtils.parseQueryParams("name=&size=10") == [name:"", size:"10"]
+        ApiUtils.parseQueryParams("name=test.zip&size=") == [name:"test.zip", size:""]
+        ApiUtils.parseQueryParams("name=test.zip&size") == [name:"test.zip", size:""]
+    }
 }

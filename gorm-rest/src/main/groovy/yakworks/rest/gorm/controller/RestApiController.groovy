@@ -81,20 +81,25 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
      * @return a new copy of the grails params
      */
     GrailsParameterMap getGrailsParams() {
+        //the dispatchParams are the normal stock params, has values added in from UrlMappings and path
+        Map dispatchParams = getParams()
+        //if this hack is enabled
         if(gormConfig.enableGrailsParams) {
-            def request = getRequest()
-            Map parsedParams = [:]
-            if(!request.getParameterMap() && request.queryString) {
-                parsedParams = ApiUtils.parseQueryParams(request.queryString)
+            def req = getRequest()
+            //possibly from an async operation, still investigating, the params in the request get lost or dropped, but queryString still there
+            if(!req.getParameterMap() && req.queryString) {
+                Map parsedParams = ApiUtils.parseQueryParams(req.queryString)
+                Map gParams = new GrailsParameterMap(parsedParams, req)
+                // if the main params "dropped" then they will now be in gParams.
+                // and the normal getParams will have what the UrlMappings added in and we put those into the newly parsed params
+                gParams.putAll(dispatchParams)
+                return gParams
+            } else {
+                //nothing should be wrong, params didnt get lost so just return the default
+                return dispatchParams
             }
-            Map gParams = new GrailsParameterMap(parsedParams, request)
-            Map dispatchParams = getParams()
-            // if the main params "dropped" then they will now be in gParams.
-            // if they exists in both then no real change, just puts them all in again
-            gParams.putAll(dispatchParams)
-            return gParams
         } else {
-            return getParams()
+            return dispatchParams
         }
     }
 

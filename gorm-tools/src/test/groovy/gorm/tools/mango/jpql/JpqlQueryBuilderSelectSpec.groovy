@@ -171,8 +171,13 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
 
     void "projections having with is not null"() {
         setup:
-        QueryArgs args = QueryArgs.of(q:[kind:'$isNotNull', amount:'$isNotNull'], projections: [kind:'group', amount:'sum'])
-
+        QueryArgs args = QueryArgs.of(
+            projections: [kind:'group', amount:'sum'],
+            q: [
+                kind:'$isNotNull',
+                amount:'$isNotNull'
+            ]
+        )
         when: "having with in"
         MangoDetachedCriteria criteria = KitchenSink.repo.query(args)
         def builder = JpqlQueryBuilder.of(criteria) //.aliasToMap(true)
@@ -243,6 +248,33 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         HAVING (SUM(kitchenSink.sinkLink.amount) < :p4)
         ORDER BY sinkLink_amount_sum ASC''')
         queryInfo.paramMap == [p1: 1, p2: 2, p3: true, p4: 100]
+    }
+
+    void "projections with q having nested ids"() {
+        given: "Some criteria"
+
+        def criteria = KitchenSink.query (
+            projections: ['sinkLink.amount':'sum'],
+            q: [
+                'ext.kitchenParent.thing.id': 1,
+                'sinkLink.thing.id': 2,
+                inactive: true,
+            ]
+        )
+
+        when: "A jpa query is built"
+        def builder = JpqlQueryBuilder.of(criteria) //.aliasToMap(true)
+        def queryInfo = builder.buildSelect()
+        def query = queryInfo.query
+
+        then: "The query is valid"
+        query != null
+        query.trim() == strip('''\
+        SELECT SUM(kitchenSink.sinkLink.amount) as sinkLink_amount_sum
+        FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
+        WHERE (kitchenSink.ext.kitchenParent.thing.id=:p1 AND kitchenSink.sinkLink.thing.id=:p2 AND kitchenSink.inactive=:p3)
+        ''')
+        queryInfo.paramMap == [p1: 1, p2: 2, p3: true]
     }
 
     void "Test projections simple with aliases"() {

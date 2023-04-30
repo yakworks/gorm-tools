@@ -1,10 +1,12 @@
 package yakworks.rally.mango
 
-
+import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.jpql.JpqlQueryBuilder
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import spock.lang.Ignore
 import spock.lang.Specification
+import yakworks.rally.orgs.model.Contact
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
@@ -149,6 +151,37 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         then: "The query is valid"
         queryInfo.paramMap['p1'] == "6"
         query != null
+        query.trim() == strip('''
+            SELECT new map( SUM(org.calc.totalDue) as calc_totalDue_sum,org.type as type )
+            FROM yakworks.rally.orgs.model.Org AS org
+            WHERE (org.member.division.num=:p1 AND org.contact.id=:p2)
+            GROUP BY org.type
+        ''')
+    }
+
+    @Ignore //TODO WIP to get exists working with JpqlQueryBuilder
+    def "exists on contact location"() {
+        given:
+        def qryContact = Contact.query(
+            q: [
+                'location.city': "second City1*",
+                'org.id' : ['$eqf': 'org_.id']
+            ]
+        ).id()
+
+        def qry = Org.query(
+            //projections: ['calc.totalDue': 'sum', 'type': 'group'],
+            q: [
+                'name': "Org1*",
+            ]
+        ).exists(qryContact)
+
+        when: "A jpa query is built"
+        def builder = JpqlQueryBuilder.of(qry as MangoDetachedCriteria)//.aliasToMap(true)
+        def queryInfo = builder.buildSelect()
+        def query = queryInfo.query
+
+        then: "The query is valid"
         query.trim() == strip('''
             SELECT new map( SUM(org.calc.totalDue) as calc_totalDue_sum,org.type as type )
             FROM yakworks.rally.orgs.model.Org AS org

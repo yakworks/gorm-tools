@@ -4,19 +4,15 @@
 */
 package yakworks.rest.gorm.controller
 
-import javax.persistence.Query
-
 import groovy.json.JsonException
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.hibernate.QueryException
-import org.hibernate.hql.internal.ast.QuerySyntaxException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataAccessException
 import org.springframework.http.HttpStatus
 
-import antlr.MismatchedTokenException
 import gorm.tools.beans.Pager
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.api.QueryMangoEntityApi
@@ -117,19 +113,19 @@ class EntityResponder<D> {
         //remove the fields that grails adds for controller and action
         // pclone.removeAll {it.key in whitelistKeys }
         try {
-        QueryArgs qargs = QueryArgs.of(pager)
-        //require q if its set
-        if (pathItem?.qRequired) qargs.qRequired = true
-        qargs = qargs.build(parms)
-        qargs.validateQ()
-        if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.criteria}")
+            QueryArgs qargs = QueryArgs.of(pager)
+            //require q if its set
+            if (pathItem?.qRequired) qargs.qRequired = true
+            qargs = qargs.build(parms)
+            qargs.validateQ()
+            if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.criteria}")
             ((QueryMangoEntityApi) getRepo()).queryList(qargs, null, debugEnabled ? log : null)
-        } catch(JsonException | IllegalArgumentException | QueryException ex) {
+        } catch (JsonException | IllegalArgumentException | QueryException ex) {
             //See #1925 - Catch bad query in 'q' parameter and report back. So we dont pollute logs, and can differentiate that its not us.
             //Hibernate throws IllegalArgumentException when Antlr fails to parse query
             //and throws QueryException when hibernate fails to execute query
             throw DataProblem.ex("Invalid query $ex.message")
-        } catch(DataAccessException ex) {
+        } catch (DataAccessException ex) {
             throw DataProblem.of(ex).toException()
         }
     }

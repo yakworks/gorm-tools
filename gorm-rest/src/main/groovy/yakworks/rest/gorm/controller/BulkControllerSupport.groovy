@@ -4,11 +4,8 @@
 */
 package yakworks.rest.gorm.controller
 
-import javax.servlet.http.HttpServletRequest
-
 import groovy.transform.CompileStatic
 
-import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.job.SyncJobArgs

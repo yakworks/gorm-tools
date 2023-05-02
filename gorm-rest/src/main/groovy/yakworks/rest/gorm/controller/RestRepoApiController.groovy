@@ -48,6 +48,7 @@ trait RestRepoApiController<D> extends RestApiController {
 
     //Need it to access log and still compile static in trait (See https://issues.apache.org/jira/browse/GROOVY-7439)
     //final private static Logger log = LoggerFactory.getLogger(this.class)
+    @SuppressWarnings(['LoggerWithWrongModifiers'])
     Logger log = LoggerFactory.getLogger(this.class)
 
     @Autowired(required = false)
@@ -144,9 +145,9 @@ trait RestRepoApiController<D> extends RestApiController {
     @Action
     def get() {
         try {
-            Serializable _id = params.id as Serializable //this should be fine since grails isnt loosing the params set from UrlMappings
-            D instance = (D) getRepo().read(_id)
-            RepoUtil.checkFound(instance, _id, getEntityClass().simpleName)
+            Serializable idx = params.id as Serializable //this should be fine since grails isnt loosing the params set from UrlMappings
+            D instance = (D) getRepo().read(idx)
+            RepoUtil.checkFound(instance, idx, getEntityClass().simpleName)
             respondWithEntityMap(instance, getParamsMap())
         } catch (Exception e) {
             handleException(e)

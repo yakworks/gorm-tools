@@ -112,7 +112,8 @@ class OrgSourceRepo extends LongIdGormRepo<OrgSource> {
             //we check when new to avoid unique index error.
             if(exists(os.sourceType, os.sourceId, os.orgType)){
                 throw DataProblemCodes.UniqueConstraint.get()
-                    .detail("Violates unique constraint [sourceType: ${os.sourceType}, sourceId: ${os.sourceId}, orgType:${os.orgType.id}]").toException()
+                    .detail("Violates unique constraint [sourceType: ${os.sourceType}, sourceId: ${os.sourceId}, orgType:${os.orgType}]")
+                    .toException()
             }
         }
     }

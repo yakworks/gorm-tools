@@ -70,9 +70,9 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
         respondWith(apiError)
     }
 
-    Map getGrailsParams() {
-        getParamsMap()
-    }
+    // Map getGrailsParams() {
+    //     getParamsMap()
+    // }
 
     /**
      * Sometimes the stock getParams will loose the query params that are passed in. Its not clear why.
@@ -85,8 +85,8 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
      */
     Map getParamsMap() {
         //the dispatchParams are the normal stock params, has values added in from UrlMappings and path
-        Map gParams = getParams()
-        Map parms = [:]
+        Map grailsParams = getParams()
+        Map pMap = [:]
         //if this hack is enabled
         if(gormConfig.enableGrailsParams) {
             def req = getRequest()
@@ -94,14 +94,14 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
             if(!req.getParameterMap() && req.queryString) {
                 Map parsedParams = ApiUtils.parseQueryParams(req.queryString)
                 //Map gParams = new GrailsParameterMap(parsedParams, req)
-                parms.putAll(parsedParams)
+                pMap.putAll(parsedParams)
             }
         }
         // if the main params "dropped" then they will now be in gParams.
         // and the normal getParams will have what the UrlMappings added in and we put those into the newly parsed params
         // this will also avoid the issues with request being passed that is referenced in GrailsParameterMap
-        parms.putAll(gParams)
-        return parms
+        pMap.putAll(grailsParams)
+        return pMap
     }
 
     // void respondWith(Object value, Map args = [:]) {

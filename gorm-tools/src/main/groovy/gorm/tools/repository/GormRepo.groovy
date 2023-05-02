@@ -573,9 +573,8 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
     /**
      * checks if its new or if its dirty
      */
-    boolean isNewOrDirty(D entity) {
-        GormMetaUtils.isNewOrDirty((GormEntity)entity)
-
+    boolean isNewOrDirty(GormEntity entity) {
+        GormMetaUtils.isNewOrDirty(entity)
     }
 
     /**

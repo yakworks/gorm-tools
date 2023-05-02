@@ -43,7 +43,8 @@ class OrgSourceRepoTests extends Specification implements DataIntegrationTest {
 
     void "test exists"() {
         when:
-        Org org = OrgSource.create(name: "test", num: "test2", orgTypeId: "3", sourceType:'ERP')
+        Org org = Org.create(name: "test", num: "test2", orgTypeId: "3", sourceType:'ERP')
+        flush()
 
         then:
         org

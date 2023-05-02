@@ -1,9 +1,8 @@
 package yakworks.rally.orgs
 
-
+import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.TestDataJson
-import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
@@ -15,16 +14,9 @@ import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
 
-class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
+class OrgSpec extends Specification implements GormHibernateTest, SecurityTest {
 
-    // Closure doWithGormBeans() { { ->
-    //     orgDimensionService(OrgDimensionService)
-    //     orgMemberService(OrgMemberService)
-    // }}
-
-    void setupSpec() {
-        mockDomains(Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo)
-    }
+    static entityClasses = [Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo]
 
     void "sanity check build"() {
         when:
@@ -65,7 +57,7 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
 
     }
 
-    def testOrgSourceChange() {
+    void testOrgSourceChange() {
         when:
         Org org = Org.of("foo", "bar", OrgType.Customer)
         Org.repo.createSource(org)
@@ -92,13 +84,13 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
         assert OrgSource.get(osi).sourceId == "test"
     }
 
-    def "create & update associations"() {
+    void "create & update associations"() {
         setup:
         Long orgId = 1000
 
-        Map flex = TestDataJson.buildMap(OrgFlex, includes: "*")
-        Map calc = TestDataJson.buildMap(OrgCalc, includes: "*")
-        Map info = TestDataJson.buildMap(OrgInfo, includes: "*")
+        Map flex = TestDataJson.buildMap(OrgFlex, includes: "*", save:false)
+        Map calc = TestDataJson.buildMap(OrgCalc, includes: "*", save:false)
+        Map info = TestDataJson.buildMap(OrgInfo, includes: "*", save:false)
 
         Map params = TestDataJson.buildMap(Org) << [id: orgId, flex: flex, info: info, type: 'Customer']
 
@@ -127,15 +119,17 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
         org.info.website == 'www.test.com'
     }
 
-    def "test insert with locations"() {
+    void "test insert with locations"() {
         setup:
         Long orgId = 10000
         //Map location = TestDataJson.buildMap(Location, includes:"*")
         List locations = [[street1: "street1"], [street1: "street loc2"]]
-        Map params = TestDataJson.buildMap(Org) + [locations: locations]
+        Map params = TestDataJson.buildMap(Org, save:false) + [locations: locations]
 
         when:
         def org = Org.create(params)
+        flush()
+
         def locs = org.locations
 
         then:

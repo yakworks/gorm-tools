@@ -131,11 +131,8 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         ge.code == DataProblemCodes.UniqueConstraint.code
 
         // def rootCause = NestedExceptionUtils.getRootCause(ge)
-        problem.detail.contains("Unique index or primary key violation") || //mysql and H2
-            problem.contains("Duplicate entry") || //mysql
-            problem.contains("Violation of UNIQUE KEY constraint") || //sql server
-            problem.contains("duplicate key value violates unique constraint") //postgres
-
+        problem.code == DataProblemCodes.UniqueConstraint.code
+        problem.detail.contains("Violates unique constraint")
     }
 
     def "test null num fails"() {
@@ -272,7 +269,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         when:
         Org otherBusiness = Org.of("b2", "b2", OrgType.Business).persist([flush: true])
         params = [
-            name: "test", num: "test", orgTypeId: "3",
+            name: "test", num: "test2", orgTypeId: "3",
             member: [
                 division: [id: division.id],
                 business: [id: otherBusiness.id]

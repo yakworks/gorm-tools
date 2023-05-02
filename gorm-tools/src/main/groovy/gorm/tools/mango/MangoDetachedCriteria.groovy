@@ -164,7 +164,9 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     boolean exists() {
         return (Boolean)withQueryInstance(Collections.emptyMap(), null) { Query query ->
             query.projections().count()
-            ((Number)query.singleResult()) > 0
+            query.maxResults(1)
+            query.projections().id()
+            ((Number)query.list().size()) > 0
         }
     }
 

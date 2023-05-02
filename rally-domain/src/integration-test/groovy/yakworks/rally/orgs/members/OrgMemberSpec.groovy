@@ -100,7 +100,7 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
         when:
         Org otherBusiness = Org.of("b2", "b2", OrgType.Business).persist([flush: true])
         params = [
-            name: "test", num: "test", orgTypeId: "3",
+            name: "test", num: "test2", orgTypeId: "3",
             member: [
                 division: [id: division.id],
                 business: [id: otherBusiness.id]

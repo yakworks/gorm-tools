@@ -1,5 +1,7 @@
 package yakworks.rally.orgs
 
+import gorm.tools.model.SourceType
+import yakworks.rally.orgs.model.Org
 import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
@@ -26,10 +28,7 @@ class OrgSourceRepoTests extends Specification implements DataIntegrationTest {
         DataProblemException ge = thrown()
         def problem = ge.problem
         problem.code == DataProblemCodes.UniqueConstraint.code
-        problem.detail.contains("Unique index or primary key violation") || //mysql and H2
-            problem.detail.contains("Duplicate entry") || //mysql
-            problem.detail.contains("Violation of UNIQUE KEY constraint") || //sql server
-            problem.detail.contains("duplicate key value violates unique constraint") //postgres
+        problem.detail.contains("Violates unique constraint")
     }
 
     void "testSave success same sourceId on different orgTypes"() {
@@ -40,6 +39,17 @@ class OrgSourceRepoTests extends Specification implements DataIntegrationTest {
         then: "should pass because new OrgSource is for different orgType"
         source
         'K14700' == source.sourceId
+    }
 
+    void "test exists"() {
+        when:
+        Org org = OrgSource.create(name: "test", num: "test2", orgTypeId: "3", sourceType:'ERP')
+
+        then:
+        org
+        org.source
+
+        and:
+        orgSourceRepo.exists(SourceType.ERP, org.num, org.type)
     }
 }

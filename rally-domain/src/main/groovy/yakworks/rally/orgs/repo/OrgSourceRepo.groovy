@@ -109,7 +109,7 @@ class OrgSourceRepo extends LongIdGormRepo<OrgSource> {
     @RepoListener
     void beforePersist(OrgSource os, BeforePersistEvent e) {
         if(os.isNew()) {
-            //we check when new to avoid ix_artransource_unique error. its updated, which is rare, we let unique index reject it
+            //we check when new to avoid unique index error.
             if(exists(os.sourceType, os.sourceId, os.orgType)){
                 throw DataProblemCodes.UniqueConstraint.get()
                     .detail("Violates unique constraint [sourceType: ${os.sourceType}, sourceId: ${os.sourceId}, orgType:${os.orgType.id}]").toException()

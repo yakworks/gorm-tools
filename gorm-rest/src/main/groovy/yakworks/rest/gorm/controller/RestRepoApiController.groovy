@@ -22,7 +22,6 @@ import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.DataOp
 import grails.web.Action
-import grails.web.servlet.mvc.GrailsParameterMap
 import yakworks.api.problem.Problem
 import yakworks.gorm.api.IncludesKey
 
@@ -101,7 +100,7 @@ trait RestRepoApiController<D> extends RestApiController {
     def post() {
         try {
             D instance = (D) getRepo().create(bodyAsMap())
-            respondWithEntityMap(instance, grailsParams, CREATED)
+            respondWithEntityMap(instance, getParamsMap(), CREATED)
         } catch (Exception e) {
             handleException(e)
         }
@@ -118,7 +117,7 @@ trait RestRepoApiController<D> extends RestApiController {
         data.putAll(dataMap) // json data may not contains id because it passed in params
         try {
             D instance = (D) getRepo().update(data)
-            respondWithEntityMap(instance, grailsParams)
+            respondWithEntityMap(instance, getParamsMap())
         } catch (Exception e) {
             handleException(e)
         }
@@ -148,7 +147,7 @@ trait RestRepoApiController<D> extends RestApiController {
             Serializable _id = params.id as Serializable //this should be fine since grails isnt loosing the params set from UrlMappings
             D instance = (D) getRepo().read(_id)
             RepoUtil.checkFound(instance, _id, getEntityClass().simpleName)
-            respondWithEntityMap(instance, grailsParams)
+            respondWithEntityMap(instance, getParamsMap())
         } catch (Exception e) {
             handleException(e)
         }
@@ -167,7 +166,7 @@ trait RestRepoApiController<D> extends RestApiController {
     @Action
     def list() {
         try {
-            Map gParams = grailsParams
+            Map gParams = getParamsMap()
             log.debug("list with gParams ${gParams}")
             Pager pager = getEntityResponder().pagedQuery(gParams, [IncludesKey.list.name()])
             //we pass in the params to args so it can get passed on to renderer, used in the excel renderer for example
@@ -180,7 +179,7 @@ trait RestRepoApiController<D> extends RestApiController {
     @Action
     def picklist() {
         try {
-            Map gParams = grailsParams
+            Map gParams = getParamsMap()
             Pager pager = picklistPagedQuery(gParams)
             //we pass in the params to args so it can get passed on to renderer, used in the excel renderer for example
             respondWith(pager, [params: gParams])
@@ -211,7 +210,7 @@ trait RestRepoApiController<D> extends RestApiController {
 
     void bulkProcess(DataOp dataOp) {
         List dataList = bodyAsList() as List<Map>
-        Map gParams = grailsParams
+        Map gParams = getParamsMap()
         HttpServletRequest req = request
         String sourceId = "${req.method} ${req.requestURI}?${req.queryString}"
         SyncJobArgs syncJobArgs = getBulkControllerSupport().setupSyncJobArgs(dataOp, gParams, sourceId)

@@ -35,6 +35,7 @@ trait RestRegistryResponder {
     private RendererRegistry rendererRegistry
 
     //will get implemented by normal controller and WebAttributes
+    //FIXME change to what we end up with with out override
     abstract GrailsParameterMap getParams()
 
     //abstract GrailsParameterMap getGrailsParams()

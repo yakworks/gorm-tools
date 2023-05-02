@@ -7,11 +7,12 @@ package gorm.tools.utils
 import spock.lang.Specification
 import testing.Cust
 import testing.CustType
+import testing.UuidSample
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class GormMetaUtilsSpec extends Specification implements GormHibernateTest {
 
-    static List entityClasses = [Cust, CustType]
+    static List entityClasses = [Cust, CustType, UuidSample]
 
     void setupSpec(){
         new CustType(name: 'foo').persist(flush: true)
@@ -72,6 +73,37 @@ class GormMetaUtilsSpec extends Specification implements GormHibernateTest {
 
         then:
         custTypeMap == [id:1, version:0, name: 'foo']
+    }
+
+    void "test isNewOrDirty"() {
+        when:
+        CustType ctNew = new CustType()
+        UuidSample ctNewUuid = new UuidSample()
+        CustType ctDirty = new CustType(name: "foo").persist()
+        ctDirty.name = 'dirty'
+
+        then:
+        GormMetaUtils.isNewOrDirty(ctNew)
+        GormMetaUtils.isNewOrDirty(ctNewUuid)
+        GormMetaUtils.isNewOrDirty(ctDirty)
+
+        when: "id is assigned it will still show as new"
+        ctNew.id = 99
+        UuidSample.repo.generateId(ctNewUuid)
+
+        then:
+        ctNew.id
+        ctNewUuid.id
+        GormMetaUtils.isNewOrDirty(ctNew)
+        GormMetaUtils.isNewOrDirty(ctNewUuid)
+
+        when: "version is assigned its no longer new"
+        ctNew.version = 0
+        ctNewUuid.version = 0
+
+        then:
+        !GormMetaUtils.isNewOrDirty(ctNew)
+        !GormMetaUtils.isNewOrDirty(ctNewUuid)
     }
 
 }

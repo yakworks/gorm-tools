@@ -89,9 +89,7 @@ class BulkControllerSupport<D> {
         Map params = syncJobArgs.params
         //default to true for CSV unless explicitely disabled in params
         syncJobArgs.async = params.getBoolean('async', true)
-        //TODO support for legacy param, remove once we know no one is using it
-        if(params.promiseEnabled != null) syncJobArgs.async = params.getBoolean('promiseEnabled', true)
-        //dont save payload by default, but if its true then save to file not db.
+        // dont save payload by default, but if its true then save to file not db.
         // TODO above comment is not true, its setting saveDataAsFile not pload
         syncJobArgs.savePayload = params.getBoolean('savePayload', false)
         //always save the data as file and not in the syncJob row
@@ -123,14 +121,9 @@ class BulkControllerSupport<D> {
             params: params
         )
 
-        //FIXME remove asyncEnabled once verified its not needed
-        if(params.asyncEnabled != null) syncJobArgs.parallel = params.getBoolean('asyncEnabled')
         if(params.parallel != null) syncJobArgs.parallel = params.getBoolean('parallel')
         //async is false by default, when this is true then runs "non-blocking" in background and will job immediately with state=running
         if(params.async != null) syncJobArgs.async = params.getBoolean('async')
-        //TODO support for legacy param, remove once we know no one is using it
-        if(params.promiseEnabled != null) syncJobArgs.async = params.getBoolean('promiseEnabled')
-
         //savePayload is true by default
         if(params.savePayload != null) syncJobArgs.savePayload = params.getBoolean('savePayload')
         //data is always saved, but can force it be in a file if passes. will get set to true if payload.size() > 1000 no matter what is set

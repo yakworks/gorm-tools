@@ -73,7 +73,25 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
         OrgMember.get(member.id) == null
     }
 
-    @IgnoreRest
+    def "test getMember"() {
+        when:
+        Org org = Org.of("O1", "O1", OrgType.Customer).persist()
+        Org branch = Org.of("Branch", "Branch", OrgType.Branch).persist()
+        Org division = Org.of("Division", "Division", OrgType.Division).persist()
+        OrgMember member = OrgMember.make(org)
+        org.member = member
+        member.branch = branch
+        member.division = division
+        member.persist(flush: true)
+        org.persist(flush: true)
+        member.persist(flush: true)
+        flush()
+
+        then:
+        branch == member.getMemberOrg(OrgType.Branch)
+        branch.id == member.getMemberOrgId(OrgType.Branch)
+    }
+
     void "test insert with orgmembers"() {
         given:
         orgDimensionService.testInit('Branch.Division.Business')

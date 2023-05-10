@@ -75,4 +75,17 @@ class OrgMember implements GormRepoEntity<OrgMember, OrgMemberRepo>, Serializabl
         return new OrgMember(id: org.getId(), org: org)
     }
 
+    /**
+     * get the id for the property based on the passed in orgType
+     */
+    Long getMemberOrgId(OrgType orgType){
+        this[orgType.idFieldName] as Long
+    }
+
+    /**
+     * get the org property based on the passed in orgType
+     */
+    Org getMemberOrg(OrgType orgType){
+        this[orgType.propertyName] as Org
+    }
 }

@@ -116,6 +116,30 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     }
 
     /**
+     * Where method derives a new query from this query. This method will not mutate the original query, but instead return a new one.
+     *
+     * @param additionalQuery The additional query
+     * @return A new query
+     */
+    @Override
+    MangoDetachedCriteria<T> where(@DelegatesTo(DetachedCriteria) Closure additionalQuery) {
+        MangoDetachedCriteria<T> newQuery = (MangoDetachedCriteria<T>)clone()
+        return newQuery.build(additionalQuery)
+    }
+
+    /**
+     * Where method derives a new query from this query. This method will not mutate the original query, but instead return a new one.
+     *
+     * @param additionalQuery The additional query
+     * @return A new query
+     */
+    MangoDetachedCriteria<T> where(Map additionalQuery) {
+        MangoDetachedCriteria<T> newQuery = (MangoDetachedCriteria<T>)clone()
+        new MangoBuilder().applyMapOrList(newQuery, [name2: 'foo'])
+        return newQuery
+    }
+
+    /**
      * Counts the number of records returned by the query
      *
      * @param args The arguments
@@ -144,10 +168,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     }
 
     /**
-     * exists, checks if count is > 0
-     *
-     * @param args The arguments
-     * @return true if count > 0
+     * force an error since this creates unpredictiable truthy checks for crieria
      */
     @Override
     boolean asBoolean(@DelegatesTo(DetachedCriteria) Closure additionalCriteria = null) {

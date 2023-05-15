@@ -15,10 +15,11 @@ import grails.artefact.controller.RestResponder
 import grails.artefact.controller.support.ResponseRenderer
 import grails.util.GrailsNameUtils
 import grails.web.api.ServletAttributes
-import grails.web.servlet.mvc.GrailsParameterMap
 import yakworks.api.problem.Problem
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.NameUtils
+import yakworks.gorm.api.ApiUtils
+import yakworks.gorm.config.GormConfig
 
 /**
  * Marker trait with common helpers for a Restfull api type controller.
@@ -27,8 +28,9 @@ import yakworks.commons.lang.NameUtils
 @CompileStatic
 trait RestApiController implements RequestJsonSupport, RestResponder, RestRegistryResponder, ServletAttributes {
 
-    @Autowired
-    ProblemHandler problemHandler
+    @Autowired ProblemHandler problemHandler
+
+    @Autowired GormConfig gormConfig
 
     //default responseFormats should be just json
     static List getResponseFormats() {
@@ -65,16 +67,41 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
 
     void handleException(Exception e) {
         Problem apiError = problemHandler.handleException(e)
-        respond(apiError)
+        respondWith(apiError)
     }
 
+    // Map getGrailsParams() {
+    //     getParamsMap()
+    // }
+
     /**
-     * Returns a new params for Request to see if this prevents them from being dropped
+     * Sometimes the stock getParams will loose the query params that are passed in. Its not clear why.
+     * It will still contain the items from urlMapping such as id and the controller and action,
+     * which is done in AbstractUrlMappingInfo.populateParamsForMapping.
+     * This creates a new instance from the request which will then copy in the standard getParams().
+     * 9999 out of 10000 when its not confused it results in the exact same Map, but when the params is missing the user query params it
+     * will end up with the missing ones.
      * @return a new copy of the grails params
      */
-    GrailsParameterMap getGrailsParams() {
-        new GrailsParameterMap(getRequest())
-        //getParams()
+    Map getParamsMap() {
+        //the dispatchParams are the normal stock params, has values added in from UrlMappings and path
+        Map grailsParams = getParams()
+        Map pMap = [:]
+        //if this hack is enabled
+        if(gormConfig.enableGrailsParams) {
+            def req = getRequest()
+            //possibly from an async operation, still investigating, the params in the request get lost or dropped, but queryString still there
+            if(!req.getParameterMap() && req.queryString) {
+                Map parsedParams = ApiUtils.parseQueryParams(req.queryString)
+                //Map gParams = new GrailsParameterMap(parsedParams, req)
+                pMap.putAll(parsedParams)
+            }
+        }
+        // if the main params "dropped" then they will now be in gParams.
+        // and the normal getParams will have what the UrlMappings added in and we put those into the newly parsed params
+        // this will also avoid the issues with request being passed that is referenced in GrailsParameterMap
+        pMap.putAll(grailsParams)
+        return pMap
     }
 
     // void respondWith(Object value, Map args = [:]) {
@@ -100,7 +127,7 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
     /**
      * looks in params for value and converts to boolean, returning the defaultValue if not found
      */
-    boolean paramBoolean(String key, boolean defaultVal){
-        return params.boolean(key, defaultVal)
-    }
+    // boolean paramBoolean(String key, boolean defaultVal){
+    //     return params.boolean(key, defaultVal)
+    // }
 }

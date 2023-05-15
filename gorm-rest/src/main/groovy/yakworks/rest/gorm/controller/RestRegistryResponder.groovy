@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 
 import grails.artefact.Controller
-import grails.core.support.proxy.ProxyHandler
 import grails.rest.render.Renderer
 import grails.rest.render.RendererRegistry
 import grails.web.mime.MimeType
@@ -33,12 +32,12 @@ trait RestRegistryResponder {
     private String PROPERTY_RESPONSE_FORMATS = "responseFormats"
 
     private RendererRegistry rendererRegistry
-    private ProxyHandler proxyHandler
 
     //will get implemented by normal controller and WebAttributes
+    //FIXME change to what we end up with with our override for getParamsMap()
     abstract GrailsParameterMap getParams()
 
-    abstract GrailsParameterMap getGrailsParams()
+    //abstract GrailsParameterMap getGrailsParams()
 
     @Generated
     @Autowired(required = false)
@@ -51,27 +50,21 @@ trait RestRegistryResponder {
         return this.rendererRegistry
     }
 
-    @Generated
-    @Autowired(required = false)
-    void setProxyHandler(ProxyHandler proxyHandler) {
-        this.proxyHandler = proxyHandler
-    }
-
-    @Generated
-    ProxyHandler getProxyHandler() {
-        return this.proxyHandler
-    }
-
     /**
      * Call the internalRegistryRender
      * Changes so it does do anything for Errors objects
      */
     @Generated
-    void respondWith(Object value, Map args = [:]) {
+    void respondWith(Object value) {
+        internalRegistryRender value, [:]
+    }
+
+    @Generated
+    void respondWith(Object value, Map args) {
         internalRegistryRender value, args
     }
 
-    void internalRegistryRender(Object value, Map args=[:]) {
+    void internalRegistryRender(Object value, Map args) {
         // BenchmarkHelper.startTime()
         Integer statusCode
         if (args.status) {
@@ -130,8 +123,8 @@ trait RestRegistryResponder {
                 throw new IllegalArgumentException("Houston we have a problem, renderer can't be found for fallback json format and ${value.class}")
         }
 
-        //put params into arguments so we can access them from a Renderer
-        args.params = getParams()
+        //put params into arguments so we can access them from a Renderer, used for the excel renderer for example
+        if(!args.params) args.params = getParams()
 
         final ServletRenderContext context = new ServletRenderContext(webRequest, args)
         if(statusCode != null) context.status = HttpStatus.valueOf(statusCode)

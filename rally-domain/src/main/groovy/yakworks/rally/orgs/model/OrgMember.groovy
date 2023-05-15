@@ -28,6 +28,7 @@ class OrgMember implements GormRepoEntity<OrgMember, OrgMemberRepo>, Serializabl
     Org sales
     Org region
     Org factory
+    Org company
 
 //    static mappedBy = [branch: "none", division: "none", business: "none", sales: "none",
 //                       region: "none", factory: "none", org: "member"]
@@ -40,6 +41,7 @@ class OrgMember implements GormRepoEntity<OrgMember, OrgMemberRepo>, Serializabl
         sales column: 'salesId', lazy: true
         region column: 'regionId', lazy: true
         factory column: 'factoryId', lazy: true
+        company column: 'companyId', lazy: true
     }
 
     static constraintsMap = [
@@ -65,7 +67,7 @@ class OrgMember implements GormRepoEntity<OrgMember, OrgMemberRepo>, Serializabl
 
     OrgMember copy() {
         return new OrgMember(branch: this.branch, division: this.division, business: this.business,
-            sales: this.sales, region: this.region, factory: this.factory)
+            sales: this.sales, region: this.region, factory: this.factory, company: this.company)
     }
 
     static OrgMember make(Org org){
@@ -73,4 +75,17 @@ class OrgMember implements GormRepoEntity<OrgMember, OrgMemberRepo>, Serializabl
         return new OrgMember(id: org.getId(), org: org)
     }
 
+    /**
+     * get the id for the property based on the passed in orgType
+     */
+    Long getMemberOrgId(OrgType orgType){
+        this[orgType.idFieldName] as Long
+    }
+
+    /**
+     * get the org property based on the passed in orgType
+     */
+    Org getMemberOrg(OrgType orgType){
+        this[orgType.propertyName] as Org
+    }
 }

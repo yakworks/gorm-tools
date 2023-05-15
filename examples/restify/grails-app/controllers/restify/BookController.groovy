@@ -21,7 +21,7 @@ class BookController implements RestRepoApiController<Book> {
             q.comments = "$comments - post was here"
             Book instance = getRepo().create(q)
             def entityMap = entityResponder.createEntityMap(instance, params)
-            respond([status: CREATED], entityMap)
+            respondWith(entityMap, [status: CREATED])
             // respond instance, [status: CREATED] //201
         } catch (RuntimeException e) {
             handleException(e)

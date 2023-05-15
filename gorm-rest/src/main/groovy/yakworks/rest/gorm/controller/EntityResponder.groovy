@@ -4,10 +4,13 @@
 */
 package yakworks.rest.gorm.controller
 
+import groovy.json.JsonException
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.hibernate.QueryException
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.DataAccessException
 import org.springframework.http.HttpStatus
 
 import gorm.tools.beans.Pager
@@ -16,8 +19,7 @@ import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
-import grails.web.api.WebAttributes
-import yakworks.commons.map.Maps
+import yakworks.api.problem.data.DataProblem
 import yakworks.gorm.api.ApiConfig
 import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.PathItem
@@ -79,9 +81,9 @@ class EntityResponder<D> {
     /**
      * respond with instance, calls ctrl.respondWith after it creates and entityMap
      */
-    void respondWith(RestRegistryResponder ctrl, D instance, HttpStatus status = HttpStatus.OK){
-        MetaMap entityMap = createEntityMap(instance, (ctrl as WebAttributes).params)
-        ctrl.respondWith(entityMap, [status: status])
+    void respondWith(RestRegistryResponder ctrl, D instance, Map params, HttpStatus status = HttpStatus.OK){
+        MetaMap entityMap = createEntityMap(instance, params)
+        ctrl.respondWith(entityMap, [status: status, params: params])
     }
 
     /**
@@ -110,14 +112,22 @@ class EntityResponder<D> {
         // Map pclone = Maps.clone(parms) as Map<String, Object>
         //remove the fields that grails adds for controller and action
         // pclone.removeAll {it.key in whitelistKeys }
-
-        QueryArgs qargs = QueryArgs.of(pager)
-        //require q if its set
-        if(pathItem?.qRequired) qargs.qRequired = true
-        qargs = qargs.build(parms)
-        qargs.validateQ()
-        if(debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.criteria}")
-        ((QueryMangoEntityApi)getRepo()).queryList(qargs, null, debugEnabled ? log : null)
+        try {
+            QueryArgs qargs = QueryArgs.of(pager)
+            //require q if its set
+            if (pathItem?.qRequired) qargs.qRequired = true
+            qargs = qargs.build(parms)
+            qargs.validateQ()
+            if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.criteria}")
+            ((QueryMangoEntityApi) getRepo()).queryList(qargs, null, debugEnabled ? log : null)
+        } catch (JsonException | IllegalArgumentException | QueryException ex) {
+            //See #1925 - Catch bad query in 'q' parameter and report back. So we dont pollute logs, and can differentiate that its not us.
+            //Hibernate throws IllegalArgumentException when Antlr fails to parse query
+            //and throws QueryException when hibernate fails to execute query
+            throw DataProblem.ex("Invalid query $ex.message")
+        } catch (DataAccessException ex) {
+            throw DataProblem.of(ex).toException()
+        }
     }
 
     /**

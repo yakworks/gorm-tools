@@ -1,7 +1,6 @@
 package yakworks.rest
 
 import org.springframework.http.HttpStatus
-
 import yakworks.commons.map.Maps
 import yakworks.rally.orgs.model.Org
 import yakworks.rest.client.OkHttpRestTrait
@@ -20,7 +19,7 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
     String getPath(String entity) { "/api/${entity}" }
 
-    def setup(){
+    def setup() {
         login()
     }
 
@@ -32,6 +31,27 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
         then:
         pageMap.data.size() == 20
+    }
+
+    void "bad query - json parse failed"() {
+        when:
+        Response resp = get(getPath('rally/org?q={bad":0}&projections=[{"bad stuff":"sum"}]}'))
+        Map pageMap = bodyToMap(resp)
+
+        then:
+        pageMap.ok == false
+        pageMap.detail.contains "Invalid query expecting current character to be"
+    }
+
+
+    void "bad query - hibernate failed to parse query"() {
+        when:
+        Response resp = get(getPath('rally/org?q={num:"0"}&projections=[{"num bad":"sum"}]}'))
+        Map pageMap = bodyToMap(resp)
+
+        then:
+        pageMap.ok == false
+        pageMap.detail.contains "Invalid query org.hibernate.hql.internal.ast.QuerySyntaxException"
     }
 
     @Unroll
@@ -51,9 +71,9 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
         body.records == count
 
         where:
-        entity         | domain
-        'rally/user'   | AppUser
-        'rally/org?q=*'    | Org //can have more thn 100 based on order of execution, need to query count
+        entity          | domain
+        'rally/user'    | AppUser
+        'rally/org?q=*' | Org //can have more thn 100 based on order of execution, need to query count
     }
 
     @Unroll
@@ -73,10 +93,10 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
         where:
 
         entity      | data
-        'rally/org'       | [num:'foo1', name: "foo", type: [id: 1]]
+        'rally/org' | [num: 'foo1', name: "foo", type: [id: 1]]
         //'user'      | [username:'galt', email: "jim@joe.com", password:'secretStuff', repassword:'secretStuff']
         //'location'  | [city: "Chicago"]
-         //'user'      | [name: 'taggy', entityName: 'Customer']
+        //'user'      | [name: 'taggy', entityName: 'Customer']
     }
 
     @Unroll
@@ -95,8 +115,8 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
         where:
 
-        entity           | id | prop   | val
-        'rally/org'      | 1  | 'num'  | 'foo123'
+        entity      | id | prop  | val
+        'rally/org' | 1  | 'num' | 'foo123'
         // 'rally/user'     | 1  | 'username' | 'jimmy'
         //        'location' | 1  | 'city' | 'Denver'
 
@@ -117,9 +137,9 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
         where:
 
-        entity           | qCount | qSearch
-        'rally/org'      | 1      | 'Org11'
-        'rally/user'     | 1      | 'admin'
+        entity       | qCount | qSearch
+        'rally/org'  | 1      | 'Org11'
+        'rally/user' | 1      | 'admin'
         //'location' | 1      | 'Denver'
 
     }

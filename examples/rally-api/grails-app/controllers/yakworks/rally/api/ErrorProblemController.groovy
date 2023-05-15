@@ -20,7 +20,7 @@ class ErrorProblemController implements RestApiController {
             .status(403)
             .title("Access Forbidden")
             .detail(ex?.message)
-        respond problem
+        respondWith problem
     }
 
     def notFound404() {
@@ -30,6 +30,6 @@ class ErrorProblemController implements RestApiController {
             .status(404)
             .title("Not Found")
             .detail(ex?.message)
-        respond problem
+        respondWith problem
     }
 }

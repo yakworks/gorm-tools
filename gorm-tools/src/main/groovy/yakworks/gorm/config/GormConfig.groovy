@@ -18,6 +18,8 @@ class GormConfig {
     /** almost never would this be false if including it unless turning off for a test */
     boolean enabled = true
     String hello
+    /** whether to enable to hack that parses queryString if request.parameters is empty */
+    boolean enableGrailsParams = true
 
     @Autowired
     AsyncConfig async

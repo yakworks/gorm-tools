@@ -101,7 +101,7 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>, ID> extends GormEntity<D> 
 
     @Transient
     boolean isNewOrDirty() {
-        findRepo().isNewOrDirty((D) this)
+        findRepo().isNewOrDirty((GormEntity) this)
     }
 
 }

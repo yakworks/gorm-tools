@@ -34,7 +34,8 @@ class HibernateProxyAsserts {
         return true
     }
 
-    static boolean asserNullCheck(Persistable proxy) {
+    //makes sure truthy check doesnt hydrate the proxy
+    static boolean assertNullCheckNotInit(Persistable proxy) {
         assert !Hibernate.isInitialized(proxy)
         //this get compiled as DefaultTypeTransformation.castToBoolean
         // -> which then calls InvokerHelper.invokeMethod(object, "asBoolean", InvokerHelper.EMPTY_ARGS)
@@ -44,15 +45,16 @@ class HibernateProxyAsserts {
         // so this style check will intialize and cause a hit to db
         //if(proxy){
 
-        // but this works if(proxy != null)
+        // this should be all fixed up now that we have hibernate-groovy-proxy
         if(proxy){
             assert !Hibernate.isInitialized(proxy)
         }
         return true
     }
 
+    //checks that the groovy dynamic calls dont initialize it
     @CompileDynamic
-    static boolean asserChecksDynamic(Persistable proxy) {
+    static boolean assertChecksDynamic(Persistable proxy) {
         //first check
         assertNotInitialized(proxy)
         //second check

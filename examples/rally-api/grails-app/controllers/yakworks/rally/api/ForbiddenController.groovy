@@ -20,6 +20,6 @@ class ForbiddenController implements RestApiController {
             .status(403)
             .title("Access Forbidden")
             .detail(ex?.message)
-        respond problem
+        respondWith problem
     }
 }

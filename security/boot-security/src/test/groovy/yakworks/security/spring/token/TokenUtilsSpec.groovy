@@ -12,9 +12,13 @@ import java.time.Instant
 import java.security.interfaces.ECKey
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider
+import org.bouncycastle.openssl.MiscPEMGenerator
 import org.bouncycastle.openssl.PEMKeyPair
 import org.bouncycastle.openssl.PEMParser
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter
+import org.bouncycastle.util.io.pem.PemObject
+import org.bouncycastle.util.io.pem.PemWriter
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.FileSystemResource
 import org.springframework.mock.web.MockHttpServletRequest
@@ -27,6 +31,8 @@ import com.nimbusds.jose.crypto.ECDSAVerifier
 import spock.lang.Specification
 
 import org.apache.commons.codec.binary.Base64
+
+import sun.security.ec.ECPrivateKeyImpl
 
 class TokenUtilsSpec extends Specification {
 
@@ -60,6 +66,30 @@ class TokenUtilsSpec extends Specification {
         then:
         Base64.encodeBase64String(keyPair.getPublic().getEncoded())
         // log.info("ecKey.privateKey: {}", Base64.encodeBase64String(keyPair.getPrivate().getEncoded()));
+    }
+
+    //WIP to try and generate the PEM using java.
+    def "es256 generator"(){
+        when:
+        KeyPair keyPair = TokenUtils.generateES256Key()
+        ECPrivateKeyImpl priv = (ECPrivateKeyImpl)keyPair.getPrivate()
+
+        then:
+        StringWriter privout = new StringWriter();
+        JcaPEMWriter privWriter = new JcaPEMWriter(privout);
+        privWriter.writeObject(keyPair.getPrivate());
+        privWriter.close();
+        println(privout);
+        // Base64.encodeBase64String(keyPair.getPublic().getEncoded())
+        // log.info("ecKey.privateKey: {}", Base64.encodeBase64String(keyPair.getPrivate().getEncoded()));
+
+        println ("-----BEGIN PRIVATE KEY-----");
+        println (java.util.Base64.getMimeEncoder().encodeToString( keyPair.getPrivate().getEncoded()));
+        println ("-----END PRIVATE KEY-----");
+
+        println ("-----BEGIN PUBLIC KEY-----");
+        println (java.util.Base64.getMimeEncoder().encodeToString( keyPair.getPublic().getEncoded()));
+        println ("-----END PUBLIC KEY-----");
     }
 
 }

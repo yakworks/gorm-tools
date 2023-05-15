@@ -17,7 +17,7 @@ class AppConfigController implements RestApiController {
         String controllerKey = params.id
         Map resourceConfig = apiConfig.getPathMap(controllerKey, namespace)
         assert resourceConfig
-        respond resourceConfig
+        respondWith resourceConfig
     }
 
 }

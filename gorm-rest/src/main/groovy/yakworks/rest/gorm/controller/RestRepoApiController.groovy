@@ -4,6 +4,8 @@
 */
 package yakworks.rest.gorm.controller
 
+import javax.servlet.http.HttpServletRequest
+
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.InvokerHelper
@@ -14,6 +16,7 @@ import org.springframework.core.GenericTypeResolver
 import org.springframework.http.HttpStatus
 
 import gorm.tools.beans.Pager
+import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
@@ -45,6 +48,7 @@ trait RestRepoApiController<D> extends RestApiController {
 
     //Need it to access log and still compile static in trait (See https://issues.apache.org/jira/browse/GROOVY-7439)
     //final private static Logger log = LoggerFactory.getLogger(this.class)
+    @SuppressWarnings(['LoggerWithWrongModifiers'])
     Logger log = LoggerFactory.getLogger(this.class)
 
     @Autowired(required = false)
@@ -97,7 +101,7 @@ trait RestRepoApiController<D> extends RestApiController {
     def post() {
         try {
             D instance = (D) getRepo().create(bodyAsMap())
-            respondWithEntityMap(instance, CREATED)
+            respondWithEntityMap(instance, getParamsMap(), CREATED)
         } catch (Exception e) {
             handleException(e)
         }
@@ -110,11 +114,11 @@ trait RestRepoApiController<D> extends RestApiController {
     @Action
     def put() {
         Map dataMap = bodyAsMap()
-        Map data = [id: params.id]
+        Map data = [id: params.id] //this should be fine since grails isnt loosing the params set from UrlMappings
         data.putAll(dataMap) // json data may not contains id because it passed in params
         try {
             D instance = (D) getRepo().update(data)
-            respondWithEntityMap(instance)
+            respondWithEntityMap(instance, getParamsMap())
         } catch (Exception e) {
             handleException(e)
         }
@@ -127,7 +131,7 @@ trait RestRepoApiController<D> extends RestApiController {
     @Action
     def delete() {
         try {
-            getRepo().removeById((Serializable) params.id)
+            getRepo().removeById((Serializable) params.id) //this should be fine since grails isnt loosing the params set from UrlMappings
             callRender(status: NO_CONTENT) //204
         } catch (Exception e) {
             handleException(e)
@@ -141,9 +145,10 @@ trait RestRepoApiController<D> extends RestApiController {
     @Action
     def get() {
         try {
-            D instance = (D) getRepo().read(params.id as Serializable)
-            RepoUtil.checkFound(instance, params.id as Serializable, getEntityClass().simpleName)
-            respondWithEntityMap(instance)
+            Serializable idx = params.id as Serializable //this should be fine since grails isnt loosing the params set from UrlMappings
+            D instance = (D) getRepo().read(idx)
+            RepoUtil.checkFound(instance, idx, getEntityClass().simpleName)
+            respondWithEntityMap(instance, getParamsMap())
         } catch (Exception e) {
             handleException(e)
         }
@@ -162,9 +167,11 @@ trait RestRepoApiController<D> extends RestApiController {
     @Action
     def list() {
         try {
-            log.debug("list with params ${getParams()}")
-            Pager pager = getEntityResponder().pagedQuery(getParams(), [IncludesKey.list.name()])
-            respondWith pager
+            Map gParams = getParamsMap()
+            log.debug("list with gParams ${gParams}")
+            Pager pager = getEntityResponder().pagedQuery(gParams, [IncludesKey.list.name()])
+            //we pass in the params to args so it can get passed on to renderer, used in the excel renderer for example
+            respondWith(pager, [params: gParams])
         } catch (Exception e) {
             handleException(e)
         }
@@ -173,8 +180,10 @@ trait RestRepoApiController<D> extends RestApiController {
     @Action
     def picklist() {
         try {
-            Pager pager = picklistPagedQuery(params)
-            respondWith pager
+            Map gParams = getParamsMap()
+            Pager pager = picklistPagedQuery(gParams)
+            //we pass in the params to args so it can get passed on to renderer, used in the excel renderer for example
+            respondWith(pager, [params: gParams])
         } catch (Exception e) {
             handleException(e)
         }
@@ -202,20 +211,24 @@ trait RestRepoApiController<D> extends RestApiController {
 
     void bulkProcess(DataOp dataOp) {
         List dataList = bodyAsList() as List<Map>
-        SyncJobEntity job = getBulkControllerSupport().process(dataOp, dataList, webRequest)
+        Map gParams = getParamsMap()
+        HttpServletRequest req = request
+        String sourceId = "${req.method} ${req.requestURI}?${req.queryString}"
+        SyncJobArgs syncJobArgs = getBulkControllerSupport().setupSyncJobArgs(dataOp, gParams, sourceId)
+        SyncJobEntity job = getBulkControllerSupport().process(dataList, syncJobArgs)
         respondWith(job, [status: MULTI_STATUS])
     }
 
-    void respondWithEntityMap(D instance, HttpStatus status = HttpStatus.OK){
-        getEntityResponder().respondWith(this, instance, status)
+    void respondWithEntityMap(D instance, Map mParams, HttpStatus status = HttpStatus.OK){
+        getEntityResponder().respondWith(this, instance, mParams, status)
     }
 
     /**
      * picklist has defaults of 50 for max and
      */
-    Pager picklistPagedQuery(Map params) {
-        params.max = params.max ?: getPicklistMax() //default to 50 for picklists
-        return getEntityResponder().pagedQuery(params, ['picklist', IncludesKey.stamp.name()])
+    Pager picklistPagedQuery(Map mParams) {
+        mParams.max = mParams.max ?: getPicklistMax() //default to 50 for picklists
+        return getEntityResponder().pagedQuery(mParams, ['picklist', IncludesKey.stamp.name()])
     }
 
     void handleException(Exception e) {

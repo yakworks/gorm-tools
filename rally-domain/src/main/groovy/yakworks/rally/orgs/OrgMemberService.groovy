@@ -84,6 +84,7 @@ class OrgMemberService {
      */
     void setupMember(Org org, Org parent, boolean isTopLevel) {
         if (!org.member) org.member = OrgMember.make(org) //create new orgmember
+        if(org.companyId) org.member.company = Org.load(org.companyId)
         if(!isTopLevel) {
             Validate.notNull(parent.member, 'Parent org must have a member set at this point')
             ['branch', 'division', 'business', 'sales', 'region', 'factory'].each { String fld ->

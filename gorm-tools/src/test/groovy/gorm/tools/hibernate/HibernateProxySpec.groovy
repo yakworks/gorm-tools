@@ -26,7 +26,7 @@ class HibernateProxySpec extends Specification implements GormHibernateTest{
         def proxy = CustType.load(1)
 
         then:
-        HibernateProxyAsserts.asserNullCheck(proxy)
+        HibernateProxyAsserts.assertNullCheckNotInit(proxy)
     }
 
     void "proxy null and metaClass checks in CompileDynamic"() {
@@ -38,7 +38,7 @@ class HibernateProxySpec extends Specification implements GormHibernateTest{
         def proxy = CustType.load(custType.id)
 
         then:
-        HibernateProxyAsserts.asserChecksDynamic(proxy)
+        HibernateProxyAsserts.assertChecksDynamic(proxy)
     }
 
     void "load Cust"() {
@@ -55,7 +55,7 @@ class HibernateProxySpec extends Specification implements GormHibernateTest{
 
         then:
         HibernateProxyAsserts.assertIdCheckStaysProxy(p)
-        HibernateProxyAsserts.asserNullCheck(p)
+        HibernateProxyAsserts.assertNullCheckNotInit(p)
         //
         // then:
         // custType2

@@ -1,5 +1,6 @@
 package gorm.tools.mango.jpql
 
+import gorm.tools.mango.MangoBuilder
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
 import spock.lang.Ignore
@@ -34,6 +35,49 @@ class JpqlQueryBuilderSelectSpec extends Specification implements GormHibernateT
         query != null
         query == 'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE (kitchenSink.name=:p1)'
     }
+
+    void "Mango Map testing for adding map to an existing criteria instance"() {
+        when:
+        def criteria = KitchenSink.query(
+            name: 'Bob'
+        )
+        def crit = criteria.where([name2: 'foo'])
+
+        def query = JpqlQueryBuilder.of(crit).buildSelect().query
+
+        then:"The query is valid"
+        query == 'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE (kitchenSink.name=:p1 AND kitchenSink.name2=:p2)'
+    }
+
+    void "Mango Map testing for adding map with applyMapOrList"() {
+        when:
+        def crit = KitchenSink.query {
+            eq 'name', 'Bob'
+        }
+        //THIS SHOWS that if dont use clone then its messed up in nesting
+        new MangoBuilder().applyMapOrList(crit, [name2: 'foo'])
+
+        //this will work
+        //crit.eq('comments', 'com')
+        //but this will not
+        // crit.build {
+        //     eq('comments', 'com')
+        // }
+        //if wanting to to add then use where and get its return for the clone
+        crit = crit.where {
+            eq('comments', 'com')
+        }
+
+        def query = JpqlQueryBuilder.of(crit).buildSelect().query
+
+        then:"The query is not valid"
+        query == strip("""\
+        SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
+        WHERE (kitchenSink.name=:p1 AND kitchenSink.name2=:p2 AND kitchenSink.comments=:p3)
+        """)
+        //query == 'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE (kitchenSink.name=:p1 AND kitchenSink.name2=:p2)'
+    }
+
 
     void "Test build simple select"() {
         given:"Some criteria"

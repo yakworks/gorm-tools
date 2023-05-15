@@ -17,7 +17,7 @@ class AttachmentController implements RestRepoApiController<Attachment> {
     def upload() {
         Map q = bodyAsMap()
         Map obj = [name: q.name]
-        respond obj
+        respondWith obj
     }
 
 }

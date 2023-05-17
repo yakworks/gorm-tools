@@ -52,6 +52,32 @@ configurations.all {
     if (details.requested.group.startsWith('io.micronaut.spring')) {
       details.useVersion project['micronaut.spring.version']
     }
+    //grails locks
+    if (details.requested.module.name.startsWith('grails-plugin-interceptors')) {
+      details.useVersion project['grailsVersion']
+    }
+    if (details.requested.module.name.startsWith('grails-plugin-datasource')) {
+      details.useVersion project['grailsVersion']
+    }
+    if (details.requested.module.name.startsWith('grails-plugin-rest')) {
+      details.useVersion project['grailsVersion']
+    }
+    if (details.requested.module.name == 'grails-datastore-gorm-test') {
+      details.useVersion project['gorm.version']
+    }
+    if (details.requested.module.name == 'grails-datastore-web') {
+      details.useVersion project['gorm.version']
+    }
+    if (details.requested.module.name == 'grails-datastore-gorm') {
+      details.useVersion project['gorm.version']
+    }
+    if (details.requested.module.name == 'grails-datastore-gorm-support') {
+      details.useVersion project['gorm.version']
+    }
+    if (details.requested.module.name == 'grails-datastore-gorm-validation') {
+      details.useVersion project['gorm.version']
+    }
+
   }
 }
 

@@ -18,6 +18,7 @@ repositories {
 }
 
 apply from: "${rootDir}/gradle/compile.gradle"
+apply from: "${rootDir}/gradle/hibernate.gradle"
 
 dependencies {
   developmentOnly("org.springframework.boot:spring-boot-devtools")
@@ -58,10 +59,6 @@ dependencies {
   implementation project(":gorm-tools")
   implementation project(":boot-security-gorm")
   implementation project(":gorm-audit")
-
-  implementation "org.grails:grails-datastore-gorm-hibernate5:$vGormHibernate"
-  implementation "org.grails.plugins:hibernate5:$vGormHibernate"
-  implementation "org.hibernate:hibernate-core:$vHibernate"
 
   runtimeOnly "com.h2database:h2:$vH2"
   runtimeOnly "com.zaxxer:HikariCP:$vHikari"

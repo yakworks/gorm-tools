@@ -13,7 +13,6 @@ dependencies {
 
   api project(":security-core")
 
-  // testImplementation project(":gorm-test-support") //this might seem circular but it can be added to itself as it dif config
   testImplementation project(":boot-security-gorm")
   testImplementation("org.spockframework:spock-spring:${vSpock}")
 

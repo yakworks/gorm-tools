@@ -39,19 +39,13 @@ class HibernateProxyInitSpec extends Specification implements DataIntegrationTes
         proxy.getId() == GormMetaUtils.getId(proxy)
         // getId should also not unwrap the proxy
         !Hibernate.isInitialized(proxy)
+        !proxyHandler.isInitialized(proxy)
 
-        //this triggers it, seems any method call does it
-        // proxy.isAttached()
-        // GormMetaUtils.getId(proxy)
-        // getId should also not unwrap the proxy
-        // !proxyHandler.isInitialized(proxy)
-        //def proxyHandler = Org.getGormPersistentEntity().mappingContext.proxyHandler
-        // !proxyHandler.isInitialized(proxy)
-        // id should also not unwrap the proxy
-        // proxy.id
-        // !proxyHandler.isInitialized(proxy)
-        // !Hibernate.isInitialized(proxy)
-
+        //dirty check should not trigger it but it does, most any method call does
+        //proxy.isAttached() will trigger it too
+        proxy.isDirty() == false
+        //FIXME change isdirty so it doesnt trigger it
+        Hibernate.isInitialized(proxy)
     }
 
     void "verify association not initialized on id prop check"() {
@@ -67,6 +61,7 @@ class HibernateProxyInitSpec extends Specification implements DataIntegrationTes
 
         //id does not init
         org.infoId == 4
+        org.info.id == 4
         !GrailsHibernateUtil.isInitialized(org, "info")
         !Hibernate.isInitialized(org.info)
 

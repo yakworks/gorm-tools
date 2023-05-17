@@ -43,10 +43,6 @@ dependencies {
   // implementation "org.grails:grails-web-url-mappings"
   implementation "org.grails.plugins:async"
 
-  implementation "org.grails.plugins:hibernate5:$vGormHibernate"
-  implementation "org.hibernate:hibernate-core:$vHibernate"
-  // compile "org.hibernate:hibernate-ehcache:$vHibernate"
-
   implementation project(":gorm-rest")
   implementation project(":rally-domain")
   implementation project(":gorm-test-domain")

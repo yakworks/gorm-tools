@@ -24,10 +24,6 @@ dependencies {
   implementation "org.grails:grails-web-boot"
   implementation "org.grails.plugins:async"
 
-  // === Gorm Hibernate ===
-  implementation "org.grails.plugins:hibernate5:$vGormHibernate"
-  implementation "org.hibernate:hibernate-core:$vHibernate"
-
   // === Yakworks plugins ===
   implementation project(":gorm-rest")
   implementation project(":rally-domain")

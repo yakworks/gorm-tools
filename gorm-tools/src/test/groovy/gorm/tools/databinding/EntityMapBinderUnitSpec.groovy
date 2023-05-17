@@ -6,7 +6,10 @@ package gorm.tools.databinding
 
 import groovy.transform.CompileStatic
 
+import org.hibernate.Hibernate
+
 import spock.lang.Ignore
+import testing.CustType
 import yakworks.commons.lang.IsoDateUtil
 import gorm.tools.repository.model.RepoEntity
 import yakworks.testing.gorm.unit.DataRepoTest
@@ -23,15 +26,15 @@ import yakworks.testing.gorm.model.KitchenSink
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
+import yakworks.testing.gorm.unit.GormHibernateTest
+
+class EntityMapBinderUnitSpec extends Specification implements GormHibernateTest{
+    static entityClasses = [TestDomain, Nest, AnotherDomain, BindableNested, KitchenSink]
+
     EntityMapBinder binder
 
     void setup() {
         binder = new EntityMapBinder()
-    }
-
-    Class[] getDomainClassesToMock() {
-        [TestDomain, Nest, AnotherDomain, BindableNested, KitchenSink]
     }
 
     void "should bind numbers without going through converters"() {
@@ -166,10 +169,10 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
     void "bind association field ending in Id as String"() {
         setup:
         TestDomain domain = new TestDomain()
-        def assoc = new AnotherDomain(id: 1, name: "test").persist(flush: true)
+        def assoc = new AnotherDomain(name: "test").persist(flush: true)
 
         when: 'assigns a new id'
-        binder.bind(domain, ["anotherDomainId": "1"])
+        binder.bind(domain, ["anotherDomainId": "${assoc.id}"])
 
         then:
         domain.anotherDomain == assoc
@@ -178,10 +181,10 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
     void "bind association field with map id key as string"() {
         setup:
         TestDomain domain = new TestDomain()
-        def assoc = new AnotherDomain(id: 1, name: "test").persist(flush: true)
+        def assoc = new AnotherDomain(name: "test").persist(flush: true)
 
         when: 'assigns a new id'
-        binder.bind(domain, [anotherDomain:[id: "1"]])
+        binder.bind(domain, [anotherDomain:[id: "${assoc.id}"]])
 
         then:
         domain.anotherDomain == assoc
@@ -190,19 +193,19 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
     void "bind association field ending in Id"() {
         setup:
         TestDomain domain = new TestDomain()
-        def assoc = new AnotherDomain(id: 1, name: "test").persist(flush: true)
+        def assoc1 = new AnotherDomain(id: 1, name: "test").persist(flush: true)
         def assoc2 = new AnotherDomain(id: 2, name: "test2").persist(flush: true)
 
         Map params = ["anotherDomainId": 1]
 
         when: 'assigns a new id'
-        binder.bind(domain, ["anotherDomainId": 1])
+        binder.bind(domain, ["anotherDomainId": assoc1.id])
 
         then:
-        domain.anotherDomain == assoc
+        domain.anotherDomain == assoc1
 
         when: 'assigns a different id'
-        binder.bind(domain, ["anotherDomainId": 2])
+        binder.bind(domain, ["anotherDomainId": assoc2.id])
 
         then:
         domain.anotherDomain == assoc2
@@ -396,7 +399,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
     void "binder should load existing association if it does not belongsTo"() {
         TestDomain testDomain = new TestDomain()
         AnotherDomain anotherDomain = new AnotherDomain(id:1, name:"name").save()
-        Map params = [name: 'test', anotherDomain:[id:1, name:"test"]]
+        Map params = [name: 'test', anotherDomain:[id:anotherDomain.id, name:"test"]]
 
         when:
         binder.bind(testDomain, params)
@@ -490,6 +493,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         testDomainWithProxy.notBindableNested.getClass().name != testDomain.notBindableNested.getClass().name
 
         // 'nested' property isn't initialized
+        //!Hibernate.isInitialized(testDomainWithProxy.notBindableNested)
         !GrailsHibernateUtil.isInitialized(testDomainWithProxy, 'notBindableNested')
 
         when:

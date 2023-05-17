@@ -2,18 +2,10 @@
 apply from: "${rootDir}/gradle/compile.gradle"
 apply from: "${rootDir}/gradle/publish.gradle"
 apply from: "${rootDir}/gradle/test-unit.gradle"
+apply from: "${rootDir}/gradle/hibernate.gradle"
 
 dependencies {
   implementation "jakarta.annotation:jakarta.annotation-api:$vJakartaAnn"
-
-  // implementation "com.fasterxml.jackson.core:jackson-core:$vJackson"
-  // implementation "com.fasterxml.jackson.core:jackson-databind:$vJackson"
-
-  // implementation "org.grails:grails-datastore-gorm:${vGorm}"
-  implementation "org.grails:grails-datastore-gorm-hibernate5:$vGormHibernate"
-  implementation "org.grails.plugins:hibernate5:$vGormHibernate"
-  implementation "org.hibernate:hibernate-core:$vHibernate"
-  // compileOnly "org.hibernate:hibernate-ehcache:$vHibernate"
 
   //try and fix the dependecy hell by locking grails version
   implementation "org.grails:grails-core:$grailsVersion"
@@ -28,7 +20,7 @@ dependencies {
   testRuntimeOnly "com.zaxxer:HikariCP:$vHikari"
 
   testRuntimeOnly("org.grails:grails-web-testing-support:$vGrailsTesting"){
-    exclude group: 'org.grails', module: 'grails-plugin-interceptors'
+    //exclude group: 'org.grails', module: 'grails-plugin-interceptors'
   }
 
   //testImplementation "net.javacrumbs.json-unit:json-unit-assertj:2.28.0"

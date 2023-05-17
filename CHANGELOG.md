@@ -1,3 +1,10 @@
+### v7.3.43
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.42...v7.3.43)
+- release [link](https://github.com/yakworks/gorm-tools/commit/dc66867a8676ccb3ff7b4667ab1c359868dc1fab)
+- Logging hotfix 2 (#676) [link](https://github.com/yakworks/gorm-tools/commit/eb9794b95a050760acc04e429df84d7b176c65d2)
+- add logger and logging for lost params that have been reparsed (#675) [link](https://github.com/yakworks/gorm-tools/commit/004214a95c29cd0eda20f797b8c181b760498a3b)
+
 ### v7.3.42
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.40...v7.3.42)

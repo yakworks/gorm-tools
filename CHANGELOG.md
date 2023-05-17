@@ -1,3 +1,8 @@
+### v7.3.44
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.43...v7.3.44)
+- release with logging for parsedParams [link](https://github.com/yakworks/gorm-tools/commit/5042dc8448bb65db961478cf3ef0f4a5d182795f)
+
 ### v7.3.43
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.42...v7.3.43)

@@ -102,14 +102,14 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
             //log out some error logging for now
             LOG.error('⛔️⛔️⛔️⛔️LOST PARAMS - REPARSED ⛔️⛔️⛔️⛔️')
             Object failReason = req.getAttribute("org.apache.catalina.parameter_parse_failed_reason")
-            LOG.error("org.apache.catalina.parameter_parse_failed_reason - ${failReason}")
             String msg = "queryString=[${req.queryString}] , method=[${req.method}] , requestURI=[${req.requestURI}], contentType:[${req.getContentType()}]"
+            msg = msg + "\n  new parsedParams from queryString - ${grailsParams}"
+            msg = msg + "\n  org.apache.catalina.parameter_parse_failed_reason - ${failReason}"
             LOG.error(msg)
-            LOG.error("new parsedParams from queryString - ${parsedParams}")
         }
         //}
-        // if the main params "dropped" then they will now be in gParams.
-        // and the normal getParams will have what the UrlMappings added in and we put those into the newly parsed params
+        // if the main params "dropped" then they will now be in pMap from the querySting parsing above.
+        // and the grailsParams will have what the UrlMappings added in
         // this will also avoid the issues with request being passed that is referenced in GrailsParameterMap
         pMap.putAll(grailsParams)
         return pMap

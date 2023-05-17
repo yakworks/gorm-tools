@@ -1,7 +1,11 @@
 //hibernate dependencies
 dependencies {
   implementation "org.grails:grails-datastore-gorm-hibernate5:$vGormHibernate"
-  implementation "org.grails.plugins:hibernate5:$vGormHibernate"
+  implementation("org.grails.plugins:hibernate5:$vGormHibernate"){
+    exclude group: 'org.grails', module: 'grails-datastore-gorm'
+    exclude group: 'org.grails', module: 'grails-datastore-web'
+    exclude group: 'org.grails', module: 'grails-datastore-gorm-support'
+  }
   implementation "org.hibernate:hibernate-core:$vHibernate"
   // compileOnly "org.hibernate:hibernate-ehcache:$vHibernate"
 }

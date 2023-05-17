@@ -27,7 +27,9 @@ dependencies {
   testRuntimeOnly "com.h2database:h2:$vH2"
   testRuntimeOnly "com.zaxxer:HikariCP:$vHikari"
 
-  testRuntimeOnly "org.grails:grails-web-testing-support:$vGrailsTesting"
+  testRuntimeOnly("org.grails:grails-web-testing-support:$vGrailsTesting"){
+    exclude group: 'org.grails', module: 'grails-plugin-interceptors'
+  }
 
   //testImplementation "net.javacrumbs.json-unit:json-unit-assertj:2.28.0"
   testRuntimeOnly "com.fasterxml.jackson.core:jackson-databind:$vJackson"

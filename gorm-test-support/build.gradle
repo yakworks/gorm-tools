@@ -13,8 +13,12 @@ dependencies {
 
   //used for bundled Test traits
   api("org.grails:grails-gorm-testing-support:$vGrailsTesting"){
-    // transitive = false
+    //transitive = false
+    exclude group: 'org.grails', module: 'grails-datastore-web'
   }
+
+  // implementation("org.grails:grails-datastore-gorm-test:7.3.3")
+  // implementation("org.grails:grails-datastore-web:7.3.3")
 
   api("io.github.longwa:build-test-data:$vBuildTestData"){
     //keep the extra stuff out.

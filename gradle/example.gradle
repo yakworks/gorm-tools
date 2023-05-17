@@ -16,9 +16,9 @@ dependencies {
   // implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
 
   // implementation "org.grails:grails-datastore-gorm:${vGorm}"
-  implementation "org.grails:grails-datastore-gorm-hibernate5:$vGormHibernate"
-  implementation "org.grails.plugins:hibernate5:$vGormHibernate"
-  implementation "org.hibernate:hibernate-core:$vHibernate"
+  // implementation "org.grails:grails-datastore-gorm-hibernate5:$vGormHibernate"
+  // implementation "org.grails.plugins:hibernate5:$vGormHibernate"
+  // implementation "org.hibernate:hibernate-core:$vHibernate"
   // compileOnly "org.hibernate:hibernate-ehcache:$vHibernate"
 
   // tests deps

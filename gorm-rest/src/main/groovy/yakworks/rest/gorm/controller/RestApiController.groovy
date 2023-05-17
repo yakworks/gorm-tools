@@ -103,7 +103,7 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
             LOG.error('⛔️⛔️⛔️⛔️LOST PARAMS - REPARSED ⛔️⛔️⛔️⛔️')
             Object failReason = req.getAttribute("org.apache.catalina.parameter_parse_failed_reason")
             String msg = "queryString=[${req.queryString}] , method=[${req.method}] , requestURI=[${req.requestURI}], contentType:[${req.getContentType()}]"
-            msg = msg + "\n  new parsedParams from queryString - ${grailsParams}"
+            msg = msg + "\n  new params from queryString - ${parsedParams}"
             msg = msg + "\n  org.apache.catalina.parameter_parse_failed_reason - ${failReason}"
             LOG.error(msg)
         }

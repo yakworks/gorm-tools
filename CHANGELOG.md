@@ -1,3 +1,28 @@
+### v7.3.43
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.42...v7.3.43)
+- release [link](https://github.com/yakworks/gorm-tools/commit/dc66867a8676ccb3ff7b4667ab1c359868dc1fab)
+- Logging hotfix 2 (#676) [link](https://github.com/yakworks/gorm-tools/commit/eb9794b95a050760acc04e429df84d7b176c65d2)
+- add logger and logging for lost params that have been reparsed (#675) [link](https://github.com/yakworks/gorm-tools/commit/004214a95c29cd0eda20f797b8c181b760498a3b)
+
+### v7.3.42
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.40...v7.3.42)
+- release [link](https://github.com/yakworks/gorm-tools/commit/c46ced546d70f9f0ebc719fb52d029d8838fea95)
+- Merge pull request #674 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/63c323af54d57cf69ddd0bb5bda3e8f599a89854)
+- fix null for icu4jArgs when null arguments [link](https://github.com/yakworks/gorm-tools/commit/4fcca857b6eff101562a0d0a5115cc9dd99ba216)
+- testing mango and add getMemberOrg for OrgMebers [link](https://github.com/yakworks/gorm-tools/commit/6825c6d012a40f612ddd13955c6aa20ec6984d80)
+- Params map (#672) [link](https://github.com/yakworks/gorm-tools/commit/18332f668512b11b7a2081f3347a5b9f91007604)
+- 1941 check if orgsource exists (#673) [link](https://github.com/yakworks/gorm-tools/commit/f2df1b50e1c29f0f858baff928a9a41c8c9692a4)
+- #1925 Handle and report back bad query in q param (#670) [link](https://github.com/yakworks/gorm-tools/commit/9ba95357fddb4916e51a0a866118abaeda1f7cd1)
+- isNewOrDirty ok for any entity, add tests (#671) [link](https://github.com/yakworks/gorm-tools/commit/e70a5a83ee97070d115883048604de55aa343bbe)
+- 9ci/domain9#1924 Parse params from query  (#669) [link](https://github.com/yakworks/gorm-tools/commit/366063402eb0fd973eeca43a582aaf188f9bbc73)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/c8dbeb6309e54777f54188c240e5368d3cb4e1aa)
+- Add companyid to orgmember (#664) [link](https://github.com/yakworks/gorm-tools/commit/73e95840b7fe8e997189c782ba61dee02f943869)
+- Rest api refactor (#667) [link](https://github.com/yakworks/gorm-tools/commit/1444bee4ea9a891cb28925b932bd1443bd126508)
+- token comments and docs [link](https://github.com/yakworks/gorm-tools/commit/92e46af756b117576c780ce56d7092f56d3186a3)
+- finish params refactor (#663) [link](https://github.com/yakworks/gorm-tools/commit/53250b867b1bd2829a9790d4ceb066c3dfdee06b)
+
 ### v7.3.40
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.39...v7.3.40)

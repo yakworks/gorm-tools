@@ -1,3 +1,8 @@
+### v7.3.46
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.45...v7.3.46)
+- downgrade to warning for lost params so we can turn it off easier [link](https://github.com/yakworks/gorm-tools/commit/a2c50f987bd1d693837e48fe5940e888eee5c5e6)
+
 ### v7.3.45
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.44...v7.3.45)

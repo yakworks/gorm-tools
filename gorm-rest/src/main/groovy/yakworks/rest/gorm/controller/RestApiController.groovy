@@ -100,11 +100,9 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
             pMap.putAll(parsedParams)
 
             //log out some error logging for now
-            LOG.error('⛔️⛔️⛔️⛔️LOST PARAMS - REPARSED ⛔️⛔️⛔️⛔️')
-            Object failReason = req.getAttribute("org.apache.catalina.parameter_parse_failed_reason")
-            String msg = "queryString=[${req.queryString}] , method=[${req.method}] , requestURI=[${req.requestURI}], contentType:[${req.getContentType()}]"
-            msg = msg + "\n  new params from queryString - ${parsedParams}"
-            msg = msg + "\n  org.apache.catalina.parameter_parse_failed_reason - ${failReason}"
+            String msg = '⛔️⛔️⛔️⛔️LOST PARAMS - REPARSED ⛔️⛔️⛔️⛔️'
+            msg = msg + "\n  queryString=[${req.queryString}] , method=[${req.method}] , requestURI=[${req.requestURI}], contentType:[${req.getContentType()}]"
+            msg = msg + "\n  params parsed from queryString - ${parsedParams}"
             LOG.error(msg)
         }
         //}

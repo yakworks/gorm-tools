@@ -8,6 +8,8 @@ package yakworks.rest.gorm.controller
 import groovy.transform.CompileStatic
 import groovy.transform.Generated
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.problem.ProblemHandler
@@ -27,6 +29,7 @@ import yakworks.gorm.config.GormConfig
  */
 @CompileStatic
 trait RestApiController implements RequestJsonSupport, RestResponder, RestRegistryResponder, ServletAttributes {
+    final static Logger LOG = LoggerFactory.getLogger(RestApiController)
 
     @Autowired ProblemHandler problemHandler
 
@@ -84,19 +87,27 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
      * @return a new copy of the grails params
      */
     Map getParamsMap() {
-        //the dispatchParams are the normal stock params, has values added in from UrlMappings and path
+        //the grailsParams are the normal stock params, has values added in from UrlMappings and path
         Map grailsParams = getParams()
         Map pMap = [:]
-        //if this hack is enabled
-        if(gormConfig.enableGrailsParams) {
-            def req = getRequest()
-            //possibly from an async operation, still investigating, the params in the request get lost or dropped, but queryString still there
-            if(!req.getParameterMap() && req.queryString) {
-                Map parsedParams = ApiUtils.parseQueryParams(req.queryString)
-                //Map gParams = new GrailsParameterMap(parsedParams, req)
-                pMap.putAll(parsedParams)
-            }
+        //if this hack is enabled, on my default right now, can turn off later or make optional later if needed
+        //if(gormConfig.enableGrailsParams) {
+        def req = getRequest()
+        //possibly from an async operation, still investigating, the params in the request get lost or dropped, but queryString still there
+        if(!req.getParameterMap() && req.queryString) {
+            Map parsedParams = ApiUtils.parseQueryParams(req.queryString)
+            //Map gParams = new GrailsParameterMap(parsedParams, req)
+            pMap.putAll(parsedParams)
+
+            //log out some error logging for now
+            LOG.error('⛔️⛔️⛔️⛔️LOST PARAMS - REPARSED ⛔️⛔️⛔️⛔️')
+            Object failReason = req.getAttribute("org.apache.catalina.parameter_parse_failed_reason")
+            LOG.error("org.apache.catalina.parameter_parse_failed_reason - ${failReason}")
+            String msg = "queryString=[${req.queryString}] , method=[${req.method}] , requestURI=[${req.requestURI}], contentType:[${req.getContentType()}]"
+            LOG.error(msg)
+            LOG.error("new parsedParams from queryString - ${parsedParams}")
         }
+        //}
         // if the main params "dropped" then they will now be in gParams.
         // and the normal getParams will have what the UrlMappings added in and we put those into the newly parsed params
         // this will also avoid the issues with request being passed that is referenced in GrailsParameterMap

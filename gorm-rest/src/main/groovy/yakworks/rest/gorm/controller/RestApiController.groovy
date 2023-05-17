@@ -100,10 +100,10 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
             pMap.putAll(parsedParams)
 
             //log out some error logging for now
-            String msg = '⛔️⛔️⛔️⛔️LOST PARAMS - REPARSED ⛔️⛔️⛔️⛔️'
+            String msg = "⚠️ - LOST PARAMS - REPARSED - ⚠️"
             msg = msg + "\n  queryString=[${req.queryString}] , method=[${req.method}] , requestURI=[${req.requestURI}], contentType:[${req.getContentType()}]"
             msg = msg + "\n  params parsed from queryString - ${parsedParams}"
-            LOG.error(msg)
+            LOG.warn(msg)
         }
         //}
         // if the main params "dropped" then they will now be in pMap from the querySting parsing above.

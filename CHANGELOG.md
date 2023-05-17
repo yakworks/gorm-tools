@@ -1,3 +1,8 @@
+### v7.3.45
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.44...v7.3.45)
+- another iteration on logging for the lost params [link](https://github.com/yakworks/gorm-tools/commit/23618649104d9adde6a938181871fbe9ba7f3608)
+
 ### v7.3.44
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.43...v7.3.44)

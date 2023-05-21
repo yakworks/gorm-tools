@@ -101,11 +101,25 @@ class EntityResponder<D> {
     }
 
     Pager pagedQuery(Map params, List<String> includesKeys, boolean requireQ = false) {
+        limitMax(params)
         Pager pager = Pager.of(params)
         List dlist = query(pager, params)
         List<String> incs = findIncludes(params, includesKeys)
         MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)
         return pager.setMetaMapList(entityMapList)
+    }
+
+    /**
+     * Overrides the params.max and limits the allowed max rows based on role.
+     * By default, 100 is forced for all roles, except few roles which are configured to allow higher value for max
+     */
+    protected void limitMax(Map params) {
+        if(!params.containsKey('max')) return
+        else {
+            //TODO allow certain roles to have bigger max value
+            int max = params.max as Integer
+            params.max = Math.min(max, 100)
+        }
     }
 
     List<D> query(Pager pager, Map parms) {

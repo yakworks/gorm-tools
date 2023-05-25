@@ -93,6 +93,12 @@ class ContactRepo extends LongIdGormRepo<Contact> {
         if (data == null) data = [:] //if null then make it empty map so it can cycle down and blow error
 
         String sourceId = Maps.value(data, 'sourceId')
+        if(!data.sources && sourceId) data['sources'] = [[sourceId:sourceId]]
+        if(data.sources) {
+            Collection sources = (Collection) Maps.value(data, 'sources')
+            sourceId = sources[0]['sourceId']
+        }
+
         if(sourceId) {
             ContactSource source = ContactSource.findWhere(sourceId: sourceId)
             return source?.contact

@@ -38,6 +38,13 @@ class ContactRepoSpec extends Specification implements DataRepoTest, SecurityTes
         then:
         c
         c.id == contact.id
+
+        when: "Lookup from sources collection"
+        c = contactRepo.lookup(sources:[[sourceId:'123']])
+
+        then:
+        c
+        c.id == contact.id
     }
 
 }

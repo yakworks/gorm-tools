@@ -240,7 +240,7 @@ trait RestRepoApiController<D> extends RestApiController {
     void handleBulkOperationException(Exception e) {
         assert getEntityClass()
         Problem apiError = problemHandler.handleException(getEntityClass(), e)
-        if(apiError.status.code == 500) {
+        if (apiError.status.code == 500) {
             log.error("⚠️ Bulk operation exception ⚠️", apiError.cause)
         } else {
             log.error("Bulk operation exception", e.cause)

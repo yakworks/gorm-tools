@@ -56,27 +56,18 @@ class Task implements RepoEntity<Task>, Serializable {
     }
 
     static constraintsMap = [
-        dueDate:[ description: 'The relative path to the locationKey',
-            nullable: false],
-        state:[ description: 'Defaults to Open',
-            nullable: false, required: false],
-        status:[ description: 'Defaults to TaskStatus.OPEN',
-            nullable: false, required: false],
-        taskType:[ description: 'The type of the task',
-            nullable: false],
+        dueDate:[description: 'The relative path to the locationKey', nullable: false],
+        state:[description: 'Defaults to Open', nullable: false, required: false],
+        status:[description: 'Defaults to TaskStatus.OPEN', nullable: false, required: false],
+        taskType:[description: 'The type of the task', nullable: false],
         //title         nullable:false
 
         /*optional */
-        completedBy:[ description: 'The user who completed',
-            nullable: true],
-        completedDate:[ description: 'The date it was completed',
-            nullable: true],
-        docTag:[ description: 'descriptor',
-            nullable: true],
-        priority:[ description: '10 is Critical, 20 High, 30 Medium, 40 Low',
-            nullable: true],
-        userId:[ description: 'User id who is responsible for making sure this thing is done. null means anyone.',
-            nullable: true]
+        completedBy:[description: 'The user who completed', nullable: true],
+        completedDate:[description: 'The date it was completed', nullable: true],
+        docTag:[description: 'descriptor', nullable: true],
+        priority:[description: '10 is Critical, 20 High, 30 Medium, 40 Low', nullable: true],
+        userId:[description: 'User id who is responsible for making sure this thing is done. null means anyone.', nullable: true]
     ]
 
     void setupDefaultStatus() {

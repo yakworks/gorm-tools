@@ -24,9 +24,10 @@ import yakworks.security.gorm.model.AppUser
 import yakworks.spring.AppResourceLoader
 import yakworks.testing.gorm.RepoTestData
 import yakworks.testing.gorm.unit.DataRepoTest
+import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
-class ActivityServiceSpec extends Specification implements DataRepoTest, SecurityTest { //implements SecuritySpecUnitTestHelper{
+class ActivityServiceSpec extends Specification implements GormHibernateTest, SecurityTest { //implements SecuritySpecUnitTestHelper{
     static List<Class> entityClasses = [
         MailMessage, AttachmentLink, ActivityLink, Activity, Task, TaskType, TaskStatus,
         Org, AppUser, ActivityNote, Contact, ActivityContact
@@ -51,8 +52,8 @@ class ActivityServiceSpec extends Specification implements DataRepoTest, Securit
     }
 
     void setup(){
-        RepoTestData.build(TaskType, [id:1, name: "Todo"])
-        RepoTestData.build(TaskStatus, [id:0, name: "Open"])
+        RepoTestData.build(TaskType, [id:1, name: "Todo"]).persist()
+        RepoTestData.build(TaskStatus, [id:0, name: "Open"]).persist(flush:true)
     }
 
     void "createLog"() {
@@ -87,6 +88,9 @@ class ActivityServiceSpec extends Specification implements DataRepoTest, Securit
     // }
 
     void "test createTodo"() {
+        expect:
+        TaskType.TODO != null
+
         when:
         def contact = MockData.createContactWithUser()
         Activity activity = activityService.createTodo(contact.org, contact.user.id, "Task Summary")

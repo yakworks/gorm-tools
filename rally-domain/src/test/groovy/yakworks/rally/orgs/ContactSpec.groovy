@@ -13,11 +13,12 @@ import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.rally.testing.MockData
 import yakworks.security.gorm.model.AppUser
 import yakworks.testing.gorm.RepoTestData
+import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.DataRepoTest
 
-class ContactSpec extends Specification implements DataRepoTest, SecurityTest {
-    static List entityClasses = [ Contact, AppUser, Org, OrgSource, OrgTypeSetup, Location, ContactPhone, ContactSource, ContactEmail]
+class ContactSpec extends Specification implements GormHibernateTest, SecurityTest {
+    static List<Class> entityClasses = [ Contact, AppUser, Org, OrgSource, OrgTypeSetup, Location, ContactPhone, ContactSource, ContactEmail]
 
     Contact createContactWithUser(){
         Contact contact = MockData.contact([firstName: "John", lastName: 'Galt',  email: "al@9ci.io"])
@@ -222,7 +223,8 @@ class ContactSpec extends Specification implements DataRepoTest, SecurityTest {
         old.addToEmails(RepoTestData.build( ContactEmail,[contact: old]))
         old.addToSources(RepoTestData.build( ContactSource,[contact: old]))
         old.persist(flush: true)
-        def loc = RepoTestData.build(Location, [id:1, org:old.org, contact: old]).persist()
+
+        def loc = RepoTestData.build(Location, [id:1, org:old.org, contact: old]).persist(flush:true)
         assert loc.id == 1
         assert loc.contact.id == old.id
         assert old.locations.size() == 1

@@ -3,12 +3,11 @@ package yakworks.security.audit
 import gorm.tools.utils.GormMetaUtils
 import spock.lang.Specification
 import yakworks.security.gorm.model.AppUser
+import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
-import yakworks.testing.gorm.unit.DataRepoTest
 
-class AuditStampAnnSpec extends Specification implements DataRepoTest, SecurityTest {
-    static List entityClasses = [StampedEntity, StampedNoConstraintsClosure, AppUser]
-
+class AuditStampAnnSpec extends Specification implements GormHibernateTest, SecurityTest {
+    static List<Class> entityClasses = [AppUser, StampedEntity, StampedNoConstraintsClosure]
 
     void "did it get the audit stamp fields"() {
         when:
@@ -104,7 +103,7 @@ class AuditStampAnnSpec extends Specification implements DataRepoTest, SecurityT
     def "test update"(){
         when:
         Long id = StampedEntity.create([name:"Wyatt Oil"]).id
-        new AppUser(id:1, name: "admin", username:"admin", email:"admin@9ci.com", password: "test").persist(flush: true)
+        new AppUser(id:1, name: "admin", username:"admin", email:"admin@9ci.com", password: "test").persist()
         flushAndClear()
 
         then:

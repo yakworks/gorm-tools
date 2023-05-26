@@ -8,6 +8,7 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.model.LongIdGormRepo
+import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactSource
 
 @GormRepository
@@ -18,5 +19,29 @@ class ContactSourceRepo extends LongIdGormRepo<ContactSource> {
     ContactSource lookup(Map data) {
         if(data.sourceId) return ContactSource.findWhere(sourceId: data.sourceId)
         return null
+    }
+
+    Long findContactIdBySourceId(String sid) {
+      return lookup(sourceId:sid)?.contactId
+    }
+
+    ContactSource createSource(Contact c, Map data) {
+        Map sourceData = [:]
+        if(data.source && data.source instanceof Map){
+            sourceData.putAll(data.source as Map)
+        } else {
+            ['sourceId', 'sourceType', 'source'].each {
+                if(data[it]) sourceData[it] = data.remove(it)
+            }
+        }
+
+        if(!sourceData.sourceId) {
+            String sid = c.num
+            if(!sid) sid = c.name
+            if(!sid) sid = c.firstName
+            sourceData.sourceId = sid
+        }
+        sourceData['contactId'] = c.id
+        return ContactSource.create(sourceData)
     }
 }

@@ -63,7 +63,9 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
     ContactFlex flex
     AppUser user
 
-    static hasMany = [phones: ContactPhone, emails: ContactEmail, sources: ContactSource]
+    ContactSource source
+
+    static hasMany = [phones: ContactPhone, emails: ContactEmail]
 
     static List<String> toOneAssociations = ['flex']
 
@@ -82,11 +84,11 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
         user column: 'userId'
         //FIXME temp mapping until column change
         altName column: 'entityName'
+        source column: 'contactSourceId'
 
         flex cascade: "all"
         emails cascade: "all-delete-orphan"
         phones cascade: "all-delete-orphan"
-        sources cascade: "all-delete-orphan"
     }
 
     static constraintsMap = [
@@ -101,6 +103,7 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
         location:[ nullable: true],
         phone:[ d:'default email', nullable: true],
         email:[ d:'default phone', email: true, nullable: true],
+        source:[ d: 'Originator source info', oapi:[read: true, create: ['source', 'sourceType', 'sourceId']], bindable: false],
 
         firstName:[ nullable: false, maxSize: 50],
         // middleName:[ nullable: true, maxSize: 50],

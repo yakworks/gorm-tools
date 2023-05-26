@@ -18,6 +18,7 @@ import yakworks.rally.mail.config.MailProps
 import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.mail.testing.TestMailService
 import yakworks.rally.orgs.model.Contact
+import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.testing.MockData
 import yakworks.security.gorm.model.AppUser
@@ -29,7 +30,7 @@ import yakworks.testing.gorm.unit.SecurityTest
 class ActivityServiceSpec extends Specification implements DataRepoTest, SecurityTest { //implements SecuritySpecUnitTestHelper{
     static List<Class> entityClasses = [
         MailMessage, AttachmentLink, ActivityLink, Activity, Task, TaskType, TaskStatus,
-        Org, AppUser, ActivityNote, Contact, ActivityContact
+        Org, AppUser, ActivityNote, Contact, ContactSource, ActivityContact
     ]
 
     @Autowired ActivityService activityService

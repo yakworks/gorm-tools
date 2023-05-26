@@ -34,6 +34,7 @@ import yakworks.rally.orgs.model.ContactPhone
 import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.tag.model.TagLink
 import yakworks.security.gorm.model.AppUser
 
@@ -44,6 +45,9 @@ class ContactRepo extends LongIdGormRepo<Contact> {
     //Making this nullable makes it easier to wire up for tests.
     @Inject @Nullable
     LocationRepo locationRepo
+
+    @Inject @Nullable
+    ContactSourceRepo contactSourceRepo
 
     @RepoListener
     void beforeValidate(Contact contact) {
@@ -72,6 +76,7 @@ class ContactRepo extends LongIdGormRepo<Contact> {
 
         // ContactSource.query(contact: contact).deleteAll() - deleted with cascade as per domain mapping.
         Location.query(contact: contact).deleteAll()
+        ContactSource.query(contactId: contact.id).deleteAll()
 
         //NOTE: This was here for CED but it was removed as logic is faulty to keep the location around for the contact if the contact is deleted.
         // I think the idea was to keep its location info even if contact was removed since contacts could be some kind of job.
@@ -82,8 +87,16 @@ class ContactRepo extends LongIdGormRepo<Contact> {
     @Override
     void doBeforePersistWithData(Contact contact, PersistArgs args) {
         Map data = args.data
+        if (args.bindAction == BindAction.Create) {
+            setupSource(contact, data)
+        }
         // we do primary location and contact here before persist so we persist org only once with contactId it is created
         if(data.location) createOrUpdateLocation(contact, data.location as Map)
+    }
+
+    void setupSource(Contact contact, Map data) {
+        if(!contact.id) contact.id = generateId()
+        contact.source = ContactSource.repo.createSource(contact, data)
     }
 
     /** lookup by num or ContactSource */
@@ -93,16 +106,13 @@ class ContactRepo extends LongIdGormRepo<Contact> {
         if (data == null) data = [:] //if null then make it empty map so it can cycle down and blow error
 
         String sourceId = Maps.value(data, 'sourceId')
-        if(!data.sources && sourceId) data['sources'] = [[sourceId:sourceId]]
-        if(data.sources) {
-            Collection sources = (Collection) Maps.value(data, 'sources')
-            sourceId = sources[0]['sourceId']
-        }
 
-        if(sourceId) {
-            ContactSource source = ContactSource.findWhere(sourceId: sourceId)
-            return source?.contact
-        } else if (data.num) {
+        if(data.source == null && sourceId) data.source = [sourceId: sourceId]
+        if (data.source && data.source['sourceId']) {
+            Long cid = contactSourceRepo.findContactIdBySourceId(Maps.value(data, "source.sourceId") as String)
+            if(cid) return get(cid)
+        }
+        else if (data.num) {
             String num = Maps.value(data, 'num')
             List contactForNum = Contact.findAllWhere(num:num)
             if(contactForNum?.size() == 1) {
@@ -241,10 +251,10 @@ class ContactRepo extends LongIdGormRepo<Contact> {
                 toContat.addToEmails(GormUtils.copyDomain(ContactEmail, e, [contact: toContat]))
             }
         }
-        if(from.sources) {
-            from.sources.each { ContactSource s ->
-                toContat.addToSources(GormUtils.copyDomain(ContactSource, s, [contact: toContat]))
-            }
+        if(from.source) {
+            ContactSource source = GormUtils.copyDomain(ContactSource, from.source, [contactId:toContat.id])
+            source.persist()
+            toContat.source = source
         }
         if(from.locations) {
             from.locations.each { Location l ->

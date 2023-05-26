@@ -1,5 +1,6 @@
 package yakworks.rally.orgs
 
+import gorm.tools.model.SourceType
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactSource
@@ -15,6 +16,36 @@ class ContactRepoSpec extends Specification implements DataRepoTest, SecurityTes
     static List entityClasses = [Contact, Org, ContactSource]
     @Inject ContactRepo contactRepo
 
+
+    void "create with source"() {
+        setup:
+        Org org = Org.of("foo", "bar", OrgType.Customer).persist()
+        assert org.id
+
+        Map data = [
+            name: "C1",
+            firstName: "C1",
+            orgId: org.id,
+            source:"test",
+            sourceType : SourceType.App,
+            sourceId: "C1-SID"
+        ]
+
+        when:
+        Contact contact = Contact.create(data)
+        flush()
+
+        then:
+        contact
+        contact.source
+
+        and:
+        contact.source.sourceId == "C1-SID"
+
+        and:
+        contact.id == ContactSource.repo.findContactIdBySourceId("C1-SID")
+    }
+
     void "lookup by num"() {
         when:
         Org org = Org.of("foo", "bar", OrgType.Customer)
@@ -28,9 +59,13 @@ class ContactRepoSpec extends Specification implements DataRepoTest, SecurityTes
 
     void "lookup by sourceId"() {
         setup:
-        Org org = Org.of("foo", "bar", OrgType.Customer)
-        Contact contact = build(Contact, firstName: 'foo', num: 'foo', org:org).persist()
-        build(ContactSource, sourceId: '123', contact:contact).persist()
+        Org org = Org.of("foo", "bar", OrgType.Customer).persist()
+        Contact contact = Contact.create(firstName: 'foo', num: 'foo', orgId:org.id, sourceId:"123")
+        flush()
+
+        expect:
+        contact.source
+        contact.source.sourceId == "123"
 
         when:
         Contact c = contactRepo.lookup(sourceId:'123')
@@ -40,7 +75,7 @@ class ContactRepoSpec extends Specification implements DataRepoTest, SecurityTes
         c.id == contact.id
 
         when: "Lookup from sources collection"
-        c = contactRepo.lookup(sources:[[sourceId:'123']])
+        c = contactRepo.lookup(source:[sourceId:'123'])
 
         then:
         c

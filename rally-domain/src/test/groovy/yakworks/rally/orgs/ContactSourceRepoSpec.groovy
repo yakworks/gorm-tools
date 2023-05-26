@@ -13,6 +13,7 @@ import javax.inject.Inject
 
 class ContactSourceRepoSpec extends Specification implements DataRepoTest, SecurityTest {
     static List entityClasses = [Contact, Org, ContactSource]
+
     @Inject ContactSourceRepo contactSourceRepo
 
 
@@ -28,6 +29,19 @@ class ContactSourceRepoSpec extends Specification implements DataRepoTest, Secur
         then:
         result
         result.id == source.id
+    }
+
+    void "test findContactIdBySourceId"() {
+        setup:
+        Org org = Org.of("foo", "bar", OrgType.Customer).persist()
+        Contact contact = Contact.create( firstName: 'foo', num: 'foo', orgId:org.id, sourceId: '123')
+
+        when:
+        Long cid = contactSourceRepo.findContactIdBySourceId('123')
+
+        then:
+        cid
+        cid == contact.id
     }
 
 }

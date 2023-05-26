@@ -9,13 +9,14 @@ import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.repo.ActivityContactRepo
 import yakworks.rally.orgs.model.Contact
+import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
 import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.DataRepoTest
 
 class ActivityContactSpec extends Specification implements DataRepoTest, SecurityTest {
-    static List entityClasses = [Activity, ActivityContact, ActivityNote, Contact, Org, Tag]
+    static List entityClasses = [Activity, ActivityContact, ActivityNote, Contact, ContactSource, Org, Tag]
 
     @Shared
     ActivityContactRepo repo

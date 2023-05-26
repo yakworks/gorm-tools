@@ -22,8 +22,6 @@ import yakworks.rally.orgs.model.Org
 import yakworks.rally.testing.MockData
 import yakworks.security.gorm.model.AppUser
 import yakworks.spring.AppResourceLoader
-import yakworks.testing.gorm.RepoTestData
-import yakworks.testing.gorm.unit.DataRepoTest
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
@@ -52,8 +50,15 @@ class ActivityServiceSpec extends Specification implements GormHibernateTest, Se
     }
 
     void setup(){
-        RepoTestData.build(TaskType, [id:1, name: "Todo"]).persist()
-        RepoTestData.build(TaskStatus, [id:0, name: "Open"]).persist(flush:true)
+        TaskType todo = new TaskType(id:1L, name: "Todo", kind:Activity.Kind.Todo, code:"test").persist()
+        TaskStatus status = new TaskStatus(id:0L, name: "Open", state:Task.State.Open, code:"test").persist()
+
+        flushAndClear()
+
+        assert todo.id == 1L
+        assert status.id == 0L
+        assert TaskType.TODO
+        assert TaskStatus.OPEN
     }
 
     void "createLog"() {

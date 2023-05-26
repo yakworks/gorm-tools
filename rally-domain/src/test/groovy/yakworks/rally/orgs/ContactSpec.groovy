@@ -224,13 +224,13 @@ class ContactSpec extends Specification implements GormHibernateTest, SecurityTe
         old.addToSources(RepoTestData.build( ContactSource,[contact: old]))
         old.persist(flush: true)
 
-        def loc = RepoTestData.build(Location, [id:1, org:old.org, contact: old]).persist(flush:true)
-        assert loc.id == 1
+        def loc = RepoTestData.build(Location, [org:old.org, contact: old]).persist(flush:true)
         assert loc.contact.id == old.id
         assert old.locations.size() == 1
 
         Contact copy = build(Contact, [org: old.org])
         Contact.repo.copy(old, copy)
+        flush()
 
         then:
         copy.name == old.name

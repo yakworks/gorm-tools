@@ -168,10 +168,10 @@ class OrgWebApiSpec extends Specification implements WebClientTrait {
         when:
         List<Map> phones = [[kind: "kind", num: "123"]]
         List<Map> emails = [[kind: "kind", address: "test@9ci.com"]]
-        List<Map> sources = [[source: "source", sourceType: "RestApi", sourceId: "1"]]
+        Map source = [source: "source", sourceType: "RestApi", sourceId: "1"]
 
         List<Map> contacts = [
-            [name: "C1", firstName: "C1", phones: phones, emails:emails, sources: sources],
+            [name: "C1", firstName: "C1", phones: phones, emails:emails, source: source],
             [name: "C2", firstName: "C2"]
         ]
         ResponseEntity resp = post(path, [num: "111", name: "Org-with-contact", type: "Customer", contacts:contacts])
@@ -207,8 +207,8 @@ class OrgWebApiSpec extends Specification implements WebClientTrait {
         c.phones[0].num == "123"
         c.emails.size() == 1
         c.emails[0].address == "test@9ci.com"
-        c.sources.size() == 1
-        c.sources[0].source == "source"
+        c.source
+        c.source.source == "source"
 
         // cleanup:
         // delete(path, orgId)

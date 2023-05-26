@@ -4,6 +4,9 @@
 */
 package yakworks.security.gorm.model
 
+import org.grails.orm.hibernate.HibernateGormStaticApi
+import org.hibernate.Session
+import org.hibernate.query.Query
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.validation.Errors
@@ -19,6 +22,7 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
+import yakworks.api.problem.data.DataProblemCodes
 
 @GormRepository
 @GrailsCompileStatic
@@ -78,7 +82,34 @@ class AppUserRepo implements GormRepo<AppUser> {
         if(user.password) {
             user.passwordHash = encodePassword(user.password)
         }
+        if(user.isNew()) {
+            //we check when new to avoid unique index error.
+            if(exists(user.username, user.email)){
+                throw DataProblemCodes.UniqueConstraint.get()
+                    .detail("Violates unique constraint [username: ${user.username}, email: ${user.email}]").toException()
+            }
+        }
     }
+
+    boolean exists(String username, String email) {
+        String queryString = """
+            select 1 from AppUser as u
+            where u.username = :username
+            or u.email = :email
+        """
+
+        HibernateGormStaticApi<AppUser> staticApi = (HibernateGormStaticApi)gormStaticApi()
+        return (Boolean) staticApi.hibernateTemplate.execute { Session session ->
+            Query q = (Query) session.createQuery(queryString)
+            q.setReadOnly(true)
+                .setMaxResults(1)
+                .setParameter('username', username)
+                .setParameter('email', email)
+
+            return q.list().size() == 1
+        }
+    }
+
 
     /**
      * Sets up password and roles fields for a given User entity. Updates the dependent Contact entity.

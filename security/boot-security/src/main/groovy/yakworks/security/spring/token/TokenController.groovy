@@ -10,17 +10,20 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 
 import org.springframework.http.CacheControl
 import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.core.AbstractOAuth2Token
 import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 import jakarta.annotation.Nullable
+import yakworks.api.HttpStatus
 import yakworks.security.spring.token.generator.JwtTokenExchanger
 import yakworks.security.spring.token.generator.JwtTokenGenerator
 import yakworks.security.spring.token.generator.StoreTokenGenerator
@@ -31,6 +34,7 @@ import yakworks.security.user.CurrentUser
  */
 @RestController
 @CompileStatic
+@Slf4j
 class TokenController {
 
     @Inject JwtTokenGenerator jwtTokenGenerator
@@ -41,6 +45,7 @@ class TokenController {
     StoreTokenGenerator storeTokenGenerator
 
     @Inject CurrentUser currentUser
+
 
     // @Value('${grails.serverURL:""}')
     // String serverURL
@@ -126,5 +131,12 @@ class TokenController {
             .cacheControl(CacheControl.noStore())
             .body(body)
     }
+
+    @ExceptionHandler(Exception.class)
+    def handleException(HttpServletRequest req, HttpServletResponse resp, Exception e) {
+        log.error(e.message)
+        return [status: HttpStatus.INTERNAL_SERVER_ERROR.code, error:e.message]
+    }
+
 
 }

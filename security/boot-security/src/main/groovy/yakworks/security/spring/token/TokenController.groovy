@@ -23,7 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 import jakarta.annotation.Nullable
-import yakworks.api.HttpStatus
+import yakworks.api.problem.Problem
+import yakworks.api.problem.UnexpectedProblem
 import yakworks.security.spring.token.generator.JwtTokenExchanger
 import yakworks.security.spring.token.generator.JwtTokenGenerator
 import yakworks.security.spring.token.generator.StoreTokenGenerator
@@ -135,8 +136,8 @@ class TokenController {
     @ExceptionHandler(Exception.class)
     def handleException(HttpServletRequest req, HttpServletResponse resp, Exception e) {
         log.error(e.message)
-        return [status: HttpStatus.INTERNAL_SERVER_ERROR.code, error:e.message]
+        //We dont have access to ProblemHandler here in boot-security. But use a problem to be consistent.
+        Problem problem = new UnexpectedProblem().cause(e).detail(e.message)
+        return problem.asMap()
     }
-
-
 }

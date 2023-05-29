@@ -7,12 +7,12 @@ import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.repo.ContactRepo
+import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
-import yakworks.testing.gorm.unit.DataRepoTest
 
 import javax.inject.Inject
 
-class ContactRepoSpec extends Specification implements DataRepoTest, SecurityTest {
+class ContactRepoSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [Contact, Org, ContactSource]
     @Inject ContactRepo contactRepo
 
@@ -48,8 +48,8 @@ class ContactRepoSpec extends Specification implements DataRepoTest, SecurityTes
 
     void "lookup by num"() {
         when:
-        Org org = Org.of("foo", "bar", OrgType.Customer)
-        Contact contact = build(Contact, firstName: 'foo', num: 'foo', org:org).persist()
+        Org org = Org.of("foo", "bar", OrgType.Customer).persist()
+        Contact contact = Contact.create( firstName: 'foo', num: 'foo', orgId:org.id)
         Contact c = contactRepo.lookup(num:'foo')
 
         then:

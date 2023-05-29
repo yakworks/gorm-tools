@@ -6,12 +6,12 @@ import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.repo.ContactSourceRepo
-import yakworks.testing.gorm.unit.DataRepoTest
+import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
 import javax.inject.Inject
 
-class ContactSourceRepoSpec extends Specification implements DataRepoTest, SecurityTest {
+class ContactSourceRepoSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [Contact, Org, ContactSource]
 
     @Inject ContactSourceRepo contactSourceRepo
@@ -19,8 +19,8 @@ class ContactSourceRepoSpec extends Specification implements DataRepoTest, Secur
 
     void "test lookup by sourceId"() {
         setup:
-        Org org = Org.of("foo", "bar", OrgType.Customer)
-        Contact contact = build(Contact, firstName: 'foo', num: 'foo', org:org).persist()
+        Org org = Org.of("foo", "bar", OrgType.Customer).persist()
+        Contact contact = Contact.create(firstName: 'foo', num: 'foo', orgId:org.id).persist()
         ContactSource source = build(ContactSource, sourceId: '123', contact:contact).persist()
 
         when:
@@ -35,6 +35,7 @@ class ContactSourceRepoSpec extends Specification implements DataRepoTest, Secur
         setup:
         Org org = Org.of("foo", "bar", OrgType.Customer).persist()
         Contact contact = Contact.create( firstName: 'foo', num: 'foo', orgId:org.id, sourceId: '123')
+        flush()
 
         when:
         Long cid = contactSourceRepo.findContactIdBySourceId('123')

@@ -5,6 +5,7 @@
 package yakworks.rest.gorm.controller
 
 import javax.inject.Inject
+import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -153,13 +154,15 @@ class BulkControllerSupport<D> {
      * Special handler for bulk operations, so that we can log/highight every bulk error we send.
      * Its here, because we cant have more thn one exception handler for "Exception" in controller
      */
-    Problem handleBulkOperationException(Exception e) {
-        assert getEntityClass()
+    Problem handleBulkOperationException(HttpServletRequest req, Exception e) {
+        String message = "queryString=[${req.queryString}], requestURI=[${req.requestURI}]"
+
         Problem apiError = problemHandler.handleException(getEntityClass(), e)
+
         if (apiError.status.code == 500) {
-            log.error("⚠️ Bulk operation exception ⚠️", apiError.cause)
+            log.error("⚠️ Bulk operation exception ⚠️ \n $message", apiError.cause)
         } else {
-            log.error("Bulk operation exception", e.cause)
+            log.error("Bulk operation exception \n $message", e.cause)
         }
         return apiError
     }

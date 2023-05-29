@@ -195,7 +195,7 @@ trait RestRepoApiController<D> extends RestApiController {
         try {
             bulkProcess(DataOp.add)
         } catch (Exception e) {
-            respondWith getBulkControllerSupport().handleBulkOperationException(e)
+            respondWith getBulkControllerSupport().handleBulkOperationException(request, e)
         }
     }
 
@@ -205,7 +205,7 @@ trait RestRepoApiController<D> extends RestApiController {
         try {
             bulkProcess(DataOp.update)
         } catch (Exception e) {
-            respondWith getBulkControllerSupport().handleBulkOperationException(e)
+            respondWith getBulkControllerSupport().handleBulkOperationException(request, e)
         }
     }
 

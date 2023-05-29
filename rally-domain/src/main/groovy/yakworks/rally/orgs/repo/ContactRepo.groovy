@@ -94,6 +94,9 @@ class ContactRepo extends LongIdGormRepo<Contact> {
         if(data.location) createOrUpdateLocation(contact, data.location as Map)
     }
 
+    /**
+     * Create and setup source on contact
+     */
     void setupSource(Contact contact, Map data) {
         if(!contact.id) contact.id = generateId()
         contact.source = ContactSource.repo.createSource(contact, data)
@@ -107,6 +110,7 @@ class ContactRepo extends LongIdGormRepo<Contact> {
 
         String sourceId = Maps.value(data, 'sourceId')
 
+        //For convience, it allows specifying sourceId directly at top level along with other contact fields.
         if(data.source == null && sourceId) data.source = [sourceId: sourceId]
         if (data.source && data.source['sourceId']) {
             Long cid = contactSourceRepo.findContactIdBySourceId(Maps.value(data, "source.sourceId") as String)

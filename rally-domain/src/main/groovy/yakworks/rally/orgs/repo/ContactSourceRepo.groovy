@@ -22,7 +22,11 @@ class ContactSourceRepo extends LongIdGormRepo<ContactSource> {
     }
 
     Long findContactIdBySourceId(String sid) {
-      return lookup(sourceId:sid)?.contactId
+        List<Long> results = ContactSource.executeQuery('select contactId from ContactSource where sourceId = :sourceId',
+            [sourceId: sid]) as List<Long>
+
+        if(results) return results[0]
+        else return null
     }
 
     ContactSource createSource(Contact c, Map data) {

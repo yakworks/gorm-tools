@@ -17,15 +17,10 @@ import yakworks.security.audit.AuditStamp
 @GrailsCompileStatic
 class ContactSource implements SourceTrait, RepoEntity<ContactSource>, Serializable {
 
-    //static belongsTo = [contact: Contact]
     Long contactId
 
     //The id from the outside source or of the collection step, promise or some future workflow template record that generated this
     String sourceVersion //edit sequence number from the source system.
-
-    static mapping = {
-        //contact column: 'contactId'
-    }
 
     static constraintsMap = [
         contactId:[ description: 'The id of the contact this is for', nullable: false],

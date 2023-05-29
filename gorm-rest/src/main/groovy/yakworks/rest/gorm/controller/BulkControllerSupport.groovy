@@ -155,7 +155,7 @@ class BulkControllerSupport<D> {
      * Its here, because we cant have more thn one exception handler for "Exception" in controller
      */
     Problem handleBulkOperationException(HttpServletRequest req, Exception e) {
-        String message = "queryString=[${req.queryString}], requestURI=[${req.requestURI}]"
+        String message = "requestURI=[${req.requestURI}], method=[${req.method}], queryString=[${req.queryString}]"
 
         Problem apiError = problemHandler.handleException(getEntityClass(), e)
 

@@ -42,9 +42,11 @@ class TokenRestApiSpec extends Specification implements OkHttpRestTrait {
         Map body = bodyToMap(resp)
 
         then:
+        !body.ok
         body.status == 500
         !body.access_token
-        body.error.contains "User not found for username: developersx@9ci.com"
+        body.code == "error.unexpected"
+        body.detail.contains "User not found for username: developersx@9ci.com"
     }
 
     void "testing token grant_type token_exchange"() {

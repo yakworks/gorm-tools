@@ -155,14 +155,10 @@ class BulkControllerSupport<D> {
      * Its here, because we cant have more thn one exception handler for "Exception" in controller
      */
     Problem handleBulkOperationException(HttpServletRequest req, Exception e) {
-        String message = "requestURI=[${req.requestURI}], method=[${req.method}], queryString=[${req.queryString}]"
-
         Problem apiError = problemHandler.handleException(getEntityClass(), e)
-
         if (apiError.status.code == 500) {
-            log.error("⚠️ Bulk operation exception ⚠️ \n $message", apiError.cause)
-        } else {
-            log.error("Bulk operation exception \n $message", e.cause)
+            String requestInfo = "requestURI=[${req.requestURI}], method=[${req.method}], queryString=[${req.queryString}]"
+            log.warn("⚠️ Bulk operation exception ⚠️ \n $requestInfo \n $apiError.cause.message")
         }
         return apiError
     }

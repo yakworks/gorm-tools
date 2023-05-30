@@ -1,7 +1,5 @@
 package yakworks.security
 
-import org.springframework.http.HttpStatus
-
 import grails.testing.mixin.integration.Integration
 import okhttp3.FormBody
 import okhttp3.Request
@@ -35,6 +33,20 @@ class TokenRestApiSpec extends Specification implements OkHttpRestTrait {
             .build();
         Response resp = getHttpClient().newCall(request).execute()
         return resp
+    }
+
+    void "testing token grant_type token_exchange_usernotfound_error"() {
+        when:
+        Response resp = doTokenPost([requested_subject: "developersx@9ci.com", grant_type: "token-exchange"])
+
+        Map body = bodyToMap(resp)
+
+        then:
+        !body.ok
+        body.status == 404
+        !body.access_token
+        body.code == "user.notfound"
+        body.detail.contains "User not found for username: developersx@9ci.com"
     }
 
     void "testing token grant_type token_exchange"() {

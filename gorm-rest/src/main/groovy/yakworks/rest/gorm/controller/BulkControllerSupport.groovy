@@ -158,7 +158,7 @@ class BulkControllerSupport<D> {
         Problem apiError = problemHandler.handleException(getEntityClass(), e)
         if (apiError.status.code == 500) {
             String requestInfo = "requestURI=[${req.requestURI}], method=[${req.method}], queryString=[${req.queryString}]"
-            log.warn("⚠️ Bulk operation exception ⚠️ \n $requestInfo \n $apiError.cause.message")
+            log.warn("⛔️ 👉 Bulk operation exception ⛔️ \n $requestInfo \n $apiError.cause?.message")
         }
         return apiError
     }

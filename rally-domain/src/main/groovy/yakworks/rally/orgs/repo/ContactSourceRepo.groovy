@@ -68,7 +68,7 @@ class ContactSourceRepo extends LongIdGormRepo<ContactSource> {
     @Transactional
     ContactSource createSource(Contact contact, String sourceId, SourceType sourceType, String source) {
         ContactSource cs = new ContactSource()
-        cs.contactId = cs.id
+        cs.contactId = contact.id
         cs.sourceId = sourceId
         //FIXME we should not default these
         cs.source = source ?: 'External'

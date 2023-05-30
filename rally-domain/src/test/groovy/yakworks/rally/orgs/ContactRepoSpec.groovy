@@ -33,7 +33,8 @@ class ContactRepoSpec extends Specification implements GormHibernateTest, Securi
 
         when:
         Contact contact = Contact.create(data)
-        flush()
+        flushAndClear()
+        contact.refresh()
 
         then:
         contact
@@ -44,6 +45,7 @@ class ContactRepoSpec extends Specification implements GormHibernateTest, Securi
 
         and:
         contact.id == ContactSource.repo.findContactIdBySourceId("C1-SID")
+
     }
 
     void "lookup by num"() {

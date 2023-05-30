@@ -99,6 +99,7 @@ class ContactRepo extends LongIdGormRepo<Contact> {
      */
     void setupSource(Contact contact, Map data) {
         if(!contact.id) contact.id = generateId()
+        //the ContactSource will be persisted in createSource
         contact.source = ContactSource.repo.createSource(contact, data)
     }
 

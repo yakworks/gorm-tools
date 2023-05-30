@@ -18,8 +18,6 @@ import yakworks.security.audit.AuditStamp
 class ContactSource implements SourceTrait, RepoEntity<ContactSource>, Serializable {
 
     Long contactId
-
-    //The id from the outside source or of the collection step, promise or some future workflow template record that generated this
     String sourceVersion //edit sequence number from the source system.
 
     static constraintsMap = [

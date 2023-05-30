@@ -103,6 +103,8 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
         location:[ nullable: true],
         phone:[ d:'default email', nullable: true],
         email:[ d:'default phone', email: true, nullable: true],
+        //FIXME this is different than how we do OrgSource and ArTranSource, we require it in those cases.
+        // if we dont require it then we need to think through the implication in our design.
         source:[ d: 'Originator source info', oapi:[read: true, create: ['source', 'sourceType', 'sourceId']], bindable: false],
 
         firstName:[ nullable: false, maxSize: 50],

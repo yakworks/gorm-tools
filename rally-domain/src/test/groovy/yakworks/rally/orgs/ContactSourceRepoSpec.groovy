@@ -35,7 +35,7 @@ class ContactSourceRepoSpec extends Specification implements GormHibernateTest, 
         setup:
         Org org = Org.of("foo", "bar", OrgType.Customer).persist()
         Contact contact = Contact.create( firstName: 'foo', num: 'foo', orgId:org.id, sourceId: '123')
-        flush()
+        flushAndClear()
 
         when:
         Long cid = contactSourceRepo.findContactIdBySourceId('123')

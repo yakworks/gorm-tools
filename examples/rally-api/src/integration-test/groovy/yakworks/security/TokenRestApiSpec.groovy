@@ -43,9 +43,9 @@ class TokenRestApiSpec extends Specification implements OkHttpRestTrait {
 
         then:
         !body.ok
-        body.status == 500
+        body.status == 404
         !body.access_token
-        body.code == "error.unexpected"
+        body.code == "user.notfound"
         body.detail.contains "User not found for username: developersx@9ci.com"
     }
 

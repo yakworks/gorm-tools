@@ -3,14 +3,14 @@ package yakworks.security.gorm
 import yakworks.security.gorm.model.AppUser
 import yakworks.api.problem.Problem
 import yakworks.security.services.PasswordValidator
+import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
-import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 
-class PasswordValidatorSpec extends Specification implements  DataRepoTest, SecurityTest {
+class PasswordValidatorSpec extends Specification implements  GormHibernateTest, SecurityTest {
+    static entityClasses = [AppUser]
 
     void setup() {
-        mockDomain(AppUser)
         new AppUser(name: "admin", username:"admin", email:"admin@9ci.com", password: "test").persist()
     }
 

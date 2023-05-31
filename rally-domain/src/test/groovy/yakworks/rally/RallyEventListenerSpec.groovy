@@ -7,11 +7,12 @@ import yakworks.testing.gorm.TestDataJson
 import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.commons.map.Maps
+import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.rally.listeners.RallyEventListener
 
-class RallyEventListenerSpec extends Specification implements DataRepoTest, SecurityTest {
-    static entityClasses = [AppUser, SecRole, SecRoleUser]
+class RallyEventListenerSpec extends Specification implements GormHibernateTest, SecurityTest {
+    static List<Class> entityClasses = [AppUser, SecRole, SecRoleUser]
     static springBeans = [rallyEventListener: RallyEventListener]
 
     void "test orgid assignment"() {
@@ -25,7 +26,7 @@ class RallyEventListenerSpec extends Specification implements DataRepoTest, Secu
         user.orgId == 100
 
         when: "its creates with null orgId"
-        user = AppUser.create([email: "email@9ci.com", username: "test-user-2"])
+        user = AppUser.create([email: "email2@9ci.com", username: "test-user-2"])
 
         then: "should get the users"
         user.orgId == 1 //default

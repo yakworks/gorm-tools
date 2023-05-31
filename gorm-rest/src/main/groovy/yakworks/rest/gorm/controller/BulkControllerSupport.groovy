@@ -4,16 +4,22 @@
 */
 package yakworks.rest.gorm.controller
 
+import javax.inject.Inject
+import javax.servlet.http.HttpServletRequest
+
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
+import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.DataOp
+import yakworks.api.problem.Problem
 import yakworks.etl.csv.CsvToMapTransformer
 import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.IncludesKey
@@ -26,6 +32,7 @@ import yakworks.spring.AppCtx
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
+@Slf4j
 @CompileStatic
 @SuppressWarnings(['CatchRuntimeException'])
 class BulkControllerSupport<D> {
@@ -38,6 +45,8 @@ class BulkControllerSupport<D> {
 
     @Autowired(required = false)
     IncludesConfig includesConfig
+
+    @Inject ProblemHandler problemHandler
 
     Class<D> entityClass // the domain class this is for
 
@@ -141,4 +150,16 @@ class BulkControllerSupport<D> {
         RepoLookup.findRepo(getEntityClass())
     }
 
+    /**
+     * Special handler for bulk operations, so that we can log/highight every bulk error we send.
+     * Its here, because we cant have more thn one exception handler for "Exception" in controller
+     */
+    Problem handleBulkOperationException(HttpServletRequest req, Exception e) {
+        Problem apiError = problemHandler.handleException(getEntityClass(), e)
+        if (apiError.status.code == 500) {
+            String requestInfo = "requestURI=[${req.requestURI}], method=[${req.method}], queryString=[${req.queryString}]"
+            log.warn("⛔️ 👉 Bulk operation exception ⛔️ \n $requestInfo \n $apiError.cause?.message")
+        }
+        return apiError
+    }
 }

@@ -23,11 +23,10 @@ import yakworks.rally.orgs.model.Org
 import yakworks.rally.testing.MockData
 import yakworks.security.gorm.model.AppUser
 import yakworks.spring.AppResourceLoader
-import yakworks.testing.gorm.RepoTestData
-import yakworks.testing.gorm.unit.DataRepoTest
+import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
-class ActivityServiceSpec extends Specification implements DataRepoTest, SecurityTest { //implements SecuritySpecUnitTestHelper{
+class ActivityServiceSpec extends Specification implements GormHibernateTest, SecurityTest { //implements SecuritySpecUnitTestHelper{
     static List<Class> entityClasses = [
         MailMessage, AttachmentLink, ActivityLink, Activity, Task, TaskType, TaskStatus,
         Org, AppUser, ActivityNote, Contact, ContactSource, ActivityContact
@@ -52,8 +51,15 @@ class ActivityServiceSpec extends Specification implements DataRepoTest, Securit
     }
 
     void setup(){
-        RepoTestData.build(TaskType, [id:1, name: "Todo"])
-        RepoTestData.build(TaskStatus, [id:0, name: "Open"])
+        TaskType todo = new TaskType(id:1L, name: "Todo", kind:Activity.Kind.Todo, code:"test").persist()
+        TaskStatus status = new TaskStatus(id:0L, name: "Open", state:Task.State.Open, code:"test").persist()
+
+        flushAndClear()
+
+        assert todo.id == 1L
+        assert status.id == 0L
+        assert TaskType.TODO
+        assert TaskStatus.OPEN
     }
 
     void "createLog"() {
@@ -88,6 +94,9 @@ class ActivityServiceSpec extends Specification implements DataRepoTest, Securit
     // }
 
     void "test createTodo"() {
+        expect:
+        TaskType.TODO != null
+
         when:
         def contact = MockData.createContactWithUser()
         Activity activity = activityService.createTodo(contact.org, contact.user.id, "Task Summary")

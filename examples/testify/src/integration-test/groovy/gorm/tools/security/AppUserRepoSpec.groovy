@@ -51,26 +51,14 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         flushAndClear()
 
         when: "username exists"
-        params.email = "test2@9ci.com"
         AppUser.create(params)
 
         then:
         Exception ex = thrown()
         ex instanceof DataProblemException
-        ex.message.contains "Violates unique constraint [username: galt, email: test2@9ci.com]"
-
-        when: "email exists"
-        params.email = "test@9ci.com"
-        params.username = "galt2"
-        AppUser.create(params)
-
-        then:
-        ex = thrown()
-        ex instanceof DataProblemException
-        ex.message.contains "Violates unique constraint [username: galt2, email: test@9ci.com]"
+        ex.message.contains "Violates unique constraint [username: galt]"
 
         when: "success"
-        params.email = "test2@9ci.com"
         params.username = "galt2"
         AppUser.create(params)
 

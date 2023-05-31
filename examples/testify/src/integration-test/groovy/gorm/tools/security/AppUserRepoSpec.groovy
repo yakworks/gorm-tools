@@ -1,7 +1,7 @@
 package gorm.tools.security
 
 import org.springframework.security.crypto.password.PasswordEncoder
-
+import yakworks.api.problem.data.DataProblemException
 import yakworks.security.Roles
 import yakworks.security.gorm.model.SecRoleUser
 import yakworks.security.gorm.model.AppUser
@@ -30,7 +30,7 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         return ([:] << baseParams << params)
     }
 
-    def "test create"() {
+    void "test create"() {
         when:
         Map params = getUserParams()
         Long id = AppUser.create(params).id
@@ -42,6 +42,40 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         user.email == params.email
         user.name == params.name
         passwordEncoder.matches(params.password, user.passwordHash)
+    }
+
+    void "test unique"() {
+        setup:
+        Map params = getUserParams()
+        AppUser.create(params)
+        flushAndClear()
+
+        when: "username exists"
+        params.email = "test2@9ci.com"
+        AppUser.create(params)
+
+        then:
+        Exception ex = thrown()
+        ex instanceof DataProblemException
+        ex.message.contains "Violates unique constraint [username: galt, email: test2@9ci.com]"
+
+        when: "email exists"
+        params.email = "test@9ci.com"
+        params.username = "galt2"
+        AppUser.create(params)
+
+        then:
+        ex = thrown()
+        ex instanceof DataProblemException
+        ex.message.contains "Violates unique constraint [username: galt2, email: test@9ci.com]"
+
+        when: "success"
+        params.email = "test2@9ci.com"
+        params.username = "galt2"
+        AppUser.create(params)
+
+        then:
+        noExceptionThrown()
     }
 
     def "test create with roles ids"() {

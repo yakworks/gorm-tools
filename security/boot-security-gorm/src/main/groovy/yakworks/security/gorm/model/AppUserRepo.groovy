@@ -4,11 +4,15 @@
 */
 package yakworks.security.gorm.model
 
+import org.grails.orm.hibernate.HibernateGormStaticApi
+import org.hibernate.Session
+import org.hibernate.query.Query
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.validation.Errors
 
 import gorm.tools.databinding.BindAction
+import gorm.tools.mango.jpql.KeyExistsQuery
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
@@ -19,6 +23,7 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
+import yakworks.api.problem.data.DataProblemCodes
 
 @GormRepository
 @GrailsCompileStatic
@@ -27,6 +32,9 @@ class AppUserRepo implements GormRepo<AppUser> {
     @Autowired
     PasswordEncoder passwordEncoder
     // SecService secService
+
+    //cached instance of the query for id to keep it fast
+    KeyExistsQuery usernameExistsQuery
 
     /**
      * overrides the bindAndCreate method vs events
@@ -78,7 +86,20 @@ class AppUserRepo implements GormRepo<AppUser> {
         if(user.password) {
             user.passwordHash = encodePassword(user.password)
         }
+        if(user.isNew()) {
+            //we check when new to avoid unique index error.
+            if(exists(user.username)){
+                throw DataProblemCodes.UniqueConstraint.get()
+                    .detail("Violates unique constraint [username: ${user.username}]").toException()
+            }
+        }
     }
+
+    boolean exists(String username) {
+        if( !usernameExistsQuery ) usernameExistsQuery = KeyExistsQuery.of(getEntityClass()).keyName('username')
+        return usernameExistsQuery.exists(username)
+    }
+
 
     /**
      * Sets up password and roles fields for a given User entity. Updates the dependent Contact entity.

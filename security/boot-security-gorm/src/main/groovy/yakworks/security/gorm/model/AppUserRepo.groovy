@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.validation.Errors
 
 import gorm.tools.databinding.BindAction
+import gorm.tools.mango.jpql.KeyExistsQuery
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
@@ -31,6 +32,9 @@ class AppUserRepo implements GormRepo<AppUser> {
     @Autowired
     PasswordEncoder passwordEncoder
     // SecService secService
+
+    //cached instance of the query for id to keep it fast
+    KeyExistsQuery usernameExistsQuery
 
     /**
      * overrides the bindAndCreate method vs events
@@ -84,30 +88,16 @@ class AppUserRepo implements GormRepo<AppUser> {
         }
         if(user.isNew()) {
             //we check when new to avoid unique index error.
-            if(exists(user.username, user.email)){
+            if(exists(user.username)){
                 throw DataProblemCodes.UniqueConstraint.get()
-                    .detail("Violates unique constraint [username: ${user.username}, email: ${user.email}]").toException()
+                    .detail("Violates unique constraint [username: ${user.username}]").toException()
             }
         }
     }
 
-    boolean exists(String username, String email) {
-        String queryString = """
-            select 1 from AppUser as u
-            where u.username = :username
-            or u.email = :email
-        """
-
-        HibernateGormStaticApi<AppUser> staticApi = (HibernateGormStaticApi)gormStaticApi()
-        return (Boolean) staticApi.hibernateTemplate.execute { Session session ->
-            Query q = (Query) session.createQuery(queryString)
-            q.setReadOnly(true)
-                .setMaxResults(1)
-                .setParameter('username', username)
-                .setParameter('email', email)
-
-            return q.list().size() == 1
-        }
+    boolean exists(String username) {
+        if( !usernameExistsQuery ) usernameExistsQuery = KeyExistsQuery.of(getEntityClass()).keyName('username')
+        return usernameExistsQuery.exists(username)
     }
 
 

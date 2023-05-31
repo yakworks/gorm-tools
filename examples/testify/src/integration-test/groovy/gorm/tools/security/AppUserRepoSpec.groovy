@@ -44,33 +44,21 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         passwordEncoder.matches(params.password, user.passwordHash)
     }
 
-    void "test unique"() {
-        setup:
+    void "test unique username"() {
+        setup: "this creates initial user"
         Map params = getUserParams()
         AppUser.create(params)
         flushAndClear()
 
         when: "username exists"
-        params.email = "test2@9ci.com"
         AppUser.create(params)
 
-        then:
+        then: "Fails"
         Exception ex = thrown()
         ex instanceof DataProblemException
-        ex.message.contains "Violates unique constraint [username: galt, email: test2@9ci.com]"
-
-        when: "email exists"
-        params.email = "test@9ci.com"
-        params.username = "galt2"
-        AppUser.create(params)
-
-        then:
-        ex = thrown()
-        ex instanceof DataProblemException
-        ex.message.contains "Violates unique constraint [username: galt2, email: test@9ci.com]"
+        ex.message.contains "Violates unique constraint [username: galt]"
 
         when: "success"
-        params.email = "test2@9ci.com"
         params.username = "galt2"
         AppUser.create(params)
 

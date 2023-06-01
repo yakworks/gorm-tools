@@ -11,7 +11,6 @@ import groovy.transform.CompileStatic
 import org.springframework.jdbc.core.JdbcTemplate
 
 import grails.gorm.transactions.Transactional
-import yakworks.rally.activity.ActivityUtil
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink

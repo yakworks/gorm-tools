@@ -56,7 +56,6 @@ class OrgCopierSpec extends Specification implements DataRepoTest, SecurityTest 
         //TestData.build(Location, [contact: contact])
         contact.addToPhones(RepoTestData.build(ContactPhone,[contact: contact]))
         contact.addToEmails(RepoTestData.build(ContactEmail,[contact: contact]))
-        contact.addToSources(RepoTestData.build(ContactSource,[contact: contact]))
         //location.contact = contact
         old.contact = contact
         //old.bind(calc: calc, flex: flex, location: location, member: member)
@@ -110,5 +109,4 @@ class OrgCopierSpec extends Specification implements DataRepoTest, SecurityTest 
         !copy.contact.is(old.contact)
         copy.contact.name == old.contact.name
     }
-
 }

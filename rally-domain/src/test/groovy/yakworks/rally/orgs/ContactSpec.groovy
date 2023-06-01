@@ -215,13 +215,12 @@ class ContactSpec extends Specification implements GormHibernateTest, SecurityTe
         Contact old = createEntity()
         old.emails.clear()
         old.phones.clear()
-        old.sources.clear()
         old.locations.clear()
 
         old.comments = "comments"
         old.addToPhones(RepoTestData.build(ContactPhone,[contact: old]))
         old.addToEmails(RepoTestData.build( ContactEmail,[contact: old]))
-        old.addToSources(RepoTestData.build( ContactSource,[contact: old]))
+        old.source = RepoTestData.build( ContactSource,[contactId: old.id])
         old.persist(flush: true)
 
         def loc = RepoTestData.build(Location, [org:old.org, contact: old]).persist(flush:true)
@@ -242,7 +241,8 @@ class ContactSpec extends Specification implements GormHibernateTest, SecurityTe
 
         copy.phones.size() == 1
         copy.emails.size() == 1
-        copy.sources.size() == 1
+        copy.source != null
+        copy.source.sourceId == old.source.sourceId
         copy.locations.size() == 1
     }
 

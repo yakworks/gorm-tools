@@ -22,6 +22,7 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.model.Lookupable
+import gorm.tools.model.Persistable
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.errors.RepoExceptionSupport
@@ -568,6 +569,15 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
             //clear, even if flush failed
             clear()
         }
+    }
+
+    /**
+     * Helper method to check if item is new. Checks in this order <br>
+     * 1. PersistArgs.insert = true
+     * 2. entity.isNew()
+     */
+    boolean isNew(Persistable entity, PersistArgs args) {
+        args.insert || entity.isNew()
     }
 
     /**

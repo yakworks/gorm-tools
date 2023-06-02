@@ -43,7 +43,7 @@ class ComboKeyExistsQuery<D> {
         return inst
     }
 
-    boolean exists(Map params){
+    boolean exists(Map<String,?> params){
         //key set should match
         if(params.keySet().toList() != keyNames)
             throw new IllegalArgumentException("params mismatch, params keys dont match the keyNames")
@@ -53,7 +53,7 @@ class ComboKeyExistsQuery<D> {
             for(String keyName : keyNames){
                 //if no whereClause then no AND
                 String AND = whereClause ? "AND" : ""
-                whereClause = "$whereClause $AND $keyName = :${keyName}Val"
+                whereClause = "$whereClause $AND $keyName = :${paramValName(keyName)}"
             }
             queryString = "$queryString ${whereClause.trim()}"
         }
@@ -62,13 +62,17 @@ class ComboKeyExistsQuery<D> {
             Query q = (Query) session.createQuery(queryString)
             q.setReadOnly(true).setMaxResults(1)
 
-            params.each {key, val ->
-                String valKey = "${key}Val"
+            params.each{ key, val ->
+                String valKey = paramValName(key)
                 q.setParameter(valKey, val)
             }
 
             return q.list().size() == 1
         }
+    }
+
+    String paramValName(String keyName){
+        return "${keyName.replace(".","_")}Val"
     }
 
 }

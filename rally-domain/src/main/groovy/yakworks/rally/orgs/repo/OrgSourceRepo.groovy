@@ -26,6 +26,18 @@ class OrgSourceRepo extends LongIdGormRepo<OrgSource> {
 
     ComboKeyExistsQuery orgSourcExistsQuery
 
+    @RepoListener
+    void beforePersist(OrgSource os, BeforePersistEvent e) {
+        if(os.isNew()) {
+            //we check when new to avoid unique index error.
+            if(exists(os.sourceType, os.sourceId, os.orgType)){
+                throw DataProblemCodes.UniqueConstraint.get()
+                    .detail("Violates unique constraint [sourceType: ${os.sourceType}, sourceId: ${os.sourceId}, orgType:${os.orgType}]")
+                    .toException()
+            }
+        }
+    }
+
     /**
      * creates the source from org and its data and sets it to its org.source
      * @param org the org this is for
@@ -103,18 +115,6 @@ class OrgSourceRepo extends LongIdGormRepo<OrgSource> {
             [sourceId: theSourceId, orgType: theOrgType] )
         // will only return 1
         res ? res[0] as Long : null
-    }
-
-    @RepoListener
-    void beforePersist(OrgSource os, BeforePersistEvent e) {
-        if(os.isNew()) {
-            //we check when new to avoid unique index error.
-            if(exists(os.sourceType, os.sourceId, os.orgType)){
-                throw DataProblemCodes.UniqueConstraint.get()
-                    .detail("Violates unique constraint [sourceType: ${os.sourceType}, sourceId: ${os.sourceId}, orgType:${os.orgType}]")
-                    .toException()
-            }
-        }
     }
 
     boolean exists(SourceType sourceType, String sourceId, OrgType orgType) {

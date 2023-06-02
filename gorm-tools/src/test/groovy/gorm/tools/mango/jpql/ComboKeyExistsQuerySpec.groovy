@@ -45,4 +45,21 @@ class ComboKeyExistsQuerySpec extends Specification implements GormHibernateTest
         IllegalArgumentException ex = thrown()
     }
 
+    void "exists association fields id"() {
+        when:
+        def qe = ComboKeyExistsQuery.of(KitchenSink).keyNames(['id','thingId'])
+
+        then:
+        qe.exists([id: 1L, 'thingId': 1L])
+        !qe.exists([id: 1L, 'thingId': 2L])
+    }
+
+    void "exists association fields dot id"() {
+        when:
+        def qe = ComboKeyExistsQuery.of(KitchenSink).keyNames(['id','thing.id'])
+
+        then:
+        qe.exists([id: 1L, 'thing.id': 1L])
+    }
+
 }

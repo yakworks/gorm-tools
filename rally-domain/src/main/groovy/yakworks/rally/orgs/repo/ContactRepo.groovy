@@ -34,7 +34,6 @@ import yakworks.rally.orgs.model.ContactPhone
 import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
-import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.tag.model.TagLink
 import yakworks.security.gorm.model.AppUser
 

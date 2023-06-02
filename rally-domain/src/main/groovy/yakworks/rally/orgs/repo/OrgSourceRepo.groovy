@@ -6,13 +6,8 @@ package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
 
-import org.grails.orm.hibernate.HibernateGormStaticApi
-import org.hibernate.Session
-import org.hibernate.query.Query
-
 import gorm.tools.databinding.BindAction
 import gorm.tools.mango.jpql.ComboKeyExistsQuery
-import gorm.tools.mango.jpql.KeyExistsQuery
 import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.BeforePersistEvent

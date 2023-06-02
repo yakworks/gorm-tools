@@ -13,8 +13,6 @@ import grails.gorm.transactions.Transactional
 import yakworks.commons.lang.EnumUtils
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactSource
-import yakworks.rally.orgs.model.Org
-import yakworks.rally.orgs.model.OrgSource
 
 @GormRepository
 @CompileStatic
@@ -30,8 +28,7 @@ class ContactSourceRepo extends LongIdGormRepo<ContactSource> {
         List<Long> results = ContactSource.executeQuery('select contactId from ContactSource where sourceId = :sourceId',
             [sourceId: sid]) as List<Long>
 
-        if(results) return results[0]
-        else return null
+        return results ? results[0] : null
     }
 
     /**

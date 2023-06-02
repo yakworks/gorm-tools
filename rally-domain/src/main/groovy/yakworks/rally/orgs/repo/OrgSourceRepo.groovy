@@ -11,6 +11,8 @@ import org.hibernate.Session
 import org.hibernate.query.Query
 
 import gorm.tools.databinding.BindAction
+import gorm.tools.mango.jpql.ComboKeyExistsQuery
+import gorm.tools.mango.jpql.KeyExistsQuery
 import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.BeforePersistEvent
@@ -26,6 +28,8 @@ import yakworks.rally.orgs.model.OrgType
 @GormRepository
 @CompileStatic
 class OrgSourceRepo extends LongIdGormRepo<OrgSource> {
+
+    ComboKeyExistsQuery orgSourcExistsQuery
 
     /**
      * creates the source from org and its data and sets it to its org.source
@@ -118,25 +122,10 @@ class OrgSourceRepo extends LongIdGormRepo<OrgSource> {
         }
     }
 
-    boolean exists(SourceType sourceType, String sourceId, OrgType orgType){
-        String queryString = """
-            select 1 from OrgSource as os
-            where os.sourceType = :sourceType
-            and os.sourceId = :sourceId
-            and os.orgType = :orgType
-        """
-
-        HibernateGormStaticApi<OrgSource> staticApi = (HibernateGormStaticApi)gormStaticApi()
-        return (Boolean) staticApi.hibernateTemplate.execute { Session session ->
-            Query q = (Query) session.createQuery(queryString)
-            q.setReadOnly(true)
-                .setMaxResults(1)
-                .setParameter('sourceType', sourceType)
-                .setParameter('sourceId', sourceId)
-                .setParameter('orgType', orgType)
-
-            return q.list().size() == 1
-        }
+    boolean exists(SourceType sourceType, String sourceId, OrgType orgType) {
+        if( !orgSourcExistsQuery ) orgSourcExistsQuery = ComboKeyExistsQuery.of(getEntityClass())
+            .keyNames(['sourceType','sourceId','orgType'])
+        return orgSourcExistsQuery.exists(sourceType: sourceType, sourceId: sourceId, orgType: orgType)
     }
 
 }

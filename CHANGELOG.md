@@ -1,3 +1,9 @@
+### v7.3.48
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.46...v7.3.48)
+- release [link](https://github.com/yakworks/gorm-tools/commit/3cd8fc798d456eedbb352a39df017e265ab5a7ea)
+- Dev (#686) [link](https://github.com/yakworks/gorm-tools/commit/b0750efd7704a816c32c71317c904cb3a41c0246)
+
 ### v7.3.46
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.45...v7.3.46)

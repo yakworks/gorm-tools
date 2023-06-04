@@ -17,8 +17,6 @@ import yakworks.security.audit.AuditStamp
 @GrailsCompileStatic
 class TaskStatus implements NameCodeDescription, RepoEntity<TaskStatus>, Serializable{
 
-    String name
-    String description
     Task.State state = Task.State.Open //should be Open(0) or Complete(1) here in status
 
     //the folowing are for what tasks kinds these are good for.
@@ -35,6 +33,7 @@ class TaskStatus implements NameCodeDescription, RepoEntity<TaskStatus>, Seriali
 
     static mapping = {
         cache "nonstrict-read-write"
+        id generator: 'assigned'
         state enumType: 'identity'
     }
 

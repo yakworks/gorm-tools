@@ -14,10 +14,8 @@ import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
 import grails.gorm.DetachedCriteria
 import yakworks.commons.beans.Transform
-import yakworks.rally.orgs.model.Company
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
-import yakworks.rally.orgs.model.OrgType
 
 @GormRepository
 @CompileStatic

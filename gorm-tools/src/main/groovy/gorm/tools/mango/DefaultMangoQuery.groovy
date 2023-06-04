@@ -4,10 +4,14 @@
 */
 package gorm.tools.mango
 
+import java.time.format.DateTimeParseException
+
+import groovy.json.JsonException
 import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 
+import org.codehaus.groovy.runtime.InvokerInvocationException
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.beans.Pager
@@ -15,6 +19,7 @@ import gorm.tools.mango.api.MangoQuery
 import gorm.tools.mango.api.QueryArgs
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
+import yakworks.api.problem.data.DataProblem
 
 /**
  * Default implementation of MangoQuery. Setup as spring bean that is used by all the repos
@@ -46,7 +51,12 @@ class DefaultMangoQuery implements MangoQuery {
      */
     public <D> MangoDetachedCriteria<D> query(Class<D> entityClass, QueryArgs qargs,
                                               @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
-        mangoBuilder.buildWithQueryArgs(entityClass, qargs, closure)
+        try {
+            return mangoBuilder.buildWithQueryArgs(entityClass, qargs, closure)
+        } catch (JsonException | InvokerInvocationException | IllegalArgumentException | DateTimeParseException ex) {
+            //See #1925 - Catch bad qargs
+            throw DataProblem.ex("Invalid query string $ex.message")
+        }
     }
 
     /**

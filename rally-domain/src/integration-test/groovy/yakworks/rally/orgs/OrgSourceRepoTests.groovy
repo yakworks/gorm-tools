@@ -52,5 +52,7 @@ class OrgSourceRepoTests extends Specification implements DataIntegrationTest {
 
         and:
         orgSourceRepo.exists(SourceType.ERP, org.num, org.type)
+        !orgSourceRepo.exists(SourceType.ERP, null, org.type)
+        !orgSourceRepo.exists(SourceType.App, org.num, org.type)
     }
 }

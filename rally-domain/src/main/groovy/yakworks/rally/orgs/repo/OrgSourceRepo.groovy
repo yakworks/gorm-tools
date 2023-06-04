@@ -6,11 +6,8 @@ package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
 
-import org.grails.orm.hibernate.HibernateGormStaticApi
-import org.hibernate.Session
-import org.hibernate.query.Query
-
 import gorm.tools.databinding.BindAction
+import gorm.tools.mango.jpql.ComboKeyExistsQuery
 import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.BeforePersistEvent
@@ -26,6 +23,20 @@ import yakworks.rally.orgs.model.OrgType
 @GormRepository
 @CompileStatic
 class OrgSourceRepo extends LongIdGormRepo<OrgSource> {
+
+    ComboKeyExistsQuery orgSourcExistsQuery
+
+    @RepoListener
+    void beforePersist(OrgSource os, BeforePersistEvent e) {
+        if(os.isNew()) {
+            //we check when new to avoid unique index error.
+            if(exists(os.sourceType, os.sourceId, os.orgType)){
+                throw DataProblemCodes.UniqueConstraint.get()
+                    .detail("Violates unique constraint [sourceType: ${os.sourceType}, sourceId: ${os.sourceId}, orgType:${os.orgType}]")
+                    .toException()
+            }
+        }
+    }
 
     /**
      * creates the source from org and its data and sets it to its org.source
@@ -106,37 +117,10 @@ class OrgSourceRepo extends LongIdGormRepo<OrgSource> {
         res ? res[0] as Long : null
     }
 
-    @RepoListener
-    void beforePersist(OrgSource os, BeforePersistEvent e) {
-        if(os.isNew()) {
-            //we check when new to avoid unique index error.
-            if(exists(os.sourceType, os.sourceId, os.orgType)){
-                throw DataProblemCodes.UniqueConstraint.get()
-                    .detail("Violates unique constraint [sourceType: ${os.sourceType}, sourceId: ${os.sourceId}, orgType:${os.orgType}]")
-                    .toException()
-            }
-        }
-    }
-
-    boolean exists(SourceType sourceType, String sourceId, OrgType orgType){
-        String queryString = """
-            select 1 from OrgSource as os
-            where os.sourceType = :sourceType
-            and os.sourceId = :sourceId
-            and os.orgType = :orgType
-        """
-
-        HibernateGormStaticApi<OrgSource> staticApi = (HibernateGormStaticApi)gormStaticApi()
-        return (Boolean) staticApi.hibernateTemplate.execute { Session session ->
-            Query q = (Query) session.createQuery(queryString)
-            q.setReadOnly(true)
-                .setMaxResults(1)
-                .setParameter('sourceType', sourceType)
-                .setParameter('sourceId', sourceId)
-                .setParameter('orgType', orgType)
-
-            return q.list().size() == 1
-        }
+    boolean exists(SourceType sourceType, String sourceId, OrgType orgType) {
+        if( !orgSourcExistsQuery ) orgSourcExistsQuery = ComboKeyExistsQuery.of(getEntityClass())
+            .keyNames(['sourceType','sourceId','orgType'])
+        return orgSourcExistsQuery.exists(sourceType: sourceType, sourceId: sourceId, orgType: orgType)
     }
 
 }

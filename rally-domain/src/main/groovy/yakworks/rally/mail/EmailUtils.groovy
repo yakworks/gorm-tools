@@ -7,11 +7,13 @@ package yakworks.rally.mail
 import javax.mail.internet.AddressException
 import javax.mail.internet.InternetAddress
 
+import groovy.transform.CompileStatic
+
 import org.apache.commons.lang3.StringUtils
 
 import yakworks.api.problem.Problem
-import yakworks.api.problem.ThrowableProblem
 
+@CompileStatic
 class EmailUtils {
 
     /**

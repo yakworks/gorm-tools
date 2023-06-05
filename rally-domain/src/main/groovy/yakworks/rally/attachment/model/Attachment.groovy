@@ -90,7 +90,7 @@ class Attachment implements NameDescription, Taggable, AuditStampTrait, RepoEnti
                 Location has the relative path and unique name on system. Use description for any other useful info''',
             maxSize: 100 ],
         location:[ description: 'The relative path to the locationKey',
-                 nullable: true, editable: false, display: false ],
+                 nullable: true, editable: false, display: false, maxSize: 255],
 
         locationKey:[ description: 'Defaults to attachments.location but can be changed to another key such as creditFiles.location',
                  example: 'attachments.location', nullable: false, required: false],
@@ -99,15 +99,15 @@ class Attachment implements NameDescription, Taggable, AuditStampTrait, RepoEnti
                  example: 7896, nullable: true, editable: false],
 
         extension:[ description: 'The extension the file should have. Pulled from the name if not set. Helps dictate the mime-type',
-                 example: 'pdf', nullable: true],
+                 example: 'pdf', nullable: true, maxSize: 255],
 
         mimeType:[ description: 'The mime type of the file. Will be pulled from the names extension',
-                 example: 'application/pdf', nullable: true, required: false],
+                 example: 'application/pdf', nullable: true, required: false, maxSize: 255],
 
         fileData:[ display: false],
 
         subject:[ description: 'Optional value for a email template or collectionStep this is the generally the subject of an email or fax cover page.',
-                 example: 'Customer', nullable: true],
+                 example: 'Customer', nullable: true, maxSize: 255],
 
         kind:[ description: 'The kind of attachment',
                  example: 'Activity', nullable: true],

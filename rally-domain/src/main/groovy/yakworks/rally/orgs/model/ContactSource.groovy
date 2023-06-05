@@ -22,6 +22,8 @@ class ContactSource implements SourceTrait, RepoEntity<ContactSource>, Serializa
 
     static constraintsMap = [
         contactId:[ description: 'The id of the contact this is for', nullable: false],
+        source:[ d: 'A description of where this came from', example: 'Oracle, BankOfAmerica, Lockbox', maxSize:255],
+        sourceId:[ d: 'the unique id from the outside source or name of the scheduled job', nullable: false, example: 'AR-123-A64', maxSize:255],
         sourceVersion:[ nullable: true],
     ]
 

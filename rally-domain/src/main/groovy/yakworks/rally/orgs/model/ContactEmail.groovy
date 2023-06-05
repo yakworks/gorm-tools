@@ -31,7 +31,7 @@ class ContactEmail implements RepoEntity<ContactEmail>, Serializable {
 
     static constraintsMap = [
         kind:[ description: 'future use', maxSize: 50],
-        address:[ description: 'The email addy', nullable: false, maxSize: 50],
+        address:[ description: 'The email addy', nullable: false, maxSize: 255],
         isPrimary:[ description: 'If this is the contacts primary email', nullable: false, required: false],
     ]
 }

@@ -1,3 +1,9 @@
+### v7.3.49
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.48...v7.3.49)
+- trigger [link](https://github.com/yakworks/gorm-tools/commit/d5ecc78920a8dc8ae84e594b1e5b5073e10a567b)
+- blow error to avoid stack overflow, not a long term solution but work… (#689) [link](https://github.com/yakworks/gorm-tools/commit/5c0a98416c1268c5af197ba1db6237a052ae943f)
+
 ### v7.3.48
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.46...v7.3.48)

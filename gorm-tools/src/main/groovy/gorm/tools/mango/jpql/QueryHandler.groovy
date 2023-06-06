@@ -6,7 +6,6 @@ package gorm.tools.mango.jpql
 
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.query.Query
-import org.springframework.core.convert.ConversionService
 
 /**
  * simple interface to be implemented for each Query. type

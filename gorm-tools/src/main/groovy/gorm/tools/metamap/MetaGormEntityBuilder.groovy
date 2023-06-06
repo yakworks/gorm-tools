@@ -182,17 +182,17 @@ class MetaGormEntityBuilder {
         //create the includes class for what we have now along with the the blacklist
         Set blacklist = getBlacklist(persistentEntity) + (this.excludes as Set)
 
-        //only if it has rootProps
-        if (metaEntity.metaProps) {
-            if(blacklist) metaEntity.addBlacklist(blacklist)
-            //if it has nestedProps then go recursive
-            if(nestedProps){
-                buildNested(nestedProps)
-            }
-            return metaEntity
-        } else {
-            return null
+        //if it doesn't have metaProps then Includes must be bad?
+        //XXX WHY DO WE RETURN NULL?
+        if (!metaEntity.metaProps)  return null //throw new IllegalArgumentException("includes must be bad, includes: ${includes}")
+
+        if(blacklist) metaEntity.addBlacklist(blacklist)
+        //if it has nestedProps then go recursive
+        if(nestedProps){
+            buildNested(nestedProps)
         }
+        return metaEntity
+
     }
 
     /** PropMeta from propName depending on whether its a persistentEntity or normal bean */

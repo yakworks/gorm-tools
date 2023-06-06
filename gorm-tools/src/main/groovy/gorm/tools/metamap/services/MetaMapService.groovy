@@ -9,6 +9,8 @@ import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
 
+import yakworks.api.problem.data.DataProblem
+import yakworks.api.problem.data.DataProblemException
 import yakworks.meta.MetaEntity
 import yakworks.meta.MetaMap
 import yakworks.meta.MetaMapList
@@ -33,6 +35,10 @@ class MetaMapService {
      */
     MetaMap createMetaMap(Object entity, List<String> includes = [], List<String> excludes = []) {
         MetaEntity metaEntity = metaEntityService.getMetaEntity(entity.class.name, includes, excludes)
+        //XXX Temp hack for now, metaEntity should never be null here unless its a Map, then its ok.
+        if(!Map.isAssignableFrom(entity.class) && !metaEntity)
+            throw DataProblem.ex("Problem creating the entity map, the includes parameter may have invalid properties")
+
         return new MetaMap(entity, metaEntity)
     }
 
@@ -48,6 +54,10 @@ class MetaMapService {
             //use first item to get the class
             Class entityClass = entityList[0].class.name
             MetaEntity metaEntity = metaEntityService.getMetaEntity(entityClass.name, includes, excludes)
+            //XXX Temp hack for now, metaEntity should never be null here unless its a Map, then its ok.
+            if(!Map.isAssignableFrom(entityClass) && !metaEntity)
+                throw DataProblem.ex("Problem creating the entity map, the includes parameter may have invalid properties")
+
             return new MetaMapList(entityList, metaEntity)
         }
         // return empty list

@@ -189,4 +189,18 @@ class OrgControllerTests extends RestIntTest {
         (data[0] as Map).keySet().size() == 4
     }
 
+    void "list with bad includes should not stackoverflow the app"() {
+        when:
+        controller.params << [
+            q:"*",
+            includes: 'bad.*'
+        ]
+        controller.list()
+        Map body = response.bodyToMap()
+
+        then:
+        response.status == 400
+        body.detail.contains("invalid properties")
+    }
+
 }

@@ -4,7 +4,9 @@
 */
 package gorm.tools.metamap.services
 
+import spock.lang.Ignore
 import spock.lang.Specification
+import yakworks.api.problem.data.DataProblemException
 import yakworks.meta.MetaMap
 import yakworks.meta.MetaMapList
 import yakworks.testing.gorm.model.Enummy
@@ -104,7 +106,35 @@ class MetaMapServiceSpec extends Specification implements GormHibernateTest  {
 
     }
 
-    void "test createEntityBeanMap with EnumThing list"() {
+    void "test just association * for all"() {
+        setup:
+        Enummy et = new Enummy(
+            testEnum: TestEnum.FOO,
+            enumIdent: TestEnumIdent.Num2
+        )
+
+        when:
+        def exp = metaMapService.createMetaMap(et, ['enumIdent.*'])
+
+        then:
+        exp == [enumIdent:[id:2, name:'Num2']]
+    }
+
+    void "test bad includes"() {
+        setup:
+        Enummy et = new Enummy(
+            testEnum: TestEnum.FOO,
+            enumIdent: TestEnumIdent.Num2
+        )
+
+        when:
+        def exp = metaMapService.createMetaMap(et, ['BAD'])
+
+        then:
+        thrown(DataProblemException)
+    }
+
+    void "test createMetaMapList with EnumThing list"() {
         when:
         List enummyList = []
         (1..2).each{id ->
@@ -129,6 +159,23 @@ class MetaMapServiceSpec extends Specification implements GormHibernateTest  {
         resultsList[0] == [testEnum: 'FOO', enumIdent: [id:2, name:'Num2']]
         resultsList[1] == [testEnum: 'FOO', enumIdent: [id:2, name:'Num2']]
 
+    }
+
+    void "test createMetaMapList with bad includes"() {
+        when:
+        List enummyList = []
+        (1..2).each{id ->
+            def et = new Enummy(
+                id: id,
+                testEnum: TestEnum.FOO,
+                enumIdent: TestEnumIdent.Num2
+            )
+            enummyList.add(et)
+        }
+        def resultsList = metaMapService.createMetaMapList(enummyList, ['BAD'])
+
+        then:
+        thrown(DataProblemException)
     }
 
     void "association tests"() {

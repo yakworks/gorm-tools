@@ -18,6 +18,7 @@ import org.hibernate.query.Query
  * Simple performant way to check if a Composite Key value combination exists in the db for an entity.
  * see the single field KeyExistsQuery for more explanation
  */
+@SuppressWarnings(['VariableName'])
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @MapConstructor
 @CompileStatic
@@ -72,7 +73,7 @@ class ComboKeyExistsQuery<D> {
     }
 
     String paramValName(String keyName){
-        return "${keyName.replace(".","_")}Val"
+        return "${keyName.replace(".", "_")}Val"
     }
 
 }

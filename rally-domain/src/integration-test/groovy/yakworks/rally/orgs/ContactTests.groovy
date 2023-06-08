@@ -23,6 +23,32 @@ class ContactTests extends Specification implements DomainIntTest {
 
     ContactRepo contactRepo
 
+    void "create"() {
+        setup:
+        Org org = Org.create(num:"foo",name:"bar", orgTypeId: OrgType.Customer.id)
+
+        expect:
+        org.id
+        org.source
+
+        when:
+        Map data = [firstName: "C1",  "num": "C1", org:[source:[sourceId:org.source.sourceId, orgType:'Customer']]]
+        Contact contact = Contact.create(data)
+
+        and:
+        flushAndClear()
+        contact.refresh()
+
+        then:
+        noExceptionThrown()
+        contact
+        contact.source == null
+        contact.orgId == org.id
+
+        and:
+        ContactSource.countByContactId(contact.id) == 0
+    }
+
     def "listActive should only return active contacts"() {
         when:
         def result = Contact.listActive(9)

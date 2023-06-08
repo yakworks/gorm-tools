@@ -27,7 +27,7 @@ class ContactTests extends Specification implements DomainIntTest {
         setup:
         Org org = Org.create(num:"foo",name:"bar", orgTypeId: OrgType.Customer.id)
         flush()
-        
+
         expect:
         org.id
         org.source

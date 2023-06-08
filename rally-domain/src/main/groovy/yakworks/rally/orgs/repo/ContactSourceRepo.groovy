@@ -18,6 +18,10 @@ import yakworks.rally.orgs.model.ContactSource
 @CompileStatic
 class ContactSourceRepo extends LongIdGormRepo<ContactSource> {
 
+    /**
+     * lookup by sourceId
+     * This is called from findWithData and is used to locate contact for updates and associtaions
+     */
     @Override
     ContactSource lookup(Map data) {
         if(data.sourceId) return ContactSource.findWhere(sourceId: data.sourceId)

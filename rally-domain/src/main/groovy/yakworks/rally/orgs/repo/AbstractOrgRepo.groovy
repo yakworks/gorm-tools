@@ -244,7 +244,13 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
     /**
      * Lookup Org by num or sourceId. Search by num is usually used for other orgs like division or num (non customer or custAccount)
      * where we have unique num. Search by sourceId is used when there is no org or org.id; for example to assign org on contact
+     * NOTE: This is called from findWithData and is used to locate for updates and associations
+     * SHOULD NOT NORMALLY BE CALLED DIRECTLY, findWithDatais used most of the time
      * @param data (num or source with sourceId and orgType)
+     */
+    /**
+     * lookup by num or ContactSource
+     * This is called from findWithData and is used to locate contact for updates and associtaions
      */
     @Override
     Org lookup(Map data) {
@@ -257,7 +263,9 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
             data.source =data.org['source']
             data.sourceId =data.org['sourceId']
         }
+        //nest sourceId under source if pecified up one level.
         if(data.source == null && data.sourceId) data.source = [sourceId: data.sourceId]
+
         if (data.source && data.source['sourceId']) {
             Map source = data.source as Map
             if(!orgType && source.orgType) {

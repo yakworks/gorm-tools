@@ -260,11 +260,13 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
         if(ident){
             //return it fast if its good to go, will have blown and error if not found
             return get(ident, data['version'] as Long)
-        } else if(Lookupable.isAssignableFrom(getEntityClass())){
+        }
+        if(Lookupable.isAssignableFrom(getEntityClass())){
             // call the lookup if domain implements the Lookupable
             //FIXME is there a cleaner way to do this?
             foundEntity = (D) ClassUtils.callStaticMethod(getEntityClass(), 'lookup', data)
-        } else {
+        }
+        if(!foundEntity) {
             foundEntity = lookup(data)
         }
         if(mustExist) RepoUtil.checkFound(foundEntity, 'data map', getEntityClass().name)
@@ -273,6 +275,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
 
     /**
      * does nothing, can be implemented by the conrete repo for special lookup logic such as for souceId
+     * if nothing is found it should return null or throw a DataRetrievalFailureException if message needed
      */
     D lookup(Map data) {
         return null

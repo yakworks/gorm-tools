@@ -1,3 +1,10 @@
+### v7.3.50
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.49...v7.3.50)
+- ignore flaky test [link](https://github.com/yakworks/gorm-tools/commit/d978deeb99a447c77ed359c85e1e423590402ea5)
+- release [link](https://github.com/yakworks/gorm-tools/commit/b23117d89d56991fdaac97c06b1bd988502af6e0)
+- Add tests for contact create (#690) [link](https://github.com/yakworks/gorm-tools/commit/b59f27a24db24229666daf9884843ea994712b18)
+
 ### v7.3.49
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.48...v7.3.49)

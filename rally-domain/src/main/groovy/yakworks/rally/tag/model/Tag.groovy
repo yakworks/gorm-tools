@@ -31,10 +31,9 @@ class Tag implements NameCodeDescription, RepoEntity<Tag>, Serializable {
     }
 
     static constraintsMap = [
-        name:[ d: 'The name of tag', nullable: false, maxSize: 255],
-        description:[ description: "The description for this tag", nullable: true, maxSize: 255],
-        name:[ description: "The tag name", nullable: false, unique: ["entityName"],  maxSize: 50],
-        entityName:[description: "The entity this tag can be applied to. May be a comma sep list of entity names", nullable: true, maxSize: 255],
+        name:[d: 'The name of tag', nullable: false],
+        description:[d: "The description for this tag", nullable: true],
+        entityName:[d: "The entity this tag can be applied to. May be a comma sep list of entity names", nullable: true, maxSize: 255],
     ]
 
     static Tag getByName(String theName, String theEntityName){

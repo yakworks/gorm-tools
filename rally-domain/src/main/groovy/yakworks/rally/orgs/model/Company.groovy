@@ -29,8 +29,8 @@ class Company implements NameNum, RepoEntity<Company>, Serializable {
 
     static constraintsMap = [
         name:[ d: 'Full name for this company', maxSize: 255],
-        website:[ description: 'The company website', nullable: true, maxSize: 255],
-        sourceId:[ description: 'The source identifier for this company', nullable: true, maxSize: 50]
+        website:[d: 'The company website', nullable: true, maxSize: 255],
+        sourceId:[d: 'The source identifier for this company', nullable: true, maxSize: 50]
     ]
 
 }

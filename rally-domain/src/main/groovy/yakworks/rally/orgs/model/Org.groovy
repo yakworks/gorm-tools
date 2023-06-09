@@ -51,7 +51,7 @@ class Org implements NameNum, RepoEntity<Org>, HasTags, CreateCriteriaSupport, S
     // OrgDynamicCalc formulaz
 
     static constraintsMap = [
-        num: [d: 'Unique alpha-numeric identifier for this organization', example: 'SPX-321', maxSize:50],
+        num: [d: 'Unique alpha-numeric identifier for this organization', example: 'SPX-321'],
         name: [d: 'The full name for this organization', example: 'SpaceX Corp.', maxSize: 255],
         type:[ d: 'The type of org', example: 'Customer',
                nullable: false, bindable: false],

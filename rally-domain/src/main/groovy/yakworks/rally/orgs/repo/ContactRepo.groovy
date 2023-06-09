@@ -151,7 +151,6 @@ class ContactRepo extends LongIdGormRepo<Contact> {
         if(data.locations) super.persistToManyData(contact, Location.repo, data.locations as List<Map>, "contact")
         if(data.phones) super.persistToManyData(contact, ContactPhone.repo, data.phones as List<Map>, "contact")
         if(data.emails) super.persistToManyData(contact, ContactEmail.repo, data.emails as List<Map>, "contact")
-        if(data.sources) super.persistToManyData(contact, ContactSource.repo, data.sources as List<Map>, "contact")
         if(data.tags != null) TagLink.addOrRemoveTags(contact, data.tags)
     }
 

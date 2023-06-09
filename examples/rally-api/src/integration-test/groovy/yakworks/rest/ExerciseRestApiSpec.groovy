@@ -2,7 +2,10 @@ package yakworks.rest
 
 import org.springframework.http.HttpStatus
 import yakworks.commons.map.Maps
+import yakworks.rally.orgs.model.Contact
+import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.OrgType
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
@@ -94,6 +97,7 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
         entity      | data
         'rally/org' | [num: 'foo1', name: "foo", type: [id: 1]]
+        'rally/contact' | [name: "C1", firstName: "C1", orgId: 2,]
         //'user'      | [username:'galt', email: "jim@joe.com", password:'secretStuff', repassword:'secretStuff']
         //'location'  | [city: "Chicago"]
         //'user'      | [name: 'taggy', entityName: 'Customer']

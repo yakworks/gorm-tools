@@ -16,6 +16,26 @@ class ContactRepoSpec extends Specification implements GormHibernateTest, Securi
     static List entityClasses = [Contact, Org, ContactSource]
     @Inject ContactRepo contactRepo
 
+    void "create without source"() {
+        setup:
+        Org org = Org.of("foo", "bar", OrgType.Customer).persist()
+        assert org.id
+
+        Map data = [name: "C1", firstName: "C1", orgId: org.id,]
+
+        when:
+        Contact contact = Contact.create(data)
+        flushAndClear()
+        contact.refresh()
+
+        then:
+        noExceptionThrown()
+        contact
+        contact.source == null
+
+        and:
+        ContactSource.countByContactId(contact.id) == 0
+    }
 
     void "create with source"() {
         setup:

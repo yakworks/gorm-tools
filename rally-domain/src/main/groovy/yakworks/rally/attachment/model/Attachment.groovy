@@ -84,36 +84,34 @@ class Attachment implements NameDescription, Taggable, AuditStampTrait, RepoEnti
     }
 
     static constraintsMap = [
-        name:[ description: '''\
+        name:[d: '''\
                 This should be the file display name without dir; foo.txt, bar.pdf, etc.
                 Populated from originalFileName when using a multiPart upload.
                 Location has the relative path and unique name on system. Use description for any other useful info''',
             maxSize: 100 ],
-        location:[ description: 'The relative path to the locationKey',
+        location:[d: 'The relative path to the locationKey',
                  nullable: true, editable: false, display: false, maxSize: 255],
 
-        locationKey:[ description: 'Defaults to attachments.location but can be changed to another key such as creditFiles.location',
+        locationKey:[d: 'Defaults to attachments.location but can be changed to another key such as creditFiles.location',
                  example: 'attachments.location', nullable: false, required: false],
 
-        contentLength:[ description: 'The file size/contentLength in bytes. Populated on save',
+        contentLength:[d: 'The file size/contentLength in bytes. Populated on save',
                  example: 7896, nullable: true, editable: false],
 
-        extension:[ description: 'The extension the file should have. Pulled from the name if not set. Helps dictate the mime-type',
+        extension:[d: 'The extension the file should have. Pulled from the name if not set. Helps dictate the mime-type',
                  example: 'pdf', nullable: true, maxSize: 255],
 
-        mimeType:[ description: 'The mime type of the file. Will be pulled from the names extension',
+        mimeType:[d: 'The mime type of the file. Will be pulled from the names extension',
                  example: 'application/pdf', nullable: true, required: false, maxSize: 255],
 
         fileData:[ display: false],
 
-        subject:[ description: 'Optional value for a email template or collectionStep this is the generally the subject of an email or fax cover page.',
+        subject:[d: 'Optional value for a email template or collectionStep this is the generally the subject of an email or fax cover page.',
                  example: 'Customer', nullable: true, maxSize: 255],
 
-        kind:[ description: 'The kind of attachment',
-                 example: 'Activity', nullable: true],
+        kind:[d: 'The kind of attachment', example: 'Activity', nullable: true],
 
-        source:[ description: 'A source description if this is synced from another system',
-                 nullable: true, maxSize: 50],
+        source:[d: 'A source description if this is synced from another system', nullable: true, maxSize: 50],
     ]
 
     static AttachmentRepo getRepo() { RepoLookup.findRepo(this) as AttachmentRepo }

@@ -33,8 +33,8 @@ class SecRole implements NameCodeDescription, RepoEntity<SecRole>, Serializable 
     }
 
     static constraintsMap = [
-        code:[ d: 'Upper case role key', nullable: false, maxSize: 30, matches: "[A-Z0-9-_]+" ],
-        name: [d: "The name of the role", nullable: false, maxSize: 20],
+        code:[ d: 'Upper case role key', nullable: false, maxSize: 25, matches: "[A-Z0-9-_]+" ],
+        name: [d: "The name of the role", nullable: false, maxSize: 50],
         description: [d: "A longer description", nullable: true],
         inactive: [d: "Whether role should be active", oapi:'U']
     ]

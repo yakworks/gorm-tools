@@ -92,17 +92,17 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
     }
 
     static constraintsMap = [
-        num:[ d:'num, used for job or orgnization type contacts', nullable: true, maxSize: 50],
-        name:[ nullable: false, maxSize: 50],
+        num:[ d:'num, used for job or orgnization type contacts', nullable: true],
+        name:[ nullable: false],
 
-        altName:[d:'alternate name, nickname or job name', nullable: true],
+        altName:[d:'alternate name, nickname or job name', nullable: true, maxSize: 255],
         inactive:[ d:'is active', nullable: false],
         // isPrimary:[ nullable: false],
 
         // isLocationDifferent:[ nullable: false],
         location:[ nullable: true],
-        phone:[ d:'default email', nullable: true],
-        email:[ d:'default phone', email: true, nullable: true],
+        phone:[ d:'default email', nullable: true, maxSize: 255],
+        email:[ d:'default phone', email: true, nullable: true, maxSize: 255],
         //FIXME this is different than how we do OrgSource and ArTranSource, we require it in those cases.
         // if we dont require it then we need to think through the implication in our design.
         source:[ d: 'Originator source info', oapi:[read: true, create: ['source', 'sourceType', 'sourceId']], bindable: false],
@@ -115,7 +115,7 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
         jobTitle:[ d:'Job title', nullable: true, maxSize: 50],
         // department:[ nullable: true, maxSize: 50],
         // birthday:[ nullable: true],
-        comments:[ d:'notes about the contact', nullable: true],
+        comments:[ d:'notes about the contact', nullable: true, maxSize: 255],
 
         tagForReminders:[ d:'if this contact should get correspondence', nullable: false],
         org:[ description: 'The organization this contact belongs to'],

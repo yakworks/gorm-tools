@@ -28,14 +28,11 @@ class OrgSource implements GormRepoEntity<OrgSource, OrgSourceRepo>, SourceTrait
     OrgType orgType
 
     static constraintsMap = [
-        orgId:[ description: 'The id of the org this is for', example: 954,
-            nullable: false],
-        orgType:[ description: 'denormalized orgType so we can have unique index within org type (sourceType, sourceId and orgType)',
+        orgId:[d: 'The id of the org this is for', example: 954, nullable: false],
+        orgType:[d: 'denormalized orgType so we can have unique index within org type (sourceType, sourceId and orgType)',
             nullable: false, example: 'Customer', editable: false, required: false],
-        sourceVersion:[ description: 'the version of the last edit in source system',
-            nullable: true, example: '912'],
-        originator:[ description: 'indicates this source was the creator of this org, should only be 1 per Org',
-            nullable: false, required: false]
+        sourceVersion:[d: 'the version of the last edit in source system', nullable: true, example: '912', maxSize: 255],
+        originator:[d: 'indicates this source was the creator of this org, should only be 1 per Org',  nullable: false, required: false]
     ]
 
     //unique index within org type (source, sourceId and orgType)

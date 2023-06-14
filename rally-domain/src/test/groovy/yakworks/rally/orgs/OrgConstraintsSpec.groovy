@@ -20,7 +20,6 @@ class OrgConstraintsSpec extends Specification implements DataRepoTest, Security
         orgDimensionService(OrgDimensionService)
     }}
 
-
     void "sanity check build"() {
         when:
         def org = build(Org)

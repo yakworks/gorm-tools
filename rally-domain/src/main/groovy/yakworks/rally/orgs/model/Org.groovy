@@ -52,10 +52,10 @@ class Org implements NameNum, RepoEntity<Org>, HasTags, CreateCriteriaSupport, S
 
     static constraintsMap = [
         num: [d: 'Unique alpha-numeric identifier for this organization', example: 'SPX-321'],
-        name: [d: 'The full name for this organization', example: 'SpaceX Corp.'],
+        name: [d: 'The full name for this organization', example: 'SpaceX Corp.', maxSize: 255],
         type:[ d: 'The type of org', example: 'Customer',
                nullable: false, bindable: false],
-        comments:[ d: 'A user visible comment', example: 'Lorem ipsum'],
+        comments:[ d: 'A user visible comment', example: 'Lorem ipsum', maxSize: 255],
         companyId:[ d: 'Company id this org belongs to', example: 2],
         inactive:[ d: 'indicator for an Org that is no longer active'],
         //associations

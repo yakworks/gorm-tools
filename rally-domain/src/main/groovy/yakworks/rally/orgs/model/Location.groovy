@@ -53,12 +53,12 @@ class Location implements GormRepoEntity<Location, LocationRepo>, Serializable {
     }
 
     static constraintsMap = [
-        org:[ description: 'The organization this belongs to'],
-        orgId:[ description: 'The org id for this', nullable: false],
-        kind:[ description: 'The address type', nullable: true],
+        org:[d: 'The organization this belongs to'],
+        orgId:[d: 'The org id for this', nullable: false],
+        kind:[d: 'The address type', nullable: true],
 
-        contact:[ description: 'The contact this belongs to', nullable: true],
-        name:[ description: 'A descriptive name, can be used for reports an letters', nullable: true],
+        contact:[d: 'The contact this belongs to', nullable: true],
+        name:[d: 'A descriptive name, can be used for reports an letters', nullable: true, maxSize: 255],
 
         // address fields
         street1:[maxSize: 100],

@@ -27,9 +27,9 @@ class OrgInfo implements RepoEntity<OrgInfo>, Serializable {
     }
 
     static constraintsMap = [
-        phone:[ description: 'primary hq number, switchboard'],
-        fax:[ description: 'primary fax'],
-        website:[ description: 'website home page']
+        phone:[d: 'primary hq number, switchboard', maxSize: 255],
+        fax:[d: 'primary fax', maxSize: 255],
+        website:[d: 'website home page', maxSize: 255]
     ]
 
 }

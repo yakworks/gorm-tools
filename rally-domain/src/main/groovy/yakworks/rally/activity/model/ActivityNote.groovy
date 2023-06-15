@@ -26,7 +26,7 @@ class ActivityNote implements RepoEntity<ActivityNote>, Serializable {
     }
 
     static constraintsMap = [
-        body:[d: 'The note body', nullable: false],
-        contentType:[d: 'plain, html, markdown', nullable: false, default: 'plain', maxSize:255]
+        body:[d: 'The note body', nullable: false, maxSize: 65535],
+        contentType:[d: 'plain, html, markdown', nullable: false, default: 'plain']
     ]
 }

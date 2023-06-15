@@ -65,7 +65,7 @@ class Task implements RepoEntity<Task>, Serializable {
         /*optional */
         completedBy:[d: 'The user who completed', nullable: true],
         completedDate:[d: 'The date it was completed', nullable: true],
-        docTag:[d: 'descriptor', nullable: true, maxSize:255],
+        docTag:[d: 'descriptor', nullable: true],
         priority:[d: '10 is Critical, 20 High, 30 Medium, 40 Low', nullable: true],
         userId:[d: 'User id who is responsible for making sure this thing is done. null means anyone.', nullable: true]
     ]

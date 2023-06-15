@@ -71,7 +71,10 @@ class GormToSchemaSpec extends Specification implements GormHibernateTest, Secur
         props.name.type == "string"
         props.name.description == "The full name for this organization"
         props.name.example == "SpaceX Corp."
+        //should pick up override
         props.name.maxLength == 255
+        //default shoudl be 255
+        props.comments.maxLength == 255
 
         //verify enum property
         props.type != null

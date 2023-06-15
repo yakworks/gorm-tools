@@ -1,5 +1,7 @@
 package yakworks.rally.orgs
 
+import org.apache.commons.lang3.RandomStringUtils
+
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.TestDataJson
@@ -43,6 +45,20 @@ class OrgSpec extends Specification implements GormHibernateTest, SecurityTest {
         !org.validate()
         org.errors.allErrors.size() == 1
         org.errors['type']
+    }
+
+    void "test org errors long name"() {
+        when:
+        Org org = new Org(type: OrgType.Customer, num:'foo1',
+            name: RandomStringUtils.randomAlphabetic(300),
+            comments: RandomStringUtils.randomAlphabetic(300),
+        )
+
+        then:
+        !org.validate()
+        org.errors.allErrors.size() == 2
+        org.errors['name'].code == 'MaxLength'
+        org.errors['comments'].code == 'MaxLength'
     }
 
     void "empty string for name or num"() {

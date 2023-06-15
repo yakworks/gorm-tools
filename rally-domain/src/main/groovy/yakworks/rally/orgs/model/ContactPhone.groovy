@@ -27,7 +27,7 @@ class ContactPhone implements RepoEntity<ContactPhone>, Serializable {
 
     static constraintsMap = [
         kind:[d: 'future use', blank: false, maxSize: 50],
-        num:[d: 'future use', blank: false, maxSize: 255],
+        num:[d: 'future use', blank: false],
         isPrimary:[d: 'if this is the contacts primary number', nullable: false, required: false],
     ]
 }

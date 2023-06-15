@@ -58,7 +58,7 @@ class Location implements GormRepoEntity<Location, LocationRepo>, Serializable {
         kind:[d: 'The address type', nullable: true],
 
         contact:[d: 'The contact this belongs to', nullable: true],
-        name:[d: 'A descriptive name, can be used for reports an letters', nullable: true, maxSize: 255],
+        name:[d: 'A descriptive name, can be used for reports an letters', nullable: true],
 
         // address fields
         street1:[maxSize: 100],

@@ -99,10 +99,10 @@ class Attachment implements NameDescription, Taggable, AuditStampTrait, RepoEnti
                  example: 7896, nullable: true, editable: false],
 
         extension:[d: 'The extension the file should have. Pulled from the name if not set. Helps dictate the mime-type',
-                 example: 'pdf', nullable: true, maxSize: 255],
+                 example: 'pdf', nullable: true],
 
         mimeType:[d: 'The mime type of the file. Will be pulled from the names extension',
-                 example: 'application/pdf', nullable: true, required: false, maxSize: 255],
+                 example: 'application/pdf', nullable: true, required: false],
 
         fileData:[ display: false],
 

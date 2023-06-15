@@ -112,25 +112,25 @@ class MailMessage implements UuidRepoEntity<MailMessage, UuidGormRepo<MailMessag
     }
 
     static constraintsMap = [
-        sendTo:[
+        sendTo: [
             d: '''
                 Email address of the recipient(s). RFC standard email format comma seperated with name in quotes and email in < .. >.
                 example: "Blow, Joe" <joe@joes.com>, john@galt.com
             '''.stripIndent(),
-            nullable: false
+            nullable: false, maxSize: 1000
         ],
-        cc:[ d: 'cc addys, see `sendTo` for format'],
-        bcc:[ d: 'bcc addys'],
-        sendFrom:[ d: 'who its from', maxSize: 255],
-        replyTo:[ d: 'what to show for replyTo in email', maxSize: 255],
-        source:[ d: 'any special source indicator', maxSize: 255],
+        cc:[ d: 'cc addys, see `sendTo` for format', maxSize: 1000],
+        bcc:[ d: 'bcc addys', maxSize: 1000],
+        sendFrom:[ d: 'who its from'],
+        replyTo:[ d: 'what to show for replyTo in email'],
+        source:[ d: 'any special source indicator'],
         state:[ d: 'the state of the message', nullable: false],
-        subject:[ d: 'email message subject'],
-        body:[ d: 'body of message'],
+        subject:[ d: 'email message subject', maxSize: 1000],
+        body:[ d: 'body of message', maxSize: 65535],
         attachmentIds:[ d: 'ids list of attachments', default: 'plain'],
         inlineIds:[ d: 'plain, html or markdown for whats in body', default: 'plain'],
         sendDate: [ d: 'The last response or error message from the mail processor when availiable.' ],
         msgResponse: [ d: 'The last response or error message from the mail processor when availiable.' ],
-        messageId: [ d: 'When using something like mailgun this is the id returned from the send submit', maxSize: 255 ]
+        messageId: [ d: 'When using something like mailgun this is the id returned from the send submit']
     ]
 }

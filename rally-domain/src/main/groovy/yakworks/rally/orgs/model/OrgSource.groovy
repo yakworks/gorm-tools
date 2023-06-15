@@ -31,7 +31,7 @@ class OrgSource implements GormRepoEntity<OrgSource, OrgSourceRepo>, SourceTrait
         orgId:[d: 'The id of the org this is for', example: 954, nullable: false],
         orgType:[d: 'denormalized orgType so we can have unique index within org type (sourceType, sourceId and orgType)',
             nullable: false, example: 'Customer', editable: false, required: false],
-        sourceVersion:[d: 'the version of the last edit in source system', nullable: true, example: '912', maxSize: 255],
+        sourceVersion:[d: 'the version of the last edit in source system', nullable: true, example: '912'],
         originator:[d: 'indicates this source was the creator of this org, should only be 1 per Org',  nullable: false, required: false]
     ]
 

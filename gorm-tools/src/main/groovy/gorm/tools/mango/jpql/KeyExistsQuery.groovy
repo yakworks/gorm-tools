@@ -50,7 +50,7 @@ class KeyExistsQuery<D> {
     }
 
     boolean exists(Object keyVal){
-        if(!queryString) queryString = "select ${keyName} from ${entityClass.name} where ${keyName} = :keyVal"
+        if(!queryString) queryString = "select 1 from ${entityClass.name} where ${keyName} = :keyVal"
         //String query = "select ${idName} from ${entity.name} where id = :id"
         return (Boolean) staticApi.hibernateTemplate.execute { Session session ->
             Query q = (Query) session.createQuery(queryString)

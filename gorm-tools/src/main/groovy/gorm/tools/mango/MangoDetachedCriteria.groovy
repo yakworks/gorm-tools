@@ -168,7 +168,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     }
 
     /**
-     * force an error since this creates unpredictiable truthy checks for crieria
+     * force an error since this creates unpredictiable truthy checks for criteria
      */
     @Override
     boolean asBoolean(@DelegatesTo(DetachedCriteria) Closure additionalCriteria = null) {
@@ -185,9 +185,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     boolean exists() {
         return (Boolean)withQueryInstance(Collections.emptyMap(), null) { Query query ->
             query.projections().count()
-            query.maxResults(1)
-            query.projections().id()
-            ((Number)query.list().size()) > 0
+            ((Number)query.singleResult()) > 0
         }
     }
 

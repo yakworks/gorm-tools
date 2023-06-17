@@ -23,12 +23,32 @@ class DefaultMangoQuerySpec extends Specification implements GormHibernateTest {
         }
     }
 
+    def "count"() {
+        when:
+        int count = mangoQuery.query(Cust, [name: 'Name1']).count() as Integer
+
+        then:
+        count
+
+        when:
+        count = mangoQuery.query(Cust, [name: 'FOOBAR']).count() as Integer
+
+        then:
+        !count
+    }
+
     def "exists"() {
         when:
         boolean hasIt = mangoQuery.query(Cust, [name: 'Name1']).exists()
 
         then:
         hasIt
+
+        when:
+        hasIt = mangoQuery.query(Cust, [name: 'FOOBAR']).exists()
+
+        then:
+        !hasIt
     }
 
     def "sort check"() {

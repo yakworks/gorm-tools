@@ -8,6 +8,7 @@ package gorm.tools.mango.jpql
 import spock.lang.Specification
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.SinkItem
+import yakworks.testing.gorm.model.Thing
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class KeyExistsQuerySpec extends Specification implements GormHibernateTest  {
@@ -32,9 +33,21 @@ class KeyExistsQuerySpec extends Specification implements GormHibernateTest  {
 
         then:
         qe.exists(1L)
-        qe.queryString == "select id from yakworks.testing.gorm.model.KitchenSink where id = :keyVal"
+        qe.queryString == "select 1 from yakworks.testing.gorm.model.KitchenSink where id = :keyVal"
 
         !qe.exists(-999L)
+    }
+
+    void "exists with domain"() {
+        when:
+        def qe = KeyExistsQuery.of(KitchenSink).keyName("thing")
+        def thing1 = Thing.get(1)
+
+        then:
+        qe.exists(thing1)
+        qe.queryString == "select 1 from yakworks.testing.gorm.model.KitchenSink where thing = :keyVal"
+
+        !qe.exists(Thing.load(-999L))
     }
 
 }

@@ -87,7 +87,7 @@ class AppUser implements UserInfo, AuditStampTrait, RepoEntity<AppUser>, Seriali
         roles:[ d: 'The string list of roles assigned to this user', validate: false, editable: false ],
         secRoles:[ d: 'The roles assigned to this user', validate: false, oapi: [read: true, edit: ['id']]],
         passwordHash:[ d: "The pwd hash, internal use only, never show this",
-                       nullable: true, maxSize: 255, bindable: false, display:false, password: true],
+                       nullable: true, bindable: false, display:false, password: true],
         passwordChangedDate:[ d: "The date password was changed",
                               nullable: true, bindable: false, oapi:'R'],
         passwordExpired:[ d: "The password expired",

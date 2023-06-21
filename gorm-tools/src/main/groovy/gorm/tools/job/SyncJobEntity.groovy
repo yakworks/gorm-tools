@@ -115,13 +115,13 @@ trait SyncJobEntity<D> implements SourceTrait {
 
     static constraintsMap = [
         state       : [d: 'State of the job', nullable: false],
-        message     : [d: 'Status message or log'],
+        message     : [d: 'Status message or log', maxSize: 500],
         payloadId   : [d: 'If payload is stored as attahcment file this is the id', oapi: "NO"],
         payloadBytes: [d      : 'Json payload data (stored as byte array) that is passed in, for example list of items to bulk create',
                        maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
         dataId      : [d: 'If data is saved as attahchment file this is the id', oapi: "NO"],
         dataBytes   : [d: 'The result data stored as bytes', maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
         //errorBytes  : [d: 'The error data stored as bytes', maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
-        sourceId    : [d: 'the unique id from the outside source for the scheduled job', nullable: true]
+        sourceId : [d: 'the unique id from the outside source for the scheduled job', nullable: true]
     ]
 }

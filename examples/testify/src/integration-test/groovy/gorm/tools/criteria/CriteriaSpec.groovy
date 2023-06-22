@@ -1,7 +1,5 @@
 package gorm.tools.criteria
 
-import org.grails.orm.hibernate.HibernateGormStaticApi
-import org.grails.orm.hibernate.HibernateSession
 import org.hibernate.Criteria
 import org.hibernate.FetchMode
 import org.hibernate.criterion.Restrictions
@@ -36,6 +34,37 @@ class CriteriaSpec extends Specification {
 
         then:
         list.size() == 1
+    }
+
+    void "test in subquery"() {
+        when:
+        def subQuery = Org.query {
+            gt "flex.num2", 2.0
+            projections {
+                property("flex.id")
+            }
+        }
+        //just a cooked up query - select * from org where flex.id in (select flex.id from org where flex.num > 2.0)
+        def query = Org.query {
+            "in" "flex.id", subQuery
+        }
+
+        //the following query should work too
+        /*
+        def query = Org.query {
+            "in" "flex.id", {
+                gt "flex.num2", 2.0
+                projections {
+                    property("flex.id")
+                }
+            }
+        }*/
+
+
+        List result = query.list()
+
+        then:
+        noExceptionThrown()
     }
 
     def "hibernate directly to criteria query"() {

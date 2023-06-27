@@ -8,6 +8,7 @@ import spock.lang.Specification
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.SinkExt
 import yakworks.testing.gorm.model.SinkItem
+import yakworks.testing.gorm.model.Thing
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class HasChangedSpec extends Specification implements GormHibernateTest {
@@ -79,7 +80,7 @@ class HasChangedSpec extends Specification implements GormHibernateTest {
 
     }
 
-    void "isDirty with association"() {
+    void "hasChanged with association with belongsto"() {
         when:
         KitchenSink sink = new KitchenSink(num: "123", name: "name").persist()
 
@@ -93,5 +94,96 @@ class HasChangedSpec extends Specification implements GormHibernateTest {
         then:
         sink.hasChanged()
         sink.hasChanged("ext")
+    }
+
+    void "hasChanged with free association"() {
+        when:
+        KitchenSink sink = new KitchenSink(num: "123", name: "name").persist()
+
+        then:
+        !sink.hasChanged()
+        !sink.hasChanged("thing")
+
+        when:
+        sink.thing = new Thing(name: "thing1")
+
+        then:
+        sink.hasChanged()
+        sink.hasChanged("thing")
+        sink.thing.hasChanged()
+    }
+
+    void "hasChanged with saved association"() {
+        when:
+        KitchenSink sink = new KitchenSink(num: "123", name: "name").persist()
+
+        then:
+        !sink.hasChanged()
+        !sink.hasChanged("thing")
+
+        when:
+        sink.thing = new Thing(name: "thing1").persist()
+
+        then:
+        sink.hasChanged()
+        sink.hasChanged("thing")
+        !sink.thing.hasChanged()
+    }
+
+    void "hasChanged with hasMany"() {
+        when:
+        KitchenSink sink = new KitchenSink(num: "123", name: "name").persist()
+
+        then:
+        !sink.hasChanged()
+        !sink.hasChanged("stringList")
+
+        when:
+        sink.stringList = ['foo', 'bar']
+
+        then:
+        sink.hasChanged()
+        sink.hasChanged("stringList")
+    }
+
+    void "hasChanged when same value is set"() {
+        when:
+        KitchenSink sink = new KitchenSink(num: "123", name: "name").persist()
+
+        then:
+        !sink.hasChanged()
+
+        when:
+        sink.num = "123"
+
+        then:
+        !sink.hasChanged()
+        !sink.hasChanged("num")
+
+        when:
+        sink.num = "456"
+
+        then:
+        sink.hasChanged()
+        sink.hasChanged("num")
+
+        when:
+        sink.persist()
+        //it seems to work with flush but thats not consistent?
+        //sink.persist(flush: true)
+
+        then:
+        //HERE BE DRAGONS, why is this failing? its like the second persist doesnt clear? or is it just spock?
+        // maybe put in normal class and see what it does
+        !sink.hasChanged()
+        !sink.hasChanged("num")
+
+        when:
+        sink.num = "456"
+
+        then:
+        !sink.hasChanged()
+        !sink.hasChanged("num")
+
     }
 }

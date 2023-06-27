@@ -31,10 +31,14 @@ class HasChangedSpec extends Specification implements GormHibernateTest {
         !sink.hasChanged()
 
         when:
+        //change trait field
         sink.num = "456"
+        //change KitchenSink field
+        sink.name2 = "foo"
 
         then:
         sink.hasChanged("num")
+        sink.hasChanged("name2")
         sink.hasChanged()
 
     }

@@ -34,11 +34,15 @@ class IsDirtySpec extends Specification implements GormHibernateTest {
         !sink.isDirty()
 
         when:
+        //change trait field
         sink.num = "456"
+        //change KitchenSink field
+        sink.name2 = "foo"
 
         then:
         //these now work?
         sink.isDirty("num")
+        sink.isDirty("name2")
         sink.isDirty()
 
     }

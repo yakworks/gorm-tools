@@ -169,7 +169,7 @@ class HasChangedSpec extends Specification implements GormHibernateTest {
 
         when:
         sink.persist()
-        //it seems to work with flush but thats not consistent?
+        //it seems to work with flush but why, thats not consistent?
         //sink.persist(flush: true)
 
         then:

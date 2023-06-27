@@ -19,9 +19,12 @@ class HasChangedSpec extends Specification implements GormHibernateTest {
         when:
         KitchenSink sink = new KitchenSink(num: "123", name: "name")
 
-        then:
+        then: "new objects show up as changed"
         sink.hasChanged()
         sink.hasChanged("num")
+
+        and: "but show even if it didnt actually get populated, so its not accurate on fields"
+        sink.hasChanged("name2")
     }
 
     void "hasChanged change persisted"() {
@@ -94,6 +97,19 @@ class HasChangedSpec extends Specification implements GormHibernateTest {
         then:
         sink.hasChanged()
         sink.hasChanged("ext")
+
+        when: "changes made to ext assoc"
+        sink.persist(flush: true) //see comment below
+        assert !sink.hasChanged()
+        assert !sink.ext.hasChanged()
+        sink.ext.name = "foo2"
+
+        then: "ext shows changes"
+        sink.ext.hasChanged()
+        sink.ext.hasChanged("name")
+
+        and: "the main sink does not show so it does not cascadem which is obvious when looking at source"
+        !sink.hasChanged()
     }
 
     void "hasChanged with free association"() {
@@ -128,7 +144,20 @@ class HasChangedSpec extends Specification implements GormHibernateTest {
         sink.hasChanged()
         sink.hasChanged("thing")
         !sink.thing.hasChanged()
+
+        when: "changes made to thing assoc"
+        sink.persist(flush: true) //see comment below
+        assert !sink.hasChanged()
+        sink.thing.name = "thing2"
+
+        then:
+        sink.thing.hasChanged()
+        sink.thing.hasChanged("name")
+        //sink does not show changes unlike with belongsTo
+        !sink.hasChanged()
     }
+
+
 
     void "hasChanged with hasMany"() {
         when:
@@ -174,7 +203,7 @@ class HasChangedSpec extends Specification implements GormHibernateTest {
 
         then:
         //HERE BE DRAGONS, why is this failing? its like the second persist doesnt clear? or is it just spock?
-        // maybe put in normal class and see what it does
+        // maybe put in normal class and see if its does the same thing or must if be flushed to be accurate? which is kind of bad. 
         !sink.hasChanged()
         !sink.hasChanged("num")
 

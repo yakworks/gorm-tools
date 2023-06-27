@@ -10,71 +10,68 @@ import yakworks.testing.gorm.model.SinkExt
 import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.unit.GormHibernateTest
 
-class IsDirtySpec extends Specification implements GormHibernateTest {
+class HasChangedSpec extends Specification implements GormHibernateTest {
 
     static entityClasses = [KitchenSink, SinkExt, SinkItem]
 
-    void "isDirty on new does not work"() {
+    void "hasChanged on new"() {
         when:
         KitchenSink sink = new KitchenSink(num: "123", name: "name")
 
         then:
-        //this fails when new
-        sink.isDirty()
-        //this fails too when new
-        sink.isDirty("num")
-
+        sink.hasChanged()
+        sink.hasChanged("num")
     }
 
-    void "isDirty change persisted"() {
+    void "hasChanged change persisted"() {
         when:
         KitchenSink sink = new KitchenSink(num: "123", name: "name").persist()
 
         then:
-        !sink.isDirty()
+        !sink.hasChanged()
 
         when:
         sink.num = "456"
 
         then:
-        //these now work?
-        sink.isDirty("num")
-        sink.isDirty()
+        sink.hasChanged("num")
+        sink.hasChanged()
 
     }
 
-    void "markDirty does not work with isdirty"() {
+    void "markDirty works"() {
         when:
         KitchenSink sink = new KitchenSink(num: "123", name: "name").persist()
         sink.markDirty()
 
         then:
-        //this fails
-        sink.isDirty()
+        sink.hasChanged()
 
         when:
         sink.num = "456"
 
         then:
-        //these now work?
-        sink.isDirty("num")
-        sink.isDirty()
+        sink.hasChanged("num")
+        sink.hasChanged()
+
     }
 
-    void "isDirty change persist called twice or isdirty called twice fails"() {
+    void "hasChanged change persist called twice or hasChanged called twice fails"() {
         when:
         KitchenSink sink = new KitchenSink(num: "123", name: "name").persist()
+        //why does this make it fail?
         sink.persist()
+
         then:
-        !sink.isDirty()
+        !sink.hasChanged()
 
         when:
         sink.num = "456"
 
         then:
         //why does this fail now?
-        sink.isDirty("num")
-        sink.isDirty()
+        sink.hasChanged("num")
+        sink.hasChanged()
 
     }
 
@@ -83,16 +80,14 @@ class IsDirtySpec extends Specification implements GormHibernateTest {
         KitchenSink sink = new KitchenSink(num: "123", name: "name").persist()
 
         then:
-        !sink.isDirty()
-        !sink.isDirty("num")
+        !sink.hasChanged()
+        !sink.hasChanged("ext")
 
         when:
         sink.ext = new SinkExt(kitchenSink: sink, name: "foo", textMax: 'fo')
 
         then:
-        //blows TransientObjectException, why?
-        sink.isDirty()
-        sink.isDirty("ext")
+        sink.hasChanged()
+        sink.hasChanged("ext")
     }
-
 }

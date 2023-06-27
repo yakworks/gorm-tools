@@ -11,6 +11,8 @@ import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.model.Thing
 import yakworks.testing.gorm.unit.GormHibernateTest
 
+//FIXME Not clear what would happen if hasChanged is used inside of the beforeValidate in a Repo, need some smoke tests for that too.
+// can trace when trackChanges or activateDirtyChecking is called so its clear.
 class HasChangedSpec extends Specification implements GormHibernateTest {
 
     static entityClasses = [KitchenSink, SinkExt, SinkItem]
@@ -203,7 +205,7 @@ class HasChangedSpec extends Specification implements GormHibernateTest {
 
         then:
         //HERE BE DRAGONS, why is this failing? its like the second persist doesnt clear? or is it just spock?
-        // maybe put in normal class and see if its does the same thing or must if be flushed to be accurate? which is kind of bad. 
+        // maybe put in normal class and see if its does the same thing or must if be flushed to be accurate? which is kind of bad.
         !sink.hasChanged()
         !sink.hasChanged("num")
 

@@ -357,7 +357,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             //check id type, and convert to long/uuid based on type
             Class idType = getIdPropertyType(association.getType())
             if(Number.isAssignableFrom(idType)) { value = sval as Long }
-            else if (UUID.isAssignableFrom(idType)) value = UUID.fromString(sval)
+            else if (UUID.isAssignableFrom(idType)) { value = UUID.fromString(sval) }
         }
 
         // if its a number then its the identifier so set it

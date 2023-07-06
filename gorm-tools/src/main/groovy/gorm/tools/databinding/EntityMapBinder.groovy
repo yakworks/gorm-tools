@@ -360,7 +360,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             else if (UUID.isAssignableFrom(idType)) { value = UUID.fromString(sval) }
         }
 
-        // if its a number then its the identifier so set it
+        // if its a number/uuid then its the identifier so set it
         if (value instanceof Number || value instanceof UUID) {
             bindNewAssociationIfNeeded(target, aprop, value)
             return

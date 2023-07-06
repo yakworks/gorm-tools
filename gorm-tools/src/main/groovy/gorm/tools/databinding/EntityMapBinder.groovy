@@ -180,6 +180,12 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
         }
     }
 
+    Class getIdPropertyType(Class domain) {
+        GormStaticApi gormStaticApi = GormEnhancer.findStaticApi(domain)
+        PersistentEntity entity = gormStaticApi.gormPersistentEntity
+        return entity.getIdentity().getClass()
+    }
+
     /**
      * Quick way to convert a string to basic type such as Date, LocalDate, LocalDateTime and number
      * if its a string it trims it and returns a null.
@@ -348,12 +354,14 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             String sval = value as String
             //if its an empty string then its nothing so return
             if(!sval.trim()) return
-            //convert to long
-            value = sval as Long
+            //check id type, and convert to long/uuid based on type
+            Class idType = getIdPropertyType(association.getType())
+            if(Number.isAssignableFrom(idType)) { value = sval as Long }
+            else if (UUID.isAssignableFrom(idType)) value = UUID.fromString(sval)
         }
 
         // if its a number then its the identifier so set it
-        if (value instanceof Number) {
+        if (value instanceof Number || value instanceof UUID) {
             bindNewAssociationIfNeeded(target, aprop, value)
             return
         }

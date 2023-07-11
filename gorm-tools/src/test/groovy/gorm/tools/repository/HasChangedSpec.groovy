@@ -69,10 +69,13 @@ class HasChangedSpec extends Specification implements GormHibernateTest {
     void "hasChanged change persist called twice or hasChanged called twice fails"() {
         when:
         KitchenSink sink = new KitchenSink(num: "123", name: "name").persist()
-        //why does this make it fail?
-        // sink.persist()
+        //XXX why does this make it fail?
+        sink.persist()
 
         then:
+        //this is fine
+        !sink.hasChanged("num")
+        //this is not
         !sink.hasChanged()
 
         when:

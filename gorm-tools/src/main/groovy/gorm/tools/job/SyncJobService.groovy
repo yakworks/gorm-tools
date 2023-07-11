@@ -145,7 +145,7 @@ trait SyncJobService<D> {
         //async is true by default
         syncJobArgs.async = params.getBoolean('async', true)
 
-        //save payload by default
+        //save payload is true by default
         syncJobArgs.savePayload = params.getBoolean('savePayload', true)
 
         syncJobArgs.sourceId = params.get('sourceId')

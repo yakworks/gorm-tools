@@ -1,18 +1,14 @@
 package gorm.tools.job
 
-import grails.testing.spring.AutowiredTest
 import spock.lang.Specification
 import testing.TestSyncJobService
-import yakworks.testing.gorm.unit.DataRepoTest
 
-class SyncJobServiceSpec extends Specification implements DataRepoTest, AutowiredTest {
-    static springBeans = [
-        syncJobService: TestSyncJobService
-    ]
-
-    SyncJobService syncJobService
+class SyncJobServiceSpec extends Specification  {
 
     void "test setupSyncJobArgs"() {
+        setup:
+        SyncJobService syncJobService = new TestSyncJobService()
+
         when: "defaults"
         SyncJobArgs args = syncJobService.setupSyncJobArgs([:])
 
@@ -24,7 +20,7 @@ class SyncJobServiceSpec extends Specification implements DataRepoTest, Autowire
         !args.sourceId
 
         when: "explicitely provided"
-        args = syncJobService.setupSyncJobArgs([paralle:true, async:true, savePayload: false, source:"test", sourceId:"test"])
+        args = syncJobService.setupSyncJobArgs([parallel:true, async:true, savePayload: false, source:"test", sourceId:"test"])
 
         then:
         args.parallel

@@ -48,7 +48,7 @@ class HasChangedIntegrationSpec extends Specification implements DomainIntTest {
         then:
         //this is fine
         !sink.hasChanged("num")
-        //this is not
+        //this is not - because repo has updated editedDate etc fields
         !sink.hasChanged()
 
         when:

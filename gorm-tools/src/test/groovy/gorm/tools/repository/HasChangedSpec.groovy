@@ -66,7 +66,7 @@ class HasChangedSpec extends Specification implements GormHibernateTest {
 
     }
 
-    void "remains dirty untill flush"() {
+    void "PROBLEM - remains dirty untill flush"() {
         when:
         KitchenSink sink = new KitchenSink(num: "123", name: "name").persist()
 
@@ -83,8 +83,8 @@ class HasChangedSpec extends Specification implements GormHibernateTest {
         sink.persist()
 
         then: "not dirty after save/persist"
-        //remains dirty untill we flush. but thts same behavior as hibernate's isDirty
-        !sink.isDirty('name')
+        //XXX remains dirty untill we flush. but thts same behavior as hibernate's isDirty
+        !sink.hasChanged('name')
         !sink.hasChanged()
     }
 

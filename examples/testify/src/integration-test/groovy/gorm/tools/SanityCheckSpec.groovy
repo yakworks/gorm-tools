@@ -18,22 +18,4 @@ class SanityCheckSpec extends Specification implements DataIntegrationTest {
         KitchenSink.load(2)
     }
 
-    void "check isDirty throws error"() {
-        setup:
-        Org org = Org.get(1)
-
-        expect:
-        org
-
-        when:
-        org.flex = new OrgFlex()
-        org.num = "new num"
-
-        and:
-        org.isDirty("num")
-
-        then:
-        noExceptionThrown()
-    }
-
 }

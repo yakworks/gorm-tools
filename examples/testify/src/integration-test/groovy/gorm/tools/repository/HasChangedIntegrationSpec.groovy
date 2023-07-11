@@ -6,6 +6,7 @@ import spock.lang.Specification
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
 import yakworks.testing.gorm.integration.DomainIntTest
+import yakworks.testing.gorm.model.KitchenSink
 
 import java.time.LocalDateTime
 
@@ -35,5 +36,27 @@ class HasChangedIntegrationSpec extends Specification implements DomainIntTest {
         then:
         //editedDateUpdated != editedDate
         !org.hasChanged()
+    }
+
+    void "hasChanged change persist called twice or hasChanged called twice fails"() {
+        when:
+        KitchenSink sink = new KitchenSink(num: "123", name: "name").persist()
+        //this will trigger auditstamp in repo and update the edited time.
+        //sink.persist(flush:true) flush will fix it
+        sink.persist()
+
+        then:
+        //this is fine
+        !sink.hasChanged("num")
+        //this is not
+        !sink.hasChanged()
+
+        when:
+        sink.num = "456"
+
+        then:
+        //why does this fail now?
+        sink.hasChanged("num")
+        sink.hasChanged()
     }
 }

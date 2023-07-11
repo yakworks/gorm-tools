@@ -136,4 +136,20 @@ trait SyncJobService<D> {
     Long runJob(SyncJobContext jobContext, Runnable runnable) {
         return runJob(jobContext.args.asyncArgs, jobContext, runnable)
     }
+
+    SyncJobArgs setupSyncJobArgs(Map params) {
+        SyncJobArgs syncJobArgs = new SyncJobArgs(params:params)
+        //parallel is false by default
+        syncJobArgs.parallel = params.getBoolean('parallel', false)
+
+        //async is true by default
+        syncJobArgs.async = params.getBoolean('async', true)
+
+        //save payload by default
+        syncJobArgs.savePayload = params.getBoolean('savePayload', true)
+
+        syncJobArgs.sourceId = params.get('sourceId')
+        syncJobArgs.source = params.get('sourceId')
+        return syncJobArgs
+    }
 }

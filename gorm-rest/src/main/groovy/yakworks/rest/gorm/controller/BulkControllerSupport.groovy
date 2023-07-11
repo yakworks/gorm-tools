@@ -91,13 +91,10 @@ class BulkControllerSupport<D> {
     Long doBulkCsv(SyncJobArgs syncJobArgs){
         //params will have already been set in syncJobArgs and for CSV we have different defaults
         Map params = syncJobArgs.params
-        //default to true for CSV unless explicitely disabled in params
-        // XXX Why is this special for CSV? should be same across the board.
+        // XXX Why is this special for CSV? should be same across the board?
         syncJobArgs.async = params.getBoolean('async', true)
-        // XXX Why do we do this like this? why is savePayload special for CSV?
+        // We set savePayload to false by default for CSV since we already have the csv file as attachment?
         syncJobArgs.savePayload = params.getBoolean('savePayload', false)
-        // XXX Why do we do this like this? why is savePayload special for CSV?
-        syncJobArgs.saveDataAsFile = params.getBoolean('saveDataAsFile', true)
 
         List<Map> dataList = transformCsvToBulkList(params)
         return getRepo().bulk(dataList, syncJobArgs)
@@ -107,33 +104,18 @@ class BulkControllerSupport<D> {
      * sets up the SyncJobArgs from whats passed in from params
      */
     SyncJobArgs setupSyncJobArgs(DataOp dataOp, Map params, String sourceId){
-        // HttpServletRequest req = webRequest.currentRequest
-        // GrailsParameterMap params = webRequest.params
-        // String sourceKey = "${req.method} ${req.requestURI}?${req.queryString}"
-
         Map includesMap = includesConfig.getIncludes(entityClass)
         List bulkIncludes = IncludesConfig.getFieldIncludes(includesMap, [IncludesKey.bulk.name()])
         List bulkErrorIncludes = includesMap['bulkError'] as List<String>
 
-        SyncJobArgs syncJobArgs = new SyncJobArgs(
-            op: dataOp,
-            includes: bulkIncludes,
-            errorIncludes: bulkErrorIncludes,
-            sourceId: sourceId,
-            source: params.jobSource,
-            params: params
-        )
+        SyncJobArgs syncJobArgs = SyncJobArgs.withParams(params)
+        syncJobArgs.op = dataOp
+        syncJobArgs.includes = bulkIncludes
+        syncJobArgs.errorIncludes = bulkErrorIncludes
+        syncJobArgs.sourceId = sourceId
 
-        if(params.parallel != null) syncJobArgs.parallel = params.getBoolean('parallel')
-        //async is false by default, when this is true then runs "non-blocking" in background and will job immediately with state=running
-        if(params.async != null) syncJobArgs.async = params.getBoolean('async')
-        //savePayload is true by default
-        if(params.savePayload != null) syncJobArgs.savePayload = params.getBoolean('savePayload')
-        //data is always saved, but can force it be in a file if passes. will get set to true if payload.size() > 1000 no matter what is set
-        // syncJobArgs.saveDataAsFile = params.boolean('saveDataAsFile')
         return syncJobArgs
     }
-
 
     /**
      * transform csv to list of maps using csvToMapTransformer.

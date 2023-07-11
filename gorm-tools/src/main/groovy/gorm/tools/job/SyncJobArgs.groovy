@@ -13,6 +13,7 @@ import groovy.transform.builder.SimpleStrategy
 import gorm.tools.async.AsyncArgs
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp
+import yakworks.commons.lang.EnumUtils
 
 /**
  * Value Object are better than using a Map to store arguments and parameters.
@@ -59,7 +60,7 @@ class SyncJobArgs {
     /**
      * If dataFormat=Payload then errors should be stored separate from result data.
      * If dataFormat=Result then errors are mixed in and the syncJob.data is just a rendered list of the results.
-     * When dataFormat=Payload then the rendering of the data is only list of whats in each results paload.
+     * When dataFormat=Payload then the rendering of the data is only list of whats in each results payload.
      * as opposed to a list of Results objects when dataFormat=Result
      * For example if processing export then instead of getting syncJob.data as a list of results objects it will be a list of what
      * the requested export is, such as Invoices. would look as if the call was made to the rest endpoint for a list synchronously
@@ -112,8 +113,10 @@ class SyncJobArgs {
      * Normally used for testing and debugging, or when encountering deadlocks.
      * Allows to override and turn off the AsyncArgs.enabled passed to ParallelTools
      * When the processes slices it will parallelize and run them async. If false then will not run in parallel and will be single threaded
+     * NOTE: This is null by default and should not default to true/false, when it gets set to AsyncArgs.enabled if thats null
+     * then it will use the system/config defaults from gorm.tools.async.enabled
      */
-    Boolean parallel
+    Boolean parallel //keep NULL by default
 
     /**
      * Whether it should run in async background thread and return the job immediately.
@@ -161,6 +164,29 @@ class SyncJobArgs {
     static SyncJobArgs update(Map args = [:]){
         args.op = DataOp.update
         new SyncJobArgs(args)
+    }
+
+    static SyncJobArgs withParams(Map params){
+        SyncJobArgs syncJobArgs = new SyncJobArgs(params:params)
+        //parallel is NULL by default
+        if(params.parallel != null) syncJobArgs.parallel = params.getBoolean('parallel')
+
+        //async is FALSE by default, XXX THIS needs to be standardized.
+        //async is false by default, when this is true then runs "non-blocking" in background and will job immediately with state=running
+        if(params.async != null) syncJobArgs.async = params.getBoolean('async')
+
+        //save payload is true by default
+        if(params.savePayload != null) syncJobArgs.savePayload = params.getBoolean('savePayload')
+
+        syncJobArgs.sourceId = params.sourceId
+        //can use both jobSource and source to support backward compat, jobSource wins if both are set
+        if(params.source != null) syncJobArgs.source = params.source
+        if(params.jobSource != null) syncJobArgs.source = params.jobSource
+
+        //allow to specify the dataFormat
+        if(params.dataFormat != null) syncJobArgs.dataFormat = EnumUtils.getEnumIgnoreCase(DataFormat, params.dataFormat as String)
+
+        return syncJobArgs
     }
 
     AsyncArgs getAsyncArgs() {

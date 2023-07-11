@@ -4,6 +4,8 @@
 */
 package yakworks.testing.gorm.model
 
+import groovy.transform.CompileDynamic
+
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -105,8 +107,11 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
     }
 
     void auditStamp(Object ent){
-        ent['createdBy'] = 1
-        ent['createdDate'] = LocalDateTime.now()
+        if( ent['createdBy'] == null) {
+            ent['createdBy'] = 1
+            ent['createdDate'] = LocalDateTime.now()
+        }
+
         ent['editedBy'] = 1
         ent['editedDate'] = LocalDateTime.now()
     }

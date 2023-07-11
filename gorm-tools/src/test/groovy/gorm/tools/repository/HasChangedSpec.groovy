@@ -66,11 +66,34 @@ class HasChangedSpec extends Specification implements GormHibernateTest {
 
     }
 
+    void "remains dirty untill flush"() {
+        when:
+        KitchenSink sink = new KitchenSink(num: "123", name: "name").persist()
+
+        then:
+        !sink.hasChanged()
+
+        when:
+        sink.name = "name2"
+
+        then:
+        sink.hasChanged()
+
+        when: "persist should reset dirty status"
+        sink.persist()
+
+        then: "not dirty after save/persist"
+        //remains dirty untill we flush. but thts same behavior as hibernate's isDirty
+        !sink.isDirty('name')
+        !sink.hasChanged()
+    }
+
     void "hasChanged change persist called twice or hasChanged called twice fails"() {
         when:
         KitchenSink sink = new KitchenSink(num: "123", name: "name").persist()
-        //XXX why does this make it fail?
-        sink.persist()
+
+        //this will trigger auditstamp in repo and update the edited time.
+        sink.persist(flush:true)
 
         then:
         //this is fine
@@ -91,8 +114,7 @@ class HasChangedSpec extends Specification implements GormHibernateTest {
     void "use HasChangedTesting to double persist"() {
         when:
         KitchenSink sink = HasChangedTesting.saveSink()
-        //XXX why does this make it fail?
-        sink.persist()
+        sink.persist(flush:true)
 
         then:
         //this is fine
@@ -107,7 +129,6 @@ class HasChangedSpec extends Specification implements GormHibernateTest {
         //why does this fail now?
         sink.hasChanged("num")
         sink.hasChanged()
-
     }
 
     void "hasChanged with association with belongsto"() {

@@ -63,9 +63,7 @@ class BulkControllerSupport<D> {
     }
 
     SyncJobEntity process(List<Map> dataList, SyncJobArgs syncJobArgs) {
-
         //SyncJobArgs syncJobArgs = setupSyncJobArgs(dataOp, webRequest.params, webRequest.currentRequest)
-
         Long jobId
         if(syncJobArgs.params.attachmentId) {
             jobId = doBulkCsv(syncJobArgs)
@@ -94,12 +92,11 @@ class BulkControllerSupport<D> {
         //params will have already been set in syncJobArgs and for CSV we have different defaults
         Map params = syncJobArgs.params
         //default to true for CSV unless explicitely disabled in params
+        // XXX Why is this special for CSV? should be same across the board.
         syncJobArgs.async = params.getBoolean('async', true)
-        // dont save payload by default, but if its true then save to file not db.
-        // TODO above comment is not true, its setting saveDataAsFile not pload
+        // XXX Why do we do this like this? why is savePayload special for CSV?
         syncJobArgs.savePayload = params.getBoolean('savePayload', false)
-        //always save the data as file and not in the syncJob row
-        //TODO why do we do this? why not let it be automated like elsewhere?
+        // XXX Why do we do this like this? why is savePayload special for CSV?
         syncJobArgs.saveDataAsFile = params.getBoolean('saveDataAsFile', true)
 
         List<Map> dataList = transformCsvToBulkList(params)

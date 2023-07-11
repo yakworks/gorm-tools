@@ -42,7 +42,7 @@ class SyncJobArgs {
     Object payload
 
     /**
-     * force how to store the payload
+     * force how to store the payload (what was sent)
      */
     Boolean savePayload = true
 
@@ -52,7 +52,7 @@ class SyncJobArgs {
     Boolean savePayloadAsFile = false
 
     /**
-     * resulting data is always saved but can force it to save to file instead of bytes in column
+     * resulting data (what is returned in response) is always saved but can force it to save to file instead of bytes in column
      */
     Boolean saveDataAsFile = false
 

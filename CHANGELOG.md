@@ -1,3 +1,15 @@
+### v7.3.51
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.50...v7.3.51)
+- release [link](https://github.com/yakworks/gorm-tools/commit/8c4d07a082f189e164d542c57a4c73bcdf1d4499)
+- Merge pull request #694 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/c7823be634fd50f9a56ae2e8ae050927f9db6e7b)
+- fix how exists work for mango (#693) [link](https://github.com/yakworks/gorm-tools/commit/e7ffd98dec7eba67d9ebb5d741b2db262fb987ac)
+- add tests for KeyExists and ComboKeyExists (#692) [link](https://github.com/yakworks/gorm-tools/commit/22279438f6531d334160663b8312ff46e0eabee6)
+- setup default for maxSize of 255 for string, for TEXT columns types jack up to reasonble levels, maxSize: 65535 for note body (#691) [link](https://github.com/yakworks/gorm-tools/commit/46ffbb6b4cdc3f7d6b787afba4a89dfdacd195b6)
+-  Add max size constraints (#687) [link](https://github.com/yakworks/gorm-tools/commit/22d5776fea23aee4091825acf1752266d428030a)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/55e75d82080badbe5d1ed2bc4d946711dc989587)
+- trigger [link](https://github.com/yakworks/gorm-tools/commit/6db734a9a59442fefc30456264524e952b5a3e91)
+
 ### v7.3.50
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.49...v7.3.50)

@@ -78,7 +78,7 @@ trait SyncJobEntity<D> implements SourceTrait {
     // abstract byte[] getPayloadData()
 
     /**
-     * if payload is stored as an attachment then this will be the id
+     * if data is stored as an attachment then this will be the id
      */
     Long dataId
 

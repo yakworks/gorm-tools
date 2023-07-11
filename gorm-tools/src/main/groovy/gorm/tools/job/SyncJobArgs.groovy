@@ -177,6 +177,7 @@ class SyncJobArgs {
 
         //save payload is true by default
         if(params.savePayload != null) syncJobArgs.savePayload = params.getBoolean('savePayload')
+        if(params.saveDataAsFile != null) syncJobArgs.saveDataAsFile = params.getBoolean('saveDataAsFile')
 
         syncJobArgs.sourceId = params.sourceId
         //can use both jobSource and source to support backward compat, jobSource wins if both are set

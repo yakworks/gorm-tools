@@ -89,9 +89,12 @@ class HasChangedSpec extends Specification implements GormHibernateTest {
         when:
         KitchenSink sink = HasChangedTesting.saveSink()
         //XXX why does this make it fail?
-        // sink.persist()
+        sink.persist()
 
         then:
+        //this is fine
+        !sink.hasChanged("num")
+        //this is not
         !sink.hasChanged()
 
         when:

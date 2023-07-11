@@ -21,7 +21,7 @@ import yakworks.testing.gorm.model.Thing
 @Rollback
 class HasChangedIntegrationSpec extends Specification implements DomainIntTest {
 
-    def setup() {
+    def setupSpec() {
         KitchenSinkRepo.doTestAuditStamp = false
     }
 

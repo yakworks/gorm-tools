@@ -11,6 +11,7 @@ import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
 import gorm.tools.async.AsyncArgs
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp
 import yakworks.commons.lang.EnumUtils
@@ -134,6 +135,12 @@ class SyncJobArgs {
     PersistArgs getPersistArgs() { return this.persistArgs ? PersistArgs.of(this.persistArgs) : new PersistArgs() }
 
     /**
+     * When params include a mango query this is the QueryArgs that are created from it. Used for the ExportSyncArgs.
+     * FUTURE USE
+     */
+    QueryArgs queryArgs
+
+    /**
      * The job id, will get populated when the job is created, normally from the syncJobContext.
      */
     Long jobId
@@ -172,7 +179,7 @@ class SyncJobArgs {
         if(params.parallel != null) syncJobArgs.parallel = params.getBoolean('parallel')
 
         //async is FALSE by default, XXX THIS needs to be standardized.
-        //async is false by default, when this is true then runs "non-blocking" in background and will job immediately with state=running
+        //when this is true then runs "non-blocking" in background and will job immediately with state=running
         if(params.async != null) syncJobArgs.async = params.getBoolean('async')
 
         //save payload is true by default
@@ -186,6 +193,11 @@ class SyncJobArgs {
 
         //allow to specify the dataFormat
         if(params.dataFormat != null) syncJobArgs.dataFormat = EnumUtils.getEnumIgnoreCase(DataFormat, params.dataFormat as String)
+
+        //setup queryArgs
+        if(params.containsKey("q") || params.containsKey("qSearch") ) {
+            syncJobArgs.queryArgs = QueryArgs.of(params)
+        }
 
         return syncJobArgs
     }

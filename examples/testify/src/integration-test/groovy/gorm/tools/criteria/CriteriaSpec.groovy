@@ -49,8 +49,16 @@ class CriteriaSpec extends Specification {
             "in" "flex.id", subQuery
         }
 
-        //the following query should work too
-        /*
+        List result = query.list()
+
+        then:
+        noExceptionThrown()
+        result
+    }
+
+    void "test in subquery as closure"() {
+        when:
+
         def query = Org.query {
             "in" "flex.id", {
                 gt "flex.num2", 2.0
@@ -58,13 +66,13 @@ class CriteriaSpec extends Specification {
                     property("flex.id")
                 }
             }
-        }*/
-
+        }
 
         List result = query.list()
 
         then:
         noExceptionThrown()
+        result
     }
 
     def "hibernate directly to criteria query"() {

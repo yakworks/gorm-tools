@@ -2,14 +2,12 @@ package gorm.tools.repository
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.testing.gorm.model.KitchenSink
-
-import java.time.LocalDateTime
-
 import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.testing.gorm.model.SinkExt
 import yakworks.testing.gorm.model.Thing
@@ -82,7 +80,26 @@ class HasChangedIntegrationSpec extends Specification implements DomainIntTest {
         then:
         sink.hasChanged("num")
         sink.hasChanged()
+    }
 
+    void "new instance is dirty till saved"() {
+        when: "nothing changed"
+        KitchenSink sink = new KitchenSink()
+
+        then:
+        sink.hasChanged() //this is because DirtyCheckable.hasChanged returns true if `$changedProperties` is null
+        sink.isDirty() //behavior differs from hibernate
+    }
+
+    void "new instance is not dirty after save without flush"() {
+        when:
+        KitchenSink sink = new KitchenSink(num: "123", name: "name").persist()
+
+        then:
+        //this is because `ClosureEventTriggeringInterceptor.activateDirtyChecking` gets called after hibernate saveOrUpdate event
+        //which checks if $changedProperties is null (it is null for new instance) then sets the $changedProperties to empty list
+        //saveOrUpdate event fires even if there's no flush
+        !sink.hasChanged()
     }
 
     void "PROBLEM - remains dirty untill flush"() {
@@ -102,7 +119,11 @@ class HasChangedIntegrationSpec extends Specification implements DomainIntTest {
         sink.persist()
 
         then: "not dirty after save/persist"
-        //XXX remains dirty untill we flush. but thts same behavior as hibernate's isDirty
+        //XXX remains dirty untill we flush. Its same behavior as hibernate's isDirty
+        //This is because in this case ClosureEventTriggeringInterceptor.activateDirtyChecking does not reset dirty status
+        //because $changedProperties is not null.
+        //And dirty status gets reset only after flush by `GrailsEntityDirtinessStrategy.resetDirty`
+        //Hibernate supports `CustomEntityDirtinessStrategy` grails implementation is `GrailsEntityDirtinessStrategy`
         !sink.hasChanged('name')
         !sink.hasChanged()
     }

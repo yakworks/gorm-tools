@@ -8,11 +8,13 @@ import spock.lang.Specification
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
 
+import java.time.LocalDate
+
 @Integration
 @Rollback
 class AuditStampOrgSpec extends Specification implements DataIntegrationTest, SecuritySpecHelper {
 
-    def "test create"(){
+    void "test create"(){
         when:
         println "AuditStampOrgSpec"
         Long id = Org.create([num:'123', name:"Wyatt Oil", type: OrgType.Customer]).id
@@ -41,5 +43,27 @@ class AuditStampOrgSpec extends Specification implements DataIntegrationTest, Se
         o.createdDate < o.editedDate
         //!DateUtils.isSameInstant(o.createdDate, o.editedDate)
         o.editedBy == 1
+    }
+
+    void "create and bind createdDate"() {
+        when:
+        Org org = Org.create([num:'123', name:"Wyatt Oil", type: OrgType.Customer, flex: [text1:"flex1", createdDate: "2020-01-01"],
+                              createdDate: "2020-01-01"])
+
+        then:
+        noExceptionThrown()
+        org
+        org.createdDate.toLocalDate() == LocalDate.parse("2020-01-01")
+        org.createdBy
+
+        and:
+        org.flex
+        org.flex.text1 == "flex1"
+        org.createdDate.toLocalDate() == LocalDate.parse("2020-01-01")
+        org.createdBy
+
+        and:
+        !org.hasErrors()
+        !org.flex.hasErrors()
     }
 }

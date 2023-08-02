@@ -189,8 +189,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
                 data.id = org.contact.getId()
             }
         }
-        //make sure it has the right settings
-        data.isPrimary = true
+        //this contact is already being set as org.contact, no need to send isPrimary flag
         data.orgId = org.getId()
         org.contact = contactRepo.createOrUpdateItem(data)
         return org.contact

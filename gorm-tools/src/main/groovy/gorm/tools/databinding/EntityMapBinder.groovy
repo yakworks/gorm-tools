@@ -376,7 +376,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
 
             //bind if not null, map has values other then id, and the association is owning side or bindable
             if(target[aprop] && value instanceof Map && value.size() > 1 && shouldBindAssociation(target, association)) {
-                fastBind(target[aprop], new SimpleMapDataBindingSource((Map) value))
+                fastBind(target[aprop], new SimpleMapDataBindingSource((Map) value), getBindingIncludeList(target[aprop]))
             }
 
         }
@@ -390,7 +390,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             //if its null then set it up
             if (target[aprop] == null) target[aprop] = association.type.newInstance()
             //recursive call to set the association up and assume its a map
-            fastBind(target[aprop], new SimpleMapDataBindingSource((Map) value))
+            fastBind(target[aprop], new SimpleMapDataBindingSource((Map) value), getBindingIncludeList(target[aprop]))
         }
     }
 

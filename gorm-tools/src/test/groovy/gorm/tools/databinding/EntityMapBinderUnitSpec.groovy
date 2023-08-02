@@ -454,6 +454,19 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         testDomain.notBindableNested.id == 99999
     }
 
+    void "should not bind non bindable props of nested domains"() {
+        TestDomain testDomain = new TestDomain(nested: new Nest(name:"name1", name2: "name2"))
+
+        Map params = [nested: [name: "updated", name2:"updated"]]
+
+        when:
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.nested.name == "updated"
+        testDomain.nested.name2 == "name2" //its bindable:false
+    }
+
     void "binder shouldn't bind the association if constraints doesn't contain 'bindable' and it does not belongsTo"() {
         TestDomain testDomain = new TestDomain()
         Map params = [name: 'outer', notBindable: 'notBindableTest', notBindableNested: [name: 'notBindableNested']]
@@ -631,6 +644,7 @@ enum TestEnumIdent implements IdEnum<TestEnumIdent,Long>{
 @Entity
 class AnotherDomain implements RepoEntity<AnotherDomain>{
     String name
+    String source
 }
 
 @Entity
@@ -642,7 +656,7 @@ class Nest implements RepoEntity<Nest>{
 
     static constraints = {
         name nullable: false
-        name2 nullable: true
+        name2 nullable: true, bindable:false
     }
 }
 

@@ -65,6 +65,10 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
 
     ContactSource source
 
+    //its here just for docs, we dont persist it, neither its bound during data binding etc.
+    Boolean isPrimary
+
+    static transients = ['isPrimary']
     static hasMany = [phones: ContactPhone, emails: ContactEmail]
 
     static List<String> toOneAssociations = ['flex']
@@ -97,7 +101,7 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
 
         altName:[d:'Alternate name, nickname or job name'],
         inactive:[ d:'True when not active', nullable: false],
-        // isPrimary:[ nullable: false],
+        isPrimary:[d:'Is this primary contact for org', oapi:'CU'],
 
         // isLocationDifferent:[ nullable: false],
         location:[ d:'Default location', nullable: true],

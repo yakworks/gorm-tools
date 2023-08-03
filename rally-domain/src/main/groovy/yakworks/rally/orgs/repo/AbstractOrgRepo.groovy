@@ -176,7 +176,8 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
 
     Contact createOrUpdatePrimaryContact(Org org, Map data){
         if(!data) return //exit fast if no data
-
+        //just in case isPrimary was passed in then null it out so contact doesnt try to set it again.
+        if(data.isPrimary) data.isPrimary = null
         // if org has a contact then its an update or replace
         if(org.contact) {
             //if data has id
@@ -189,7 +190,9 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
                 data.id = org.contact.getId()
             }
         }
-        //this contact is already being set as org.contact, no need to send isPrimary flag
+        //contact is already being set as primary, remove if its there so it doesnt re update the org in contactRepo
+        data.remove('isPrimary')
+
         data.orgId = org.getId()
         org.contact = contactRepo.createOrUpdateItem(data)
         return org.contact

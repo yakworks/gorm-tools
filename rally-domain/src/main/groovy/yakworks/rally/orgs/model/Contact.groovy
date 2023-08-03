@@ -65,7 +65,7 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
 
     ContactSource source
 
-    //its here just for docs, we dont persist it, neither its bound during data binding etc.
+    /** transient for isPrimary when creating or updating a contact */
     Boolean isPrimary
 
     static transients = ['isPrimary']

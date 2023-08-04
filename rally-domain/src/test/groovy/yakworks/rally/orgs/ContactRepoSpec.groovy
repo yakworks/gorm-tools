@@ -35,6 +35,25 @@ class ContactRepoSpec extends Specification implements GormHibernateTest, Securi
 
         and:
         ContactSource.countByContactId(contact.id) == 0
+        contact.org
+        contact.orgId == org.id
+        contact.org.contact == null
+    }
+
+    void "create and set as primary contact"() {
+        setup:
+        Org org = Org.of("foo", "bar", OrgType.Customer).persist()
+        Map data = [name: "C1", firstName: "C1", orgId: org.id, isPrimary:true]
+
+        when:
+        Contact contact = Contact.create(data)
+        flushAndClear()
+        contact.refresh()
+
+        then:
+        noExceptionThrown()
+        contact
+        contact.org.contact == contact
     }
 
     void "create with source"() {

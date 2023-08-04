@@ -101,9 +101,12 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
 
         altName:[d:'Alternate name, nickname or job name'],
         inactive:[ d:'True when not active', nullable: false],
-        isPrimary:[d:'Is this primary contact for org', oapi:'CU'],
-
-        // isLocationDifferent:[ nullable: false],
+        isPrimary:[d: '''\
+            Set to true is this should this be set as the primary contact for the Org.
+            Not persisted to the data store, this only serves as an instruction command when creating or updating a contact.
+            If the Org already has a primary contact set then this contact will be set as the new primary leaving the old primary contact as
+            a normal contact.
+            ''', oapi:'CU'],
         location:[ d:'Default location', nullable: true],
         phone:[ d:'Default phone'],
         email:[ d:'Default email', email: true],

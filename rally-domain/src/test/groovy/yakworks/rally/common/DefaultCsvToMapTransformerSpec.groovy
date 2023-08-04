@@ -74,6 +74,7 @@ class DefaultCsvToMapTransformerSpec extends Specification implements DataRepoTe
 
         then:
         noExceptionThrown()
+        attachment.extension == 'csv'
         attachment.resource.exists()
 
         when:

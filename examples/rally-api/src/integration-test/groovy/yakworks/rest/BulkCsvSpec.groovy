@@ -92,6 +92,9 @@ class BulkCsvSpec  extends RestIntTest {
         Attachment.withNewTransaction {
             if(attachment) attachment.remove()
             if(body.id) SyncJob.removeById(body.id as Long) //syncjob is created in new transaction
+            Contact.findAllByNumLike("bulk_").each {
+                it.remove()
+            }
         }
         if(zip.exists()) zip.delete()
     }
@@ -153,6 +156,9 @@ class BulkCsvSpec  extends RestIntTest {
         Attachment.withNewTransaction {
             if(attachment) attachment.remove()
             if(body.id) SyncJob.removeById(body.id as Long) //syncjob is created in new transaction
+            Contact.findAllByNumLike("bulk_").each {
+                it.remove()
+            }
         }
     }
 }

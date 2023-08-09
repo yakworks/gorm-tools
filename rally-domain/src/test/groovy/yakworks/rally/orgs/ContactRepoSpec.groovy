@@ -4,6 +4,7 @@ import gorm.tools.model.SourceType
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactSource
+import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.repo.ContactRepo
@@ -121,6 +122,45 @@ class ContactRepoSpec extends Specification implements GormHibernateTest, Securi
         then:
         c
         c.id == contact.id
+    }
+
+    /**
+     The problem with isDirty is : isDirty throws transient object exception if a new association is set on instance.
+     Its replaced with "hasChanged"
+
+     Here's how hasChanged works.
+
+     1.Dirty status is stored in $changedProperties which is null initially
+     2.instance.hasChanged() returns true if $changedProperties is null (thts strange)
+     3."New instance is always dirty untill saved" : That is because it has $changedProperties = null
+     4."New instance is not dirty after save, even without flush" :
+        That is because ClosureEventTriggeringInterceptor.activateDirtyChecking sets  $changedProperties to empty list if its null.
+        ClosureEventTriggeringInterceptor gets called during hibernate's saveOrUpdate event` that even fires even without flush
+     5."Existing instance is dirty untill saved with flush"
+        In this case dirty status is reset by GrailsEntityDirtinessStrategy.resetDirty which implements a CustomEntityDirtinessStrategy
+        Dirty status does not get reset during  saveOrUpdate event like in the case of new, because, ClosureEventTriggeringInterceptor does that only if changedProperties is null. and its not null in this case.
+
+     See https://github.com/yakworks/gorm-tools/pull/696
+     **/
+    void "set location on existing contact"() {
+        setup:
+        Org org = Org.of("foo", "bar", OrgType.Customer).persist()
+        Contact contact = Contact.create(firstName: 'foo', num: 'foo', orgId:org.id, sourceId:"123")
+        flushAndClear()
+
+        when:
+        contact = Contact.get(contact.id)
+
+        then:
+        !contact.location
+
+        when:
+        contact.location = new Location()
+        //contact.isDirty() this would throw TransientObjectException, and so is replaced with hasChanged
+        contact.hasChanged()
+
+        then:
+        noExceptionThrown()
     }
 
 }

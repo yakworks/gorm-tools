@@ -1,3 +1,17 @@
+### v7.3.52
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.51...v7.3.52)
+- release [link](https://github.com/yakworks/gorm-tools/commit/7b137a6c61d8999157fcba6a62a69c21424f61bd)
+- Merge pull request #715 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/8b9e214d670fb1b3a798e3e52f1e5437b163ad90)
+- test for hasChanged and isDirty (#696) [link](https://github.com/yakworks/gorm-tools/commit/f5680d6ab788beac3ea51151c8fd7572ca68ccb1)
+- Allow csv for bulk instead of only zip (#711) [link](https://github.com/yakworks/gorm-tools/commit/b0b399cb7ad84089e33267eb0a6b402a1ade836b)
+- Misc refactors (#710) [link](https://github.com/yakworks/gorm-tools/commit/1fe0ef6916718971f4ddefc2eb63de619d19cd1a)
+- 9ci/cust-rndc-ext#174 set contact as primary contact - if isPrimary=true (#709) [link](https://github.com/yakworks/gorm-tools/commit/ecd121099e50bd987f8b4c9ff224a9b249f20368)
+- Data binder fix  (#708) [link](https://github.com/yakworks/gorm-tools/commit/cbe6b520a2b1a5081a0a352140df53fb3fcac70b)
+- Api generator fix : handle space without any entities (#707) [link](https://github.com/yakworks/gorm-tools/commit/bfccba7479f3f23f2c154cb42d3089a0dd8d2f15)
+- uuid fix (#705) [link](https://github.com/yakworks/gorm-tools/commit/4da93f25847b46ce9dcb2851932f57c1b28b3064)
+- 9ci/domain9#2085 Add helper to setup syncjob args and make consitent.  (#700) [link](https://github.com/yakworks/gorm-tools/commit/ab7860d3c6e6cc206d27a55c8f7b7ce2eb6c5f1a)
+
 ### v7.3.51
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.50...v7.3.51)

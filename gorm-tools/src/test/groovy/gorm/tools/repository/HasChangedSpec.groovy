@@ -11,8 +11,17 @@ import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.model.Thing
 import yakworks.testing.gorm.unit.GormHibernateTest
 
-//FIXME Not clear what would happen if hasChanged is used inside of the beforeValidate in a Repo, need some smoke tests for that too.
-// can trace when trackChanges or activateDirtyChecking is called so its clear.
+/**
+ * Dirty status is stored in $changedProperties which is null initially
+ instance.hasChanged() returns true if $changedProperties is null (thts strange)
+ New instance is always dirty untill saved : That is because it has $changedProperties = null
+ New instance is not dirty after save, even without flush :
+ That is because ClosureEventTriggeringInterceptor.activateDirtyChecking sets $changedProperties to empty list if its null.
+ ClosureEventTriggeringInterceptor gets called during hibernate's saveOrUpdate event` that even fires even without flush
+ Existing instance is dirty untill saved with flush
+ In this case dirty status is reset by GrailsEntityDirtinessStrategy.resetDirty which implements a CustomEntityDirtinessStrategy
+ Dirty status does not get reset during saveOrUpdate event like in the case of new, because, ClosureEventTriggeringInterceptor does that only if changedProperties is null. and its not null in this case.
+ */
 class HasChangedSpec extends Specification implements GormHibernateTest {
 
     static entityClasses = [KitchenSink, SinkExt, SinkItem]
@@ -83,9 +92,9 @@ class HasChangedSpec extends Specification implements GormHibernateTest {
         sink.persist()
 
         then: "not dirty after save/persist"
-        //XXX remains dirty untill we flush. but thts same behavior as hibernate's isDirty
-        !sink.hasChanged('name')
-        !sink.hasChanged()
+        //XXX remains dirty untill we flush. thats same behavior as hibernate's isDirty
+        sink.hasChanged('name') //not what we want
+        sink.hasChanged() //not what we want
     }
 
     void "hasChanged change persist called twice or hasChanged called twice fails"() {

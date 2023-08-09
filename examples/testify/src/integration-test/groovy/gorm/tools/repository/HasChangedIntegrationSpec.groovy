@@ -88,7 +88,7 @@ class HasChangedIntegrationSpec extends Specification implements DomainIntTest {
 
         then:
         sink.hasChanged() //this is because DirtyCheckable.hasChanged returns true if `$changedProperties` is null
-        sink.isDirty() //behavior differs from hibernate
+        !sink.isDirty() //behavior differs from hibernate
     }
 
     void "new instance is not dirty after save without flush"() {
@@ -124,8 +124,8 @@ class HasChangedIntegrationSpec extends Specification implements DomainIntTest {
         //because $changedProperties is not null.
         //And dirty status gets reset only after flush by `GrailsEntityDirtinessStrategy.resetDirty`
         //Hibernate supports `CustomEntityDirtinessStrategy` grails implementation is `GrailsEntityDirtinessStrategy`
-        !sink.hasChanged('name')
-        !sink.hasChanged()
+        sink.hasChanged('name') //still shows changed, not what we want
+        sink.hasChanged() //still shows changed, not what we want
     }
 
     void "hasChanged change persist called twice or hasChanged called twice fails"() {

@@ -92,7 +92,73 @@ class BulkCsvSpec  extends RestIntTest {
         Attachment.withNewTransaction {
             if(attachment) attachment.remove()
             if(body.id) SyncJob.removeById(body.id as Long) //syncjob is created in new transaction
+            Contact.findAllByNumLike("bulk_").each {
+                it.remove()
+            }
         }
         if(zip.exists()) zip.delete()
+    }
+
+    void "test upload single csv file for bulk process"() {
+
+        when: "create attachment"
+        def csvFile = BuildSupport.rootProjectPath.resolve("examples/resources/csv/contact.csv")
+        Map params = [name: csvFile.fileName.toString(), sourcePath: csvFile]
+        Attachment attachment
+        Attachment.withNewTransaction {
+            attachment = Attachment.create(params)
+        }
+        RepoUtil.flush()
+
+        then: "make sure attachment is good"
+        noExceptionThrown()
+        attachment != null
+        attachment.id != null
+        attachment.resource.getFile().exists()
+
+        when:
+        controller.params.attachmentId = attachment.id
+        controller.params['async'] = false //disable promise for test
+        controller.params['saveDataAsFile'] = true //write to file
+
+        controller.bulkCreate()
+        Map body = response.bodyToMap()
+
+        then:
+        body != null
+        body.state == "Finished"
+        body.ok == true
+        body.id != null
+
+        and: "sanity check response"
+        body.data instanceof Collection
+        body.data[0].ok == true
+        body.data[0].data instanceof Map
+        body.data[0].data.num == "bulk1"
+
+        when: "Verify db records"
+        List<Contact> created = Contact.findAllByNumLike("bulk_")
+
+        then:
+        3 == created.size()
+        created[0].num == "bulk1"
+        created[0].orgId == 1
+
+        when: "Verify syncjob"
+        SyncJob syncJob =  SyncJob.get(body.id as Long)
+
+        then:
+        syncJob  != null
+        syncJob.dataId != null //should have been set for bulk csv.
+
+        cleanup: "cleanup db"
+        attachmentRepo.removeById(syncJob.dataId as Long)
+        Attachment.withNewTransaction {
+            if(attachment) attachment.remove()
+            if(body.id) SyncJob.removeById(body.id as Long) //syncjob is created in new transaction
+            Contact.findAllByNumLike("bulk_").each {
+                it.remove()
+            }
+        }
     }
 }

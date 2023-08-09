@@ -136,7 +136,7 @@ class GormMetaUtils {
         else if(!proxyHandler.isInitialized(entity)){
             return false
         } else {
-            return entity.isDirty() || ((Persistable)entity).isNew()
+            return entity.hasChanged() || ((Persistable)entity).isNew()
         }
 
     }

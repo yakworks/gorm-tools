@@ -136,7 +136,7 @@ class ContactRepo extends LongIdGormRepo<Contact> {
 
     @RepoListener
     void afterPersist(Contact contact, AfterPersistEvent e) {
-        if (contact.location?.isDirty()) contact.location.persist()
+        if (contact.location?.hasChanged()) contact.location.persist()
         syncChangesToUser(contact)
     }
 
@@ -183,13 +183,13 @@ class ContactRepo extends LongIdGormRepo<Contact> {
     void syncChangesToUser(Contact contact){
         AppUser user = contact.user
         if(user){
-            if(contact.isDirty('email')){
+            if(contact.hasChanged('email')){
                 user.email = contact.email
             }
-            if(contact.isDirty('name') && contact.user.name != contact.name){
+            if(contact.hasChanged('name') && contact.user.name != contact.name){
                 user.name = contact.name
             }
-            if(user.isDirty()) user.persist()
+            if(user.hasChanged()) user.persist()
         }
     }
 

@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 import groovy.transform.CompileStatic
 
+import org.apache.commons.lang3.StringUtils
 import org.grails.core.artefact.AnnotationDomainClassArtefactHandler
 import org.grails.core.artefact.DomainClassArtefactHandler
 import org.grails.core.exceptions.GrailsConfigurationException
@@ -348,8 +349,8 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             String sval = value as String
             //if its an empty string then its nothing so return
             if(!sval.trim()) return
-            //convert to long
-            value = sval as Long
+            //convert to long if its numeric
+            if(StringUtils.isNumeric(sval.trim())) value = sval as Long
         }
 
         // if its a number then its the identifier so set it
@@ -358,7 +359,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             return
         }
 
-        //at this point if its assumed the value is mostlikely a Map or some object with and id property
+        //at this point if its assumed the value is mostlikely a Map or some object with an id property or maybe a UUID
         Object idValue = isDomainClass(value.getClass()) ? value['id'] : getIdentifierValueFrom(value)
         idValue = idValue == 'null' ? null : idValue
 
@@ -375,7 +376,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
 
             //bind if not null, map has values other then id, and the association is owning side or bindable
             if(target[aprop] && value instanceof Map && value.size() > 1 && shouldBindAssociation(target, association)) {
-                fastBind(target[aprop], new SimpleMapDataBindingSource((Map) value))
+                fastBind(target[aprop], new SimpleMapDataBindingSource((Map) value), getBindingIncludeList(target[aprop]))
             }
 
         }
@@ -389,7 +390,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             //if its null then set it up
             if (target[aprop] == null) target[aprop] = association.type.newInstance()
             //recursive call to set the association up and assume its a map
-            fastBind(target[aprop], new SimpleMapDataBindingSource((Map) value))
+            fastBind(target[aprop], new SimpleMapDataBindingSource((Map) value), getBindingIncludeList(target[aprop]))
         }
     }
 

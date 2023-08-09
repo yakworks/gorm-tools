@@ -7,6 +7,7 @@ package yakworks.testing.gorm.model
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import gorm.tools.repository.GormRepository
@@ -27,6 +28,8 @@ import yakworks.commons.lang.IsoDateUtil
 @GormRepository
 @CompileStatic
 class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
+    //for unit tests,
+    static boolean doTestAuditStamp = true
 
     //used for testing and cleanupSpec since gorm spock nulls out appCtx and cant get to it in there.
     static KitchenSinkRepo INSTANCE
@@ -104,11 +107,17 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
         if(data.sinkItems) super.persistToManyData(kitchenSink, SinkItem.repo, data.sinkItems as List<Map>, "kitchenSink")
     }
 
-    void auditStamp(Object ent){
-        ent['createdBy'] = 1
-        ent['createdDate'] = LocalDateTime.now()
-        ent['editedBy'] = 1
-        ent['editedDate'] = LocalDateTime.now()
+    //USED FOR UNIT TESTS
+    static void auditStamp(KitchenSink ent){
+        if(!doTestAuditStamp) return
+        if( ent.isNew()) {
+            ent['createdBy'] = 1
+            ent['createdDate'] = LocalDateTime.now()
+        }
+        if(ent.hasChanged()) {
+            ent['editedBy'] = 1
+            ent['editedDate'] = LocalDateTime.now()
+        }
     }
 
     KitchenSink build(Long id, boolean flushIt = true){

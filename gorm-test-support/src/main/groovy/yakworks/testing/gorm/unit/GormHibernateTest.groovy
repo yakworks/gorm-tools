@@ -26,11 +26,11 @@ import gorm.tools.jdbc.DbDialectService
 import spock.lang.AutoCleanup
 import spock.lang.Shared
 import yakworks.commons.lang.PropertyTools
+import yakworks.gorm.boot.SpringBeanUtils
 import yakworks.testing.gorm.TestTools
 import yakworks.testing.gorm.support.BaseRepoEntityUnitTest
 import yakworks.testing.gorm.support.RepoTestDataBuilder
 import yakworks.testing.grails.GrailsAppUnitTest
-import yakworks.testing.grails.SpringBeanUtils
 
 /**
  * Can be a drop in replacement for the HibernateSpec. Makes sure repositories are setup for the domains

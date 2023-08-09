@@ -10,6 +10,8 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation to marks a Repository artifact when not under grails-app/repo
+ * AST tranform will also add the Spring @Component annotation so that it gets picked up on a scan
+ * as well as the @Artefact that grails uses and needs for artifacts.
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.1

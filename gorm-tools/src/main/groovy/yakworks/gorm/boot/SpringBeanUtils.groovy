@@ -19,30 +19,6 @@ import gorm.tools.repository.model.UuidRepoEntity
 class SpringBeanUtils {
 
     /**
-     * creates the GormRepo bean definitions in the registry for the entityClasses.
-     * Checks to see if a bean name for the repo already exists and does nothing if so.
-     * Otherwise registers a DefaultGormRepo or UuidGormRepo depending interfaces assigned to entityClass
-     */
-    static void registerRepos(BeanDefinitionRegistry registry, List<Class<?>> entityClasses) {
-        for(Class entityClass: entityClasses){
-            String repoName = RepoLookup.getRepoBeanName(entityClass)
-            // def hasRepo = repoClasses.find { NameUtils.getPropertyName(it.simpleName) == repoName }
-            if (!registry.containsBeanDefinition(repoName)) {
-                Class repoClass = DefaultGormRepo
-                if(UuidRepoEntity.isAssignableFrom(entityClass)) {
-                    repoClass = UuidGormRepo
-                }
-                // newRepoBeanMap[repoName] = [repoClass, entityClass]
-                var bdef = BeanDefinitionBuilder.rootBeanDefinition(repoClass)
-                    .addConstructorArgValue(entityClass)
-                    .setLazyInit(true)
-                    .getBeanDefinition()
-                registry.registerBeanDefinition(repoName, bdef)
-            }
-        }
-    }
-
-    /**
      * Uses the beanDefMap to setup beans. similiar to the BeanBuilder but doesnt require closures.
      * The key of of the beanDefMap is the bean name and the value is the Class or a List.
      * If its a List then the first item is the Class and the remianing items are what to pass to the constructor args.
@@ -68,6 +44,30 @@ class SpringBeanUtils {
                 throw new IllegalArgumentException("bean map value must either be a class or a list where arg[0] is class and the rest are const args")
             }
             beanDefinitionRegistry.registerBeanDefinition(beanName, bdef)
+        }
+    }
+
+    /**
+     * creates the GormRepo bean definitions in the registry for the entityClasses.
+     * Checks to see if a bean name for the repo already exists and does nothing if so.
+     * Otherwise registers a DefaultGormRepo or UuidGormRepo depending interfaces assigned to entityClass
+     */
+    static void registerRepos(BeanDefinitionRegistry registry, List<Class<?>> entityClasses) {
+        for(Class entityClass: entityClasses){
+            String repoName = RepoLookup.getRepoBeanName(entityClass)
+            // def hasRepo = repoClasses.find { NameUtils.getPropertyName(it.simpleName) == repoName }
+            if (!registry.containsBeanDefinition(repoName)) {
+                Class repoClass = DefaultGormRepo
+                if(UuidRepoEntity.isAssignableFrom(entityClass)) {
+                    repoClass = UuidGormRepo
+                }
+                // newRepoBeanMap[repoName] = [repoClass, entityClass]
+                var bdef = BeanDefinitionBuilder.rootBeanDefinition(repoClass)
+                    .addConstructorArgValue(entityClass)
+                    .setLazyInit(true)
+                    .getBeanDefinition()
+                registry.registerBeanDefinition(repoName, bdef)
+            }
         }
     }
 

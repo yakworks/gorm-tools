@@ -102,7 +102,9 @@ class OpenApiGenerator implements ConfigAware {
         Map groupedPaths = apiConfig.paths.groupBy { it.value.namespace }
 
         for(ns in namespaces){
-            Map sortedPathz = groupedPaths[ns.key].sort{ it.key }
+            //it is possible that there are no entities under a space, eg "reports"
+            Map spacePaths = groupedPaths[ns.key] ?: [:]
+            Map sortedPathz = spacePaths.sort{ it.key }
             for(entry in sortedPathz){
                 PathItem pathItem = (PathItem)entry.value
                 String endpoint = pathItem.name

@@ -136,4 +136,5 @@ trait SyncJobService<D> {
     Long runJob(SyncJobContext jobContext, Runnable runnable) {
         return runJob(jobContext.args.asyncArgs, jobContext, runnable)
     }
+
 }

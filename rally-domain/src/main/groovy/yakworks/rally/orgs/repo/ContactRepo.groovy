@@ -40,6 +40,7 @@ import yakworks.security.gorm.model.AppUser
 @GormRepository
 @CompileStatic
 class ContactRepo extends LongIdGormRepo<Contact> {
+    private static final String IS_PRIMARY = "isPrimary"
 
     //Making this nullable makes it easier to wire up for tests.
     @Inject @Nullable
@@ -135,7 +136,7 @@ class ContactRepo extends LongIdGormRepo<Contact> {
 
     @RepoListener
     void afterPersist(Contact contact, AfterPersistEvent e) {
-        if (contact.location?.isDirty()) contact.location.persist()
+        if (contact.location?.hasChanged()) contact.location.persist()
         syncChangesToUser(contact)
     }
 
@@ -147,7 +148,11 @@ class ContactRepo extends LongIdGormRepo<Contact> {
     @Override
     void doAfterPersistWithData(Contact contact, PersistArgs args) {
         Map data = args.data
-
+        if(data.getBoolean(IS_PRIMARY)) {
+            Org org = Org.get(contact.orgId)
+            org.contact = contact
+            org.persist()
+        }
         if(data.locations) super.persistToManyData(contact, Location.repo, data.locations as List<Map>, "contact")
         if(data.phones) super.persistToManyData(contact, ContactPhone.repo, data.phones as List<Map>, "contact")
         if(data.emails) super.persistToManyData(contact, ContactEmail.repo, data.emails as List<Map>, "contact")
@@ -178,13 +183,13 @@ class ContactRepo extends LongIdGormRepo<Contact> {
     void syncChangesToUser(Contact contact){
         AppUser user = contact.user
         if(user){
-            if(contact.isDirty('email')){
+            if(contact.hasChanged('email')){
                 user.email = contact.email
             }
-            if(contact.isDirty('name') && contact.user.name != contact.name){
+            if(contact.hasChanged('name') && contact.user.name != contact.name){
                 user.name = contact.name
             }
-            if(user.isDirty()) user.persist()
+            if(user.hasChanged()) user.persist()
         }
     }
 

@@ -70,8 +70,7 @@ class Org implements NameNum, RepoEntity<Org>, HasTags, CreateCriteriaSupport, S
         location:[ description: 'The primary organization address info',
                    bindable: false, oapi:[read: true, edit: ['$ref']]
         ],
-        calc:[ description: 'Calculated fields',
-               bindable: false, editable: false],
+        calc:[ description: 'Calculated fields', bindable: false, editable: false],
         member:[ description: 'Dimension hierarchy fields',
                  bindable: false, oapi:[read: true, edit: ['$ref']]
         ],

@@ -19,6 +19,7 @@ import grails.spring.BeanBuilder
 import grails.util.Holders
 import grails.validation.DeferredBindingActions
 import yakworks.commons.lang.PropertyTools
+import yakworks.gorm.boot.SpringBeanUtils
 
 /**
  * replacement of the GrailUnitTest and adds the following

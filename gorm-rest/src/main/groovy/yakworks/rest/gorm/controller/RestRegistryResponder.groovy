@@ -89,7 +89,7 @@ trait RestRegistryResponder {
         RendererRegistry registry = rendererRegistry
         if (registry == null) throw new IllegalArgumentException("Houston we have a problem, no rendererRegistry")
 
-        Renderer renderer = null
+        Renderer renderer
 
         for(MimeType mimeType in mimeTypes) {
             if (mimeType == MimeType.ALL && formats) {
@@ -129,7 +129,7 @@ trait RestRegistryResponder {
         final ServletRenderContext context = new ServletRenderContext(webRequest, args)
         if(statusCode != null) context.status = HttpStatus.valueOf(statusCode)
 
-        renderer.render(value, context)
+        ((Renderer<Object>)renderer).render(value, context)
 
         // BenchmarkHelper.printEndTimeMsg("${renderer.class} render")
 

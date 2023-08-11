@@ -46,7 +46,7 @@ class XlsxSpreadsheetBuilder {
         // BenchmarkHelper.startTime()
         Map<String, Object> firstRow = dataList[0] as Map<String, Object>
         Map flatRow = flattenMap(firstRow)
-        headers = flatRow.keySet()
+        headers = flatRow.keySet() as Set<String>
 
         SpreadsheetBuilder sb = PoiSpreadsheetBuilder.create(outputStream)
         // def psb = new PoiSpreadsheetBuilder(new XSSFWorkbook(), out)

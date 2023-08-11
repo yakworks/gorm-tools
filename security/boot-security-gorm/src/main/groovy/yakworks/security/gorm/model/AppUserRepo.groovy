@@ -197,7 +197,7 @@ class AppUserRepo implements GormRepo<AppUser> {
         }
         if (addition?.size() > 0) {
             addition.each { Long id ->
-                SecRoleUser.create(user, SecRole.findById(id) as SecRole)
+                SecRoleUser.create(user, SecRole.load(id) as SecRole)
             }
         }
 

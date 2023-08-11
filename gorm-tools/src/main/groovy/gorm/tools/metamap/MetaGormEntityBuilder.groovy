@@ -186,7 +186,7 @@ class MetaGormEntityBuilder {
         //XXX WHY DO WE RETURN NULL?
         if (!metaEntity.metaProps)  return null //throw new IllegalArgumentException("includes must be bad, includes: ${includes}")
 
-        if(blacklist) metaEntity.addBlacklist(blacklist)
+        if(blacklist) metaEntity.addBlacklist(blacklist as Set<String>)
         //if it has nestedProps then go recursive
         if(nestedProps){
             buildNested(nestedProps)

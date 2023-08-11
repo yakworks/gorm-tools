@@ -64,7 +64,7 @@ class CSVPathKeyMapReader extends CSVReaderHeaderAware {
      * @return the list of maps for entire file
      */
     List<Map<String, Object>> readAllRows() {
-        List result = []
+        List result = [] as List<Map<String, Object>>
         while (hasNext) {
             Map r = readMap()
             if(r) result << r

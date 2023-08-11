@@ -1,3 +1,10 @@
+### v7.3.53
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.52...v7.3.53)
+- Merge pull request #716 from yakworks/thread-safe-ComboKeyExistsQuery [link](https://github.com/yakworks/gorm-tools/commit/c14ccfecf901dca0fdcf1e3e226987cb922eacdd)
+- prep for release [link](https://github.com/yakworks/gorm-tools/commit/a2f20b6fb98d776f8dde388f2c649b96324443fc)
+- make ComboKeyExistsQuery, build the string each call, will be fast and no need to cache it. [link](https://github.com/yakworks/gorm-tools/commit/9faee6bef1e6fe147d25f36393521d55f12d1907)
+
 ### v7.3.52
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.51...v7.3.52)

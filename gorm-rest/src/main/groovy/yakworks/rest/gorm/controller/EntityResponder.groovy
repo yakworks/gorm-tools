@@ -118,7 +118,7 @@ class EntityResponder<D> {
             if (pathItem?.qRequired) qargs.qRequired = true
             qargs = qargs.build(parms)
             qargs.validateQ()
-            if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.criteria}")
+            if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.buildCriteria()}")
             ((QueryMangoEntityApi) getRepo()).queryList(qargs, null, debugEnabled ? log : null)
         } catch (JsonException | IllegalArgumentException | QueryException ex) {
             //See #1925 - Catch bad query in 'q' parameter and report back. So we dont pollute logs, and can differentiate that its not us.

@@ -12,6 +12,7 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.util.ClassUtils
 import org.springframework.util.ReflectionUtils
 import org.springframework.validation.Errors
 
@@ -19,7 +20,6 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
-import gorm.tools.repository.RepoUtil
 import yakworks.spring.AppCtx
 
 /**
@@ -63,7 +63,13 @@ class RepoEventPublisher {
 
     void cacheEventsMethods(Class repoClass) {
         Map<String, Method> eventMethodMap = new ConcurrentHashMap<>()
-        repoEventMethodCache.put(repoClass.simpleName, eventMethodMap)
+
+        //Gives the original repo class name in case it was proxied by spring (eg because pf Cacheable or other spring annotations)
+        //Otherwise at the time of publishing events, it would not be able to find event methods from repo
+        //See `invokeEventMethod` below which would otherwise fail to find cached event methods
+        String className = ClassUtils.getUserClass(repoClass).simpleName
+
+        repoEventMethodCache.put(className, eventMethodMap)
 
         RepositoryEventType.values().each { RepositoryEventType et ->
             findAndCacheEventMethods(et.eventKey, repoClass, eventMethodMap)
@@ -71,7 +77,7 @@ class RepoEventPublisher {
     }
 
     private void findAndCacheEventMethods(String eventKey, Class repoClass, Map<String, Method> events) {
-        Method method = ReflectionUtils.findMethod(repoClass, eventKey, null)
+        Method method = ReflectionUtils.findMethod(ClassUtils.getUserClass(repoClass), eventKey, null)
         RepoListener ann = method?.getAnnotation(RepoListener)
         if (method != null && ann)
             events[eventKey] = method
@@ -93,7 +99,7 @@ class RepoEventPublisher {
 //    }
 
     void invokeEventMethod(GormRepo repo, String eventKey, Object... methodArgs) {
-        Map<String, Method> eventMethodMap = repoEventMethodCache.get(repo.class.simpleName)
+        Map<String, Method> eventMethodMap = repoEventMethodCache.get(ClassUtils.getUserClass(repo.class).simpleName)
         //if (!eventMethodMap) return //eventMethodMap = cacheEventsMethods(repo.class)
         Method method = eventMethodMap?.get(eventKey)
         if (!method) return

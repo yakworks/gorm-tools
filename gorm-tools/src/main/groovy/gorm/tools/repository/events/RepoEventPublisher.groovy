@@ -54,7 +54,7 @@ class RepoEventPublisher {
         if(!repoBeans) return
         //def repoBeanClasses = RepoUtil.getRepoClasses()
         //DefaultGormRepo are set up automatically for an Entity and wont have event methods.
-        List<Class<?>> repoBeanClasses = repoBeans.collect{ it.class }.findAll{ it != DefaultGormRepo }
+        List<Class<?>> repoBeanClasses = repoBeans.collect{ getRepoClass(it.class) }.findAll{ it != DefaultGormRepo }
 
         for (Class repoClass : repoBeanClasses) {
             cacheEventsMethods(repoClass)
@@ -64,10 +64,7 @@ class RepoEventPublisher {
     void cacheEventsMethods(Class repoClass) {
         Map<String, Method> eventMethodMap = new ConcurrentHashMap<>()
 
-        //Gives the original repo class name in case it was proxied by spring (eg because pf Cacheable or other spring annotations)
-        //Otherwise at the time of publishing events, it would not be able to find event methods from repo
-        //See `invokeEventMethod` below which would otherwise fail to find cached event methods
-        String className = ClassUtils.getUserClass(repoClass).simpleName
+        String className = repoClass.simpleName
 
         repoEventMethodCache.put(className, eventMethodMap)
 
@@ -77,7 +74,7 @@ class RepoEventPublisher {
     }
 
     private void findAndCacheEventMethods(String eventKey, Class repoClass, Map<String, Method> events) {
-        Method method = ReflectionUtils.findMethod(ClassUtils.getUserClass(repoClass), eventKey, null)
+        Method method = ReflectionUtils.findMethod(repoClass, eventKey, null)
         RepoListener ann = method?.getAnnotation(RepoListener)
         if (method != null && ann)
             events[eventKey] = method
@@ -99,7 +96,7 @@ class RepoEventPublisher {
 //    }
 
     void invokeEventMethod(GormRepo repo, String eventKey, Object... methodArgs) {
-        Map<String, Method> eventMethodMap = repoEventMethodCache.get(ClassUtils.getUserClass(repo.class).simpleName)
+        Map<String, Method> eventMethodMap = repoEventMethodCache.get(getRepoClass(repo.class).simpleName)
         //if (!eventMethodMap) return //eventMethodMap = cacheEventsMethods(repo.class)
         Method method = eventMethodMap?.get(eventKey)
         if (!method) return
@@ -147,6 +144,15 @@ class RepoEventPublisher {
         def event = new AfterRemoveEvent<D>(repo, entity, args)
         publishEvents(repo, event, [entity, event] as Object[])
 
+    }
+
+    /**
+     * Unwraps the proxy and gives the original repo class
+     * If repo class is a spring proxy (eg because of @Cacheable etc) it would not be able to find event methods
+     * See `findAndCacheEventMethods` & `invokeEventMethod` which would otherwise fail to find event methods
+     */
+    Class getRepoClass(Class clazz) {
+        return ClassUtils.getUserClass(clazz)
     }
 
 //    private void findAndCacheListenerAnnotations(Class repoClass, Map<String, Method> listenerMethodMad) {

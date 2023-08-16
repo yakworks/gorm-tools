@@ -63,10 +63,7 @@ class RepoEventPublisher {
 
     void cacheEventsMethods(Class repoClass) {
         Map<String, Method> eventMethodMap = new ConcurrentHashMap<>()
-
-        String className = repoClass.simpleName
-
-        repoEventMethodCache.put(className, eventMethodMap)
+        repoEventMethodCache.put(repoClass.simpleName, eventMethodMap)
 
         RepositoryEventType.values().each { RepositoryEventType et ->
             findAndCacheEventMethods(et.eventKey, repoClass, eventMethodMap)

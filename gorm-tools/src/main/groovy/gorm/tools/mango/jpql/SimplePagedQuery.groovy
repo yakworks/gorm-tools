@@ -30,6 +30,13 @@ class SimplePagedQuery {
     // org.hibernate.query.Query query
     HibernateGormStaticApi staticApi
     GrailsHibernateTemplate hibernateTemplate
+
+    /**
+     * The aliases we created.
+     * for example a projection:['amount':'sum'] will get an alias of 'amount_sum',
+     * we remove that _sum suffix automatically because its set in the systemAliases.
+     * but if we did projection:['amount as amount_totals':'sum'] then that is user specified. we dont want to remove the _totals suffix.
+     */
     List<String> systemAliases = [] as List<String>
 
     SimplePagedQuery(GormStaticApi staticApi) {
@@ -85,9 +92,9 @@ class SimplePagedQuery {
             populateQueryArguments(q, params)
             populateQueryArguments(q, args)
             populateQueryWithNamedArguments(q, params)
-            //sets the transformer to remove the _sum, _avg, etc..
-            //TODO make this smarter so it only removes the system created projections
-            q.setResultTransformer(AliasProjectionResultTransformer.INSTANCE)
+            //sets the transformer to remove the _sum, _avg, etc.. systemAliases
+            // q.setResultTransformer(AliasProjectionResultTransformer.INSTANCE)
+            q.setResultTransformer(new AliasProjectionResultTransformer(systemAliases))
 
             def qry = createHqlQuery(session, q)
             def list = qry.list()

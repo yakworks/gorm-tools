@@ -5,8 +5,7 @@
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package gorm.tools.mango.hibernate;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import org.hibernate.transform.AliasedTupleSubsetResultTransformer;
 import org.hibernate.transform.ResultTransformer;
 
@@ -18,13 +17,22 @@ import org.hibernate.transform.ResultTransformer;
  */
 public class AliasProjectionResultTransformer extends AliasedTupleSubsetResultTransformer {
 
+    java.util.List<String> includeAliases = new ArrayList<String>();
+
 	public static final AliasProjectionResultTransformer INSTANCE = new AliasProjectionResultTransformer();
 
 	/**
 	 * Disallow instantiation of AliasToEntityMapResultTransformer.
 	 */
-	private AliasProjectionResultTransformer() {
+	public AliasProjectionResultTransformer() {
 	}
+
+    /**
+     * Disallow instantiation of AliasToEntityMapResultTransformer.
+     */
+    public AliasProjectionResultTransformer(java.util.List<String> includeAliases ) {
+        this.includeAliases = includeAliases;
+    }
 
     /**
      * removes evrything after the last _ thats in the projectionList
@@ -39,14 +47,17 @@ public class AliasProjectionResultTransformer extends AliasedTupleSubsetResultTr
 			String alias = aliases[i];
 			if ( alias != null ) {
 				result.put( getKeyName(alias), tuple[i] );
-			}
+			} else {
+                //for null just label it wil the index
+                result.put( "null"+(i+1), tuple[i] );
+            }
 		}
 		return result;
 	}
 
     String getKeyName(String alias){
         int endIndex = alias.lastIndexOf("_");
-        if (endIndex != -1) {
+        if (includeAliases.contains(alias) && endIndex != -1) {
             alias = alias.substring(0, endIndex); // not forgot to put check if(endIndex != -1)
         }
         return alias;

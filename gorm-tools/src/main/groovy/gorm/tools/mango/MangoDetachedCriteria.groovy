@@ -48,7 +48,13 @@ import yakworks.commons.lang.NameUtils
 class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
     Map<String, String> propertyAliases = [:]
-    //auto system created aliases, tracked so we can remove the _sum, _avg, etc.. suffixes in the result transformer
+
+    /**
+     * auto system created aliases, The aliases we created to make them unique and usable in filters.
+     * for example a projection:['amount':'sum'] will get an alias of 'amount_sum',
+     * we remove that _sum suffix automatically because its set in the systemAliases.
+     * but if we did projection:['amount as amount_totals':'sum'] then that is user specified. we dont want to remove the _totals suffix.
+     */
     List<String> systemAliases = [] as List<String>
 
     /**
@@ -135,7 +141,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      */
     MangoDetachedCriteria<T> where(Map additionalQuery) {
         MangoDetachedCriteria<T> newQuery = (MangoDetachedCriteria<T>)clone()
-        new MangoBuilder().applyMapOrList(newQuery, [name2: 'foo'])
+        new MangoBuilder().applyMapOrList(newQuery, additionalQuery)
         return newQuery
     }
 
@@ -463,7 +469,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
             aliasKey = "${key}_${p}"
             propertyAliases[aliasKey] = parts[1].trim()
         } else {
-            //if no key its groupby so just return it
+            //if no key its a groupby so just return it
             if(!key) return p
             String alas = p.replace('.', '_')
             alas = "${alas}_${key.toLowerCase()}"

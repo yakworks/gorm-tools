@@ -1,11 +1,14 @@
 package gorm.tools.mango.jpql
 
+import javax.persistence.criteria.JoinType
+
 import gorm.tools.mango.MangoBuilder
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
 import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.testing.gorm.model.KitchenSink
+import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 
@@ -14,10 +17,21 @@ import yakworks.testing.gorm.unit.GormHibernateTest
  */
 class JpqlQueryBuilderSelectClosureSpec extends Specification implements GormHibernateTest  {
 
-    static List entityClasses = [KitchenSink]
+    static List entityClasses = [KitchenSink, SinkItem]
 
     String strip(String val){
         val.stripIndent().replace('\n',' ').trim()
+    }
+
+    void setupSpec(){
+        KitchenSink.withTransaction {
+            KitchenSink.repo.createKitchenSinks(10)
+            assert KitchenSink.get(1)
+            def list = KitchenSink.list()
+            assert list
+            assert KitchenSink.findWhere(num: '1')
+            flushAndClear()
+        }
     }
 
     void "Test build simple select hibernate compatible"() {
@@ -282,17 +296,18 @@ class JpqlQueryBuilderSelectClosureSpec extends Specification implements GormHib
                 gt("amount", 0.0)
                 eq("kind", KitchenSink.Kind.CLIENT)
             }
+            join("sinkLink", JoinType.LEFT)
         }
 
         when:"A jpa query is built"
-        def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
+        def builder = JpqlQueryBuilder.of(criteria) //.aliasToMap(true)
         def queryInfo = builder.buildSelect()
         def query = queryInfo.query
 
         then:"The query is valid"
         query != null
         query == strip("""\
-        SELECT new map( MAX(kitchenSink.sinkLink.amount) as maxam, kitchenSink.ext.name as name )
+        SELECT MAX(kitchenSink.sinkLink.amount) as maxam, kitchenSink.ext.name as name
         FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
         WHERE (kitchenSink.sinkLink.amount > :p1 AND kitchenSink.sinkLink.kind=:p2)
         GROUP BY kitchenSink.ext.name
@@ -320,5 +335,37 @@ class JpqlQueryBuilderSelectClosureSpec extends Specification implements GormHib
         then:"The query is valid"
         query != null
         query == 'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE (kitchenSink.name=:p1)'
+    }
+
+    void "Test select using property method"() {
+        given:"Some criteria"
+
+        def criteria = KitchenSink.query(null).property("id").property("name")
+
+        //produces same thing if we do
+        //def criteria = KitchenSink.query(null).distinct("id").distinct("name")
+
+        // this does not work for some reason
+        // def criteria = KitchenSink.query{
+        //     property("id")
+        //     property("name")
+        // }
+
+        when:
+        def builder = JpqlQueryBuilder.of(criteria)
+        //builder.hibernateCompatible = true
+        JpqlQueryInfo queryInfo = builder.buildSelect()
+
+        then:
+        queryInfo.query == strip("""
+            SELECT kitchenSink.id as id, kitchenSink.name as name
+            FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
+            GROUP BY kitchenSink.id,kitchenSink.name
+        """)
+
+        List<Map> list = criteria.mapList()
+        list.size() == 10
+        list[0].id == 1
+        list[0].name == 'Blue Cheese'
     }
 }

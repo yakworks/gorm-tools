@@ -113,12 +113,18 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     List<Map> mapList(Map args = Collections.emptyMap()) {
         def builder = JpqlQueryBuilder.of(this) //.aliasToMap(true)
         JpqlQueryInfo queryInfo = builder.buildSelect()
-        def api = currentGormStaticApi()
         //use SimplePagedQuery so it can attach the totalCount
-        SimplePagedQuery hq = new SimplePagedQuery(api, this.systemAliases)
+        SimplePagedQuery hq = buildSimplePagedQuery()
         //def list = hq.list(queryInfo.query, queryInfo.paramMap, args)
         def list = hq.list(queryInfo.query, queryInfo.paramMap, args)
         return list
+    }
+
+    SimplePagedQuery buildSimplePagedQuery(){
+        def api = currentGormStaticApi()
+        //use SimplePagedQuery so it can attach the totalCount
+        SimplePagedQuery pq = new SimplePagedQuery(api, this.systemAliases)
+        return pq
     }
 
     /**
@@ -250,6 +256,32 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         projectionList.groupProperty(property)
         return this
     }
+
+    /**
+     * Adds a simple property select
+     *
+     * @param property The property to sum by
+     * @return This criteria instance
+     */
+    MangoDetachedCriteria<T> property(String prop) {
+        prop = parseAlias(prop, "")
+        ensureAliases(prop)
+        projectionList.property(prop)
+        return this
+    }
+
+    /**
+     * Adds a distinct select
+     *
+     * @param property The property to sum by
+     * @return This criteria instance
+     */
+    // MangoDetachedCriteria<T> distinct(String prop) {
+    //     prop = parseAlias(prop, "")
+    //     ensureAliases(prop)
+    //     projectionList.distinct(prop)
+    //     return this
+    // }
 
     /**
      * Adds a countDistinct projection

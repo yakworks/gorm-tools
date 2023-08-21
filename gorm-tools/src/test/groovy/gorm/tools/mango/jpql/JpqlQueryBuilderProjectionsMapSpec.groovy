@@ -32,57 +32,6 @@ class JpqlQueryBuilderProjectionsMapSpec extends Specification implements GormHi
         }
     }
 
-    void "Test build simple select with added where"() {
-        when:
-
-        def criteria = KitchenSink.query(
-            name: 'Blue Cheese'
-        )
-        def crit = criteria.where([num: '1'])
-
-        def query = JpqlQueryBuilder.of(crit).buildSelect().query
-
-        then:"The query is valid"
-        query == strip("""
-        SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-        WHERE (kitchenSink.name=:p1 AND kitchenSink.num=:p2)
-        """)
-        crit.list().size() == 1
-    }
-
-    void "Test build select with or"() {
-        given:"Some criteria"
-
-        def criteria = KitchenSink.query(
-            '$or': [
-                ['num': '1'],
-                ['num': '2']
-            ]
-        )
-        //XXX @SUD lets get error checking in place for this, where they pass in duplicate key
-        // def criteria = KitchenSink.query(
-        //     '$or': [
-        //         'name': 'Bob',
-        //         'name': 'Fred'
-        //     ]
-        // )
-
-        when:"A jpa query is built"
-        def builder = JpqlQueryBuilder.of(criteria)
-        final queryInfo = builder.buildSelect()
-
-        then:"The query is valid"
-        queryInfo.query!= null
-        //NOTE TODO, see the same query using closure, this adds extra parens
-        queryInfo.query == strip("""
-        SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-        WHERE (((kitchenSink.num=:p1) OR (kitchenSink.num=:p2)))
-        """)
-        queryInfo.parameters == ['1', '2']
-
-        criteria.list().size() == 2
-    }
-
     void "Test projections simple aliasToMap"() {
         given:"Some criteria"
 

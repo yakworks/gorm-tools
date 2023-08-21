@@ -50,7 +50,8 @@ import grails.orm.RlikeExpression
  * Replaces org.grails.orm.hibernate.query.HibernateQuery since there was a myriad of issues with the DetachedCriteria
  *
  * Enhancments over what HibernateQuery was not doing properly
- * - around the nested and aliases. For example ordering by something like foo.bar.baz.
+ * - auto setup of nested and aliases
+ * - For example ordering by something like foo.bar.baz will work properly
  * - take advantage of being able to specify the ordering for nulls so we can keep postgress consistent with mysql and mssql etc..
  * - working on adding json querying.
  *

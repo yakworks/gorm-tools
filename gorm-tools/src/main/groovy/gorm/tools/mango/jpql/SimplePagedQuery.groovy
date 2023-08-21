@@ -49,6 +49,7 @@ class SimplePagedQuery {
         this.systemAliases = systemAliases
     }
 
+
     Integer countQuery(CharSequence queryString, Map params){
 
         def template = hibernateTemplate
@@ -100,6 +101,7 @@ class SimplePagedQuery {
             def list = qry.list()
             return list
         }
+        //only do the count query if its needed
         int rowCount = dataList.size()
         if(rowCount > 1 && maxCount && rowCount >= maxCount){
             rowCount = countQuery(queryString, params)

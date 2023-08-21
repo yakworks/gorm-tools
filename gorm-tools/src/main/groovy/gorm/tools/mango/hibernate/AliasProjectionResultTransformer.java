@@ -17,7 +17,8 @@ import org.hibernate.transform.ResultTransformer;
  */
 public class AliasProjectionResultTransformer extends AliasedTupleSubsetResultTransformer {
 
-    java.util.List<String> includeAliases = new ArrayList<String>();
+    // removes everything after the last _ on these. so foo_sum will just end up as foo.
+    java.util.List<String> aliasesToTrimSuffix = new ArrayList<String>();
 
 	public static final AliasProjectionResultTransformer INSTANCE = new AliasProjectionResultTransformer();
 
@@ -30,8 +31,8 @@ public class AliasProjectionResultTransformer extends AliasedTupleSubsetResultTr
     /**
      * Disallow instantiation of AliasToEntityMapResultTransformer.
      */
-    public AliasProjectionResultTransformer(java.util.List<String> includeAliases ) {
-        this.includeAliases = includeAliases;
+    public AliasProjectionResultTransformer(java.util.List<String> aliasesToTrimSuffix) {
+        this.aliasesToTrimSuffix = aliasesToTrimSuffix;
     }
 
     /**
@@ -57,7 +58,7 @@ public class AliasProjectionResultTransformer extends AliasedTupleSubsetResultTr
 
     String getKeyName(String alias){
         int endIndex = alias.lastIndexOf("_");
-        if (includeAliases.contains(alias) && endIndex != -1) {
+        if (aliasesToTrimSuffix.contains(alias) && endIndex != -1) {
             alias = alias.substring(0, endIndex); // not forgot to put check if(endIndex != -1)
         }
         return alias;

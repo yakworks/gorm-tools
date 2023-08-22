@@ -31,8 +31,8 @@ class OrgMangoControllerTests extends RestIntTest {
         response.status == 200
         data.size() == 5
         data[0].type.name == 'Client'
-        data[0]['calc_totalDue'] < data[1]['calc_totalDue']
-        data[1]['calc_totalDue'] < data[2]['calc_totalDue']
+        data[0]['calc.totalDue'] < data[1]['calc.totalDue']
+        data[1]['calc.totalDue'] < data[2]['calc.totalDue']
     }
 
     void "list mango full monty"() {
@@ -86,7 +86,7 @@ class OrgMangoControllerTests extends RestIntTest {
         // List data = body.data
 
         then:
-        response.contentAsString.startsWith('"type.id","type.name","calc_totalDue')
+        response.contentAsString.startsWith('"type.id","type.name","calc.totalDue')
         response.status == 200
         response.header("Content-Type").contains("text/csv")
 

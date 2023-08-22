@@ -64,12 +64,17 @@ class SimplePagedQuerySpec extends Specification implements GormHibernateTest  {
         //[[thing_country:US, amount:30.00, kind:CLIENT], [thing:US, amount:1.25, kind:PARENT], [thing:US, amount:25.00, kind:VENDOR]]
         list.size() == 3
         list.totalCount == 3
-        Map row1 = list[0]
+        Map row = list[0]
+        row.init()
+        Map row1 = row.cloneMap()
+        row1.keySet() == ['foo'] as Set
+        row1.containsKey('thing')
         row1.containsKey('thing.country')
+        row1['thing'].containsKey('country')
         row1.containsKey('sinkLink.amount')
         row1.containsKey('amount')
         row1.containsKey('kind')
-        row1['thing.country'] == 'US'
+        row1.thing.country == 'US'
         row1.amount == 30.00
         row1.kind == KitchenSink.Kind.CLIENT
     }

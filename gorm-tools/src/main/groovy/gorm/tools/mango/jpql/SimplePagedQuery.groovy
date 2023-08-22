@@ -16,6 +16,7 @@ import org.hibernate.Session
 import org.hibernate.query.Query
 
 import gorm.tools.mango.hibernate.AliasProjectionResultTransformer
+import gorm.tools.mango.hibernate.PathKeyMapResultTransformer
 import yakworks.commons.model.SimplePagedList
 
 /**
@@ -94,8 +95,8 @@ class SimplePagedQuery {
             populateQueryArguments(q, args)
             populateQueryWithNamedArguments(q, params)
             //sets the transformer to remove the _sum, _avg, etc.. systemAliases
-            // q.setResultTransformer(AliasProjectionResultTransformer.INSTANCE)
-            q.setResultTransformer(new AliasProjectionResultTransformer(systemAliases))
+            //q.setResultTransformer(new AliasProjectionResultTransformer(systemAliases))
+            q.setResultTransformer(new PathKeyMapResultTransformer(systemAliases))
 
             def qry = createHqlQuery(session, q)
             def list = qry.list()

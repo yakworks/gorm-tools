@@ -58,9 +58,12 @@ public class AliasProjectionResultTransformer extends AliasedTupleSubsetResultTr
 
     String getKeyName(String alias){
         int endIndex = alias.lastIndexOf("_");
+        //if its in the list, for example an aggregate like amount_sum, amount_avg, _etc then trim off the _sum, _avg, _etc part
         if (aliasesToTrimSuffix.contains(alias) && endIndex != -1) {
             alias = alias.substring(0, endIndex); // not forgot to put check if(endIndex != -1)
         }
+        //replace the _ with dots XXX what if user puts their own alias in?
+        alias = alias.replace('_', '.');
         return alias;
     }
 

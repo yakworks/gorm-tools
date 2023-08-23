@@ -334,6 +334,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      */
     void removeById(Serializable id, Map args = [:]) {
         D entity = getWithTrx(id)
+        RepoUtil.checkFound(entity, id, getEntityClass().name)
         remove(entity, args)
     }
 

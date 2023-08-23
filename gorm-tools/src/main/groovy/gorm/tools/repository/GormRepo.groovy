@@ -333,9 +333,15 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * @throws NotFoundProblem.Exception if its not found or DataProblemException if a DataIntegrityViolationException is thrown
      */
     void removeById(Serializable id, Map args = [:]) {
-        D entity = getWithTrx(id)
-        RepoUtil.checkFound(entity, id, getEntityClass().name)
-        remove(entity, args)
+        try {
+            withTrx {
+                D entity = get(id, null)
+                doRemove(entity, PersistArgs.of(args))
+            }
+        }
+        catch (DataAccessException ex) {
+            throw RepoExceptionSupport.translateException(ex, id)
+        }
     }
 
     /**

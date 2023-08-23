@@ -11,6 +11,7 @@ import org.codehaus.groovy.runtime.StackTraceUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSourceResolvable
 import org.springframework.dao.DataAccessException
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
@@ -153,6 +154,17 @@ class ProblemHandler {
             rootMessage.contains("Duplicate entry") || //mysql
             rootMessage.contains("Violation of UNIQUE KEY constraint") || //sql server
             rootMessage.contains("unique constraint")) {
+            return rootMessage
+        } else {
+            return null
+        }
+    }
+
+    static String isForeignKeyViolation(DataAccessException dax) {
+        if (!dax.rootCause || !(dax instanceof DataIntegrityViolationException)) return null
+        String rootMessage = dax.rootCause.message.toLowerCase()
+        //postgres and H2 - if its DataIntegrityViolationException and contains keyword 'foreign key' thn its fk violation
+        if (rootMessage.contains("foreign key")) {
             return rootMessage
         } else {
             return null

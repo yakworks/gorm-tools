@@ -333,10 +333,8 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * @throws NotFoundProblem.Exception if its not found or if a DataIntegrityViolationException is thrown
      */
     void removeById(Serializable id, Map args = [:]) {
-        withTrx {
-            D entity = get(id, null)
-            doRemove(entity, PersistArgs.of(args))
-        }
+        D entity = getWithTrx(id)
+        remove(entity, args)
     }
 
     /**
@@ -346,8 +344,15 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * @throws ValidationProblem.Exception if a spring DataIntegrityViolationException is thrown
      */
     void remove(D entity, Map args = [:]) {
-        withTrx {
-            doRemove(entity, PersistArgs.of(args))
+        try {
+            //Wrap the withTrx in try/catch
+            //Because the exception (eg fk violation), if occurs, would occur in withTrx when transaction gets commited. not occur during doRemove.
+            withTrx {
+                doRemove(entity, PersistArgs.of(args))
+            }
+        }
+        catch (DataAccessException ex) {
+            throw RepoExceptionSupport.translateException(ex, entity)
         }
     }
 
@@ -358,14 +363,9 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * @param args - args passed to delete
      */
     void doRemove(D entity, PersistArgs args) {
-        try {
-            getRepoEventPublisher().doBeforeRemove(this, (GormEntity)entity, args)
-            gormInstanceApi().delete(entity, args as Map)
-            getRepoEventPublisher().doAfterRemove(this, (GormEntity)entity, args)
-        }
-        catch (DataAccessException ex) {
-            throw RepoExceptionSupport.translateException(ex, entity)
-        }
+        getRepoEventPublisher().doBeforeRemove(this, (GormEntity)entity, args)
+        gormInstanceApi().delete(entity, args as Map)
+        getRepoEventPublisher().doAfterRemove(this, (GormEntity)entity, args)
     }
 
     /**

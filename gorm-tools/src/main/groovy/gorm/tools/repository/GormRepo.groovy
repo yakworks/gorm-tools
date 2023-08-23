@@ -330,7 +330,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * @param id - the id to delete
      * @param args - the args to pass to delete. flush being the most common
      *
-     * @throws NotFoundProblem.Exception if its not found or if a DataIntegrityViolationException is thrown
+     * @throws NotFoundProblem.Exception if its not found or DataProblemException if a DataIntegrityViolationException is thrown
      */
     void removeById(Serializable id, Map args = [:]) {
         D entity = getWithTrx(id)
@@ -342,7 +342,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * Transactional, Calls delete always with flush = true so we can intercept any DataIntegrityViolationExceptions.
      *
      * @param entity the domain entity
-     * @throws ValidationProblem.Exception if a spring DataIntegrityViolationException is thrown
+     * @throws DataProblemException if a DataIntegrityViolationException is thrown
      */
     void remove(D entity, Map args = [:]) {
         try {

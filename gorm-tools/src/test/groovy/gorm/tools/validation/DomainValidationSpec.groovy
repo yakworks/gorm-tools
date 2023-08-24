@@ -97,12 +97,12 @@ class DomainValidationSpec extends Specification implements GormHibernateTest  {
         errors['xNotBlank'].code == ValidationCode.NotBlank.name()
         errors['xNotBlank'].codes.size() == codesCount
 
-        // errors['xRange'].code == ValidationCode.Range.name()
-        // errors['xRange'].codes.size() == codesCount
+        errors['xRange'].code == ValidationCode.Range.name()
+        errors['xRange'].codes.size() == codesCount
 
         errors['xInList'].code == ValidationCode.InList.name()
         errors['xInList'].codes.size() == codesCount
-        errors.errorCount == 9
+        errors.errorCount == 10
     }
 
     void "check validations messages"(){
@@ -117,14 +117,14 @@ class DomainValidationSpec extends Specification implements GormHibernateTest  {
         // JakartaValidationCodeAdaptor
 
         then:
-        errors.errorCount == 9
+        errors.errorCount == 10
         messageSource.getMessage(errors['xRequired']) == 'must not be null'
         messageSource.getMessage(errors['xMax']) == 'must be less than or equal to 3'
         messageSource.getMessage(errors['xMin']) == 'must be greater than or equal to 3'
         messageSource.getMessage(errors['xMatches']) == 'must match "HI"'
         messageSource.getMessage(errors['xEmail']) == 'must be a well-formed email address'
         messageSource.getMessage(errors['xNotBlank']) == 'must not be blank'
-        //messageSource.getMessage(errors['xRange']) == 'must be between 1 and 3'
+        messageSource.getMessage(errors['xRange']) == 'must be between 1 and 3'
 
         messageSource.getMessage(errors['xMinSize']) == 'length must be greater than or equal to 3'
         messageSource.getMessage(errors['xMaxSize']) == 'length must be less than or equal to 3'

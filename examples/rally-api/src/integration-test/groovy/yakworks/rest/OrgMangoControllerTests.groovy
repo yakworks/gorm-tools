@@ -31,8 +31,8 @@ class OrgMangoControllerTests extends RestIntTest {
         response.status == 200
         data.size() == 5
         data[0].type.name == 'Client'
-        data[0]['calc.totalDue'] < data[1]['calc.totalDue']
-        data[1]['calc.totalDue'] < data[2]['calc.totalDue']
+        data[0]['calc']['totalDue'] < data[1]['calc']['totalDue']
+        data[1]['calc']['totalDue'] < data[2]['calc']['totalDue']
     }
 
     void "list mango full monty"() {

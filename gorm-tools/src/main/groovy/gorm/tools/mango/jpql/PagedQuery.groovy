@@ -15,9 +15,8 @@ import org.hibernate.ScrollableResults
 import org.hibernate.Session
 import org.hibernate.query.Query
 
-import gorm.tools.mango.hibernate.AliasProjectionResultTransformer
+import gorm.tools.mango.hibernate.PathKeyMapPagedList
 import gorm.tools.mango.hibernate.PathKeyMapResultTransformer
-import yakworks.commons.model.SimplePagedList
 
 /**
  * Helper to get the hibernate template and query so we can do scrollable to add totalCount logic with JPAQL.
@@ -27,7 +26,7 @@ import yakworks.commons.model.SimplePagedList
  * But that will be tricky with HQL.
  */
 @CompileStatic
-class SimplePagedQuery {
+class PagedQuery {
     // org.hibernate.query.Query query
     HibernateGormStaticApi staticApi
     GrailsHibernateTemplate hibernateTemplate
@@ -40,12 +39,12 @@ class SimplePagedQuery {
      */
     List<String> systemAliases = [] as List<String>
 
-    SimplePagedQuery(GormStaticApi staticApi) {
+    PagedQuery(GormStaticApi staticApi) {
         this.staticApi = (HibernateGormStaticApi)staticApi;
         hibernateTemplate = this.staticApi.getHibernateTemplate()
     }
 
-    SimplePagedQuery(GormStaticApi staticApi, List<String> systemAliases) {
+    PagedQuery(GormStaticApi staticApi, List<String> systemAliases) {
         this(staticApi)
         this.systemAliases = systemAliases
     }
@@ -77,7 +76,7 @@ class SimplePagedQuery {
     /**
      * Executes and returns a PagedList for a JPAQL Query
      */
-    public SimplePagedList<Map> list(CharSequence queryString, Map params, Map args) {
+    public PathKeyMapPagedList list(CharSequence queryString, Map params, Map args) {
         def template = hibernateTemplate
         args = new HashMap(args)
         Integer maxCount = args.max as Integer
@@ -107,7 +106,7 @@ class SimplePagedQuery {
         if(rowCount > 1 && maxCount && rowCount >= maxCount){
             rowCount = countQuery(queryString, params)
         }
-        SimplePagedList<Map> pagedList = new SimplePagedList<Map>(dataList, rowCount)
+        PathKeyMapPagedList pagedList = new PathKeyMapPagedList(dataList, rowCount)
         return pagedList
     }
 

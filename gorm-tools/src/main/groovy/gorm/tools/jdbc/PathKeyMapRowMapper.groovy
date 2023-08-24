@@ -13,7 +13,7 @@ import groovy.transform.CompileStatic
 import org.springframework.jdbc.core.ColumnMapRowMapper
 import org.springframework.jdbc.support.JdbcUtils
 
-import yakworks.commons.map.PathKeyMap
+import yakworks.commons.map.LazyPathKeyMap
 
 /**
  * Row mapper which allows to convert data from a given ResultSet instance
@@ -49,11 +49,11 @@ class PathKeyMapRowMapper extends ColumnMapRowMapper {
     }
 
     /**
-     * Returns a PathKeyMap instance. not really need but for implementing rowMapper
+     * Returns a PathKeyMap instance
      */
     @Override
     protected Map createColumnMap(int columnCount) {
-        return new PathKeyMap([:])
+        return new LazyPathKeyMap([:])
     }
 
 }

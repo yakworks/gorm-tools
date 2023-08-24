@@ -24,7 +24,7 @@ class CSVPathKeyMapReaderSpec extends Specification {
         when:
         CSVPathKeyMapReader csvReader = new CSVPathKeyMapReader(new FileReader(kitchenSinkCsv))
         List data = csvReader.readAllRows()
-        data[0].init()
+
         then:
         // data[0] instanceof PathKeyMap
         data[0].name == "red"
@@ -80,7 +80,7 @@ class CSVPathKeyMapReaderSpec extends Specification {
         while (sinkItemReader.hasNext()) {
             Map row = sinkItemReader.readMap() { row ->
                 if (!row) return //might have empty line on end
-                String kitchenSinkNum = row['kitchenSink_num']
+                String kitchenSinkNum = row['kitchenSink']['num']
                 Map kc = kitchenSinks.find({ it.num == kitchenSinkNum })
                 row.kitchenSink = kc
                 if (!kc.items) kc.items = []
@@ -119,7 +119,7 @@ class CSVPathKeyMapReaderSpec extends Specification {
         while (sinkItemReader.hasNext()) {
             Map row = sinkItemReader.readMap() { row ->
                 if (!row) return //last line is empty row
-                String kitchenSinkNum = row['kitchenSink_num']
+                String kitchenSinkNum = row['kitchenSink']['num']
                 //if not currentSink then first row so lookup , or if they dont match
                 if (!currentSink || currentSink.num != kitchenSinkNum) {
                     currentSink = kitchenSinks.find({ it.num == kitchenSinkNum })

@@ -4,13 +4,13 @@
 */
 package gorm.tools.mango.jpql
 
-import gorm.tools.mango.jpql.SimplePagedQuery
 import spock.lang.Specification
+import yakworks.commons.map.LazyPathKeyMap
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.unit.GormHibernateTest
 
-class SimplePagedQuerySpec extends Specification implements GormHibernateTest  {
+class PagedQuerySpec extends Specification implements GormHibernateTest  {
     static List entityClasses = [KitchenSink, SinkItem]
 
     void setupSpec() {
@@ -29,7 +29,7 @@ class SimplePagedQuerySpec extends Specification implements GormHibernateTest  {
     void "count works"() {
         when:
         def staticApi = KitchenSink.repo.gormStaticApi()
-        def qe = new SimplePagedQuery(staticApi)
+        def qe = new PagedQuery(staticApi)
         int count = qe.countQuery("Select id from KitchenSink", [:])
 
         then:
@@ -39,7 +39,7 @@ class SimplePagedQuerySpec extends Specification implements GormHibernateTest  {
     void "list returns pagedList with the right total"() {
         when:
         def staticApi = KitchenSink.repo.gormStaticApi()
-        def qe = new SimplePagedQuery(staticApi)
+        def qe = new PagedQuery(staticApi)
         List list = qe.list("Select id from KitchenSink", [:], [max: 2])
 
         then:
@@ -61,17 +61,18 @@ class SimplePagedQuerySpec extends Specification implements GormHibernateTest  {
 
         then:"The query is valid"
 
-        //[[thing_country:US, amount:30.00, kind:CLIENT], [thing:US, amount:1.25, kind:PARENT], [thing:US, amount:25.00, kind:VENDOR]]
         list.size() == 3
         list.totalCount == 3
-        Map row = list[0]
-        row.init()
-        Map row1 = row.cloneMap()
-        row1.keySet() == ['foo'] as Set
+
+        LazyPathKeyMap row1 = list[0]
+        //row1.init()
+        //Map row1 = row.cloneMap()
+        row1.keySet() == ['amount', 'thing', 'kind', 'sinkLink'] as Set
         row1.containsKey('thing')
-        row1.containsKey('thing.country')
+        !row1.containsKey('thing.country')
         row1['thing'].containsKey('country')
-        row1.containsKey('sinkLink.amount')
+        row1.containsKey('sinkLink')
+        row1['sinkLink'].containsKey('amount')
         row1.containsKey('amount')
         row1.containsKey('kind')
         row1.thing.country == 'US'
@@ -83,7 +84,7 @@ class SimplePagedQuerySpec extends Specification implements GormHibernateTest  {
     List doList(String query, Map params, Map args, List<String> systemAliases = []){
         def staticApi = KitchenSink.repo.gormStaticApi()
         //SimplePagedQuery spq = new SimplePagedQuery(staticApi)
-        SimplePagedQuery spq = new SimplePagedQuery(staticApi, systemAliases)
+        PagedQuery spq = new PagedQuery(staticApi, systemAliases)
         def list = spq.list(query, params, args)
         return list
     }

@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus
 import spock.lang.Specification
 import testing.TestSyncJob
 import testing.TestSyncJobService
-import yakworks.commons.map.PathKeyMap
+import yakworks.commons.map.LazyPathKeyMap
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.testing.gorm.model.SinkExt
@@ -262,8 +262,8 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
         given:
         List data = [] as List<Map>
 
-        data << PathKeyMap.of([num:'1', name:'Sink1', ext_name:'SinkExt1', bazMap_foo:'bar'], '_')
-        data << PathKeyMap.of([num:'2', name:'Sink2', ext_name:'SinkExt2', bazMap_foo:'bar'], '_')
+        data << LazyPathKeyMap.of([num:'1', name:'Sink1', ext_name:'SinkExt1', bazMap_foo:'bar'], '_')
+        data << LazyPathKeyMap.of([num:'2', name:'Sink2', ext_name:'SinkExt2', bazMap_foo:'bar'], '_')
 
         when: "bulk insert 2 records"
         SyncJobArgs args = setupSyncJobArgs()

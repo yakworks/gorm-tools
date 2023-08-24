@@ -18,9 +18,9 @@ import org.grails.orm.hibernate.cfg.Mapping
 import gorm.tools.utils.GormMetaUtils
 import grails.gorm.validation.ConstrainedProperty
 import grails.gorm.validation.DefaultConstrainedProperty
+import yakworks.commons.beans.PropertyTools
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.NameUtils
-import yakworks.commons.lang.PropertyTools
 import yakworks.commons.map.Maps
 import yakworks.openapi.OapiUtils
 

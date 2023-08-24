@@ -20,7 +20,7 @@ import org.grails.orm.hibernate.AbstractHibernateSession
 import gorm.tools.mango.hibernate.HibernateMangoQuery
 import gorm.tools.mango.jpql.JpqlQueryBuilder
 import gorm.tools.mango.jpql.JpqlQueryInfo
-import gorm.tools.mango.jpql.SimplePagedQuery
+import gorm.tools.mango.jpql.PagedQuery
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 import grails.gorm.PagedResultList
@@ -114,16 +114,16 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         def builder = JpqlQueryBuilder.of(this) //.aliasToMap(true)
         JpqlQueryInfo queryInfo = builder.buildSelect()
         //use SimplePagedQuery so it can attach the totalCount
-        SimplePagedQuery hq = buildSimplePagedQuery()
+        PagedQuery hq = buildSimplePagedQuery()
         //def list = hq.list(queryInfo.query, queryInfo.paramMap, args)
         def list = hq.list(queryInfo.query, queryInfo.paramMap, args)
-        return list
+        return list as List<Map>
     }
 
-    SimplePagedQuery buildSimplePagedQuery(){
+    PagedQuery buildSimplePagedQuery(){
         def api = currentGormStaticApi()
         //use SimplePagedQuery so it can attach the totalCount
-        SimplePagedQuery pq = new SimplePagedQuery(api, this.systemAliases)
+        PagedQuery pq = new PagedQuery(api, this.systemAliases)
         return pq
     }
 

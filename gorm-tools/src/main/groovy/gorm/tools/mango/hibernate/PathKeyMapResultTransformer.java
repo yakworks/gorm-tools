@@ -6,6 +6,8 @@
  */
 package gorm.tools.mango.hibernate;
 
+import yakworks.commons.map.LazyPathKeyMap;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,8 +59,7 @@ public class PathKeyMapResultTransformer implements ResultTransformer {
                 result.put("null" + (i + 1), tuple[i]);
             }
         }
-        var pathMap = PathKeyMap.of(result);
-        //pathMap.init();
+        var pathMap = LazyPathKeyMap.of(result);
         return pathMap;
     }
 

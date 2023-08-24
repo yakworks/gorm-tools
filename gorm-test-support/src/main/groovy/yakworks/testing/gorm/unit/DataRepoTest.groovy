@@ -8,7 +8,7 @@ import groovy.transform.CompileStatic
 
 import org.junit.AfterClass
 
-import yakworks.commons.lang.PropertyTools
+import yakworks.commons.beans.PropertyTools
 import yakworks.spring.AppCtx
 import yakworks.testing.gorm.support.BaseRepoEntityUnitTest
 import yakworks.testing.gorm.support.RepoBuildDataTest

@@ -1,6 +1,6 @@
 package gorm.tools.mango.jpql
 
-import gorm.tools.mango.MangoBuilder
+
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
 import spock.lang.Ignore
@@ -34,7 +34,7 @@ class JpqlQueryBuilderProjectionsMapSpec extends Specification implements GormHi
 
     List doList(String query, Map params, Map args = [:]){
         def staticApi = KitchenSink.repo.gormStaticApi()
-        def spq = new SimplePagedQuery(staticApi)
+        def spq = new PagedQuery(staticApi)
         def list = spq.list(query, params, args)
         return list
     }
@@ -75,10 +75,12 @@ class JpqlQueryBuilderProjectionsMapSpec extends Specification implements GormHi
         //[[thing_country:US, amount:30.00, kind:CLIENT], [thing:US, amount:1.25, kind:PARENT], [thing:US, amount:25.00, kind:VENDOR]]
         list.size() == 3
         Map row1 = list[0]
-        row1.containsKey('thing.country')
+
+        !row1.containsKey('thing.country')
+        row1.containsKey('thing')
         row1.containsKey('amount')
         row1.containsKey('kind')
-        row1['thing.country'] == 'US'
+        row1.thing.country == 'US'
         row1.amount == 30.00
         row1.kind == KitchenSink.Kind.CLIENT
     }
@@ -108,11 +110,16 @@ class JpqlQueryBuilderProjectionsMapSpec extends Specification implements GormHi
         ''')
         //queryInfo.paramMap == [p1: 100.0]
 
-        List<Map> list = criteria.mapList()
+        List<Map> rows = criteria.mapList()
         //[[thing_country:US, amount:30.00, kind:CLIENT], [thing:US, amount:1.25, kind:PARENT], [thing:US, amount:25.00, kind:VENDOR]]
-        list.size() == 3
-        list[0]['ext.totalDue']  > list[1]['ext.totalDue']
-        list[1]['ext.totalDue']  > list[2]['ext.totalDue']
+        rows.size() == 3
+        Map row0 = rows[0]
+        !row0.containsKey('ext.totalDue')
+        row0.containsKey('ext')
+        row0.ext.containsKey('totalDue')
+
+        row0.ext.totalDue  > rows[1].ext.totalDue
+        rows[1].ext.totalDue  > rows[2].ext.totalDue
     }
 
     void "sum on association with q and sort on aggregate field"() {
@@ -146,7 +153,7 @@ class JpqlQueryBuilderProjectionsMapSpec extends Specification implements GormHi
 
         List<Map> list = criteria.mapList()
         list.size() == 2
-        list[0]['ext.totalDue']  > list[1]['ext.totalDue']
+        list[0].ext.totalDue  > list[1].ext.totalDue
     }
 
     void "test aggreagate without group"() {

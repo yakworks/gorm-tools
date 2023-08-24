@@ -35,7 +35,7 @@ class ValidationEntity implements RepoEntity<ValidationEntity>{
         xMatches: [matches: "HI"],
         xEmail: [email: true],
         xNotBlank: [blank: false],
-        xRange: [range: (1..3)],
+        xRange: [range: ((1..3) as Range)],
         xInList: [inList: ['a', 'b']]
     ]
 

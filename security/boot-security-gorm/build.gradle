@@ -22,3 +22,19 @@ dependencies {
 // jar {
 //   enabled = true
 // }
+
+configurations.all {
+  resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+    ['grails-datastore-gorm', 'grails-datastore-gorm-validation', 'grails-datastore-gorm-support', 'grails-datastore-core'].each {
+      if (details.requested.name == it) {
+        details.useVersion project['gorm.version']
+      }
+    }
+    ['grails-plugin-datasource', 'grails-plugin-interceptors', 'grails-plugin-controllers',
+     'grails-plugin-url-mappings', 'grails-plugin-rest'].each {
+      if (details.requested.name == it) {
+        details.useVersion project['grailsVersion']
+      }
+    }
+  }
+}

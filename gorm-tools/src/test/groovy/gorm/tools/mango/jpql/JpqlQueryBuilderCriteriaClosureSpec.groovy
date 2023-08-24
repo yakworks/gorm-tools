@@ -4,7 +4,6 @@ import javax.persistence.criteria.JoinType
 
 import gorm.tools.mango.MangoBuilder
 import gorm.tools.mango.MangoDetachedCriteria
-import gorm.tools.mango.api.QueryArgs
 import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.testing.gorm.model.KitchenSink
@@ -394,7 +393,7 @@ class JpqlQueryBuilderCriteriaClosureSpec extends Specification implements GormH
 
     List doList(JpqlQueryInfo queryInfo, Map args = [:]){
         def staticApi = KitchenSink.repo.gormStaticApi()
-        def spq = new SimplePagedQuery(staticApi)
+        def spq = new PagedQuery(staticApi)
         def list = spq.list(queryInfo.query, queryInfo.paramMap, args)
         return list
 

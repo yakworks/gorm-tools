@@ -9,8 +9,8 @@ import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
 import com.opencsv.CSVReaderHeaderAware
+import yakworks.commons.map.LazyPathKeyMap
 import yakworks.commons.map.Maps
-import yakworks.commons.map.PathKeyMap
 /**
  * Overrides the CSVReaderHeaderAware to read csv rows into the PathKeyMap
  * which can then be used for the EntityMapBinder
@@ -55,7 +55,7 @@ class CSVPathKeyMapReader extends CSVReaderHeaderAware {
         Map data = super.readMap()
         data = prune && data ? Maps.prune(data) : data
         // data = data as Map<String, String>
-        return PathKeyMap.of(data, pathDelimiter) as Map<String, Object>
+        return LazyPathKeyMap.of(data as Map<String, Object>, pathDelimiter)
     }
 
     /**

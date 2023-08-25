@@ -29,6 +29,7 @@ import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 
 import gorm.tools.utils.GormMetaUtils
+import grails.core.support.proxy.ProxyHandler
 import grails.databinding.DataBindingSource
 import grails.databinding.SimpleDataBinder
 import grails.databinding.SimpleMapDataBindingSource
@@ -40,6 +41,8 @@ import grails.util.Environment
 import grails.validation.ValidationErrors
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.IsoDateUtil
+
+import static gorm.tools.utils.GormMetaUtils.getEntityClass
 
 /**
  * Faster data binder for PersistentEntity.persistentProperties. Uses the persistentProperties to assign values from the Map
@@ -58,6 +61,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
     static final Map<Class, List> EXPLICIT_BINDING_LIST = new ConcurrentHashMap<Class, List>()
     protected static final Map<Class, List> CLASS_TO_BINDING_INCLUDE_LIST = new ConcurrentHashMap<Class, List>()
 
+    ProxyHandler proxyHandler
     protected MessageSource messageSource
     boolean trimStrings = true
     boolean convertEmptyStringsToNull = true
@@ -107,7 +111,10 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
      */
     @Override
     void bind(Object object, DataBindingSource source, String filter, List whiteList, List blackList, DataBindingListener listener) {
-        BindingResult bindingResult = new BeanPropertyBindingResult(object, object.getClass().name)
+
+        String className = getEntityClass(object).name
+
+        BindingResult bindingResult = new BeanPropertyBindingResult(object, className)
         doBind object, source, filter, whiteList, blackList, listener, bindingResult
     }
 
@@ -508,7 +515,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
         PersistentEntity domain = getPersistentEntity(obj.getClass())
 
         if (domain != null && bindingResult != null) {
-            def newResult = new ValidationErrors(obj)
+            def newResult = new ValidationErrors(obj, getEntityClass(obj).name)
             for (Object error : bindingResult.getAllErrors()) {
                 if (error instanceof FieldError) {
                     def fieldError = (FieldError)error
@@ -538,6 +545,9 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
         def mc = obj.metaClass
         if (mc.hasProperty(obj, "errors") != null && bindingResult != null) {
             def errors = obj['errors'] as AbstractBindingResult //this has the addError method
+
+            //Here the 'objectName' in bindingResult and 'objectName' in 'errors' must match.
+            //Ensure its not a proxy name, or else it will give IllegalArgumentException
             errors.addAllErrors(bindingResult)
         }
     }

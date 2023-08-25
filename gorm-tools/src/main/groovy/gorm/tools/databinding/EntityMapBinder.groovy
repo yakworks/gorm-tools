@@ -29,7 +29,6 @@ import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 
 import gorm.tools.utils.GormMetaUtils
-import grails.core.support.proxy.ProxyHandler
 import grails.databinding.DataBindingSource
 import grails.databinding.SimpleDataBinder
 import grails.databinding.SimpleMapDataBindingSource
@@ -61,7 +60,6 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
     static final Map<Class, List> EXPLICIT_BINDING_LIST = new ConcurrentHashMap<Class, List>()
     protected static final Map<Class, List> CLASS_TO_BINDING_INCLUDE_LIST = new ConcurrentHashMap<Class, List>()
 
-    ProxyHandler proxyHandler
     protected MessageSource messageSource
     boolean trimStrings = true
     boolean convertEmptyStringsToNull = true

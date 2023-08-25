@@ -12,7 +12,7 @@ import com.opencsv.CSVReaderHeaderAware
 import yakworks.commons.map.LazyPathKeyMap
 import yakworks.commons.map.Maps
 /**
- * Overrides the CSVReaderHeaderAware to read csv rows into the PathKeyMap
+ * Overrides the CSVReaderHeaderAware to read csv rows into the LazyPathKeyMap
  * which can then be used for the EntityMapBinder
  */
 @Builder(builderStrategy = SimpleStrategy, prefix = "")

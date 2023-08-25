@@ -221,7 +221,7 @@ class ApiConstraints {
         replaceDescriptionShortcut(mergedList)
 
         //with order above, classMaps override traitMaps and yamlMaps override all
-        Map<String, Map> mergedMap = mergedList.size() == 1 ? mergedList[0] : Maps.merge(mergedList)
+        Map<String, Map> mergedMap = mergedList.size() == 1 ? mergedList[0] : Maps.merge([:], mergedList)
 
         return mergedMap //mergedList
     }

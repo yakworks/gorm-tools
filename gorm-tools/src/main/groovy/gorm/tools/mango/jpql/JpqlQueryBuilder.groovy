@@ -132,7 +132,7 @@ class JpqlQueryBuilder {
         if (propertiesToUpdate.isEmpty()) {
             throw new InvalidDataAccessResourceUsageException("No properties specified to update")
         }
-        allowJoins = false
+        // allowJoins = false
         StringBuilder queryString = new StringBuilder("UPDATE ${entity.getName()} ${logicalName}")
 
         List parameters = []
@@ -567,6 +567,21 @@ class JpqlQueryBuilder {
             }
         })
 
+        queryHandlers.put(Query.Exists, new QueryHandler() {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters) {
+                Query.Exists existsQuery = (Query.Exists) criterion
+
+                whereClause.append(" EXISTS (")
+                QueryableCriteria subquery = existsQuery.getSubquery()
+                if (subquery != null) {
+                    buildSubQuery(q, whereClause, position, parameters, subquery)
+                }
+
+                return position
+            }
+        })
+
     }
 
     int handleSubQuery(PersistentEntity entity, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters,
@@ -658,6 +673,10 @@ class JpqlQueryBuilder {
         if(name.endsWith('.id') && name.count('.') >= 1){
             return GormMetaUtils.getPersistentProperty(entity, name)
         }
+        // if(name.endsWith('.id') && name.count('.') == 1) {
+        //     String assoc = name.tokenize('.')[0]
+        //     return (entity.getPropertyByName(assoc) as Association).getAssociatedEntity().getIdentity()
+        // }
 
         PersistentProperty identity = entity.getIdentity()
         if (identity != null && identity.getName().equals(name)) {

@@ -74,18 +74,18 @@ class RallyUserService {
     @ReadOnly
     List<AppUser> getOrgManagers(Long orgId) {
         DetachedCriteria secSubQuery = SecRoleUser.query {
-            setAlias 'secRoleUser'
-            createAlias('role', 'role')
-            eqProperty("user.id", "appUser.id")
+            // setAlias 'secRoleUser'
+            // createAlias('role', 'role')
+            eqProperty("user.id", "appUser_.id")
             inList('role.name', [Roles.AR_MANAGER, Roles.MANAGER])
         }
         DetachedCriteria conSubQuery = Contact.query {
-            setAlias 'contact'
-            eqProperty("id", "appUser.id")
+            // setAlias 'contact'
+            eqProperty("id", "appUser_.id")
             eq 'org.id', orgId
         }
         DetachedCriteria userCrit = AppUser.query {
-            setAlias 'appUser'
+            //setAlias 'appUser'
             exists secSubQuery.id()
             exists conSubQuery.id()
         }

@@ -28,8 +28,8 @@ import gorm.tools.repository.events.RepoEventPublisher
 import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.api.problem.data.DataProblem
+import yakworks.commons.map.LazyPathKeyMap
 import yakworks.commons.map.Maps
-import yakworks.commons.map.PathKeyMap
 import yakworks.meta.MetaMap
 
 /**
@@ -179,11 +179,8 @@ trait BulkableRepo<D> {
         //or it can create circular references - eg org.contact.org - which would result in Stackoverflow when converting to json
         Map dataClone
 
-        if(data instanceof PathKeyMap){
-            // Initialize the PathKey map so that the deep nested structure is created  and repos can expect a deep nested map
-            // Clone after it is initialized, so that it will clone the deep nested structure and not flat map
-            data.init()
-            dataClone = data.cloneMap()   //clone it, probably from CSV
+        if(data instanceof LazyPathKeyMap){
+            dataClone = data.cloneMap()  //clone it, probably from CSV
         } else {
             dataClone = Maps.clone(data)
         }

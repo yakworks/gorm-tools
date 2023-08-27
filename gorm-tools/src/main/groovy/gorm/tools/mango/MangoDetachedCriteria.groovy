@@ -20,7 +20,7 @@ import org.grails.orm.hibernate.AbstractHibernateSession
 import gorm.tools.mango.hibernate.HibernateMangoQuery
 import gorm.tools.mango.jpql.JpqlQueryBuilder
 import gorm.tools.mango.jpql.JpqlQueryInfo
-import gorm.tools.mango.jpql.SimplePagedQuery
+import gorm.tools.mango.jpql.PagedQuery
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 import grails.gorm.PagedResultList
@@ -48,7 +48,13 @@ import yakworks.commons.lang.NameUtils
 class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
     Map<String, String> propertyAliases = [:]
-    //auto system created aliases, tracked so we can remove the _sum, _avg, etc.. suffixes in the result transformer
+
+    /**
+     * auto system created aliases, The aliases we created to make them unique and usable in filters.
+     * for example a projection:['amount':'sum'] will get an alias of 'amount_sum',
+     * we remove that _sum suffix automatically because its set in the systemAliases.
+     * but if we did projection:['amount as amount_totals':'sum'] then that is user specified. we dont want to remove the _totals suffix.
+     */
     List<String> systemAliases = [] as List<String>
 
     /**
@@ -107,12 +113,18 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     List<Map> mapList(Map args = Collections.emptyMap()) {
         def builder = JpqlQueryBuilder.of(this) //.aliasToMap(true)
         JpqlQueryInfo queryInfo = builder.buildSelect()
-        def api = currentGormStaticApi()
         //use SimplePagedQuery so it can attach the totalCount
-        SimplePagedQuery hq = new SimplePagedQuery(api, this.systemAliases)
+        PagedQuery hq = buildSimplePagedQuery()
         //def list = hq.list(queryInfo.query, queryInfo.paramMap, args)
         def list = hq.list(queryInfo.query, queryInfo.paramMap, args)
-        return list
+        return list as List<Map>
+    }
+
+    PagedQuery buildSimplePagedQuery(){
+        def api = currentGormStaticApi()
+        //use SimplePagedQuery so it can attach the totalCount
+        PagedQuery pq = new PagedQuery(api, this.systemAliases)
+        return pq
     }
 
     /**
@@ -135,7 +147,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      */
     MangoDetachedCriteria<T> where(Map additionalQuery) {
         MangoDetachedCriteria<T> newQuery = (MangoDetachedCriteria<T>)clone()
-        new MangoBuilder().applyMapOrList(newQuery, [name2: 'foo'])
+        new MangoBuilder().applyMapOrList(newQuery, additionalQuery)
         return newQuery
     }
 
@@ -244,6 +256,32 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         projectionList.groupProperty(property)
         return this
     }
+
+    /**
+     * Adds a simple property select
+     *
+     * @param property The property to sum by
+     * @return This criteria instance
+     */
+    MangoDetachedCriteria<T> property(String prop) {
+        prop = parseAlias(prop, "")
+        ensureAliases(prop)
+        projectionList.property(prop)
+        return this
+    }
+
+    /**
+     * Adds a distinct select
+     *
+     * @param property The property to sum by
+     * @return This criteria instance
+     */
+    // MangoDetachedCriteria<T> distinct(String prop) {
+    //     prop = parseAlias(prop, "")
+    //     ensureAliases(prop)
+    //     projectionList.distinct(prop)
+    //     return this
+    // }
 
     /**
      * Adds a countDistinct projection
@@ -463,7 +501,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
             aliasKey = "${key}_${p}"
             propertyAliases[aliasKey] = parts[1].trim()
         } else {
-            //if no key its groupby so just return it
+            //if no key its a groupby so just return it
             if(!key) return p
             String alas = p.replace('.', '_')
             alas = "${alas}_${key.toLowerCase()}"

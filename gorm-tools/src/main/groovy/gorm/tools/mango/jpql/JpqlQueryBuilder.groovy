@@ -253,7 +253,8 @@ class JpqlQueryBuilder {
                         appendAlias(queryString, projField, pp.getPropertyName(), 'MAX')
                     }
                     else if (projection instanceof Query.CountDistinctProjection) {
-                        queryString.append("COUNT(DISTINCT ${logicalName}.${pp.getPropertyName()})")
+                        String projField = "COUNT(DISTINCT ${logicalName}.${pp.getPropertyName()})"
+                        appendAlias(queryString, projField, pp.getPropertyName(), 'COUNT')
                     }
                     else {
                         String projField = "${logicalName}.${pp.getPropertyName()}"
@@ -264,6 +265,7 @@ class JpqlQueryBuilder {
 
                 if (i.hasNext()) {
                     queryString.append(COMMA)
+                    queryString.append(' ')
                 }
             }
 

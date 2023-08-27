@@ -53,8 +53,8 @@ class OrgMangoJPQLTests extends Specification implements DomainIntTest {
         when:
         def qry = Org.query {}
         def hibCrit = qry.hibernateQuery.hibernateCriteria
-            .setProjection(Projections.projectionList()
-                .add(Projections.property("o.id"), "id")
+            .setProjection(
+                Projections.projectionList().add(Projections.property("o.id"), "id")
             )
         qry = qry.property("contact")
         def sumbObj = qry.list()

@@ -15,7 +15,6 @@ import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.proxy.ProxyHandler
 import org.grails.orm.hibernate.cfg.Mapping
-import org.hibernate.Hibernate
 import org.springframework.validation.Validator
 
 import gorm.tools.model.Persistable
@@ -112,7 +111,7 @@ class GormMetaUtils {
     /**
      * Returns the original class if the instance is a hibernate proxy. or returns the class name of the object
      */
-    static Class getEntityClass(def entity) {
+    static Class getEntityClass(Object entity) {
         Validate.notNull(entity, "Entity is null")
         return getProxyHandler().getProxiedClass(entity)
     }

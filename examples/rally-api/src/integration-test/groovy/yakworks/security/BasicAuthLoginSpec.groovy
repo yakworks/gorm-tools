@@ -45,4 +45,12 @@ class BasicAuthLoginSpec extends Specification implements OkHttpRestTrait {
         //body.access_token == "foo"
     }
 
+    void "login with username case doesnt match"() {
+        when:
+        def resp = basicLogin('ADMIN', '123')
+        Map body = bodyToMap(resp)
+
+        then:
+        body.access_token
+    }
 }

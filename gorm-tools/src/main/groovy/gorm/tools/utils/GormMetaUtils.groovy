@@ -114,7 +114,7 @@ class GormMetaUtils {
      */
     static Class getEntityClass(def entity) {
         Validate.notNull(entity, "Entity is null")
-        return Hibernate.getClass(entity)
+        return getProxyHandler().getProxiedClass(entity)
     }
 
     /**

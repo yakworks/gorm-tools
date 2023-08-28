@@ -545,7 +545,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             def errors = obj['errors'] as AbstractBindingResult //this has the addError method
 
             //Here the 'objectName' in bindingResult and 'objectName' in 'errors' must match.
-            //Ensure its not a proxy name, or else it will give IllegalArgumentException
+            //Ensure its not a proxy name in bindingResult, or else it will give IllegalArgumentException below when doing addAllErrors
             errors.addAllErrors(bindingResult)
         }
     }

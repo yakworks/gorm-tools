@@ -10,7 +10,6 @@ import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 
 import yakworks.api.problem.data.DataProblem
-import yakworks.api.problem.data.DataProblemException
 import yakworks.meta.MetaEntity
 import yakworks.meta.MetaMap
 import yakworks.meta.MetaMapList

@@ -166,13 +166,13 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         ''')
     }
 
-    @Ignore //TODO WIP to get exists working with JpqlQueryBuilder
+    //FIXME still need to work out alias
     def "exists on contact location"() {
         given:
         def qryContact = Contact.query(
             q: [
                 'location.city': "second City1*",
-                'org.id' : ['$eqf': 'org_.id']
+                'org.id' : ['$eqf': 'org_.id'] //not picking up the org_
             ]
         ).id()
 
@@ -185,15 +185,19 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
 
         when: "A jpa query is built"
         def builder = JpqlQueryBuilder.of(qry as MangoDetachedCriteria)//.aliasToMap(true)
+        //def builder = JpqlQueryBuilder.of(qryContact as MangoDetachedCriteria)//.aliasToMap(true)
         def queryInfo = builder.buildSelect()
         def query = queryInfo.query
 
         then: "The query is valid"
         query.trim() == strip('''
-            SELECT new map( SUM(org.calc.totalDue) as calc_totalDue_sum,org.type as type )
-            FROM yakworks.rally.orgs.model.Org AS org
-            WHERE (org.member.division.num=:p1 AND org.contact.id=:p2)
-            GROUP BY org.type
+            SELECT DISTINCT org FROM yakworks.rally.orgs.model.Org AS org
+            WHERE (lower(org.name) like lower(:p1) AND
+            EXISTS (
+            SELECT contact1.id FROM yakworks.rally.orgs.model.Contact contact1
+            WHERE lower(contact1.location.city) like lower(:p2) AND contact1.org.id = org.id
+            )
+            )
         ''')
     }
 }

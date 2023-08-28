@@ -252,10 +252,10 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
                 property("contact.id")
                 property("contact.name")
             }
-            lte("id", 5)
+            lte("id", 5L)
         }
 
-        def sumbObj = qry.list()
+        def sumbObj = qry.mapList()
 
         then:
         sumbObj.size() == 5

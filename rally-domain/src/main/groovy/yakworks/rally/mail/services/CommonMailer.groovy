@@ -16,6 +16,7 @@ import grails.gorm.transactions.Transactional
 import yakworks.api.Result
 import yakworks.handlebars.Bars
 import yakworks.rally.activity.ActivityService
+import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.mail.model.MailerTemplate
@@ -54,9 +55,34 @@ class CommonMailer {
             subject: subject,
             tags: mailerTemplate.tags,
             body: body + "\n\n"
-        ).persist()
-
+        )
+        if(mailerTemplate.attachmentIds)  msg.attachmentIds = mailerTemplate.attachmentIds
+        msg.persist()
         return msg
+    }
+
+    /**
+     * helper method that redirects to the activityService.buildEmail
+     *
+     * @param orgId the Org the act is for
+     * @param mailMessage the mailMessage to attach to act
+     * @return an unsaved Activity
+     */
+    Activity buildEmailActivity(Long orgId, MailMessage mailMessage){
+        activityService.buildEmail(orgId, mailMessage)
+    }
+
+    /**
+     * Sends the email catching any errors into a problem, so this never throws
+     * @param activityId the id to send.
+     * @return the Result or Problem
+     */
+    Result sendEmail(Long activityId){
+        try{
+            return activityService.sendEmail(activityId)
+        } catch(ex){
+            return problemHandler.handleException(ex)
+        }
     }
 
     String applyHandlebars(String templ, Map model){
@@ -75,11 +101,4 @@ class CommonMailer {
         }
     }
 
-    Result sendEmail(Long activityId){
-        try{
-            return activityService.sendEmail(activityId)
-        } catch(ex){
-            return problemHandler.handleException(ex)
-        }
-    }
 }

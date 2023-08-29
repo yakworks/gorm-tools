@@ -33,6 +33,8 @@ class CommonMailerTests extends Specification implements DomainIntTest {
 
         then:
         mailMsg
+        mailMsg.sendFrom == "bob@bill.com"
+        mailMsg.replyTo == "Test Account <joe@greenbill.io>"
         mailMsg.subject == "Payment Receipt"
         mailMsg.sendTo == "admin@testmeee.com"
 

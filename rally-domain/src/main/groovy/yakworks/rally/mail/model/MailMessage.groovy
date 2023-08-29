@@ -8,6 +8,8 @@ import java.time.LocalDateTime
 
 import groovy.transform.CompileDynamic
 
+import org.grails.datastore.mapping.config.MappingDefinition
+
 import gorm.tools.hibernate.type.JsonType
 import gorm.tools.repository.model.UuidGormRepo
 import gorm.tools.repository.model.UuidRepoEntity
@@ -15,6 +17,8 @@ import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.security.audit.AuditCreatedTrait
+
+import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 
 @Entity
 @IdEqualsHashCode
@@ -97,18 +101,19 @@ class MailMessage implements UuidRepoEntity<MailMessage, UuidGormRepo<MailMessag
     // }
 
 
-    //@CompileDynamic
-    static mapping = {
-        id generator: "assigned"
-        sendTo sqlType:'TEXT'
-        cc sqlType:'TEXT'
-        bcc sqlType:'TEXT'
-        subject sqlType:'TEXT'
-        body sqlType:'TEXT'
-        subject sqlType:'TEXT'
-        attachmentIds type: JsonType, params: [type: ArrayList]
-        inlineIds type: JsonType, params: [type: ArrayList]
-        tags type: JsonType, params: [type: ArrayList]
+    static mapping = orm {
+        //id(generator: "assigned")
+        columns(
+            id: property(generator: "assigned"),
+            sendTo: property(sqlType: 'TEXT'),
+            cc: property(sqlType: 'TEXT'),
+            bcc: property(sqlType: 'TEXT'),
+            subject: property(sqlType: 'TEXT'),
+            body: property(sqlType: 'TEXT'),
+            attachmentIds: property(type: JsonType, typeParams: [type: ArrayList]),
+            inlineIds: property(type: JsonType, typeParams: [type: ArrayList]),
+            tags: property(type: JsonType, typeParams: [type: ArrayList]),
+        )
     }
 
     static constraintsMap = [

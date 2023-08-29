@@ -10,7 +10,6 @@ import groovy.util.logging.Slf4j
 import yakworks.api.Result
 import yakworks.api.problem.data.DataProblem
 import yakworks.rally.mail.EmailService
-import yakworks.rally.mail.MailTo
 
 /**
  * Used for testing to swap out MailService and check Map for results

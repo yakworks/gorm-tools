@@ -1,4 +1,4 @@
-package yakworks.rally.mail
+package yakworks.rally.mail.services
 
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -7,9 +7,9 @@ import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.api.Result
 import yakworks.rally.attachment.model.Attachment
-import yakworks.rally.mail.mailgun.MailgunService
+import yakworks.rally.mail.EmailService
+import yakworks.rally.mail.EmailService.MailTo
 import yakworks.rally.mail.model.MailMessage
-import yakworks.rally.mail.testing.TestMailService
 import yakworks.rally.testing.MockData
 import yakworks.testing.gorm.integration.DomainIntTest
 

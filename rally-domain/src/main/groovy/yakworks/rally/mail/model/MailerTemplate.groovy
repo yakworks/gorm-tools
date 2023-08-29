@@ -6,6 +6,7 @@ package yakworks.rally.mail.model
 
 import java.nio.file.Path
 
+import groovy.transform.AutoClone
 import groovy.transform.CompileStatic
 
 import yakworks.rally.mail.model.ContentType
@@ -14,9 +15,10 @@ import yakworks.rally.mail.model.ContentType
  * A value object to represent a specific type of email to be sent (receipt, statement, etc...)
  * For spring configs as well as to be passed into the CommonMailer to send emails.
  */
+@AutoClone //(excludes = ['bodyTemplate'])
 @CompileStatic
 class MailerTemplate {
-    boolean enabled = false
+    boolean enabled = true
     /** the send it from address, should match domain used in mailgun, can be set from higher level config defaults  */
     String sendFrom
     /** the reply to address, can be set from higher level config defaults */
@@ -36,4 +38,6 @@ class MailerTemplate {
 
     /** tags to put on mailgun so it can be grouped and easy to see what part of app its coming from */
     List<String> tags
+
+    List<Long> attachmentIds
 }

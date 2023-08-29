@@ -96,7 +96,7 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
     }
 
     static constraintsMap = [
-        num:[ d:'num, used for job or orgnization type contacts', nullable: true],
+        num:[ d:'num, used for job or organization type contacts', nullable: true],
         name:[ d:'Name of Contact, joined using firstName + lastName', nullable: false],
 
         altName:[d:'Alternate name, nickname or job name'],

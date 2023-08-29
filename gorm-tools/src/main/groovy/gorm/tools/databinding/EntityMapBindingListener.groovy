@@ -15,6 +15,8 @@ import grails.databinding.errors.BindingError
 import grails.databinding.events.DataBindingListenerAdapter
 import grails.util.GrailsNameUtils
 
+import static gorm.tools.utils.GormMetaUtils.getEntityClass
+
 /**
  * Copy of GrailsWebDataBindingListener so we dont need to depend on the grails web-databinder that messes with the domains because
  * of the WebDataBindingTraitInjector that messes up the map constructor
@@ -31,7 +33,7 @@ class EntityMapBindingListener extends DataBindingListenerAdapter {
     @Override
     void bindingError(BindingError error, Object errors) {
         BindingResult bindingResult = (BindingResult)errors
-        String className = error.object?.getClass()?.getName()
+        String className = getEntityClass(error.object).name
         String classAsPropertyName = GrailsNameUtils.getPropertyNameRepresentation(className)
         String propertyName = error.getPropertyName()
         String[] codes = [

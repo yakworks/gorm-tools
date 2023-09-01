@@ -171,6 +171,14 @@ class ProblemHandler {
         }
     }
 
+    /**
+     * Broken pipe exception happens when client has closed the socket and server tries to write/send any response byte on the output stream.
+     * Server Can write nothing to output stream once we encounter Broken pipe exception
+     */
+    static isBrokenPipe(Exception ex) {
+        return ex.message.toLowerCase().contains("broken pipe")
+    }
+
     //Legacy from ValidationException
     static String formatErrors(Errors errors, String msg) {
         String ls = System.getProperty("line.separator");

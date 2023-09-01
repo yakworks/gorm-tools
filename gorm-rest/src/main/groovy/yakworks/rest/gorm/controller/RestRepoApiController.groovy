@@ -25,6 +25,7 @@ import grails.web.Action
 import yakworks.api.problem.Problem
 import yakworks.gorm.api.IncludesKey
 
+import static gorm.tools.problem.ProblemHandler.isBrokenPipe
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.MULTI_STATUS
 import static org.springframework.http.HttpStatus.NO_CONTENT
@@ -232,9 +233,12 @@ trait RestRepoApiController<D> extends RestApiController {
     }
 
     void handleException(Exception e) {
-        assert getEntityClass()
-        Problem apiError = problemHandler.handleException(getEntityClass(), e)
-        respondWith(apiError)
+        //do nothing if its broken pipe, coz we can not write any byte to response at all.
+        if(isBrokenPipe(e)) return
+        else {
+            assert getEntityClass()
+            Problem apiError = problemHandler.handleException(getEntityClass(), e)
+            respondWith(apiError)
+        }
     }
-
 }

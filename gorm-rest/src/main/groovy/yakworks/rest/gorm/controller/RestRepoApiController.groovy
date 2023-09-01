@@ -233,7 +233,11 @@ trait RestRepoApiController<D> extends RestApiController {
     }
 
     void handleException(Exception e) {
-        //do nothing if its broken pipe, coz we can not write any byte to response at all.
+        /*
+         * Broken pipe exception occurs when connection is closed before server has finished writing response.
+         * Once that happens, trying to write any response to output stream will result in broken pipe.
+         * We have "caught" broken pipe, and now during "catch" here, if we again try "respondWith" it will again result in "broken pipe" error
+         */
         if(isBrokenPipe(e)) return
         else {
             assert getEntityClass()

@@ -70,7 +70,11 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
     }
 
     void handleException(Exception e) {
-        //Do nothing if its "broken pipe" exception
+        /*
+         * Broken pipe exception occurs when connection is closed before server has finished writing response.
+         * Once that happens, trying to write any response to output stream will result in broken pipe.
+         * We have "caught" broken pipe, and now during "catch" here, if we again try "respondWith" it will again result in "broken pipe" error
+         */
         if(isBrokenPipe(e)) return
         else {
             Problem apiError = problemHandler.handleException(e)

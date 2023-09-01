@@ -73,4 +73,11 @@ class ProblemHandlerSpec extends Specification implements DataRepoTest {
          errors.hasFieldErrors('type')
      }
 
+    void "test is broken pipe"() {
+        expect:
+        !ProblemHandler.isBrokenPipe(new RuntimeException("test"))
+        ProblemHandler.isBrokenPipe(new IOException("broken pipe"))
+        ProblemHandler.isBrokenPipe(new IOException("java.io.IOException: Broken pipe"))
+    }
+
 }

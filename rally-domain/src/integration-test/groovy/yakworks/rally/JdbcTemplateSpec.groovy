@@ -11,11 +11,9 @@ import org.springframework.jdbc.core.JdbcTemplate
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import yakworks.rally.activity.model.Activity
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgFlex
 import yakworks.rally.orgs.model.OrgType
-import yakworks.testing.gorm.model.KitchenSink
 
 @Integration
 @Rollback

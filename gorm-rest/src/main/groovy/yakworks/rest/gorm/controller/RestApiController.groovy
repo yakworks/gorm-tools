@@ -4,7 +4,6 @@
 */
 package yakworks.rest.gorm.controller
 
-
 import groovy.transform.CompileStatic
 import groovy.transform.Generated
 
@@ -22,6 +21,8 @@ import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.NameUtils
 import yakworks.gorm.api.ApiUtils
 import yakworks.gorm.config.GormConfig
+
+import static gorm.tools.problem.ProblemHandler.isBrokenPipe
 
 /**
  * Marker trait with common helpers for a Restfull api type controller.
@@ -69,8 +70,16 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
     }
 
     void handleException(Exception e) {
-        Problem apiError = problemHandler.handleException(e)
-        respondWith(apiError)
+        /*
+         * Broken pipe exception occurs when connection is closed before server has finished writing response.
+         * Once that happens, trying to write any response to output stream will result in broken pipe.
+         * We have "caught" broken pipe, and now during "catch" here, if we again try "respondWith" it will again result in "broken pipe" error
+         */
+        if(isBrokenPipe(e)) return
+        else {
+            Problem apiError = problemHandler.handleException(e)
+            respondWith(apiError)
+        }
     }
 
     // Map getGrailsParams() {

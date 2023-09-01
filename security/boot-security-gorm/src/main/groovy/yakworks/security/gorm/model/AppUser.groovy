@@ -100,7 +100,11 @@ class AppUser implements UserInfo, AuditStampTrait, RepoEntity<AppUser>, Seriali
 
     @CompileDynamic
     static AppUser getByUsername(String uname) {
-        AppUser.findByUsername(uname.trim())
+        Collection<AppUser> results = AppUser.executeQuery("from AppUser where lower(username) = :uname",
+            [uname:uname.trim().toLowerCase(), max:1])
+
+        AppUser user = results ? results[0] : null
+        return user
     }
 
     @Override //UserInfo

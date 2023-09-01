@@ -41,6 +41,8 @@ import grails.validation.ValidationErrors
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.IsoDateUtil
 
+import static gorm.tools.utils.GormMetaUtils.getEntityClass
+
 /**
  * Faster data binder for PersistentEntity.persistentProperties. Uses the persistentProperties to assign values from the Map
  * Explicitly checks and converts most common property types eg (numbers and dates). Otherwise fallbacks to value converters.
@@ -107,7 +109,10 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
      */
     @Override
     void bind(Object object, DataBindingSource source, String filter, List whiteList, List blackList, DataBindingListener listener) {
-        BindingResult bindingResult = new BeanPropertyBindingResult(object, object.getClass().name)
+
+        String className = getEntityClass(object).name
+
+        BindingResult bindingResult = new BeanPropertyBindingResult(object, className)
         doBind object, source, filter, whiteList, blackList, listener, bindingResult
     }
 
@@ -508,7 +513,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
         PersistentEntity domain = getPersistentEntity(obj.getClass())
 
         if (domain != null && bindingResult != null) {
-            def newResult = new ValidationErrors(obj)
+            def newResult = new ValidationErrors(obj, getEntityClass(obj).name)
             for (Object error : bindingResult.getAllErrors()) {
                 if (error instanceof FieldError) {
                     def fieldError = (FieldError)error
@@ -538,6 +543,9 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
         def mc = obj.metaClass
         if (mc.hasProperty(obj, "errors") != null && bindingResult != null) {
             def errors = obj['errors'] as AbstractBindingResult //this has the addError method
+
+            //Here the 'objectName' in bindingResult and 'objectName' in 'errors' must match.
+            //Ensure its not a proxy name in bindingResult, or else it will give IllegalArgumentException below when doing addAllErrors
             errors.addAllErrors(bindingResult)
         }
     }

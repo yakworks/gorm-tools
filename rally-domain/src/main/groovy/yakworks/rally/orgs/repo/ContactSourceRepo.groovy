@@ -4,13 +4,13 @@
 */
 package yakworks.rally.orgs.repo
 
-import gorm.tools.mango.jpql.KeyExistsQuery
-import gorm.tools.repository.events.BeforePersistEvent
-import gorm.tools.repository.events.RepoListener
 import groovy.transform.CompileStatic
 
+import gorm.tools.mango.jpql.KeyExistsQuery
 import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepository
+import gorm.tools.repository.events.BeforePersistEvent
+import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import grails.gorm.transactions.Transactional
 import yakworks.api.problem.data.DataProblemCodes

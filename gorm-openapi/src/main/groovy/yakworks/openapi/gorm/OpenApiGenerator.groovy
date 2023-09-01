@@ -36,7 +36,7 @@ import static ApiSchemaEntity.CruType
  */
 @SuppressWarnings(['UnnecessaryGetter', 'AbcMetric', 'Println'])
 @CompileStatic
-class OpenApiGenerator implements ConfigAware {
+class OpenApiGenerator {
     @Autowired ApiConfig apiConfig
     //inject src and build dirs when setting up bean
     String apiSrc

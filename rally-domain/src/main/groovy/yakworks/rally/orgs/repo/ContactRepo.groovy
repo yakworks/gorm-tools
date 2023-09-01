@@ -261,11 +261,13 @@ class ContactRepo extends LongIdGormRepo<Contact> {
                 toContat.addToEmails(GormUtils.copyDomain(ContactEmail, e, [contact: toContat]))
             }
         }
+
+        /* XXX contactSource.sourceId has unique key, can not copy it. What should happen @JB @JD
         if(from.source) {
             ContactSource source = GormUtils.copyDomain(ContactSource, from.source, [contactId:toContat.id])
             source.persist()
             toContat.source = source
-        }
+        }*/
         if(from.locations) {
             from.locations.each { Location l ->
                 Location c = GormUtils.copyDomain(Location, l, [org: toContat.org, contact: toContat])

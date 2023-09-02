@@ -49,4 +49,12 @@ class KitchenSinkRepoIntegrationTest extends Specification implements DomainIntT
             sink.delete()
         }
     }
+
+    //not transactional, to verify that "exists" wraps query in trx
+    @NotTransactional
+    void "test exists"() {
+        expect:
+        KitchenSink.repo.exists(1L)
+        !KitchenSink.repo.exists(999999)
+    }
 }

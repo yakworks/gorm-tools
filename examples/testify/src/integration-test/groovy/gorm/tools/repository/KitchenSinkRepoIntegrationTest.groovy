@@ -55,6 +55,6 @@ class KitchenSinkRepoIntegrationTest extends Specification implements DomainIntT
     void "test exists"() {
         expect:
         KitchenSink.repo.exists(1L)
-        !KitchenSink.repo.exists(999999)
+        !KitchenSink.repo.exists(999999L)
     }
 }

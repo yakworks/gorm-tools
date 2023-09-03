@@ -420,7 +420,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * @return the retrieved entity
      */
     D read(Serializable id) {
-        entityReadOnlyTrx {
+        withReadOnlyTrx {
             (D) gormStaticApi().read(id)
         }
     }
@@ -619,7 +619,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * @param callable The closure to call
      * @return The entity that was run in the closure
      */
-    D entityReadOnlyTrx(Closure<D> callable) {
+    public <T> T withReadOnlyTrx(Closure<T> callable) {
         def trxAttr = new CustomizableRollbackTransactionAttribute()
         trxAttr.readOnly = true
         gormStaticApi().withTransaction(trxAttr, callable)

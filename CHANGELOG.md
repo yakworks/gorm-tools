@@ -1,3 +1,21 @@
+### v7.3.54
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.53...v7.3.54)
+- bump vGroovyCommons=3.11.1, and release [link](https://github.com/yakworks/gorm-tools/commit/6dcc7891ffadc25c43a743eaca69296b4429e6f6)
+- release [link](https://github.com/yakworks/gorm-tools/commit/9dbe2636fecd95894896d384e7e2354390cc53a3)
+- v54 - Merge pull request #732 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/d1ccad4d3de36c8136d2671a877ac5715371a41e)
+- #2255 Add check for contact source unique key (#730) [link](https://github.com/yakworks/gorm-tools/commit/0d72c021c147dd65c0d40fd710f8a60cbec0462b)
+- Handle broken pipe exception (#731) [link](https://github.com/yakworks/gorm-tools/commit/ef8cb57f2f6187eb3f856db4ae1b81c47f2a090f)
+- add SyncJobContext.updateMessage for updating messages without a result. [link](https://github.com/yakworks/gorm-tools/commit/7e602ccac39a40f0f9f31567c35b64f48e529c21)
+- commons 3.11.1-snapshot, dep hell on handlbars springboot plugin, got rid of humanize, and got versions in check [link](https://github.com/yakworks/gorm-tools/commit/7d1ec8dc655d3186ab9e1f4f1373a05fd75add3c)
+- 9ci/domain9#2222 login should be case insensitive (#726) [link](https://github.com/yakworks/gorm-tools/commit/a1fdbd5bfca44c4035e4345473767af5a6b454f8)
+- add clone to MailerTemplate (#728) [link](https://github.com/yakworks/gorm-tools/commit/115e143f56998f535f5ef75efc813af7ad61cd64)
+- Common mailer (#727) [link](https://github.com/yakworks/gorm-tools/commit/e0a6811430ff951774d84fa9d0d7686bd3cdd08a)
+- Fix to handle db exceptions and convert to problem during remove (#722) [link](https://github.com/yakworks/gorm-tools/commit/3bfbb897f059c4d39705b27739b0ff8a7a946170)
+- Fix binder to handle hibernate proxies (#724) [link](https://github.com/yakworks/gorm-tools/commit/cbd0e2ea4700fa57d4040c2341b0b9dfefb2c388)
+- unwrap spring proxy before looking up event methods on repo (#719) [link](https://github.com/yakworks/gorm-tools/commit/821b6caf208ac1e5a20e0d75cda5f386b5bb408a)
+- rename getCriteria to buildCriteria() (#717) [link](https://github.com/yakworks/gorm-tools/commit/e5a4afd36d2515c40801907815d926db2dcc34ce)
+
 ### v7.3.53
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.52...v7.3.53)

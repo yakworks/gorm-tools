@@ -11,7 +11,7 @@ logging:
     #    org.hibernate.orm.deprecation: INFO # turns on deprecation notices
     # uncomment to turn on sql logging
 #    org.hibernate.stat: DEBUG
-    org.hibernate.SQL: DEBUG
+#    org.hibernate.SQL: DEBUG
 #     shows the sql parameters
 #    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 

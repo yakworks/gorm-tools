@@ -34,7 +34,6 @@ import grails.core.support.proxy.ProxyHandler
 import grails.validation.ValidationException
 import yakworks.api.problem.data.NotFoundProblem
 import yakworks.commons.lang.ClassUtils
-import yakworks.commons.map.PathKeyMap
 
 /**
  * A trait that turns a class into a Repository
@@ -308,7 +307,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      */
     void bind(D entity, Map data, BindAction bindAction, PersistArgs args = new PersistArgs()) {
         //if its a PathKeyMap then init it
-        if(data instanceof PathKeyMap) data.init()
+        // if(data instanceof PathKeyMap) data.init()
 
         getRepoEventPublisher().doBeforeBind(this, (GormEntity)entity, data, bindAction, args)
         doBind(entity, data, bindAction, args)

@@ -4,7 +4,7 @@
 */
 package gorm.tools.databinding
 
-import yakworks.commons.map.PathKeyMap
+import yakworks.commons.map.LazyPathKeyMap
 import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.testing.gorm.model.KitchenSink
@@ -30,7 +30,7 @@ class PathKeyMapEntityMapBinderSpec extends Specification implements DataRepoTes
         ]
 
         when:
-        PathKeyMap params = PathKeyMap.of(sub).init()
+        LazyPathKeyMap params = LazyPathKeyMap.of(sub)
         KitchenSink sink = new KitchenSink()
         binder.bind(sink, params)
 

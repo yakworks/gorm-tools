@@ -15,8 +15,8 @@ import org.hibernate.ScrollableResults
 import org.hibernate.Session
 import org.hibernate.query.Query
 
-import gorm.tools.mango.hibernate.AliasProjectionResultTransformer
-import yakworks.commons.model.SimplePagedList
+import gorm.tools.mango.hibernate.PathKeyMapPagedList
+import gorm.tools.mango.hibernate.PathKeyMapResultTransformer
 
 /**
  * Helper to get the hibernate template and query so we can do scrollable to add totalCount logic with JPAQL.
@@ -26,21 +26,29 @@ import yakworks.commons.model.SimplePagedList
  * But that will be tricky with HQL.
  */
 @CompileStatic
-class SimplePagedQuery {
+class PagedQuery {
     // org.hibernate.query.Query query
     HibernateGormStaticApi staticApi
     GrailsHibernateTemplate hibernateTemplate
+
+    /**
+     * The aliases we created.
+     * for example a projection:['amount':'sum'] will get an alias of 'amount_sum',
+     * we remove that _sum suffix automatically because its set in the systemAliases.
+     * but if we did projection:['amount as amount_totals':'sum'] then that is user specified. we dont want to remove the _totals suffix.
+     */
     List<String> systemAliases = [] as List<String>
 
-    SimplePagedQuery(GormStaticApi staticApi) {
+    PagedQuery(GormStaticApi staticApi) {
         this.staticApi = (HibernateGormStaticApi)staticApi;
         hibernateTemplate = this.staticApi.getHibernateTemplate()
     }
 
-    SimplePagedQuery(GormStaticApi staticApi, List<String> systemAliases) {
+    PagedQuery(GormStaticApi staticApi, List<String> systemAliases) {
         this(staticApi)
         this.systemAliases = systemAliases
     }
+
 
     Integer countQuery(CharSequence queryString, Map params){
 
@@ -68,7 +76,7 @@ class SimplePagedQuery {
     /**
      * Executes and returns a PagedList for a JPAQL Query
      */
-    public SimplePagedList<Map> list(CharSequence queryString, Map params, Map args) {
+    public PathKeyMapPagedList list(CharSequence queryString, Map params, Map args) {
         def template = hibernateTemplate
         args = new HashMap(args)
         Integer maxCount = args.max as Integer
@@ -85,19 +93,20 @@ class SimplePagedQuery {
             populateQueryArguments(q, params)
             populateQueryArguments(q, args)
             populateQueryWithNamedArguments(q, params)
-            //sets the transformer to remove the _sum, _avg, etc..
-            //TODO make this smarter so it only removes the system created projections
-            q.setResultTransformer(AliasProjectionResultTransformer.INSTANCE)
+            //sets the transformer to remove the _sum, _avg, etc.. systemAliases
+            //q.setResultTransformer(new AliasProjectionResultTransformer(systemAliases))
+            q.setResultTransformer(new PathKeyMapResultTransformer(systemAliases))
 
             def qry = createHqlQuery(session, q)
             def list = qry.list()
             return list
         }
+        //only do the count query if its needed
         int rowCount = dataList.size()
         if(rowCount > 1 && maxCount && rowCount >= maxCount){
             rowCount = countQuery(queryString, params)
         }
-        SimplePagedList<Map> pagedList = new SimplePagedList<Map>(dataList, rowCount)
+        PathKeyMapPagedList pagedList = new PathKeyMapPagedList(dataList, rowCount)
         return pagedList
     }
 

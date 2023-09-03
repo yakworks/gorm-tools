@@ -121,7 +121,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         def params = MockData.createOrg
         params.num = '9' //should already exist in test db
         //flush during create so it forces the error catching
-        def org = orgRepo.create(Maps.deepCopy(params), [flush: true])
+        def org = orgRepo.create(Maps.clone(params), [flush: true])
         // orgRepo.flush()
 
         then:
@@ -141,7 +141,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
             name: 'testComp',
             type: 'Customer'
         ]
-        orgRepo.create(Maps.deepCopy(params))
+        orgRepo.create(Maps.clone(params))
         orgRepo.flush()
 
         then:

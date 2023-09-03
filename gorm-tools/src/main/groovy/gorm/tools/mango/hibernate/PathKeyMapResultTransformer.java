@@ -5,7 +5,13 @@
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package gorm.tools.mango.hibernate;
-import java.util.*;
+
+import yakworks.commons.map.LazyPathKeyMap;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.hibernate.transform.AliasedTupleSubsetResultTransformer;
 import org.hibernate.transform.ResultTransformer;
 
@@ -15,48 +21,54 @@ import org.hibernate.transform.ResultTransformer;
  *
  * @author Joshua Burnett
  */
-public class AliasProjectionResultTransformer extends AliasedTupleSubsetResultTransformer {
+public class PathKeyMapResultTransformer implements ResultTransformer {
 
     // removes everything after the last _ on these. so foo_sum will just end up as foo.
-    java.util.List<String> aliasesToTrimSuffix = new ArrayList<String>();
+    List<String> aliasesToTrimSuffix = new ArrayList<String>();
 
-	public static final AliasProjectionResultTransformer INSTANCE = new AliasProjectionResultTransformer();
-
-	/**
-	 * Disallow instantiation of AliasToEntityMapResultTransformer.
-	 */
-	public AliasProjectionResultTransformer() {
-	}
+    //public static final PathKeyMapResultTransformer INSTANCE = new PathKeyMapResultTransformer();
 
     /**
      * Disallow instantiation of AliasToEntityMapResultTransformer.
      */
-    public AliasProjectionResultTransformer(java.util.List<String> aliasesToTrimSuffix) {
+    public PathKeyMapResultTransformer() {
+    }
+
+    /**
+     * Disallow instantiation of AliasToEntityMapResultTransformer.
+     */
+    public PathKeyMapResultTransformer(List<String> aliasesToTrimSuffix) {
         this.aliasesToTrimSuffix = aliasesToTrimSuffix;
     }
 
     /**
-     * removes evrything after the last _ thats in the projectionList
+     * removes everything after the last _ thats in the projectionList
      * @param tuple The result elements
      * @param aliases The result aliases ("parallel" array to tuple)
      * @return the map
      */
-	@Override
-	public Object transformTuple(Object[] tuple, String[] aliases) {
-		Map result = new HashMap(tuple.length);
-		for ( int i=0; i<tuple.length; i++ ) {
-			String alias = aliases[i];
-			if ( alias != null ) {
-				result.put( getKeyName(alias), tuple[i] );
-			} else {
+    @Override
+    public Object transformTuple(Object[] tuple, String[] aliases) {
+        Map result = new HashMap<String, Object>(tuple.length);
+        for (int i = 0; i < tuple.length; i++) {
+            String alias = aliases[i];
+            if (alias != null) {
+                result.put(getKeyName(alias), tuple[i]);
+            } else {
                 //for null just label it wil the index
-                result.put( "null"+(i+1), tuple[i] );
+                result.put("null" + (i + 1), tuple[i]);
             }
-		}
-		return result;
-	}
+        }
+        var pathMap = LazyPathKeyMap.of(result);
+        return pathMap;
+    }
 
-    String getKeyName(String alias){
+    @Override
+    public List transformList(List collection) {
+        return collection;
+    }
+
+    String getKeyName(String alias) {
         int endIndex = alias.lastIndexOf("_");
         //if its in the list, for example an aggregate like amount_sum, amount_avg, _etc then trim off the _sum, _avg, _etc part
         if (aliasesToTrimSuffix.contains(alias) && endIndex != -1) {
@@ -67,17 +79,4 @@ public class AliasProjectionResultTransformer extends AliasedTupleSubsetResultTr
         return alias;
     }
 
-	@Override
-	public boolean isTransformedValueATupleElement(String[] aliases, int tupleLength) {
-		return false;
-	}
-
-	/**
-	 * Serialization hook for ensuring singleton uniqueing.
-	 *
-	 * @return The singleton instance : {@link #INSTANCE}
-	 */
-	private Object readResolve() {
-		return INSTANCE;
-	}
 }

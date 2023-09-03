@@ -10,7 +10,7 @@ import groovy.transform.CompileStatic
 import org.apache.commons.beanutils.PropertyUtils
 
 import com.opencsv.CSVWriter
-import yakworks.commons.lang.PropertyTools
+import yakworks.commons.beans.PropertyTools
 import yakworks.commons.map.MapFlattener
 import yakworks.meta.MetaMapList
 

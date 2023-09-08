@@ -37,16 +37,15 @@ class CurrentUserExtTests extends Specification implements DomainIntTest {
 
     def "user in thread"() {
         when:
-        def syncOrg = false
+        def syncOrg
         def completableFuture = asyncService.runAsync(AsyncArgs.withSession()) {
             syncOrg = currentUser.org
         }
         completableFuture.join() //wait
-        // assert syncOrg
 
         then:
+        syncOrg
         currentUser.org
-        // syncOrg
     }
 
     private void doInThread(Closure c) {

@@ -116,7 +116,6 @@ trait SyncJobService<D> {
             .whenComplete { res, ex ->
                 if (ex) {
                     //ideally should not happen as the pattern here is that all exceptions should be handled in supplierFunc
-                    LOG.error("runJob unexpected exception in supplyAsync", ex)
                     jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
                 }
                 jobContext.finishJob()

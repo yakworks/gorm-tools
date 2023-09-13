@@ -101,7 +101,7 @@ class ProblemHandler {
     }
 
     GenericProblem handleUnexpected(Throwable e){
-        log.error("UNEXPECTED Internal Server Error ${e.message}", StackTraceUtils.deepSanitize(e))
+        log.error("UNEXPECTED Internal Server Error\n${e.message}", StackTraceUtils.deepSanitize(e))
         if (e instanceof GenericProblem) {
             return (GenericProblem) e
         }

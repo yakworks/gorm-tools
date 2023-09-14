@@ -5,6 +5,7 @@
 package yakworks.rally.activity.repo
 
 
+import java.time.LocalDateTime
 import javax.persistence.criteria.JoinType
 
 import groovy.transform.CompileStatic
@@ -61,6 +62,9 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
     @RepoListener
     void beforeValidate(Activity activity) {
         updateNameSummary(activity)
+        if(!activity.actDate) {
+            activity.actDate = LocalDateTime.now()
+        }
     }
 
     @RepoListener

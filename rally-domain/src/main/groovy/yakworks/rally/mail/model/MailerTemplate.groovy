@@ -9,8 +9,6 @@ import java.nio.file.Path
 import groovy.transform.AutoClone
 import groovy.transform.CompileStatic
 
-import yakworks.rally.mail.model.ContentType
-
 /**
  * A value object to represent a specific type of email to be sent (receipt, statement, etc...)
  * For spring configs as well as to be passed into the CommonMailer to send emails.

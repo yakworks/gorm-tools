@@ -50,6 +50,7 @@ class ActivityTests extends Specification implements DomainIntTest {
         result != null
         result.name == "test-note"
         result.kind == ActKind.Note
+        result.actDate
 
         when: "update"
         result = activityRepo.update([id: result.id, name: "test-updated", kind: "Note", visibleTo: 'Owner'])

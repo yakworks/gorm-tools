@@ -151,7 +151,7 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
             default: 'Everyone',
             nullable: false
         ],
-        actDate: [d: 'Activity date', nullable: false]
+        actDate: [d: 'Activity date', nullable: false, oapi:'CR']
     ]
 
     /** creates an ActivityLink for the entity */

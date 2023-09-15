@@ -1,5 +1,8 @@
 package yakworks.rally.activity
 
+import gorm.tools.problem.ValidationProblem
+import grails.validation.ValidationException
+
 import java.nio.file.Files
 
 import grails.gorm.transactions.Rollback
@@ -16,6 +19,8 @@ import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
+
+import java.time.LocalDateTime
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKind
 import static yakworks.rally.activity.model.Activity.VisibleTo
@@ -35,6 +40,24 @@ class ActivityTests extends Specification implements DomainIntTest {
         Tag tag1 = new Tag(id:9, code: "Tag1", entityName: "Activity").persist(flush:true)
         Tag tag2 = new Tag(id:10, code: "Tag2", entityName: "Activity").persist(flush:true)
         return [tag1, tag2]
+    }
+
+    void "test actDate"() {
+        when: "create"
+        Activity act = Activity.create([org: Org.load(10), note: [body: 'Test note']])
+
+        then:
+        noExceptionThrown()
+        act.actDate
+        act.id
+
+        when: "update actDate"
+        act = Activity.repo.update(id:act.id, actDate: LocalDateTime.now())
+
+        then:
+        ValidationProblem.Exception ex = thrown()
+        ex.errors.hasFieldErrors('actDate')
+        ex.errors.getFieldError('actDate').code == "error.notupdateable"
     }
 
     void "create note"() {

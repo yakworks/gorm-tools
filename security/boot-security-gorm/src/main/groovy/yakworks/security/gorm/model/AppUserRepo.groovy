@@ -4,9 +4,7 @@
 */
 package yakworks.security.gorm.model
 
-import org.grails.orm.hibernate.HibernateGormStaticApi
-import org.hibernate.Session
-import org.hibernate.query.Query
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.validation.Errors

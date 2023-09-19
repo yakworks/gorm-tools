@@ -4,7 +4,6 @@
 */
 package yakworks.rest.gorm.controller
 
-import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
 
@@ -16,6 +15,7 @@ import org.springframework.core.GenericTypeResolver
 import org.springframework.http.HttpStatus
 
 import gorm.tools.beans.Pager
+import gorm.tools.job.JobUtils
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.GormRepo
@@ -213,8 +213,10 @@ trait RestRepoApiController<D> extends RestApiController {
     void bulkProcess(DataOp dataOp) {
         List dataList = bodyAsList() as List<Map>
         Map gParams = getParamsMap()
-        HttpServletRequest req = request
-        String sourceId = "${req.method} ${req.requestURI}?${req.queryString}"
+
+        String sourceId = JobUtils.requestToSourceId(request)
+        //String sourceId = "${request.method} ${request.requestURI}?${request.queryString}"
+
         SyncJobArgs syncJobArgs = getBulkControllerSupport().setupSyncJobArgs(dataOp, gParams, sourceId)
         SyncJobEntity job = getBulkControllerSupport().process(dataList, syncJobArgs)
         respondWith(job, [status: MULTI_STATUS])

@@ -7,6 +7,10 @@ apply from: "${rootDir}/gradle/gorm-lib.gradle"
 dependencies {
 
   compileOnly "org.springframework.boot:spring-boot-autoconfigure"
+  //here only for the HttpServletRequest, grail compile AST tries to add the EnableWebMvc to the Application if the servlet-api is found
+  compileOnly "org.springframework:spring-webmvc"
+  compileOnly "javax.servlet:javax.servlet-api:4.0.1"
+
   // api project(":commons")
   // TODO use this standard for json converters
   // api "jakarta.json.bind:jakarta.json.bind-api:2.0.0"

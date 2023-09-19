@@ -7,8 +7,8 @@ package yakworks.etl.excel
 
 import groovy.transform.CompileStatic
 
+import yakworks.commons.beans.PropertyTools
 import yakworks.commons.lang.LabelUtils
-import yakworks.commons.lang.PropertyTools
 import yakworks.gorm.api.ApiConfig
 import yakworks.meta.MetaMapList
 import yakworks.meta.MetaProp

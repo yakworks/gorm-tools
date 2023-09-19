@@ -24,7 +24,7 @@ import gorm.tools.validation.RepoEntityValidator
 import gorm.tools.validation.RepoValidatorRegistry
 import grails.config.Config
 import grails.core.GrailsApplication
-import yakworks.commons.lang.PropertyTools
+import yakworks.commons.beans.PropertyTools
 import yakworks.gorm.boot.SpringBeanUtils
 
 /**

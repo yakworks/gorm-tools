@@ -21,6 +21,7 @@ import org.springframework.dao.InvalidDataAccessResourceUsageException
 
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.utils.GormMetaUtils
+import grails.gorm.DetachedCriteria
 
 /**
  * Builds JPQL String-based queries from the DetachedCriteria.
@@ -44,7 +45,8 @@ class JpqlQueryBuilder {
     private Query.Junction criteria
     private Query.ProjectionList projectionList = new Query.ProjectionList()
     private List<Query.Order> orders = Collections.emptyList()
-    private String logicalName
+    //the main root entity alias, will normall be just the decapitalized name
+    private String entityAlias
 
     PersistentEntity entity
     boolean hibernateCompatible
@@ -75,12 +77,12 @@ class JpqlQueryBuilder {
     JpqlQueryBuilder(PersistentEntity entity, Query.Junction criteria) {
         this.entity = entity
         this.criteria = criteria
-        this.logicalName = entity.getDecapitalizedName()
+        this.entityAlias = entity.getDecapitalizedName()
     }
 
     JpqlQueryBuilder(PersistentEntity entity) {
         this.entity = entity
-        this.logicalName = entity.getDecapitalizedName()
+        this.entityAlias = entity.getDecapitalizedName()
     }
 
     // JpqlQueryBuilder(PersistentEntity entity, Query.Junction criteria, Query.ProjectionList projectionList) {
@@ -94,7 +96,7 @@ class JpqlQueryBuilder {
     // }
 
     static JpqlQueryBuilder of(MangoDetachedCriteria crit){
-        def jqb = new JpqlQueryBuilder(crit.persistentEntity, new Query.Conjunction(crit.criteria) )
+        var jqb = new JpqlQueryBuilder(crit.persistentEntity, new Query.Conjunction(crit.criteria) )
         jqb.initHandlers()
         // List<Query.Criterion> criteria = crit.getCriteria()
         // jqb.criteria = new Query.Conjunction(criteria)
@@ -132,13 +134,13 @@ class JpqlQueryBuilder {
         if (propertiesToUpdate.isEmpty()) {
             throw new InvalidDataAccessResourceUsageException("No properties specified to update")
         }
-        allowJoins = false
-        StringBuilder queryString = new StringBuilder("UPDATE ${entity.getName()} ${logicalName}")
+        // allowJoins = false
+        StringBuilder queryString = new StringBuilder("UPDATE ${entity.getName()} ${entityAlias}")
 
         List parameters = []
         buildUpdateStatement(queryString, propertiesToUpdate, parameters)
         StringBuilder whereClause = new StringBuilder()
-        buildWhereClause(queryString, whereClause, logicalName, parameters)
+        buildWhereClause(queryString, whereClause, entityAlias, parameters)
         return new JpqlQueryInfo(queryString.toString(), parameters)
     }
 
@@ -148,10 +150,10 @@ class JpqlQueryBuilder {
      * @return The JpaQueryInfo
      */
     public JpqlQueryInfo buildDelete() {
-        StringBuilder queryString = new StringBuilder("DELETE ${entity.getName()} ${logicalName}")
+        StringBuilder queryString = new StringBuilder("DELETE ${entity.getName()} ${entityAlias}")
         StringBuilder whereClause = new StringBuilder()
         allowJoins = false
-        List parameters = buildWhereClause(queryString, whereClause, logicalName)
+        List parameters = buildWhereClause(queryString, whereClause, entityAlias)
         return new JpqlQueryInfo(queryString.toString(), parameters)
     }
 
@@ -168,16 +170,16 @@ class JpqlQueryBuilder {
         StringBuilder whereClause= new StringBuilder()
         List parameters = []
         if (!criteria.isEmpty()) {
-            parameters = buildWhereClause(queryString, whereClause, logicalName, parameters)
+            parameters = buildWhereClause(queryString, whereClause, entityAlias, parameters)
         }
 
         buildGroup(queryString)
 
         if (!criteria.isEmpty() && projectionAliases) {
-            buildHavingClause(queryString, logicalName, parameters)
+            buildHavingClause(queryString, entityAlias, parameters)
         }
 
-        appendOrder(queryString, logicalName)
+        appendOrder(queryString, entityAlias)
         return new JpqlQueryInfo(queryString.toString(), parameters)
     }
 
@@ -196,7 +198,7 @@ class JpqlQueryBuilder {
 
     private void buildSelectClause(StringBuilder queryString) {
         Query.ProjectionList projectionList = this.projectionList
-        String logicalName = this.logicalName
+        String logicalName = this.entityAlias
         PersistentEntity entity = this.entity
         buildSelect(queryString, projectionList.getProjectionList(), logicalName, entity)
 
@@ -253,7 +255,8 @@ class JpqlQueryBuilder {
                         appendAlias(queryString, projField, pp.getPropertyName(), 'MAX')
                     }
                     else if (projection instanceof Query.CountDistinctProjection) {
-                        queryString.append("COUNT(DISTINCT ${logicalName}.${pp.getPropertyName()})")
+                        String projField = "COUNT(DISTINCT ${logicalName}.${pp.getPropertyName()})"
+                        appendAlias(queryString, projField, pp.getPropertyName(), 'COUNT')
                     }
                     else {
                         String projField = "${logicalName}.${pp.getPropertyName()}"
@@ -264,6 +267,7 @@ class JpqlQueryBuilder {
 
                 if (i.hasNext()) {
                     queryString.append(COMMA)
+                    queryString.append(' ')
                 }
             }
 
@@ -565,6 +569,21 @@ class JpqlQueryBuilder {
             }
         })
 
+        queryHandlers.put(Query.Exists, new QueryHandler() {
+            public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
+                              String logicalName, int position, List parameters) {
+                Query.Exists existsQuery = (Query.Exists) criterion
+
+                whereClause.append("EXISTS ( ")
+                QueryableCriteria subquery = existsQuery.getSubquery()
+                if (subquery != null) {
+                    buildSubQuery(q, whereClause, position, parameters, subquery)
+                }
+                whereClause.append(" ) ")
+                return position
+            }
+        })
+
     }
 
     int handleSubQuery(PersistentEntity entity, StringBuilder q, StringBuilder whereClause, String logicalName, int position, List parameters,
@@ -589,12 +608,13 @@ class JpqlQueryBuilder {
         whereClause.append("SELECT ")
         buildSelect(whereClause, subquery.getProjections(), associatedEntityLogicalName, associatedEntity)
         whereClause.append(" FROM ${associatedEntityName} ${associatedEntityLogicalName} WHERE ")
-        // JpqlQueryBuilder subQueryBuilder = new  JpqlQueryBuilder(associatedEntity)
+
         List<Query.Criterion> criteria = subquery.getCriteria()
-        for (Query.Criterion subCriteria : criteria) {
-            QueryHandler queryHandler = queryHandlers.get(subCriteria.getClass())
-            queryHandler.handle(associatedEntity, subCriteria, q, whereClause, associatedEntityLogicalName, position, parameters)
-        }
+        var conj = new Query.Conjunction(criteria)
+        position = buildWhereClauseForCriterion(associatedEntity, conj, q, whereClause, associatedEntityLogicalName,
+            criteria, position, parameters)
+
+        // JpqlQueryBuilder subQueryBuilder = new  JpqlQueryBuilder(associatedEntity)
     }
 
     int handleAssociationCriteria(StringBuilder query, StringBuilder whereClause, String logicalName, int position, List parameters,
@@ -633,7 +653,7 @@ class JpqlQueryBuilder {
             """.stripIndent())
 
             parameters.add(propertiesToUpdate.get(propertyName))
-            queryString.append(" ${logicalName}.${propertyName}=")
+            queryString.append(" ${entityAlias}.${propertyName}=")
             queryString.append(PARAMETER_PREFIX).append(parameters.size())
             if (iterator.hasNext()) {
                 queryString.append(COMMA)
@@ -641,21 +661,36 @@ class JpqlQueryBuilder {
         }
     }
 
-    private static void appendPropertyComparison(StringBuilder q, String logicalName, String propertyName, String otherProperty,
+    void appendPropertyComparison(StringBuilder q, String logicalName, String propertyName, String otherProperty,
                                                  String operator) {
         q.append(logicalName)
          .append(DOT)
          .append(propertyName)
          .append(operator)
-         .append(logicalName)
-         .append(DOT)
-         .append(otherProperty)
+
+        //FIXME hack for now, if the other property ends with _ and removnig that matches the logicalName then its the alias
+        // used in EXISTS query where there is a subquery and we are tying it together.
+        int dotIdx = otherProperty.indexOf(".")
+        String rootObj = dotIdx > -1 ? otherProperty.substring(0, dotIdx) : otherProperty
+        if(rootObj.endsWith('_') && rootObj[0..-2] == this.entityAlias){
+            String restOfPath = dotIdx > -1 ? otherProperty.substring(dotIdx) : ""
+            //[0..-2] removes last char from string
+            q.append(rootObj[0..-2])
+                .append(restOfPath)
+        } else {
+            q.append(logicalName).append(DOT).append(otherProperty)
+        }
+
     }
 
     PersistentProperty validateProperty(PersistentEntity entity, String name, String whatItChecks) {
         if(name.endsWith('.id') && name.count('.') >= 1){
             return GormMetaUtils.getPersistentProperty(entity, name)
         }
+        // if(name.endsWith('.id') && name.count('.') == 1) {
+        //     String assoc = name.tokenize('.')[0]
+        //     return (entity.getPropertyByName(assoc) as Association).getAssociatedEntity().getIdentity()
+        // }
 
         PersistentProperty identity = entity.getIdentity()
         if (identity != null && identity.getName().equals(name)) {
@@ -733,11 +768,11 @@ class JpqlQueryBuilder {
         }
     }
 
-    int buildWhereClauseForCriterion(JpqlQueryBuilder subQueryBuilder, Query.Junction criteria, StringBuilder q, StringBuilder whereClause,
-                                     String logicalName, final List<Query.Criterion> criterionList, int position, List parameters) {
-
-        return buildWhereClauseForCriterion(subQueryBuilder.entity, criteria, q, whereClause, logicalName, criterionList, position, parameters)
-    }
+    // int buildWhereClauseForCriterion(JpqlQueryBuilder subQueryBuilder, Query.Junction criteria, StringBuilder q, StringBuilder whereClause,
+    //                                  String logicalName, final List<Query.Criterion> criterionList, int position, List parameters) {
+    //
+    //     return buildWhereClauseForCriterion(subQueryBuilder.entity, criteria, q, whereClause, logicalName, criterionList, position, parameters)
+    // }
 
     int buildWhereClauseForCriterion(PersistentEntity persistentEntity, Query.Junction criteria, StringBuilder q, StringBuilder whereClause,
                                      String logicalName, final List<Query.Criterion> criterionList, int position, List parameters) {

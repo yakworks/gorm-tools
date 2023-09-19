@@ -150,7 +150,7 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
             // actDate: LocalDateTime.now().plusDays(id).toDate(),
             localDate: IsoDateUtil.format(LocalDate.now().plusDays(id)),
             localDateTime: IsoDateUtil.format(LocalDateTime.now().plusDays(id)),
-            ext:[ name: "SinkExt$id"],
+            ext:[ name: "SinkExt$id", totalDue: id * 10.25],
             bazMap: [foo: 'bar']
             // thing: [id: id]
         ]

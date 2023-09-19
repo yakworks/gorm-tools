@@ -34,7 +34,6 @@ import grails.core.support.proxy.ProxyHandler
 import grails.validation.ValidationException
 import yakworks.api.problem.data.NotFoundProblem
 import yakworks.commons.lang.ClassUtils
-import yakworks.commons.map.PathKeyMap
 
 /**
  * A trait that turns a class into a Repository
@@ -308,7 +307,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      */
     void bind(D entity, Map data, BindAction bindAction, PersistArgs args = new PersistArgs()) {
         //if its a PathKeyMap then init it
-        if(data instanceof PathKeyMap) data.init()
+        // if(data instanceof PathKeyMap) data.init()
 
         getRepoEventPublisher().doBeforeBind(this, (GormEntity)entity, data, bindAction, args)
         doBind(entity, data, bindAction, args)
@@ -421,7 +420,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * @return the retrieved entity
      */
     D read(Serializable id) {
-        entityReadOnlyTrx {
+        withReadOnlyTrx {
             (D) gormStaticApi().read(id)
         }
     }
@@ -620,7 +619,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * @param callable The closure to call
      * @return The entity that was run in the closure
      */
-    D entityReadOnlyTrx(Closure<D> callable) {
+    public <T> T withReadOnlyTrx(Closure<T> callable) {
         def trxAttr = new CustomizableRollbackTransactionAttribute()
         trxAttr.readOnly = true
         gormStaticApi().withTransaction(trxAttr, callable)

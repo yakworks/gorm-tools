@@ -9,6 +9,7 @@ import java.time.LocalDateTime
 import groovy.transform.CompileDynamic
 
 import grails.gorm.Entity
+import yakworks.commons.map.Maps
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.orgs.model.Contact
@@ -125,7 +126,7 @@ class MockData {
     ]
 
     static Map getCreateOrg() {
-        return baseOrgParams.clone() as Map
+        return Maps.clone(baseOrgParams)
     }
 
     static Map getUpdateOrg(){

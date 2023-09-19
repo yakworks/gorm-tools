@@ -244,7 +244,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
     void "test insert with orgmembers"() {
         given:
-        orgDimensionService.testInit('Branch.Division.Business')
+        orgDimensionService.setDimensions(['Branch.Division.Business']).init()
         Org division = Org.of("Division", "Division", OrgType.Division).persist()
         division.member = OrgMember.make(division)
         division.member.business = Org.of("Business", "Business", OrgType.Business).persist()
@@ -281,7 +281,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         result.member.business == division.member.business
 
         cleanup:
-        orgDimensionService.testInit(null)
+        orgDimensionService.setDimensions(null).init()
     }
 
     void "delete should fail when source is ERP"() {
@@ -489,7 +489,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
     void "create org with member branch lookup by num"() {
         setup:
-        orgDimensionService.testInit('Customer.Branch')
+        orgDimensionService.setDimensions(['Customer.Branch']).init()
         Org branch = Org.findByOrgTypeId(OrgType.Branch.id)
 
         expect:
@@ -508,7 +508,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         branch.id == org.member.branch.id
 
         cleanup:
-        orgDimensionService.testInit(null)
+        orgDimensionService.setDimensions(null).init()
     }
 
 }

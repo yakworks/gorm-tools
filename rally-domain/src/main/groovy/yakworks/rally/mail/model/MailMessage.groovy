@@ -8,8 +8,6 @@ import java.time.LocalDateTime
 
 import groovy.transform.CompileDynamic
 
-import org.grails.datastore.mapping.config.MappingDefinition
-
 import gorm.tools.hibernate.type.JsonType
 import gorm.tools.repository.model.UuidGormRepo
 import gorm.tools.repository.model.UuidRepoEntity

@@ -6,6 +6,7 @@ package yakworks.rally
 
 import groovy.transform.CompileStatic
 
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
@@ -19,6 +20,7 @@ import yakworks.security.spring.DefaultSecurityConfiguration
 @Configuration @Lazy
 @Import([DefaultSecurityConfiguration, SecurityGormConfiguration, AuditStampConfiguration, MailSpringConfig])
 //@ComponentScan(['yakworks.rally']) //scan and pick up all
+@ConfigurationPropertiesScan([ 'yakworks.rally.config' ])
 @ComponentScan(['yakworks.security.gorm', 'yakworks.rally'])
 @CompileStatic
 class RallyConfiguration {

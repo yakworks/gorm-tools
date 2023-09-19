@@ -32,6 +32,7 @@ class OrgCopierSpec extends Specification implements DataRepoTest, SecurityTest 
         ContactEmail, ContactSource, ContactFlex, Activity, ActivityLink, AttachmentLink, MailMessage]
 
     @Autowired OrgCopier orgCopier
+    @Autowired OrgDimensionService orgDimensionService
 
     Closure doWithGormBeans(){ { ->
         orgDimensionService(OrgDimensionService)
@@ -41,6 +42,8 @@ class OrgCopierSpec extends Specification implements DataRepoTest, SecurityTest 
 
     def "test copy"() {
         setup:
+        orgDimensionService.setDimensions(null).init()
+
         Org old = build(Org)
         // old.type = TestData.build(OrgType)
         // old.orgTypeId = old.type.id

@@ -30,7 +30,7 @@ class OrgMemberService {
 
 
     boolean isOrgMemberEnabled(){
-        return orgDimensionService?.orgMemberEnabled
+        return orgDimensionService?.dimensions
     }
 
     /**

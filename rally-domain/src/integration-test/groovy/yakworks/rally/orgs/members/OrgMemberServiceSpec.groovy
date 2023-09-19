@@ -19,10 +19,8 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
     OrgDimensionService orgDimensionService
     OrgMemberService orgMemberService
 
-    void initOrgDimensions(Map dims){
-        orgDimensionService.dimensionsConfig = dims
-        orgDimensionService.clearCache()
-        orgDimensionService.init()
+    void initOrgDimensions(List dims){
+        orgDimensionService.setDimensions(dims).init()
     }
 
     void testSetParent() {
@@ -58,7 +56,7 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
     void "test setupMember"() {
         setup:
         //appConfig.orgDimensions = [primary: "Branch.Division.Business", second: "Branch.Sales"]
-        initOrgDimensions([primary: "Branch.Division.Business", second: "Branch.Sales"])
+        initOrgDimensions(["Branch.Division.Business", "Branch.Sales"])
 
         Org division = Org.of("Division", "Division", OrgType.Division).persist()
         division.member = OrgMember.make(division)
@@ -84,7 +82,7 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
 
     void "test setupMember lookup by num"() {
         setup:
-        initOrgDimensions([primary: "Branch.Division"])
+        initOrgDimensions(["Branch.Division"])
         Org division = Org.findByOrgTypeId(OrgType.Division.id)
 
         when:
@@ -111,7 +109,7 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
 
         // orgMemberService.setupMember(customer, [branch:[num:branch.num]])
 
-        initOrgDimensions([primary: "CustAccount.Customer"])
+        initOrgDimensions(["CustAccount.Customer"])
         when:
         Org custAccount = Org.of("test", "test", OrgType.CustAccount).persist()
         orgMemberService.setupMember(custAccount, [customer:[org:[source:[sourceId:'T1']]]])

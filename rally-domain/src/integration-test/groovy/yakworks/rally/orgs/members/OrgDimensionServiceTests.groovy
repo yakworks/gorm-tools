@@ -28,22 +28,20 @@ class OrgDimensionServiceTests extends Specification implements DomainIntTest {
     }
     */
     void setupDims() {
-        orgDimensionService.dimensionsConfig = [
-            test1: "CustAccount.Branch.Division.Business",
-            test2: "CustAccount.Branch.Sales.Region",
-            test3: "CustAccount.Customer.Division.Business"
-        ]
-
-        //repopulate cache based on the new config specified above.
-        orgDimensionService.init()
+        orgDimensionService.setDimensions([
+            "CustAccount.Branch.Division.Business",
+            "CustAccount.Branch.Sales.Region",
+            "CustAccount.Customer.Division.Business"
+        ]).init()
     }
+
     def cleanup(){
-        orgDimensionService.testInit(null)
+        orgDimensionService.setDimensions(null).init()
     }
 
     def "dimensions are empty"() {
         when:
-        orgDimensionService.testInit(null)
+        orgDimensionService.setDimensions(null).init()
 
         then:
         orgDimensionService.getChildLevels(OrgType.Business).size() == 0
@@ -120,9 +118,7 @@ class OrgDimensionServiceTests extends Specification implements DomainIntTest {
         orgDimensionService.getParentLevels(OrgType.Company) == []
 
         cleanup:
-        // clearAppConfigCache()
-        orgDimensionService.clearCache()
-        orgDimensionService.testInit(null)
+        orgDimensionService.setDimensions(null).init()
 
     }
 

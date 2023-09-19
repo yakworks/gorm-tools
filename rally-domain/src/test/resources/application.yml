@@ -20,16 +20,31 @@ logging:
 #    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
 app:
+
+  # Resources root-location
+  resources-dir: "./build/rootLocation"
   resources:
-    rootLocation: "./build/rootLocation"
-    tempDir: "./build/rootLocation/tempDir"
+    rootLocation: ${app.resources-dir}
+    tempDir: "${app.resources-dir}/tempDir"
     attachments.location: 'attachments'
 
-  # see MailConfig class
+  # Organizations setup
+  orgs:
+    partition-org-type: Division
+    multi-company: true
+    dimensions:
+      - CustAccount.Customer.Division.Business
+      - CustAccount.Branch.Division.Business
+#    dimensions:
+#      enabled: true  # see MailConfig class
+#      paths:
+#        primary: CustAccount.Customer.Branch.Company
+
   mail:
     enabled: true
     default-domain: mg.greenbill.io
     mailgun:
       # enabled: true
       private-api-key: zzz
+
 

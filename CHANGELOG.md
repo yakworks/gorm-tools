@@ -1,3 +1,21 @@
+### v7.3.55
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.54...v7.3.55)
+- release 7.3.55 [link](https://github.com/yakworks/gorm-tools/commit/39acc9e86f930538b0074a79172bbc876b506475)
+- Merge dev for 7.3.55 release [link](https://github.com/yakworks/gorm-tools/commit/8203573ad09e668fbd664e6472009c920bbc167c)
+- vSpringGrailsKit=5.1 & vGroovyCommons=3.12 [link](https://github.com/yakworks/gorm-tools/commit/1ff2cd240fbcbe1a2faf0de3e96de94f11354d22)
+- fix catch [link](https://github.com/yakworks/gorm-tools/commit/d9f6f4fde3c585f696bed73733b1ede37dee05b4)
+- catch throwable so asserts get caught and it finishes job. (#735) [link](https://github.com/yakworks/gorm-tools/commit/4cbc5954431e754d1a9206146ea8daaeeb02eb51)
+- Release/jobs (#734) [link](https://github.com/yakworks/gorm-tools/commit/0967b9c85dcb4bc3911cd282817470b644ce09fa)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/d686a7d1ceceb9bf1e6b55e46d9b5d25086b99d9)
+- Wrap exists in trx (#733) [link](https://github.com/yakworks/gorm-tools/commit/db24d82ee0fb98ef5fd338e3603954792af266de)
+- Merge pull request #729 from yakworks/release/dev-next [link](https://github.com/yakworks/gorm-tools/commit/98a91932c3ce3f27232e3ed16d84632ec9f2c5a7)
+- Merge branch 'dev' into release/dev-next [link](https://github.com/yakworks/gorm-tools/commit/f1ebfb8061d429ee9cb30b28a5b3cf549f6ee6b7)
+- bump vSpringGrailsKit=5.0.11-SNAPSHOT [link](https://github.com/yakworks/gorm-tools/commit/d74f65a54a251861aec905bca79c6cb63b1b7ea3)
+- Merge branch 'dev' into release/dev-next [link](https://github.com/yakworks/gorm-tools/commit/1a5d06899a28fa0a6a3a74c83bdbacd91fc2126f)
+- Jpql exists (#725) [link](https://github.com/yakworks/gorm-tools/commit/197e895d28856a125df10f30d46b9dcab4aa8138)
+- JPQL enhance, commons 3.12 (#720) [link](https://github.com/yakworks/gorm-tools/commit/f259fe44f81615eca89a7315088922fa748b8996)
+
 ### v7.3.54
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.53...v7.3.54)

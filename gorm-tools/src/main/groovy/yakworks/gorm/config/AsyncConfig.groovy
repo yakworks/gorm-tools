@@ -12,7 +12,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Configuration
 
 @Configuration(proxyBeanMethods = false)
-@ConfigurationProperties(prefix="gorm.tools.async")
+@ConfigurationProperties(prefix="yakworks.gorm.async")
 // @ConfigurationPropertiesScan
 @CompileStatic
 class AsyncConfig {

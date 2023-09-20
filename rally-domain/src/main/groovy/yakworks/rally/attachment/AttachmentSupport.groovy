@@ -14,8 +14,6 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.springframework.context.annotation.Lazy
-import org.springframework.core.io.FileSystemResource
-import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 
@@ -87,7 +85,7 @@ class AttachmentSupport {
      * gets the directory for attachments using appResourceLoader.getLocation and appending the
      * date yyyy-MM sub-directory and the unique file name
      */
-    Path getAttachmentsPath(Long id, String fileName, String locationKey = ATTACHMENTS_LOCATION_KEY) {
+    private Path getAttachmentsPath(Long id, String fileName, String locationKey) {
         String attachFileName = concatFileNameId(fileName, id)
         return getAttachmentsPath(locationKey).resolve(attachFileName)
     }
@@ -96,7 +94,7 @@ class AttachmentSupport {
      * gets the directory for attachments using appResourceLoader.getLocation and appending the
      * date yyyy-MM sub-directory.
      */
-    Path getAttachmentsPath(String locationKey = ATTACHMENTS_LOCATION_KEY) {
+    private Path getAttachmentsPath(String locationKey) {
         Path rootPath = appResourceLoader.getPath(locationKey)
         Path attachmentPath = rootPath.resolve(getMonthDir())
         //make sure it exists
@@ -115,14 +113,14 @@ class AttachmentSupport {
         return relativePath.toString()
     }
 
-    String getRelativePath(File file, String locationKey = ATTACHMENTS_LOCATION_KEY) {
-        getRelativePath(file.toPath(), locationKey)
-    }
+    // String getRelativePath(File file, String locationKey = ATTACHMENTS_LOCATION_KEY) {
+    //     getRelativePath(file.toPath(), locationKey)
+    // }
 
     /**
      * uses appResourceLoader to get the tempDir pat
      */
-    Path getTempPath() {
+    private Path getTempPath() {
         appResourceLoader.getTempDirectory()
     }
 
@@ -137,15 +135,15 @@ class AttachmentSupport {
         appResourceLoader.createTempFile(fileName, data)
     }
 
-    Path getFile(String location, String locationKey = ATTACHMENTS_LOCATION_KEY) {
+    Path getPath(String location, String locationKey = ATTACHMENTS_LOCATION_KEY) {
         Path rootPath = appResourceLoader.getPath(locationKey)
         Path attachmentPath = rootPath.resolve(location)
         return attachmentPath
     }
 
-    Path getFile(Attachment attachment){
-        return getFile(attachment.location, attachment.locationKey?:ATTACHMENTS_LOCATION_KEY)
-    }
+    // Path getFile(Attachment attachment){
+    //     return getFile(attachment.location, attachment.locationKey?:ATTACHMENTS_LOCATION_KEY)
+    // }
 
     /**
      * Deletes a file if it exists.
@@ -157,15 +155,15 @@ class AttachmentSupport {
      *          exist
      */
     boolean deleteFile(String location, String locationKey = ATTACHMENTS_LOCATION_KEY) {
-        Path attachedFile = getFile(location, locationKey)
+        Path attachedFile = getPath(location, locationKey)
         if(attachedFile) return Files.deleteIfExists(attachedFile)
         return false
     }
 
-    Resource getResource(Attachment attachment){
-        Path path = getFile(attachment)
-        return new FileSystemResource(path)
-    }
+    // Resource getResource(Attachment attachment){
+    //     Path path = getFile(attachment.location, attachment.locationKey)
+    //     return new FileSystemResource(path)
+    // }
 
     String getDownloadUrl(Attachment attachment) {
         //grailsLinkGenerator.link(uri: "/attachment/download/${attachment.id}")

@@ -57,7 +57,7 @@ class AttachmentRepoSpec extends Specification implements DomainIntTest {
         attachment.location != null
 
         when:
-        File attachedFile = attachmentSupport.getResource(attachment).file
+        File attachedFile = attachment.resource.file
 
         then:
         attachedFile.exists()
@@ -93,8 +93,7 @@ class AttachmentRepoSpec extends Specification implements DomainIntTest {
         'txt' == attachment.extension
 
         cleanup:
-        File attachedFile = attachmentSupport.getResource(attachment).file
-        attachedFile?.delete()
+        attachment.resource.file?.delete()
     }
 
     def testRemove_works() {
@@ -152,7 +151,7 @@ class AttachmentRepoSpec extends Specification implements DomainIntTest {
         copy.extension != null
 
         when:
-        File file = attachmentSupport.getResource(copy).file
+        File file = copy.resource.file
         println copy.id
         println file.absolutePath
 

@@ -151,7 +151,7 @@ class AttachmentSpec extends Specification implements GormHibernateTest, Securit
 
         when:
         Attachment attachment = attachments[0]
-        File attachedFile = attachmentSupport.getResource(attachment).file
+        File attachedFile = attachment.resource.file
 
         then:
         attachment.location != null
@@ -189,7 +189,7 @@ class AttachmentSpec extends Specification implements GormHibernateTest, Securit
         byte[] bytes = Files.readAllBytes(getFile('grails_logo.jpg'))
         MockMultipartFile file = new MockMultipartFile("file", "grails_logo.jpg", "image/jpeg", bytes);
         Attachment entity = attachmentRepo.create(file, [:]);
-        File attachedFile = attachmentSupport.getResource(entity).file
+        Path attachedFile = entity.resource.file.toPath()
 
         then:
         entity

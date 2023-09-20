@@ -11,6 +11,7 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.PathResource
 import org.springframework.core.io.Resource
 import org.springframework.web.multipart.MultipartFile
 
@@ -219,11 +220,13 @@ class AttachmentRepo extends LongIdGormRepo<Attachment> {
 
 
     Resource getResource(Attachment attachment){
-        attachmentSupport.getResource(attachment)
+        //attachmentSupport.getResource(attachment)
+        Path path = getFile(attachment)
+        return new PathResource(path)
     }
 
     Path getFile(Attachment attachment){
-        attachmentSupport.getFile(attachment.location, attachment.locationKey)
+        attachmentSupport.getPath(attachment.location, attachment.locationKey)
     }
 
     String getDownloadUrl(Attachment attachment) {

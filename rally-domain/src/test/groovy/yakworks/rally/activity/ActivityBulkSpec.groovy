@@ -117,7 +117,7 @@ class ActivityBulkSpec extends Specification implements DataRepoTest, SecurityTe
             Activity activity = link?.activity
             Attachment attachment = activity?.attachments[0]
             if (attachment) {
-                attachmentSupport.getResource(attachment).file.delete()
+                attachment.resource.file.delete()
             }
         }
     }

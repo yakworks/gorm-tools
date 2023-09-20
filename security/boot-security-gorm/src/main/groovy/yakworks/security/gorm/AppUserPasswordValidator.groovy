@@ -18,6 +18,9 @@ import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecPasswordHistory
 import yakworks.security.services.PasswordValidator
 
+/**
+ * Older password validation for ApUser and SecPasswordHistory.
+ */
 @CompileStatic
 class AppUserPasswordValidator extends PasswordValidator {
 

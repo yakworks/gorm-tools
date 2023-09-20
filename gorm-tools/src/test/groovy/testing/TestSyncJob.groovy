@@ -22,7 +22,7 @@ import static yakworks.json.groovy.JsonEngine.parseJson
 @IdEqualsHashCode
 @Entity
 @GrailsCompileStatic
-class TestSyncJob implements RepoEntity<TestSyncJob>, SyncJobEntity<TestSyncJob> {
+class TestSyncJob implements RepoEntity<TestSyncJob>, SyncJobEntity {
 
     //parseJson
     <T> T parseData(Class<T> clazz = List){

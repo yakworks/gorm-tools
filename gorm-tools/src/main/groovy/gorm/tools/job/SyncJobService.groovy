@@ -23,7 +23,7 @@ import yakworks.spring.AppCtx
 
 /** Trait for a conretete SyncJobService that provides standard functionality to create and update a jobs status */
 @CompileStatic
-trait SyncJobService<D> {
+abstract class SyncJobService<D> {
     final static Logger LOG = LoggerFactory.getLogger(SyncJobService)
 
     @Autowired

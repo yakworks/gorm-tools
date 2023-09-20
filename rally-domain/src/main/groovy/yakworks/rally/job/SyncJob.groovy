@@ -27,7 +27,7 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.orm
  */
 @Entity
 @GrailsCompileStatic
-class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity<SyncJob>,  AuditStampTrait, Serializable {
+class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity,  AuditStampTrait, Serializable {
 
     // List<Map> problems
 

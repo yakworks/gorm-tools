@@ -33,3 +33,7 @@ app:
       # enabled: true
       private-api-key: zzz
 
+  job:
+    maintenance-window:
+      - '* * 14,15 * * MON-FRI'
+      - '* * 20,21,22,23 * * SAT,SUN'

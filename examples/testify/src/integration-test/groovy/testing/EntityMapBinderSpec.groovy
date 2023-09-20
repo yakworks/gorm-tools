@@ -1,5 +1,6 @@
 package testing
 
+import org.hibernate.Hibernate
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.databinding.EntityMapBinder
@@ -79,5 +80,24 @@ class EntityMapBinderSpec extends Specification {
         activity.mailMessage
         activity.mailMessage.id == msg.id
         !activity.hasErrors()
+    }
+
+    void "bind a proxy with validation errors"() {
+        setup:
+        Org org = Org.repo.lookup([num: "8"])
+
+        expect: "contact would be a proxy"
+        org
+        !Hibernate.isInitialized(org.contact)
+
+        when: "try to bind a proxy which fails validation"
+        binder.bind(org.contact, [name:null, firstName:null])
+
+        then: "This should not through exception, should report errors"
+        noExceptionThrown()
+        !org.contact.validate()
+        org.contact.errors
+        org.contact.errors.hasFieldErrors('firstName')
+        org.contact.errors.getFieldError('firstName').code == "NotNull"
     }
 }

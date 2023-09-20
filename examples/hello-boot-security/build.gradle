@@ -38,9 +38,14 @@ dependencies {
     implementation "org.opensaml:opensaml-saml-impl:4.1.1"
   }
 
-  implementation 'pl.allegro.tech.boot:handlebars-spring-boot-starter:0.3.4'
-  implementation 'com.github.jknack:handlebars:4.3.0'
-  implementation 'com.github.jknack:handlebars-springmvc:4.3.0'
+  implementation('pl.allegro.tech.boot:handlebars-spring-boot-starter:0.3.4'){
+    exclude group:"com.github.jknack", module: "handlebars-humanize"
+    exclude group:"com.github.jknack", module: "handlebars-markdown"
+    exclude group:"com.github.jknack", module: "handlebars-guava-cache"
+    exclude group:"com.github.jknack", module: "handlebars-jackson2"
+  }
+  implementation 'com.github.jknack:handlebars:4.3.1'
+  implementation 'com.github.jknack:handlebars-springmvc:4.3.1'
   // implementation 'com.github.jknack:handlebars-helpers:4.2.0',
   //   'com.github.jknack:handlebars-jackson2:4.2.0',
   //   'com.github.jknack:handlebars-humanize:4.2.0',

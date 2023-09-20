@@ -13,6 +13,9 @@ import org.apache.commons.lang3.StringUtils
 
 import yakworks.api.problem.Problem
 
+/**
+ * Misc utils for emails.
+ */
 @CompileStatic
 class EmailUtils {
 

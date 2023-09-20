@@ -14,7 +14,7 @@ import org.apache.poi.ss.usermodel.CellStyle
 import builders.dsl.spreadsheet.builder.api.SpreadsheetBuilder
 import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import yakworks.commons.lang.DateUtil
-import yakworks.commons.lang.PropertyTools
+import yakworks.commons.beans.PropertyTools
 import yakworks.commons.map.MapFlattener
 
 /**

@@ -18,7 +18,7 @@ import grails.core.GrailsApplication
 import grails.spring.BeanBuilder
 import grails.util.Holders
 import grails.validation.DeferredBindingActions
-import yakworks.commons.lang.PropertyTools
+import yakworks.commons.beans.PropertyTools
 import yakworks.gorm.boot.SpringBeanUtils
 
 /**

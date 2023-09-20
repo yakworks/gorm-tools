@@ -2,7 +2,7 @@
 * Copyright 2023 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.rally.mail
+package yakworks.rally.mail.services
 
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -14,6 +14,8 @@ import grails.gorm.transactions.Transactional
 import yakworks.api.Result
 import yakworks.api.problem.Problem
 import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.mail.EmailService
+import yakworks.rally.mail.EmailService.MailTo
 import yakworks.rally.mail.model.ContentType
 import yakworks.rally.mail.model.MailMessage
 

@@ -11,6 +11,7 @@ import org.codehaus.groovy.runtime.StackTraceUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSourceResolvable
 import org.springframework.dao.DataAccessException
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
@@ -100,7 +101,7 @@ class ProblemHandler {
     }
 
     GenericProblem handleUnexpected(Throwable e){
-        log.error("UNEXPECTED Internal Server Error ${e.message}", StackTraceUtils.deepSanitize(e))
+        log.error("UNEXPECTED Internal Server Error\n${e.message}", StackTraceUtils.deepSanitize(e))
         if (e instanceof GenericProblem) {
             return (GenericProblem) e
         }
@@ -157,6 +158,25 @@ class ProblemHandler {
         } else {
             return null
         }
+    }
+
+    static String isForeignKeyViolation(DataAccessException dax) {
+        if (!dax.rootCause || !(dax instanceof DataIntegrityViolationException)) return null
+        String rootMessage = dax.rootCause.message.toLowerCase()
+        //postgres and H2 - if its DataIntegrityViolationException and contains keyword 'foreign key' thn its fk violation
+        if (rootMessage.contains("foreign key")) {
+            return rootMessage
+        } else {
+            return null
+        }
+    }
+
+    /**
+     * Broken pipe exception happens when client has closed the socket and server tries to write/send any response byte on the output stream.
+     * Server Can write nothing to output stream once we encounter Broken pipe exception
+     */
+    static isBrokenPipe(Exception ex) {
+        return ex.message.toLowerCase().contains("broken pipe")
     }
 
     //Legacy from ValidationException

@@ -86,6 +86,7 @@ class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRep
         ext column: 'extId', lazy: true
         thing column: 'thingId', lazy: true
         status enumType: 'identity'
+        sinkLink column: "sinkLinkId"
     }
 
     static constraintsMap = [

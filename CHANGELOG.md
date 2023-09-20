@@ -1,3 +1,46 @@
+### v7.3.55
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.54...v7.3.55)
+- release 7.3.55 [link](https://github.com/yakworks/gorm-tools/commit/39acc9e86f930538b0074a79172bbc876b506475)
+- Merge dev for 7.3.55 release [link](https://github.com/yakworks/gorm-tools/commit/8203573ad09e668fbd664e6472009c920bbc167c)
+- vSpringGrailsKit=5.1 & vGroovyCommons=3.12 [link](https://github.com/yakworks/gorm-tools/commit/1ff2cd240fbcbe1a2faf0de3e96de94f11354d22)
+- fix catch [link](https://github.com/yakworks/gorm-tools/commit/d9f6f4fde3c585f696bed73733b1ede37dee05b4)
+- catch throwable so asserts get caught and it finishes job. (#735) [link](https://github.com/yakworks/gorm-tools/commit/4cbc5954431e754d1a9206146ea8daaeeb02eb51)
+- Release/jobs (#734) [link](https://github.com/yakworks/gorm-tools/commit/0967b9c85dcb4bc3911cd282817470b644ce09fa)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/d686a7d1ceceb9bf1e6b55e46d9b5d25086b99d9)
+- Wrap exists in trx (#733) [link](https://github.com/yakworks/gorm-tools/commit/db24d82ee0fb98ef5fd338e3603954792af266de)
+- Merge pull request #729 from yakworks/release/dev-next [link](https://github.com/yakworks/gorm-tools/commit/98a91932c3ce3f27232e3ed16d84632ec9f2c5a7)
+- Merge branch 'dev' into release/dev-next [link](https://github.com/yakworks/gorm-tools/commit/f1ebfb8061d429ee9cb30b28a5b3cf549f6ee6b7)
+- bump vSpringGrailsKit=5.0.11-SNAPSHOT [link](https://github.com/yakworks/gorm-tools/commit/d74f65a54a251861aec905bca79c6cb63b1b7ea3)
+- Merge branch 'dev' into release/dev-next [link](https://github.com/yakworks/gorm-tools/commit/1a5d06899a28fa0a6a3a74c83bdbacd91fc2126f)
+- Jpql exists (#725) [link](https://github.com/yakworks/gorm-tools/commit/197e895d28856a125df10f30d46b9dcab4aa8138)
+- JPQL enhance, commons 3.12 (#720) [link](https://github.com/yakworks/gorm-tools/commit/f259fe44f81615eca89a7315088922fa748b8996)
+
+### v7.3.54
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.53...v7.3.54)
+- bump vGroovyCommons=3.11.1, and release [link](https://github.com/yakworks/gorm-tools/commit/6dcc7891ffadc25c43a743eaca69296b4429e6f6)
+- release [link](https://github.com/yakworks/gorm-tools/commit/9dbe2636fecd95894896d384e7e2354390cc53a3)
+- v54 - Merge pull request #732 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/d1ccad4d3de36c8136d2671a877ac5715371a41e)
+- #2255 Add check for contact source unique key (#730) [link](https://github.com/yakworks/gorm-tools/commit/0d72c021c147dd65c0d40fd710f8a60cbec0462b)
+- Handle broken pipe exception (#731) [link](https://github.com/yakworks/gorm-tools/commit/ef8cb57f2f6187eb3f856db4ae1b81c47f2a090f)
+- add SyncJobContext.updateMessage for updating messages without a result. [link](https://github.com/yakworks/gorm-tools/commit/7e602ccac39a40f0f9f31567c35b64f48e529c21)
+- commons 3.11.1-snapshot, dep hell on handlbars springboot plugin, got rid of humanize, and got versions in check [link](https://github.com/yakworks/gorm-tools/commit/7d1ec8dc655d3186ab9e1f4f1373a05fd75add3c)
+- 9ci/domain9#2222 login should be case insensitive (#726) [link](https://github.com/yakworks/gorm-tools/commit/a1fdbd5bfca44c4035e4345473767af5a6b454f8)
+- add clone to MailerTemplate (#728) [link](https://github.com/yakworks/gorm-tools/commit/115e143f56998f535f5ef75efc813af7ad61cd64)
+- Common mailer (#727) [link](https://github.com/yakworks/gorm-tools/commit/e0a6811430ff951774d84fa9d0d7686bd3cdd08a)
+- Fix to handle db exceptions and convert to problem during remove (#722) [link](https://github.com/yakworks/gorm-tools/commit/3bfbb897f059c4d39705b27739b0ff8a7a946170)
+- Fix binder to handle hibernate proxies (#724) [link](https://github.com/yakworks/gorm-tools/commit/cbd0e2ea4700fa57d4040c2341b0b9dfefb2c388)
+- unwrap spring proxy before looking up event methods on repo (#719) [link](https://github.com/yakworks/gorm-tools/commit/821b6caf208ac1e5a20e0d75cda5f386b5bb408a)
+- rename getCriteria to buildCriteria() (#717) [link](https://github.com/yakworks/gorm-tools/commit/e5a4afd36d2515c40801907815d926db2dcc34ce)
+
+### v7.3.53
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.52...v7.3.53)
+- Merge pull request #716 from yakworks/thread-safe-ComboKeyExistsQuery [link](https://github.com/yakworks/gorm-tools/commit/c14ccfecf901dca0fdcf1e3e226987cb922eacdd)
+- prep for release [link](https://github.com/yakworks/gorm-tools/commit/a2f20b6fb98d776f8dde388f2c649b96324443fc)
+- make ComboKeyExistsQuery, build the string each call, will be fast and no need to cache it. [link](https://github.com/yakworks/gorm-tools/commit/9faee6bef1e6fe147d25f36393521d55f12d1907)
+
 ### v7.3.52
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.51...v7.3.52)

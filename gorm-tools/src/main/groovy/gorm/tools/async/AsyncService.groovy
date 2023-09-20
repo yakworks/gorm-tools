@@ -80,7 +80,7 @@ class AsyncService {
             try{
                 T res = wrappedSupplier.get()
                 syncFuture = CompletableFuture.completedFuture(res)
-            } catch (e){
+            } catch (AssertionError | Exception e){
                 syncFuture = new CompletableFuture<T>()
                 syncFuture.completeExceptionally(e)
             }

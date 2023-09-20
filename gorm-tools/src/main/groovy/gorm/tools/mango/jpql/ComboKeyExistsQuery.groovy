@@ -27,8 +27,6 @@ class ComboKeyExistsQuery<D> {
 
     /** property/column to query */
     List<String> keyNames
-    /** cached query string */
-    String queryString
 
     // org.hibernate.query.Query query
     HibernateGormStaticApi<D> staticApi
@@ -48,16 +46,9 @@ class ComboKeyExistsQuery<D> {
         //key set should match
         if(params.keySet().toList() != keyNames)
             throw new IllegalArgumentException("params mismatch, params keys dont match the keyNames")
-        if(!queryString) {
-            queryString = "select 1 from ${entityClass.name} where"
-            String whereClause = ""
-            for(String keyName : keyNames){
-                //if no whereClause then no AND
-                String AND = whereClause ? "AND" : ""
-                whereClause = "$whereClause $AND $keyName = :${paramValName(keyName)}"
-            }
-            queryString = "$queryString ${whereClause.trim()}"
-        }
+
+        //NOTE: this is not sql, its hql so entityClass.name is the domain name that hql translates to the sql.
+        String queryString = buildQueryString(params)
 
         return (Boolean) staticApi.hibernateTemplate.execute { Session session ->
             Query q = (Query) session.createQuery(queryString)
@@ -72,7 +63,20 @@ class ComboKeyExistsQuery<D> {
         }
     }
 
-    String paramValName(String keyName){
+    String buildQueryString(Map<String,?> params){
+        //NOTE: this is not sql, its hql so entityClass.name is the domain name that hql translates to the sql.
+        String queryString = "select 1 from ${entityClass.name} where"
+        String whereClause = ""
+        for(String keyName : keyNames){
+            //if no whereClause then no AND
+            String AND = whereClause ? "AND" : ""
+            whereClause = "$whereClause $AND $keyName = :${paramValName(keyName)}"
+        }
+        queryString = "$queryString ${whereClause.trim()}"
+        return queryString
+    }
+
+    protected String paramValName(String keyName){
         return "${keyName.replace(".", "_")}Val"
     }
 

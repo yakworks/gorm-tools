@@ -25,7 +25,7 @@ import org.springframework.transaction.TransactionStatus
 import gorm.tools.jdbc.DbDialectService
 import spock.lang.AutoCleanup
 import spock.lang.Shared
-import yakworks.commons.lang.PropertyTools
+import yakworks.commons.beans.PropertyTools
 import yakworks.gorm.boot.SpringBeanUtils
 import yakworks.testing.gorm.TestTools
 import yakworks.testing.gorm.support.BaseRepoEntityUnitTest

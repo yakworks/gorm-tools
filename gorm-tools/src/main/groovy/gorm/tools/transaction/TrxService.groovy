@@ -163,14 +163,14 @@ class TrxService {
      * see the static flush method which is called with the getTargetDatastore()
      */
     void flush() {
-        TrxStaticApi.flush(getTargetDatastore())
+        TrxUtils.flush(getTargetDatastore())
     }
 
     /**
      * see the static clear method which is called with the getTargetDatastore()
      */
     void clear() {
-        TrxStaticApi.clear(getTargetDatastore())
+        TrxUtils.clear(getTargetDatastore())
     }
 
     static TrxService bean(){

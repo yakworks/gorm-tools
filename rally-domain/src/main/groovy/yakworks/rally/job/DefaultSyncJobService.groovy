@@ -5,13 +5,17 @@
 package yakworks.rally.job
 
 import java.nio.file.Path
+import java.time.LocalDateTime
 
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
+import gorm.tools.job.SyncJobArgs
+import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobService
 import gorm.tools.repository.GormRepo
 import yakworks.rally.attachment.AttachmentSupport
@@ -20,7 +24,10 @@ import yakworks.rally.attachment.repo.AttachmentRepo
 
 @Lazy @Service('syncJobService')
 @CompileStatic
-class DefaultSyncJobService implements SyncJobService<SyncJob> {
+class DefaultSyncJobService extends SyncJobService<SyncJob> {
+
+    @Autowired
+    JobProps jobProps
 
     @Autowired
     SyncJobRepo syncJobRepo
@@ -30,6 +37,12 @@ class DefaultSyncJobService implements SyncJobService<SyncJob> {
 
     @Autowired
     AttachmentSupport attachmentSupport
+
+    @Override
+    SyncJobContext createJob(SyncJobArgs args, Object payload){
+        MaintWindowUtil.checkWindows(jobProps.maintenanceWindow, LocalDateTime.now())
+        super.createJob(args, payload)
+    }
 
     @Override
     GormRepo<SyncJob> getRepo(){
@@ -46,5 +59,6 @@ class DefaultSyncJobService implements SyncJobService<SyncJob> {
         Attachment attachment = attachmentRepo.create(sourcePath, name)
         return attachment.id
     }
+
 
 }

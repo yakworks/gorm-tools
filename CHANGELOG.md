@@ -1,3 +1,10 @@
+### v7.3.56
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.55...v7.3.56)
+- RestResponderService and maint window bloacker for jobs [link](https://github.com/yakworks/gorm-tools/commit/7c5e15ccf9577cb81c68ae8a5ac8c2e3c0924dd4)
+- move to RestResponderService, use the orm builder for the json ones w… (#740) [link](https://github.com/yakworks/gorm-tools/commit/db104131be5bde12e0319f1fe4c528bf3c3bd83d)
+- add check for jobs to see if its in maint window, also a bunch of lint/codenarc fixes that were bad. (#739) [link](https://github.com/yakworks/gorm-tools/commit/7903a5ef831f751459573b7ac6e0794229c105af)
+
 ### v7.3.55
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.54...v7.3.55)

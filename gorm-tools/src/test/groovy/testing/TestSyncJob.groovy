@@ -22,7 +22,7 @@ import static yakworks.json.groovy.JsonEngine.parseJson
 @IdEqualsHashCode
 @Entity
 @GrailsCompileStatic
-class TestSyncJob implements RepoEntity<TestSyncJob>, SyncJobEntity<TestSyncJob> {
+class TestSyncJob implements RepoEntity<TestSyncJob>, SyncJobEntity {
 
     //parseJson
     <T> T parseData(Class<T> clazz = List){
@@ -44,11 +44,13 @@ class TestSyncJob implements RepoEntity<TestSyncJob>, SyncJobEntity<TestSyncJob>
 
     static TestSyncJobRepo getRepo() { RepoLookup.findRepo(this) as TestSyncJobRepo }
 
-    static mapping = {
-        state column: 'state', enumType: 'identity'
-        payloadBytes sqlType: 'BLOB'
-        dataBytes sqlType: 'BLOB'
-        //intelij show this as an error but it works fine
-        problems type: JsonType, params: [type: ArrayList]
+    static mapping = orm {
+        //id(generator: "assigned")
+        columns(
+            state: property(enumType: 'identity'),
+            payloadBytes: property(sqlType: 'BLOB'),
+            dataBytes: property(sqlType: 'BLOB'),
+            problems: property(type: JsonType, typeParams: [type: ArrayList])
+        )
     }
 }

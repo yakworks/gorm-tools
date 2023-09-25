@@ -46,4 +46,19 @@ class ExKitchenSinkApiSpec extends Specification implements OkHttpRestTrait {
         delete(path, body.id)
     }
 
+    void "post with bindId"() {
+        when:
+
+        Response resp = post(path + "?bindId=true", [num: "foobie123", name: "foobie", id:9999])
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code() == HttpStatus.CREATED.value()
+        body.id == 9999
+        body.name == 'foobie'
+
+        cleanup:
+        if(body.id) delete(path, body.id)
+    }
+
 }

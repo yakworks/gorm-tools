@@ -42,7 +42,7 @@ class DefaultSyncJobServiceSpec extends Specification implements DataRepoTest, S
         noExceptionThrown()
 
         when:
-        //force error with catch all cron expresions
+        //force error with catch all cron expresions that makes ever hour of every day the window
         jobProps.maintenanceWindow = ['* * 0-23 * * MON-SUN']
         jobContext = syncJobService.createJob(syncJobArgs, [])
         then:

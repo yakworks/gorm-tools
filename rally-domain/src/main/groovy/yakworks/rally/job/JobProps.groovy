@@ -13,5 +13,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 class JobProps {
 
     List<String> maintenanceWindow
-
+    List<String> maintenanceZone
 }

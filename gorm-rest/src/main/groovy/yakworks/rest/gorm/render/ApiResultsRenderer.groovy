@@ -9,7 +9,9 @@ import groovy.transform.CompileStatic
 import org.springframework.http.HttpStatus
 
 import grails.rest.render.RenderContext
+import grails.web.mime.MimeType
 import yakworks.api.ApiResults
+import yakworks.api.ResultUtils
 
 /**
  * Concrete so we can set the HttpStatus.MULTI_STATUS
@@ -24,7 +26,8 @@ class ApiResultsRenderer implements JsonRendererTrait<ApiResults>{
     void render(ApiResults results, RenderContext context) {
         setContentType(context)
         context.status = HttpStatus.MULTI_STATUS
-        jsonBuilder(context).call(results.asMap())
+        var dataMap = results.asMap()
+        jsonBuilder(context).call(dataMap)
     }
 
 }

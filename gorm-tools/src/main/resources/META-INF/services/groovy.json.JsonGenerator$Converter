@@ -1,1 +1,3 @@
-gorm.tools.utils.GormEntityJsonConverter
+yakworks.gorm.json.GormEntityJsonConverter
+yakworks.gorm.json.ProblemConverter
+yakworks.gorm.json.ViolationConverter

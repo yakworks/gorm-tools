@@ -7,6 +7,7 @@ package yakworks.rally.job
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.model.SourceType
+import yakworks.rally.config.JobProps
 import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.json.groovy.JsonEngine
@@ -19,7 +20,7 @@ class SyncJobSpec extends Specification implements DataRepoTest, SecurityTest {
     static springBeans = [
         attachmentSupport:AttachmentSupport,
         syncJobService:DefaultSyncJobService,
-        jobProps:JobProps
+        jobProps: JobProps
     ]
 
     @Autowired DefaultSyncJobService syncJobService

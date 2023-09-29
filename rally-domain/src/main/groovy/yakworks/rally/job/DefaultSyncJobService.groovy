@@ -10,7 +10,6 @@ import java.time.LocalDateTime
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
@@ -21,6 +20,7 @@ import gorm.tools.repository.GormRepo
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.repo.AttachmentRepo
+import yakworks.rally.config.JobProps
 
 @Lazy @Service('syncJobService')
 @CompileStatic

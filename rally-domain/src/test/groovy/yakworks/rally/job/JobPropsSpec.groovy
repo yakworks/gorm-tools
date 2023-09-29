@@ -3,6 +3,7 @@ package yakworks.rally.job
 import org.springframework.beans.factory.annotation.Autowired
 
 import spock.lang.Specification
+import yakworks.rally.config.JobProps
 import yakworks.testing.grails.GrailsAppUnitTest
 
 /**

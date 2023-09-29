@@ -8,12 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
-import gorm.tools.model.SourceType
 import spock.lang.Specification
 import yakworks.api.problem.ThrowableProblem
-import yakworks.json.groovy.JsonEngine
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.config.JobProps
 import yakworks.testing.gorm.unit.DataRepoTest
 import yakworks.testing.gorm.unit.SecurityTest
 

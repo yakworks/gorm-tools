@@ -56,8 +56,13 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
         MailTo mailTo = mailMessageSender.convertMailMessage(mailMsg)
 
         then:
-        mailTo
-        mailTo
+        mailTo.to[0] == mailMsg.sendTo
+        mailTo.from == mailMsg.sendFrom
+        mailTo.replyTo == mailMsg.replyTo
+        mailTo.subject == mailMsg.subject
+        mailTo.getText() == mailMsg.body
+        mailTo.tags == mailMsg.tags
+
     }
 
     void "convertMailMessage with attachment"() {

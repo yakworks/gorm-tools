@@ -1,3 +1,9 @@
+### v7.3.57
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.56...v7.3.57)
+- try cache bust [link](https://github.com/yakworks/gorm-tools/commit/cbaa88d8519bb9596597a90084fa4966549d2aae)
+- fix so tags gets copied from MailMessage and sent through mailgun (#745) [link](https://github.com/yakworks/gorm-tools/commit/278a45338e4724a720d7b8b332c2653550e73980)
+
 ### v7.3.56
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.55...v7.3.56)

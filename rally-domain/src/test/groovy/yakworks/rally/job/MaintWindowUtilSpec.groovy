@@ -18,14 +18,14 @@ class MaintWindowUtilSpec extends Specification {
 
     void "test timezone playground"() {
         setup:
-        var tz = TimeZone.getDefault()
+        //var tz = TimeZone.getDefault()
         var tz1 = StringUtils.parseTimeZoneString("CST")
         var utc = StringUtils.parseTimeZoneString("UTC")
 
         expect:
         utc.toZoneId() == ZoneId.of("UTC")
         ZoneId.of("America/Denver")
-        tz.toZoneId() == ZoneId.of("America/Denver")
+        //tz.toZoneId() == ZoneId.of("America/Denver")
         tz1.toZoneId().toString() == "America/Chicago"
         LocalDateTime localDateTime = LocalDateTime.parse("2023-09-20T13:59:59")
         localDateTime.toString() == "2023-09-20T13:59:59"

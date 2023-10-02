@@ -47,11 +47,13 @@ app:
       # enabled: true
       private-api-key: zzz
 
-  job:
-    maintenance-timezone: CST
-    maintenance-window:
+  maintenance:
+    zone: CST
+    # list of crons
+    crons:
       # 9pm-11pm MON-FRI Central time, which in UTC is 02:00-04:00 TUE-SAT
       # set the hours with comma instead of range, so we say all of hour 02 and all of hour 03, which wont include hour 04.
       - '* * 2,3 * * TUE-SAT'
       # 3pm-7pm SAT-SUN Central time, which in UTC is 20:00-24:00 SAT,SUN
       - '* * 20,21,22,23 * * SAT,SUN'
+

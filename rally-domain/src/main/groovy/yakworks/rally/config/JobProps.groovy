@@ -8,6 +8,11 @@ import groovy.transform.CompileStatic
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 
+/**
+ * Config prioperties for the syncJobs.
+ * Can setup defaults and whats availiable.
+ *
+ */
 @ConfigurationProperties(prefix="app.job")
 @CompileStatic
 class JobProps {

@@ -20,27 +20,24 @@ import gorm.tools.repository.GormRepo
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.repo.AttachmentRepo
-import yakworks.rally.config.JobProps
+import yakworks.rally.config.MaintenanceProps
 
 @Lazy @Service('syncJobService')
 @CompileStatic
 class DefaultSyncJobService extends SyncJobService<SyncJob> {
 
-    @Autowired
-    JobProps jobProps
+    //@Autowired JobProps jobProps
+    @Autowired MaintenanceProps maintenanceProps
 
-    @Autowired
-    SyncJobRepo syncJobRepo
+    @Autowired SyncJobRepo syncJobRepo
 
-    @Autowired
-    AttachmentRepo attachmentRepo
+    @Autowired AttachmentRepo attachmentRepo
 
-    @Autowired
-    AttachmentSupport attachmentSupport
+    @Autowired AttachmentSupport attachmentSupport
 
     @Override
     SyncJobContext createJob(SyncJobArgs args, Object payload){
-        MaintWindowUtil.checkWindows(jobProps.maintenanceWindow, LocalDateTime.now())
+        MaintWindowUtil.checkWindows(maintenanceProps.crons, LocalDateTime.now())
         super.createJob(args, payload)
     }
 

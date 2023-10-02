@@ -8,6 +8,11 @@ import groovy.transform.CompileStatic
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 
+/**
+ * properties/config for when app will be be in Maintenance mode.
+ * Work with a list of crons expressions and an have a time zone.
+ * Used in the jobs for now but can be used in other areas of the app to make sure sensitive areas are not touched while in maint mode.
+ */
 @ConfigurationProperties(prefix="app.maintenance")
 @CompileStatic
 class MaintenanceProps {

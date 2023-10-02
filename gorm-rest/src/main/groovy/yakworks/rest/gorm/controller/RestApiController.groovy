@@ -27,9 +27,11 @@ import static gorm.tools.problem.ProblemHandler.isBrokenPipe
 /**
  * Marker trait with common helpers for a Restfull api type controller.
  * see grails-core/grails-plugin-rest/src/main/groovy/grails/artefact/controller/RestResponder.groovy
+ * RestResponder is here as the RestResponderTraitInjector will inject it and be out of order potentially.
+ * We want RestRegistryResponder which is basically a replacement for it.
  */
 @CompileStatic
-trait RestApiController implements RequestJsonSupport, RestResponder, RestRegistryResponder, ServletAttributes {
+trait RestApiController implements RequestJsonSupport, RestResponder, RestResponderTrait, ServletAttributes {
     final static Logger LOG = LoggerFactory.getLogger(RestApiController)
 
     @Autowired ProblemHandler problemHandler

@@ -101,7 +101,8 @@ trait RestRepoApiController<D> extends RestApiController {
     @Action
     def post() {
         try {
-            D instance = (D) getRepo().create(bodyAsMap())
+            Boolean bindId = params.getBoolean('bindId')
+            D instance = (D) getRepo().create(bodyAsMap(), [bindId:bindId])
             respondWithEntityMap(instance, getParamsMap(), CREATED)
         } catch (Exception e) {
             handleException(e)

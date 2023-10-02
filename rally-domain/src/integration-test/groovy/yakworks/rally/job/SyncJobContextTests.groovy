@@ -24,7 +24,7 @@ import static yakworks.json.groovy.JsonEngine.parseJson
 @Rollback
 class SyncJobContextTests extends Specification implements DomainIntTest {
 
-    SyncJobService syncJobService
+    DefaultSyncJobService syncJobService
 
     SyncJobContext createJob(){
         def samplePaylod = [1,2,3,4]

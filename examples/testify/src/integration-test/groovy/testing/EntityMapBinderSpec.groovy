@@ -4,7 +4,7 @@ import org.hibernate.Hibernate
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.repository.RepoUtil
+import gorm.tools.transaction.TrxUtils
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
@@ -55,7 +55,7 @@ class EntityMapBinderSpec extends Specification {
     void "association with uuid"() {
         setup:
         MailMessage msg = MailMessage.create(state: MailMessage.MsgState.Queued, source: "test", sendFrom:"test@9ci.cim", sendTo:"dev@9ci.com")
-        RepoUtil.flush()
+        TrxUtils.flush()
 
         expect:
         msg.id

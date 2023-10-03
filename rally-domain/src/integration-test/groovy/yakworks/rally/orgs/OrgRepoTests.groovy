@@ -281,7 +281,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         result.member.business == division.member.business
 
         cleanup:
-        orgDimensionService.setDimensions(null).init()
+        orgDimensionService.clearDimensions()
     }
 
     void "delete should fail when source is ERP"() {
@@ -508,7 +508,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         branch.id == org.member.branch.id
 
         cleanup:
-        orgDimensionService.setDimensions(null).init()
+        orgDimensionService.clearDimensions()
     }
 
 }

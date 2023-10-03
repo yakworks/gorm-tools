@@ -60,7 +60,7 @@ class OrgDimensionService {
 
     /**
      * Parse dimension levels from appsetup config and cache on server startup,
-     * but it can be called manually afterwards (eg from tests), and it will reset the cache and repopulate it based
+     * but it can be called manually afterwards for testing, and it will reset the cache and repopulate it based
      * on the current appsetup config.
      */
     @PostConstruct
@@ -73,18 +73,17 @@ class OrgDimensionService {
         isInitialized = true
     }
 
-    /** DEPRECATED, temp here for legacy code, use dimensions instead */
-    OrgDimensionService setDimensionsConfig(Map<String, String> v){
-        isInitialized = false
-        this.dimensions = v*.value
-        return this
-    }
-
     /** The list of dimensions paths that are valid */
     OrgDimensionService setDimensions(List<String> paths){
         isInitialized = false
         this.dimensions = paths
         return this
+    }
+
+    /** Used for testing to null out and clear the dimensions */
+    protected void clearDimensions(){
+        setDimensions(null)
+        init()
     }
 
     /**

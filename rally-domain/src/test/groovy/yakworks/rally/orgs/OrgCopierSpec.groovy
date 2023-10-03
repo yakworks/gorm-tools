@@ -42,7 +42,7 @@ class OrgCopierSpec extends Specification implements DataRepoTest, SecurityTest 
 
     def "test copy"() {
         setup:
-        orgDimensionService.setDimensions(null).init()
+        orgDimensionService.clearDimensions()
 
         Org old = build(Org)
         // old.type = TestData.build(OrgType)

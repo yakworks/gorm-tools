@@ -24,12 +24,12 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
     OrgDimensionService orgDimensionService
 
     void nullOutDimensions(){
-        orgDimensionService.setDimensions(null).init()
+        orgDimensionService.clearDimensions()
     }
 
     def "test sanity check on orgMember"() {
         setup:
-        nullOutDimensions()
+        orgDimensionService.clearDimensions()
         Org org = Org.of("O1", "O1", OrgType.Customer).persist()
         Org branch = Org.of("Branch", "Branch", OrgType.Branch).persist()
         Org division = Org.of("Division", "Division", OrgType.Division).persist()
@@ -133,15 +133,13 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
         result.member.business == division.member.business
 
         cleanup:
-        nullOutDimensions()
+        orgDimensionService.clearDimensions()
     }
 
     void "test create customer with branch by id"() {
         given:
-        orgDimensionService.setDimensions(['Branch']).init()
-        orgDimensionService.dimensionsConfig = [ test1: "Customer.Branch" ]
-        orgDimensionService.clearCache()
-        orgDimensionService.init()
+        orgDimensionService.setDimensions(["Customer.Branch"]).init()
+
         when:
         Org branch = Org.findByOrgTypeId(OrgType.Branch.id)
         assert branch
@@ -157,15 +155,13 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
         result.member.company
 
         cleanup:
-        nullOutDimensions()
+        orgDimensionService.clearDimensions()
     }
 
     void "test create customer with branch by num"() {
         given:
-        orgDimensionService.setDimensions(['Branch']).init()
-        orgDimensionService.dimensionsConfig = [ test1: "Customer.Branch" ]
-        orgDimensionService.clearCache()
-        orgDimensionService.init()
+        orgDimensionService.setDimensions(["Customer.Branch"]).init()
+
         when:
         Org branch = Org.findByOrgTypeId(OrgType.Branch.id)
         assert branch
@@ -180,12 +176,13 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
         result.member.branch.id == branch.id
 
         cleanup:
-        nullOutDimensions()
+        orgDimensionService.clearDimensions()
     }
 
     void "test delete is cascaded"() {
         setup:
-        nullOutDimensions()
+        orgDimensionService.clearDimensions()
+
         Org org = createOrg("test", "T001", OrgType.Branch).persist(flush: true)
         Long oid = org.id
         OrgMember orgMember = OrgMember.make(org)
@@ -204,7 +201,7 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
 
     def "constraint: nothing is required when no dimensions specified"() {
         when:
-        nullOutDimensions()
+        orgDimensionService.clearDimensions()
         Org org = createOrg("test", "T001", OrgType.Branch)
         OrgMember orgMember = OrgMember.make(org)
 
@@ -257,7 +254,7 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
         validateErrors(member.errors, requiredLevels)
 
         cleanup:
-        nullOutDimensions()
+        orgDimensionService.clearDimensions()
 
         where:
 

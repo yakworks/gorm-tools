@@ -27,8 +27,7 @@ class OrgMemberService {
 
     @Autowired(required = false)
     OrgDimensionService orgDimensionService
-
-
+    
     boolean isOrgMemberEnabled(){
         return orgDimensionService?.dimensions
     }

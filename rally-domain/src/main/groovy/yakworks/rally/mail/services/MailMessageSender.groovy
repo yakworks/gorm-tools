@@ -97,6 +97,8 @@ class MailMessageSender {
             }
             if(attachFiles) mailTo.attachments = attachFiles
         }
+        //tags
+        if(mailMessage.tags) mailTo.tags = mailMessage.tags
         //TODO do inline
         return mailTo
     }

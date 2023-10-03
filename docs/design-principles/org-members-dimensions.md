@@ -1,18 +1,29 @@
 ### 9ci Organization structure into Org Types:
 
 
-Organization data is sorted in a hierarchical arrangement, according to dimensions and measures. **Dimensions** (_Org_) group the data along natural categories and consist of one or more levels (org types). Each **level** (_Org Type_) represents a different grouping within the same dimension. For example, an org dimension can include levels (_org types_) such as customer, division, branch, business.
+Organization data is sorted in a hierarchical arrangement, according to dimensions and measures. 
+**Dimensions** (_Org_) group the data along natural categories and consist of one or more levels (org types). 
+Each **level** (_Org Type_) represents a different grouping within the same dimension. 
+For example, an org dimension can include levels (_org types_) such as customer, division, branch, business.
 
-**Levels** (_org types_) are organized into one or more **hierarchies** we call _dimension paths_, typically from a coarse-grained level (for example, Year) down to the most detailed one (for example, Day). In 9ci structure the lowest would be custAccount and customer and the highest business, company and client). The individual category values (for example, Customer(205)) are called **members** (_org record_ , _set of data_).
+**Levels** (_org types_) are organized into one or more **hierarchies** we call _dimension paths_, 
+typically from a coarse-grained level (for example, Year) down to the most detailed one (for example, Day). 
+In 9ci structure the lowest would be custAccount and customer and the highest business, company and client). 
+The individual category values (for example, Customer(205)) are called **members** (_org record_ , _set of data_).
 
 Each combination of the dimension path values is called a **member** which is essentially row in the list. Some examples of members:
 - CustAccount(20).branch(31)
 - Customer(11).division(41).business(52)
 
-A dimension can also have multiple _paths_ to provide different sequences of groupings. For example, a CustAccount dimension can have a custAccount path with branch.division.business and a operation path: opsDivision.sales.
+A dimension can also have multiple _paths_ to provide different sequences of groupings. 
+For example, a CustAccount dimension can have a custAccount path with branch.division.business and a operation path: opsDivision.sales.
 
-Not all categorical data attributes need to become a member of a hierarchy level. Some grouping information is needed only as additional information for a member or for applying subsets to data. These attributes can be loaded into member properties. Member properties can be associated with any level in a hierarchy.
-Validation for 9ci orgs can be configiured and you can specify which org members are required on each level (_OrgType_). For example, orgs that is not required can be factory or brand, not every Org needs to have a factory, or for other clients it can be called differently. 9ci stores them as flexOrg1, flexOrg2.
+Not all categorical data attributes need to become a member of a hierarchy level. 
+Some grouping information is needed only as additional information for a member or for applying subsets to data. 
+These attributes can be loaded into member properties. Member properties can be associated with any level in a hierarchy.
+Validation for 9ci orgs can be configiured and you can specify which org members are required on each level (_OrgType_). 
+For example, orgs that is not required can be factory or brand, not every Org needs to have a factory, 
+or for other clients it can be called differently. 9ci stores them as flexOrg1, flexOrg2.
 
 
 ***Org Types settings***

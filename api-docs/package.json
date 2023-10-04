@@ -28,7 +28,7 @@
     "markdown-it-anchor": "^7.1.0",
     "markdown-it-prism": "^2.1.6",
     "openapi-sampler": "^1.0.1",
-    "postcss": "^8.3.2",
+    "postcss": "^8.4.31",
     "postcss-cli": "^8.3.1",
     "reftools": "^1.1.8",
     "rollup": "^2.51.2",

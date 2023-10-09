@@ -17,6 +17,10 @@ import yakworks.rally.orgs.model.OrgType
 class OrgConfig {
 
     /**
+     * <p> The app can be used consolidate multiple accounting systems into a single central repository.
+     * This is done by partitioning the data with the partitionOrgType, where each Organization with the type segments
+     * the different systems or sets of books.
+     *
      * <p> The organization type or level (Company, Division, etc..) the data is segmented or "partioned" by.
      * The default is Company and there can be many companies under a single Client for example.
      * This is the Organization mapped to an ERP or GL or set of books. Can also be a considered a tenant.
@@ -48,7 +52,7 @@ class OrgConfig {
     OrgType partitionOrgType = OrgType.Company
 
     /**
-     * Whether there will be multiple Organizations for whats set in partitionOrgType.
+     * Whether there will be multiple Organizations for the type set in partitionOrgType.
      * For example, partitionOrgType will default to Company. In a straight forward instance of the App this will be false and there will
      * be a single Company for this app (Company id 2 by default) and a single set of books.
      * When this is set to true then multiple Companies (or Divisions) will be allowed.
@@ -56,5 +60,15 @@ class OrgConfig {
     boolean multiPartition = false
 
     List<String> dimensions
+
+    static class PartitionConfig {
+        OrgType orgType
+        boolean multi
+    }
+
+    static class MemberConfig {
+        List<OrgType> dimension1
+        List<OrgType> dimension2
+    }
 
 }

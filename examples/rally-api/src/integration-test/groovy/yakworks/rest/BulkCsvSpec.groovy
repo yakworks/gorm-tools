@@ -1,17 +1,18 @@
 package yakworks.rest
 
-import gorm.tools.repository.RepoUtil
-import yakworks.rest.gorm.controller.RestRepoApiController
+
+import gorm.tools.transaction.TrxUtils
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import yakworks.commons.io.ZipUtils
 import yakworks.commons.util.BuildSupport
-import yakworks.testing.rest.RestIntTest
-import yakworks.spring.AppResourceLoader
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Contact
+import yakworks.rest.gorm.controller.RestRepoApiController
+import yakworks.spring.AppResourceLoader
+import yakworks.testing.rest.RestIntTest
 
 @Rollback
 @Integration
@@ -43,7 +44,7 @@ class BulkCsvSpec  extends RestIntTest {
         Attachment.withNewTransaction {
             attachment = Attachment.create(params)
         }
-        RepoUtil.flush()
+        TrxUtils.flush()
 
         then:
         noExceptionThrown()
@@ -108,7 +109,7 @@ class BulkCsvSpec  extends RestIntTest {
         Attachment.withNewTransaction {
             attachment = Attachment.create(params)
         }
-        RepoUtil.flush()
+        TrxUtils.flush()
 
         then: "make sure attachment is good"
         noExceptionThrown()

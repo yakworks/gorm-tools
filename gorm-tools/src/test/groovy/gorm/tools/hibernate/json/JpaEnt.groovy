@@ -10,7 +10,7 @@ import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
 
-import com.vladmihalcea.hibernate.type.json.JsonType
+import io.hypersistence.utils.hibernate.type.json.JsonType
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.model.RepoEntity

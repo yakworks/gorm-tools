@@ -65,6 +65,7 @@ class ActivitySpec extends Specification implements GormHibernateTest, SecurityT
         activity.name == 'got it'
         activity.kind == Activity.Kind.Log
         !activity.note
+        activity.actDate
     }
 
     void "simple note creation2"() {

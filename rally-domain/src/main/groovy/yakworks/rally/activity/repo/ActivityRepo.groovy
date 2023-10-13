@@ -4,13 +4,14 @@
 */
 package yakworks.rally.activity.repo
 
-
+import java.time.LocalDateTime
 import javax.persistence.criteria.JoinType
 
 import groovy.transform.CompileStatic
 
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.validation.Errors
 
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
@@ -24,6 +25,7 @@ import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
+import gorm.tools.validation.Rejector
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.ReadOnly
 import yakworks.rally.activity.model.Activity
@@ -59,8 +61,20 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
     ProblemHandler problemHandler
 
     @RepoListener
-    void beforeValidate(Activity activity) {
+    void beforeValidate(Activity activity, Errors errors) {
         updateNameSummary(activity)
+        validateActDate(activity, errors)
+    }
+
+    void validateActDate(Activity activity, Errors errors) {
+        if(activity.isNew()) {
+            if(!activity.actDate) {
+                activity.actDate = LocalDateTime.now()
+            }
+        } else if(activity.hasChanged('actDate')) {
+            //actDate can not be updated.
+            Rejector.of(activity, errors).withError('actDate', activity.actDate, 'error.notupdateable', [name:"actDate"])
+        }
     }
 
     @RepoListener

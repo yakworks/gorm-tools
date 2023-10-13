@@ -1,3 +1,15 @@
+### v7.3.58
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.57...v7.3.58)
+- release [link](https://github.com/yakworks/gorm-tools/commit/f96be053f0f954bd11facc6370c065718fa45aa3)
+- Merge dev for release 7.3.58 [link](https://github.com/yakworks/gorm-tools/commit/f1753f8aa0800223e79c1fbc3ca03b23a4aa0b8a)
+- vGroovyCommons=3.13 [link](https://github.com/yakworks/gorm-tools/commit/bf57694cec2b76ebac6b01cab52673e8a3004167)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/84e0e0adc7c1aa090fd7070f67625d6541659b13)
+- remove the flush and clears from RepoUtils (#744) [link](https://github.com/yakworks/gorm-tools/commit/66cbd970e2d294b0f6c1a235d15c683fb239f822)
+- Hibernate session cache and query gotchas (#742) [link](https://github.com/yakworks/gorm-tools/commit/4d896411648b876f8e3f69843b14ea0ea3b95403)
+- Merge pull request #743 from yakworks/2292-bindid [link](https://github.com/yakworks/gorm-tools/commit/896c4c56e1be7f07edecb3fbc46ff46f9749857e)
+- support bindId during post [link](https://github.com/yakworks/gorm-tools/commit/a7df89714843d47356bebe41017589d570306bf0)
+
 ### v7.3.57
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.56...v7.3.57)

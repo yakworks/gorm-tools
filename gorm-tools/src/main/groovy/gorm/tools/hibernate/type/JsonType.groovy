@@ -12,15 +12,15 @@ import groovy.transform.CompileStatic
 import org.hibernate.type.descriptor.sql.SqlTypeDescriptor
 import org.hibernate.usertype.ParameterizedType
 
-import com.vladmihalcea.hibernate.type.json.internal.JsonTypeDescriptor
-import com.vladmihalcea.hibernate.type.util.Configuration
+import io.hypersistence.utils.hibernate.type.json.internal.JsonTypeDescriptor
+//import io.hypersistence.utils.hibernate.type.util.Configuration
 
 /**
  * Overrides so we can access setParameterValues using the gorm mapping
  */
 @SuppressWarnings(["ClassNameSameAsSuperclass"])
 @CompileStatic
-class JsonType extends com.vladmihalcea.hibernate.type.json.JsonType {
+class JsonType extends io.hypersistence.utils.hibernate.type.json.JsonType {
 
     // public static final com.vladmihalcea.hibernate.type.json.JsonType INSTANCE = new JsonExtType();
 

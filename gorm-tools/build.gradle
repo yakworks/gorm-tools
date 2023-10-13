@@ -19,7 +19,9 @@ dependencies {
   api "org.grails:grails-databinding:$grailsVersion"
 
   api "org.yakworks:hibernate-groovy-proxy:$vHibernateGroovy"
-  api "org.yakworks:hibernate-groovy-db:$vHibernateGroovy"
+  api("org.yakworks:hibernate-groovy-db:$vHibernateGroovy"){
+    exclude group:"com.vladmihalcea", module: "hibernate-types-55"
+  }
 
   api ("org.yakworks:grails-kit:$vSpringGrailsKit")
   api "org.yakworks:grails-icu4j:$vYakICU4J"
@@ -28,7 +30,8 @@ dependencies {
   // see https://github.com/f4b6a3/uuid-creator
   api "com.github.f4b6a3:uuid-creator:$vUuidCreator"
   //add the hibernate types for json fields.
-  api "com.vladmihalcea:$vHibTypes"
+  //api "com.vladmihalcea:$vHibTypes"
+  api "io.hypersistence:$vHypersistences"
 
   api "jakarta.annotation:jakarta.annotation-api:$vJakartaAnn"
 

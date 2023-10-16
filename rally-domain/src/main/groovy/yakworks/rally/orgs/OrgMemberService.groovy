@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
 import yakworks.commons.lang.Validate
+import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgType
@@ -28,18 +29,19 @@ class OrgMemberService {
     @Autowired(required = false)
     OrgDimensionService orgDimensionService
 
+    @Autowired(required = false)
+    OrgProps orgProps
+
     boolean isOrgMemberEnabled(){
-        return orgDimensionService?.dimensions
+        return orgProps.members.enabled
     }
 
     /**
      * Sets up OrgMember
      * Looks into org dimensions to find all parents for given orgtype and sets the parents accordingly
      *
-     * @param org
-     *        the org to setup the orgMember for
-     * @param params
-     *        should contain the id values for the required immediate parents.
+     * @param org the org to setup the orgMember for
+     * @param params should contain the id values for the required immediate parents.
      *        for example if the orgDimensionService has immediateParents of [Division,Sales] then
      *               map should contain [division: [id: 123], sales: [id: 234]]
      */

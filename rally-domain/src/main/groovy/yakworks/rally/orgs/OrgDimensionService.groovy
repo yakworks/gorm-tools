@@ -17,8 +17,7 @@ import org.springframework.cache.annotation.Cacheable
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
-import grails.gorm.transactions.Transactional
-import yakworks.commons.lang.EnumUtils
+import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.model.OrgType
 
 /**
@@ -33,6 +32,7 @@ import yakworks.rally.orgs.model.OrgType
 @CompileStatic
 class OrgDimensionService {
 
+    @Autowired(required = false) OrgProps orgProps
 
     @Autowired(required = false) //required = false so unit tests work
     CacheManager cacheManager
@@ -44,7 +44,7 @@ class OrgDimensionService {
     @Value('${app.orgs.dimensions:}')
     List<String> dimensions
 
-    boolean isInitialized = false
+    protected boolean isInitialized = false
 
     @CompileStatic
     static enum DimLevel {
@@ -67,24 +67,26 @@ class OrgDimensionService {
     void init() {
         if(isInitialized) return
         clearCache()
-        if(dimensions){
-            parsePathsAndInitCache(dimensions)
+        // if(dimensions){
+        //     parsePathsAndInitCache(dimensions)
+        // }
+        if(orgProps.members.enabled){
+            initDims()
         }
         isInitialized = true
     }
 
-    /** The list of dimensions paths that are valid */
-    OrgDimensionService setDimensions(List<String> paths){
+    void reinit(){
         isInitialized = false
-        this.dimensions = paths
-        return this
-    }
-
-    /** Used for testing to null out and clear the dimensions */
-    protected void clearDimensions(){
-        setDimensions(null)
         init()
     }
+
+    // /** The list of dimensions paths that are valid */
+    // OrgDimensionService setDimensions(List<String> paths){
+    //     isInitialized = false
+    //     this.dimensions = paths
+    //     return this
+    // }
 
     /**
      * Get all parent levels for given orgtype
@@ -105,7 +107,7 @@ class OrgDimensionService {
 
     /**
      * Get immediate parents for given orgtype
-     * For example, given org dimension
+     * For example, given org dimensions
      *   - CustAccount.Branch.Division
      *   - CustAccount.Customer.Division
      * then getImmediateParents(CustAccount) will return [Branch,Customer]
@@ -124,21 +126,30 @@ class OrgDimensionService {
     //Parse given paths and populate dimensionsCache with DimensionLevel instances
     protected void parsePathsAndInitCache(List paths) {
         for (String path : paths) {
-            String[] arr = path.split("\\.").reverse()
-            OrgType previousType
-            for (String orgTypeName : arr) {
-                OrgType typeEnum = EnumUtils.getEnum(OrgType, orgTypeName)
-                DimensionLevel dlevel = getOrCreateCachedDimensionLevel(typeEnum)
-                if (previousType) {
-                    DimensionLevel parent = getOrCreateCachedDimensionLevel(previousType)
-                    parent.addChild(dlevel)
-                }
-                previousType = typeEnum
-            }
+            List<OrgType> arr = path.tokenize('.').collect{ it as  OrgType }
+            initDimensions(arr)
         }
+        createClientCompanyDimLevels()
+    }
 
-        createClientCompanyDimLevel(OrgType.Client, allLevels)
-        createClientCompanyDimLevel(OrgType.Company, allLevels)
+    protected void initDims(){
+        initDimensions(orgProps.members.dimension)
+        initDimensions(orgProps.members.dimension2)
+        createClientCompanyDimLevels()
+    }
+
+    protected void initDimensions(List<OrgType> typePath) {
+        if(!typePath) return
+        typePath = typePath.reverse() //reverse it so the top starts first
+        OrgType previousType
+        for (OrgType otype : typePath) {
+            DimensionLevel dlevel = getOrCreateCachedDimensionLevel(otype)
+            if (previousType) {
+                DimensionLevel parent = getOrCreateCachedDimensionLevel(previousType)
+                parent.addChild(dlevel)
+            }
+            previousType = otype
+        }
     }
 
     protected void clearCache(){
@@ -192,14 +203,22 @@ class OrgDimensionService {
     }
 
     /**
+     * create the Company and Client dimension levels
+     */
+    protected void createClientCompanyDimLevels() {
+        createClientCompanyDimLevel(OrgType.Client)
+        createClientCompanyDimLevel(OrgType.Company)
+    }
+
+    /**
      * Find if a DimensionLevel is already created for given name and cached in dimensionsCache, or create a new and
      * cache it.
      */
-    protected DimensionLevel createClientCompanyDimLevel(OrgType orgType, List<OrgType> allOrgTypes) {
+    protected DimensionLevel createClientCompanyDimLevel(OrgType orgType) {
         DimensionLevel dlevel = dimensionsCache.get(orgType)
         if (!dlevel) {
             dlevel = new DimensionLevel(orgType)
-            allOrgTypes.each {
+            allLevels.each {
                 def childDim = getOrCreateCachedDimensionLevel(it)
                 dlevel.children.add(childDim)
             }

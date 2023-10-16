@@ -14,6 +14,7 @@ import org.springframework.dao.DataRetrievalFailureException
 
 import gorm.tools.model.SourceType
 import gorm.tools.problem.ValidationProblem
+import yakworks.rally.testing.OrgDimensionTesting
 import yakworks.testing.gorm.TestDataJson
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
@@ -244,7 +245,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
     void "test insert with orgmembers"() {
         given:
-        orgDimensionService.setDimensions(['Branch.Division.Business']).init()
+        OrgDimensionTesting.setDimensions(['Branch', 'Division', 'Business'])
         Org division = Org.of("Division", "Division", OrgType.Division).persist()
         division.member = OrgMember.make(division)
         division.member.business = Org.of("Business", "Business", OrgType.Business).persist()
@@ -281,7 +282,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         result.member.business == division.member.business
 
         cleanup:
-        orgDimensionService.clearDimensions()
+        OrgDimensionTesting.clearDimensions()
     }
 
     void "delete should fail when source is ERP"() {
@@ -489,7 +490,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
     void "create org with member branch lookup by num"() {
         setup:
-        orgDimensionService.setDimensions(['Customer.Branch']).init()
+        OrgDimensionTesting.setDimensions([OrgType.Customer, OrgType.Branch])
         Org branch = Org.findByOrgTypeId(OrgType.Branch.id)
 
         expect:
@@ -508,7 +509,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         branch.id == org.member.branch.id
 
         cleanup:
-        orgDimensionService.clearDimensions()
+        OrgDimensionTesting.clearDimensions()
     }
 
 }

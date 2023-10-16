@@ -3,13 +3,8 @@ package yakworks.rally.orgs
 import org.springframework.beans.factory.annotation.Autowired
 
 import yakworks.commons.lang.EnumUtils
-import yakworks.rally.config.OrgConfig
-import yakworks.rally.config.RallyConfig
-import yakworks.testing.gorm.unit.SecurityTest
-import yakworks.testing.gorm.unit.DataRepoTest
-import grails.testing.services.ServiceUnitTest
+import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.model.OrgType
-import yakworks.rally.orgs.model.OrgTypeSetup
 import spock.lang.Specification
 import yakworks.testing.grails.GrailsAppUnitTest
 
@@ -19,6 +14,7 @@ class OrgDimensionServiceSpec extends Specification implements GrailsAppUnitTest
 
     Closure doWithSpring() { { ->
         orgDimensionService(OrgDimensionService)
+        orgProps(OrgProps)
     }}
 
     void initPaths(){

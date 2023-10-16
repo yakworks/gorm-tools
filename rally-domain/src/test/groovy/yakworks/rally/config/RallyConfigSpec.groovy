@@ -2,10 +2,8 @@ package yakworks.rally.config
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.test.context.TestPropertySource
 
 import spock.lang.Specification
-import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
 import yakworks.testing.grails.GrailsAppUnitTest
 
@@ -21,11 +19,11 @@ class RallyConfigSpec extends Specification implements GrailsAppUnitTest {
     String appResourcesDir
 
     @Autowired RallyConfig rallyConfig
-    @Autowired OrgConfig orgConfig
+    @Autowired OrgProps orgProps
 
     Closure doWithSpring() { { ->
         rallyConfig(RallyConfig)
-        orgConfig(OrgConfig)
+        orgProps(OrgProps)
     }}
 
     def "sanity Check"() {
@@ -38,9 +36,9 @@ class RallyConfigSpec extends Specification implements GrailsAppUnitTest {
 
     def "orgs Check"() {
         expect:
-        orgConfig.partitionOrgType == OrgType.Division
-        orgConfig.dimensions[0] == 'CustAccount.Customer.Division.Business'
-
+        orgProps.partition.enabled
+        orgProps.partition.orgType == OrgType.Division
+        orgProps.members.dimension == [OrgType.CustAccount, OrgType.Customer, OrgType.Division, OrgType.Business]
     }
 
 }

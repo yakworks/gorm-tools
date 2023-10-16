@@ -30,7 +30,21 @@ class Org implements NameNum, RepoEntity<Org>, HasTags, CreateCriteriaSupport, S
     static List<String> toOneAssociations = ['flex', 'info', 'calc', 'member']
 
     String  comments
+
+    /**
+     * Denormalized from the relevant field in OrgMember.
+     * Company is the highest level in any dimension heirarchy and is used heavily for segmenting permissions and mini-multi tenant concepts.
+     */
     Long    companyId
+
+    /**
+     * The Partition Org this org belongs to. Denormalized from the relevant field in OrgMember.
+     * When the partition.orgType = Company that the highest level in the dimension and this will be set to itself for the company records
+     * In the example where partition.orgType = Division and the dimension heirarchy = Customer -> Division -> Company
+     * Then this will be null for the Company orgs and the Division orgs will have this set to themselves.
+     */
+    // Org    partitionOrg
+
     Long    orgTypeId
     OrgType type
     Boolean inactive = false  // no logic attached. Just a flag for reports for now.

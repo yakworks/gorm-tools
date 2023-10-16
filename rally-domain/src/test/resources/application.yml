@@ -30,15 +30,18 @@ app:
 
   # Organizations setup
   orgs:
-    partition-org-type: Division
-    multi-company: true
+    partition:
+      enabled: true
+      org-type: Division
+
+    members:
+      enabled: true
+      dimension: [ CustAccount, Customer, Division, Business ]
+      dimension2: [ CustAccount, Branch, Division, Business]
+
     dimensions:
       - CustAccount.Customer.Division.Business
       - CustAccount.Branch.Division.Business
-#    dimensions:
-#      enabled: true  # see MailConfig class
-#      paths:
-#        primary: CustAccount.Customer.Branch.Company
 
   mail:
     enabled: true

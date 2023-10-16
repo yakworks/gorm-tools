@@ -2,7 +2,9 @@ package yakworks.rally.orgs
 
 import org.springframework.beans.factory.annotation.Autowired
 
+import yakworks.rally.config.OrgProps
 import yakworks.rally.mail.model.MailMessage
+import yakworks.rally.testing.OrgDimensionTesting
 import yakworks.testing.gorm.RepoTestData
 import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.DataRepoTest
@@ -38,11 +40,12 @@ class OrgCopierSpec extends Specification implements DataRepoTest, SecurityTest 
         orgDimensionService(OrgDimensionService)
         orgCopier(OrgCopier)
         activityCopier(ActivityCopier)
+        orgProps(OrgProps)
     }}
 
     def "test copy"() {
         setup:
-        orgDimensionService.clearDimensions()
+        OrgDimensionTesting.clearDimensions()
 
         Org old = build(Org)
         // old.type = TestData.build(OrgType)

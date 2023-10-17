@@ -26,7 +26,8 @@ class OrgRepo extends AbstractOrgRepo {
     @RepoListener
     void beforeValidate(Org org, Errors errors) {
         super.beforeValidate(org, errors)
-        wireOrgMember(org)
+        //dont try to setup member if it has any errors
+        if(!errors.hasErrors()) wireOrgMember(org)
         //verifyCompany(org)
     }
 

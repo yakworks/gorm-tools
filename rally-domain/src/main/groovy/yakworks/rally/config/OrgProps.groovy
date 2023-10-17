@@ -65,7 +65,7 @@ class OrgProps {
 
     static class MemberConfig {
         /** Set to true to activate members and dimension hierarchies */
-        boolean enabled = false
+        boolean enabled = true
 
         /**
          * The default dimension.

@@ -31,12 +31,12 @@ class OrgDimensionServiceTests extends Specification implements DomainIntTest {
     }
 
     def cleanup(){
-        OrgDimensionTesting.clearDimensions()
+        OrgDimensionTesting.resetDimensions()
     }
 
     def "dimensions are empty"() {
         when:
-        OrgDimensionTesting.clearDimensions()
+        OrgDimensionTesting.emptyDimensions()
 
         then:
         orgDimensionService.getChildLevels(OrgType.Business).size() == 0
@@ -100,7 +100,7 @@ class OrgDimensionServiceTests extends Specification implements DomainIntTest {
         orgDimensionService.getParentLevels(OrgType.Company) == []
 
         cleanup:
-        OrgDimensionTesting.clearDimensions()
+        OrgDimensionTesting.resetDimensions()
 
     }
 

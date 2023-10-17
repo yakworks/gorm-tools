@@ -5,7 +5,6 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import yakworks.rally.testing.OrgDimensionTesting
 import yakworks.testing.gorm.integration.DomainIntTest
-import yakworks.rally.orgs.OrgDimensionService
 import yakworks.rally.orgs.OrgMemberService
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgMember
@@ -73,7 +72,7 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
         branch.member.sales == sales
 
         cleanup:
-        OrgDimensionTesting.clearDimensions()
+        OrgDimensionTesting.resetDimensions()
     }
 
     void "test setupMember lookup by num"() {
@@ -91,7 +90,7 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
         branch.member.division == division
 
         cleanup:
-        OrgDimensionTesting.clearDimensions()
+        OrgDimensionTesting.resetDimensions()
     }
 
     void "test setupMember lookup for customer by org source "() {

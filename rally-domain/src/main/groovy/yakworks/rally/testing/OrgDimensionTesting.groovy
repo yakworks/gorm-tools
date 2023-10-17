@@ -32,6 +32,7 @@ class OrgDimensionTesting {
 
     // /** The list of dimensions paths that are valid */
     static void setDimensions(List dimension, List dimension2 = null){
+        //make sure its enabled
         orgProps.members.enabled = true
         //List<OrgType> arr = dimension.collect{ it as  OrgType }
         orgProps.members.dimension = dimension
@@ -40,9 +41,18 @@ class OrgDimensionTesting {
     }
 
     /** Used for testing to null out and clear the dimensions */
-    static void clearDimensions(){
+    static void emptyDimensions(){
         orgProps.members.with {
             dimension = []
+            dimension2 = []
+        }
+        reinit()
+    }
+
+    /** Resets the dimensions to the default */
+    static void resetDimensions(){
+        orgProps.members.with {
+            dimension = [OrgType.Customer, OrgType.Company]
             dimension2 = []
         }
         reinit()
@@ -55,12 +65,10 @@ class OrgDimensionTesting {
     }
 
     //Legacy , Parse dot path like Customer.Branch.Division into array and init.
-    @CompileDynamic
-    static void parsePathsAndInitCache(List paths) {
-        for (String path : paths) {
-            List<OrgType> arr = path.tokenize('.').collect{ it as  OrgType }
-            orgDimensionService.initDimensions(arr)
-        }
-        orgDimensionService.createClientCompanyDimLevels()
+    static void setDimensionsPath(String dim1, String dim2 =  null) {
+        List<OrgType> dim1List = dim1.tokenize('.').collect{ it as  OrgType }
+        List<OrgType> dim2List
+        if(dim2) dim2List = dim2.tokenize('.').collect{ it as  OrgType }
+        setDimensions(dim1List, dim2List)
     }
 }

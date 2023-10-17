@@ -33,7 +33,7 @@ class OrgMemberService {
     OrgProps orgProps
 
     boolean isOrgMemberEnabled(){
-        return orgProps.members.enabled
+        return orgProps?.members?.enabled
     }
 
     /**

@@ -282,7 +282,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         result.member.business == division.member.business
 
         cleanup:
-        OrgDimensionTesting.clearDimensions()
+        OrgDimensionTesting.resetDimensions()
     }
 
     void "delete should fail when source is ERP"() {
@@ -304,8 +304,9 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         Contact contact2 = Contact.findWhere(num: 'secondary9')
         OrgCalc calc = new OrgCalc(id:org.id).persist()
         org.calc = calc
-        org.member = OrgMember.make(org).persist()
-        org.persist(flush:true)
+        assert org.member
+        // org.member = OrgMember.make(org).persist()
+        // org.persist(flush:true)
 
         then:
         contact
@@ -509,7 +510,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         branch.id == org.member.branch.id
 
         cleanup:
-        OrgDimensionTesting.clearDimensions()
+        OrgDimensionTesting.resetDimensions()
     }
 
 }

@@ -35,13 +35,9 @@ app:
       org-type: Division
 
     members:
-      enabled: true
+#      enabled: true
       dimension: [ CustAccount, Customer, Division, Business ]
       dimension2: [ CustAccount, Branch, Division, Business]
-
-    dimensions:
-      - CustAccount.Customer.Division.Business
-      - CustAccount.Branch.Division.Business
 
   mail:
     enabled: true

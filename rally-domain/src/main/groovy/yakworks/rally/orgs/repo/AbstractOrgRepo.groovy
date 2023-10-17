@@ -95,8 +95,9 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         Map data = args.data
         if (args.bindAction == BindAction.Create) {
             verifyNumAndOrgSource(org, data)
-            //orgMemberService is nullable so its easier to mock for testing
-            if(orgMemberService?.isOrgMemberEnabled()) orgMemberService.setupMember(org, data.remove('member') as Map)
+            //if no orgType then let it fall through and fail validation, orgMemberService is nullable so its easier to mock for testing
+            if(org.type && orgMemberService?.isOrgMemberEnabled())
+                orgMemberService.setupMember(org, data.remove('member') as Map)
         }
         // we do primary location and contact here before persist so we persist org only once with contactId it is created
         if(data.location) createOrUpdatePrimaryLocation(org, data.location as Map)

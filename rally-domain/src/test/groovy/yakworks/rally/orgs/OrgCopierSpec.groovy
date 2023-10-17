@@ -45,7 +45,7 @@ class OrgCopierSpec extends Specification implements DataRepoTest, SecurityTest 
 
     def "test copy"() {
         setup:
-        OrgDimensionTesting.clearDimensions()
+        OrgDimensionTesting.emptyDimensions()
 
         Org old = build(Org)
         // old.type = TestData.build(OrgType)

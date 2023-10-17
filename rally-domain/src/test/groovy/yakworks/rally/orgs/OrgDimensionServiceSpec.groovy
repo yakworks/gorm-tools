@@ -17,16 +17,8 @@ class OrgDimensionServiceSpec extends Specification implements GrailsAppUnitTest
         orgProps(OrgProps)
     }}
 
-    void initPaths(){
-        // orgDimensionService.setDimensions([
-        //     "CustAccount.Customer.Division.Business",
-        //     "CustAccount.Branch.Division.Business"
-        // ]).init()
-    }
-
     void "test CustAccount"() {
         expect:
-        initPaths()
         verifyParents("CustAccount", ["Customer", "Branch", "Division", "Business"])
         verifyImmediatedParents("CustAccount", ["Customer", "Branch"])
         verifyChilds("CustAccount", [])
@@ -34,7 +26,6 @@ class OrgDimensionServiceSpec extends Specification implements GrailsAppUnitTest
 
     void "test Division"() {
         expect:
-        initPaths()
         verifyChilds("Division", ["Customer", "Branch", "CustAccount"])
         verifyParents("Division", ["Business"])
         verifyImmediatedParents("Division", ["Business"])
@@ -42,7 +33,6 @@ class OrgDimensionServiceSpec extends Specification implements GrailsAppUnitTest
 
     void "test client and company"() {
         when:
-        initPaths()
         List allOrgTypes = ['Customer', 'CustAccount', 'Branch', 'Division', 'Business']
 
         then:
@@ -61,7 +51,6 @@ class OrgDimensionServiceSpec extends Specification implements GrailsAppUnitTest
     void "test imutable"() {
 
         when: "User modifies the returned list"
-        initPaths()
         List childs = orgDimensionService.getChildLevels(OrgType.Division)
         List parents = orgDimensionService.getParentLevels(OrgType.Division)
         childs.add(OrgType.Prospect)

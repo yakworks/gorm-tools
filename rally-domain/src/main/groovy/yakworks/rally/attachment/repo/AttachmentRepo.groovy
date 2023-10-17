@@ -168,7 +168,7 @@ class AttachmentRepo extends LongIdGormRepo<Attachment> {
     /**
      * 4 ways a file can be set via params
      *   1. with tempFileName key, where its a name of a file that has been uploaded
-     *      to the tempDir location key for appResourceLoader
+     *      to the tempDir location key
      *   2. with sourcePath, this should be a absolute path object or string
      *   3. with MultipartFile
      *   4. with bytes, similiar to MultiPartFile. if this is the case then name should have the info for the file

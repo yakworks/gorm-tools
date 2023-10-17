@@ -32,17 +32,10 @@ import yakworks.rally.orgs.model.OrgType
 @CompileStatic
 class OrgDimensionService {
 
-    @Autowired(required = false) OrgProps orgProps
+    @Autowired OrgProps orgProps
 
     @Autowired(required = false) //required = false so unit tests work
     CacheManager cacheManager
-
-    /**
-     * The list of dimensions paths that are valid
-     * For example "Customer.Division.Company" and "CustAccount.Branch.Division.Company"
-     */
-    @Value('${app.orgs.dimensions:}')
-    List<String> dimensions
 
     protected boolean isInitialized = false
 
@@ -51,11 +44,13 @@ class OrgDimensionService {
         PARENTS, CHILDREN
     }
 
-    //DimensionLevel instances created by parsing the paths specified in config are cached here.
-    //DimensionLevel contains just immediate parents and children not all children and parents recursive.
+    /*
+     DimensionLevel instances created by parsing the paths specified in config are cached here.
+     DimensionLevel contains just immediate parents and children not all children and parents recursive.
+    */
     private final Map<OrgType, DimensionLevel> dimensionsCache = new ConcurrentHashMap<OrgType, DimensionLevel>()
 
-    //all levels configured in dimension paths
+    //all levels configured in the dimensions
     private final List<OrgType> allLevels = []
 
     /**
@@ -67,26 +62,11 @@ class OrgDimensionService {
     void init() {
         if(isInitialized) return
         clearCache()
-        // if(dimensions){
-        //     parsePathsAndInitCache(dimensions)
-        // }
         if(orgProps.members.enabled){
             initDims()
         }
         isInitialized = true
     }
-
-    void reinit(){
-        isInitialized = false
-        init()
-    }
-
-    // /** The list of dimensions paths that are valid */
-    // OrgDimensionService setDimensions(List<String> paths){
-    //     isInitialized = false
-    //     this.dimensions = paths
-    //     return this
-    // }
 
     /**
      * Get all parent levels for given orgtype
@@ -123,17 +103,9 @@ class OrgDimensionService {
         return parentList ?: [] as List<OrgType>
     }
 
-    //Parse given paths and populate dimensionsCache with DimensionLevel instances
-    protected void parsePathsAndInitCache(List paths) {
-        for (String path : paths) {
-            List<OrgType> arr = path.tokenize('.').collect{ it as  OrgType }
-            initDimensions(arr)
-        }
-        createClientCompanyDimLevels()
-    }
-
     protected void initDims(){
         initDimensions(orgProps.members.dimension)
+        //if dimension2 is set then do that one too
         initDimensions(orgProps.members.dimension2)
         createClientCompanyDimLevels()
     }

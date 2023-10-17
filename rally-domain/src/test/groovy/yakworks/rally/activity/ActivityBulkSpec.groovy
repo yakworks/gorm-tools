@@ -2,11 +2,11 @@ package yakworks.rally.domain
 
 import java.nio.file.Path
 
-import gorm.tools.repository.model.RepoEntity
-import grails.persistence.Entity
 import org.apache.commons.io.FileUtils
 import org.springframework.beans.factory.annotation.Autowired
 
+import gorm.tools.repository.model.RepoEntity
+import grails.persistence.Entity
 import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.commons.lang.IsoDateUtil
@@ -26,9 +26,8 @@ import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
-import yakworks.spring.AppResourceLoader
-import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.DataRepoTest
+import yakworks.testing.gorm.unit.SecurityTest
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 
@@ -43,7 +42,6 @@ class ActivityBulkSpec extends Specification implements DataRepoTest, SecurityTe
     @Autowired AttachmentSupport attachmentSupport
 
     Closure doWithGormBeans() { { ->
-        appResourceLoader(AppResourceLoader)
         attachmentSupport(AttachmentSupport)
         activityBulk(ActivityBulk)
     }}

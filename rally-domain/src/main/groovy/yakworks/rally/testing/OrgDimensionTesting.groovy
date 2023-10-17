@@ -9,6 +9,7 @@ import groovy.transform.CompileStatic
 
 import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.OrgDimensionService
+import yakworks.rally.orgs.model.OrgType
 import yakworks.spring.AppCtx
 
 /**
@@ -53,4 +54,13 @@ class OrgDimensionTesting {
         orgDimensionService.init()
     }
 
+    //Legacy , Parse dot path like Customer.Branch.Division into array and init.
+    @CompileDynamic
+    static void parsePathsAndInitCache(List paths) {
+        for (String path : paths) {
+            List<OrgType> arr = path.tokenize('.').collect{ it as  OrgType }
+            orgDimensionService.initDimensions(arr)
+        }
+        orgDimensionService.createClientCompanyDimLevels()
+    }
 }

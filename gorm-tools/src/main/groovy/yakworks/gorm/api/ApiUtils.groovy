@@ -37,13 +37,13 @@ class ApiUtils {
 
     /**
      * Parses name=xyz&size=123 query string into a map
-     * @param queryString
+     * @param queryString Query string
      * @return Map<String,String>
      */
     static Map parseQueryParams(String queryString) {
         if(!queryString) return [:]
         queryString.split("&")
-            .collect({ it.split("=") })
+            .collect { it.split("=") }
             .collectEntries { String[] arr ->
                 String k = arr.length > 0 ? arr[0] : ""
                 String v = arr.length > 1 ? arr[1] : ""

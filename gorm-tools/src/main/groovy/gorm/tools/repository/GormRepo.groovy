@@ -609,7 +609,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
     public <T> T withTrx(TransactionDefinition trxAttr, Closure<T> callable) {
         try {
             gormStaticApi().withTransaction(trxAttr, callable)
-        } catch(RuntimeException ex) {
+        } catch(ValidationException | DataAccessException ex) {
             //Many of the exceptions such as PK/FK constraint failures, Optimistic locking failures will happen when transaction commits
             throw RepoExceptionSupport.translateException(ex, null)
         }

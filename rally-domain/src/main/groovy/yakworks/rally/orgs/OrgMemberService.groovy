@@ -90,9 +90,11 @@ class OrgMemberService {
         if (org.companyId) org.member.company = Org.load(org.companyId)
         if (!isTopLevel) {
             Validate.notNull(parent.member, 'Parent org must have a member set at this point')
-            ['branch', 'division', 'business', 'sales', 'region', 'factory'].each { String fld ->
+            ['branch', 'division', 'business', 'sales', 'region', 'factory', 'company'].each { String fld ->
                 if (parent.member[fld]) org.member[fld] = parent.member[fld]
             }
+            //for now company is special. this is temporary until we get rid of it or if not then settle on the business logic.
+            if (!org.member.company) org.member.company = parent.member.company
         }
         String orgMemberName = parent.type.propertyName
         //if the parent is a customer its not in member so check hasProperty to make sure

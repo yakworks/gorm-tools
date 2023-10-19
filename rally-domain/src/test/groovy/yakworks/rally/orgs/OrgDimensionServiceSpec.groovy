@@ -2,10 +2,12 @@ package yakworks.rally.orgs
 
 import org.springframework.beans.factory.annotation.Autowired
 
+import spock.lang.Specification
 import yakworks.commons.lang.EnumUtils
 import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.model.OrgType
-import spock.lang.Specification
+import yakworks.rally.testing.OrgDimensionTesting
+import yakworks.spring.AppCtx
 import yakworks.testing.grails.GrailsAppUnitTest
 
 class OrgDimensionServiceSpec extends Specification implements GrailsAppUnitTest {
@@ -15,7 +17,15 @@ class OrgDimensionServiceSpec extends Specification implements GrailsAppUnitTest
     Closure doWithSpring() { { ->
         orgDimensionService(OrgDimensionService)
         orgProps(OrgProps)
+        appCtx(AppCtx)
     }}
+
+    def setup(){
+        OrgDimensionTesting.setDimensions(
+            ['CustAccount', 'Customer', 'Division', 'Business'],
+            ['CustAccount', 'Branch', 'Division', 'Business']
+        )
+    }
 
     void "test CustAccount"() {
         expect:

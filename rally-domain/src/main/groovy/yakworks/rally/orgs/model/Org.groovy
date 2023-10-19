@@ -128,18 +128,18 @@ class Org implements NameNum, RepoEntity<Org>, HasTags, CreateCriteriaSupport, S
     }
 
     /**
-     * quick shortcut to make an Org. unlike create, this returns and UNSAVED new entity
+     * quick shortcut to make an Org. unlike create, this returns an UNSAVED new entity
      */
-    static Org of(String num, String name, Long orgTypeId, Long companyId = Company.DEFAULT_COMPANY_ID) {
-        of(num, name, OrgType.get(orgTypeId), companyId)
-    }
+    // static Org of(String num, String name, Long orgTypeId, Long companyId = Company.DEFAULT_COMPANY_ID) {
+    //     of(num, name, OrgType.get(orgTypeId), companyId)
+    // }
 
     /**
      * quick shortcut to make an Org. unlike create, this returns and UNSAVED new entity
      */
     static Org of(String num, String name, OrgType orgType, Long companyId = Company.DEFAULT_COMPANY_ID) {
-        def o = new Org(num: num, name: name, companyId: companyId)
-        o.type = orgType
+        def o = new Org(num: num, name: name, type: orgType, companyId: companyId)
+        //o.companyId = companyId
         return o
     }
 }

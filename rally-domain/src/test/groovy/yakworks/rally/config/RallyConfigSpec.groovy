@@ -38,7 +38,7 @@ class RallyConfigSpec extends Specification implements GrailsAppUnitTest {
         expect:
         orgProps.partition.enabled
         orgProps.partition.orgType == OrgType.Division
-        orgProps.members.dimension == [OrgType.CustAccount, OrgType.Customer, OrgType.Division, OrgType.Business]
+        //orgProps.members.dimension == [OrgType.CustAccount, OrgType.Customer, OrgType.Division, OrgType.Business]
     }
 
 }

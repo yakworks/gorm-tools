@@ -36,7 +36,7 @@ class OrgDimensionTesting {
         orgProps.members.enabled = true
         //List<OrgType> arr = dimension.collect{ it as  OrgType }
         orgProps.members.dimension = dimension
-        if(dimension2) orgProps.members.dimension2 = dimension2
+        orgProps.members.dimension2 = dimension2 ?: []
         reinit()
     }
 

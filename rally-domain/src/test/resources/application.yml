@@ -31,13 +31,13 @@ app:
   # Organizations setup
   orgs:
     partition:
-      enabled: true
+      enabled: true # means there can be more than one.
       org-type: Division
 
-    members:
-#      enabled: true
-      dimension: [ CustAccount, Customer, Division, Business ]
-      dimension2: [ CustAccount, Branch, Division, Business]
+#    members:
+      # enabled: true # defaults to true
+#      dimension: [ CustAccount, Customer, Division, Business ]
+#      dimension2: [ CustAccount, Branch, Division, Business]
 
   mail:
     enabled: true

@@ -1,3 +1,18 @@
+### v7.3.59
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.58...v7.3.59)
+- release 7.3.59 [link](https://github.com/yakworks/gorm-tools/commit/6ec5ae870861a33fb02b1be10b5a8fdb66fb2851)
+- Merge pull request #753 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/acc59b7a4956b85178859766132c9a5b0f96ff76)
+- Catch exception (#751) [link](https://github.com/yakworks/gorm-tools/commit/e14e5bcf8e3c205ecee6bcac06229fe776692937)
+- Merge pull request #748 from yakworks/hypersistence-upgrade [link](https://github.com/yakworks/gorm-tools/commit/aaaf1a37da309e6116341b94160e33f42363899d)
+- move to io.hypersistence.hypersistence-utils-hibernate-55 3.5.2 [link](https://github.com/yakworks/gorm-tools/commit/36c4ac8d4a4391ed4d3493acd3422d55a76d0bfa)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/514255d5ecc9b7d56788e75fce840a2b6b828be8)
+- Merge pull request #736 from yakworks/2127-activity-date [link](https://github.com/yakworks/gorm-tools/commit/0558e8b2f7e3ff49becddb890174d6e339d14abe)
+- Merge branch 'dev' into 2127-activity-date [link](https://github.com/yakworks/gorm-tools/commit/5ea3a323058490da615d283faf589758709edfe5)
+- update constraint [link](https://github.com/yakworks/gorm-tools/commit/f3ab3f25b05e65498ba540b1c0788cef2545e68f)
+- cleanup, add tests [link](https://github.com/yakworks/gorm-tools/commit/d66b04bd0e73e4e7048372bc0ffead30d31055a8)
+- 9ci/domain9#2127 Add actDate field to activity [link](https://github.com/yakworks/gorm-tools/commit/6eb1febd0a075316c4abff9f0c84a3adf519cca2)
+
 ### v7.3.58
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.57...v7.3.58)

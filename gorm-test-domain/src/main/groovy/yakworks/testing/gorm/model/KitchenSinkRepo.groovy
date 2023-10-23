@@ -7,14 +7,12 @@ package yakworks.testing.gorm.model
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.events.AfterBindEvent
-import gorm.tools.repository.events.AfterBulkSaveEntityEvent
 import gorm.tools.repository.events.BeforeBulkSaveEntityEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.RepoListener

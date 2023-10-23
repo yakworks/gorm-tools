@@ -17,7 +17,6 @@ import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.parser.OpenAPIV3Parser
 import io.swagger.v3.parser.core.models.ParseOptions
 import yakworks.commons.util.BuildSupport
-import yakworks.json.groovy.EnhancedJsonGenerator
 
 /**
  * exposes a parsed openApi yaml

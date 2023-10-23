@@ -17,7 +17,7 @@ import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.model.TaskType
 import yakworks.rally.orgs.OrgDimensionService
-import yakworks.rally.orgs.OrgMemberService
+import yakworks.rally.orgs.OrgService
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
@@ -60,7 +60,7 @@ class RallySeed {
     //extra spring beans when orgMember and orgDimensionService is being used.
     static springBeans = [
         orgDimensionService: OrgDimensionService,
-        orgMemberService: OrgMemberService
+        orgService: OrgService
     ]
 
     // see good explanation of thread safe static instance stratgey https://stackoverflow.com/a/16106598/6500859

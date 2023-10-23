@@ -28,6 +28,12 @@ dependencies {
   api "javax.mail:javax.mail-api:1.6.2"
   api "com.sun.mail:javax.mail:1.6.2"
 
+  //WIP for s3 paths
+  compileOnly platform('software.amazon.awssdk:bom:2.20.56')
+  compileOnly 'software.amazon.awssdk:s3:'
+  compileOnly 'software.amazon.nio.s3:aws-java-nio-spi-for-s3:1.2.4'
+  // compileOnly 'org.carlspring.cloud.aws:s3fs-nio:1.0.2'
+
   compileOnly "org.grails:grails-core"
 
   testRuntimeOnly "org.springframework.boot:spring-boot-autoconfigure"

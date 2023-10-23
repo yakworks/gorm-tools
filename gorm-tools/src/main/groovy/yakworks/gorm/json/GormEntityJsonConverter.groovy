@@ -2,12 +2,14 @@
 * Copyright 2013 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.utils
+package yakworks.gorm.json
 
 import groovy.json.JsonGenerator
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEntity
+
+import gorm.tools.utils.GormMetaUtils
 
 /**
  * Fall through if GormEntity makes it to Json conversion. With the special fields added in with AST it will get a

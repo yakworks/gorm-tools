@@ -221,7 +221,7 @@ test.token-exchange:
 	# http localhost:8080/api -A bearer -a "$$TOKEN"
 
 test.token.cookie:
-	RESP=`http -b POST admin:123@localhost:8080/api/oauth/token`
+	RESP=`https -b POST admin:123@localhost:8080/api/oauth/token`
 	# use awk to parse out the access_token
 	TOKEN=`echo $$RESP | awk -F'"' -v RS="," '/access_token/{ print $$4 }'`
 	echo "$$TOKEN"

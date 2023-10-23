@@ -21,9 +21,7 @@ import yakworks.commons.map.Maps
 import yakworks.commons.util.BuildSupport
 import yakworks.commons.util.StringUtils
 import yakworks.gorm.api.ApiConfig
-import yakworks.gorm.api.ApiUtils
 import yakworks.gorm.api.PathItem
-import yakworks.grails.support.ConfigAware
 import yakworks.yaml.YamlUtils
 
 import static ApiSchemaEntity.CruType

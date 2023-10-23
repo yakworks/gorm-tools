@@ -263,8 +263,8 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         OrgType orgType = coerceOrgType(data.type)
         // special case for customer lookup when it comes with org.source; for example [org:[source:[sourceId:K14700]]
         if(data.org) {
-            data.source =data.org['source']
-            data.sourceId =data.org['sourceId']
+            data.source = data.org['source']
+            data.sourceId = data.org['sourceId']
         }
         //nest sourceId under source if pecified up one level.
         if(data.source == null && data.sourceId) data.source = [sourceId: data.sourceId]
@@ -279,7 +279,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
                 oid = orgSourceRepo.findOrgIdBySourceIdAndOrgType(source.sourceId as String, orgType)
                 if(oid) org = get(oid)
             }
-            else {
+            else {1
                 // lookup by just sourceId and see if it returns just one
                 List<Long> res = orgSourceRepo.findOrgIdBySourceId(source.sourceId as String)
                 if(res?.size() == 1) {

@@ -32,6 +32,7 @@ import gorm.tools.transaction.TrxUtils
 import gorm.tools.utils.GormMetaUtils
 import grails.core.support.proxy.ProxyHandler
 import grails.validation.ValidationException
+import yakworks.api.problem.ThrowableProblem
 import yakworks.api.problem.data.NotFoundProblem
 import yakworks.commons.lang.ClassUtils
 
@@ -268,7 +269,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
         if(!foundEntity) {
             foundEntity = lookup(data)
         }
-        if(mustExist) RepoUtil.checkFound(foundEntity, 'data map', getEntityClass().name)
+        if(mustExist) RepoUtil.checkFound(foundEntity, data as Serializable, getEntityClass().name)
         return foundEntity
     }
 
@@ -350,7 +351,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * Transactional, Calls delete always with flush = true so we can intercept any DataIntegrityViolationExceptions.
      *
      * @param entity the domain entity
-     * @throws DataProblemException if a DataIntegrityViolationException is thrown
+     * @throws ThrowableProblem if a DataIntegrityViolationException is thrown
      */
     void remove(D entity, Map args = [:]) {
         try {

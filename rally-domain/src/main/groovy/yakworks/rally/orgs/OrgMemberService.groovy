@@ -58,6 +58,8 @@ class OrgMemberService {
         for (OrgType type : immediateParents) {
             Map orgParam = params[type.propertyName]
             Validate.notEmpty(orgParam, "setupMember called but params does not contain ${type.propertyName}")
+            //add type for lookup
+            orgParam.type = type
 
             Org parent = Org.repo.findWithData(orgParam as Map)
 

@@ -79,6 +79,8 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
         setup:
         OrgDimensionTesting.setDimensions(['Branch','Division'])
         Org division = Org.findByOrgTypeId(OrgType.Division.id)
+        //setup another org with same num to make sure its locating the right one
+        Org dupDiv = Org.of(division.num, division.num + "dup", OrgType.Branch).persist(flush:true)
 
         when:
         Org branch = Org.of("Branch", "Branch", OrgType.Branch).persist()

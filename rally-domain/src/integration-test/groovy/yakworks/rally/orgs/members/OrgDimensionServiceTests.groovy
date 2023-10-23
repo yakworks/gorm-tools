@@ -4,6 +4,8 @@ import yakworks.commons.lang.EnumUtils
 
 import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
+import yakworks.rally.config.OrgProps
+import yakworks.rally.testing.OrgDimensionTesting
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.orgs.OrgDimensionService
 import yakworks.rally.orgs.model.OrgType
@@ -14,36 +16,27 @@ import spock.lang.Specification
 class OrgDimensionServiceTests extends Specification implements DomainIntTest {
 
     OrgDimensionService orgDimensionService
-    /*
-    example from CED:
-    dimensions {
-        org {
-            primary {
-                path = "CustAccount.Branch.Division" //.Business"
-            }
-            custDim {
-                path = "CustAccount.Customer.Division" //.Business"
-            }
-        }
-    }
-    */
-    void setupDims() {
-        orgDimensionService.dimensionsConfig = [
-            test1: "CustAccount.Branch.Division.Business",
-            test2: "CustAccount.Branch.Sales.Region",
-            test3: "CustAccount.Customer.Division.Business"
-        ]
+    OrgProps orgProps
 
-        //repopulate cache based on the new config specified above.
+    void setupDims() {
+        orgProps.members.enabled = true
+        orgProps.members.dimension = [OrgType.CustAccount, OrgType.Branch, OrgType.Division, OrgType.Business]
+        orgProps.members.dimension2 = [OrgType.CustAccount, OrgType.Customer, OrgType.Division, OrgType.Business]
+        orgDimensionService.isInitialized = false
         orgDimensionService.init()
+        // orgDimensionService.setDimensions([
+        //     "CustAccount.Branch.Division.Business",
+        //     "CustAccount.Customer.Division.Business"
+        // ]).init()
     }
+
     def cleanup(){
-        orgDimensionService.testInit(null)
+        OrgDimensionTesting.resetDimensions()
     }
 
     def "dimensions are empty"() {
         when:
-        orgDimensionService.testInit(null)
+        OrgDimensionTesting.emptyDimensions()
 
         then:
         orgDimensionService.getChildLevels(OrgType.Business).size() == 0
@@ -57,35 +50,27 @@ class OrgDimensionServiceTests extends Specification implements DomainIntTest {
 
         then:
 
-        orgDimensionService.getAllLevels().size() == 7
-        orgDimensionService.getAllLevels()*.name().containsAll(["CustAccount", "Customer", "Branch", "Division", "Business", "Sales", "Region"])
+        orgDimensionService.getAllLevels().size() == 5
+        orgDimensionService.getAllLevels()*.name().containsAll(["CustAccount", "Customer", "Branch", "Division", "Business"])
 
         verifyChilds("Business", ["Division", "Branch", "CustAccount", "Customer"])
         verifyParents("Business", [])
         verifyImmediatedParents("Business", [])
 
-        verifyChilds("Region", ["Sales", "Branch", "CustAccount"])
-        verifyImmediatedParents("Region", [])
-        verifyParents("Region", [])
-
         verifyChilds("Division", ["Customer", "Branch", "CustAccount"])
         verifyParents("Division", ["Business"])
         verifyImmediatedParents("Division", ["Business"])
 
-        verifyChilds("Sales", ["Branch", "CustAccount"])
-        verifyParents("Sales", ["Region"])
-        verifyImmediatedParents("Sales", ["Region"])
-
-        verifyImmediatedParents("Branch", ["Division", "Sales"])
+        verifyImmediatedParents("Branch", ["Division"])
         verifyChilds("Branch", ["CustAccount"])
-        verifyParents("Branch", ["Business", "Division", "Sales", "Region"])
+        verifyParents("Branch", ["Business", "Division"])
 
 
         verifyChilds("Customer", ["CustAccount"])
         verifyParents("Customer", ["Business", "Division"])
         verifyImmediatedParents("Customer", ["Division"])
 
-        verifyParents("CustAccount", ["Business", "Division", "Branch", "Customer", "Sales", "Region"])
+        verifyParents("CustAccount", ["Business", "Division", "Branch", "Customer"])
         verifyChilds("CustAccount", [])
         verifyImmediatedParents("CustAccount", ["Branch", "Customer"])
 
@@ -94,11 +79,6 @@ class OrgDimensionServiceTests extends Specification implements DomainIntTest {
     def "test company and client"() {
         when: "dimensions are specified"
         setupDims()
-        // List allOrgTypes = OrgType.query {
-        //     not {
-        //         inList("id", [OrgTypeEnum.Client.id, OrgTypeEnum.Company.id])
-        //     }
-        // }.list().collect { it.orgTypeEnum.name() }
 
         List allOrgTypes = orgDimensionService.allLevels
         def childs = orgDimensionService.getChildLevels(OrgType.Client)
@@ -120,9 +100,7 @@ class OrgDimensionServiceTests extends Specification implements DomainIntTest {
         orgDimensionService.getParentLevels(OrgType.Company) == []
 
         cleanup:
-        // clearAppConfigCache()
-        orgDimensionService.clearCache()
-        orgDimensionService.testInit(null)
+        OrgDimensionTesting.resetDimensions()
 
     }
 

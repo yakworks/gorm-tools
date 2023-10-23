@@ -21,11 +21,11 @@ logging:
     org.hibernate.SQL: DEBUG
 
 
-gorm:
-  tools:
+yakworks:
+  gorm:
     hello: world
     async:
-      poolSize: 2
-      foo: bar
-    idGenerator:
-      startValue: 1
+      pool-size: 2
+    id-generator:
+      start-value: 1
+

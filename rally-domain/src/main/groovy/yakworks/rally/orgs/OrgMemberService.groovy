@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
 import yakworks.commons.lang.Validate
+import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgType
@@ -28,9 +29,11 @@ class OrgMemberService {
     @Autowired(required = false)
     OrgDimensionService orgDimensionService
 
+    @Autowired(required = false)
+    OrgProps orgProps
 
     boolean isOrgMemberEnabled(){
-        return orgDimensionService?.orgMemberEnabled
+        return orgProps?.members?.enabled
     }
 
     /**
@@ -39,7 +42,7 @@ class OrgMemberService {
      *
      * @param org the org to setup the orgMember for
      * @param params should contain the id values for the required immediate parents.
-     *               for example if the orgDimensionService has immediateParents of [Division,Sales] then
+     *        for example if the orgDimensionService has immediateParents of [Division,Sales] then
      *               map should contain [division: [id: 123], sales: [id: 234]]
      */
     void setupMember(Org org, Map params) {
@@ -79,21 +82,23 @@ class OrgMemberService {
      * then copies the member vals
      *
      * @param org  an Org entity to set parent to
-     * @param parent the imediate parent org to copy member values from
+     * @param parent the immediate parent org to copy member values from
      * @param isTopLevel if true then it wont require the parent org to have an orgMember as its the top level
      */
     void setupMember(Org org, Org parent, boolean isTopLevel) {
         if (!org.member) org.member = OrgMember.make(org) //create new orgmember
-        if(org.companyId) org.member.company = Org.load(org.companyId)
-        if(!isTopLevel) {
+        if (org.companyId) org.member.company = Org.load(org.companyId)
+        if (!isTopLevel) {
             Validate.notNull(parent.member, 'Parent org must have a member set at this point')
-            ['branch', 'division', 'business', 'sales', 'region', 'factory'].each { String fld ->
+            ['branch', 'division', 'business', 'sales', 'region', 'factory', 'company'].each { String fld ->
                 if (parent.member[fld]) org.member[fld] = parent.member[fld]
             }
+            //for now company is special. this is temporary until we get rid of it or if not then settle on the business logic.
+            if (!org.member.company) org.member.company = parent.member.company
         }
         String orgMemberName = parent.type.propertyName
-        //if the parent is a customer or company its not in member so check hasProperty to make sure
-        if(org.member.hasProperty(orgMemberName)) org.member[orgMemberName] = parent
+        //if the parent is a customer its not in member so check hasProperty to make sure
+        if (org.member.hasProperty(orgMemberName)) org.member[orgMemberName] = parent
 
     }
 

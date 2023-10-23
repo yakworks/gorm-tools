@@ -37,9 +37,8 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
     def "create fail"(){
         when:
         Map invalidData2 = [num:'foo1', name: "foo", sinkLink: ["name": "", num:'foo2']]
-        def sink = new KitchenSink()
+        def sink = KitchenSink.create(invalidData2, persistAfterAction: false)
 
-        sink.bind(invalidData2)
         sink.validate()
         //Org.create(invalidData2)
 

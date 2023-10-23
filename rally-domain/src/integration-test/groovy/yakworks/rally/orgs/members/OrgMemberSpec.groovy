@@ -4,11 +4,10 @@ import org.springframework.validation.Errors
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import spock.lang.IgnoreRest
 import yakworks.rally.orgs.model.Company
+import yakworks.rally.testing.OrgDimensionTesting
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.api.problem.data.DataProblemException
-import yakworks.rally.orgs.OrgDimensionService
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgType
@@ -21,12 +20,18 @@ import yakworks.rally.orgs.repo.OrgRepo
 class OrgMemberSpec extends Specification implements DomainIntTest {
 
     OrgRepo orgRepo
-    OrgDimensionService orgDimensionService
+
+    void emptyDimensions(){
+        OrgDimensionTesting.emptyDimensions()
+    }
+
+    void cleanupSpec() {
+        OrgDimensionTesting.resetDimensions()
+    }
 
     def "test sanity check on orgMember"() {
         setup:
-        //appConfig.orgDimensions = [:]
-        orgDimensionService.testInit(null)
+        emptyDimensions()
         Org org = Org.of("O1", "O1", OrgType.Customer).persist()
         Org branch = Org.of("Branch", "Branch", OrgType.Branch).persist()
         Org division = Org.of("Division", "Division", OrgType.Division).persist()
@@ -94,7 +99,7 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
 
     void "test insert with orgmembers"() {
         given:
-        orgDimensionService.testInit('Branch.Division.Business')
+        OrgDimensionTesting.setDimensions([OrgType.Branch, OrgType.Division, OrgType.Business])
         Org division = Org.of("Division", "Division", OrgType.Division).persist()
         division.member = OrgMember.make(division)
         division.member.business = Org.of("Business", "Business", OrgType.Business).persist()
@@ -129,16 +134,12 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
         then: "Specified business should NOT take precedence parents set from division"
         result.member.business == division.member.business
 
-        cleanup:
-        orgDimensionService.testInit(null)
     }
 
     void "test create customer with branch by id"() {
         given:
-        orgDimensionService.testInit('Branch')
-        orgDimensionService.dimensionsConfig = [ test1: "Customer.Branch" ]
-        orgDimensionService.clearCache()
-        orgDimensionService.init()
+        OrgDimensionTesting.setDimensions([OrgType.Customer, OrgType.Branch])
+
         when:
         Org branch = Org.findByOrgTypeId(OrgType.Branch.id)
         assert branch
@@ -153,16 +154,12 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
         result.member.branch.id == branch.id
         result.member.company
 
-        cleanup:
-        orgDimensionService.testInit(null)
     }
 
     void "test create customer with branch by num"() {
         given:
-        orgDimensionService.testInit('Branch')
-        orgDimensionService.dimensionsConfig = [ test1: "Customer.Branch" ]
-        orgDimensionService.clearCache()
-        orgDimensionService.init()
+        OrgDimensionTesting.setDimensions([OrgType.Customer, OrgType.Branch])
+
         when:
         Org branch = Org.findByOrgTypeId(OrgType.Branch.id)
         assert branch
@@ -176,13 +173,12 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
         result.member != null
         result.member.branch.id == branch.id
 
-        cleanup:
-        orgDimensionService.testInit(null)
     }
 
     void "test delete is cascaded"() {
         setup:
-        orgDimensionService.testInit(null)
+        emptyDimensions()
+
         Org org = createOrg("test", "T001", OrgType.Branch).persist(flush: true)
         Long oid = org.id
         OrgMember orgMember = OrgMember.make(org)
@@ -201,7 +197,7 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
 
     def "constraint: nothing is required when no dimensions specified"() {
         when:
-        orgDimensionService.testInit(null)
+        emptyDimensions()
         Org org = createOrg("test", "T001", OrgType.Branch)
         OrgMember orgMember = OrgMember.make(org)
 
@@ -212,7 +208,8 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
 
     def "fails when no member fields are specified but parents required"() {
         when:
-        orgDimensionService.testInit("CustAccount.Customer.Branch")
+        OrgDimensionTesting.setDimensions([OrgType.CustAccount, OrgType.Customer, OrgType.Branch])
+
         Org org = Org.create(name:"test", num:"T001", orgTypeId:OrgType.Customer.id)
 
         then: "Branch should be required for customer"
@@ -237,12 +234,13 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
         org != null
         org.validate()
         org.hasErrors() == false
+
     }
 
     @Unroll
-    def "test constraints: fields #requiredLevels should be required for paths #paths and orgType #orgType"(OrgType orgType, List paths, List requiredLevels) {
+    def "test constraints: fields #requiredLevels should be required for paths #dimension and orgType #orgType"(OrgType orgType, List dimension, List requiredLevels) {
         setup:
-        orgDimensionService.parsePathsAndInitCache(paths)
+        OrgDimensionTesting.setDimensions(dimension)
 
         when:
         Org org = createOrg("Test", "T001", orgType)
@@ -253,18 +251,36 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
         member.hasErrors() == true
         validateErrors(member.errors, requiredLevels)
 
-        cleanup:
-        orgDimensionService.testInit(null)
+        where:
+
+        orgType          | dimension                          | requiredLevels
+        OrgType.Branch   | ['Branch', 'Division']             | ["division"]
+        OrgType.Branch   | ['Branch', 'Division', 'Business'] | ["division", "business"]
+        OrgType.Division | ['Branch', 'Division', 'Business'] | ["business"]
+
+    }
+
+    @Unroll
+    def "test 2 dims: dim1 #dimension, dim2 #dimension2 and orgType #orgType"(OrgType orgType, List dimension, List dimension2, List requiredLevels) {
+        setup:
+        OrgDimensionTesting.setDimensions(dimension, dimension2)
+
+        when:
+        Org org = createOrg("Test", "T001", orgType)
+        OrgMember member = OrgMember.make(org)
+
+        then:
+        !member.validate()
+        member.hasErrors() == true
+        validateErrors(member.errors, requiredLevels)
 
         where:
 
-        orgType             | paths                                                        | requiredLevels
-        OrgType.Branch      | ["Branch.Division"]                                         | ["division"]
-        OrgType.Branch      | ["Branch.Division.Business"]                                | ["division", "business"]
-        OrgType.Division    | ["Branch.Division.Business"]                                | ["business"]
-        OrgType.Customer    | ["Customer.Branch", "Branch.Division"] | ["branch", "division"]
-        OrgType.CustAccount | ["CustAccount.Customer.Branch", "Branch.Division.Business"] | ["branch", "division", "business"]
-        OrgType.Division    | ["Branch.Division", "Division.Business", "Business.Region"] | ["business", "region"]
+        orgType             | dimension                             | dimension2                         | requiredLevels
+        OrgType.Customer    | ['Customer', 'Branch']                | ['Branch', 'Division']             | ["branch", "division"]
+        OrgType.CustAccount | ['CustAccount', 'Customer', 'Branch'] | ['Branch', 'Division', 'Business'] | ["branch", "division", "business"]
+        // OrgType.Division    | ["Branch.Division", "Division.Business", "Business.Region"] | ["business", "region"]
+
     }
 
     private void validateErrors(Errors errors, List requiredLevels) {

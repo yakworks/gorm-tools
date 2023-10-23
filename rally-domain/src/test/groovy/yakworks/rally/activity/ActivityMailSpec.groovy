@@ -9,19 +9,18 @@ import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
-import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.model.TaskType
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
 import yakworks.rally.testing.MockData
-import yakworks.spring.AppResourceLoader
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
@@ -33,7 +32,6 @@ class ActivityMailSpec extends Specification implements GormHibernateTest, Secur
         Tag, TagLink, Attachment, ActivityNote, Contact, ActivityContact
     ]
     static springBeans = [
-        appResourceLoader: AppResourceLoader,
         attachmentSupport: AttachmentSupport
     ]
 

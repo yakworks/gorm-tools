@@ -36,6 +36,23 @@ class OrgService {
         return orgProps?.members?.enabled
     }
 
+    /** shortcut to config orgProps.partition */
+    OrgProps.PartitionConfig getPartition(){
+        orgProps.partition
+    }
+
+    String getPartitionPropName(){
+        return orgProps.partition.type.propertyName
+    }
+
+    String getMemberPartitionPath(){
+        return "member.${orgProps.partition.type.propertyName}"
+    }
+
+    String getMemberPartitionIdPath(){
+        return "member.${orgProps.partition.type.propertyName}.id"
+    }
+
     /**
      * Sets up OrgMember
      * Looks into org dimensions to find all parents for given orgtype and sets the parents accordingly

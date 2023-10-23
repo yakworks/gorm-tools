@@ -25,7 +25,7 @@ import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.utils.GormMetaUtils
 import gorm.tools.validation.Rejector
 import jakarta.annotation.Nullable
-import yakworks.rally.orgs.OrgMemberService
+import yakworks.rally.orgs.OrgService
 import yakworks.rally.orgs.model.Company
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
@@ -39,20 +39,15 @@ import yakworks.rally.orgs.model.OrgType
 @CompileStatic
 abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
     //Making these nullable makes it easier to wire up for tests.
-    @Inject @Nullable
-    LocationRepo locationRepo
+    @Inject @Nullable LocationRepo locationRepo
 
-    @Inject @Nullable
-    ContactRepo contactRepo
+    @Inject @Nullable ContactRepo contactRepo
 
-    @Inject @Nullable
-    OrgTagRepo orgTagRepo
+    @Inject @Nullable OrgTagRepo orgTagRepo
 
-    @Inject @Nullable
-    OrgSourceRepo orgSourceRepo
+    @Inject @Nullable OrgSourceRepo orgSourceRepo
 
-    @Inject @Nullable
-    OrgMemberService orgMemberService
+    @Inject @Nullable OrgService orgService
 
     @RepoListener
     void beforeValidate(Org org, Errors errors) {
@@ -95,9 +90,9 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         Map data = args.data
         if (args.bindAction == BindAction.Create) {
             verifyNumAndOrgSource(org, data)
-            //if no orgType then let it fall through and fail validation, orgMemberService is nullable so its easier to mock for testing
-            if(org.type && orgMemberService?.isOrgMemberEnabled())
-                orgMemberService.setupMember(org, data.remove('member') as Map)
+            //if no orgType then let it fall through and fail validation, orgService is nullable so its easier to mock for testing
+            if(org.type && orgService?.isOrgMemberEnabled())
+                orgService.setupMember(org, data.remove('member') as Map)
         }
         // we do primary location and contact here before persist so we persist org only once with contactId it is created
         if(data.location) createOrUpdatePrimaryLocation(org, data.location as Map)

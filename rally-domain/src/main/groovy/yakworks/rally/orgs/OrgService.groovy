@@ -24,7 +24,7 @@ import yakworks.rally.orgs.model.OrgType
 @Service @Lazy
 @Slf4j
 @CompileStatic
-class OrgMemberService {
+class OrgService {
 
     @Autowired(required = false)
     OrgDimensionService orgDimensionService

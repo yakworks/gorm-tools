@@ -1,9 +1,7 @@
 package yakworks.rally.orgs
 
-import org.apache.commons.lang3.RandomStringUtils
 
 import gorm.tools.transaction.TrxUtils
-import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.model.Contact
@@ -18,7 +16,6 @@ import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.testing.OrgDimensionTesting
 import yakworks.spring.AppCtx
-import yakworks.testing.gorm.TestDataJson
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
@@ -28,7 +25,7 @@ class OrgMemberSpec extends Specification implements GormHibernateTest, Security
 
     Closure doWithGormBeans(){ { ->
         orgDimensionService(OrgDimensionService)
-        orgMemberService(OrgMemberService)
+        orgService(OrgService)
         orgProps(OrgProps)
     }}
 

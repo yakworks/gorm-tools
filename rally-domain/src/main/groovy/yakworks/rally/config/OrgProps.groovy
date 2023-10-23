@@ -60,7 +60,7 @@ class OrgProps {
          */
         boolean enabled = false
 
-        OrgType orgType = OrgType.Company
+        OrgType type = OrgType.Company
     }
 
     static class MemberConfig {

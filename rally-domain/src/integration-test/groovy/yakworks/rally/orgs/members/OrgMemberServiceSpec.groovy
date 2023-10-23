@@ -5,7 +5,7 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import yakworks.rally.testing.OrgDimensionTesting
 import yakworks.testing.gorm.integration.DomainIntTest
-import yakworks.rally.orgs.OrgMemberService
+import yakworks.rally.orgs.OrgService
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgSource
@@ -16,7 +16,7 @@ import spock.lang.Specification
 @Rollback
 class OrgMemberServiceSpec extends Specification implements DomainIntTest {
 
-    OrgMemberService orgMemberService
+    OrgService OrgService
 
     void testSetParent() {
         setup:
@@ -35,7 +35,7 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
         branch.persist(flush: true)
 
         when:
-        orgMemberService.setupMember(customer, branch, false)
+        OrgService.setupMember(customer, branch, false)
 
         then:
         customer.member != null
@@ -62,7 +62,7 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
 
         when:
         Org branch = Org.of("Branch", "Branch", OrgType.Branch).persist()
-        orgMemberService.setupMember(branch, [division:[id:division.id], sales:[id:sales.id]])
+        OrgService.setupMember(branch, [division:[id:division.id], sales:[id:sales.id]])
 
         then:
         branch.member != null
@@ -84,7 +84,7 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
 
         when:
         Org branch = Org.of("Branch", "Branch", OrgType.Branch).persist()
-        orgMemberService.setupMember(branch, [division:[num:division.num]])
+        OrgService.setupMember(branch, [division:[num:division.num]])
 
         then:
         branch.member != null
@@ -104,12 +104,9 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
         customer.persist(flush:true)
         assert OrgSource.repo.findOrgIdBySourceIdAndOrgType("T1" as String, OrgType.get(1))
 
-        // orgMemberService.setupMember(customer, [branch:[num:branch.num]])
-
-        //initOrgDimensions(["CustAccount.Customer"])
         when:
         Org custAccount = Org.of("test", "test", OrgType.CustAccount).persist()
-        orgMemberService.setupMember(custAccount, [customer:[org:[source:[sourceId:'T1']]]])
+        OrgService.setupMember(custAccount, [customer:[org:[source:[sourceId:'T1']]]])
 
         then:
         custAccount

@@ -8,6 +8,7 @@ import java.time.Duration
 import java.time.Instant
 
 import org.springframework.boot.context.event.ApplicationReadyEvent
+import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Import
 import org.springframework.context.event.EventListener
 
@@ -20,6 +21,7 @@ import grails.plugins.metadata.PluginSource
  */
 @Import([RallyConfiguration])
 //@ComponentScan(['yakworks.rally']) //scan and pick up all
+@ComponentScan(['yakworks.testing.gorm.model'])
 @PluginSource
 class Application extends GrailsAutoConfiguration {
 
@@ -50,7 +52,7 @@ class Application extends GrailsAutoConfiguration {
      */
     @Override
     Collection<String> packageNames() {
-        super.packageNames() + RallyConfiguration.entityScanPackages
+        super.packageNames() + RallyConfiguration.entityScanPackages + ['yakworks.testing.gorm.model']
     }
 
 }

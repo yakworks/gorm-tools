@@ -305,10 +305,10 @@ class OrgWebApiSpec extends Specification implements WebClientTrait {
         if(resp.statusCode !=  HttpStatus.CREATED){
             assert body == [WTF: "Work That Failed"]
         }
+        body.id
         body.tags[0].id == tag1.id
 
         cleanup:
         Org.removeById(body.id as Long)
-
     }
 }

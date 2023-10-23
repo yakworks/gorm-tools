@@ -23,7 +23,7 @@ import yakworks.spring.AppCtx
 
 /** Trait for a conretete SyncJobService that provides standard functionality to create and update a jobs status */
 @CompileStatic
-trait SyncJobService<D> {
+abstract class SyncJobService<D> {
     final static Logger LOG = LoggerFactory.getLogger(SyncJobService)
 
     @Autowired
@@ -116,7 +116,6 @@ trait SyncJobService<D> {
             .whenComplete { res, ex ->
                 if (ex) {
                     //ideally should not happen as the pattern here is that all exceptions should be handled in supplierFunc
-                    LOG.error("runJob unexpected exception in supplyAsync", ex)
                     jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
                 }
                 jobContext.finishJob()
@@ -136,4 +135,5 @@ trait SyncJobService<D> {
     Long runJob(SyncJobContext jobContext, Runnable runnable) {
         return runJob(jobContext.args.asyncArgs, jobContext, runnable)
     }
+
 }

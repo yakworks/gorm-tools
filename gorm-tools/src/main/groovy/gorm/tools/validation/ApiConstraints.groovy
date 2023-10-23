@@ -114,13 +114,10 @@ class ApiConstraints {
         if(attrs && attrs['validate'] == false){
             createNonValidated(prop, attrs)
         } else {
-            // DefaultConstrainedProperty cp //= (DefaultConstrainedProperty)builder.constrainedProperties[prop]
-            // if(cp){
-            //     addMaxSizeIfMissing(cp, attrs)
-            // } else { }
             descriptionShortcut(attrs)
             addNullableIfMissing(attrs)
-            addBlankFalseIfNullableFalse(prop, attrs)
+            addStringDefaults(prop, attrs)
+            //addBlankFalseIfNullableFalse(prop, attrs)
             invokeOnBuilder(prop, attrs)
         }
 
@@ -182,6 +179,24 @@ class ApiConstraints {
     }
 
     /**
+     * if nullable is not set then add it to be true
+     * and add blank false if nullable is false
+     */
+    void addStringDefaults(String propName, Map attr) {
+        //only if its a string type
+        Class<?> propertyType = determinePropertyType(propName)
+        if(propertyType && String.isAssignableFrom(propertyType)){
+            //if no maxSize then set to 255
+            if(!attr.containsKey('maxSize')){
+                attr.maxSize = 255
+            }
+            //if nullable is false then by default make blank false too
+            if(attr.containsKey('nullable') && attr.nullable == false){
+                attr.blank = false
+            }
+        }
+    }
+    /**
      * if nullable is false then by default make blank false too
      */
     void addBlankFalseIfNullableFalse(String propName, Map attr){
@@ -206,7 +221,7 @@ class ApiConstraints {
         replaceDescriptionShortcut(mergedList)
 
         //with order above, classMaps override traitMaps and yamlMaps override all
-        Map<String, Map> mergedMap = Maps.merge(mergedList)
+        Map<String, Map> mergedMap = mergedList.size() == 1 ? mergedList[0] : Maps.merge([:], mergedList)
 
         return mergedMap //mergedList
     }

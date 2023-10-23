@@ -153,6 +153,28 @@ class SyncJobContext {
     }
 
     /**
+     * Update the total counts for processedCount and problemCount
+     * and updates message only with the counts, doesn't add or update any results.
+     * FIXME WIP, needs tests, not used anywhere yet.
+     *
+     * @param processedCnt the count to add to the the total processedCount
+     * @param probCnt the problems to add to the problemCount
+     */
+    void updateMessage(int processedCnt, int probCnt) {
+        try {
+            if(processedCnt) processedCount.addAndGet(probCnt)
+            if(probCnt) problemCount.addAndGet(probCnt)
+
+            String message = getJobUpdateMessage(probCnt > 0)
+
+            updateJob(null, [id: jobId, ok: ok.get(), message: message])
+        } catch (e) {
+            //ok to swallow this excep since we dont want to disrupt the flow, really this should be async
+            log.error("Unexpected error during updateJobResults", StackTraceUtils.deepSanitize(e))
+        }
+    }
+
+    /**
      * updates job with a result or a problem
      */
     void updateWithResult(Result result) {
@@ -281,7 +303,7 @@ class SyncJobContext {
         synchronized ("SyncJob${jobId}".toString().intern()) {
             syncJobService.updateJob(data)
             // append json to dataFile
-            appendDataResults(currentResults)
+            if(currentResults) appendDataResults(currentResults)
         }
     }
 

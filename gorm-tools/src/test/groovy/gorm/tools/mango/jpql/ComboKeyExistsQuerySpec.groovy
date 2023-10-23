@@ -8,6 +8,7 @@ package gorm.tools.mango.jpql
 import spock.lang.Specification
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.SinkItem
+import yakworks.testing.gorm.model.Thing
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class ComboKeyExistsQuerySpec extends Specification implements GormHibernateTest  {
@@ -29,10 +30,12 @@ class ComboKeyExistsQuerySpec extends Specification implements GormHibernateTest
     void "exists with multiple fields"() {
         when:
         def qe = ComboKeyExistsQuery.of(KitchenSink).keyNames(['id','name2'])
+        def params = [id: 1L, name2: 'KitchenSink-1']
+        def qry = qe.buildQueryString(params)
 
         then:
-        qe.exists([id: 1L, name2: 'KitchenSink-1'])
-        qe.queryString == "select 1 from yakworks.testing.gorm.model.KitchenSink where id = :idVal AND name2 = :name2Val"
+        qe.exists(params)
+        qry == "select 1 from yakworks.testing.gorm.model.KitchenSink where id = :idVal AND name2 = :name2Val"
 
         !qe.exists([id: 1L, name2: 'foo'])
     }
@@ -60,6 +63,26 @@ class ComboKeyExistsQuerySpec extends Specification implements GormHibernateTest
 
         then:
         qe.exists([id: 1L, 'thing.id': 1L])
+    }
+
+    void "exists single field"() {
+        when:
+        def qe = ComboKeyExistsQuery.of(KitchenSink).keyNames(['id'])
+
+        then:
+        qe.exists([id: 1L])
+        !qe.exists([id: -999L])
+    }
+
+    void "exists single field as domain"() {
+        when:
+        def qe = ComboKeyExistsQuery.of(KitchenSink).keyNames(['thing'])
+        def thing1 = Thing.get(1)
+
+        then:
+        qe.exists([thing: thing1])
+
+        !qe.exists([thing: Thing.load(-999L)])
     }
 
 }

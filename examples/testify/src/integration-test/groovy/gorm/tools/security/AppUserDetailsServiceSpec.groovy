@@ -34,6 +34,14 @@ class AppUserDetailsServiceSpec extends Specification implements DataIntegration
 
         then:
         user.name== 'karen'
+
+        when: "case doesnt match"
+        gUser = userDetailsService.loadUserByUsername('KAREN')
+
+        then: "should find user"
+        gUser
+        gUser.username == "karen"
+        gUser.id == user.id
     }
 
     void "test when user has empty password when using token"() {

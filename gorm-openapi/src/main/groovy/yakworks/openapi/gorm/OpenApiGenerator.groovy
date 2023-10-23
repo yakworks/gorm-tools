@@ -21,9 +21,7 @@ import yakworks.commons.map.Maps
 import yakworks.commons.util.BuildSupport
 import yakworks.commons.util.StringUtils
 import yakworks.gorm.api.ApiConfig
-import yakworks.gorm.api.ApiUtils
 import yakworks.gorm.api.PathItem
-import yakworks.grails.support.ConfigAware
 import yakworks.yaml.YamlUtils
 
 import static ApiSchemaEntity.CruType
@@ -36,7 +34,7 @@ import static ApiSchemaEntity.CruType
  */
 @SuppressWarnings(['UnnecessaryGetter', 'AbcMetric', 'Println'])
 @CompileStatic
-class OpenApiGenerator implements ConfigAware {
+class OpenApiGenerator {
     @Autowired ApiConfig apiConfig
     //inject src and build dirs when setting up bean
     String apiSrc
@@ -102,7 +100,9 @@ class OpenApiGenerator implements ConfigAware {
         Map groupedPaths = apiConfig.paths.groupBy { it.value.namespace }
 
         for(ns in namespaces){
-            Map sortedPathz = groupedPaths[ns.key].sort{ it.key }
+            //it is possible that there are no entities under a space, eg "reports"
+            Map spacePaths = groupedPaths[ns.key] ?: [:]
+            Map sortedPathz = spacePaths.sort{ it.key }
             for(entry in sortedPathz){
                 PathItem pathItem = (PathItem)entry.value
                 String endpoint = pathItem.name

@@ -20,15 +20,24 @@ class OrgMangoBench{
     static void forLoopBaseLine() {
         def start = BenchmarkHelper.startTime()
         for (int i = 0; i < cnt; i++) {
-            print(i)
+            assert i >= 0
         }
         println BenchmarkHelper.endTimeMsg("For loop", start)
     }
 
-    static void mangoOrgFindBy() {
+    static void findByName() {
         def start = BenchmarkHelper.startTime()
         for (int i = 0; i < cnt; i++) {
             def org = Org.findByName("Org23")
+            assert org
+        }
+        println BenchmarkHelper.endTimeMsg("For loop", start)
+    }
+
+    static void findWhere() {
+        def start = BenchmarkHelper.startTime()
+        for (int i = 0; i < cnt; i++) {
+            def org = Org.findWhere(name: "Org23")
             assert org
         }
         println BenchmarkHelper.endTimeMsg("For loop", start)
@@ -43,7 +52,7 @@ class OrgMangoBench{
         println BenchmarkHelper.endTimeMsg("For loop", start)
     }
 
-    static void mangoOrgGet() {
+    static void mangoOrgQueryGetWithMap() {
         def start = BenchmarkHelper.startTime()
         for (int i = 0; i < cnt; i++) {
             def org = Org.query([name: "Org23"]).get()
@@ -52,7 +61,18 @@ class OrgMangoBench{
         println BenchmarkHelper.endTimeMsg("For loop", start)
     }
 
-    void mangoBuilder() {
+    static void mangoOrgQueryGetWithClosure() {
+        def start = BenchmarkHelper.startTime()
+        for (int i = 0; i < cnt; i++) {
+            def org = Org.query{
+                eq "name", "Org23"
+            }.get()
+            assert org
+        }
+        println BenchmarkHelper.endTimeMsg("For loop", start)
+    }
+
+    void mangoBuilderBuild() {
         def start = BenchmarkHelper.startTime()
         for (int i = 0; i < cnt; i++) {
             def crit = mangoBuilder.build(Org, [name: "Org23"], null)

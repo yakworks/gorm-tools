@@ -1,30 +1,34 @@
 package yakworks.rally.orgs
 
-import yakworks.commons.lang.EnumUtils
+import org.springframework.beans.factory.annotation.Autowired
 
-import yakworks.testing.gorm.unit.SecurityTest
-import yakworks.testing.gorm.unit.DataRepoTest
-import grails.testing.services.ServiceUnitTest
-import yakworks.rally.orgs.model.OrgType
-import yakworks.rally.orgs.model.OrgTypeSetup
 import spock.lang.Specification
+import yakworks.commons.lang.EnumUtils
+import yakworks.rally.config.OrgProps
+import yakworks.rally.orgs.model.OrgType
+import yakworks.rally.testing.OrgDimensionTesting
+import yakworks.spring.AppCtx
+import yakworks.testing.grails.GrailsAppUnitTest
 
-class OrgDimensionServiceSpec extends Specification implements ServiceUnitTest<OrgDimensionService>, DataRepoTest, SecurityTest {
+class OrgDimensionServiceSpec extends Specification implements GrailsAppUnitTest {
 
-    void setupSpec() {
-        mockDomain OrgTypeSetup
-    }
+    @Autowired OrgDimensionService orgDimensionService
 
-    void initPaths(){
-        service.parsePathsAndInitCache([
-            "CustAccount.Customer.Division.Business",
-            "CustAccount.Branch.Division.Business"
-        ])
+    Closure doWithSpring() { { ->
+        orgDimensionService(OrgDimensionService)
+        orgProps(OrgProps)
+        appCtx(AppCtx)
+    }}
+
+    def setup(){
+        OrgDimensionTesting.setDimensions(
+            ['CustAccount', 'Customer', 'Division', 'Business'],
+            ['CustAccount', 'Branch', 'Division', 'Business']
+        )
     }
 
     void "test CustAccount"() {
         expect:
-        initPaths()
         verifyParents("CustAccount", ["Customer", "Branch", "Division", "Business"])
         verifyImmediatedParents("CustAccount", ["Customer", "Branch"])
         verifyChilds("CustAccount", [])
@@ -32,7 +36,6 @@ class OrgDimensionServiceSpec extends Specification implements ServiceUnitTest<O
 
     void "test Division"() {
         expect:
-        initPaths()
         verifyChilds("Division", ["Customer", "Branch", "CustAccount"])
         verifyParents("Division", ["Business"])
         verifyImmediatedParents("Division", ["Business"])
@@ -40,7 +43,6 @@ class OrgDimensionServiceSpec extends Specification implements ServiceUnitTest<O
 
     void "test client and company"() {
         when:
-        initPaths()
         List allOrgTypes = ['Customer', 'CustAccount', 'Branch', 'Division', 'Business']
 
         then:
@@ -59,9 +61,8 @@ class OrgDimensionServiceSpec extends Specification implements ServiceUnitTest<O
     void "test imutable"() {
 
         when: "User modifies the returned list"
-        initPaths()
-        List childs = service.getChildLevels(OrgType.Division)
-        List parents = service.getParentLevels(OrgType.Division)
+        List childs = orgDimensionService.getChildLevels(OrgType.Division)
+        List parents = orgDimensionService.getParentLevels(OrgType.Division)
         childs.add(OrgType.Prospect)
         parents.add(OrgType.Prospect)
 
@@ -72,17 +73,17 @@ class OrgDimensionServiceSpec extends Specification implements ServiceUnitTest<O
     }
 
     private void verifyChilds(String name, List<String> expected) {
-        List<OrgType> childs = service.getChildLevels(getEnum(name))
+        List<OrgType> childs = orgDimensionService.getChildLevels(getEnum(name))
         verifyCommon(childs, expected)
     }
 
     private void verifyParents(String name, List<String> expected) {
-        List<OrgType> parents = service.getParentLevels(getEnum(name))
+        List<OrgType> parents = orgDimensionService.getParentLevels(getEnum(name))
         verifyCommon(parents, expected)
     }
 
     private void verifyImmediatedParents(String name, List<String> expected) {
-        List<OrgType> parents = service.getImmediateParents(getEnum(name))
+        List<OrgType> parents = orgDimensionService.getImmediateParents(getEnum(name))
         verifyCommon(parents, expected)
     }
 

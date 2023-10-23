@@ -19,15 +19,14 @@ import grails.gorm.transactions.Transactional
 import jakarta.annotation.Nullable
 import yakworks.api.Result
 import yakworks.api.problem.Problem
-import yakworks.api.problem.data.NotFoundProblem
 import yakworks.commons.lang.Validate
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.Task
 import yakworks.rally.activity.model.TaskStatus
 import yakworks.rally.activity.model.TaskType
-import yakworks.rally.mail.MailMessageSender
 import yakworks.rally.mail.model.MailMessage
+import yakworks.rally.mail.services.MailMessageSender
 import yakworks.rally.orgs.model.Org
 import yakworks.spring.AppCtx
 
@@ -115,7 +114,7 @@ class ActivityService {
     }
 
     /**
-     * Sends the email with mailMessageSender. Update act to leve:Error if anything goes wrong.
+     * Sends the email with mailMessageSender. Update act to level:Error if anything goes wrong.
      * Will update the mailMessage to sent via mailMessageSender.send
      * Throws NotFoundPropblem is the activity doesn't have a mailMessage, or throws if persist fails.<br>
      * So this needs to wrap in try catch as well as check the result for status.

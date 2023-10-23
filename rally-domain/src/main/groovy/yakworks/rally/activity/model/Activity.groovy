@@ -4,6 +4,8 @@
 */
 package yakworks.rally.activity.model
 
+import java.time.LocalDateTime
+
 import groovy.transform.CompileDynamic
 
 import gorm.tools.model.NamedEntity
@@ -62,6 +64,8 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
     /** The priority level generally for an Alert or Log, but can be used for other Activity Kinds */
     AlertLevel level = AlertLevel.Info
 
+    LocalDateTime actDate
+
     //
     @CompileDynamic
     static enum Kind {
@@ -111,37 +115,23 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
     }
 
     static Map constraintsMap = [
-        contacts: [
-            d: 'The contacts associated with this activity.', validate: false
-        ],
-        kind: [
-            d: 'The type of the activity, certain kinds are only valid for a Task.',
-            nullable: false,
-            default: 'Note',
-            opai: 'CR'
-        ],
-        links: [
-            d: 'The entities this is linked to.',
-            validate: false
-        ],
-        note: [
-            d: 'A note for this activity. Name will be built from this'
-        ],
+        contacts: [d: 'The contacts associated with this activity.', validate: false],
+        kind: [d: 'The type of the activity, certain kinds are only valid for a Task.', nullable: false, default: 'Note', opai: 'CR'],
+        links: [d: 'The entities this is linked to.', validate: false],
+        note: [d: 'A note for this activity. Name will be built from this'],
         //FIXME update db data and make this nullable false.
-        level: [
-            d: 'The priority level generally for an Alert or Log, but can be used for other Activity Kinds', nullable: true, default: "Info"
-        ],
-        org: [
-            d: 'The Org this activity belongs to',
-            nullable: false
-        ],
+        level: [d: 'The priority level generally for an Alert or Log, but can be used for other Activity Kinds', nullable:
+            true, default: "Info"],
+        org: [d: 'The Org this activity belongs to', nullable: false],
         source: [
             d: ''' The source description for where this activity came from.
-                The gorm domain name of the record that generated this such as CollectionStep, Promise'''
+                The gorm domain name of the record that generated this such as CollectionStep, Promise''',
+            maxSize: 50
         ],
         sourceId: [
             nullable: true,
-            d: 'The id from the outside source or of the collection step, promise or some future workflow template record that generated this'
+            d: 'The id from the outside source or of the collection step, promise or some future workflow template record that generated this',
+            maxSize: 50
         ],
         name: [
             d: 'The short name or a 255 char string summary of the activity, if note it will ends with ... if there is more to the note.',
@@ -160,7 +150,8 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
             d: 'Who can see this activity. Defaults to Everyone',
             default: 'Everyone',
             nullable: false
-        ]
+        ],
+        actDate: [d: 'Activity date', nullable: false, oapi:'CR']
     ]
 
     /** creates an ActivityLink for the entity */

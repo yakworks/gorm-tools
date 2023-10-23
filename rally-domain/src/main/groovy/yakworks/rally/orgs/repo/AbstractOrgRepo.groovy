@@ -64,7 +64,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
     /**
      * makes sure org has a company on it, and sets it self if its a company
      */
-    void verifyCompany(Org org){
+    void ensureCompany(Org org){
         if (org.companyId == null) {
             if (org.type == OrgType.Company){
                 org.companyId = org.id
@@ -78,7 +78,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
     @RepoListener
     void beforeBind(Org org, Map data, BeforeBindEvent be) {
         if (be.isBindCreate()) {
-            verifyCompany(org)
+            ensureCompany(org)
             org.type = getOrgTypeFromData(data)
             //bind id early or generate one as we use it in afterBind
             if(data.id) {
@@ -95,8 +95,9 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         Map data = args.data
         if (args.bindAction == BindAction.Create) {
             verifyNumAndOrgSource(org, data)
-            //orgMemberService is nullable so its easier to mock for testing
-            if(orgMemberService?.isOrgMemberEnabled()) orgMemberService.setupMember(org, data.remove('member') as Map)
+            //if no orgType then let it fall through and fail validation, orgMemberService is nullable so its easier to mock for testing
+            if(org.type && orgMemberService?.isOrgMemberEnabled())
+                orgMemberService.setupMember(org, data.remove('member') as Map)
         }
         // we do primary location and contact here before persist so we persist org only once with contactId it is created
         if(data.location) createOrUpdatePrimaryLocation(org, data.location as Map)
@@ -176,7 +177,8 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
 
     Contact createOrUpdatePrimaryContact(Org org, Map data){
         if(!data) return //exit fast if no data
-
+        //just in case isPrimary was passed in then null it out so contact doesnt try to set it again.
+        if(data.isPrimary) data.isPrimary = null
         // if org has a contact then its an update or replace
         if(org.contact) {
             //if data has id
@@ -189,8 +191,9 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
                 data.id = org.contact.getId()
             }
         }
-        //make sure it has the right settings
-        data.isPrimary = true
+        //contact is already being set as primary, remove if its there so it doesnt re update the org in contactRepo
+        data.remove('isPrimary')
+
         data.orgId = org.getId()
         org.contact = contactRepo.createOrUpdateItem(data)
         return org.contact

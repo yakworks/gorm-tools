@@ -18,7 +18,7 @@ import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.api.Result
 import yakworks.commons.util.BuildSupport
-import yakworks.rally.mail.MailTo
+import yakworks.rally.mail.EmailService.MailTo
 import yakworks.rally.mail.config.MailProps
 import yakworks.testing.gorm.integration.DataIntegrationTest
 
@@ -33,7 +33,7 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
 
     @Autowired MailgunService emailService
     //@Autowired MailgunEventsApi mailgunEventsApi
-    @Autowired MailProps mailConfig
+    @Autowired MailProps mailProps
 
     String htmlBody = """
         <html><body>
@@ -53,10 +53,10 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
         emailService.mailgunEventsApi
         emailService.mailgunMessagesApi
         //mailgunEventsApi
-        mailConfig.enabled
-        mailConfig.defaultDomain
-        mailConfig.mailgun.privateApiKey
-        mailConfig.mailgun.enabled
+        mailProps.enabled
+        mailProps.defaultDomain
+        mailProps.mailgun.privateApiKey
+        mailProps.mailgun.enabled
     }
 
     //@Ignore
@@ -112,7 +112,7 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
             .html(htmlBody)
             .attachment(testAttach.toFile())
             .build()
-        MessageResponse messageResponse = emailService.sendMessage(mailConfig.defaultDomain, message)
+        MessageResponse messageResponse = emailService.sendMessage(mailProps.defaultDomain, message)
 
         then:
         messageResponse
@@ -198,7 +198,7 @@ class MailgunServiceTest extends Specification implements DataIntegrationTest  {
 
     def "Validation"() {
         when:
-        MailgunEmailVerificationApi mgunVerify = MailgunClient.config(mailConfig.mailgun.privateApiKey)
+        MailgunEmailVerificationApi mgunVerify = MailgunClient.config(mailProps.mailgun.privateApiKey)
             .createApi(MailgunEmailVerificationApi.class)
 
         AddressValidationResponse result = mgunVerify.validateAddress("canderson@marczyk.com")

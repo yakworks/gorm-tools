@@ -6,7 +6,6 @@ import gorm.tools.mango.MangoBuilder
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.testing.gorm.integration.DomainIntTest
 
@@ -23,17 +22,22 @@ class OrgMangoBenchTests extends Specification implements DomainIntTest {
         OrgMangoBench.forLoopBaseLine()
     }
 
-    def "mangoFindBy"() {
+    def "findByName"() {
         expect:
-        OrgMangoBench.mangoOrgFindBy()
+        OrgMangoBench.findByName()
+    }
+
+    def "findWhere"() {
+        expect:
+        OrgMangoBench.findWhere()
     }
 
     //@IgnoreRest
-    def "mangoBuilder"() {
+    def "mangoBuilderBuild"() {
         setup:
         OrgMangoBench orgMangoBench = new OrgMangoBench(mangoBuilder: mangoBuilder)
         expect:
-        orgMangoBench.mangoBuilder()
+        orgMangoBench.mangoBuilderBuild()
     }
 
     // @IgnoreRest
@@ -43,14 +47,20 @@ class OrgMangoBenchTests extends Specification implements DomainIntTest {
     }
 
     //@IgnoreRest
-    def "mangoOrgQuery"() {
+    def "mangoOrgQuery no get"() {
         expect:
         OrgMangoBench.mangoOrgQuery()
     }
 
-    def "mangoOrgGet"() {
+    def "mangoOrgQuery get with map"() {
         expect:
-        OrgMangoBench.mangoOrgGet()
+        OrgMangoBench.mangoOrgQueryGetWithMap()
     }
+
+    def "mangoOrgQuery get with closure"() {
+        expect:
+        OrgMangoBench.mangoOrgQueryGetWithClosure()
+    }
+
 
 }

@@ -1,22 +1,31 @@
 package yakworks.rally.orgs
 
-import yakworks.testing.gorm.unit.GormHibernateTest
-import yakworks.testing.gorm.unit.SecurityTest
-import yakworks.testing.gorm.TestDataJson
+import org.apache.commons.lang3.RandomStringUtils
+
 import spock.lang.Specification
+import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgCalc
 import yakworks.rally.orgs.model.OrgFlex
 import yakworks.rally.orgs.model.OrgInfo
+import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
+import yakworks.testing.gorm.TestDataJson
+import yakworks.testing.gorm.unit.GormHibernateTest
+import yakworks.testing.gorm.unit.SecurityTest
 
 class OrgSpec extends Specification implements GormHibernateTest, SecurityTest {
 
-    static entityClasses = [Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo]
+    static entityClasses = [Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo, OrgMember]
+
+    Closure doWithGormBeans(){ { ->
+        orgDimensionService(OrgDimensionService)
+        orgProps(OrgProps)
+    }}
 
     void "sanity check build"() {
         when:
@@ -27,13 +36,15 @@ class OrgSpec extends Specification implements GormHibernateTest, SecurityTest {
 
     }
 
-    // void "CRUD tests"() {
-    //     expect:
-    //     createEntity().id
-    //     persistEntity().id
-    //     updateEntity().version > 0
-    //     removeEntity()
-    // }
+    void "test create with of"() {
+        when:
+        Org org = Org.of('foo1', "foo", OrgType.Division)
+        org.persist(flush: true)
+
+        then:
+        org.companyId == 2
+    }
+
 
     void "test org errors, no type"() {
         when:
@@ -43,6 +54,20 @@ class OrgSpec extends Specification implements GormHibernateTest, SecurityTest {
         !org.validate()
         org.errors.allErrors.size() == 1
         org.errors['type']
+    }
+
+    void "test org errors long name"() {
+        when:
+        Org org = new Org(type: OrgType.Customer, num:'foo1',
+            name: RandomStringUtils.randomAlphabetic(300),
+            comments: RandomStringUtils.randomAlphabetic(300),
+        )
+
+        then:
+        !org.validate()
+        org.errors.allErrors.size() == 2
+        org.errors['name'].code == 'MaxLength'
+        org.errors['comments'].code == 'MaxLength'
     }
 
     void "empty string for name or num"() {

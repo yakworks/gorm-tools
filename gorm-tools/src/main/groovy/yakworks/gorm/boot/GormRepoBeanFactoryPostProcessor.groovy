@@ -20,7 +20,7 @@ import gorm.tools.repository.model.UuidRepoEntity
 /**
  * Sets up the spring beans for the GormRepos.
  * The GormRepo annotation should have already put the @Component annotation on it to make it eligible for scanning
- * this will spin through the entities and look for ones that dont have a concerete one setup and
+ * this will spin through the entities and look for ones that dont have a concerete repo setup and
  * make a DefaultGormRepo or UuidGormRepo depending on what setup.
  */
 @CompileStatic

@@ -20,7 +20,6 @@ class OrgConstraintsSpec extends Specification implements DataRepoTest, Security
         orgDimensionService(OrgDimensionService)
     }}
 
-
     void "sanity check build"() {
         when:
         def org = build(Org)
@@ -33,21 +32,21 @@ class OrgConstraintsSpec extends Specification implements DataRepoTest, Security
         when:
         def org = build(Org)
 
-        Map orgProps = GormMetaUtils.findConstrainedProperties(Org)
+        Map oProps = GormMetaUtils.findConstrainedProperties(Org)
 
         then:
         ['createdDate','editedDate','createdBy','editedBy'].each{key->
             assert org.hasProperty(key)
         }
         //sanity check the main ones
-        orgProps.name.nullable == false
+        oProps.name.nullable == false
 
-        orgProps['editedBy'].metaConstraints["bindable"] == false
-        orgProps['editedBy'].metaConstraints["description"] == "edited by user id"
+        oProps['editedBy'].metaConstraints["bindable"] == false
+        oProps['editedBy'].metaConstraints["description"] == "edited by user id"
 
         ['editedBy','createdBy', 'editedDate','createdDate'].each {
             assert org.hasProperty(it)
-            def conProp = orgProps[it]
+            def conProp = oProps[it]
             conProp.metaConstraints["bindable"] == false
             assert !conProp.nullable
             assert !conProp.editable

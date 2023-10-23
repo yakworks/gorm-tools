@@ -234,7 +234,9 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
                 removeList(main, dataList as List)
             }
             else {
-                throw new UnsupportedOperationException("op=update and op=remove are currently the only supported operation when passing a map for associations")
+                throw new UnsupportedOperationException(
+                    "op=update and op=remove are currently the only supported operation when passing a map for associations"
+                )
             }
         } else { //its a list
             xlist = replaceList(main, itemParams as List)

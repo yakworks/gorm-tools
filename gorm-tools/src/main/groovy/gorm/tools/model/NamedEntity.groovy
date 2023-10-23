@@ -23,7 +23,7 @@ trait NamedEntity extends Named {
     ]
 
     static constraintsMap = [
-        name:[ d: 'The name for this entity', nullable: false, maxSize: 50 ],
+        name:[ d: 'The name for this entity', nullable: false, maxSize: 50],
     ]
 
 }

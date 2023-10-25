@@ -12,7 +12,7 @@
     "autoprefixer": "^10.2.6",
     "cheerio": "^1.0.0-rc.9",
     "cross-var": "^1.1.0",
-    "crypto-js": "^4.0.0",
+    "crypto-js": "^4.2.0",
     "cssnano": "^5.0.6",
     "date-fns": "^2.22.1",
     "dotenv": "^10.0.0",

@@ -108,6 +108,11 @@ class BulkControllerSupport<D> {
         List bulkIncludes = IncludesConfig.getFieldIncludes(includesMap, [IncludesKey.bulk.name()])
         List bulkErrorIncludes = includesMap['bulkError'] as List<String>
 
+        //Default async=false for bulk
+        if(!params.containsKey('async')) {
+            params['async'] = false
+        }
+
         SyncJobArgs syncJobArgs = SyncJobArgs.withParams(params)
         syncJobArgs.op = dataOp
         syncJobArgs.includes = bulkIncludes

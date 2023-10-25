@@ -178,9 +178,9 @@ class SyncJobArgs {
         //parallel is NULL by default
         if(params.parallel != null) syncJobArgs.parallel = params.getBoolean('parallel')
 
-        //async is FALSE by default, XXX THIS needs to be standardized.
+        //async is TRUE by default, XXX THIS needs to be standardized.
         //when this is true then runs "non-blocking" in background and will job immediately with state=running
-        if(params.async != null) syncJobArgs.async = params.getBoolean('async')
+        syncJobArgs.async = params.getBoolean('async', true)
 
         //save payload is true by default
         if(params.savePayload != null) syncJobArgs.savePayload = params.getBoolean('savePayload')

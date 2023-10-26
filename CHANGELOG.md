@@ -1,3 +1,9 @@
+### v7.3.60
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.59...v7.3.60)
+- release [link](https://github.com/yakworks/gorm-tools/commit/3f527e38b647e09f4b3781e1dca6098e74785517)
+- SyncJobArgs Default async=true (#754) [link](https://github.com/yakworks/gorm-tools/commit/2da5f643bcc5a89c67c22a73fbaae4256a16b06f)
+
 ### v7.3.59
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.58...v7.3.59)

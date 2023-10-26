@@ -124,7 +124,7 @@ class SyncJobArgs {
      * Essentially makes the job a sort of Promise or Future.
      * when false (default) run in a standard blocking synchronous thread and return when job is done
      */
-    Boolean async = false
+    Boolean async = true
 
     /**
      * the args, such as flush:true etc.., to pass down to the repo methods
@@ -178,7 +178,6 @@ class SyncJobArgs {
         //parallel is NULL by default
         if(params.parallel != null) syncJobArgs.parallel = params.getBoolean('parallel')
 
-        //async is TRUE by default, XXX THIS needs to be standardized.
         //when this is true then runs "non-blocking" in background and will job immediately with state=running
         syncJobArgs.async = params.getBoolean('async', true)
 

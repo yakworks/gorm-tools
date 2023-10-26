@@ -26,8 +26,7 @@ class BulkableDoBulkSpec extends Specification implements GormHibernateTest {
     @Autowired KitchenSinkRepo kitchenSinkRepo
 
     SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
-        return new SyncJobArgs(parallel: false, op: op, source: "test", sourceId: "test",
-            includes: ["id", "name", "ext.name"])
+        return new SyncJobArgs(parallel: false, async:false, op: op, source: "test", sourceId: "test", includes: ["id", "name", "ext.name"])
     }
 
     void "success doBulk add"() {

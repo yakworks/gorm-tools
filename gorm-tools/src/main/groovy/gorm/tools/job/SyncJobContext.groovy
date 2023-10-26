@@ -40,7 +40,7 @@ import static gorm.tools.job.SyncJobArgs.DataFormat
 @SuppressWarnings('Println')
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @MapConstructor
-@ToString
+@ToString(includeNames = true, includes = ['ok', 'startTime', 'jobId'])
 @Slf4j
 @CompileStatic
 class SyncJobContext {

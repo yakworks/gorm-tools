@@ -12,7 +12,8 @@ import javax.servlet.http.HttpServletRequest
 class JobUtils {
 
     static String requestToSourceId(HttpServletRequest req){
-        String sourceId = "${req.method} ${req.requestURI}?${req.queryString}"
+        String sourceId = "${req.method} ${req.requestURI}"
+        if(req.queryString) sourceId = "${sourceId}?${req.queryString}"
         return sourceId
     }
 }

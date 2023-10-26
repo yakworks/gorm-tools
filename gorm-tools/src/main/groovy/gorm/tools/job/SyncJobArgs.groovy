@@ -24,7 +24,7 @@ import yakworks.commons.lang.EnumUtils
  */
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @MapConstructor
-@ToString
+@ToString(includeNames = true, includes = ['id', 'op', 'source', 'sourceId', 'async', 'jobId'])
 @CompileStatic
 class SyncJobArgs {
     public static final DATA_FORMAT_RESULT = "result"

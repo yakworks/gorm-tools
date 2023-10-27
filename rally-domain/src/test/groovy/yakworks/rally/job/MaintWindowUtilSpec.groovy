@@ -4,39 +4,13 @@
 */
 package yakworks.rally.job
 
-
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.ZonedDateTime
-
-import org.springframework.util.StringUtils
 
 import spock.lang.Specification
 import yakworks.api.problem.ThrowableProblem
 
 class MaintWindowUtilSpec extends Specification {
-
-    void "test timezone playground"() {
-        setup:
-        //var tz = TimeZone.getDefault()
-        var tz1 = StringUtils.parseTimeZoneString("CST")
-        var utc = StringUtils.parseTimeZoneString("UTC")
-
-        expect:
-        utc.toZoneId() == ZoneId.of("UTC")
-        ZoneId.of("America/Denver")
-        //tz.toZoneId() == ZoneId.of("America/Denver")
-        tz1.toZoneId().toString() == "America/Chicago"
-        LocalDateTime localDateTime = LocalDateTime.parse("2023-09-20T13:59:59")
-        localDateTime.toString() == "2023-09-20T13:59:59"
-        ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.of("America/Chicago"))
-        zonedDateTime.toString() == "2023-09-20T13:59:59-05:00[America/Chicago]"
-        //central time
-        var zonedDateTime2 = LocalDateTime.parse("2023-11-06T13:59:59").atZone(ZoneId.of("America/Chicago"))
-        zonedDateTime2.toString() == "2023-11-06T13:59:59-06:00[America/Chicago]"
-        zonedDateTime2.withZoneSameInstant(ZoneId.of("UTC")).toString() == "2023-11-06T19:59:59Z[UTC]"
-        zonedDateTime2.withZoneSameInstant(ZoneId.of("UTC")).toLocalDateTime().toString() == "2023-11-06T19:59:59"
-    }
 
     void "test secondsToNextRun"() {
         setup:

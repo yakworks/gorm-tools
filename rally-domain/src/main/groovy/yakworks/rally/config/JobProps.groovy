@@ -4,6 +4,9 @@
 */
 package yakworks.rally.config
 
+import java.time.Clock
+import java.time.LocalDate
+
 import groovy.transform.CompileStatic
 
 import org.springframework.boot.context.properties.ConfigurationProperties
@@ -17,5 +20,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 class JobProps {
     //future defaults
     boolean async
-
+    var foo = LocalDate.now ( Clock.systemDefaultZone ( ))
 }

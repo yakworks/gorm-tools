@@ -30,7 +30,8 @@ class MaintenanceProps {
 
     /**
      * Timezone for the crons expressions. UTC is default.
-     * Should use the region. so for CST set the "America/Chicago" and EST "America/New_York", etc..
+     * Should use the region not 3 letters acronym,
+     * "America/Chicago"=CST, "America/New_York"=EST, "America/Denver"=MST, "America/Los_Angeles"=PST
      */
     String zone
 }

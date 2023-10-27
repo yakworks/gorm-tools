@@ -107,7 +107,13 @@ class ProblemHandler {
         }
         else if (e instanceof ThrowableProblem) {
             return (GenericProblem) e.problem
-        } else {
+        }
+        else if (e instanceof NullPointerException) {
+            //deal with the dreaded null pointer
+            String stackLine1 = e.stackTrace[0].toString()
+            return new UnexpectedProblem().cause(e).detail("NullPointerException at ${stackLine1}")
+        }
+        else {
             return new UnexpectedProblem().cause(e).detail(e.message)
         }
     }

@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration
 
 import yakworks.rally.orgs.model.OrgType
 
-@Configuration(proxyBeanMethods = false)
+// @Configuration(proxyBeanMethods = false)
 @ConfigurationProperties(prefix="app.orgs") //,ignoreUnknownFields=false)
 @CompileStatic
 class OrgProps {

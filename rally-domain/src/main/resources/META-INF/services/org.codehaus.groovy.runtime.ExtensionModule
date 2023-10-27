@@ -2,4 +2,4 @@ moduleName = rally-domain-extensions
 moduleVersion = ${moduleVersion}
 extensionClasses = yakworks.rally.extensions.CurrentUserExt,\
                     yakworks.rally.extensions.UserInfoExt
-# staticExtensionClasses = yakworks.commons.extensions.MathStaticExtensions
+staticExtensionClasses = yakworks.rally.extensions.TimeStaticExt

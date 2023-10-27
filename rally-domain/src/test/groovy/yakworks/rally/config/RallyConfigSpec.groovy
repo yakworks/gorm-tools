@@ -32,6 +32,8 @@ class RallyConfigSpec extends Specification implements GrailsAppUnitTest {
         appResourcesDir == rootDir
         rallyConfig.resourcesDir == "./build/rootLocation"
         rallyConfig.hello == "world"
+        rallyConfig.defaults.currency.currencyCode == 'USD'
+        rallyConfig.defaults.timeZone.toZoneId().toString() == "America/New_York"
     }
 
     def "orgs Check"() {

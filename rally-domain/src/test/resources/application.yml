@@ -28,6 +28,10 @@ app:
     tempDir: "${app.resources-dir}/tempDir"
     attachments.location: 'attachments'
 
+  defaults:
+#    time-zone: "America/New_York"
+    currency: USD
+
   # Organizations setup
   orgs:
     partition:

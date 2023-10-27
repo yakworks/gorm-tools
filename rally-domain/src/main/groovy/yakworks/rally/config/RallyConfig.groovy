@@ -40,6 +40,5 @@ class RallyConfig {
     @PostConstruct
     void init(){
         AppTimeZone.timeZone = defaults.timeZone
-        assert defaults.currency.currencyCode == 'USD'
     }
 }

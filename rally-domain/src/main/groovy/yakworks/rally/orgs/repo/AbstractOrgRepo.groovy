@@ -274,7 +274,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
                 oid = orgSourceRepo.findOrgIdBySourceIdAndOrgType(source.sourceId as String, orgType)
                 if(oid) org = get(oid)
             }
-            else {1
+            else {
                 // lookup by just sourceId and see if it returns just one
                 List<Long> res = orgSourceRepo.findOrgIdBySourceId(source.sourceId as String)
                 if(res?.size() == 1) {

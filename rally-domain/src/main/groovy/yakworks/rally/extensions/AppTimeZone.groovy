@@ -20,6 +20,7 @@ import groovy.transform.CompileStatic
  * then its tomorrow at 1am in UTC so using the vanilla java LocalDate.now() will give a date for tomorrow when the accounting books
  * are still open and running for today.
  */
+@SuppressWarnings(['PropertyName'])
 @CompileStatic
 class AppTimeZone {
 
@@ -43,7 +44,6 @@ class AppTimeZone {
      * So for example when I want today and its 9:00pm Eastern, its tomorrow at 1am in UTC so using the default
      * LocalDate.now() give a date for tomorrow.
      *
-     * @param type
      * @return the LocalDate in the default time zone.
      */
     static LocalDate localDateNow() {

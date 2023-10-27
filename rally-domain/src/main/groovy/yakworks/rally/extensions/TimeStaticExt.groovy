@@ -20,7 +20,6 @@ class TimeStaticExt {
      * So for example when I want today and its 9:00pm Eastern, its tomorrow at 1am in UTC so using the default
      * LocalDate.now() give a date for tomorrow.
      *
-     * @param type
      * @return the LocalDate in the default time zone.
      */
     static LocalDate nowAppZone(final LocalDate type) {
@@ -40,7 +39,6 @@ class TimeStaticExt {
      * So for example when I want today and its 9:00pm Eastern, its tomorrow at 1am in UTC so using the default
      * LocalDate.now() give a date for tomorrow.
      *
-     * @param type
      * @return the LocalDate in the default time zone.
      */
     static ZoneId appDefault(final ZoneId type) {

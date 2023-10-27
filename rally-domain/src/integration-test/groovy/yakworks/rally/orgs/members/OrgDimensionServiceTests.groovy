@@ -1,5 +1,7 @@
 package yakworks.rally.orgs.members
 
+import org.springframework.beans.factory.annotation.Autowired
+
 import yakworks.commons.lang.EnumUtils
 
 import grails.testing.mixin.integration.Integration
@@ -15,8 +17,8 @@ import spock.lang.Specification
 @Rollback
 class OrgDimensionServiceTests extends Specification implements DomainIntTest {
 
-    OrgDimensionService orgDimensionService
-    OrgProps orgProps
+    @Autowired OrgDimensionService orgDimensionService
+    @Autowired OrgProps orgProps
 
     void setupDims() {
         orgProps.members.enabled = true

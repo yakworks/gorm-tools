@@ -51,6 +51,7 @@ app:
       private-api-key: zzz
 
   maintenance:
+    time-zone: CST
     zone: CST
     # list of crons
     crons:
@@ -60,3 +61,7 @@ app:
       # 3pm-7pm SAT-SUN Central time, which in UTC is 20:00-24:00 SAT,SUN
       - '* * 20,21,22,23 * * SAT,SUN'
 
+job:
+  test:
+    cron: '* * 2,3 * * TUE-SAT'
+    time-zone: America/New_York

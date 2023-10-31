@@ -33,5 +33,5 @@ class MaintenanceProps {
      * Should use the region not 3 letters acronym,
      * "America/Chicago"=CST, "America/New_York"=EST, "America/Denver"=MST, "America/Los_Angeles"=PST
      */
-    String zone
+    TimeZone timeZone
 }

@@ -9,7 +9,7 @@ import yakworks.testing.grails.GrailsAppUnitTest
 /**
  * sanity checking that @ConfigurationProperties works
  */
-class JobPropsSpec extends Specification implements GrailsAppUnitTest {
+class MaintenancePropsSpec extends Specification implements GrailsAppUnitTest {
 
     @Autowired MaintenanceProps maintenanceProps
 
@@ -20,6 +20,7 @@ class JobPropsSpec extends Specification implements GrailsAppUnitTest {
     def "sanity Check"() {
         expect:
         maintenanceProps.crons.size() == 2
+        maintenanceProps.timeZone == TimeZone.getTimeZone("CST")
     }
 
 }

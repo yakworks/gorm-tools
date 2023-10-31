@@ -10,7 +10,7 @@ import yakworks.testing.grails.GrailsAppUnitTest
 /**
  * sanity checking that @ConfigurationProperties works
  */
-class RallyConfigSpec extends Specification implements GrailsAppUnitTest {
+class AppRallyConfigSpec extends Specification implements GrailsAppUnitTest {
 
     @Value('${app.resources-dir}')
     String rootDir
@@ -18,11 +18,11 @@ class RallyConfigSpec extends Specification implements GrailsAppUnitTest {
     @Value('${app.resources.rootLocation}')
     String appResourcesDir
 
-    @Autowired RallyConfig rallyConfig
+    @Autowired AppRallyConfig rallyConfig
     @Autowired OrgProps orgProps
 
     Closure doWithSpring() { { ->
-        rallyConfig(RallyConfig)
+        rallyConfig(AppRallyConfig)
         orgProps(OrgProps)
     }}
 

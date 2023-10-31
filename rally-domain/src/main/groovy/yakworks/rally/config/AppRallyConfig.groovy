@@ -16,7 +16,7 @@ import yakworks.rally.extensions.AppTimeZone
 @ConfigurationProperties(prefix="app")
 // @ConfigurationPropertiesScan
 @CompileStatic
-class RallyConfig {
+class AppRallyConfig {
     String hello = "world"
 
     String resourcesDir

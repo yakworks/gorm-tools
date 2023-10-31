@@ -24,6 +24,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class AppTimeZone {
 
+    /** The default timezone for App Time, for spring gets set after  */
     static TimeZone APP_ZONE = TimeZone.getTimeZone("America/New_York")
 
     static void setTimeZone(TimeZone zone){
@@ -37,6 +38,7 @@ class AppTimeZone {
     static ZoneId getZoneId(){
         APP_ZONE.toZoneId()
     }
+
     /**
      * Uses the app default zone to get the current date.
      * The system zone should be set to UTC. The App can have a default time zone.

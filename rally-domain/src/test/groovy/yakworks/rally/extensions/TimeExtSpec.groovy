@@ -6,15 +6,14 @@ import java.time.ZoneId
 import org.springframework.beans.factory.annotation.Autowired
 
 import spock.lang.Specification
-import yakworks.rally.config.OrgProps
-import yakworks.rally.config.RallyConfig
+import yakworks.rally.config.AppRallyConfig
 import yakworks.testing.grails.GrailsAppUnitTest
 
 class TimeExtSpec extends Specification implements GrailsAppUnitTest  {
-    @Autowired RallyConfig rallyConfig
+    @Autowired AppRallyConfig rallyConfig
 
     Closure doWithSpring() { { ->
-        rallyConfig(RallyConfig)
+        rallyConfig(AppRallyConfig)
     }}
 
     def "test nowAppZone"() {

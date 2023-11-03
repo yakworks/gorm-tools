@@ -128,8 +128,8 @@ class OrgTagTests extends Specification implements DomainIntTest {
     void "copyToOrg"() {
         setup:
         setUpData()
-        Org from = Org.of("T01", "T01", OrgType.Customer.id).persist()
-        Org to = Org.of("T01", "T01", OrgType.Customer.id).persist()
+        Org from = Org.of("T01", "T01", OrgType.Customer).persist()
+        Org to = Org.of("T01", "T01", OrgType.Customer).persist()
         flush()
 
         orgTagRepo.create(from, Tag.load(1))

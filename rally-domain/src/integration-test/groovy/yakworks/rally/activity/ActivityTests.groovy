@@ -121,7 +121,7 @@ class ActivityTests extends Specification implements DomainIntTest {
         then:
         activity.attachments.size() == 1
 
-        Files.exists(attachmentSupport.getFile(attachmentLocation))
+        Files.exists(attachmentSupport.getPath(attachmentLocation))
 
         when: "we flag it for delete"
         flushAndClear()
@@ -136,7 +136,7 @@ class ActivityTests extends Specification implements DomainIntTest {
         then:
         updateAct
         updateAct.attachments.size() == 0
-        Files.notExists(attachmentSupport.getFile(attachmentLocation))
+        Files.notExists(attachmentSupport.getPath(attachmentLocation))
 
         when:
         flushAndClear()

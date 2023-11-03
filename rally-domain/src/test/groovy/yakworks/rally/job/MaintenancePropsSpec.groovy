@@ -3,22 +3,24 @@ package yakworks.rally.job
 import org.springframework.beans.factory.annotation.Autowired
 
 import spock.lang.Specification
+import yakworks.rally.config.MaintenanceProps
 import yakworks.testing.grails.GrailsAppUnitTest
 
 /**
  * sanity checking that @ConfigurationProperties works
  */
-class JobPropsSpec extends Specification implements GrailsAppUnitTest {
+class MaintenancePropsSpec extends Specification implements GrailsAppUnitTest {
 
-    @Autowired JobProps jobProps
+    @Autowired MaintenanceProps maintenanceProps
 
     Closure doWithSpring() { { ->
-        jobProps(JobProps)
+        maintenanceProps(MaintenanceProps)
     }}
 
     def "sanity Check"() {
         expect:
-        jobProps.maintenanceWindow.size() == 2
+        maintenanceProps.crons.size() == 2
+        maintenanceProps.timeZone == TimeZone.getTimeZone("CST")
     }
 
 }

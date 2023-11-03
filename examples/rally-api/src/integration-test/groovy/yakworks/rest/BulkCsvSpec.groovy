@@ -1,5 +1,6 @@
 package yakworks.rest
 
+import java.nio.file.Path
 
 import gorm.tools.transaction.TrxUtils
 import grails.gorm.transactions.Rollback
@@ -11,7 +12,6 @@ import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Contact
 import yakworks.rest.gorm.controller.RestRepoApiController
-import yakworks.spring.AppResourceLoader
 import yakworks.testing.rest.RestIntTest
 
 @Rollback
@@ -19,7 +19,6 @@ import yakworks.testing.rest.RestIntTest
 class BulkCsvSpec  extends RestIntTest {
 
     RestRepoApiController<Contact> controller
-    AppResourceLoader appResourceLoader
     AttachmentRepo attachmentRepo
 
     void setup() {
@@ -29,11 +28,11 @@ class BulkCsvSpec  extends RestIntTest {
     void "test upload zip file for bulk process"() {
         setup: "Create zip"
         //Org.create(num:"bulk1", name:"bulk1", companyId: Company.DEFAULT_COMPANY_ID).persist()
-
-        File contactCsv =  new File(BuildSupport.rootProjectDir, "examples/resources/csv/contact.csv")
+        Path resDir = BuildSupport.rootProjectPath.resolve('examples/resources')
+        Path contactCsv =  resDir.resolve("csv/contact.csv")
         assert contactCsv.exists()
 
-        File zip = ZipUtils.zip("test.zip", appResourceLoader.rootPath.toFile(), contactCsv)
+        File zip = ZipUtils.zip("test.zip", resDir.toFile(), contactCsv.toFile())
 
         expect:
         zip.exists()

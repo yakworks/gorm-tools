@@ -6,9 +6,12 @@ package gorm.tools.job
 
 import javax.servlet.http.HttpServletRequest
 
+import groovy.transform.CompileStatic
+
 /**
  * Misc static helpers for SynJobs/ApiJobs
  */
+@CompileStatic
 class JobUtils {
 
     static String requestToSourceId(HttpServletRequest req){

@@ -3,9 +3,9 @@ package yakworks.rally.orgs.members
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import yakworks.rally.testing.OrgDimensionTesting
 import yakworks.testing.gorm.integration.DomainIntTest
-import yakworks.rally.orgs.OrgDimensionService
-import yakworks.rally.orgs.OrgMemberService
+import yakworks.rally.orgs.OrgService
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgSource
@@ -16,14 +16,7 @@ import spock.lang.Specification
 @Rollback
 class OrgMemberServiceSpec extends Specification implements DomainIntTest {
 
-    OrgDimensionService orgDimensionService
-    OrgMemberService orgMemberService
-
-    void initOrgDimensions(Map dims){
-        orgDimensionService.dimensionsConfig = dims
-        orgDimensionService.clearCache()
-        orgDimensionService.init()
-    }
+    OrgService OrgService
 
     void testSetParent() {
         setup:
@@ -42,7 +35,7 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
         branch.persist(flush: true)
 
         when:
-        orgMemberService.setupMember(customer, branch, false)
+        OrgService.setupMember(customer, branch, false)
 
         then:
         customer.member != null
@@ -58,7 +51,7 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
     void "test setupMember"() {
         setup:
         //appConfig.orgDimensions = [primary: "Branch.Division.Business", second: "Branch.Sales"]
-        initOrgDimensions([primary: "Branch.Division.Business", second: "Branch.Sales"])
+        OrgDimensionTesting.setDimensions(['Branch','Division','Business'], ['Branch','Sales'])
 
         Org division = Org.of("Division", "Division", OrgType.Division).persist()
         division.member = OrgMember.make(division)
@@ -69,7 +62,7 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
 
         when:
         Org branch = Org.of("Branch", "Branch", OrgType.Branch).persist()
-        orgMemberService.setupMember(branch, [division:[id:division.id], sales:[id:sales.id]])
+        OrgService.setupMember(branch, [division:[id:division.id], sales:[id:sales.id]])
 
         then:
         branch.member != null
@@ -79,17 +72,19 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
         branch.member.sales == sales
 
         cleanup:
-        initOrgDimensions(null)
+        OrgDimensionTesting.resetDimensions()
     }
 
     void "test setupMember lookup by num"() {
         setup:
-        initOrgDimensions([primary: "Branch.Division"])
+        OrgDimensionTesting.setDimensions(['Branch','Division'])
         Org division = Org.findByOrgTypeId(OrgType.Division.id)
+        //setup another org with same num to make sure its locating the right one
+        Org dupDiv = Org.of(division.num, division.num + "dup", OrgType.Branch).persist(flush:true)
 
         when:
         Org branch = Org.of("Branch", "Branch", OrgType.Branch).persist()
-        orgMemberService.setupMember(branch, [division:[num:division.num]])
+        OrgService.setupMember(branch, [division:[num:division.num]])
 
         then:
         branch.member != null
@@ -97,7 +92,7 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
         branch.member.division == division
 
         cleanup:
-        initOrgDimensions(null)
+        OrgDimensionTesting.resetDimensions()
     }
 
     void "test setupMember lookup for customer by org source "() {
@@ -109,17 +104,14 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
         customer.persist(flush:true)
         assert OrgSource.repo.findOrgIdBySourceIdAndOrgType("T1" as String, OrgType.get(1))
 
-        // orgMemberService.setupMember(customer, [branch:[num:branch.num]])
-
-        initOrgDimensions([primary: "CustAccount.Customer"])
         when:
         Org custAccount = Org.of("test", "test", OrgType.CustAccount).persist()
-        orgMemberService.setupMember(custAccount, [customer:[org:[source:[sourceId:'T1']]]])
+        OrgService.setupMember(custAccount, [customer:[org:[source:[sourceId:'T1']]]])
 
         then:
         custAccount
 
-        cleanup:
-       initOrgDimensions(null)
+       //  cleanup:
+       // initOrgDimensions(null)
     }
 }

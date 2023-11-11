@@ -32,7 +32,7 @@ class ProblemHandlerSpec extends Specification implements DataRepoTest {
 
         then:
         problem.status.code == 500
-        problem.code == 'error.unhandled'
+        problem.code == 'error.unexpected'
         // problem.title == 'Unhandled Problem'
         problem.detail == "test error"
         //FIXME finish showing stacktrace

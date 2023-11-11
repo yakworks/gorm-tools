@@ -41,6 +41,37 @@ class ProblemHandler {
 
     @Autowired ICUMessageSource messageSource
 
+    //the list of packages to summarize up so logging trace is not so noisy. only logs one line if multiples start with these
+    private static final List NOISY_PACKAGES = [
+        'jdk.internal.reflect.NativeMethodAccessorImpl',
+        'jdk.internal.reflect.DelegatingMethodAccessorImpl',
+        'jdk.internal.reflect.GeneratedMethodAccessor',
+        'org.springframework.web.filter.OncePerRequestFilter',
+        'org.springframework.web.filter.CharacterEncodingFilter',
+        'org.springframework.web.filter.DelegatingFilterProxy',
+        'org.springframework.security.web',
+        'org.grails.core.DefaultGrailsControllerClass',
+        'org.grails.web.servlet.mvc.GrailsWebRequestFilter',
+        'org.grails.web.filters.HiddenHttpMethodFilter',
+        'org.grails.datastore.mapping.reflect.FieldEntityAccess',
+        'org.apache.catalina.core',
+        'org.apache.tomcat.websocket.server.WsFilter',
+        'org.apache.tomcat.util.net',
+        'org.apache.tomcat.util.threads',
+        'org.apache.coyote'
+    ];
+
+    static {
+        StackTraceUtils.addClassTest { String className ->
+            for (String groovyPackage : NOISY_PACKAGES) {
+                if (className.startsWith(groovyPackage)) {
+                    return false
+                }
+            }
+            return null
+        }
+    }
+
     GenericProblem handleException(Class entityClass, Throwable e) {
         handleException(e, entityClass.simpleName)
     }

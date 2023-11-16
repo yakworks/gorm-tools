@@ -29,6 +29,7 @@ class ParallelStreamTools implements ParallelTools {
         ClassLoaderThreadFactory factory = new ClassLoaderThreadFactory()
         // if (poolSize == 0) poolSize = 4 //  Math.min(32767, Runtime.getRuntime().availableProcessors()),
         forkJoinPool = new ForkJoinPool(getAsyncConfig().poolSize, factory, null, false)
+        // forkJoinPool = new ForkJoinPool(getAsyncConfig().poolSize)
     }
 
     @Override

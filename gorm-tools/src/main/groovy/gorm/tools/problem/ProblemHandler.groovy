@@ -206,6 +206,7 @@ class ProblemHandler {
         return b.toString();
     }
 
+    @SuppressWarnings(['BooleanMethodReturnsNull'])
     static void stackTraceUtilsDefaultFilters(){
         StackTraceUtils.addClassTest { String className ->
             for (String groovyPackage : (NOISY_PACKAGES + NOISY_TEST_PACKAGES)) {

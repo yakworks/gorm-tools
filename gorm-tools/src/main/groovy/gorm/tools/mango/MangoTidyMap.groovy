@@ -95,8 +95,22 @@ class MangoTidyMap {
                     // for handling case {customer: [{id:1}, {id:2}]}, transforms to {customer:{id:{'$in': [1,2]}}}
                     if (valAsList[0] instanceof Map) {
                         Map mapVal = valAsList[0]
-                        Map inMap = ['$in': valAsList.collect { (it as Map).values()[0] }]
-                        result[key]["${mapVal.keySet()[0]}"] = inMap
+
+                        String inKey
+                        Collection inList
+
+                        if(mapVal.containsKey('id')) {
+                            //if map contains ids, use it for in query
+                            inKey = 'id'
+                            inList = valAsList.collect { it['id']}
+                        } else {
+                            //take the first key from maps and use it for in
+                            inKey = mapVal.keySet()[0]
+                            inList = valAsList.collect { it[inKey]}
+                        }
+
+                        Map inMap = ['$in': inList]
+                        result[key][inKey] = inMap
                     } else {
                         result[key]['$in'] = val
                     }

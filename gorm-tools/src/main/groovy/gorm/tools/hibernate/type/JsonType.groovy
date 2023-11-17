@@ -13,7 +13,6 @@ import org.hibernate.type.descriptor.sql.SqlTypeDescriptor
 import org.hibernate.usertype.ParameterizedType
 
 import io.hypersistence.utils.hibernate.type.json.internal.JsonTypeDescriptor
-//import io.hypersistence.utils.hibernate.type.util.Configuration
 
 /**
  * Overrides so we can access setParameterValues using the gorm mapping

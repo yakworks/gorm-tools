@@ -58,6 +58,21 @@ class MangoTidyMapSpec extends Specification {
                 ]
             ]
         ])
+
+        when: "id is not 1st key"
+        mmap = tidy([
+            "customer": [[name:"x1", "id": 1], [name:"x2", "id": 2], ["id": 3, name:"x3"]]
+        ])
+
+        then:
+        flatten(mmap) == flatten([
+            customer: [
+                id: [
+                    '$in': [1, 2, 3]
+                ]
+            ]
+        ])
+
     }
 
     void "test like"() {

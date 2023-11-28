@@ -39,23 +39,36 @@ class DefaultCsvToMapTransformer implements CsvToMapTransformer {
         Long attachmentId = params.attachmentId as Long
         String dataFilename = params.dataFilename ?: "data.csv"
         String headerPathDelimiter = params.headerPathDelimiter ?: "."
-        return processRows(attachmentId, dataFilename, headerPathDelimiter) as List<Map>
+
+        List<Map> rows
+        //try-with-resources so it automatically closes and cleans up after itself
+        try (InputStream ins = getInputStream(attachmentId, dataFilename)) {
+            rows = processRows(ins, headerPathDelimiter) as List<Map>
+        }
+        return rows
     }
 
-    List<Map<String, Object>> processRows(Long attachmentId, String dataFileName, String delim) {
+    /**
+     * returns the InputStream for the attachment depending on whether its a zip or not
+     */
+    InputStream getInputStream(Long attachmentId, String dataFileName){
         Attachment attachment = Attachment.get(attachmentId)
         Validate.notNull(attachment, "Attachment not found : ${attachmentId}")
-
-        Resource zipR = attachment.resource
-        Validate.notNull(zipR)
-        File zip = zipR.file
-        Validate.notNull(zip)
-
-        InputStream dataIn = ZipUtils.getZipEntryInputStream(zip, dataFileName)
-        Validate.notNull(dataIn, "$dataFileName not found in zip")
-        return processRows(dataIn, delim)
+        Resource res = attachment.resource
+        Validate.notNull(res)
+        File file = res.file
+        InputStream ins
+        //if its a zip then get the file specified in dataFilename
+        if(attachment.extension == 'zip') {
+            ins = ZipUtils.getZipEntryInputStream(file, dataFileName)
+            Validate.notNull(ins, "$dataFileName not found in zip")
+        } else {
+            ins = file.newInputStream()
+        }
+        return ins
     }
 
+    /** uses the CSVPathKeyMapReader to actual read and process the csv */
     List<Map<String, Object>> processRows(InputStream dataIn, String delim) {
         CSVPathKeyMapReader dataRowsReader = CSVPathKeyMapReader.of(new InputStreamReader(dataIn)).pathDelimiter(delim)
         return dataRowsReader.readAllRows()

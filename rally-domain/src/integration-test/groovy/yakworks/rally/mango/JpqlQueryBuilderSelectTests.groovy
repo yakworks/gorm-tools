@@ -1,17 +1,26 @@
 package yakworks.rally.mango
 
-
+import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.jpql.JpqlQueryBuilder
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import spock.lang.Ignore
 import spock.lang.Specification
+import yakworks.rally.orgs.model.Contact
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
+import yakworks.testing.gorm.model.KitchenSink
 
 @Integration
 @Rollback
 class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest {
+
+    void buildKitchen(){
+        //KitchenSink.withTransaction {
+            KitchenSink.repo.createKitchenSinks(10)
+       // }
+    }
 
     String strip(String val){
         val.stripIndent().replace('\n',' ').trim()
@@ -19,7 +28,7 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
 
     void "Test projections simple no aliasToMap"() {
         given:"Some criteria"
-
+        buildKitchen()
         def criteria = Org.query {
             sum('calc.totalDue')
             groupBy('type')
@@ -35,7 +44,7 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         then:"The query is valid"
         query != null
         query.trim() == strip('''
-            SELECT SUM(org.calc.totalDue) as calc_totalDue_sum,org.type as type
+            SELECT SUM(org.calc.totalDue) as calc_totalDue_sum, org.type as type
             FROM yakworks.rally.orgs.model.Org AS org
             GROUP BY org.type
             HAVING (SUM(org.calc.totalDue) < :p1)
@@ -76,7 +85,7 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         queryInfo.paramMap == [p1: false, p2: 100]
         query != null
         query.trim() == strip('''
-            SELECT new map( SUM(org.calc.totalDue) as calc_totalDue_sum,org.type as type )
+            SELECT new map( SUM(org.calc.totalDue) as calc_totalDue_sum, org.type as type )
             FROM yakworks.rally.orgs.model.Org AS org
             WHERE (org.inactive=:p1)
             GROUP BY org.type
@@ -114,7 +123,7 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         queryInfo.paramMap['p1'] == 6
         query != null
         query.trim() == strip('''
-            SELECT new map( SUM(org.calc.totalDue) as calc_totalDue_sum,org.type as type )
+            SELECT new map( SUM(org.calc.totalDue) as calc_totalDue_sum, org.type as type )
             FROM yakworks.rally.orgs.model.Org AS org
             WHERE (org.member.division.id=:p1 AND org.contact.id=:p2)
             GROUP BY org.type
@@ -150,10 +159,45 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         queryInfo.paramMap['p1'] == "6"
         query != null
         query.trim() == strip('''
-            SELECT new map( SUM(org.calc.totalDue) as calc_totalDue_sum,org.type as type )
+            SELECT new map( SUM(org.calc.totalDue) as calc_totalDue_sum, org.type as type )
             FROM yakworks.rally.orgs.model.Org AS org
             WHERE (org.member.division.num=:p1 AND org.contact.id=:p2)
             GROUP BY org.type
+        ''')
+    }
+
+    //FIXME still need to work out alias
+    def "exists on contact location"() {
+        given:
+        def qryContact = Contact.query(
+            q: [
+                'location.city': "second City1*",
+                'org.id' : ['$eqf': 'org_.id'] //not picking up the org_
+            ]
+        ).id()
+
+        def qry = Org.query(
+            //projections: ['calc.totalDue': 'sum', 'type': 'group'],
+            q: [
+                'name': "Org1*",
+            ]
+        ).exists(qryContact)
+
+        when: "A jpa query is built"
+        def builder = JpqlQueryBuilder.of(qry as MangoDetachedCriteria)//.aliasToMap(true)
+        //def builder = JpqlQueryBuilder.of(qryContact as MangoDetachedCriteria)//.aliasToMap(true)
+        def queryInfo = builder.buildSelect()
+        def query = queryInfo.query
+
+        then: "The query is valid"
+        query.trim() == strip('''
+            SELECT DISTINCT org FROM yakworks.rally.orgs.model.Org AS org
+            WHERE (lower(org.name) like lower(:p1) AND
+            EXISTS (
+            SELECT contact1.id FROM yakworks.rally.orgs.model.Contact contact1
+            WHERE lower(contact1.location.city) like lower(:p2) AND contact1.org.id = org.id
+            )
+            )
         ''')
     }
 }

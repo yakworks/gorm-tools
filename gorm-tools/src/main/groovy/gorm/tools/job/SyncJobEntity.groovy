@@ -46,7 +46,7 @@ transform example when in a job
  */
 
 @CompileStatic
-trait SyncJobEntity<D> implements SourceTrait {
+trait SyncJobEntity implements SourceTrait {
 
     public static int MAX_MEG_IN_BYTES = 1024 * 1024 * 10 //10 megabytes
 

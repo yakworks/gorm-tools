@@ -23,7 +23,7 @@ class OrgMember implements GormRepoEntity<OrgMember, OrgMemberRepo>, Serializabl
 
     //denormalized
     Org branch //at CED this is Profit Center and comes from CustAcct
-    Org division //at CED this is credit center
+    Org division //at CED this is Credit Center, ar RNDC this is the Market.
     Org business
     Org sales
     Org region

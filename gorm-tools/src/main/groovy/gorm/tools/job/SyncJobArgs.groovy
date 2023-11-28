@@ -24,7 +24,7 @@ import yakworks.commons.lang.EnumUtils
  */
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @MapConstructor
-@ToString
+@ToString(includeNames = true, includes = ['jobId', 'op', 'source', 'sourceId', 'async'])
 @CompileStatic
 class SyncJobArgs {
     public static final DATA_FORMAT_RESULT = "result"
@@ -124,7 +124,7 @@ class SyncJobArgs {
      * Essentially makes the job a sort of Promise or Future.
      * when false (default) run in a standard blocking synchronous thread and return when job is done
      */
-    Boolean async = false
+    Boolean async = true
 
     /**
      * the args, such as flush:true etc.., to pass down to the repo methods
@@ -178,9 +178,8 @@ class SyncJobArgs {
         //parallel is NULL by default
         if(params.parallel != null) syncJobArgs.parallel = params.getBoolean('parallel')
 
-        //async is FALSE by default, XXX THIS needs to be standardized.
         //when this is true then runs "non-blocking" in background and will job immediately with state=running
-        if(params.async != null) syncJobArgs.async = params.getBoolean('async')
+        syncJobArgs.async = params.getBoolean('async', true)
 
         //save payload is true by default
         if(params.savePayload != null) syncJobArgs.savePayload = params.getBoolean('savePayload')

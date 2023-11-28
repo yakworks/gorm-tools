@@ -66,4 +66,30 @@ class DefaultCsvToMapTransformerSpec extends Specification implements DataRepoTe
         if(attachment) attachment.resource.getFile()?.delete()
     }
 
+    void "test with only csv"() {
+        when: "create attachment"
+        def csvFile = BuildSupport.rootProjectPath.resolve("examples/resources/csv/contact.csv")
+        Map params = [name: csvFile.fileName.toString(), sourcePath: csvFile]
+        Attachment attachment = Attachment.create(params)
+
+        then:
+        noExceptionThrown()
+        attachment.extension == 'csv'
+        attachment.resource.exists()
+
+        when:
+        List<Map> rows = csvToMapTransformer.process([attachmentId:attachment.id])
+
+        then:
+        noExceptionThrown()
+        rows != null
+        rows.size() == 3
+        rows[0].name == "name1"
+        rows[0].num == "bulk1"
+        rows[0]["orgId"] == "1"
+
+        cleanup:
+        if(attachment) attachment.resource.getFile()?.delete()
+    }
+
 }

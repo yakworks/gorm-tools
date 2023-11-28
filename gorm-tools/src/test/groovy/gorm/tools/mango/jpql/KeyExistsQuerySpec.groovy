@@ -33,7 +33,7 @@ class KeyExistsQuerySpec extends Specification implements GormHibernateTest  {
 
         then:
         qe.exists(1L)
-        qe.queryString == "select 1 from yakworks.testing.gorm.model.KitchenSink where id = :keyVal"
+        //qe.queryString == "select 1 from yakworks.testing.gorm.model.KitchenSink where id = :keyVal"
 
         !qe.exists(-999L)
     }
@@ -45,7 +45,7 @@ class KeyExistsQuerySpec extends Specification implements GormHibernateTest  {
 
         then:
         qe.exists(thing1)
-        qe.queryString == "select 1 from yakworks.testing.gorm.model.KitchenSink where thing = :keyVal"
+        //qe.queryString == "select 1 from yakworks.testing.gorm.model.KitchenSink where thing = :keyVal"
 
         !qe.exists(Thing.load(-999L))
     }

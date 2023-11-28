@@ -30,10 +30,12 @@ class ComboKeyExistsQuerySpec extends Specification implements GormHibernateTest
     void "exists with multiple fields"() {
         when:
         def qe = ComboKeyExistsQuery.of(KitchenSink).keyNames(['id','name2'])
+        def params = [id: 1L, name2: 'KitchenSink-1']
+        def qry = qe.buildQueryString(params)
 
         then:
-        qe.exists([id: 1L, name2: 'KitchenSink-1'])
-        qe.queryString == "select 1 from yakworks.testing.gorm.model.KitchenSink where id = :idVal AND name2 = :name2Val"
+        qe.exists(params)
+        qry == "select 1 from yakworks.testing.gorm.model.KitchenSink where id = :idVal AND name2 = :name2Val"
 
         !qe.exists([id: 1L, name2: 'foo'])
     }

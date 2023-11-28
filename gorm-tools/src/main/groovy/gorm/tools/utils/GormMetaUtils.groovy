@@ -23,6 +23,7 @@ import grails.gorm.validation.ConstrainedEntity
 import grails.gorm.validation.ConstrainedProperty
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.NameUtils
+import yakworks.commons.lang.Validate
 import yakworks.spring.AppCtx
 
 /**
@@ -108,6 +109,14 @@ class GormMetaUtils {
     }
 
     /**
+     * Returns the original class if the instance is a hibernate proxy. or returns the class name of the object
+     */
+    static Class getEntityClass(Object entity) {
+        Validate.notNull(entity, "Entity is null")
+        return getProxyHandler().getProxiedClass(entity)
+    }
+
+    /**
      * Doesnt require proxyHandler and just looks at the name.
      * - If the name has `_$$_` its java assist
      * - if it matches $HibernateProxy$ then its ByteBuddy
@@ -136,7 +145,7 @@ class GormMetaUtils {
         else if(!proxyHandler.isInitialized(entity)){
             return false
         } else {
-            return entity.isDirty() || ((Persistable)entity).isNew()
+            return entity.hasChanged() || ((Persistable)entity).isNew()
         }
 
     }

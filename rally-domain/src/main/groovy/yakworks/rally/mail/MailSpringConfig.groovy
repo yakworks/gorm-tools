@@ -11,9 +11,10 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
-import org.springframework.context.annotation.Profile
 
 import yakworks.rally.mail.mailgun.MailgunService
+import yakworks.rally.mail.services.CommonMailer
+import yakworks.rally.mail.services.MailMessageSender
 import yakworks.rally.mail.testing.TestMailService
 
 @Configuration @Lazy
@@ -32,6 +33,11 @@ class MailSpringConfig {
     @Bean
     MailMessageSender mailMessageSender() {
         return new MailMessageSender()
+    }
+
+    @Bean
+    CommonMailer commonMailer() {
+        return new CommonMailer()
     }
 
     @Configuration

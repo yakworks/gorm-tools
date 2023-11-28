@@ -4,7 +4,6 @@
 */
 package yakworks.rest.gorm.controller
 
-import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
 
@@ -16,6 +15,7 @@ import org.springframework.core.GenericTypeResolver
 import org.springframework.http.HttpStatus
 
 import gorm.tools.beans.Pager
+import gorm.tools.job.JobUtils
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.GormRepo
@@ -25,6 +25,7 @@ import grails.web.Action
 import yakworks.api.problem.Problem
 import yakworks.gorm.api.IncludesKey
 
+import static gorm.tools.problem.ProblemHandler.isBrokenPipe
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.MULTI_STATUS
 import static org.springframework.http.HttpStatus.NO_CONTENT
@@ -100,7 +101,8 @@ trait RestRepoApiController<D> extends RestApiController {
     @Action
     def post() {
         try {
-            D instance = (D) getRepo().create(bodyAsMap())
+            Boolean bindId = params.getBoolean('bindId')
+            D instance = (D) getRepo().create(bodyAsMap(), [bindId:bindId])
             respondWithEntityMap(instance, getParamsMap(), CREATED)
         } catch (Exception e) {
             handleException(e)
@@ -212,8 +214,10 @@ trait RestRepoApiController<D> extends RestApiController {
     void bulkProcess(DataOp dataOp) {
         List dataList = bodyAsList() as List<Map>
         Map gParams = getParamsMap()
-        HttpServletRequest req = request
-        String sourceId = "${req.method} ${req.requestURI}?${req.queryString}"
+
+        String sourceId = JobUtils.requestToSourceId(request)
+        //String sourceId = "${request.method} ${request.requestURI}?${request.queryString}"
+
         SyncJobArgs syncJobArgs = getBulkControllerSupport().setupSyncJobArgs(dataOp, gParams, sourceId)
         SyncJobEntity job = getBulkControllerSupport().process(dataList, syncJobArgs)
         respondWith(job, [status: MULTI_STATUS])
@@ -232,9 +236,16 @@ trait RestRepoApiController<D> extends RestApiController {
     }
 
     void handleException(Exception e) {
-        assert getEntityClass()
-        Problem apiError = problemHandler.handleException(getEntityClass(), e)
-        respondWith(apiError)
+        /*
+         * Broken pipe exception occurs when connection is closed before server has finished writing response.
+         * Once that happens, trying to write any response to output stream will result in broken pipe.
+         * We have "caught" broken pipe, and now during "catch" here, if we again try "respondWith" it will again result in "broken pipe" error
+         */
+        if(isBrokenPipe(e)) return
+        else {
+            assert getEntityClass()
+            Problem apiError = problemHandler.handleException(getEntityClass(), e)
+            respondWith(apiError)
+        }
     }
-
 }

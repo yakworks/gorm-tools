@@ -1,3 +1,124 @@
+### v7.3.61
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.60...v7.3.61)
+- Merge branch 'master' of https://github.com/yakworks/gorm-tools [link](https://github.com/yakworks/gorm-tools/commit/170d44d184aee73d6618ab42fe698cca5ada423c)
+- release [link](https://github.com/yakworks/gorm-tools/commit/9425056a0b19190532a0dec320be9928718956d0)
+- dev merge for 7.3.61 release [link](https://github.com/yakworks/gorm-tools/commit/25f4d49e4134d4ab68003d9c851887fc35716619)
+- ignoreUnknownFields=false on OrgProps [link](https://github.com/yakworks/gorm-tools/commit/ae91bcb2243fa9b7db4236a278e9ebc9f355009b)
+- cronJobProps (#757) [link](https://github.com/yakworks/gorm-tools/commit/5b251a0999a872129fa3ebf02e804926404d469a)
+- App time zone (#756) [link](https://github.com/yakworks/gorm-tools/commit/8fa86aaf68ebeab142402a5e47792d4c312f748b)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/9682fec5401b6b4545934fc7c3f3a59c2c88f00b)
+- bump version to 61 [link](https://github.com/yakworks/gorm-tools/commit/74d64a8a49b3206f155f15e36ee2fa204ec407bc)
+- merge master [link](https://github.com/yakworks/gorm-tools/commit/9f0135d612061466cf97844085be9e74dd98059e)
+- Merge pull request #752 from yakworks/release/dev-next [link](https://github.com/yakworks/gorm-tools/commit/6c4b8b7903da88c2e32a28840bd7e1ac5288329e)
+- add getter for partitionOrg members to centralize common logic in OrgService [link](https://github.com/yakworks/gorm-tools/commit/10e023dfca327d4af93ec1af0f10b586ae8a927a)
+- rename OrgMemberService to OrgService to prep for it doing more. [link](https://github.com/yakworks/gorm-tools/commit/ba0e88c063d8bf25bfde6be40b8c6dc7132a2529)
+- Cleanup (#750) [link](https://github.com/yakworks/gorm-tools/commit/9e576f9a76d291c9751b2f6abd2103f1d26f7907)
+- setup OrgConfig and refactor OrgDimensions (#737) [link](https://github.com/yakworks/gorm-tools/commit/2367bba6796eeaad37cbff9a9539233197471ae8)
+
+### v7.3.60
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.59...v7.3.60)
+- release [link](https://github.com/yakworks/gorm-tools/commit/3f527e38b647e09f4b3781e1dca6098e74785517)
+- SyncJobArgs Default async=true (#754) [link](https://github.com/yakworks/gorm-tools/commit/2da5f643bcc5a89c67c22a73fbaae4256a16b06f)
+
+### v7.3.59
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.58...v7.3.59)
+- release 7.3.59 [link](https://github.com/yakworks/gorm-tools/commit/6ec5ae870861a33fb02b1be10b5a8fdb66fb2851)
+- Merge pull request #753 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/acc59b7a4956b85178859766132c9a5b0f96ff76)
+- Catch exception (#751) [link](https://github.com/yakworks/gorm-tools/commit/e14e5bcf8e3c205ecee6bcac06229fe776692937)
+- Merge pull request #748 from yakworks/hypersistence-upgrade [link](https://github.com/yakworks/gorm-tools/commit/aaaf1a37da309e6116341b94160e33f42363899d)
+- move to io.hypersistence.hypersistence-utils-hibernate-55 3.5.2 [link](https://github.com/yakworks/gorm-tools/commit/36c4ac8d4a4391ed4d3493acd3422d55a76d0bfa)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/514255d5ecc9b7d56788e75fce840a2b6b828be8)
+- Merge pull request #736 from yakworks/2127-activity-date [link](https://github.com/yakworks/gorm-tools/commit/0558e8b2f7e3ff49becddb890174d6e339d14abe)
+- Merge branch 'dev' into 2127-activity-date [link](https://github.com/yakworks/gorm-tools/commit/5ea3a323058490da615d283faf589758709edfe5)
+- update constraint [link](https://github.com/yakworks/gorm-tools/commit/f3ab3f25b05e65498ba540b1c0788cef2545e68f)
+- cleanup, add tests [link](https://github.com/yakworks/gorm-tools/commit/d66b04bd0e73e4e7048372bc0ffead30d31055a8)
+- 9ci/domain9#2127 Add actDate field to activity [link](https://github.com/yakworks/gorm-tools/commit/6eb1febd0a075316c4abff9f0c84a3adf519cca2)
+
+### v7.3.58
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.57...v7.3.58)
+- release [link](https://github.com/yakworks/gorm-tools/commit/f96be053f0f954bd11facc6370c065718fa45aa3)
+- Merge dev for release 7.3.58 [link](https://github.com/yakworks/gorm-tools/commit/f1753f8aa0800223e79c1fbc3ca03b23a4aa0b8a)
+- vGroovyCommons=3.13 [link](https://github.com/yakworks/gorm-tools/commit/bf57694cec2b76ebac6b01cab52673e8a3004167)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/84e0e0adc7c1aa090fd7070f67625d6541659b13)
+- remove the flush and clears from RepoUtils (#744) [link](https://github.com/yakworks/gorm-tools/commit/66cbd970e2d294b0f6c1a235d15c683fb239f822)
+- Hibernate session cache and query gotchas (#742) [link](https://github.com/yakworks/gorm-tools/commit/4d896411648b876f8e3f69843b14ea0ea3b95403)
+- Merge pull request #743 from yakworks/2292-bindid [link](https://github.com/yakworks/gorm-tools/commit/896c4c56e1be7f07edecb3fbc46ff46f9749857e)
+- support bindId during post [link](https://github.com/yakworks/gorm-tools/commit/a7df89714843d47356bebe41017589d570306bf0)
+
+### v7.3.57
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.56...v7.3.57)
+- try cache bust [link](https://github.com/yakworks/gorm-tools/commit/cbaa88d8519bb9596597a90084fa4966549d2aae)
+- fix so tags gets copied from MailMessage and sent through mailgun (#745) [link](https://github.com/yakworks/gorm-tools/commit/278a45338e4724a720d7b8b332c2653550e73980)
+
+### v7.3.56
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.55...v7.3.56)
+- RestResponderService and maint window bloacker for jobs [link](https://github.com/yakworks/gorm-tools/commit/7c5e15ccf9577cb81c68ae8a5ac8c2e3c0924dd4)
+- move to RestResponderService, use the orm builder for the json ones w… (#740) [link](https://github.com/yakworks/gorm-tools/commit/db104131be5bde12e0319f1fe4c528bf3c3bd83d)
+- add check for jobs to see if its in maint window, also a bunch of lint/codenarc fixes that were bad. (#739) [link](https://github.com/yakworks/gorm-tools/commit/7903a5ef831f751459573b7ac6e0794229c105af)
+
+### v7.3.55
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.54...v7.3.55)
+- release 7.3.55 [link](https://github.com/yakworks/gorm-tools/commit/39acc9e86f930538b0074a79172bbc876b506475)
+- Merge dev for 7.3.55 release [link](https://github.com/yakworks/gorm-tools/commit/8203573ad09e668fbd664e6472009c920bbc167c)
+- vSpringGrailsKit=5.1 & vGroovyCommons=3.12 [link](https://github.com/yakworks/gorm-tools/commit/1ff2cd240fbcbe1a2faf0de3e96de94f11354d22)
+- fix catch [link](https://github.com/yakworks/gorm-tools/commit/d9f6f4fde3c585f696bed73733b1ede37dee05b4)
+- catch throwable so asserts get caught and it finishes job. (#735) [link](https://github.com/yakworks/gorm-tools/commit/4cbc5954431e754d1a9206146ea8daaeeb02eb51)
+- Release/jobs (#734) [link](https://github.com/yakworks/gorm-tools/commit/0967b9c85dcb4bc3911cd282817470b644ce09fa)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/d686a7d1ceceb9bf1e6b55e46d9b5d25086b99d9)
+- Wrap exists in trx (#733) [link](https://github.com/yakworks/gorm-tools/commit/db24d82ee0fb98ef5fd338e3603954792af266de)
+- Merge pull request #729 from yakworks/release/dev-next [link](https://github.com/yakworks/gorm-tools/commit/98a91932c3ce3f27232e3ed16d84632ec9f2c5a7)
+- Merge branch 'dev' into release/dev-next [link](https://github.com/yakworks/gorm-tools/commit/f1ebfb8061d429ee9cb30b28a5b3cf549f6ee6b7)
+- bump vSpringGrailsKit=5.0.11-SNAPSHOT [link](https://github.com/yakworks/gorm-tools/commit/d74f65a54a251861aec905bca79c6cb63b1b7ea3)
+- Merge branch 'dev' into release/dev-next [link](https://github.com/yakworks/gorm-tools/commit/1a5d06899a28fa0a6a3a74c83bdbacd91fc2126f)
+- Jpql exists (#725) [link](https://github.com/yakworks/gorm-tools/commit/197e895d28856a125df10f30d46b9dcab4aa8138)
+- JPQL enhance, commons 3.12 (#720) [link](https://github.com/yakworks/gorm-tools/commit/f259fe44f81615eca89a7315088922fa748b8996)
+
+### v7.3.54
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.53...v7.3.54)
+- bump vGroovyCommons=3.11.1, and release [link](https://github.com/yakworks/gorm-tools/commit/6dcc7891ffadc25c43a743eaca69296b4429e6f6)
+- release [link](https://github.com/yakworks/gorm-tools/commit/9dbe2636fecd95894896d384e7e2354390cc53a3)
+- v54 - Merge pull request #732 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/d1ccad4d3de36c8136d2671a877ac5715371a41e)
+- #2255 Add check for contact source unique key (#730) [link](https://github.com/yakworks/gorm-tools/commit/0d72c021c147dd65c0d40fd710f8a60cbec0462b)
+- Handle broken pipe exception (#731) [link](https://github.com/yakworks/gorm-tools/commit/ef8cb57f2f6187eb3f856db4ae1b81c47f2a090f)
+- add SyncJobContext.updateMessage for updating messages without a result. [link](https://github.com/yakworks/gorm-tools/commit/7e602ccac39a40f0f9f31567c35b64f48e529c21)
+- commons 3.11.1-snapshot, dep hell on handlbars springboot plugin, got rid of humanize, and got versions in check [link](https://github.com/yakworks/gorm-tools/commit/7d1ec8dc655d3186ab9e1f4f1373a05fd75add3c)
+- 9ci/domain9#2222 login should be case insensitive (#726) [link](https://github.com/yakworks/gorm-tools/commit/a1fdbd5bfca44c4035e4345473767af5a6b454f8)
+- add clone to MailerTemplate (#728) [link](https://github.com/yakworks/gorm-tools/commit/115e143f56998f535f5ef75efc813af7ad61cd64)
+- Common mailer (#727) [link](https://github.com/yakworks/gorm-tools/commit/e0a6811430ff951774d84fa9d0d7686bd3cdd08a)
+- Fix to handle db exceptions and convert to problem during remove (#722) [link](https://github.com/yakworks/gorm-tools/commit/3bfbb897f059c4d39705b27739b0ff8a7a946170)
+- Fix binder to handle hibernate proxies (#724) [link](https://github.com/yakworks/gorm-tools/commit/cbd0e2ea4700fa57d4040c2341b0b9dfefb2c388)
+- unwrap spring proxy before looking up event methods on repo (#719) [link](https://github.com/yakworks/gorm-tools/commit/821b6caf208ac1e5a20e0d75cda5f386b5bb408a)
+- rename getCriteria to buildCriteria() (#717) [link](https://github.com/yakworks/gorm-tools/commit/e5a4afd36d2515c40801907815d926db2dcc34ce)
+
+### v7.3.53
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.52...v7.3.53)
+- Merge pull request #716 from yakworks/thread-safe-ComboKeyExistsQuery [link](https://github.com/yakworks/gorm-tools/commit/c14ccfecf901dca0fdcf1e3e226987cb922eacdd)
+- prep for release [link](https://github.com/yakworks/gorm-tools/commit/a2f20b6fb98d776f8dde388f2c649b96324443fc)
+- make ComboKeyExistsQuery, build the string each call, will be fast and no need to cache it. [link](https://github.com/yakworks/gorm-tools/commit/9faee6bef1e6fe147d25f36393521d55f12d1907)
+
+### v7.3.52
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.51...v7.3.52)
+- release [link](https://github.com/yakworks/gorm-tools/commit/7b137a6c61d8999157fcba6a62a69c21424f61bd)
+- Merge pull request #715 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/8b9e214d670fb1b3a798e3e52f1e5437b163ad90)
+- test for hasChanged and isDirty (#696) [link](https://github.com/yakworks/gorm-tools/commit/f5680d6ab788beac3ea51151c8fd7572ca68ccb1)
+- Allow csv for bulk instead of only zip (#711) [link](https://github.com/yakworks/gorm-tools/commit/b0b399cb7ad84089e33267eb0a6b402a1ade836b)
+- Misc refactors (#710) [link](https://github.com/yakworks/gorm-tools/commit/1fe0ef6916718971f4ddefc2eb63de619d19cd1a)
+- 9ci/cust-rndc-ext#174 set contact as primary contact - if isPrimary=true (#709) [link](https://github.com/yakworks/gorm-tools/commit/ecd121099e50bd987f8b4c9ff224a9b249f20368)
+- Data binder fix  (#708) [link](https://github.com/yakworks/gorm-tools/commit/cbe6b520a2b1a5081a0a352140df53fb3fcac70b)
+- Api generator fix : handle space without any entities (#707) [link](https://github.com/yakworks/gorm-tools/commit/bfccba7479f3f23f2c154cb42d3089a0dd8d2f15)
+- uuid fix (#705) [link](https://github.com/yakworks/gorm-tools/commit/4da93f25847b46ce9dcb2851932f57c1b28b3064)
+- 9ci/domain9#2085 Add helper to setup syncjob args and make consitent.  (#700) [link](https://github.com/yakworks/gorm-tools/commit/ab7860d3c6e6cc206d27a55c8f7b7ce2eb6c5f1a)
+
 ### v7.3.51
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.50...v7.3.51)

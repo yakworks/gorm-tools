@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
 import yakworks.commons.lang.Validate
+import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgType
@@ -23,14 +24,33 @@ import yakworks.rally.orgs.model.OrgType
 @Service @Lazy
 @Slf4j
 @CompileStatic
-class OrgMemberService {
+class OrgService {
 
     @Autowired(required = false)
     OrgDimensionService orgDimensionService
 
+    @Autowired(required = false)
+    OrgProps orgProps
 
     boolean isOrgMemberEnabled(){
-        return orgDimensionService?.orgMemberEnabled
+        return orgProps?.members?.enabled
+    }
+
+    /** shortcut to config orgProps.partition */
+    OrgProps.PartitionConfig getPartition(){
+        orgProps.partition
+    }
+
+    String getPartitionPropName(){
+        return orgProps.partition.type.propertyName
+    }
+
+    String getMemberPartitionPath(){
+        return "member.${orgProps.partition.type.propertyName}"
+    }
+
+    String getMemberPartitionIdPath(){
+        return "member.${orgProps.partition.type.propertyName}.id"
     }
 
     /**
@@ -39,7 +59,7 @@ class OrgMemberService {
      *
      * @param org the org to setup the orgMember for
      * @param params should contain the id values for the required immediate parents.
-     *               for example if the orgDimensionService has immediateParents of [Division,Sales] then
+     *        for example if the orgDimensionService has immediateParents of [Division,Sales] then
      *               map should contain [division: [id: 123], sales: [id: 234]]
      */
     void setupMember(Org org, Map params) {
@@ -54,17 +74,11 @@ class OrgMemberService {
         //spin through orgTypes for immediate parents and update parents
         for (OrgType type : immediateParents) {
             Map orgParam = params[type.propertyName]
-
             Validate.notEmpty(orgParam, "setupMember called but params does not contain ${type.propertyName}")
-            Org parent
+            //add type for lookup
+            orgParam.type = type
 
-            if(orgParam['id']) {
-                parent = Org.get(orgParam['id'] as Long)
-            } else {
-                orgParam.type = type
-                parent = Org.repo.lookup(orgParam as Map)
-            }
-            Validate.notNull(parent, "setupMember failed trying to get Org from param ${orgParam}}")
+            Org parent = Org.repo.findWithData(orgParam as Map)
 
             //if its has no parents then its a toplevel
             boolean isTopLevel = orgDimensionService.getImmediateParents(type).isEmpty()
@@ -79,21 +93,23 @@ class OrgMemberService {
      * then copies the member vals
      *
      * @param org  an Org entity to set parent to
-     * @param parent the imediate parent org to copy member values from
+     * @param parent the immediate parent org to copy member values from
      * @param isTopLevel if true then it wont require the parent org to have an orgMember as its the top level
      */
     void setupMember(Org org, Org parent, boolean isTopLevel) {
         if (!org.member) org.member = OrgMember.make(org) //create new orgmember
-        if(org.companyId) org.member.company = Org.load(org.companyId)
-        if(!isTopLevel) {
+        if (org.companyId) org.member.company = Org.load(org.companyId)
+        if (!isTopLevel) {
             Validate.notNull(parent.member, 'Parent org must have a member set at this point')
-            ['branch', 'division', 'business', 'sales', 'region', 'factory'].each { String fld ->
+            ['branch', 'division', 'business', 'sales', 'region', 'factory', 'company'].each { String fld ->
                 if (parent.member[fld]) org.member[fld] = parent.member[fld]
             }
+            //for now company is special. this is temporary until we get rid of it or if not then settle on the business logic.
+            if (!org.member.company) org.member.company = parent.member.company
         }
         String orgMemberName = parent.type.propertyName
-        //if the parent is a customer or company its not in member so check hasProperty to make sure
-        if(org.member.hasProperty(orgMemberName)) org.member[orgMemberName] = parent
+        //if the parent is a customer its not in member so check hasProperty to make sure
+        if (org.member.hasProperty(orgMemberName)) org.member[orgMemberName] = parent
 
     }
 

@@ -4,20 +4,26 @@
 */
 package yakworks.rally.job
 
+import org.springframework.beans.factory.annotation.Autowired
+
 import gorm.tools.model.SourceType
-import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.json.groovy.JsonEngine
-import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.config.MaintenanceProps
+import yakworks.testing.gorm.unit.DataRepoTest
+import yakworks.testing.gorm.unit.SecurityTest
 
 class SyncJobSpec extends Specification implements DataRepoTest, SecurityTest {
     static entityClasses = [SyncJob, Attachment]
     static springBeans = [
         attachmentSupport:AttachmentSupport,
-        syncJobService:DefaultSyncJobService
+        syncJobService:DefaultSyncJobService,
+        maintenanceProps: MaintenanceProps
     ]
+
+    @Autowired DefaultSyncJobService syncJobService
 
     SyncJob createJob(){
         return new SyncJob([sourceType: SourceType.ERP, sourceId: 'ar/org']).persist(flush:true)
@@ -28,6 +34,11 @@ class SyncJobSpec extends Specification implements DataRepoTest, SecurityTest {
         SyncJob job = new SyncJob([sourceType: SourceType.ERP, sourceId: 'ar/org'])
         job.validate()
         job.persist()
+    }
+
+    void "smoke test jobProps"() {
+        expect:
+        syncJobService.maintenanceProps.crons.size() == 2
     }
 
     void "kick off simulation of Job"() {

@@ -28,13 +28,13 @@ import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.PersistableRepoEntity
-import gorm.tools.transaction.TrxStaticApi
+import gorm.tools.transaction.TrxUtils
 import gorm.tools.utils.GormMetaUtils
 import grails.core.support.proxy.ProxyHandler
 import grails.validation.ValidationException
+import yakworks.api.problem.ThrowableProblem
 import yakworks.api.problem.data.NotFoundProblem
 import yakworks.commons.lang.ClassUtils
-import yakworks.commons.map.PathKeyMap
 
 /**
  * A trait that turns a class into a Repository
@@ -260,19 +260,22 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
         if(ident){
             //return it fast if its good to go, will have blown and error if not found
             return get(ident, data['version'] as Long)
-        } else if(Lookupable.isAssignableFrom(getEntityClass())){
+        }
+        if(Lookupable.isAssignableFrom(getEntityClass())){
             // call the lookup if domain implements the Lookupable
             //FIXME is there a cleaner way to do this?
             foundEntity = (D) ClassUtils.callStaticMethod(getEntityClass(), 'lookup', data)
-        } else {
+        }
+        if(!foundEntity) {
             foundEntity = lookup(data)
         }
-        if(mustExist) RepoUtil.checkFound(foundEntity, 'data map', getEntityClass().name)
+        if(mustExist) RepoUtil.checkFound(foundEntity, data as Serializable, getEntityClass().name)
         return foundEntity
     }
 
     /**
      * does nothing, can be implemented by the conrete repo for special lookup logic such as for souceId
+     * if nothing is found it should return null or throw a DataRetrievalFailureException if message needed
      */
     D lookup(Map data) {
         return null
@@ -308,7 +311,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      */
     void bind(D entity, Map data, BindAction bindAction, PersistArgs args = new PersistArgs()) {
         //if its a PathKeyMap then init it
-        if(data instanceof PathKeyMap) data.init()
+        // if(data instanceof PathKeyMap) data.init()
 
         getRepoEventPublisher().doBeforeBind(this, (GormEntity)entity, data, bindAction, args)
         doBind(entity, data, bindAction, args)
@@ -330,12 +333,17 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * @param id - the id to delete
      * @param args - the args to pass to delete. flush being the most common
      *
-     * @throws NotFoundProblem.Exception if its not found or if a DataIntegrityViolationException is thrown
+     * @throws NotFoundProblem.Exception if its not found or DataProblemException if a DataIntegrityViolationException is thrown
      */
     void removeById(Serializable id, Map args = [:]) {
-        withTrx {
-            D entity = get(id, null)
-            doRemove(entity, PersistArgs.of(args))
+        try {
+            withTrx {
+                D entity = get(id, null)
+                doRemove(entity, PersistArgs.of(args))
+            }
+        }
+        catch (DataAccessException ex) {
+            throw RepoExceptionSupport.translateException(ex, id)
         }
     }
 
@@ -343,11 +351,18 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * Transactional, Calls delete always with flush = true so we can intercept any DataIntegrityViolationExceptions.
      *
      * @param entity the domain entity
-     * @throws ValidationProblem.Exception if a spring DataIntegrityViolationException is thrown
+     * @throws ThrowableProblem if a DataIntegrityViolationException is thrown
      */
     void remove(D entity, Map args = [:]) {
-        withTrx {
-            doRemove(entity, PersistArgs.of(args))
+        try {
+            //Wrap the withTrx in try/catch
+            //Because the exception (eg fk violation), if occurs, would occur in withTrx when transaction gets commited. not occur during doRemove.
+            withTrx {
+                doRemove(entity, PersistArgs.of(args))
+            }
+        }
+        catch (DataAccessException ex) {
+            throw RepoExceptionSupport.translateException(ex, entity)
         }
     }
 
@@ -358,14 +373,9 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * @param args - args passed to delete
      */
     void doRemove(D entity, PersistArgs args) {
-        try {
-            getRepoEventPublisher().doBeforeRemove(this, (GormEntity)entity, args)
-            gormInstanceApi().delete(entity, args as Map)
-            getRepoEventPublisher().doAfterRemove(this, (GormEntity)entity, args)
-        }
-        catch (DataAccessException ex) {
-            throw RepoExceptionSupport.translateException(ex, entity)
-        }
+        getRepoEventPublisher().doBeforeRemove(this, (GormEntity)entity, args)
+        gormInstanceApi().delete(entity, args as Map)
+        getRepoEventPublisher().doAfterRemove(this, (GormEntity)entity, args)
     }
 
     /**
@@ -414,7 +424,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * @return the retrieved entity
      */
     D read(Serializable id) {
-        entityReadOnlyTrx {
+        withReadOnlyTrx {
             (D) gormStaticApi().read(id)
         }
     }
@@ -554,12 +564,12 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
 
     /** flush on the datastore's currentSession.*/
     void flush(){
-        TrxStaticApi.flush(getDatastore())
+        TrxUtils.flush(getDatastore())
     }
 
     /** cache clear on the datastore's currentSession.*/
     void clear(){
-        TrxStaticApi.clear(getDatastore())
+        TrxUtils.clear(getDatastore())
     }
 
     void flushAndClear() {
@@ -613,7 +623,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * @param callable The closure to call
      * @return The entity that was run in the closure
      */
-    D entityReadOnlyTrx(Closure<D> callable) {
+    public <T> T withReadOnlyTrx(Closure<T> callable) {
         def trxAttr = new CustomizableRollbackTransactionAttribute()
         trxAttr.readOnly = true
         gormStaticApi().withTransaction(trxAttr, callable)

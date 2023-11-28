@@ -33,6 +33,7 @@ trait QueryMangoEntityApi<D> {
 
     //implemented by GormRepo
     abstract public <D> D withTrx(Closure<D> callable)
+    abstract public <D> D withReadOnlyTrx(Closure<D> callable)
 
     /**
      * Primary method. Builds detached criteria for repository's domain based on mango criteria language and additional criteria
@@ -112,10 +113,12 @@ trait QueryMangoEntityApi<D> {
     }
 
     /**
-     * performant way to check if id exists in database.
+     * Performant way to check if id exists in database.
      */
     boolean exists(Serializable id) {
-        if( !idExistsQuery ) idExistsQuery = KeyExistsQuery.of(getEntityClass())
-        return idExistsQuery.exists(id)
+        withReadOnlyTrx {
+            if (!idExistsQuery) idExistsQuery = KeyExistsQuery.of(getEntityClass())
+            return idExistsQuery.exists(id)
+        }
     }
 }

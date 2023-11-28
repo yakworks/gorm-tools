@@ -23,7 +23,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @since 7.x
  */
 @CompileStatic
-class TrxStaticApi {
+class TrxUtils {
 
     /**
      * force a roll back if in a transaction

@@ -21,6 +21,7 @@ class SinkExt implements NamedEntity, RepoEntity<SinkExt>{
     String name
     String textMax
     Thing thing
+    BigDecimal totalDue = 0.0
 
     static mapping = {
         id generator: 'assigned'

@@ -6,10 +6,14 @@ package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.mango.jpql.KeyExistsQuery
 import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepository
+import gorm.tools.repository.events.BeforePersistEvent
+import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import grails.gorm.transactions.Transactional
+import yakworks.api.problem.data.DataProblemCodes
 import yakworks.commons.lang.EnumUtils
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactSource
@@ -18,10 +22,22 @@ import yakworks.rally.orgs.model.ContactSource
 @CompileStatic
 class ContactSourceRepo extends LongIdGormRepo<ContactSource> {
 
+    KeyExistsQuery contactSourceExistsQuery
+
     @Override
     ContactSource lookup(Map data) {
         if(data.sourceId) return ContactSource.findWhere(sourceId: data.sourceId)
         return null
+    }
+
+    @RepoListener
+    void beforePersist(ContactSource contactSource, BeforePersistEvent e) {
+        if(contactSource.isNew()) {
+            if(exists(contactSource.sourceId)){
+                throw DataProblemCodes.UniqueConstraint.get()
+                    .detail("Violates unique constraint [sourceId: ${contactSource.sourceId}]").toException()
+            }
+        }
     }
 
     Long findContactIdBySourceId(String sid) {
@@ -72,5 +88,10 @@ class ContactSourceRepo extends LongIdGormRepo<ContactSource> {
         cs.sourceType = sourceType ?: SourceType.ERP
         cs.persist()
         return cs
+    }
+
+    boolean exists(String sourceId) {
+        if( !contactSourceExistsQuery ) contactSourceExistsQuery = KeyExistsQuery.of(getEntityClass()).keyName('sourceId')
+        return contactSourceExistsQuery.exists(sourceId)
     }
 }

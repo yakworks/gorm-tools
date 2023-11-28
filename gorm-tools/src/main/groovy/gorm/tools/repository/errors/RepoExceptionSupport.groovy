@@ -61,9 +61,12 @@ class RepoExceptionSupport {
         else if (ex instanceof DataAccessException) {
             // Root of the hierarchy of data access exceptions
             if(ProblemHandler.isUniqueIndexViolation(ex)){
-                return DataProblemCodes.UniqueConstraint.of(ex)
-                    .entity(entity).toException()
-            } else {
+                return DataProblemCodes.UniqueConstraint.of(ex).entity(entity).toException()
+            }
+            else if(ProblemHandler.isForeignKeyViolation(ex)){
+                return DataProblemCodes.ReferenceKey.of(ex).entity(entity).toException()
+            }
+            else {
                 return DataProblem.of(ex).entity(entity).toException()
             }
         }

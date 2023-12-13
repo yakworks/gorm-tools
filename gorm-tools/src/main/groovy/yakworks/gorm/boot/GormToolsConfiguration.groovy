@@ -107,7 +107,9 @@ class GormToolsConfiguration {
     @Bean
     TrxService trxService(){ new TrxService()}
 
-    @Bean
-    ProblemHandler problemHandler(){ new ProblemHandler()}
+    @Bean @Lazy(false)
+    ProblemHandler problemHandler(){
+        new ProblemHandler()
+    }
 
 }

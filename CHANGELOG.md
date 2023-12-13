@@ -1,3 +1,42 @@
+### v7.3.61
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.60...v7.3.61)
+- Merge branch 'master' of https://github.com/yakworks/gorm-tools [link](https://github.com/yakworks/gorm-tools/commit/170d44d184aee73d6618ab42fe698cca5ada423c)
+- release [link](https://github.com/yakworks/gorm-tools/commit/9425056a0b19190532a0dec320be9928718956d0)
+- dev merge for 7.3.61 release [link](https://github.com/yakworks/gorm-tools/commit/25f4d49e4134d4ab68003d9c851887fc35716619)
+- ignoreUnknownFields=false on OrgProps [link](https://github.com/yakworks/gorm-tools/commit/ae91bcb2243fa9b7db4236a278e9ebc9f355009b)
+- cronJobProps (#757) [link](https://github.com/yakworks/gorm-tools/commit/5b251a0999a872129fa3ebf02e804926404d469a)
+- App time zone (#756) [link](https://github.com/yakworks/gorm-tools/commit/8fa86aaf68ebeab142402a5e47792d4c312f748b)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/9682fec5401b6b4545934fc7c3f3a59c2c88f00b)
+- bump version to 61 [link](https://github.com/yakworks/gorm-tools/commit/74d64a8a49b3206f155f15e36ee2fa204ec407bc)
+- merge master [link](https://github.com/yakworks/gorm-tools/commit/9f0135d612061466cf97844085be9e74dd98059e)
+- Merge pull request #752 from yakworks/release/dev-next [link](https://github.com/yakworks/gorm-tools/commit/6c4b8b7903da88c2e32a28840bd7e1ac5288329e)
+- add getter for partitionOrg members to centralize common logic in OrgService [link](https://github.com/yakworks/gorm-tools/commit/10e023dfca327d4af93ec1af0f10b586ae8a927a)
+- rename OrgMemberService to OrgService to prep for it doing more. [link](https://github.com/yakworks/gorm-tools/commit/ba0e88c063d8bf25bfde6be40b8c6dc7132a2529)
+- Cleanup (#750) [link](https://github.com/yakworks/gorm-tools/commit/9e576f9a76d291c9751b2f6abd2103f1d26f7907)
+- setup OrgConfig and refactor OrgDimensions (#737) [link](https://github.com/yakworks/gorm-tools/commit/2367bba6796eeaad37cbff9a9539233197471ae8)
+
+### v7.3.60
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.59...v7.3.60)
+- release [link](https://github.com/yakworks/gorm-tools/commit/3f527e38b647e09f4b3781e1dca6098e74785517)
+- SyncJobArgs Default async=true (#754) [link](https://github.com/yakworks/gorm-tools/commit/2da5f643bcc5a89c67c22a73fbaae4256a16b06f)
+
+### v7.3.59
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.58...v7.3.59)
+- release 7.3.59 [link](https://github.com/yakworks/gorm-tools/commit/6ec5ae870861a33fb02b1be10b5a8fdb66fb2851)
+- Merge pull request #753 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/acc59b7a4956b85178859766132c9a5b0f96ff76)
+- Catch exception (#751) [link](https://github.com/yakworks/gorm-tools/commit/e14e5bcf8e3c205ecee6bcac06229fe776692937)
+- Merge pull request #748 from yakworks/hypersistence-upgrade [link](https://github.com/yakworks/gorm-tools/commit/aaaf1a37da309e6116341b94160e33f42363899d)
+- move to io.hypersistence.hypersistence-utils-hibernate-55 3.5.2 [link](https://github.com/yakworks/gorm-tools/commit/36c4ac8d4a4391ed4d3493acd3422d55a76d0bfa)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/514255d5ecc9b7d56788e75fce840a2b6b828be8)
+- Merge pull request #736 from yakworks/2127-activity-date [link](https://github.com/yakworks/gorm-tools/commit/0558e8b2f7e3ff49becddb890174d6e339d14abe)
+- Merge branch 'dev' into 2127-activity-date [link](https://github.com/yakworks/gorm-tools/commit/5ea3a323058490da615d283faf589758709edfe5)
+- update constraint [link](https://github.com/yakworks/gorm-tools/commit/f3ab3f25b05e65498ba540b1c0788cef2545e68f)
+- cleanup, add tests [link](https://github.com/yakworks/gorm-tools/commit/d66b04bd0e73e4e7048372bc0ffead30d31055a8)
+- 9ci/domain9#2127 Add actDate field to activity [link](https://github.com/yakworks/gorm-tools/commit/6eb1febd0a075316c4abff9f0c84a3adf519cca2)
+
 ### v7.3.58
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.57...v7.3.58)

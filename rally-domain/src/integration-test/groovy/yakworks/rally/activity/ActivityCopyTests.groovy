@@ -112,7 +112,7 @@ class ActivityCopyTests extends Specification implements DomainIntTest {
         copy.tags.size() == 1
 
         cleanup:
-        if(copy && copy.attachments) attachmentSupport.getResource(copy.attachments[0]).getFile().delete()
+        if(copy && copy.attachments) copy.attachments[0].resource.file.delete()
     }
 
 }

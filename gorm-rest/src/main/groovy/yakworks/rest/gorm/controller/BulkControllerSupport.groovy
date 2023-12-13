@@ -68,6 +68,10 @@ class BulkControllerSupport<D> {
         if(syncJobArgs.params.attachmentId) {
             jobId = doBulkCsv(syncJobArgs)
         } else {
+            //XXX dirty ugly hack since we were not consistent and now need to do clean up
+            // RNDC expects async to be false by default when its not CSV
+            syncJobArgs.async = syncJobArgs.params.getBoolean('async', false)
+
             jobId = getRepo().bulk(dataList, syncJobArgs)
         }
 
@@ -91,11 +95,8 @@ class BulkControllerSupport<D> {
     Long doBulkCsv(SyncJobArgs syncJobArgs){
         //params will have already been set in syncJobArgs and for CSV we have different defaults
         Map params = syncJobArgs.params
-        // XXX Why is this special for CSV? should be same across the board?
-        syncJobArgs.async = params.getBoolean('async', true)
         // We set savePayload to false by default for CSV since we already have the csv file as attachment?
         syncJobArgs.savePayload = params.getBoolean('savePayload', false)
-
         List<Map> dataList = transformCsvToBulkList(params)
         return getRepo().bulk(dataList, syncJobArgs)
     }

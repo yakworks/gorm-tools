@@ -5,6 +5,7 @@
 package yakworks.rally.orgs
 
 import java.util.concurrent.ConcurrentHashMap
+import javax.annotation.PostConstruct
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -15,12 +16,11 @@ import org.springframework.cache.annotation.Cacheable
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
-import grails.gorm.transactions.Transactional
-import yakworks.commons.lang.EnumUtils
+import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.model.OrgType
 
 /**
- * See https://github.com/9ci/9ci/blob/master/documentation/SpecsAndDesigns/orgType-levels-hierarchy-members.md
+ * See docs/design-principles/org-members-dimensions.md
  * Organization types are arranged in hierarchie, and configured in AppSetupConfig.
  *
  * OrgDimensionService provides methods to parse the orgdimension level hierarchie and get children, parents and
@@ -31,79 +31,106 @@ import yakworks.rally.orgs.model.OrgType
 @CompileStatic
 class OrgDimensionService {
 
+    @Autowired OrgProps orgProps
+
     @Autowired(required = false) //required = false so unit tests work
     CacheManager cacheManager
 
-    //this is what should be inject at startup
-    Map<String, String> dimensionsConfig
+    protected boolean isInitialized = false
 
     @CompileStatic
     static enum DimLevel {
         PARENTS, CHILDREN
     }
 
-    //DimensionLevel instances created by parsing the paths specified in config are cached here.
-    //DimensionLevel contains just immediate parents and children not all children and parents recursive.
+    /*
+     DimensionLevel instances created by parsing the paths specified in config are cached here.
+     DimensionLevel contains just immediate parents and children not all children and parents recursive.
+    */
     private final Map<OrgType, DimensionLevel> dimensionsCache = new ConcurrentHashMap<OrgType, DimensionLevel>()
 
-    //all levels configured in dimension paths
+    //all levels configured in the dimensions
     private final List<OrgType> allLevels = []
 
     /**
      * Parse dimension levels from appsetup config and cache on server startup,
-     * but it can be called manually afterwards (eg from tests), and it will reset the cache and repopulate it based
+     * but it can be called manually afterwards for testing, and it will reset the cache and repopulate it based
      * on the current appsetup config.
      */
+    @PostConstruct
     void init() {
-        if(dimensionsConfig){
-            parsePathsAndInitCache(dimensionsConfig*.value)
+        if(isInitialized) return
+        clearCache()
+        if(orgProps.members.enabled){
+            initDims()
         }
+        isInitialized = true
     }
 
-    // used for tests to set both the appConfig.orgDimensions and then init
-    void testInit(String path) {
-        clearCache()
-        dimensionsConfig = path ? [primary: path] : null
-        init()
+    /**
+     * Get all parent levels for given orgtype
+     */
+    @Cacheable('OrgDimension.parentLevels')
+    List<OrgType> getParentLevels(OrgType type) {
+        return getLevels(DimLevel.PARENTS, type)
     }
 
-    boolean isOrgMemberEnabled(){
-        dimensionsConfig
+    /**
+     * Get all child levels for given orgtype
+     * NOT USED OUTSIDE TESTS RIGHT NOW
+     */
+    @Cacheable('OrgDimension.childLevels')
+    List<OrgType> getChildLevels(OrgType typeEnum) {
+        return getLevels(DimLevel.CHILDREN, typeEnum)
     }
 
-    //Parse given paths and populate dimensionsCache with DimensionLevel instances
-    @Transactional(readOnly = true)
-    void parsePathsAndInitCache(List paths) {
-        //first clear caches
-        clearCache()
+    /**
+     * Get immediate parents for given orgtype
+     * For example, given org dimensions
+     *   - CustAccount.Branch.Division
+     *   - CustAccount.Customer.Division
+     * then getImmediateParents(CustAccount) will return [Branch,Customer]
+     * and getImmediateParents(Customer) and getImmediateParents(Branch) will both return [Division]
+     * and getImmediateParents(Division) would return and empty list meaning its top level
+     */
+    List<OrgType> getImmediateParents(OrgType type) {
+        if(!isInitialized) init()
+        DimensionLevel level = dimensionsCache[type]
+        if (!level) return []
+        Set<DimensionLevel> parents = level.parents
+        List<OrgType> parentList = parents*.orgType
+        return parentList ?: [] as List<OrgType>
+    }
 
-        for (String path : paths) {
-            String[] arr = path.split("\\.").reverse()
-            OrgType previousType
-            for (String orgTypeName : arr) {
-                OrgType typeEnum = EnumUtils.getEnum(OrgType, orgTypeName)
-                DimensionLevel dlevel = getOrCreateCachedDimensionLevel(typeEnum)
-                if (previousType) {
-                    DimensionLevel parent = getOrCreateCachedDimensionLevel(previousType)
-                    parent.addChild(dlevel)
-                }
-                previousType = typeEnum
+    protected void initDims(){
+        initDimensions(orgProps.members.dimension)
+        //if dimension2 is set then do that one too
+        initDimensions(orgProps.members.dimension2)
+        createClientCompanyDimLevels()
+    }
+
+    protected void initDimensions(List<OrgType> typePath) {
+        if(!typePath) return
+        typePath = typePath.reverse() //reverse it so the top starts first
+        OrgType previousType
+        for (OrgType otype : typePath) {
+            DimensionLevel dlevel = getOrCreateCachedDimensionLevel(otype)
+            if (previousType) {
+                DimensionLevel parent = getOrCreateCachedDimensionLevel(previousType)
+                parent.addChild(dlevel)
             }
+            previousType = otype
         }
-
-        createClientCompanyDimLevel(OrgType.Client, allLevels)
-        createClientCompanyDimLevel(OrgType.Company, allLevels)
-
     }
 
-    void clearCache(){
+    protected void clearCache(){
         dimensionsCache.clear()
         allLevels.clear()
         cacheManager?.getCache("OrgDimension.parentLevels")?.clear()
         cacheManager?.getCache("OrgDimension.childLevels")?.clear()
     }
 
-    List<OrgType> getLevels(DimLevel dimLevel, OrgType orgType) {
+    protected List<OrgType> getLevels(DimLevel dimLevel, OrgType orgType) {
         DimensionLevel dimensionLevel = dimensionsCache[orgType]
         if (!dimensionLevel) return []
 
@@ -124,43 +151,11 @@ class OrgDimensionService {
     }
 
     /**
-     * Get all child levels for given orgtype
-     */
-    @Cacheable('OrgDimension.childLevels')
-    List<OrgType> getChildLevels(OrgType typeEnum) {
-        return getLevels(DimLevel.CHILDREN, typeEnum)
-    }
-
-    /**
-     * Get all parent levels for given orgtype
-     */
-    @Cacheable('OrgDimension.parentLevels')
-    List<OrgType> getParentLevels(OrgType type) {
-        return getLevels(DimLevel.PARENTS, type)
-    }
-
-    /**
-     * Get immediate parents for given orgtype
-     * For example, given org dimension
-     *   - CustAccount.Branch.Division
-     *   - CustAccount.Customer.Division
-     * then getImmediateParents(CustAccount) will return [Branch,Customer]
-     * and getImmediateParents(Customer) and getImmediateParents(Branch) will both return [Division]
-     * and getImmediateParents(Division) would return and empty list meaning its top level
-     */
-    List<OrgType> getImmediateParents(OrgType type) {
-        DimensionLevel level = dimensionsCache[type]
-        if (!level) return []
-        Set<DimensionLevel> parents = level.parents
-        List<OrgType> parentList = parents*.orgType
-        return parentList ?: [] as List<OrgType>
-    }
-
-    /**
      * All levels configured in dimension paths
+     * USED ONLY IN TESTS RIGHT NOW
      * @return List < OrgType >
      */
-    List<OrgType> getAllLevels() {
+    protected List<OrgType> getAllLevels() {
         return allLevels
     }
 
@@ -179,14 +174,22 @@ class OrgDimensionService {
     }
 
     /**
+     * create the Company and Client dimension levels
+     */
+    protected void createClientCompanyDimLevels() {
+        createClientCompanyDimLevel(OrgType.Client)
+        createClientCompanyDimLevel(OrgType.Company)
+    }
+
+    /**
      * Find if a DimensionLevel is already created for given name and cached in dimensionsCache, or create a new and
      * cache it.
      */
-    protected DimensionLevel createClientCompanyDimLevel(OrgType orgType, List<OrgType> allOrgTypes) {
+    protected DimensionLevel createClientCompanyDimLevel(OrgType orgType) {
         DimensionLevel dlevel = dimensionsCache.get(orgType)
         if (!dlevel) {
             dlevel = new DimensionLevel(orgType)
-            allOrgTypes.each {
+            allLevels.each {
                 def childDim = getOrCreateCachedDimensionLevel(it)
                 dlevel.children.add(childDim)
             }

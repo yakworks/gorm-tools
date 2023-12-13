@@ -1,7 +1,8 @@
 package yakworks.rally.activity
 
-import gorm.tools.model.Persistable
 import org.apache.commons.lang3.RandomStringUtils
+
+import gorm.tools.model.Persistable
 import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
@@ -10,7 +11,6 @@ import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.model.TaskType
-import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.mail.model.MailMessage
@@ -20,7 +20,6 @@ import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
 import yakworks.rally.testing.MockData
-import yakworks.spring.AppResourceLoader
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
@@ -28,13 +27,12 @@ import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 
 class ActivitySpec extends Specification implements GormHibernateTest, SecurityTest {
     static entityClasses = [
-        AttachmentLink, ActivityLink, Activity, MailMessage, TaskType, Org, OrgTag,
-        Tag, TagLink, Attachment, ActivityNote, Contact, ActivityContact
+        AttachmentLink, ActivityLink, Activity, MailMessage, TaskType, Attachment, ActivityNote, ActivityContact,
+        Org, OrgTag, Tag, TagLink, Contact
     ]
-    static springBeans = [
-        appResourceLoader: AppResourceLoader,
-        attachmentSupport: AttachmentSupport
-    ]
+    // static springBeans = [
+    //     attachmentSupport: AttachmentSupport
+    // ]
 
     @Shared Long orgId
 

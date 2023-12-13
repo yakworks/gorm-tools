@@ -13,6 +13,7 @@ import java.util.regex.Pattern
 import groovy.transform.CompileStatic
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
+import groovy.util.logging.Slf4j
 
 import org.apache.poi.ss.usermodel.BorderStyle
 import org.apache.poi.ss.usermodel.BuiltinFormats
@@ -43,6 +44,7 @@ import yakworks.meta.MetaProp
 @Builder(builderStrategy= SimpleStrategy, prefix="", includes=['includes', 'headerType', 'headers', 'outputStream'])
 @SuppressWarnings(['NestedBlockDepth'])
 @CompileStatic
+@Slf4j
 class ExcelBuilder {
     public static final String SHEET_NAME = "data"
     public static final DefaultIndexedColorMap INDEXED_COLOR_MAP = new DefaultIndexedColorMap()
@@ -289,7 +291,12 @@ class ExcelBuilder {
      * write workbook to output stream
      */
     ExcelBuilder writeOut() {
-        workbook.write(outputStream)
+        try {
+            workbook.write(outputStream)
+        } catch(IOException ex) {
+            //just log error without stacktrace
+            log.error(ex.message)
+        }
         return this
     }
 

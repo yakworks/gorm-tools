@@ -103,30 +103,34 @@ class ContactRepo extends LongIdGormRepo<Contact> {
         contact.source = ContactSource.repo.createSource(contact, data)
     }
 
-    /** lookup by num or ContactSource */
+    /**
+     * lookup by num or ContactSource
+     * This is called from findWithData and is used to locate contact for updates and associtaions
+     */
     @Override
     Contact lookup(Map data) {
         Contact contact
         if (data == null) data = [:] //if null then make it empty map so it can cycle down and blow error
 
-        String sourceId = Maps.value(data, 'sourceId')
+        String sourceId = data.sourceId
 
         //For convience, it allows specifying sourceId directly at top level along with other contact fields.
         if(data.source == null && sourceId) data.source = [sourceId: sourceId]
+
         if (data.source && data.source['sourceId']) {
             Long cid = contactSourceRepo.findContactIdBySourceId(Maps.value(data, "source.sourceId") as String)
             if(cid) return get(cid)
         }
         else if (data.num) {
-            String num = Maps.value(data, 'num')
-            List contactForNum = Contact.findAllWhere(num:num)
+            String num = data.num
+            List contactForNum = Contact.findAllWhere(num: num)
             if(contactForNum?.size() == 1) {
                 contact = contactForNum[0]
             } else if (contactForNum.size() > 1){
                 throw new DataRetrievalFailureException("Multiple Contacts found for num: ${data.num}, lookup key must return a unique Contact")
             }
         }
-        return load(contact?.getId())
+        return contact
     }
 
     @RepoListener

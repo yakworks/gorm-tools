@@ -103,7 +103,7 @@ class PagedQuery {
         }
         //only do the count query if its needed
         int rowCount = dataList.size()
-        if(rowCount > 1 && maxCount && rowCount >= maxCount){
+        if(rowCount >= 1 && maxCount){
             rowCount = countQuery(queryString, params)
         }
         PathKeyMapPagedList pagedList = new PathKeyMapPagedList(dataList, rowCount)

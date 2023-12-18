@@ -5,6 +5,7 @@
 package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 
 import org.springframework.validation.Errors
 
@@ -13,12 +14,16 @@ import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
 import grails.gorm.DetachedCriteria
+import grails.gorm.transactions.ReadOnly
+import grails.gorm.transactions.Transactional
+import yakworks.api.problem.data.DataProblem
 import yakworks.commons.beans.Transform
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
 
 @GormRepository
 @CompileStatic
+@Slf4j
 class OrgRepo extends AbstractOrgRepo {
 
 
@@ -62,5 +67,30 @@ class OrgRepo extends AbstractOrgRepo {
             detCrit.exists(OrgTag.buildExistsCriteria(critTagIds))
         }
         return detCrit
+    }
+
+
+    /**
+     * Query org based on Q criteria
+     * eg from q=[org:[num:xx]] or q=[companyId:2]
+     */
+    @ReadOnly
+    Org getOrgFromQCriteria(Map criteria) {
+        if (!criteria)
+            throw DataProblem.ex("A company or partionOrg is required, criteria is null")
+
+        Org org = null
+        if (criteria['org']) {
+            org = Org.query(criteria['org'] as Map).get()
+            if (log.debugEnabled) log.debug("Found org ${org} with criteria: ${criteria['org']}}")
+        } else if (criteria['companyId']) {
+            org = Org.get(criteria['companyId'] as Long)
+        }
+
+        if (!org) {
+            throw DataProblem.ex("The criteria did not return a valid Company or partition Org")
+        }
+
+        return org
     }
 }

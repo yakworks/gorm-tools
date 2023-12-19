@@ -516,21 +516,21 @@ class OrgRepoTests extends Specification implements DomainIntTest {
     void "test getOrgFromCriteria"() {
 
         when: "find by num"
-        Org org = orgRepo.getOrgFromQCriteria([org:[num:'7']])
+        Org org = orgRepo.getOrgFromCriteria([org:[num:'7']])
 
         then:
         org
         org.id == 7
 
         when: "by id"
-        org = orgRepo.getOrgFromQCriteria([org:[id:2]])
+        org = orgRepo.getOrgFromCriteria([org:[id:2]])
 
         then:
         org
         org.id == 2
 
         when: "company id"
-        org = orgRepo.getOrgFromQCriteria([companyId:2])
+        org = orgRepo.getOrgFromCriteria([companyId:2])
 
         then:
         org

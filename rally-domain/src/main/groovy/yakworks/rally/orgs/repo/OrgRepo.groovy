@@ -75,7 +75,7 @@ class OrgRepo extends AbstractOrgRepo {
      * eg from q=[org:[num:xx]] or q=[companyId:2]
      */
     @ReadOnly
-    Org getOrgFromQCriteria(Map criteria) {
+    Org getOrgFromCriteria(Map criteria) {
         if (!criteria)
             throw DataProblem.ex("A company or partionOrg is required, criteria is null")
 

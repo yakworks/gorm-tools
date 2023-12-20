@@ -9,6 +9,7 @@ import org.hibernate.criterion.Projections
 import org.hibernate.type.StandardBasicTypes
 import org.hibernate.type.Type
 import spock.lang.Ignore
+import spock.lang.IgnoreRest
 import spock.lang.Issue
 import spock.lang.Specification
 import yakworks.commons.model.SimplePagedList
@@ -81,6 +82,26 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
         then:
         sumbObj.size() == 1
         sumbObj.totalCount == 1
+    }
+
+    void "mapList with pagination"() {
+        MangoDetachedCriteria qry = Org.query([projections: ['calc.totalDue':'sum', 'type': 'group']])
+
+        when: "there's 1 record in last page"
+        List results = qry.mapList(max:2, offset:4)
+
+        then:
+        results
+        results.totalCount == 5
+        results.size() == 1
+
+        when: "max = 1"
+        results = qry.mapList(max:1)
+
+        then:
+        results
+        results.totalCount == 5
+        results.size() == 1
     }
 
     def "sum projections with type groupBy having on sum"() {

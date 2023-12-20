@@ -82,9 +82,7 @@ class OrgRepo extends AbstractOrgRepo {
         Org org = null
         if (criteria['org']) {
             org = Org.query(criteria['org'] as Map).get()
-            if (log.debugEnabled) log.debug("Found org ${org} with criteria: ${criteria['org']}}")
-        } else if (criteria['companyId']) {
-            org = Org.get(criteria['companyId'] as Long)
+            log.debug("Found org ${org} with criteria: ${criteria['org']}}")
         }
 
         if (!org) {

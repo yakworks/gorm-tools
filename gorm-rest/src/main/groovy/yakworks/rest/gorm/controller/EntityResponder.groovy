@@ -114,6 +114,9 @@ class EntityResponder<D> {
         // pclone.removeAll {it.key in whitelistKeys }
         try {
             QueryArgs qargs = QueryArgs.of(pager)
+            if(!qargs.sort) {
+                qargs.sort("id":"asc")
+            }
             //require q if its set
             if (pathItem?.qRequired) qargs.qRequired = true
             qargs = qargs.build(parms)

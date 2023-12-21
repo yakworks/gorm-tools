@@ -78,7 +78,7 @@ class OrgRepo extends AbstractOrgRepo {
      * @throws DataProblem if no org found for given criteria
      */
     @ReadOnly
-    Org getOrgFromCriteria(Map criteria) {
+    Org getPartitionOrgFromCriteria(Map criteria) {
         if (!criteria)
             throw DataProblem.ex("A company or partionOrg is required, criteria is null")
 

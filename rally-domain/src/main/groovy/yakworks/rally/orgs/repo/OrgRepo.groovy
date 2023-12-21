@@ -72,7 +72,10 @@ class OrgRepo extends AbstractOrgRepo {
 
     /**
      * Query org based on Q criteria
-     * eg from q=[org:[num:xx]] or q=[companyId:2]
+     * eg from q=[org:[num:xx]] or q=[org:[member.divisionId:x]]
+     * Similar to findWithData/lookup but allows querying on any field/association on org and not just num+type
+     *
+     * @throws DataProblem if no org found for given criteria
      */
     @ReadOnly
     Org getOrgFromCriteria(Map criteria) {

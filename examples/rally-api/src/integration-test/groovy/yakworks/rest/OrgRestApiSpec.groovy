@@ -2,7 +2,7 @@ package yakworks.rest
 
 import grails.gorm.transactions.Rollback
 import org.springframework.http.HttpStatus
-
+import spock.lang.IgnoreRest
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.HttpUrl
@@ -104,6 +104,22 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         resp.code() == HttpStatus.OK.value()
         body.data.size() == 1
         body.data[0].name == "Org20"
+    }
+
+    void "default sort by id"() {
+        when: "sort asc"
+        def resp = get("${path}?q=*")
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code() == HttpStatus.OK.value()
+        body
+        body.data
+        body.data.eachWithIndex{ def entry, int i ->
+            if(i > 0) {
+                assert entry['id'] > body.data[i - 1]['id']
+            }
+        }
     }
 
     void "test sorting"() {

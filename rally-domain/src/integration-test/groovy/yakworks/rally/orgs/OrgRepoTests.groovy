@@ -513,20 +513,4 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         OrgDimensionTesting.resetDimensions()
     }
 
-    void "test getPartitionOrgFromCriteria"() {
-        when: "find by num"
-        Org org = orgRepo.getPartitionOrgFromCriteria([org:[num:'7']])
-
-        then:
-        org
-        org.id == 7
-
-        when: "by id"
-        org = orgRepo.getPartitionOrgFromCriteria([org:[id:2]])
-
-        then:
-        org
-        org.id == 2
-    }
-
 }

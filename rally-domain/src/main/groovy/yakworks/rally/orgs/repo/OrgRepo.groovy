@@ -68,30 +68,4 @@ class OrgRepo extends AbstractOrgRepo {
         }
         return detCrit
     }
-
-
-    /**
-     * Query org based on Q criteria
-     * eg from q=[org:[num:xx]] or q=[org:[member.divisionId:x]]
-     * Similar to findWithData/lookup but allows querying on any field/association on org and not just num+type
-     *
-     * @throws DataProblem if no org found for given criteria
-     */
-    @ReadOnly
-    Org getPartitionOrgFromCriteria(Map criteria) {
-        if (!criteria)
-            throw DataProblem.ex("A company or partionOrg is required, criteria is null")
-
-        Org org = null
-        if (criteria['org']) {
-            org = Org.query(criteria['org'] as Map).get()
-            log.debug("Found org ${org} with criteria: ${criteria['org']}}")
-        }
-
-        if (!org) {
-            throw DataProblem.ex("The criteria did not return a valid Company or partition Org")
-        }
-
-        return org
-    }
 }

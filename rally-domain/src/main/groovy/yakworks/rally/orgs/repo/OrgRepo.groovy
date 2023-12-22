@@ -14,9 +14,6 @@ import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
 import grails.gorm.DetachedCriteria
-import grails.gorm.transactions.ReadOnly
-import grails.gorm.transactions.Transactional
-import yakworks.api.problem.data.DataProblem
 import yakworks.commons.beans.Transform
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag

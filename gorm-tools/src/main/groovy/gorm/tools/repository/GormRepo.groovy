@@ -607,13 +607,22 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      */
     public <T> T withTrx(Closure<T> callable) {
         def trxAttr = new CustomizableRollbackTransactionAttribute()
-        gormStaticApi().withTransaction(trxAttr, callable)
+        withTrx(trxAttr, callable)
+    }
+
+    public <T> T withTrx(TransactionDefinition trxAttr, Closure<T> callable) {
+        try {
+            gormStaticApi().withTransaction(trxAttr, callable)
+        } catch(ValidationException | DataAccessException ex) {
+            //Many of the exceptions such as PK/FK constraint failures, Optimistic locking failures will happen when transaction commits
+            throw RepoExceptionSupport.translateException(ex, null)
+        }
     }
 
     public <T> T withNewTrx(Closure<T> callable) {
         def trxAttr = new CustomizableRollbackTransactionAttribute()
         trxAttr.propagationBehavior = TransactionDefinition.PROPAGATION_REQUIRES_NEW
-        gormStaticApi().withTransaction(trxAttr, callable)
+        withTrx(trxAttr, callable)
     }
 
     /**

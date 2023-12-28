@@ -5,6 +5,7 @@
 package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 
 import org.springframework.validation.Errors
 
@@ -19,6 +20,7 @@ import yakworks.rally.orgs.model.OrgTag
 
 @GormRepository
 @CompileStatic
+@Slf4j
 class OrgRepo extends AbstractOrgRepo {
 
 

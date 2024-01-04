@@ -247,6 +247,35 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
         res.size() == 3
     }
 
+    void "query by uuid string"() {
+        setup:
+        Cust one = Cust.get(1)
+        Cust two = Cust.get(2)
+        one.uid = UUID.randomUUID()
+        two.uid = UUID.randomUUID()
+        one.save()
+        two.save()
+        flush()
+
+        String uid1 = one.uid.toString()
+        String uid2 = two.uid.toString()
+
+        when:
+        Cust res = build(uid:uid1).get()
+
+        then:
+        res
+        res == one
+
+        when:
+        List results = build(uid:['$in':[uid1, uid2]]).list()
+
+        then:
+        results.size() == 2
+        results[0] == one
+        results[1] == two
+    }
+
     def "test gt"() {
         when:
 

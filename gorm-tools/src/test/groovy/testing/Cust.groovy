@@ -19,6 +19,7 @@ import grails.persistence.Entity
 @GrailsCompileStatic
 class Cust implements GormRepoEntity<Cust, CustRepo> {
     String name
+    UUID uid //an UUID field for testing
     Integer descId // inverted order for test
     //strings
     String name2
@@ -59,6 +60,7 @@ class Cust implements GormRepoEntity<Cust, CustRepo> {
 
     static constraintsMap = [
         name:[      nullable: false],
+        uid: [      nullable: true ],
         descId:[    nullable: true ],
         name2:[     nullable: true ],
         secret:[    nullable: true, display: false ],

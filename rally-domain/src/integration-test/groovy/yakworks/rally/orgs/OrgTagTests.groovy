@@ -238,7 +238,6 @@ class OrgTagTests extends Specification implements DomainIntTest {
             return orgCrit
         }
 
-
         List hasTag1 = orgCrit([1]).list()
         List hasTag2 = orgCrit([2]).list()
         List has1or2 = orgCrit([1, 2]).list()
@@ -248,6 +247,11 @@ class OrgTagTests extends Specification implements DomainIntTest {
         hasTag2.size() == 2
         has1or2.size() == 4
 
+        when: "query by tags"
+        List<Org> orgs = Org.query([tagIds:[1]]).list()
+
+        then:
+        3 == orgs.size()
     }
 
     void "criteria default org map" () {

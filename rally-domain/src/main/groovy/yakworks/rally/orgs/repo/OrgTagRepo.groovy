@@ -90,7 +90,7 @@ class OrgTagRepo extends AbstractLinkedEntityRepo<OrgTag, Tag> {
             existsCrit = buildExistsCriteria(tagIds, linkedId)
         } else if(criteriaMap.tagIds) {
             //should be list of id if this key is present
-            existsCrit = buildExistsCriteria((List)criteriaMap.remove('tagIds'))
+            existsCrit = buildExistsCriteria((List)criteriaMap.remove('tagIds'), linkedId)
         }
         return existsCrit
     }

@@ -1,3 +1,16 @@
+### v7.3.62
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.61...v7.3.62)
+- release 7.3.62 [link](https://github.com/yakworks/gorm-tools/commit/ff1933b7a660c2df5ca357dc1261cc71b630ab3b)
+- Merge pull request #768 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/a03c6a87b4533e18d420f092f30cc9236730d372)
+- get org from q criteria (#765) [link](https://github.com/yakworks/gorm-tools/commit/945a2bb22469549f096978ae673c772b6f0de821)
+- Repo exception handling (#749) [link](https://github.com/yakworks/gorm-tools/commit/403e6402c48bcc043a3759bede702e414f590cf2)
+- Support querying by uuid string (#767) [link](https://github.com/yakworks/gorm-tools/commit/2a5ae8694ab31fa534716502a436246dd0e1e592)
+- #2162 Add InvalidApiCallEvent (#763) [link](https://github.com/yakworks/gorm-tools/commit/029be08cc172f21985bad8655dcdc866a2bfffe6)
+- 9ci/domain9#2440 , 9ci/cust-rndc-ext#325 (#764) [link](https://github.com/yakworks/gorm-tools/commit/746922701dad691657632f7734922396d72a4d19)
+-  Fix tidy map to use id for inquery if key exist in map list (#762) [link](https://github.com/yakworks/gorm-tools/commit/2774f07214b015ec37899c2e2a2d72a6b107f0e2)
+- Stack helper (#760) [link](https://github.com/yakworks/gorm-tools/commit/9d165043c25044271394aae4528bb69df3466be7)
+
 ### v7.3.61
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.60...v7.3.61)

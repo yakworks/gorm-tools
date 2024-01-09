@@ -4,7 +4,6 @@
 */
 package yakworks.rally.orgs
 
-
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
@@ -12,11 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
+import grails.gorm.transactions.ReadOnly
+import yakworks.api.problem.data.DataProblem
 import yakworks.commons.lang.Validate
 import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgType
+import yakworks.rally.orgs.repo.OrgRepo
 
 /**
  * event listener for afterbind to setup org member
@@ -31,6 +33,9 @@ class OrgService {
 
     @Autowired(required = false)
     OrgProps orgProps
+
+    @Autowired(required = false)
+    OrgRepo orgRepo
 
     boolean isOrgMemberEnabled(){
         return orgProps?.members?.enabled
@@ -111,6 +116,37 @@ class OrgService {
         //if the parent is a customer its not in member so check hasProperty to make sure
         if (org.member.hasProperty(orgMemberName)) org.member[orgMemberName] = parent
 
+    }
+
+    /**
+     * Query partition org based on given criteria
+     * eg from q=[org:[num:xx, type: 'Division']]
+     *
+     * @throws yakworks.api.problem.data.DataProblem if no org found for given criteria, or the org is not a valid partition org
+     */
+    @ReadOnly
+    Org getPartitionOrgFromCriteria(Map criteria) {
+        if (!criteria) {
+            throw DataProblem.ex("A partionOrg is required, criteria is null")
+        }
+
+        Org org
+
+        if (criteria['org']) {
+            org = orgRepo.findWithData(criteria['org'] as Map)
+            log.debug("Found org ${org} with criteria: ${criteria['org']}}")
+        }
+
+        if (!org) {
+            throw DataProblem.ex("The criteria did not return a partition Org")
+        }
+
+
+        if (partition.type && org.type != partition.type) {
+            throw DataProblem.ex("Org [id: ${org.id}, num: ${org.num}, type: ${org.type}] is not a valid partition Org")
+        }
+
+        return org
     }
 
 }

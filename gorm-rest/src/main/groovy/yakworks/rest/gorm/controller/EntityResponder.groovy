@@ -113,13 +113,18 @@ class EntityResponder<D> {
         //remove the fields that grails adds for controller and action
         // pclone.removeAll {it.key in whitelistKeys }
         try {
-            QueryArgs qargs = QueryArgs.of(pager)
+            QueryArgs qargs = QueryArgs.of(parms)
+            //require q if its set
+            if (pathItem?.qRequired) qargs.qRequired = true
+
+            // when paging we need a sort so rows dont show up next page, so use id if nothing is specified.
+            // see https://github.com/9ci/domain9/issues/2280
+
+            // Default sort by id:asc if no  sort is provided in params
+            //if sort was passed in params, or if $sort is provided in `q` criteria, then the default sort by id wont be used
             if(!qargs.sort) {
                 qargs.sort("id":"asc")
             }
-            //require q if its set
-            if (pathItem?.qRequired) qargs.qRequired = true
-            qargs = qargs.build(parms)
             qargs.validateQ()
             if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.buildCriteria()}")
             ((QueryMangoEntityApi) getRepo()).queryList(qargs, null, debugEnabled ? log : null)

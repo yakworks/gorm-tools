@@ -73,9 +73,6 @@ class TagLinkRepo extends AbstractLinkedEntityRepo<TagLink, Tag> {
             //convert to id long list
             List<Long> tagIds = Transform.objectToLongList((List)criteriaMap.remove('tags'), 'id')
             existsCrit = buildExistsCriteria(tagIds, linkedEntityClazz, linkedIdJoinProperty)
-        } else if(criteriaMap.tagIds) {
-            //should be list of id if this key is present
-            existsCrit = buildExistsCriteria((List)criteriaMap.remove('tagIds'),  linkedEntityClazz, linkedIdJoinProperty)
         }
         return existsCrit
     }

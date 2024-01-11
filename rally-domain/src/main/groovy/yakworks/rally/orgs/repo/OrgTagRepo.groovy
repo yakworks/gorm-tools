@@ -88,9 +88,6 @@ class OrgTagRepo extends AbstractLinkedEntityRepo<OrgTag, Tag> {
             //convert to id long list
             List<Long> tagIds = Transform.objectToLongList((List)criteriaMap.remove('tags'), 'id')
             existsCrit = buildExistsCriteria(tagIds, linkedId)
-        } else if(criteriaMap.tagIds) {
-            //should be list of id if this key is present
-            existsCrit = buildExistsCriteria((List)criteriaMap.remove('tagIds'), linkedId)
         }
         return existsCrit
     }

@@ -36,14 +36,14 @@ class OrgTag implements TagLinkTrait<OrgTag>, GormRepoEntity<OrgTag, OrgTagRepo>
     ]
 
     /**
-     * build exists criteria for the linkedId and tag list
-     *
+     * Add exists criteria to a DetachedCriteria if its has tags
+     * in the criteriaMap
      */
-    static DetachedCriteria buildExistsCriteria(List tagList, String linkedId = 'org_.id'){
-        return OrgTag.query {
-            eqProperty("linkedId", linkedId)
-            inList('tag.id', Transform.toLongList(tagList))
-        }.id()
+    static DetachedCriteria getExistsCriteria(Map criteriaMap, String linkedId = 'org_.id'){
+        getRepo().getExistsCriteria(criteriaMap, linkedId)
     }
 
+    static DetachedCriteria buildExistsCriteria(List tagList, String linkedId = 'org_.id') {
+        getRepo().buildExistsCriteria(tagList, linkedId)
+    }
 }

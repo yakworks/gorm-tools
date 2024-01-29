@@ -10,6 +10,8 @@ import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.model.AbstractLinkedEntityRepo
+import grails.gorm.DetachedCriteria
+import yakworks.commons.beans.Transform
 import yakworks.commons.lang.Validate
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
@@ -64,6 +66,30 @@ class OrgTagRepo extends AbstractLinkedEntityRepo<OrgTag, Tag> {
     void copyToOrg(Org fromOrg, Org toOrg) {
         List<Long> tagsIds = collectLongIds(list(fromOrg), "tagId")
         if (tagsIds) add(toOrg as Persistable, tagsIds)
+    }
+
+    /**
+     * build exists criteria for the linkedId and tag list
+     */
+    DetachedCriteria buildExistsCriteria(List tagList, String linkedId = 'org_.id'){
+        return OrgTag.query {
+            eqProperty("linkedId", linkedId)
+            inList('tag.id', Transform.toLongList(tagList))
+        }.id()
+    }
+
+    /**
+     * Add exists criteria to a DetachedCriteria if its has tags
+     * in the criteriaMap
+     */
+    DetachedCriteria getExistsCriteria(Map criteriaMap, String linkedId = 'org_.id'){
+        DetachedCriteria existsCrit
+        if(criteriaMap.tags){
+            //convert to id long list
+            List<Long> tagIds = Transform.objectToLongList((List)criteriaMap.remove('tags'), 'id')
+            existsCrit = buildExistsCriteria(tagIds, linkedId)
+        }
+        return existsCrit
     }
 
 }

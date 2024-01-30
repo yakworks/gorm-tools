@@ -102,13 +102,13 @@ class EntityResponder<D> {
 
     Pager pagedQuery(Map params, List<String> includesKeys, boolean requireQ = false) {
         Pager pager = Pager.of(params)
-        List dlist = query(pager, params)
+        List dlist = query(params)
         List<String> incs = findIncludes(params, includesKeys)
         MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)
         return pager.setMetaMapList(entityMapList)
     }
 
-    List<D> query(Pager pager, Map parms) {
+    List<D> query(Map parms) {
         // Map pclone = Maps.clone(parms) as Map<String, Object>
         //remove the fields that grails adds for controller and action
         // pclone.removeAll {it.key in whitelistKeys }

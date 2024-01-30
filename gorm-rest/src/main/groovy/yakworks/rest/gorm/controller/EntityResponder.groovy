@@ -102,20 +102,23 @@ class EntityResponder<D> {
 
     Pager pagedQuery(Map params, List<String> includesKeys, boolean requireQ = false) {
         Pager pager = Pager.of(params)
-        List dlist = query(params)
+        List dlist = query(pager, params)
         List<String> incs = findIncludes(params, includesKeys)
         MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)
         return pager.setMetaMapList(entityMapList)
     }
 
-    List<D> query(Map parms) {
+    List<D> query(Pager pager, Map parms) {
         // Map pclone = Maps.clone(parms) as Map<String, Object>
         //remove the fields that grails adds for controller and action
         // pclone.removeAll {it.key in whitelistKeys }
         try {
-            QueryArgs qargs = QueryArgs.of(parms)
+            QueryArgs qargs = QueryArgs.of(pager)
             //require q if its set
             if (pathItem?.qRequired) qargs.qRequired = true
+            //build query args with params (Eg from q etc) - pager is already set on qargs above
+            //this weill set sort/order etc, we use sort below to check if sort is provided by caller.
+            qargs.build(parms)
 
             // when paging we need a sort so rows dont show up next page, so use id if nothing is specified.
             // see https://github.com/9ci/domain9/issues/2280

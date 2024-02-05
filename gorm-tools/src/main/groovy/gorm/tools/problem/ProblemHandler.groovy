@@ -4,6 +4,7 @@
 */
 package gorm.tools.problem
 
+import groovy.json.JsonException
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSourceResolvable
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
@@ -38,6 +40,13 @@ import yakworks.i18n.icu.ICUMessageSource
 @Slf4j
 @CompileStatic
 class ProblemHandler {
+
+    //Exceptions classes, for which we dont want log stacktraces in log files
+    private static final List DO_NOT_LOG_STACKTRACES = [
+        HttpMessageNotReadableException.name, //thrown when incoming json is invalid (Spring controllers)
+        JsonException.name                    //Thrown when incoming json is invalid (Grails controllers)
+    ]
+
 
     @Autowired ICUMessageSource messageSource
 
@@ -105,7 +114,8 @@ class ProblemHandler {
     }
 
     GenericProblem handleUnexpected(Throwable e){
-        log.error("UNEXPECTED Internal Server Error\n${e.message}", StackTraceUtils.deepSanitize(e))
+        Throwable sanitized = shouldLogStacktrace(e) ? StackTraceUtils.deepSanitize(e) : null
+        log.error("UNEXPECTED Internal Server Error\n${e.message}", sanitized)
         if (e instanceof GenericProblem) {
             return (GenericProblem) e
         }
@@ -187,6 +197,10 @@ class ProblemHandler {
      */
     static boolean isBrokenPipe(Exception ex) {
         return ex.message && ex.message.toLowerCase().contains("broken pipe")
+    }
+
+    static shouldLogStacktrace(Throwable t) {
+        return !(t.class.name in DO_NOT_LOG_STACKTRACES)
     }
 
     //Legacy from ValidationException

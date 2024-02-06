@@ -125,9 +125,10 @@ class EntityResponder<D> {
 
             // Default sort by id:asc if no  sort is provided in params
             //if sort was passed in params, or if $sort is provided in `q` criteria, then the default sort by id wont be used
-            if(!qargs.sort) {
-                qargs.sort("id":"asc")
-            }
+            //XXX @SUD hot fix, we need a test, this is what I htink is blowing up projections
+            // if(!qargs.sort) {
+            //     qargs.sort("id":"asc")
+            // }
             qargs.validateQ()
             if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.buildCriteria()}")
             ((QueryMangoEntityApi) getRepo()).queryList(qargs, null, debugEnabled ? log : null)

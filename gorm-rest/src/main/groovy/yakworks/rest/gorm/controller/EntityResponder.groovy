@@ -123,12 +123,15 @@ class EntityResponder<D> {
             // when paging we need a sort so rows dont show up next page, so use id if nothing is specified.
             // see https://github.com/9ci/domain9/issues/2280
 
-            // Default sort by id:asc if no  sort is provided in params
-            //if sort was passed in params, or if $sort is provided in `q` criteria, then the default sort by id wont be used
-            //XXX @SUD hot fix, we need a test, this is what I htink is blowing up projections
-            // if(!qargs.sort) {
-            //     qargs.sort("id":"asc")
-            // }
+            /*
+              Apply Default sort by id:asc if no sort is provided in params
+              Do not apply default sort if
+              - $sort is provided in `q` criteria
+              - If params has projections - because thn there's no id column. In this case, if required, params should explicitely pass sort
+             */
+             if(!qargs.sort && !qargs.projections) {
+                 qargs.sort("id":"asc")
+             }
             qargs.validateQ()
             if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.buildCriteria()}")
             ((QueryMangoEntityApi) getRepo()).queryList(qargs, null, debugEnabled ? log : null)

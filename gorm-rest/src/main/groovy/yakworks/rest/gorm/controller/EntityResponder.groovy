@@ -116,7 +116,19 @@ class EntityResponder<D> {
             QueryArgs qargs = QueryArgs.of(pager)
             //require q if its set
             if (pathItem?.qRequired) qargs.qRequired = true
-            qargs = qargs.build(parms)
+            //build query args with params (Eg from q etc) - pager is already set on qargs above
+            //this weill set sort/order etc, we use sort below to check if sort is provided by caller.
+            qargs.build(parms)
+
+            // when paging we need a sort so rows dont show up next page, so use id if nothing is specified.
+            // see https://github.com/9ci/domain9/issues/2280
+
+            // Default sort by id:asc if no  sort is provided in params
+            //if sort was passed in params, or if $sort is provided in `q` criteria, then the default sort by id wont be used
+            //XXX @SUD hot fix, we need a test, this is what I htink is blowing up projections
+            // if(!qargs.sort) {
+            //     qargs.sort("id":"asc")
+            // }
             qargs.validateQ()
             if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.buildCriteria()}")
             ((QueryMangoEntityApi) getRepo()).queryList(qargs, null, debugEnabled ? log : null)

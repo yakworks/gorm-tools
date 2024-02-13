@@ -213,6 +213,32 @@ class QueryArgsSpec extends Specification {
         qargs.buildCriteria() == ['$sort': ['foo':'asc']]
     }
 
+    void "defaultSortById"() {
+        when:
+        QueryArgs qargs = new QueryArgs().defaultSortById()
+
+        then:
+        qargs.sort
+        qargs.sort['id'] == 'asc'
+
+        when: "should not apply default Sort, if sort already provided"
+        qargs = QueryArgs.of(sort:"foo").defaultSortById()
+        Set sortKeys = qargs.sort.keySet()
+
+        then:
+        sortKeys
+        sortKeys.size() == 1
+        sortKeys.contains('foo')
+        !sortKeys.contains('id')
+
+        when: "There are projections"
+        qargs = QueryArgs.of(projections:["flex.num1":"sum",type:"group"])
+
+        then:
+        qargs.projections
+        !qargs.sort
+    }
+
     def "parJson sanity check"() {
         when:
         QueryArgs qargs = new QueryArgs()

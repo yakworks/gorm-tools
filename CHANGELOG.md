@@ -1,3 +1,8 @@
+### v7.3.63
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.62...v7.3.63)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/bd28f356ec85dbfc433d51ec45f92144a29487af)
+
 ### v7.3.62
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.61...v7.3.62)

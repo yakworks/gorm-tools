@@ -229,13 +229,29 @@ class QueryArgs {
      * Can bypass this by passing in q=* or qSearch=*
      * @throws DataProblemException
      */
-    void validateQ(){
+    QueryArgs validateQ(){
         //FIXME we wouldnt need it if manual query parsing / lost params issue is fixed - See #1924
         if(qRequired && !qCriteria){
             throw DataProblem.of('error.data.qRequired')
                 .status(HttpStatus.I_AM_A_TEAPOT) //TODO 418 error for now so its easy to add to retry as it gets droppped sometimes
                 .title("q or qSearch parameter restriction is required").toException()
         }
+        return this
+    }
+
+    /**
+      Applies Default sort by id:asc if no sort is provided in params
+      Does not apply default sort if
+      - $sort is provided in `q` criteria
+      - If params has projections - because thn there's no id column. In this case, if required, params should explicitely pass sort
+
+      when paging we need a sort so rows dont show up next page see https://github.com/9ci/domain9/issues/2280
+     */
+    QueryArgs defaultSortById() {
+        if(!sort && !projections) {
+            sort = ['id':'asc']
+        }
+        return this
     }
 
     /**

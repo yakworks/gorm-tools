@@ -1,3 +1,11 @@
+### v7.3.66
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.65...v7.3.66)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/cce28b88c5a00860cffc23ae4049037756895b10)
+- Merge pull request #776 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/b9340955e8de5c4b48f0920469848b043e7d6f34)
+- Contact controller tests 9ci/domain9#550 (#773) [link](https://github.com/yakworks/gorm-tools/commit/a054853b6b6cac28dbdee8d4e26006e6a4ce5841)
+- Fix syncjob data update issue (#775) [link](https://github.com/yakworks/gorm-tools/commit/2736eef03c39fe965d1e55d02a73bb8c2236d93c)
+
 ### v7.3.65
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.64...v7.3.65)

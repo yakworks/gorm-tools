@@ -7,6 +7,7 @@ package yakworks.rest.gorm.render
 import groovy.json.JsonOutput
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 
 import gorm.tools.job.SyncJobEntity
 import grails.rest.render.RenderContext
@@ -17,6 +18,7 @@ import grails.rest.render.RenderContext
  * @author Joshua Burnett (@basejump)
  * @since 7.0.8
  */
+@Slf4j
 @CompileStatic
 class SyncJobRenderer implements JsonRendererTrait<SyncJobEntity> {
 
@@ -26,7 +28,13 @@ class SyncJobRenderer implements JsonRendererTrait<SyncJobEntity> {
         setContentType(context)
 
         // gets the raw json string and use the unescaped to it just dumps it to writer without any round robin conversion
-        JsonOutput.JsonUnescaped rawDataJson = JsonOutput.unescaped(job.dataToString())
+        String jobData = job.dataToString()
+        JsonOutput.JsonUnescaped rawDataJson = JsonOutput.unescaped(jobData)
+
+        //if its null/empty or has just 2 chars eg {}, or [], thn log it
+        if(job.ok && job.sourceId.contains('exportSync') && (!jobData || jobData.length() < 3)) {
+            log.warn("Syncjob#${job['id']} with empty data")
+        }
 
         Map response = [
             id: job.id,

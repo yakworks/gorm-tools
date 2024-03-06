@@ -1,3 +1,10 @@
+### v7.3.67
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.66...v7.3.67)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/2ed59ef0faf53d26718bacb29acac261c2ff7f54)
+- Merge pull request #777 from yakworks/syncjob-hotfix [link](https://github.com/yakworks/gorm-tools/commit/d5a25951ff6eb43facad321c8884f95a92651b48)
+- Log Syncjob with empty data [link](https://github.com/yakworks/gorm-tools/commit/e49fd4854697b70d249e0dd65eb7a41669cbf39b)
+
 ### v7.3.66
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.65...v7.3.66)

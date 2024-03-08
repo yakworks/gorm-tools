@@ -10,6 +10,7 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import gorm.tools.job.SyncJobEntity
+import gorm.tools.job.SyncJobState
 import grails.rest.render.RenderContext
 
 /**
@@ -31,9 +32,10 @@ class SyncJobRenderer implements JsonRendererTrait<SyncJobEntity> {
         String jobData = job.dataToString()
         JsonOutput.JsonUnescaped rawDataJson = JsonOutput.unescaped(jobData)
 
-        //if its null/empty or has just 2 chars eg {}, or [], thn log it
-        if(job.ok && job.sourceId.contains('exportSync') && (!jobData || jobData.length() < 3)) {
-            log.warn("Syncjob#${job['id']} with empty data")
+        //FIXME if its null/empty or has just 2 chars eg {}, or [], thn log it
+        if(job.state == SyncJobState.Finished && jobData?.length() < 4 && job.sourceId.contains('exportSync') && job.message?.trim()) {
+
+            log.warn("Syncjob#${job['id']} has empty data")
         }
 
         Map response = [
@@ -44,6 +46,13 @@ class SyncJobRenderer implements JsonRendererTrait<SyncJobEntity> {
             sourceId: job.sourceId,
             data: rawDataJson
         ]
+
+        //check the map and  rawDataJson just to make sure its good
+        if(response.state == 'Finished' && response.sourceId.contains('exportSync') && job.message?.trim()
+            && (response.data as String)?.length() < 4) {
+
+            log.warn("Syncjob#${job['id']} response.data with rawJson is empty")
+        }
 
         if(job.problems) {
             response['problems'] = job.problems

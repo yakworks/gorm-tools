@@ -712,8 +712,9 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
     @Override
     MangoDetachedCriteria<T> gt(String propertyName, Object value) {
-        ensureAliases(propertyName)
-        return (MangoDetachedCriteria<T>)super.gt(propertyName, value)
+        nestedPathPropCall(propertyName, value, "gt")
+        //ensureAliases(propertyName)
+        //return (MangoDetachedCriteria<T>)super.gt(propertyName, value)
     }
 
     @Override
@@ -860,4 +861,19 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         return (MangoDetachedCriteria<T>)super.leAll(propertyName, propertyValue)
     }
 
+    /*
+     * This gets called from AbstractDetachedCriteria when a subquery is built (Eg for "in")
+     * We have to override it, so that the subquery too goes through mango and supports properties with dots like eq "org.member.division"
+     *
+     * Example (situation in which it gets used)
+     *
+     *  Org.query {
+     *    in "member.id", {
+     *      //subquery here
+     *    }
+     * }
+     */
+    protected QueryableCriteria buildQueryableCriteria(Closure queryClosure) {
+        return new MangoDetachedCriteria(targetClass).build(queryClosure)
+    }
 }

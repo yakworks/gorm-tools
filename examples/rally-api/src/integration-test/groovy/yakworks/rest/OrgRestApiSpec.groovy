@@ -2,9 +2,6 @@ package yakworks.rest
 
 import grails.gorm.transactions.Rollback
 import org.springframework.http.HttpStatus
-
-import spock.lang.Ignore
-import spock.lang.IgnoreRest
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.HttpUrl
@@ -108,7 +105,6 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         body.data[0].name == "Org20"
     }
 
-    @Ignore //XXX @SUD need test for projections which are blowing up, we have no good tests apprently for that
     void "default sort by id"() {
 
         when: "default sort by id asc"
@@ -141,7 +137,21 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         }
     }
 
-    void "test sorting"() {
+    void "default sort by id should not apply with projections"() {
+        when: "there's a projection without id column"
+        def resp = get("${path}?q=*&projections="+'flex.num1:"sum",type:"group"')
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code() == HttpStatus.OK.value()
+        body
+        body.records == 5 //RallySeed creates orgs with 5 different org types, so one record for each group
+        body.data.size() == 5
+        body.data[0].type.name != null
+        body.data[0].flex.num1 != null
+    }
+
+    void "test explicit sort"() {
         when: "sort asc"
         def resp = get("${path}?q=*&sort=id&order=asc")
         Map body = bodyToMap(resp)

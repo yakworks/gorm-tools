@@ -6,6 +6,7 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
 import spock.lang.Specification
+import yakworks.rally.mail.model.ContentType
 import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.mail.model.MailerTemplate
 import yakworks.testing.gorm.integration.DomainIntTest
@@ -37,6 +38,7 @@ class CommonMailerTests extends Specification implements DomainIntTest {
         mailMsg.replyTo == "Test Account <joe@greenbill.io>"
         mailMsg.subject == "Payment Receipt"
         mailMsg.sendTo == "admin@testmeee.com"
+        mailMsg.contentType == ContentType.plain
 
         when:
         //sanity check the body
@@ -45,6 +47,15 @@ class CommonMailerTests extends Specification implements DomainIntTest {
         then:
         body.contains("ID: 123")
         body.contains("Amount: \$9,999.90")
+
+        when: "content type is html"
+        receipt.body = "<td>ID</td><td>{{  payTran.id }}</td>"
+        receipt.contentType = ContentType.html
+        mailMsg = commonMailer.createMailMessage("admin@testmeee.com", receipt, model)
+
+        then:
+        mailMsg.contentType == ContentType.html
+        mailMsg.body.contains "<td>ID</td><td>123</td>"
     }
 
 }

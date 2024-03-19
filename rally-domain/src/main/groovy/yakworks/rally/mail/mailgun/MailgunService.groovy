@@ -45,7 +45,7 @@ class MailgunService extends EmailService {
         if(mailMsg.bcc) bldr.bcc(mailMsg.bcc)
         if(mailMsg.tags) bldr.tag(mailMsg.tags)
         if(mailMsg.text) bldr.text(mailMsg.text)
-        if(mailMsg.html) bldr.html(mailMsg.html)
+        if(mailMsg.html) bldr.html(mailMsg.html) //html will be present, when contentType=html
         if(mailMsg.attachments) bldr.attachment(mailMsg.attachments as List<File>)
 
         return bldr.build()

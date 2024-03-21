@@ -1,3 +1,10 @@
+### v7.3.68
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.67...v7.3.68)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/46d21bb973ee143f4345d8e47cc9f36d743357e0)
+- Merge pull request #782 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/77ec7e895a3c9733552dd603cf91638f38f8e131)
+- Support html emails for paymailer (#779) [link](https://github.com/yakworks/gorm-tools/commit/76c86df558edf363d31f6aba259791dd7f89909b)
+
 ### v7.3.67
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.66...v7.3.67)

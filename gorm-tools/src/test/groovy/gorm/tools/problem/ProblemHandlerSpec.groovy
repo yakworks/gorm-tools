@@ -5,6 +5,8 @@ import org.springframework.validation.Errors
 import spock.lang.Specification
 import testing.Cust
 import yakworks.api.HttpStatus
+import yakworks.api.problem.GenericProblem
+import yakworks.api.problem.Problem
 import yakworks.i18n.icu.DefaultICUMessageSource
 import yakworks.testing.gorm.unit.DataRepoTest
 
@@ -78,6 +80,17 @@ class ProblemHandlerSpec extends Specification implements DataRepoTest {
         !ProblemHandler.isBrokenPipe(new RuntimeException("test"))
         ProblemHandler.isBrokenPipe(new IOException("broken pipe"))
         ProblemHandler.isBrokenPipe(new IOException("java.io.IOException: Broken pipe"))
+    }
+
+    void "assertion error"() {
+        when:
+        AssertionError cause = new AssertionError("test")
+        Problem p = problemHandler.handleException(cause)
+
+        then:
+        p instanceof GenericProblem
+        p.cause == cause
+        p.detail == "test"
     }
 
 }

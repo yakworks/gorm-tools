@@ -99,7 +99,10 @@ class ProblemHandler {
                 log.error("MAYBE UNEXPECTED? Data Access Exception ${msgInfo}", StackTraceUtils.deepSanitize(e))
                 return DataProblem.of(e)
             }
-        } else {
+        } else if(e instanceof AssertionError) {
+            return GenericProblem.of(e)
+        }
+        else {
             return handleUnexpected(e)
         }
     }

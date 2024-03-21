@@ -134,7 +134,7 @@ class BulkControllerSupport<D> {
      * Special handler for bulk operations, so that we can log/highight every bulk error we send.
      * Its here, because we cant have more thn one exception handler for "Exception" in controller
      */
-    Problem handleBulkOperationException(HttpServletRequest req, Exception e) {
+    Problem handleBulkOperationException(HttpServletRequest req, Throwable e) {
         Problem apiError = problemHandler.handleException(getEntityClass(), e)
         if (apiError.status.code == 500) {
             String requestInfo = "requestURI=[${req.requestURI}], method=[${req.method}], queryString=[${req.queryString}]"

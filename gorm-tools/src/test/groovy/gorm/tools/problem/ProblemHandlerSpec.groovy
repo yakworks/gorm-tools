@@ -85,7 +85,7 @@ class ProblemHandlerSpec extends Specification implements DataRepoTest {
     void "assertion error"() {
         when:
         AssertionError cause = new AssertionError("test")
-        Problem p = problemHandler.handleException()
+        Problem p = problemHandler.handleException(cause)
 
         then:
         p instanceof GenericProblem

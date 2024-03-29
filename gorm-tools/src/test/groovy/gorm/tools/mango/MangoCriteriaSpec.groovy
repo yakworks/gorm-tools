@@ -53,6 +53,27 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
         ex.message.contains "Invalid criteria for field:Type"
     }
 
+    void "query by association field"() {
+        when:
+        int res = build(['location.address': '$isNotNull']).count()
+
+        then:
+        noExceptionThrown()
+        res == 10
+
+        when:
+        res = build(['location.address': 'City1']).count()
+
+        then:
+        res == 1
+
+        when:
+        res = build(['location': [address:['$eq': 'City1']]]).count()
+
+        then:
+        res == 1
+    }
+
     def "test detached isActive"() {
         when:
         List res = build([inactive: true]).list()

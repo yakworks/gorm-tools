@@ -36,12 +36,42 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
         }
     }
 
-    def "test field that does not exist"() {
+    void "test field that does not exist"() {
         when:
         List res = build([nonExistingFooBar: true]).list()
 
-        then: "Its ignores the bad field and move on"
+        then: "fails with query exception"
         thrown(QueryException)
+    }
+
+    void "test non existent association field"() {
+        when:
+        List res = build(['Type.name': "test"]).list()
+
+        then:
+        IllegalArgumentException ex = thrown()
+        ex.message.contains "Invalid criteria for field:Type"
+    }
+
+    void "query by association field"() {
+        when:
+        int res = build(['location.address': '$isNotNull']).count()
+
+        then:
+        noExceptionThrown()
+        res == 10
+
+        when:
+        res = build(['location.address': 'City1']).count()
+
+        then:
+        res == 1
+
+        when:
+        res = build(['location': [address:['$eq': 'City1']]]).count()
+
+        then:
+        res == 1
     }
 
     def "test detached isActive"() {

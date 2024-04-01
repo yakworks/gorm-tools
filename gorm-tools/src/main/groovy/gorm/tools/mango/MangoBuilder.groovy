@@ -266,7 +266,12 @@ class MangoBuilder {
             if (eop) {
                 criteria.invokeMethod(eop.op, field)
                 continue
+            } else {
+                //field is not an association, but value is a map and key doesnt match any of the operator ?
+                //It is invalid query eg ("Source.sourceId = "xx")
+                throw new IllegalArgumentException("Invalid criteria for field:$field value:$fieldVal")
             }
+
         }
     }
 

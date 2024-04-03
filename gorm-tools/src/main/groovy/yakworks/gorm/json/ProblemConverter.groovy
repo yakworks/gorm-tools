@@ -61,4 +61,3 @@ class ProblemConverter implements JsonGenerator.Converter {
         return errors as List<Violation>
     }
 }
-

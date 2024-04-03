@@ -17,8 +17,7 @@ import yakworks.api.problem.Violation
 import yakworks.api.problem.ViolationFieldError
 
 /**
- * Proof of concept to stop stack overflow on ApiResults renderer.
- * FIXME move to gorm-tools. get tests in place both in rcm and in gorm-tools
+ * Stops stack overflow on ApiResults renderer.
  */
 @CompileStatic
 class ProblemConverter implements JsonGenerator.Converter {
@@ -62,3 +61,4 @@ class ProblemConverter implements JsonGenerator.Converter {
         return errors as List<Violation>
     }
 }
+

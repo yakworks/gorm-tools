@@ -79,12 +79,14 @@ class MailMessageSender {
             to: [mailMessage.sendTo],
             subject: mailMessage.subject
         )
+
+        //TODO only html, plain handled, need to impl markdown
         if(mailMessage.contentType == ContentType.html){
             mailTo.html = mailMessage.body
         } else {
             mailTo.text = mailMessage.body
         }
-        //TODO only html, plain handled, need to impl markdown
+
         if(mailMessage.cc) mailTo.cc = [mailMessage.cc]
         if(mailMessage.bcc) mailTo.cc = [mailMessage.bcc]
 

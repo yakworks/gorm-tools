@@ -10,8 +10,7 @@ import groovy.transform.CompileStatic
 import yakworks.api.problem.Violation
 
 /**
- * Proof of concept to stop stack overflow on ApiResults renderer.
- * FIXME move to gorm-tools. get tests in place both in rcm and in gorm-tools
+ * Stop stack overflow on ApiResults renderer.
  */
 @CompileStatic
 class ViolationConverter implements JsonGenerator.Converter {

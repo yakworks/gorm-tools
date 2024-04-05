@@ -22,12 +22,9 @@ class ApiResultsTestControllerTests extends RestIntTest {
 
         then:
         body.ok == true
+        body.status == 207
         //its not 207 by default anymore
-        // body.status == 207
-        // response.status == 207
-        body.status == 200
         response.status == 200
-
     }
 
 }

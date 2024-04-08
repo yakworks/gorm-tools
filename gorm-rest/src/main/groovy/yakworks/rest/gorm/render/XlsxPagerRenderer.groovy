@@ -37,8 +37,8 @@ class XlsxPagerRenderer implements XlsRendererTrait<Pager> {
         //for future use
         // String headers = params['headers']
         // String includesKey = params['includesKey']
-        //if includes or includesKey was passed then dont use whats in the grid config
-        if(dataList instanceof MetaMapList && !params['includes'] && !params['includesKey']){
+        //if includes was passed then dont use whats in the grid config
+        if(dataList instanceof MetaMapList && !params['includes']){
             //look in config and match whats there if not specified
             ExcelBuilderSupport.useIncludesConfig(eb, apiConfig, dataList)
         }

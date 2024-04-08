@@ -31,11 +31,6 @@ class SyncJobRenderer implements JsonRendererTrait<SyncJobEntity> {
         String jobData = job.dataToString()
         JsonOutput.JsonUnescaped rawDataJson = JsonOutput.unescaped(jobData)
 
-        //if its null/empty or has just 2 chars eg {}, or [], thn log it
-        if(job.ok && job.sourceId.contains('exportSync') && (!jobData || jobData.length() < 3)) {
-            log.warn("Syncjob#${job['id']} with empty data")
-        }
-
         Map response = [
             id: job.id,
             ok: job.ok,

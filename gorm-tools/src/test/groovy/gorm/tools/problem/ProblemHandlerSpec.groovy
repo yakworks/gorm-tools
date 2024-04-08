@@ -84,7 +84,23 @@ class ProblemHandlerSpec extends Specification implements DataRepoTest {
         ProblemHandler.isBrokenPipe(new IOException("java.io.IOException: Broken pipe"))
     }
 
-    void "json exception"() {
+    void "assertion error"() {
+        when:
+        AssertionError cause = new AssertionError("test")
+        Problem p = problemHandler.handleException(cause)
+
+        then:
+        p instanceof GenericProblem
+        p.cause == cause
+        p.detail == "test"
+        p = problemHandler.handleException(new HttpMessageNotReadableException("test"))
+
+        then:
+        p instanceof GenericProblem
+        p.cause instanceof HttpMessageNotReadableException
+    }
+
+  void "json exception"() {
         when:
         Problem p = problemHandler.handleException(new JsonException("test"))
 
@@ -99,5 +115,4 @@ class ProblemHandlerSpec extends Specification implements DataRepoTest {
         p instanceof GenericProblem
         p.cause instanceof HttpMessageNotReadableException
     }
-
 }

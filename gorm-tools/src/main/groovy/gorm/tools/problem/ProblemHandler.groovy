@@ -101,8 +101,12 @@ class ProblemHandler {
                 log.error("MAYBE UNEXPECTED? Data Access Exception ${msgInfo}", StackTraceUtils.deepSanitize(e))
                 return DataProblem.of(e)
             }
-        } else if (e instanceof HttpMessageNotReadableException || e instanceof JsonException) {
+        }
+        else if (e instanceof HttpMessageNotReadableException || e instanceof JsonException) {
             //this happens if request contains bad data / malformed json. we dont want to log stacktraces for these as they are expected
+            return DataProblem.of(e)
+        }
+        else if(e instanceof AssertionError) {
             return DataProblem.of(e)
         }
         else {

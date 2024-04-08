@@ -104,7 +104,7 @@ trait RestRepoApiController<D> extends RestApiController {
             Boolean bindId = params.getBoolean('bindId')
             D instance = (D) getRepo().create(bodyAsMap(), [bindId:bindId])
             respondWithEntityMap(instance, getParamsMap(), CREATED)
-        } catch (Exception e) {
+        } catch (Exception | AssertionError e) {
             handleException(e)
         }
     }
@@ -121,7 +121,7 @@ trait RestRepoApiController<D> extends RestApiController {
         try {
             D instance = (D) getRepo().update(data)
             respondWithEntityMap(instance, getParamsMap())
-        } catch (Exception e) {
+        } catch (Exception | AssertionError e) {
             handleException(e)
         }
 
@@ -135,7 +135,7 @@ trait RestRepoApiController<D> extends RestApiController {
         try {
             getRepo().removeById((Serializable) params.id) //this should be fine since grails isnt loosing the params set from UrlMappings
             callRender(status: NO_CONTENT) //204
-        } catch (Exception e) {
+        } catch (Exception | AssertionError e) {
             handleException(e)
         }
 
@@ -151,7 +151,7 @@ trait RestRepoApiController<D> extends RestApiController {
             D instance = (D) getRepo().read(idx)
             RepoUtil.checkFound(instance, idx, getEntityClass().simpleName)
             respondWithEntityMap(instance, getParamsMap())
-        } catch (Exception e) {
+        } catch (Exception | AssertionError e) {
             handleException(e)
         }
     }
@@ -174,7 +174,7 @@ trait RestRepoApiController<D> extends RestApiController {
             Pager pager = getEntityResponder().pagedQuery(gParams, [IncludesKey.list.name()])
             //we pass in the params to args so it can get passed on to renderer, used in the excel renderer for example
             respondWith(pager, [params: gParams])
-        } catch (Exception e) {
+        } catch (Exception | AssertionError e) {
             handleException(e)
         }
     }
@@ -186,7 +186,7 @@ trait RestRepoApiController<D> extends RestApiController {
             Pager pager = picklistPagedQuery(gParams)
             //we pass in the params to args so it can get passed on to renderer, used in the excel renderer for example
             respondWith(pager, [params: gParams])
-        } catch (Exception e) {
+        } catch (Exception | AssertionError e) {
             handleException(e)
         }
     }
@@ -196,7 +196,7 @@ trait RestRepoApiController<D> extends RestApiController {
     def bulkCreate() {
         try {
             bulkProcess(DataOp.add)
-        } catch (Exception e) {
+        } catch (Exception | AssertionError e) {
             respondWith getBulkControllerSupport().handleBulkOperationException(request, e)
         }
     }
@@ -206,7 +206,7 @@ trait RestRepoApiController<D> extends RestApiController {
     def bulkUpdate() {
         try {
             bulkProcess(DataOp.update)
-        } catch (Exception e) {
+        } catch (Exception | AssertionError e) {
             respondWith getBulkControllerSupport().handleBulkOperationException(request, e)
         }
     }
@@ -235,13 +235,13 @@ trait RestRepoApiController<D> extends RestApiController {
         return getEntityResponder().pagedQuery(mParams, ['picklist', IncludesKey.stamp.name()])
     }
 
-    void handleException(Exception e) {
+    void handleException(Throwable e) {
         /*
          * Broken pipe exception occurs when connection is closed before server has finished writing response.
          * Once that happens, trying to write any response to output stream will result in broken pipe.
          * We have "caught" broken pipe, and now during "catch" here, if we again try "respondWith" it will again result in "broken pipe" error
          */
-        if(isBrokenPipe(e)) return
+        if (isBrokenPipe((Exception) e)) return
         else {
             assert getEntityClass()
             Problem apiError = problemHandler.handleException(getEntityClass(), e)

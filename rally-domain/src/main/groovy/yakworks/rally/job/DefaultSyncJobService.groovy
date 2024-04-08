@@ -37,7 +37,7 @@ class DefaultSyncJobService extends SyncJobService<SyncJob> {
 
     @Override
     SyncJobContext createJob(SyncJobArgs args, Object payload){
-        MaintWindowUtil.checkWindows(maintenanceProps.crons, LocalDateTime.now())
+        MaintWindowUtil.check(maintenanceProps)
         super.createJob(args, payload)
     }
 

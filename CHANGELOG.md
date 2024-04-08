@@ -1,3 +1,8 @@
+### v7.3.70
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.69...v7.3.70)
+- use check for syncJob (#787) [link](https://github.com/yakworks/gorm-tools/commit/f5ec384f9146112adcd8ff6d22769214ca374f6a)
+
 ### v7.3.69
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.68...v7.3.69)

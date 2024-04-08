@@ -5,7 +5,6 @@
 package yakworks.rally.job
 
 import java.nio.file.Path
-import java.time.LocalDateTime
 
 import groovy.transform.CompileStatic
 
@@ -37,7 +36,7 @@ class DefaultSyncJobService extends SyncJobService<SyncJob> {
 
     @Override
     SyncJobContext createJob(SyncJobArgs args, Object payload){
-        MaintWindowUtil.checkWindows(maintenanceProps.crons, LocalDateTime.now())
+        MaintWindowUtil.check(maintenanceProps)
         super.createJob(args, payload)
     }
 

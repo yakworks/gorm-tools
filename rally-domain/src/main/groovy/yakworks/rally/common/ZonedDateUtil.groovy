@@ -43,10 +43,6 @@ class ZonedDateUtil {
         return ChronoUnit.HOURS.between(ldtInclusive, ldtExclusive)
     }
 
-    static Date convertToDateViaInstant(ZonedDateTime dateToConvert) {
-        return java.util.Date.from(dateToConvert.toInstant());
-    }
-
     /** used for testing to see if 2 times are within 60 seconds of each other */
     static boolean isSameMinute(Temporal t1, Temporal t2){
         ChronoUnit.SECONDS.between(t1, t2).abs() < 60

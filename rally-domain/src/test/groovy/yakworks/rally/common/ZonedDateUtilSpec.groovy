@@ -60,8 +60,7 @@ class ZonedDateUtilSpec extends Specification {
         //ChronoUnit.MINUTES.between(zdtUTCNow.toLocalDateTime(), zdEt.toLocalDateTime()) == 0
         ZonedDateUtil.isSameMinute(zdtUTCNow, zdEt)
         ZonedDateUtil.isSameSecond(zdtUTCNow, zdEt)
-        //but wont be equal as milliseconds are off
-        zdtUTCNow == zdEt
+
     }
 
     void "isSameMinute isSameSecond same"() {

@@ -24,16 +24,21 @@ import yakworks.rally.config.MaintenanceProps
 @CompileStatic
 class MaintWindowUtil {
 
-    static boolean checkWindows(MaintenanceProps mprops){
-        LocalDateTime timeToUse = currentTime(mprops)
-        return checkWindows(mprops, timeToUse)
+    static boolean check(MaintenanceProps mprops){
+        return check(mprops.crons, mprops.timeZone?.toZoneId())
     }
 
-    static boolean checkWindows(MaintenanceProps mprops, LocalDateTime timeToUse){
-        List<String> cronList = mprops.crons
-        return checkWindows(cronList, timeToUse)
+    static boolean check(List<String> cronList, ZoneId zoneId = null){
+        return checkWindows(cronList, currentTime(zoneId))
     }
 
+    /**
+     * checks to see if the date falls inisde the list of cron expresions.
+     *
+     * @param cronList the list to crons to see if the curDate falls inside. If empty or null then it returns true
+     * @param curDate the date to check against. If null then it retuns true.
+     * @return true if its good, will never return false as it throws error
+     */
     static <T extends Temporal & Comparable<? super T>> boolean checkWindows(List<String> cronList, T curDate){
         cronList?.each { String cronString ->
             long secondsToNextRun = secondsToNextRun(cronString, curDate)
@@ -49,30 +54,17 @@ class MaintWindowUtil {
     }
 
     static <T extends Temporal & Comparable<? super T>> long secondsToNextRun(String cronString, T curDate){
-        //should be every second and minute with * in those fields
-        //var expression = CronExpression.parse("* * 14,15 * * MON-FRI")
-        //var curDate = LocalDateTime.parse("2023-09-20T13:59:59")//a wednesday
+        //Every second and minute should have * in those fields as we are only looking at hours
         var expression = CronExpression.parse(cronString)
         Temporal nextRun = expression.next(curDate)
         long secDif = ChronoUnit.SECONDS.between(curDate, nextRun);
         return secDif
     }
 
-    static LocalDateTime currentTime(MaintenanceProps mprops){
-        TimeZone timeZone = mprops.timeZone
-        LocalDateTime timeToUse = timeZone ? LocalDateTime.now(timeZone.toZoneId()) : LocalDateTime.now()
+    /** Uses timezone in MaintenanceProps to get the current time */
+    static LocalDateTime currentTime(ZoneId zoneId){
+        LocalDateTime timeToUse = zoneId ? LocalDateTime.now(zoneId) : LocalDateTime.now()
         return timeToUse
     }
 
-    static LocalDateTime toLocalDateTimeZone(ZonedDateTime zonedDateTime, ZoneId toZoneId){
-        return zonedDateTime
-            .withZoneSameInstant(toZoneId)
-            .toLocalDateTime()
-    }
-
-    static LocalDateTime toLocalDateTimeZone(LocalDateTime localDateTime, ZoneId fromZoneId, ZoneId toZoneId){
-        return localDateTime.atZone(fromZoneId)
-            .withZoneSameInstant(toZoneId)
-            .toLocalDateTime()
-    }
 }

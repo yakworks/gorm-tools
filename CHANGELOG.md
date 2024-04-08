@@ -1,3 +1,8 @@
+### v7.3.69
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.68...v7.3.69)
+- Main util fix (#786) [link](https://github.com/yakworks/gorm-tools/commit/bcbf5b89201f3a065854e991a7b4bda781600049)
+
 ### v7.3.68
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.67...v7.3.68)

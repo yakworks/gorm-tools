@@ -11,7 +11,7 @@ import java.time.ZoneId
 import groovy.transform.CompileStatic
 
 @CompileStatic
-class TimeStaticExt {
+class LocalDateTimeStaticExt {
 
     /**
      * Uses the app default zone to get the current date.
@@ -29,6 +29,7 @@ class TimeStaticExt {
     static LocalDateTime nowAppZone(final LocalDateTime type) {
         LocalDateTime.now(AppTimeZone.zoneId)
     }
+
 
     /**
      * Sister to ZoneId.systemDefault()

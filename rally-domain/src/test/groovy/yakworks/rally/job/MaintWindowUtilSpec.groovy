@@ -6,9 +6,12 @@ package yakworks.rally.job
 
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 
 import spock.lang.Specification
 import yakworks.api.problem.ThrowableProblem
+import yakworks.rally.common.ZonedDateUtil
+import yakworks.rally.config.MaintenanceProps
 
 class MaintWindowUtilSpec extends Specification {
 
@@ -17,9 +20,11 @@ class MaintWindowUtilSpec extends Specification {
         String cron = "* * 14,15 * * MON-FRI"
 
         expect:
+        //within a second
         1 == MaintWindowUtil.secondsToNextRun(cron, LocalDateTime.parse("2023-09-20T13:59:59"))
+        //60 seconds away
         60 == MaintWindowUtil.secondsToNextRun(cron, LocalDateTime.parse("2023-09-20T13:59:00"))
-        //in middle
+        //in the middle
         1 == MaintWindowUtil.secondsToNextRun(cron, LocalDateTime.parse("2023-09-20T15:00"))
         //at end
         79200 == MaintWindowUtil.secondsToNextRun(cron, LocalDateTime.parse("2023-09-20T16:00"))
@@ -31,8 +36,30 @@ class MaintWindowUtilSpec extends Specification {
         //catch all for all hours and all days, will ALWAYS throw error with cron like this
         List<String> cronList = ['* * 0-23 * * MON-SUN']
         MaintWindowUtil.checkWindows(cronList, LocalDateTime.now())
+
         then:
         thrown(ThrowableProblem)
+    }
+
+    void "test checkWindows catch all MaintenanceProps"() {
+        when:
+        MaintenanceProps maintenanceProps = new MaintenanceProps(crons: ['* * 0-23 * * MON-SUN'], timeZone: TimeZone.getTimeZone("CST"))
+        MaintWindowUtil.checkWindows(maintenanceProps)
+
+        then:
+        thrown(ThrowableProblem)
+    }
+
+    void "test currentTime"() {
+        when:
+        var nyTZ = TimeZone.getTimeZone("America/New_York")
+        MaintenanceProps maintenanceProps = new MaintenanceProps(timeZone: nyTZ)
+        LocalDateTime curTime = MaintWindowUtil.currentTime(new MaintenanceProps(timeZone: nyTZ))
+        LocalDateTime curTimeNoZone = MaintWindowUtil.currentTime(new MaintenanceProps())
+
+        then:
+        ZonedDateUtil.isSameSecond(curTime, LocalDateTime.now(nyTZ.toZoneId()))
+        ZonedDateUtil.isSameSecond(curTimeNoZone, LocalDateTime.now())
     }
 
     void "test checkWindows"() {
@@ -88,55 +115,50 @@ class MaintWindowUtilSpec extends Specification {
 
     }
 
-    void "test checkWindows central time"() {
+    void "test checkWindows MainProps timeZone"() {
         when:
-        // # 9pm-11pm MON-FRI Central time, which in UTC is 02:00-04:00 TUE-SAT
-        // # set the hours with comma instead of range, so we say all of hour 02 and all of hour 03, which wont include hour 04.
-        // - '* * 2,3 * * TUE-SAT'
-        // # 3pm-7pm SAT-SUN Central time, which in UTC is 20:00-24:00 SAT,SUN
-        // - '* * 20,21,22,23 * * SAT,SUN'
 
-        List<String> cronList = ['* * 2,3 * * TUE-SAT', '* * 20,21,22,23 * * SAT,SUN']
-
-        // NOTE: 2023-09-18 is a MON. 2023-09-24 is SUN
+        List<String> cronList = ['* * 21,22 * * MON-SAT', '* * 15,16,17,18 * * SUN']
+        MaintenanceProps maintenanceProps = new MaintenanceProps(
+            crons: cronList,
+            timeZone: TimeZone.getTimeZone("America/New_York")
+        )
         then:
         //8:59 pm MONDAY
-        MaintWindowUtil.checkWindows(cronList, centralToUTC("2023-09-18T20:59:00"))
-        //11:00pm MON
-        MaintWindowUtil.checkWindows(cronList, centralToUTC("2023-09-18T23:00"))
+        MaintWindowUtil.checkWindows(cronList, LocalDateTime.parse("2023-09-18T20:59:00"))
+        //11:01AM MON
+        MaintWindowUtil.checkWindows(cronList, LocalDateTime.parse("2023-09-19T23:01"))
 
         when: "8:59 pm MON within a second"
-        MaintWindowUtil.checkWindows(cronList, centralToUTC("2023-09-18T20:59:59"))
+        MaintWindowUtil.checkWindows(cronList, LocalDateTime.parse("2023-09-18T20:59:59"))
 
         then:
         var e = thrown(ThrowableProblem)
         e.status.code == 503
 
         when: "im middle at 10pm on WED"
-        MaintWindowUtil.checkWindows(cronList, centralToUTC("2023-09-20T22:00:00"))
+        MaintWindowUtil.checkWindows(cronList, LocalDateTime.parse("2023-09-20T22:00:00"))
 
         then:
         e = thrown(ThrowableProblem)
         e.status.code == 503
 
         when: "at 11pm Wed"
-        MaintWindowUtil.checkWindows(cronList, centralToUTC("2023-09-20T23:00:00"))
+        MaintWindowUtil.checkWindows(cronList, LocalDateTime.parse("2023-09-20T23:00:00"))
 
         then:
         noExceptionThrown()
 
-        when: "Weekend"
+        when: "Weekend SUN"
         //make sure the first one doesnt pick up and only the weekend one picks up
-        //SAT at 9pm
-        MaintWindowUtil.checkWindows(cronList, centralToUTC("2023-09-23T21:00:00"))
         //SUN at 9pm
-        MaintWindowUtil.checkWindows(cronList, centralToUTC("2023-09-24T21:00:00"))
+        MaintWindowUtil.checkWindows(cronList, LocalDateTime.parse("2023-09-24T21:00:00"))
 
         then:
         noExceptionThrown()
 
-        when: "Sat at 3pm start time"
-        MaintWindowUtil.checkWindows(cronList, centralToUTC("2023-09-23T15:00:00"))
+        when: "SUN at 3pm start time"
+        MaintWindowUtil.checkWindows(cronList, LocalDateTime.parse("2023-09-24T15:00:00"))
 
         then:
         e = thrown(ThrowableProblem)
@@ -144,10 +166,10 @@ class MaintWindowUtilSpec extends Specification {
 
     }
 
-    LocalDateTime centralToUTC(String sdate){
-        LocalDateTime localDateTime = LocalDateTime.parse(sdate)
-        return localDateTime.atZone(ZoneId.of("America/Chicago"))
-            .withZoneSameInstant(ZoneId.of("UTC"))
-            .toLocalDateTime()
-    }
+    // LocalDateTime centralToUTC(String sdate){
+    //     LocalDateTime localDateTime = LocalDateTime.parse(sdate)
+    //     return localDateTime.atZone(ZoneId.of("America/Chicago"))
+    //         .withZoneSameInstant(ZoneId.of("UTC"))
+    //         .toLocalDateTime()
+    // }
 }

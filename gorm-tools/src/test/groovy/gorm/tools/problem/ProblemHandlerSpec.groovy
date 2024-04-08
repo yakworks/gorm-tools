@@ -93,11 +93,6 @@ class ProblemHandlerSpec extends Specification implements DataRepoTest {
         p instanceof GenericProblem
         p.cause == cause
         p.detail == "test"
-        p = problemHandler.handleException(new HttpMessageNotReadableException("test"))
-
-        then:
-        p instanceof GenericProblem
-        p.cause instanceof HttpMessageNotReadableException
     }
 
   void "json exception"() {

@@ -1,6 +1,8 @@
 package gorm.tools.problem
 
+import groovy.json.JsonException
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.validation.Errors
 import spock.lang.Specification
 import testing.Cust
@@ -93,4 +95,19 @@ class ProblemHandlerSpec extends Specification implements DataRepoTest {
         p.detail == "test"
     }
 
+  void "json exception"() {
+        when:
+        Problem p = problemHandler.handleException(new JsonException("test"))
+
+        then:
+        p instanceof GenericProblem
+        p.cause instanceof JsonException
+
+        when:
+        p = problemHandler.handleException(new HttpMessageNotReadableException("test"))
+
+        then:
+        p instanceof GenericProblem
+        p.cause instanceof HttpMessageNotReadableException
+    }
 }

@@ -7,7 +7,6 @@ package yakworks.rally.config
 import groovy.transform.CompileStatic
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.context.annotation.Configuration
 
 import yakworks.rally.orgs.model.OrgType
 

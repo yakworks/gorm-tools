@@ -29,11 +29,14 @@ class ApiResultsRenderer implements JsonRendererTrait<ApiResults>{
         //context.status = HttpStatus.MULTI_STATUS
         var dataMap = results.asMap()
 
+        //FIXME do we need this?
         //hack for now, this will try and get message from first item in the ApiResults list
         if(!dataMap.title && results.list.size() != 0) {
             //use msg form first item
             dataMap.title = msgService.get(results.list[0].msg)
         }
+        //FIXME do we need this?
+        if(!dataMap.containsKey("problems")) dataMap.problems = []
 
         jsonBuilder(context).call(dataMap)
     }

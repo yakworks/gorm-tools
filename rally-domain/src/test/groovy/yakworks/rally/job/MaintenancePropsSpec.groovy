@@ -18,6 +18,7 @@ class MaintenancePropsSpec extends Specification implements GrailsAppUnitTest {
     }}
 
     def "sanity Check"() {
+        //checks against whats in the MaintenanceProps in application.yml
         expect:
         maintenanceProps.crons.size() == 2
         maintenanceProps.timeZone == TimeZone.getTimeZone("CST")

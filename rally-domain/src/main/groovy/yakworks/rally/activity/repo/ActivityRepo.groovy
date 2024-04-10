@@ -155,9 +155,8 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
         DetachedCriteria tagExistsCrit
         DetachedCriteria actLinkExists
         if(crit.tags || crit.tagIds) {
-            Map tagCriteriaMap = [tags: crit.remove('tags'), tagIds: crit.remove('tagIds')]
             //if its has tags keys then this returns something to add to exists, will remove the keys as well
-            tagExistsCrit = TagLink.getExistsCriteria(tagCriteriaMap, Activity, 'activity_.id')
+            tagExistsCrit = TagLink.getExistsCriteria(crit, Activity, 'activity_.id')
         }
         if(crit.linkedId && crit.linkedEntity) {
             Long linkedId = crit.remove('linkedId') as Long //remove so they dont flow through to query

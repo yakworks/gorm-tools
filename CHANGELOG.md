@@ -1,3 +1,84 @@
+### v7.3.70
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.69...v7.3.70)
+- use check for syncJob (#787) [link](https://github.com/yakworks/gorm-tools/commit/f5ec384f9146112adcd8ff6d22769214ca374f6a)
+
+### v7.3.69
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.68...v7.3.69)
+- Main util fix (#786) [link](https://github.com/yakworks/gorm-tools/commit/bcbf5b89201f3a065854e991a7b4bda781600049)
+
+### v7.3.68
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.67...v7.3.68)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/46d21bb973ee143f4345d8e47cc9f36d743357e0)
+- Merge pull request #782 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/77ec7e895a3c9733552dd603cf91638f38f8e131)
+- Support html emails for paymailer (#779) [link](https://github.com/yakworks/gorm-tools/commit/76c86df558edf363d31f6aba259791dd7f89909b)
+
+### v7.3.67
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.66...v7.3.67)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/2ed59ef0faf53d26718bacb29acac261c2ff7f54)
+- Merge pull request #777 from yakworks/syncjob-hotfix [link](https://github.com/yakworks/gorm-tools/commit/d5a25951ff6eb43facad321c8884f95a92651b48)
+- Log Syncjob with empty data [link](https://github.com/yakworks/gorm-tools/commit/e49fd4854697b70d249e0dd65eb7a41669cbf39b)
+
+### v7.3.66
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.65...v7.3.66)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/cce28b88c5a00860cffc23ae4049037756895b10)
+- Merge pull request #776 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/b9340955e8de5c4b48f0920469848b043e7d6f34)
+- Contact controller tests 9ci/domain9#550 (#773) [link](https://github.com/yakworks/gorm-tools/commit/a054853b6b6cac28dbdee8d4e26006e6a4ce5841)
+- Fix syncjob data update issue (#775) [link](https://github.com/yakworks/gorm-tools/commit/2736eef03c39fe965d1e55d02a73bb8c2236d93c)
+
+### v7.3.65
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.64...v7.3.65)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/239ff53e551ef651616883289f507fc79b5f726d)
+- Merge pull request #774 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/b976cfe0460890c6825c8e50240f04499a22cb0b)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/8f076a7ff948a6898c511a00217514f0ad8e6b08)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/fe362116afe0640df3dbe3a5641fc81bf03a7ce1)
+- Fix default sort by id for projections (#772) [link](https://github.com/yakworks/gorm-tools/commit/48b41889708a7e2b86e8e0a51ae4c72348e32b7b)
+- ignore test [link](https://github.com/yakworks/gorm-tools/commit/d645d9f95e8e1bc5631f15ac8e1614bb96c15b41)
+- hot fix for default sort id [link](https://github.com/yakworks/gorm-tools/commit/930ca9d423cb84b0134d155b28b0cf25a45b478c)
+- Merge pull request #766 from yakworks/list-default-sort [link](https://github.com/yakworks/gorm-tools/commit/52374fad7d113a6f8624f77d447a254957bb6162)
+- cleanup [link](https://github.com/yakworks/gorm-tools/commit/d5d32a6b42a5bd4cf54e280fa0e096e7b0cc755e)
+- remove pager from method args [link](https://github.com/yakworks/gorm-tools/commit/2696d6bff4cc5310267951e347de6a64c906cf1e)
+- Merge branch 'dev' into list-default-sort [link](https://github.com/yakworks/gorm-tools/commit/d90c75b950a5709899c25f12dd2702ae1f4706b4)
+- Merge pull request #769 from yakworks/cust-tags-search [link](https://github.com/yakworks/gorm-tools/commit/1d2b725307ecf751bde53c5ac4e7ce3a0854b25e)
+- remove tagIds support [link](https://github.com/yakworks/gorm-tools/commit/05ed4a231d09acbcb9746fde645ea3e5b3b3236e)
+- comments / add tests [link](https://github.com/yakworks/gorm-tools/commit/cde7f2c7c72f92beceee822e0a33f00a0d4fbb33)
+- Merge branch 'dev' into list-default-sort [link](https://github.com/yakworks/gorm-tools/commit/46736cbb1ff9ad96dbdd1a125d2fee8dec387bcb)
+- small fix [link](https://github.com/yakworks/gorm-tools/commit/8115311a55b7d5f0a32135782bd6bb43151d4697)
+- Support searching customer / account by tags [link](https://github.com/yakworks/gorm-tools/commit/350af3827e6ebd77b81ce573eb1bae7b32a18c4b)
+- Merge branch 'dev' into list-default-sort [link](https://github.com/yakworks/gorm-tools/commit/9f8a30612890aabbf0357a88b343dc74321c970e)
+- Merge branch 'dev' into list-default-sort [link](https://github.com/yakworks/gorm-tools/commit/449824c2dcdb67b7fb20d151a2ac79c4d0fb284e)
+- Merge branch 'dev' into list-default-sort [link](https://github.com/yakworks/gorm-tools/commit/6f279f86e778b937b573992f1227a0a22903c14f)
+- Add test [link](https://github.com/yakworks/gorm-tools/commit/285e928c05b109d4b8f350aaca1f1f6b80a4b114)
+- default sort by id [link](https://github.com/yakworks/gorm-tools/commit/fb45b1416268fb1d134537560c9510ff65588e11)
+
+### v7.3.64
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.63...v7.3.64)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/ff08f37e738a021371eb8ddf6999a006d63275d6)
+
+### v7.3.63
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.62...v7.3.63)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/bd28f356ec85dbfc433d51ec45f92144a29487af)
+
+### v7.3.62
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.61...v7.3.62)
+- release 7.3.62 [link](https://github.com/yakworks/gorm-tools/commit/ff1933b7a660c2df5ca357dc1261cc71b630ab3b)
+- Merge pull request #768 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/a03c6a87b4533e18d420f092f30cc9236730d372)
+- get org from q criteria (#765) [link](https://github.com/yakworks/gorm-tools/commit/945a2bb22469549f096978ae673c772b6f0de821)
+- Repo exception handling (#749) [link](https://github.com/yakworks/gorm-tools/commit/403e6402c48bcc043a3759bede702e414f590cf2)
+- Support querying by uuid string (#767) [link](https://github.com/yakworks/gorm-tools/commit/2a5ae8694ab31fa534716502a436246dd0e1e592)
+- #2162 Add InvalidApiCallEvent (#763) [link](https://github.com/yakworks/gorm-tools/commit/029be08cc172f21985bad8655dcdc866a2bfffe6)
+- 9ci/domain9#2440 , 9ci/cust-rndc-ext#325 (#764) [link](https://github.com/yakworks/gorm-tools/commit/746922701dad691657632f7734922396d72a4d19)
+-  Fix tidy map to use id for inquery if key exist in map list (#762) [link](https://github.com/yakworks/gorm-tools/commit/2774f07214b015ec37899c2e2a2d72a6b107f0e2)
+- Stack helper (#760) [link](https://github.com/yakworks/gorm-tools/commit/9d165043c25044271394aae4528bb69df3466be7)
+
 ### v7.3.61
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.60...v7.3.61)

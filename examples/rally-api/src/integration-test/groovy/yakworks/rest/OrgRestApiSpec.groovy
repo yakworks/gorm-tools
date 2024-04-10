@@ -2,7 +2,6 @@ package yakworks.rest
 
 import grails.gorm.transactions.Rollback
 import org.springframework.http.HttpStatus
-
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.HttpUrl
@@ -106,7 +105,53 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         body.data[0].name == "Org20"
     }
 
-    void "test sorting"() {
+    void "default sort by id"() {
+
+        when: "default sort by id asc"
+        def resp = get("${path}?q=*")
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code() == HttpStatus.OK.value()
+        body
+        body.data
+        body.data.eachWithIndex{ def entry, int i ->
+            if(i > 0) {
+                assert entry['id'] > body.data[i - 1]['id']
+            }
+        }
+
+        when: 'default sort should not apply if $sort is in q'
+        String q = '{inactive: true, $sort: {id:"desc"}}' //This should apply sort id:desc, instead of default id:asc
+        resp = get("${path}?q=$q")
+        body = bodyToMap(resp)
+
+        then: 'sorted as per $sort from q'
+        resp.code() == HttpStatus.OK.value()
+        body
+        body.data
+        body.data.eachWithIndex{ def entry, int i ->
+            if(i > 0) {
+                assert entry['id'] < body.data[i - 1]['id']
+            }
+        }
+    }
+
+    void "default sort by id should not apply with projections"() {
+        when: "there's a projection without id column"
+        def resp = get("${path}?q=*&projections="+'flex.num1:"sum",type:"group"')
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code() == HttpStatus.OK.value()
+        body
+        body.records == 5 //RallySeed creates orgs with 5 different org types, so one record for each group
+        body.data.size() == 5
+        body.data[0].type.name != null
+        body.data[0].flex.num1 != null
+    }
+
+    void "test explicit sort"() {
         when: "sort asc"
         def resp = get("${path}?q=*&sort=id&order=asc")
         Map body = bodyToMap(resp)

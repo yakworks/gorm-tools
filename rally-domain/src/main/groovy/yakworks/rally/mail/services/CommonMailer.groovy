@@ -18,6 +18,7 @@ import yakworks.handlebars.Bars
 import yakworks.rally.activity.ActivityService
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.repo.ActivityRepo
+import yakworks.rally.mail.model.ContentType
 import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.mail.model.MailerTemplate
 
@@ -47,6 +48,11 @@ class CommonMailer {
 
         String body = applyHandlebarsBody(mailerTemplate, model)
 
+        //two extra blank lines at the bottom, if plain text email
+        if(mailerTemplate.contentType == ContentType.plain) {
+            body = body + "\n\n"
+        }
+
         MailMessage msg = new MailMessage(
             state: MailMessage.MsgState.Queued,
             sendTo: sendTo,
@@ -54,7 +60,8 @@ class CommonMailer {
             replyTo: mailerTemplate.replyTo,
             subject: subject,
             tags: mailerTemplate.tags,
-            body: body + "\n\n"
+            body: body,
+            contentType: mailerTemplate.contentType
         )
         if(mailerTemplate.attachmentIds)  msg.attachmentIds = mailerTemplate.attachmentIds
         msg.persist()

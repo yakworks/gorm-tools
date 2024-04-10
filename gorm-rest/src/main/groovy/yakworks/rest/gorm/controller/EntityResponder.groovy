@@ -114,10 +114,11 @@ class EntityResponder<D> {
         // pclone.removeAll {it.key in whitelistKeys }
         try {
             QueryArgs qargs = QueryArgs.of(pager)
-            //require q if its set
-            if (pathItem?.qRequired) qargs.qRequired = true
-            qargs = qargs.build(parms)
-            qargs.validateQ()
+            .qRequired(pathItem?.qRequired)
+            .build(parms)
+            .defaultSortById()
+            .validateQ()
+
             if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.buildCriteria()}")
             ((QueryMangoEntityApi) getRepo()).queryList(qargs, null, debugEnabled ? log : null)
         } catch (JsonException | IllegalArgumentException | QueryException ex) {

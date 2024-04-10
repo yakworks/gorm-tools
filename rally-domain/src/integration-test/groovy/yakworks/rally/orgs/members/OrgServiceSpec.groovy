@@ -1,8 +1,8 @@
 package yakworks.rally.orgs.members
 
-
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import yakworks.api.problem.data.DataProblemException
 import yakworks.rally.testing.OrgDimensionTesting
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.orgs.OrgService
@@ -14,7 +14,7 @@ import spock.lang.Specification
 
 @Integration
 @Rollback
-class OrgMemberServiceSpec extends Specification implements DomainIntTest {
+class OrgServiceSpec extends Specification implements DomainIntTest {
 
     OrgService OrgService
 
@@ -113,5 +113,36 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
 
        //  cleanup:
        // initOrgDimensions(null)
+    }
+
+    void "test getPartitionOrgFromCriteria"() {
+        setup:
+        OrgType bck = OrgService.partition.type
+
+        when: "find by num"
+        OrgService.partition.type = OrgType.Division
+        Org org = OrgService.getPartitionOrgFromCriteria([org:[num:'7', type:"Division"]])
+
+        then:
+        org
+        org.id == 7
+
+        when: "by id"
+        OrgService.partition.type = OrgType.Company
+        org = OrgService.getPartitionOrgFromCriteria([org:[id:2]])
+
+        then:
+        org
+        org.id == 2
+
+        when: "not partition org"
+        OrgService.getPartitionOrgFromCriteria([org:[id:8]])
+
+        then:
+        DataProblemException ex = thrown()
+        ex.message.contains "is not a valid partition Org"
+
+        cleanup:
+        OrgService.partition.type = bck
     }
 }

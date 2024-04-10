@@ -20,7 +20,6 @@ import yakworks.api.Result
 import yakworks.api.problem.Problem
 import yakworks.api.problem.data.DataProblem
 import yakworks.rally.mail.EmailService
-import yakworks.rally.mail.MailTo
 
 /**
  * Basic service for MailGun.
@@ -46,7 +45,7 @@ class MailgunService extends EmailService {
         if(mailMsg.bcc) bldr.bcc(mailMsg.bcc)
         if(mailMsg.tags) bldr.tag(mailMsg.tags)
         if(mailMsg.text) bldr.text(mailMsg.text)
-        if(mailMsg.html) bldr.html(mailMsg.html)
+        if(mailMsg.html) bldr.html(mailMsg.html) //html will be present, when contentType=html
         if(mailMsg.attachments) bldr.attachment(mailMsg.attachments as List<File>)
 
         return bldr.build()
@@ -91,15 +90,15 @@ class MailgunService extends EmailService {
 
     EventsResponse getEvents(EventsQueryOptions queryOptions = null){
         if(queryOptions){
-            return mailgunEventsApi.getEvents(mailConfig.defaultDomain, queryOptions)
+            return mailgunEventsApi.getEvents(mailProps.defaultDomain, queryOptions)
         } else {
-            return mailgunEventsApi.getAllEvents(mailConfig.defaultDomain);
+            return mailgunEventsApi.getAllEvents(mailProps.defaultDomain);
         }
     }
 
     MailgunMessagesApi getMailgunMessagesApi() {
         if(!_mailgunMessagesApi) {
-            _mailgunMessagesApi = MailgunClient.config(mailConfig.mailgun.privateApiKey)
+            _mailgunMessagesApi = MailgunClient.config(mailProps.mailgun.privateApiKey)
                 .createApi(MailgunMessagesApi.class)
         }
         return _mailgunMessagesApi
@@ -107,7 +106,7 @@ class MailgunService extends EmailService {
 
     MailgunEventsApi getMailgunEventsApi() {
         if(!_mailgunEventsApi) {
-            _mailgunEventsApi = MailgunClient.config(mailConfig.mailgun.privateApiKey)
+            _mailgunEventsApi = MailgunClient.config(mailProps.mailgun.privateApiKey)
                 .createApi(MailgunEventsApi.class)
         }
         return _mailgunEventsApi

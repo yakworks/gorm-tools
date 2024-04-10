@@ -4,6 +4,8 @@
 */
 package yakworks.rally.activity.model
 
+import java.time.LocalDateTime
+
 import groovy.transform.CompileDynamic
 
 import gorm.tools.model.NamedEntity
@@ -61,6 +63,8 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
 
     /** The priority level generally for an Alert or Log, but can be used for other Activity Kinds */
     AlertLevel level = AlertLevel.Info
+
+    LocalDateTime actDate
 
     //
     @CompileDynamic
@@ -146,7 +150,8 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
             d: 'Who can see this activity. Defaults to Everyone',
             default: 'Everyone',
             nullable: false
-        ]
+        ],
+        actDate: [d: 'Activity date', nullable: false, oapi:'CR']
     ]
 
     /** creates an ActivityLink for the entity */

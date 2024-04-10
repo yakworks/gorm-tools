@@ -11,6 +11,7 @@ import org.codehaus.groovy.runtime.StackTraceUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSourceResolvable
 import org.springframework.dao.DataAccessException
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
@@ -39,6 +40,10 @@ import yakworks.i18n.icu.ICUMessageSource
 class ProblemHandler {
 
     @Autowired ICUMessageSource messageSource
+
+    static {
+        stackTraceUtilsDefaultFilters()
+    }
 
     GenericProblem handleException(Class entityClass, Throwable e) {
         handleException(e, entityClass.simpleName)
@@ -100,13 +105,19 @@ class ProblemHandler {
     }
 
     GenericProblem handleUnexpected(Throwable e){
-        log.error("UNEXPECTED Internal Server Error ${e.message}", StackTraceUtils.deepSanitize(e))
+        log.error("UNEXPECTED Internal Server Error\n${e.message}", StackTraceUtils.deepSanitize(e))
         if (e instanceof GenericProblem) {
             return (GenericProblem) e
         }
         else if (e instanceof ThrowableProblem) {
             return (GenericProblem) e.problem
-        } else {
+        }
+        else if (e instanceof NullPointerException) {
+            //deal with the dreaded null pointer
+            String stackLine1 = e.stackTrace[0].toString()
+            return new UnexpectedProblem().cause(e).detail("NullPointerException at ${stackLine1}")
+        }
+        else {
             return new UnexpectedProblem().cause(e).detail(e.message)
         }
     }
@@ -159,6 +170,25 @@ class ProblemHandler {
         }
     }
 
+    static String isForeignKeyViolation(DataAccessException dax) {
+        if (!dax.rootCause || !(dax instanceof DataIntegrityViolationException)) return null
+        String rootMessage = dax.rootCause.message.toLowerCase()
+        //postgres and H2 - if its DataIntegrityViolationException and contains keyword 'foreign key' thn its fk violation
+        if (rootMessage.contains("foreign key")) {
+            return rootMessage
+        } else {
+            return null
+        }
+    }
+
+    /**
+     * Broken pipe exception happens when client has closed the socket and server tries to write/send any response byte on the output stream.
+     * Server Can write nothing to output stream once we encounter Broken pipe exception
+     */
+    static boolean isBrokenPipe(Exception ex) {
+        return ex.message && ex.message.toLowerCase().contains("broken pipe")
+    }
+
     //Legacy from ValidationException
     static String formatErrors(Errors errors, String msg) {
         String ls = System.getProperty("line.separator");
@@ -175,5 +205,48 @@ class ProblemHandler {
         }
         return b.toString();
     }
+
+    @SuppressWarnings(['BooleanMethodReturnsNull'])
+    static void stackTraceUtilsDefaultFilters(){
+        StackTraceUtils.addClassTest { String className ->
+            for (String groovyPackage : (NOISY_PACKAGES + NOISY_TEST_PACKAGES)) {
+                if (className.startsWith(groovyPackage)) {
+                    return false
+                }
+            }
+            return null
+        }
+    }
+
+    //the list of packages to summarize up so logging trace is not so noisy. only logs one line if multiples start with these
+    public static List NOISY_PACKAGES = [
+        'jdk.internal.reflect.NativeMethodAccessorImpl',
+        'jdk.internal.reflect.DelegatingMethodAccessorImpl',
+        'jdk.internal.reflect.GeneratedMethodAccessor',
+        'org.springframework.web.filter.OncePerRequestFilter',
+        'org.springframework.web.filter.CharacterEncodingFilter',
+        'org.springframework.web.filter.DelegatingFilterProxy',
+        'org.springframework.security.web',
+        'org.grails.core.DefaultGrailsControllerClass',
+        'org.grails.web.servlet.mvc.GrailsWebRequestFilter',
+        'org.grails.web.filters.HiddenHttpMethodFilter',
+        'org.grails.datastore.mapping.reflect.FieldEntityAccess',
+        'org.apache.catalina.core',
+        'org.apache.tomcat.websocket.server.WsFilter',
+        'org.apache.tomcat.util.net',
+        'org.apache.tomcat.util.threads',
+        'org.apache.coyote'
+    ];
+
+    public static List NOISY_TEST_PACKAGES = [
+        'jdk.internal.reflect.NativeConstructorAccessorImpl',
+        'org.spockframework.runtime',
+        'org.spockframework.util.ReflectionUtil',
+        'org.spockframework.junit4.ExceptionAdapterInterceptor',
+        'org.junit.platform.engine.support.hierarchical',
+        'org.junit.platform.launcher.core.EngineExecutionOrchestrator',
+        //'org.gradle',
+
+    ];
 
 }

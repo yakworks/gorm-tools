@@ -103,6 +103,19 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
         //'user'      | [name: 'taggy', entityName: 'Customer']
     }
 
+    void "post org with bindId"() {
+        when:
+        Response resp = post("/api/rally/org?bindId=true", [num: 'org9999', name: "org9999", type: [id: 1], id:9999])
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code() == HttpStatus.CREATED.value()
+        body.id == 9999
+
+        cleanup:
+        if(body.id) delete("${getPath("rally/org")}/${body.id}")
+    }
+
     @Unroll
     def "PUT update: #entity/#id"(String entity, Long id, String prop, String val) {
         setup:

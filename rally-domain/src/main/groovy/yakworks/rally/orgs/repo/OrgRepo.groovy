@@ -5,7 +5,9 @@
 package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.validation.Errors
 
 import gorm.tools.mango.MangoDetachedCriteria
@@ -13,20 +15,23 @@ import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
 import grails.gorm.DetachedCriteria
-import yakworks.commons.beans.Transform
 import yakworks.rally.orgs.model.Org
-import yakworks.rally.orgs.model.OrgTag
 
 @GormRepository
 @CompileStatic
+@Slf4j
 class OrgRepo extends AbstractOrgRepo {
+
+    @Autowired(required = false)
+    OrgTagRepo orgTagRepo
 
 
     // add @Override
     @RepoListener
     void beforeValidate(Org org, Errors errors) {
         super.beforeValidate(org, errors)
-        wireOrgMember(org)
+        //dont try to setup member if it has any errors
+        if(!errors.hasErrors()) wireOrgMember(org)
         //verifyCompany(org)
     }
 
@@ -46,20 +51,15 @@ class OrgRepo extends AbstractOrgRepo {
      */
     @Override
     MangoDetachedCriteria<Org> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure = null) {
-        List critTags = queryArgs.qCriteria.remove('tags') as List
-        List critTagIds = queryArgs.qCriteria.remove('tagIds') as List
 
+        DetachedCriteria tagCriteria = orgTagRepo.getExistsCriteria(queryArgs.qCriteria)
         DetachedCriteria<Org> detCrit = getMangoQuery().query(Org, queryArgs, closure)
 
         //if it has tags key
-        if(critTags){
-            //convert to id long list
-            List<Long> tagIds = Transform.objectToLongList(critTags)
-            detCrit.exists(OrgTag.buildExistsCriteria(tagIds))
-        } else if(critTagIds) {
-            //should be list of id if this key is present
-            detCrit.exists(OrgTag.buildExistsCriteria(critTagIds))
+        if(tagCriteria != null) {
+            detCrit.exists(tagCriteria)
         }
+
         return detCrit
     }
 }

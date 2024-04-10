@@ -4,6 +4,8 @@
 */
 package gorm.tools.mango
 
+import java.util.UUID
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -70,7 +72,8 @@ class MangoBuilder {
 
     public <D> MangoDetachedCriteria<D> buildWithQueryArgs(Class<D> clazz, QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
         MangoDetachedCriteria<D> mangoCriteria = new MangoDetachedCriteria<D>(clazz)
-        Map criteria = qargs.criteria //will be copy if sort exists
+        Map criteria = qargs.buildCriteria()
+        //will be copy if sort exists
         def tidyMap = MangoTidyMap.tidy(criteria)
         applyMapOrList(mangoCriteria, tidyMap)
 
@@ -411,6 +414,9 @@ class MangoBuilder {
             }
             else if (typeToConvertTo.isEnum()) {
                 v = EnumUtils.getEnum(typeToConvertTo, (String)v)
+            }
+            else if (UUID.isAssignableFrom(typeToConvertTo)) {
+                v = UUID.fromString((String)v)
             }
 
         }

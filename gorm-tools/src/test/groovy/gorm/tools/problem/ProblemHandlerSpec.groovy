@@ -26,17 +26,17 @@ class ProblemHandlerSpec extends Specification implements DataRepoTest {
         1 == 1.0
     }
 
-    // def 'Unhandled Problem'() {
-    //     when:
-    //     def problem = problemHandler.handleException(new RuntimeException("test error"))
-    //
-    //     then:
-    //     problem.status == INTERNAL_SERVER_ERROR
-    //     problem.code == 'error.unhandled'
-    //     // problem.title == 'Unhandled Problem'
-    //     problem.detail == "test error"
-    //     //FIXME finish showing stacktrace
-    // }
+    def 'Unhandled Problem'() {
+        when:
+        def problem = problemHandler.handleException(new RuntimeException("test error"))
+
+        then:
+        problem.status.code == 500
+        problem.code == 'error.unexpected'
+        // problem.title == 'Unhandled Problem'
+        problem.detail == "test error"
+        //FIXME finish showing stacktrace
+    }
 
     void 'WTF'() {
         when:
@@ -72,5 +72,12 @@ class ProblemHandlerSpec extends Specification implements DataRepoTest {
          errors.hasFieldErrors("name")
          errors.hasFieldErrors('type')
      }
+
+    void "test is broken pipe"() {
+        expect:
+        !ProblemHandler.isBrokenPipe(new RuntimeException("test"))
+        ProblemHandler.isBrokenPipe(new IOException("broken pipe"))
+        ProblemHandler.isBrokenPipe(new IOException("java.io.IOException: Broken pipe"))
+    }
 
 }

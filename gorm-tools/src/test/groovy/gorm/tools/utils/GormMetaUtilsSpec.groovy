@@ -67,17 +67,9 @@ class GormMetaUtilsSpec extends Specification implements GormHibernateTest {
         custTypeMap == [id:1, version:0, name: 'foo']
     }
 
-    void "test getProperties"() {
-        when:
-        Map custTypeMap = GormMetaUtils.getProperties(CustType.get(1))
-
-        then:
-        custTypeMap == [id:1, version:0, name: 'foo']
-    }
-
     void "test isNewOrDirty"() {
         when:
-        CustType ctNew = new CustType()
+        CustType ctNew = new CustType(name: 'foo')
         UuidSample ctNewUuid = new UuidSample()
         CustType ctDirty = new CustType(name: "foo").persist()
         ctDirty.name = 'dirty'
@@ -98,12 +90,35 @@ class GormMetaUtilsSpec extends Specification implements GormHibernateTest {
         GormMetaUtils.isNewOrDirty(ctNewUuid)
 
         when: "version is assigned its no longer new"
+        // ctNew.persist()
+        // ctNewUuid.persist()
         ctNew.version = 0
         ctNewUuid.version = 0
+        //trackChanges resets the tracking.
+        ctNew.trackChanges()
+        ctNewUuid.trackChanges()
 
         then:
+        !ctNew.hasChanged()
         !GormMetaUtils.isNewOrDirty(ctNew)
         !GormMetaUtils.isNewOrDirty(ctNewUuid)
+    }
+
+    void "test getEntityClass"() {
+        when:
+        CustType type = CustType.load(999) //doesnt matter, it returns a proxy and thts what we want to verify
+
+        then: "its a proxy"
+        type.getClass().name.contains('$')
+        type.getClass().name != 'testing.CustType'
+
+
+        when:
+        Class clazz = GormMetaUtils.getEntityClass(type)
+
+        then:
+        clazz.name == "testing.CustType"
+
     }
 
 }

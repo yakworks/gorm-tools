@@ -119,7 +119,7 @@ class OrgSourceRepo extends LongIdGormRepo<OrgSource> {
 
     boolean exists(SourceType sourceType, String sourceId, OrgType orgType) {
         if( !orgSourcExistsQuery ) orgSourcExistsQuery = ComboKeyExistsQuery.of(getEntityClass())
-            .keyNames(['sourceType','sourceId','orgType'])
+            .keyNames(['sourceType', 'sourceId', 'orgType'])
         return orgSourcExistsQuery.exists(sourceType: sourceType, sourceId: sourceId, orgType: orgType)
     }
 

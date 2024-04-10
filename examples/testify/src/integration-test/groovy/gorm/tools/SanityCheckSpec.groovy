@@ -1,5 +1,7 @@
 package gorm.tools
 
+import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.OrgFlex
 import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration

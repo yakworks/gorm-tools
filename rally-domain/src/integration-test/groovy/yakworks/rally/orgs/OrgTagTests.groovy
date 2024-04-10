@@ -128,8 +128,8 @@ class OrgTagTests extends Specification implements DomainIntTest {
     void "copyToOrg"() {
         setup:
         setUpData()
-        Org from = Org.of("T01", "T01", OrgType.Customer.id).persist()
-        Org to = Org.of("T01", "T01", OrgType.Customer.id).persist()
+        Org from = Org.of("T01", "T01", OrgType.Customer).persist()
+        Org to = Org.of("T01", "T01", OrgType.Customer).persist()
         flush()
 
         orgTagRepo.create(from, Tag.load(1))
@@ -238,7 +238,6 @@ class OrgTagTests extends Specification implements DomainIntTest {
             return orgCrit
         }
 
-
         List hasTag1 = orgCrit([1]).list()
         List hasTag2 = orgCrit([2]).list()
         List has1or2 = orgCrit([1, 2]).list()
@@ -248,6 +247,11 @@ class OrgTagTests extends Specification implements DomainIntTest {
         hasTag2.size() == 2
         has1or2.size() == 4
 
+        when: "query by tags"
+        List<Org> orgs = Org.query([tags:[[id:1]]]).list()
+
+        then:
+        3 == orgs.size()
     }
 
     void "criteria default org map" () {
@@ -255,13 +259,13 @@ class OrgTagTests extends Specification implements DomainIntTest {
         addTagsForSearch()
 
         def orgCrit = { tagList ->
-            return Org.query(tagIds: tagList)
+            return Org.query(tags: tagList)
         }
 
 
-        List hasTag1 = orgCrit([1]).list()
-        List hasTag2 = orgCrit([2]).list()
-        List has1or2 = orgCrit([1, 2]).list()
+        List hasTag1 = orgCrit([[id:1]]).list()
+        List hasTag2 = orgCrit([[id:2]]).list()
+        List has1or2 = orgCrit([[id:1], [id:2]]).list()
 
         then:
         hasTag1.size() == 3

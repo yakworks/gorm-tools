@@ -9,6 +9,7 @@ import org.hibernate.criterion.Projections
 import org.hibernate.type.StandardBasicTypes
 import org.hibernate.type.Type
 import spock.lang.Ignore
+import spock.lang.IgnoreRest
 import spock.lang.Issue
 import spock.lang.Specification
 import yakworks.commons.model.SimplePagedList
@@ -76,11 +77,31 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
             ]
         ])
 
-        SimplePagedList sumbObj = qry.mapList(max:10)
+        List<Map> sumbObj = qry.mapList(max:10)
 
         then:
         sumbObj.size() == 1
         sumbObj.totalCount == 1
+    }
+
+    void "mapList with pagination"() {
+        MangoDetachedCriteria qry = Org.query([projections: ['calc.totalDue':'sum', 'type': 'group']])
+
+        when: "there's 1 record in last page"
+        List results = qry.mapList(max:2, offset:4)
+
+        then:
+        results
+        results.totalCount == 5
+        results.size() == 1
+
+        when: "max = 1"
+        results = qry.mapList(max:1)
+
+        then:
+        results
+        results.totalCount == 5
+        results.size() == 1
     }
 
     def "sum projections with type groupBy having on sum"() {
@@ -155,8 +176,8 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
         //there are 5 types, one for each type
         sumbObj.size() == 5
         sumbObj[0]['type'] == OrgType.Client
-        sumbObj[0]['calc_totalDue'] < sumbObj[1]['calc_totalDue']
-        sumbObj[1]['calc_totalDue'] < sumbObj[2]['calc_totalDue']
+        sumbObj[0]['calc']['totalDue'] < sumbObj[1]['calc']['totalDue']
+        sumbObj[1]['calc']['totalDue'] < sumbObj[2]['calc']['totalDue']
     }
 
     def "sum and groupby methods order desc"() {
@@ -170,8 +191,8 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
         //there are 5 types, one for each type
         sumbObj.size() == 5
         sumbObj[0]['type'] == OrgType.Customer
-        sumbObj[0]['calc_totalDue'] > sumbObj[1]['calc_totalDue']
-        sumbObj[1]['calc_totalDue'] > sumbObj[2]['calc_totalDue']
+        sumbObj[0]['calc']['totalDue'] > sumbObj[1]['calc']['totalDue']
+        sumbObj[1]['calc']['totalDue'] > sumbObj[2]['calc']['totalDue']
     }
 
     def "sum with QueryArgs"() {
@@ -252,10 +273,10 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
                 property("contact.id")
                 property("contact.name")
             }
-            lte("id", 5)
+            lte("id", 5L)
         }
 
-        def sumbObj = qry.list()
+        def sumbObj = qry.mapList()
 
         then:
         sumbObj.size() == 5

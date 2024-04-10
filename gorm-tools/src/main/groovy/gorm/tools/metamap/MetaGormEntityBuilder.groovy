@@ -18,7 +18,7 @@ import org.grails.datastore.mapping.model.types.ToMany
 
 import gorm.tools.utils.GormMetaUtils
 import grails.gorm.validation.ConstrainedProperty
-import yakworks.commons.lang.PropertyTools
+import yakworks.commons.beans.PropertyTools
 import yakworks.gorm.api.IncludesConfig
 import yakworks.meta.MetaEntity
 import yakworks.meta.MetaProp

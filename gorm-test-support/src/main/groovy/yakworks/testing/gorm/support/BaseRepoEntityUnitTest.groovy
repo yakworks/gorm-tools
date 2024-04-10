@@ -24,8 +24,8 @@ import gorm.tools.validation.RepoEntityValidator
 import gorm.tools.validation.RepoValidatorRegistry
 import grails.config.Config
 import grails.core.GrailsApplication
-import yakworks.commons.lang.PropertyTools
-import yakworks.testing.grails.SpringBeanUtils
+import yakworks.commons.beans.PropertyTools
+import yakworks.gorm.boot.SpringBeanUtils
 
 /**
  * Base trait for mocking spring beans needed to test repository's and domain entities.

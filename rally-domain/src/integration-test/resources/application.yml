@@ -11,7 +11,7 @@ logging:
     #    org.hibernate.orm.deprecation: INFO # turns on deprecation notices
     # uncomment to turn on sql logging
 #    org.hibernate.stat: DEBUG
-    org.hibernate.SQL: DEBUG
+#    org.hibernate.SQL: DEBUG
 #     shows the sql parameters
 #    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
@@ -24,8 +24,12 @@ app:
   # see MailConfig class
   mail:
     enabled: true
-    default-domain: mg.greenbill.io
-    mailgun:
-      # enabled: true
-      private-api-key: zzz
+    # the testing domain for mailgun, need to go here and add your email to be verified
+    # https://app.mailgun.com/app/sending/domains/sandbox597489f7971340b583ee0a01ba7d313a.mailgun.org
+    default-domain: sandbox597489f7971340b583ee0a01ba7d313a.mailgun.org
 
+    # Uncomment this to do a real email test and add the key, this will disable the TestMailService and use the real one.
+#    mailgun:
+#      enabled: true
+#      # ⁉️⛔️DO NOT CHECK THE private-api-key INTO GITHUB OR MAILGUN WILL SUSPEND US!!! ⁉️⛔️
+#      private-api-key: 9c7c1eddae....

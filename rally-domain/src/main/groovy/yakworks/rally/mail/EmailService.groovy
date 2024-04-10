@@ -21,7 +21,7 @@ import yakworks.rally.mail.config.MailProps
 @CompileStatic
 abstract class EmailService {
 
-    @Inject MailProps mailConfig
+    @Inject MailProps mailProps
 
     /**
      * calls mailgunMessagesApi.sendMessage
@@ -32,7 +32,7 @@ abstract class EmailService {
      * calls mailgunMessagesApi.sendMessage using the MailgunConfig.defaultDomain
      */
     Result send(MailTo mailMsg){
-        return send(mailConfig.defaultDomain, mailMsg)
+        return send(mailProps.defaultDomain, mailMsg)
     }
 
     /**
@@ -45,4 +45,55 @@ abstract class EmailService {
         return Result.OK()
     }
 
+    /**
+     * The class is used for sending messages(emails) using the Email and Mailgun API.
+     */
+    static class MailTo {
+
+        /** Email address for From header */
+        String from
+
+        /**
+         * Email address of the recipient(s).
+         * can also be a single item with emails in the standard comma seperated format.
+         */
+        List<String> to
+
+        /**
+         * Same as {@link #to} but for Cc.
+         * can alos be a single item with emails in standard comma seperated format.
+         */
+        List<String> cc
+
+        /**
+         * Same as {@link #to} but for Bcc.
+         * can also be a single item with emails in standard comma seperated format.
+         */
+        List<String> bcc
+
+        /** Message subject.*/
+        String subject
+
+        /** Body of the message. (text version) */
+        String text
+
+        /** Body of the message. (HTML version) */
+        String html
+
+        /** File attachment */
+        List<File> attachments;
+
+        /** Attachment with inline disposition. */
+        List<File> inline;
+
+        /** Name of a template stored via template API */
+        String template;
+
+        /** Tag string for mailgun*/
+        List<String> tags;
+
+        /** Specify Reply-To address */
+        String replyTo;
+
+    }
 }

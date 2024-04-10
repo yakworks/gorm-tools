@@ -81,7 +81,7 @@ class EntityResponder<D> {
     /**
      * respond with instance, calls ctrl.respondWith after it creates and entityMap
      */
-    void respondWith(RestRegistryResponder ctrl, D instance, Map params, HttpStatus status = HttpStatus.OK){
+    void respondWith(RestResponderTrait ctrl, D instance, Map params, HttpStatus status = HttpStatus.OK){
         MetaMap entityMap = createEntityMap(instance, params)
         ctrl.respondWith(entityMap, [status: status, params: params])
     }
@@ -114,11 +114,12 @@ class EntityResponder<D> {
         // pclone.removeAll {it.key in whitelistKeys }
         try {
             QueryArgs qargs = QueryArgs.of(pager)
-            //require q if its set
-            if (pathItem?.qRequired) qargs.qRequired = true
-            qargs = qargs.build(parms)
-            qargs.validateQ()
-            if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.criteria}")
+            .qRequired(pathItem?.qRequired)
+            .build(parms)
+            .defaultSortById()
+            .validateQ()
+
+            if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.buildCriteria()}")
             ((QueryMangoEntityApi) getRepo()).queryList(qargs, null, debugEnabled ? log : null)
         } catch (JsonException | IllegalArgumentException | QueryException ex) {
             //See #1925 - Catch bad query in 'q' parameter and report back. So we dont pollute logs, and can differentiate that its not us.

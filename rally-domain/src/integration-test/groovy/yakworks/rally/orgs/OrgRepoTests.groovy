@@ -14,6 +14,7 @@ import org.springframework.dao.DataRetrievalFailureException
 
 import gorm.tools.model.SourceType
 import gorm.tools.problem.ValidationProblem
+import yakworks.rally.testing.OrgDimensionTesting
 import yakworks.testing.gorm.TestDataJson
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
@@ -121,7 +122,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         def params = MockData.createOrg
         params.num = '9' //should already exist in test db
         //flush during create so it forces the error catching
-        def org = orgRepo.create(Maps.deepCopy(params), [flush: true])
+        def org = orgRepo.create(Maps.clone(params), [flush: true])
         // orgRepo.flush()
 
         then:
@@ -141,7 +142,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
             name: 'testComp',
             type: 'Customer'
         ]
-        orgRepo.create(Maps.deepCopy(params))
+        orgRepo.create(Maps.clone(params))
         orgRepo.flush()
 
         then:
@@ -244,7 +245,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
     void "test insert with orgmembers"() {
         given:
-        orgDimensionService.testInit('Branch.Division.Business')
+        OrgDimensionTesting.setDimensions(['Branch', 'Division', 'Business'])
         Org division = Org.of("Division", "Division", OrgType.Division).persist()
         division.member = OrgMember.make(division)
         division.member.business = Org.of("Business", "Business", OrgType.Business).persist()
@@ -281,7 +282,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         result.member.business == division.member.business
 
         cleanup:
-        orgDimensionService.testInit(null)
+        OrgDimensionTesting.resetDimensions()
     }
 
     void "delete should fail when source is ERP"() {
@@ -303,8 +304,9 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         Contact contact2 = Contact.findWhere(num: 'secondary9')
         OrgCalc calc = new OrgCalc(id:org.id).persist()
         org.calc = calc
-        org.member = OrgMember.make(org).persist()
-        org.persist(flush:true)
+        assert org.member
+        // org.member = OrgMember.make(org).persist()
+        // org.persist(flush:true)
 
         then:
         contact
@@ -372,23 +374,23 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
         expect:
         org.source.sourceId == "foo"
-        Org.repo.lookup([source: [sourceId: 'foo', orgType: 'Customer']])
+        orgRepo.lookup([source: [sourceId: 'foo', orgType: 'Customer']])
 
         when:
-        Org o = Org.repo.findWithData([source: [sourceId: 'foo', orgType: 'Customer']])
+        Org o = orgRepo.findWithData([source: [sourceId: 'foo', orgType: 'Customer']])
 
         then: "source id is the default"
         o != null
 
         when: "findWithData has type in daya"
         flushAndClear()
-        o = Org.repo.findWithData([type: 'Customer', source: [sourceId: 'foo']])
+        o = orgRepo.findWithData([type: 'Customer', source: [sourceId: 'foo']])
 
         then: "source id is the default"
         o
 
         expect: "lookup by sourceid contained in org map"
-        Org.repo.lookup([type: 'Customer', org:[source: [sourceId: 'foo']]]) != null
+        orgRepo.lookup([type: 'Customer', org:[source: [sourceId: 'foo']]]) != null
     }
 
 
@@ -398,16 +400,16 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         orgRepo.flush()
 
         expect:
-        Org.repo.lookup(num: "foo3")
+        orgRepo.lookup(num: "foo3")
 
         when:
-        Org o3 = Org.repo.findWithData(num: "foo3")
+        Org o3 = orgRepo.findWithData(num: "foo3")
 
         then: "found because unique"
         o3 != null
 
         when:
-        o3 = Org.repo.findWithData(num: "foo3", type: OrgType.Customer)
+        o3 = orgRepo.findWithData(num: "foo3", type: OrgType.Customer)
 
         then: "also found"
         o3 != null
@@ -439,16 +441,16 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         orgRepo.flush()
 
         expect:
-        Org.repo.lookup(num: "foo", type: OrgType.Customer)
+        orgRepo.lookup(num: "foo", type: OrgType.Customer)
 
         when:
-        Org o3 = Org.repo.findWithData(num: "foo", type: OrgType.Customer)
+        Org o3 = orgRepo.findWithData(num: "foo", type: OrgType.Customer)
 
         then: "found because data has type"
         o3
 
         when: "will uses type"
-        o3 = Org.repo.findWithData(source:[ sourceId: "foo"], type: OrgType.Customer)
+        o3 = orgRepo.findWithData(source:[ sourceId: "foo"], type: OrgType.Customer)
 
         then: "not found because not unique"
         o3
@@ -481,7 +483,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         org.source.sourceId == 'foo'
 
         when: "just sourceid is passed"
-        def result = Org.repo.lookup(sourceId:"foo", type:org.type)
+        def result = orgRepo.lookup(sourceId:"foo", type:org.type)
 
         then:
         result == org
@@ -489,7 +491,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
     void "create org with member branch lookup by num"() {
         setup:
-        orgDimensionService.testInit('Customer.Branch')
+        OrgDimensionTesting.setDimensions([OrgType.Customer, OrgType.Branch])
         Org branch = Org.findByOrgTypeId(OrgType.Branch.id)
 
         expect:
@@ -508,7 +510,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         branch.id == org.member.branch.id
 
         cleanup:
-        orgDimensionService.testInit(null)
+        OrgDimensionTesting.resetDimensions()
     }
 
 }

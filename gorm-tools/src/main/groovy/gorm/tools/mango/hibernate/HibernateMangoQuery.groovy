@@ -91,7 +91,12 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
      */
     @CompileDynamic
     Criteria getHibernateCriteria() {
-        return super.@criteria
+        Criteria crit = super.@criteria
+        if(crit) {
+            //XXX FIXME take it from config
+            crit.setTimeout(10)
+        }
+        return crit
     }
 
     /** implements abstract, copied in from HibernateQuery */

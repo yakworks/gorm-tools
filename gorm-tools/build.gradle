@@ -26,7 +26,7 @@ dependencies {
   api ("org.yakworks:grails-kit:$vSpringGrailsKit")
   api "org.yakworks:grails-icu4j:$vYakICU4J"
   api "org.yakworks:groovy-commons:$vGroovyCommons"
-
+  api project(":boot-security")
   // see https://github.com/f4b6a3/uuid-creator
   api "com.github.f4b6a3:uuid-creator:$vUuidCreator"
   //add the hibernate types for json fields.
@@ -44,7 +44,7 @@ dependencies {
   testImplementation "ch.qos.logback:logback-classic:1.2.11"
 
   testImplementation project(":gorm-test-domain")
-  testImplementation project(":boot-security")
+
 
 }
 

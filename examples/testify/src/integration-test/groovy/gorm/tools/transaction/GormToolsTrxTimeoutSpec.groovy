@@ -31,6 +31,7 @@ class GormToolsTrxTimeoutSpec extends Specification {
         gormToolsPreQueryEventListener
         gormToolsPreQueryEventListener.extendedQueryTimeout == 120
         gormToolsPreQueryEventListener.users.size() == 1
+        gormToolsPreQueryEventListener.users.contains 'admin'
     }
 
 

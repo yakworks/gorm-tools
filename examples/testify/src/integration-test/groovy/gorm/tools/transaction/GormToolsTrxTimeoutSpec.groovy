@@ -5,7 +5,6 @@ import gorm.tools.hibernate.GormToolsTrxManagerBeanPostProcessor
 import grails.gorm.transactions.Transactional
 import grails.testing.mixin.integration.Integration
 import org.grails.orm.hibernate.GrailsHibernateTransactionManager
-import org.hibernate.QueryTimeoutException
 import org.springframework.transaction.TransactionTimedOutException
 import org.springframework.transaction.annotation.Propagation
 import spock.lang.Specification

@@ -30,11 +30,13 @@ class GormToolsPreQueryEventListener implements ApplicationListener<PreQueryEven
     @CompileDynamic
     void onApplicationEvent(PreQueryEvent event) {
 
-        int queryTimeout = queryTimeoutConfig.query
+        Integer queryTimeout = queryTimeoutConfig.query
 
         if(extendedQueryTimeoutEnabledForCurrentUser()) {
             queryTimeout = queryTimeoutConfig.users[currentUser.user.username].queryTimeout
         }
+
+        if(queryTimeout <= 0) return
 
 
         //this would set query timeout on underlying jdbc statement.

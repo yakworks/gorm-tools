@@ -23,6 +23,7 @@ import gorm.tools.async.ParallelTools
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.hibernate.GormToolsPreQueryEventListener
 import gorm.tools.hibernate.GormToolsTrxManagerBeanPostProcessor
+import gorm.tools.hibernate.QueryTimeoutConfig
 import gorm.tools.idgen.IdGenerator
 import gorm.tools.idgen.JdbcIdGenerator
 import gorm.tools.idgen.PooledIdGenerator
@@ -44,7 +45,7 @@ import yakworks.gorm.config.IdGeneratorConfig
 
 @Configuration(proxyBeanMethods = false)
 @Lazy
-@EnableConfigurationProperties([AsyncConfig, GormConfig, IdGeneratorConfig])
+@EnableConfigurationProperties([AsyncConfig, GormConfig, IdGeneratorConfig, QueryTimeoutConfig])
 @CompileStatic
 class GormToolsConfiguration {
 

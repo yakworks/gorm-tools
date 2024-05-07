@@ -1,11 +1,11 @@
-
 spring.transaction.default-timeout: 60
 
 # Longer query timeout for specific users.
 yakworks:
   gorm:
-    hibernate:
-      user-query-timeout:
-        value: 120
-        users:
-          - admin
+    timeouts:
+      query: 60
+      transaction: 120
+      users:
+        admin:
+          query-timeout: 120

@@ -4,6 +4,8 @@
 */
 package gorm.tools.hibernate
 
+import javax.inject.Inject
+
 import groovy.transform.CompileStatic
 
 import org.grails.orm.hibernate.GrailsHibernateTransactionManager
@@ -17,17 +19,16 @@ import org.springframework.beans.factory.config.BeanPostProcessor
 @CompileStatic
 class GormToolsTrxManagerBeanPostProcessor implements BeanPostProcessor {
 
+    @Inject QueryTimeoutConfig queryTimeoutConfig
+
     /**
      * Sets default transaction timeout for transactions.
      * Default value is -1 which is same as TransactionDefinition.TIMEOUT_DEFAULT
      */
-    @Value('${spring.transaction.default-timeout:-1}')
-    Integer transactionTimeout
-
     @Override
     def postProcessAfterInitialization(Object bean, String beanName) {
         if(bean instanceof GrailsHibernateTransactionManager) {
-            bean.setDefaultTimeout(transactionTimeout)
+            bean.setDefaultTimeout(queryTimeoutConfig.transaction)
         }
         return bean
     }

@@ -2,6 +2,7 @@ package gorm.tools.transaction
 
 import gorm.tools.hibernate.GormToolsPreQueryEventListener
 import gorm.tools.hibernate.GormToolsTrxManagerBeanPostProcessor
+import gorm.tools.hibernate.QueryTimeoutConfig
 import grails.gorm.transactions.Transactional
 import grails.testing.mixin.integration.Integration
 import org.grails.orm.hibernate.GrailsHibernateTransactionManager
@@ -18,33 +19,48 @@ class GormToolsTrxTimeoutSpec extends Specification {
     @Inject GormToolsTrxManagerBeanPostProcessor gormToolsTrxManagerBeanPostProcessor
     @Inject GrailsHibernateTransactionManager grailsHibernateTransactionManager
     @Inject GormToolsPreQueryEventListener gormToolsPreQueryEventListener
+    @Inject QueryTimeoutConfig queryTimeoutConfig
 
     void "sanity check trx timeout"() {
         expect: "should be picked up from config"
-        gormToolsTrxManagerBeanPostProcessor.transactionTimeout == 60
-        grailsHibernateTransactionManager.defaultTimeout == 60
+        gormToolsTrxManagerBeanPostProcessor.queryTimeoutConfig.transaction == 120
+        grailsHibernateTransactionManager.defaultTimeout == 120
     }
 
     void "sanity check prequery listener"() {
         expect:
         gormToolsPreQueryEventListener
-        gormToolsPreQueryEventListener.extendedQueryTimeout == 120
-        gormToolsPreQueryEventListener.users.size() == 1
-        gormToolsPreQueryEventListener.users.contains 'admin'
+        queryTimeoutConfig.query == 60
+        queryTimeoutConfig.transaction == 120
+        queryTimeoutConfig.users.size() == 1
+        queryTimeoutConfig.users.containsKey 'admin'
+        queryTimeoutConfig.users.admin.queryTimeout == 120
     }
 
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    void timeout() {
-        Thread.sleep(60 * 1000)
+    void timeout(int seconds) {
+        Thread.sleep(seconds * 1000)
         Org.get(1)
     }
 
-    void "test timeout"() {
+    void "test trx timeout"() {
         when:
-        timeout()
+        timeout(121)
 
-        then:
+        then: "trx should timeout with 120 sec delay"
+        TransactionTimedOutException ex = thrown()
+    }
+
+    //XXX @Josh here's the problem
+    //Every time before firing a query, hibernate calculates remaning time for the query based on the trx timeout
+    //Hence, whatever value is set as query timeout will always get overriden when we have trx timeout
+    //See StatementPreparerImpl.java line 200
+    void "test query timeout"() {
+        when:
+        timeout(60)
+
+        then: "trx should timeout with 120 sec delay"
         TransactionTimedOutException ex = thrown()
     }
 }

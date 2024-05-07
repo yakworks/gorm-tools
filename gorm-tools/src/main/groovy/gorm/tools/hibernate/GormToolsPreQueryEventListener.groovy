@@ -12,7 +12,6 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.mapping.query.event.PreQueryEvent
 import org.grails.orm.hibernate.query.AbstractHibernateQuery
 import org.grails.orm.hibernate.query.HibernateHqlQuery
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationListener
 
 import yakworks.security.user.CurrentUser
@@ -25,29 +24,29 @@ import yakworks.security.user.CurrentUser
 class GormToolsPreQueryEventListener implements ApplicationListener<PreQueryEvent> {
 
     @Inject CurrentUser currentUser
-
-    @Value('${yakworks.gorm.hibernate.user-query-timeout.value:-1}')
-    Integer extendedQueryTimeout
-
-    @Value('${yakworks.gorm.hibernate.user-query-timeout.users}')
-    List<String> users
-
+    @Inject QueryTimeoutConfig queryTimeoutConfig
 
     @Override
     @CompileDynamic
     void onApplicationEvent(PreQueryEvent event) {
-        if(!extendedQueryTimeoutEnabledForCurrentUser()) return
+
+        int queryTimeout = queryTimeoutConfig.query
+
+        if(extendedQueryTimeoutEnabledForCurrentUser()) {
+            queryTimeout = queryTimeoutConfig.users[currentUser.user.username].queryTimeout
+        }
+
 
         //this would set query timeout on underlying jdbc statement.
         if(event.query instanceof AbstractHibernateQuery) {
-            ((AbstractHibernateQuery)event.query).@criteria.setTimeout(extendedQueryTimeout)
+            ((AbstractHibernateQuery)event.query).@criteria.setTimeout(queryTimeout)
         } else if (event.query instanceof HibernateHqlQuery) {
-            ((HibernateHqlQuery)event.query).query.setTimeout(extendedQueryTimeout)
+            ((HibernateHqlQuery)event.query).query.setTimeout(queryTimeout)
         }
     }
 
     boolean extendedQueryTimeoutEnabledForCurrentUser() {
-        if(!users || !currentUser || !currentUser.loggedIn) return false
-        return (extendedQueryTimeout != -1 && users.contains(currentUser.user.username))
+        if(!queryTimeoutConfig.users || !currentUser || !currentUser.loggedIn) return false
+        return (queryTimeoutConfig.users.containsKey(currentUser.user.username))
     }
 }

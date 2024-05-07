@@ -19,7 +19,7 @@ class QueryTimeoutConfig {
     Integer query
 
     //transaction timeout
-    @Value('${spring.transaction.default-timeout}')
+    @Value('${spring.transaction.default-timeout:-1}')
     Integer transaction
 
     //User specific timeouts

@@ -5,8 +5,11 @@
 package gorm.tools.databinding
 
 import groovy.transform.CompileStatic
-
+import org.grails.datastore.gorm.GormEnhancer
+import org.grails.datastore.gorm.GormStaticApi
+import org.grails.datastore.mapping.model.PersistentEntity
 import spock.lang.Ignore
+import spock.lang.IgnoreRest
 import yakworks.commons.lang.IsoDateUtil
 import gorm.tools.repository.model.RepoEntity
 import yakworks.testing.gorm.unit.DataRepoTest
@@ -581,6 +584,67 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         testDomain.active == null
     }
 
+    void "bind update : blank out values with empty strings"() {
+        given:
+        TestDomain testDomain = testDomainInstance()
+
+        when: "empty strings"
+        Map params = [
+            name:"",
+            age:"",
+            amount: "",
+            active: "",
+            localDate: "",
+            testEnum: "",
+            anotherDomain: null //empty values  doesnt set an association to null
+        ]
+
+        binder.bind(testDomain, params)
+
+        then:
+        noExceptionThrown()
+        verifyAllNull(testDomain)
+    }
+
+    void "bind update : blank out values with null"() {
+        given:
+        TestDomain testDomain = testDomainInstance()
+
+        when: "empty strings"
+        Map params = [
+            name:null,
+            age:null,
+            amount: null,
+            active: null,
+            localDate: null,
+            testEnum: null,
+            anotherDomain: null
+        ]
+
+        binder.bind(testDomain, params)
+
+        then:
+        noExceptionThrown()
+    }
+
+    TestDomain testDomainInstance() {
+        AnotherDomain nested = new AnotherDomain(name:"test")
+        TestDomain testDomain = new TestDomain(name:"test", age:40, amount: 100.00, active:true, localDate:LocalDate.now(), testEnum:"FOO")
+        testDomain.anotherDomain = nested
+
+        return testDomain
+    }
+
+    void verifyAllNull(def object) {
+
+        GormStaticApi gormStaticApi = GormEnhancer.findStaticApi(object.getClass() as Class)
+        PersistentEntity entity = gormStaticApi.gormPersistentEntity
+        List<String> properties = entity.persistentPropertyNames
+
+        properties.each {
+            assert object[it] == null
+        }
+    }
 }
 
 

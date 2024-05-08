@@ -1,6 +1,6 @@
 package yakworks.hibernate
 
-import gorm.tools.hibernate.GormToolsTrxManagerBeanPostProcessor
+
 import grails.testing.mixin.integration.Integration
 import org.grails.orm.hibernate.GrailsHibernateTransactionManager
 import spock.lang.Specification

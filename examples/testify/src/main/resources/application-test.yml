@@ -5,7 +5,10 @@ yakworks:
   gorm:
     timeouts:
       query: 60
-      transaction: 120
-      users:
-        admin:
-          query-timeout: 120
+      #transaction: 120
+
+app:
+  security:
+    users:
+      admin:
+        query-timeout: 120

@@ -22,8 +22,8 @@ import gorm.tools.async.ParallelStreamTools
 import gorm.tools.async.ParallelTools
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.hibernate.GormToolsPreQueryEventListener
-import gorm.tools.hibernate.GormToolsTrxManagerBeanPostProcessor
 import gorm.tools.hibernate.QueryTimeoutConfig
+import gorm.tools.hibernate.UserQueryTimeoutConfig
 import gorm.tools.idgen.IdGenerator
 import gorm.tools.idgen.JdbcIdGenerator
 import gorm.tools.idgen.PooledIdGenerator
@@ -45,7 +45,7 @@ import yakworks.gorm.config.IdGeneratorConfig
 
 @Configuration(proxyBeanMethods = false)
 @Lazy
-@EnableConfigurationProperties([AsyncConfig, GormConfig, IdGeneratorConfig, QueryTimeoutConfig])
+@EnableConfigurationProperties([AsyncConfig, GormConfig, IdGeneratorConfig, QueryTimeoutConfig, UserQueryTimeoutConfig])
 @CompileStatic
 class GormToolsConfiguration {
 
@@ -111,15 +111,9 @@ class GormToolsConfiguration {
     TrxService trxService(){ new TrxService()}
 
     @Bean
-    GormToolsTrxManagerBeanPostProcessor gormToolsTrxManagerBeanPostProcessor() {
-        return new GormToolsTrxManagerBeanPostProcessor()
-    }
-
-    @Bean
     GormToolsPreQueryEventListener gormToolsPreQueryEventListener() {
         return new GormToolsPreQueryEventListener()
     }
-
 
     @Bean @Lazy(false)
     ProblemHandler problemHandler(){

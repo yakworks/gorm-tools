@@ -6,16 +6,19 @@ package gorm.tools.hibernate
 
 import groovy.transform.CompileStatic
 
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Configuration
 
+
 @CompileStatic
 @Configuration(proxyBeanMethods = false)
-@ConfigurationProperties(prefix="yakworks.gorm.timeouts")
-class QueryTimeoutConfig {
+@ConfigurationProperties(prefix="app.security")
+class UserQueryTimeoutConfig {
 
-    @Value('${spring.transaction.default-timeout:-1}')
-    Integer query
+    //User specific timeouts
+    Map<String, UserTimeoutConfig> users
 
+    static class UserTimeoutConfig {
+        Integer queryTimeout
+    }
 }

@@ -25,6 +25,7 @@ class GormToolsPreQueryEventListener implements ApplicationListener<PreQueryEven
 
     @Inject CurrentUser currentUser
     @Inject QueryTimeoutConfig queryTimeoutConfig
+    @Inject UserQueryTimeoutConfig userQueryTimeoutConfig
 
     @Override
     @CompileDynamic
@@ -33,7 +34,7 @@ class GormToolsPreQueryEventListener implements ApplicationListener<PreQueryEven
         Integer queryTimeout = queryTimeoutConfig.query
 
         if(extendedQueryTimeoutEnabledForCurrentUser()) {
-            queryTimeout = queryTimeoutConfig.users[currentUser.user.username].queryTimeout
+            queryTimeout = userQueryTimeoutConfig.users[currentUser.user.username].queryTimeout
         }
 
         if(queryTimeout <= 0) return
@@ -48,7 +49,7 @@ class GormToolsPreQueryEventListener implements ApplicationListener<PreQueryEven
     }
 
     boolean extendedQueryTimeoutEnabledForCurrentUser() {
-        if(!queryTimeoutConfig.users || !currentUser || !currentUser.loggedIn) return false
-        return (queryTimeoutConfig.users.containsKey(currentUser.user.username))
+        if(!userQueryTimeoutConfig.users || !currentUser || !currentUser.loggedIn) return false
+        return (userQueryTimeoutConfig.users.containsKey(currentUser.user.username))
     }
 }

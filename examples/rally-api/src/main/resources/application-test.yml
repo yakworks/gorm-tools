@@ -6,11 +6,3 @@ spring.security.user.name: admin
 spring.security.user.password: 123
 spring.transaction.default-timeout: 60
 
-# Longer query timeout for specific users.
-yakworks:
-  gorm:
-    hibernate:
-      user-query-timeout:
-        value: 120
-        users:
-          - admin

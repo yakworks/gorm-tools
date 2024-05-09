@@ -17,13 +17,7 @@ class GormToolsTrxTimeoutSpec extends Specification {
     @Inject QueryTimeoutConfig queryTimeoutConfig
     @Inject UserQueryTimeoutConfig userQueryTimeoutConfig
 
-    /*
-    void "sanity check trx timeout"() {
-        expect: "should be picked up from config"
-        gormToolsTrxManagerBeanPostProcessor.queryTimeoutConfig.transaction == 120
-        grailsHibernateTransactionManager.defaultTimeout == 120
-    }*/
-
+    
     void "sanity check prequery listener"() {
         expect:
         gormToolsPreQueryEventListener

@@ -17,7 +17,7 @@ class GormToolsTrxTimeoutSpec extends Specification {
     @Inject QueryTimeoutConfig queryTimeoutConfig
     @Inject UserQueryTimeoutConfig userQueryTimeoutConfig
 
-    
+
     void "sanity check prequery listener"() {
         expect:
         gormToolsPreQueryEventListener

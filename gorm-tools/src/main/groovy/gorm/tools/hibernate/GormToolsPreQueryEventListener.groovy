@@ -36,12 +36,7 @@ class GormToolsPreQueryEventListener implements ApplicationListener<PreQueryEven
     @CompileDynamic
     void onApplicationEvent(PreQueryEvent event) {
 
-        Integer queryTimeout = queryTimeoutConfig.query
-
-        if(extendedQueryTimeoutEnabledForCurrentUser()) {
-            queryTimeout = userQueryTimeoutConfig.users[currentUser.user.username].queryTimeout
-        }
-
+        Integer queryTimeout = getQueryTimeout()
         if(queryTimeout <= 0) return
 
         //this would set query timeout on underlying hibernate criteria or hibernate query
@@ -67,8 +62,12 @@ class GormToolsPreQueryEventListener implements ApplicationListener<PreQueryEven
         return fieldValue
     }
 
-    boolean extendedQueryTimeoutEnabledForCurrentUser() {
-        if(!userQueryTimeoutConfig.users || !currentUser || !currentUser.loggedIn) return false
-        return (userQueryTimeoutConfig.users.containsKey(currentUser.user.username))
+    //returns default query timeout, or user specific query timeout if configured
+    Integer getQueryTimeout() {
+        Integer defaultTimeout = queryTimeoutConfig.query
+        if(!currentUser || !currentUser.loggedIn || !userQueryTimeoutConfig.users) return defaultTimeout
+        else {
+            return userQueryTimeoutConfig.getUserTimeout(currentUser.user.username) ?: defaultTimeout
+        }
     }
 }

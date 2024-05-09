@@ -21,4 +21,13 @@ class UserQueryTimeoutConfig {
     static class UserTimeoutConfig {
         Integer queryTimeout
     }
+
+    Integer getUserTimeout(String username) {
+        Integer timeout = null
+        if(users.containsKey(username)) {
+            timeout = users[username].queryTimeout
+        }
+        return timeout
+    }
+
 }

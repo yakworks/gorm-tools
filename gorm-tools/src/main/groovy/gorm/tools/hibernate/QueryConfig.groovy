@@ -12,10 +12,9 @@ import org.springframework.context.annotation.Configuration
 
 @CompileStatic
 @Configuration(proxyBeanMethods = false)
-@ConfigurationProperties(prefix="yakworks.gorm.timeouts")
-class QueryTimeoutConfig {
+@ConfigurationProperties(prefix="yakworks.gorm.query")
+class QueryConfig {
 
-    @Value('${spring.transaction.default-timeout:-1}')
-    Integer query
-
+    Integer max
+    Integer timeout
 }

@@ -13,21 +13,22 @@ import org.springframework.context.annotation.Configuration
 @CompileStatic
 @Configuration(proxyBeanMethods = false)
 @ConfigurationProperties(prefix="app.security")
-class UserQueryTimeoutConfig {
+class UserSecurityConfig {
 
     //User specific timeouts
-    Map<String, UserTimeoutConfig> users
+    Map<String, UserConfig> users
 
-    static class UserTimeoutConfig {
-        Integer queryTimeout
-    }
-
-    Integer getUserTimeout(String username) {
+    Integer getQueryTimeout(String username) {
         Integer timeout = null
-        if(users.containsKey(username)) {
+        if(users && users.containsKey(username)) {
             timeout = users[username].queryTimeout
         }
         return timeout
+    }
+
+    static class UserConfig {
+        Integer queryMax
+        Integer queryTimeout
     }
 
 }

@@ -11,7 +11,6 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.mapping.query.event.PreQueryEvent
 import org.springframework.context.ApplicationListener
 import org.springframework.core.Ordered
-import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 
 import gorm.tools.hibernate.AbstractQueryListener
@@ -23,10 +22,8 @@ import yakworks.security.user.CurrentUser
  * Enables to set extended query timeout for specific users
  */
 @CompileStatic
-@Order(Ordered.LOWEST_PRECEDENCE)
 @Component
-//low precedent, so that it runs after GormToolsQueryListener and can override user specific values
-class RallyPreQueryEventListener extends AbstractQueryListener implements ApplicationListener<PreQueryEvent> {
+class RallyPreQueryEventListener extends AbstractQueryListener implements ApplicationListener<PreQueryEvent>, Ordered {
 
     @Inject CurrentUser currentUser
     @Inject UserSecurityConfig userSecurityConfig
@@ -53,5 +50,11 @@ class RallyPreQueryEventListener extends AbstractQueryListener implements Applic
         } else {
             return null
         }
+    }
+
+    //low precedent, so that it runs after GormToolsQueryListener and can override user specific values
+    @Override
+    int getOrder() {
+        return Ordered.LOWEST_PRECEDENCE
     }
 }

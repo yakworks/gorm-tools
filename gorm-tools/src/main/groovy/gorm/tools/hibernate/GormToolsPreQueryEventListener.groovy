@@ -10,12 +10,13 @@ import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.query.event.PreQueryEvent
 import org.springframework.context.ApplicationListener
+import org.springframework.core.Ordered
 
 /**
  * Sets query timeout for hibernate queries.
  */
 @CompileStatic
-class GormToolsPreQueryEventListener extends AbstractQueryListener implements ApplicationListener<PreQueryEvent> {
+class GormToolsPreQueryEventListener extends AbstractQueryListener implements ApplicationListener<PreQueryEvent>, Ordered {
 
     @Inject QueryConfig queryConfig
 
@@ -32,4 +33,8 @@ class GormToolsPreQueryEventListener extends AbstractQueryListener implements Ap
         }
     }
 
+    @Override
+    int getOrder() {
+        return Ordered.HIGHEST_PRECEDENCE
+    }
 }

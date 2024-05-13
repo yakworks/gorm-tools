@@ -37,7 +37,7 @@ abstract class AbstractQueryListener {
     /**
      * It would set query timeout on underlying hibernate criteria or hql query
      - `AbstractHibernateQuery` is used by
-        - Dynamic finders, "find by example" queries, such as find, findAll, & criteria queries      
+        - Dynamic finders, "find by example" queries, such as find, findAll, & criteria queries
      - HibernateHqlQuery is used by
         - executeUpdate, get, list, count, exists, and find, findAll queries which takes hql string
 

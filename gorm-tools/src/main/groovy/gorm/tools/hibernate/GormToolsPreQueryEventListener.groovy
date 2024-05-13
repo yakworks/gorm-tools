@@ -18,7 +18,7 @@ import org.springframework.context.ApplicationListener
 class GormToolsPreQueryEventListener extends AbstractQueryListener implements ApplicationListener<PreQueryEvent> {
 
     @Inject QueryConfig queryConfig
-    
+
     @Override
     void onApplicationEvent(PreQueryEvent event) {
 

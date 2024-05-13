@@ -20,7 +20,7 @@ import static yakworks.util.ReflectionUtils.getPrivateFieldValue
 abstract class AbstractQueryListener {
 
     //returns criteria or hql query based on type of query
-    def getHibernateCriteriaOrQuery(def gormQuery) {
+    def getHibernateCriteriaOrQuery(Object gormQuery) {
         if (gormQuery instanceof AbstractHibernateQuery) {
             ((AbstractHibernateQuery) gormQuery)
             Criteria criteria = (Criteria) getPrivateFieldValue(AbstractHibernateQuery, "criteria", gormQuery)
@@ -50,14 +50,14 @@ abstract class AbstractQueryListener {
      * @param timeout timeout in seconds
      */
     @CompileDynamic
-    void setTimeout(def query, int timeout) {
+    void setTimeout(Object query, int timeout) {
         def hQuery = getHibernateCriteriaOrQuery(query)
         Validate.notNull(hQuery)
         hQuery.setTimeout(timeout)
     }
 
     @CompileDynamic
-    void setMax(def query, int max) {
+    void setMax(Object query, int max) {
         def hQuery = getHibernateCriteriaOrQuery(query)
         Validate.notNull(hQuery)
 

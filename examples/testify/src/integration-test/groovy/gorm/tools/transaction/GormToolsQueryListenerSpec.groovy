@@ -2,7 +2,7 @@ package gorm.tools.transaction
 
 import gorm.tools.hibernate.GormToolsPreQueryEventListener
 import gorm.tools.hibernate.QueryConfig
-import gorm.tools.hibernate.UserSecurityConfig
+import yakworks.rally.security.UserSecurityConfig
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import org.springframework.transaction.TransactionTimedOutException

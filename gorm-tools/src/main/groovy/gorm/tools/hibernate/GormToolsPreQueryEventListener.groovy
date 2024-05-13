@@ -10,6 +10,7 @@ import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.query.event.PreQueryEvent
 import org.springframework.context.ApplicationListener
+
 /**
  * Sets query timeout for hibernate queries.
  */
@@ -17,8 +18,7 @@ import org.springframework.context.ApplicationListener
 class GormToolsPreQueryEventListener extends AbstractQueryListener implements ApplicationListener<PreQueryEvent> {
 
     @Inject QueryConfig queryConfig
-    @Inject UserSecurityConfig userQueryTimeoutConfig
-
+    
     @Override
     void onApplicationEvent(PreQueryEvent event) {
 

@@ -15,7 +15,7 @@ import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 
 import gorm.tools.hibernate.AbstractQueryListener
-import gorm.tools.hibernate.UserSecurityConfig
+import yakworks.rally.security.UserSecurityConfig
 import yakworks.security.user.CurrentUser
 
 /**

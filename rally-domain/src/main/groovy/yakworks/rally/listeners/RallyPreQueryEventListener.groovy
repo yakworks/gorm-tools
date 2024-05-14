@@ -52,7 +52,7 @@ class RallyPreQueryEventListener extends AbstractQueryListener implements Applic
         }
     }
 
-    //low precedent, so that it runs after GormToolsQueryListener and can override user specific values
+    //low precedence, so that it runs after GormToolsQueryListener and can override user specific values
     @Override
     int getOrder() {
         return Ordered.LOWEST_PRECEDENCE

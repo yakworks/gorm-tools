@@ -33,6 +33,7 @@ class GormToolsPreQueryEventListener extends AbstractQueryListener implements Ap
         }
     }
 
+    //high precedence, so that it runs before RallyPreQueryEventListener
     @Override
     int getOrder() {
         return Ordered.HIGHEST_PRECEDENCE

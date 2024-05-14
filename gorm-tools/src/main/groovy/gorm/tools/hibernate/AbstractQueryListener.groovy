@@ -20,17 +20,17 @@ import static yakworks.util.ReflectionUtils.getPrivateFieldValue
 abstract class AbstractQueryListener {
 
     //returns criteria or hql query based on type of query
-    def getHibernateCriteriaOrQuery(Object gormQuery) {
+    @CompileDynamic
+    Object getHibernateCriteriaOrQuery(Object gormQuery) {
         if (gormQuery instanceof AbstractHibernateQuery) {
             ((AbstractHibernateQuery) gormQuery)
-            Criteria criteria = (Criteria) getPrivateFieldValue(AbstractHibernateQuery, "criteria", gormQuery)
-            Validate.notNull(criteria)
-            return criteria
+            return (Criteria) gormQuery.getHibernateCriteria()
         } else if (gormQuery instanceof HibernateHqlQuery) {
-            Query hqlQuery = (Query) getPrivateFieldValue(HibernateHqlQuery, "query", gormQuery)
-            Validate.notNull(hqlQuery)
-            hqlQuery.getMaxResults()
-            return hqlQuery
+            //Need to get private field value with reflection.
+            //Because few of the gorm queries, such as count() uses inner class for HibernateHqlQuery
+            //and direct field access with .@ would fail for inner class.
+            //See ReflectionUtils tests for example.
+            return (Query) getPrivateFieldValue(HibernateHqlQuery, "query", gormQuery)
         }
     }
 
@@ -61,6 +61,7 @@ abstract class AbstractQueryListener {
         Validate.notNull(hQuery)
 
         //if existing max value on query is smaller, thn dont force higher value configured in config.
+        //for example: when page size is set to 10, the max would already be set as 10 and we dont want to foce higher value here.
         int existingMax = hQuery.getMaxResults() ?: max
         max = Math.min(existingMax, max)
         hQuery.setMaxResults(max)

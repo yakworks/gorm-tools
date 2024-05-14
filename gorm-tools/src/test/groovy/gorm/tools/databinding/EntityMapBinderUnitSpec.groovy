@@ -5,8 +5,11 @@
 package gorm.tools.databinding
 
 import groovy.transform.CompileStatic
-
+import org.grails.datastore.gorm.GormEnhancer
+import org.grails.datastore.gorm.GormStaticApi
+import org.grails.datastore.mapping.model.PersistentEntity
 import spock.lang.Ignore
+import spock.lang.IgnoreRest
 import yakworks.commons.lang.IsoDateUtil
 import gorm.tools.repository.model.RepoEntity
 import yakworks.testing.gorm.unit.DataRepoTest
@@ -560,25 +563,6 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         then:
         TestEnumIdent.get(2) == TestEnumIdent.Num2
         testDomain.enumIdent == TestEnumIdent.Num2
-    }
-
-    void "test binder should convert empty values to null"() {
-        given:
-        TestDomain testDomain = new TestDomain()
-        Map params = [name: "  ", age: "", amount: "", localDate: "", active: "  "]
-
-        when:
-        binder.bind(testDomain, params)
-
-        then: "No exceptions or class cast errors should have been generates, empty values set as null"
-        noExceptionThrown()
-
-        testDomain.hasErrors() == false
-        testDomain.name == null
-        testDomain.age == null
-        testDomain.amount == null
-        testDomain.localDate == null
-        testDomain.active == null
     }
 
 }

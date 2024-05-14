@@ -55,8 +55,9 @@ class ExcelBuilderSupport {
         Map colMap = [:] as Map<String, String>
         if(colModel){
             colModel.each {
-                //TODO deal with the hidden values?
-                colMap[(it.name as String)] = it.label as String
+                if(!it.hidden) {
+                    colMap[(it.name as String)] = it.label as String
+                }
             }
         }
         return colMap

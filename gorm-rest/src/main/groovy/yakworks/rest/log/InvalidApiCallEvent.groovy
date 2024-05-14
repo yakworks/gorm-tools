@@ -4,22 +4,29 @@
 */
 package yakworks.rest.log
 
+import groovy.transform.CompileStatic
+import groovy.transform.builder.Builder
+import groovy.transform.builder.SimpleStrategy
+
 import org.springframework.context.ApplicationEvent
 
+@CompileStatic
+@Builder(builderStrategy= SimpleStrategy, prefix="")
 class InvalidApiCallEvent extends ApplicationEvent {
 
+    String uri
     String code
     String title
     String detail
     String user
     Object payload
 
-    InvalidApiCallEvent(String code, String title, String detail, String user = null, Object payload = null) {
-        super(code)
-        this.code = code
-        this.title = title
-        this.detail = detail
-        this.user = user
-        this.payload = payload
+    InvalidApiCallEvent(String uri) {
+        super(uri)
+        this.uri = uri
+    }
+
+    static InvalidApiCallEvent of(String uri, String code) {
+        return new InvalidApiCallEvent(uri).code(code)
     }
 }

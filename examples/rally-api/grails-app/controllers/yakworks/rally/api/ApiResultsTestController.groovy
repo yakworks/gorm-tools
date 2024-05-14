@@ -7,6 +7,7 @@ package yakworks.rally.api
 import groovy.transform.CompileStatic
 
 import yakworks.api.ApiResults
+import yakworks.api.problem.Problem
 import yakworks.rally.orgs.model.Org
 import yakworks.rest.gorm.controller.RestRepoApiController
 
@@ -16,6 +17,12 @@ class ApiResultsTestController implements RestRepoApiController<Org> {
     @Override
     def get() {
         respondWith(ApiResults.OK())
+    }
+
+    def getWithProblems() {
+        var res = ApiResults.OK()
+        res << Problem.of('error.unhandled')
+        respondWith(res)
     }
 
 }

@@ -4,14 +4,15 @@
 */
 package gorm.tools.hibernate
 
-import groovy.transform.CompileDynamic
+
 import groovy.transform.CompileStatic
 
-import org.grails.orm.hibernate.query.AbstractHibernateQuery
+import org.grails.datastore.mapping.query.Query
 import org.grails.orm.hibernate.query.HibernateHqlQuery
+import org.grails.orm.hibernate.query.HibernateQuery
 import org.hibernate.Criteria
-import org.hibernate.query.Query
 
+import gorm.tools.mango.hibernate.HibernateMangoQuery
 import yakworks.commons.lang.Validate
 
 import static yakworks.util.ReflectionUtils.getPrivateFieldValue
@@ -19,17 +20,16 @@ import static yakworks.util.ReflectionUtils.getPrivateFieldValue
 @CompileStatic
 abstract class AbstractQueryListener {
 
-    //returns criteria or hql query based on type of query
-    @CompileDynamic
-    Object getHibernateCriteriaOrQuery(Object gormQuery) {
-        if (gormQuery instanceof AbstractHibernateQuery) {
-            ((AbstractHibernateQuery) gormQuery)
-            return (Criteria) gormQuery.getHibernateCriteria()
+    /** returns criteria or hql query based on type of query */
+    Object getHibernateCriteriaOrQuery(Query gormQuery) {
+        //
+        if (gormQuery instanceof HibernateMangoQuery) {
+            return gormQuery.getHibernateCriteria()
+        } else if (gormQuery instanceof HibernateQuery) {
+            return gormQuery.getHibernateCriteria()
         } else if (gormQuery instanceof HibernateHqlQuery) {
-            //Need to get private field value with reflection.
-            //Because few of the gorm queries, such as count() uses inner class for HibernateHqlQuery
-            //and direct field access with .@ would fail for inner class.
-            //See ReflectionUtils tests for example.
+            // Need to get private field value with reflection. Using groovy .@ doesnt work here because of inner classes
+            // See ReflectionUtils tests for example.
             return (Query) getPrivateFieldValue(HibernateHqlQuery, "query", gormQuery)
         }
     }
@@ -48,22 +48,25 @@ abstract class AbstractQueryListener {
      * @param query query instance
      * @param timeout timeout in seconds
      */
-    @CompileDynamic
-    void setTimeout(Object query, int timeout) {
-        def hQuery = getHibernateCriteriaOrQuery(query)
+    void setTimeout(Query query, int timeout) {
+        var hQuery = getHibernateCriteriaOrQuery(query)
         Validate.notNull(hQuery)
-        hQuery.setTimeout(timeout)
+        if (hQuery instanceof Criteria) {
+            hQuery.setTimeout(timeout)
+        } else if (hQuery instanceof org.hibernate.query.Query) {
+            hQuery.setTimeout(timeout)
+        }
     }
 
-    @CompileDynamic
-    void setMax(Object query, int max) {
-        def hQuery = getHibernateCriteriaOrQuery(query)
-        Validate.notNull(hQuery)
-
-        //if existing max value on query is smaller, thn dont force higher value configured in config.
-        //for example: when page size is set to 10, the max would already be set as 10 and we dont want to foce higher value here.
-        int existingMax = hQuery.getMaxResults() ?: max
-        max = Math.min(existingMax, max)
-        hQuery.setMaxResults(max)
-    }
+    // @CompileDynamic
+    // void setMax(Query query, int max) {
+    //     def hQuery = getHibernateCriteriaOrQuery(query)
+    //     Validate.notNull(hQuery)
+    //
+    //     //if existing max value on query is smaller, thn dont force higher value configured in config.
+    //     //for example: when page size is set to 10, the max would already be set as 10 and we dont want to foce higher value here.
+    //     int existingMax = hQuery.getMaxResults() ?: max
+    //     max = Math.min(existingMax, max)
+    //     hQuery.setMaxResults(max)
+    // }
 }

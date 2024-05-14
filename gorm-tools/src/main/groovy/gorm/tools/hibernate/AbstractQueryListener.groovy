@@ -4,7 +4,6 @@
 */
 package gorm.tools.hibernate
 
-
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.query.Query
@@ -13,16 +12,18 @@ import org.grails.orm.hibernate.query.HibernateQuery
 import org.hibernate.Criteria
 
 import gorm.tools.mango.hibernate.HibernateMangoQuery
-import yakworks.commons.lang.Validate
 
 import static yakworks.util.ReflectionUtils.getPrivateFieldValue
 
 @CompileStatic
 abstract class AbstractQueryListener {
 
-    /** returns criteria or hql query based on type of query */
+    /**
+     * gets the Gorm criteria or hibernate Query, depends on what kind of gormQuery this event is for.
+     * @param gormQuery the gorm Query that was set in the Event.
+     * @return either the Criteria or the org.hibernate.query.Query
+     */
     Object getHibernateCriteriaOrQuery(Query gormQuery) {
-        //
         if (gormQuery instanceof HibernateMangoQuery) {
             return gormQuery.getHibernateCriteria()
         } else if (gormQuery instanceof HibernateQuery) {
@@ -30,7 +31,7 @@ abstract class AbstractQueryListener {
         } else if (gormQuery instanceof HibernateHqlQuery) {
             // Need to get private field value with reflection. Using groovy .@ doesnt work here because of inner classes
             // See ReflectionUtils tests for example.
-            return (Query) getPrivateFieldValue(HibernateHqlQuery, "query", gormQuery)
+            return (org.hibernate.query.Query) getPrivateFieldValue(HibernateHqlQuery, "query", gormQuery)
         }
     }
 
@@ -40,6 +41,8 @@ abstract class AbstractQueryListener {
         - Dynamic finders, "find by example" queries, such as find, findAll, & criteria queries
      - HibernateHqlQuery is used by
         - executeUpdate, get, list, count, exists, and find, findAll queries which takes hql string
+     //XXX is above true when its not multiTenant? I dont see it firing on get or list. I set breakpoint and ran some unit tests
+     // that should have fired.
 
      See AbstractHibernateGormStaticApi, HibernateStaticApi & DynamicFinder classes for more details.
      Note: hibernate would set this timeout on underlying jdbc statement.
@@ -50,7 +53,7 @@ abstract class AbstractQueryListener {
      */
     void setTimeout(Query query, int timeout) {
         var hQuery = getHibernateCriteriaOrQuery(query)
-        Validate.notNull(hQuery)
+        assert hQuery //should never be null
         if (hQuery instanceof Criteria) {
             hQuery.setTimeout(timeout)
         } else if (hQuery instanceof org.hibernate.query.Query) {

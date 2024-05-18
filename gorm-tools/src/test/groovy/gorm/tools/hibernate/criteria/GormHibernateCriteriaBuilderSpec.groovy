@@ -21,8 +21,9 @@ class GormHibernateCriteriaBuilderSpec extends Specification implements GormHibe
     void "test order"() {
         setup:
         (1..3).each { index ->
-            new Test(id: index, someField: "aaa_$index", someField2: "bbb_$index").save()
+            new Test(someField: "aaa_$index", someField2: "bbb_$index").save()
         }
+        flush()
 
         when:
         List result = builder.list() {
@@ -41,8 +42,11 @@ class GormHibernateCriteriaBuilderSpec extends Specification implements GormHibe
     void "test order with a nested property"() {
         setup:
         (0..2).each { index ->
-            new Test(id: index, someField: "1", someField2: "2", nestedField: new Test2(someField: "abc_$index").save()).save()
+            new Test(
+                someField: "1", someField2: "2", nestedField: new Test2(someField: "abc_$index").save()
+            ).save()
         }
+        flush()
 
         when:
         List result = builder.list() { order("nestedField.someField", "desc") }
@@ -55,9 +59,10 @@ class GormHibernateCriteriaBuilderSpec extends Specification implements GormHibe
 
     void "test ilike"() {
         setup:
-        new Test(id: 0, someField: "abc", someField2: "abc").save()
-        new Test(id: 1, someField: "aBc", someField2: "abc").save()
-        new Test(id: 2, someField: "Bcd", someField2: "bcd").save()
+        new Test(someField: "abc", someField2: "abc").save()
+        new Test(someField: "aBc", someField2: "abc").save()
+        new Test(someField: "Bcd", someField2: "bcd").save()
+        flush()
 
         when:
         List result = builder.list() { ilike('someField', 'aB%') }
@@ -74,9 +79,10 @@ class GormHibernateCriteriaBuilderSpec extends Specification implements GormHibe
 
     void "test like"() {
         setup:
-        new Test(id: 0, someField: "abc", someField2: "abc").save()
-        new Test(id: 1, someField: "aBc", someField2: "abc").save()
-        new Test(id: 2, someField: "Bcd", someField2: "bcd").save()
+        new Test(someField: "abc", someField2: "abc").save()
+        new Test(someField: "aBc", someField2: "abc").save()
+        new Test(someField: "Bcd", someField2: "bcd").save()
+        flush()
 
         when:
         List result = builder.list() { like('someField', 'aB%') }
@@ -90,9 +96,10 @@ class GormHibernateCriteriaBuilderSpec extends Specification implements GormHibe
 
     void "test inList"() {
         setup:
-        new Test(id: 0, someField: "abc", someField2: "abc").save()
-        new Test(id: 1, someField: "aBc", someField2: "abc").save()
-        new Test(id: 2, someField: "Bcd", someField2: "bcd").save()
+        new Test(someField: "abc", someField2: "abc").save()
+        new Test(someField: "aBc", someField2: "abc").save()
+        new Test(someField: "Bcd", someField2: "bcd").save()
+        flush()
 
         when:
         List result = builder.list() { inList('someField', ['abc', 'Bcd']) }
@@ -110,6 +117,7 @@ class GormHibernateCriteriaBuilderSpec extends Specification implements GormHibe
         setup:
         new Test(id: 0, someField: '123', someField2: '123', nestedField: new Test2(someField: '456')).save()
         new Test(id: 0, someField: '321', someField2: '321', nestedField: new Test2(someField: '654')).save()
+        flush()
 
         when:
         List result = builder.list() { nestedPathPropCall('nestedField.someField', '456', 'eq') }

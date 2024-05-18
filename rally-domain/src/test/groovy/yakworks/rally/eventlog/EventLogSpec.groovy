@@ -41,7 +41,6 @@ class EventLogSpec extends Specification implements GormHibernateTest {
     @Override
     Closure doWithConfig() {
         { cfg ->
-            gormConfigDefaults(cfg)
             cfg.nine.eventLog.purgeDays = 2
         }
     }

@@ -12,10 +12,10 @@ class TagLinkSpec extends Specification implements GormHibernateTest, SecurityTe
     static List entityClasses = [TagLink, Tag, Attachment]
 
     List createSomeTags(){
-        def tag1 = Tag.create(name: 'tag1', code: 'tag1')
-        def tag2 = Tag.create(name: 'tag2', code: 'tag2', entityName: 'Foo, Attachment')
-        def tag3 = Tag.create(name: 'tag3', code: 'tag3', entityName: 'Attachment')
-        def tag4 = Tag.create(name: 'tag4 wont work', code: 'tag4', entityName: 'SomethingElse')
+        def tag1 = Tag.repo.create([id: 1, name: 'tag1', code: 'tag1'], [bindId: true])
+        def tag2 = Tag.repo.create([id: 2, name: 'tag2', code: 'tag2', entityName: 'Foo, Attachment'], [bindId: true])
+        def tag3 = Tag.repo.create([id: 3, name: 'tag3', code: 'tag3', entityName: 'Attachment'], [bindId: true])
+        def tag4 = Tag.repo.create([id: 4, name: 'tag4 wont work', code: 'tag4', entityName: 'SomethingElse'], [bindId: true])
         return [tag1, tag2, tag3, tag4]
     }
 

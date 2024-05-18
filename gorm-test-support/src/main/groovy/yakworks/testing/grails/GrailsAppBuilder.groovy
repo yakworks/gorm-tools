@@ -7,13 +7,18 @@ package yakworks.testing.grails
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
+import org.grails.config.PropertySourcesConfig
 import org.grails.spring.context.support.GrailsPlaceholderConfigurer
 import org.grails.spring.context.support.MapBasedSmartPropertyOverrideConfigurer
 import org.grails.testing.GrailsApplicationBuilder
 import org.grails.transaction.TransactionManagerPostProcessor
+import org.springframework.beans.MutablePropertyValues
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor
+import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.beans.factory.config.ConfigurableBeanFactory
+import org.springframework.beans.factory.config.ConstructorArgumentValues
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
+import org.springframework.beans.factory.support.RootBeanDefinition
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.AnnotationConfigUtils
@@ -21,8 +26,10 @@ import org.springframework.context.support.ConversionServiceFactoryBean
 import org.springframework.context.support.StaticMessageSource
 import org.springframework.core.env.ConfigurableEnvironment
 
+import gorm.tools.ConfigDefaults
 import grails.core.GrailsApplication
 import grails.core.support.proxy.DefaultProxyHandler
+import grails.util.Holders
 
 /**
  * Copied in from grails-testing-support Created by jameskleeh on 5/31/17.
@@ -86,6 +93,9 @@ class GrailsAppBuilder extends GrailsApplicationBuilder {
             // adds AutowiredAnnotationBeanPostProcessor, CommonAnnotationBeanPostProcessor and others
             // see org.springframework.context.annotation.AnnotationConfigUtils.registerAnnotationConfigProcessors method
             //NOTE: commented out as it conflicts with the overrides to replace bean that has required=false as default
+            //XXX when removing the the blow up happens in DataTestSetupSpecInterceptor.configureDataTest
+            // this line:
+            //   applicationContext.getBean('constraintRegistry', ConstraintRegistry).addConstraint(UniqueConstraint)
             if(isDataRepoTest) {
                 context.'annotation-config'()
             }
@@ -98,6 +108,47 @@ class GrailsAppBuilder extends GrailsApplicationBuilder {
                 grailsApplication = grailsApplication
             }
         }
+    }
+
+    @Override //overriden so we can add in the ConfigDefaults without messing with doWithConfig
+    @CompileDynamic
+    protected void registerGrailsAppPostProcessorBean(ConfigurableBeanFactory beanFactory) {
+
+        GrailsApplication grailsApp
+
+        Closure doWithSpringClosure = {
+            registerBeans(grailsApp)
+            executeDoWithSpringCallback(grailsApp)
+        }
+
+        Closure customizeGrailsApplicationClosure = { grailsApplication ->
+            grailsApp = grailsApplication
+            def cfg = grailsApplication.config
+            //Add the defaults in
+            cfg.putAll(ConfigDefaults.getConfigMap(false))
+            //fire closure if its used
+            if (doWithConfig) {
+                //call the closure
+                doWithConfig.call(cfg)
+            }
+            // reset flatConfig
+            grailsApplication.configChanged()
+
+            Holders.config = grailsApplication.config
+        }
+
+        ConstructorArgumentValues constructorArgumentValues = new ConstructorArgumentValues()
+        constructorArgumentValues.addIndexedArgumentValue(0, doWithSpringClosure)
+        constructorArgumentValues.addIndexedArgumentValue(1, includePlugins ?: DEFAULT_INCLUDED_PLUGINS)
+
+        MutablePropertyValues values = new MutablePropertyValues()
+        values.add('localOverride', localOverride)
+        values.add('loadExternalBeans', loadExternalBeans)
+        values.add('customizeGrailsApplicationClosure', customizeGrailsApplicationClosure)
+
+        RootBeanDefinition beandef = new RootBeanDefinition(TestRuntimeGrailsApplicationPostProcessor, constructorArgumentValues, values)
+        beandef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE)
+        beanFactory.registerBeanDefinition("grailsApplicationPostProcessor", beandef)
     }
 
 }

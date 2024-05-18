@@ -32,10 +32,11 @@ class AppUserSpec extends Specification implements GormHibernateTest, SecurityTe
 
     void createRoles(){
 
-        SecRole.create(code: 'admin')
-        SecRole.create(code: 'user')
-        SecRole.create(code: 'cust')
+        new SecRole(id:1, code: 'admin').persist()
+        new SecRole(id:2, code: 'user').persist()
+        new SecRole(id:3, code: 'cust').persist()
         flush()
+
         assert SecRole.get(1) != null
         assert SecRole.get(1).code == "ADMIN"
 

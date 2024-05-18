@@ -186,7 +186,8 @@ class RallySeed {
         Org.repo.flush()
 
         if(createContact){
-            Contact contact = makeContact(org, [id: org.id])
+            Contact contact = makeContact(org, [id: org.id]) //cant have same id as Org, to complicated with secondary.
+            //Contact contact = makeContact(org)
             org.contact = contact
             org.persist()
         }

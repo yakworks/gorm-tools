@@ -198,14 +198,12 @@ trait BaseRepoEntityUnitTest {
 
     /**
      * doWithConfig is called early on the first setup of the AppCtx in the GrailsAppUnitTest.
-     * override this to modify config but dont forget to add in the gormConfigDefaults if doing so.
+     * override this to modify config.
      */
     @Override //in the GrailUnitTest
     @CompileDynamic //closure might have a weird delegate if this is not marked with CompileDynamic
     Closure doWithConfig() {
-        { cfg ->
-            gormConfigDefaults((PropertySourcesConfig)cfg)
-        }
+        null
     }
 
     /**

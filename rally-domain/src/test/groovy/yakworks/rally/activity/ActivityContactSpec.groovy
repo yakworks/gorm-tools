@@ -34,16 +34,16 @@ class ActivityContactSpec extends Specification implements GormHibernateTest, Se
 
     List createSomeContacts(Long orgId){
         List items = []
-        (0..9).each { eid ->
-            items <<  Contact.create(firstName: "Name$eid", org:[id: orgId])
+        (0..9).eachWithIndex { eid, idx ->
+            items <<  Contact.repo.create([id: idx+1, firstName: "Name$eid", org:[id: orgId]],[bindId:true])
         }
         flushAndClear()
         return items
     }
 
-    Activity setupData(List contacts = null){
-        def org = build(Org)
-        if(!contacts) contacts = createSomeContacts(org.id)
+    Activity setupData(List contacts){
+        // def org = build(Org)
+        // if(!contacts) contacts = createSomeContacts(org.id)
         List<Map> cmap = [
             [id:contacts[0].id],
             [id:contacts[1].id],
@@ -53,7 +53,7 @@ class ActivityContactSpec extends Specification implements GormHibernateTest, Se
         flush()
 
         def data = [
-            org    : [id: 1],
+            org    : contacts[0].org,
             note   : [body: 'test note'],
             contacts: cmap
         ]
@@ -68,9 +68,9 @@ class ActivityContactSpec extends Specification implements GormHibernateTest, Se
         when:
         def org = build(Org)
 
-        def c = createSomeContacts(org.id)
-        def con1 = c[0]
-        def con2 = c[1]
+        List c = createSomeContacts(org.id)
+        Contact con1 = c[0]
+        Contact con2 = c[1]
         def act = setupData(c)
         flush() //needed for the checks as it queries
 

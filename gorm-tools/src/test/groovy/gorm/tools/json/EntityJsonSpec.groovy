@@ -51,9 +51,9 @@ class EntityJsonSpec extends Specification implements GormHibernateTest {
         return JsonEngine.toJson(elist)
     }
 
-    void "test Org json stock"() {
+    void "test CustType json stock"() {
         when:
-        def custType = build(CustType)
+        def custType = build(CustType, id:1)
         def res = JsonEngine.toJson(custType)
 
         then:
@@ -63,7 +63,7 @@ class EntityJsonSpec extends Specification implements GormHibernateTest {
     void "test Org json stock"() {
         when:
         def excludes = ['version']
-        def org = build(Cust)
+        def org = build(Cust, id:1)
         def res = toJson(org, ['*', 'type'], excludes)
 
         then:
@@ -75,7 +75,7 @@ class EntityJsonSpec extends Specification implements GormHibernateTest {
             "kind":"CLIENT",
             "beforeValidateCheck":"got it",
             "testIdent":{"id":2,"name":"Num2"},
-            "type":{"id":2}
+            "type":{"id":1000}
         }
         ''')
 

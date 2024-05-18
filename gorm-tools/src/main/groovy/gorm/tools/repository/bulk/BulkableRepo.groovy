@@ -41,7 +41,7 @@ trait BulkableRepo<D> {
 
     final private static Logger log = LoggerFactory.getLogger(BulkableRepo)
 
-    @Autowired(required = false)
+    @Autowired(required = false) //optional to make testing easier and can do gorm-tools without syncJob
     SyncJobService syncJobService
 
     @Autowired

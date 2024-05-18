@@ -1,11 +1,8 @@
 package yakworks.spring.config
 
-import org.grails.testing.GrailsUnitTest
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.scheduling.annotation.Scheduled
-import org.springframework.scheduling.support.CronExpression
 
-import grails.testing.spring.AutowiredTest
+import org.springframework.beans.factory.annotation.Autowired
+
 import spock.lang.Specification
 import yakworks.testing.grails.GrailsAppUnitTest
 

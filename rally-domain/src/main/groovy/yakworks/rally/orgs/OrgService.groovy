@@ -28,14 +28,9 @@ import yakworks.rally.orgs.repo.OrgRepo
 @CompileStatic
 class OrgService {
 
-    @Autowired(required = false)
-    OrgDimensionService orgDimensionService
-
-    @Autowired(required = false)
-    OrgProps orgProps
-
-    @Autowired(required = false)
-    OrgRepo orgRepo
+    @Autowired OrgDimensionService orgDimensionService
+    @Autowired OrgProps orgProps
+    @Autowired OrgRepo orgRepo
 
     boolean isOrgMemberEnabled(){
         return orgProps?.members?.enabled

@@ -11,14 +11,16 @@ import spock.lang.Specification
 import yakworks.json.groovy.JsonEngine
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.config.MaintenanceProps
 import yakworks.testing.gorm.unit.DataRepoTest
+import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
-class SyncJobSpec extends Specification implements DataRepoTest, SecurityTest {
-    static entityClasses = [SyncJob, Attachment]
+class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTest {
+    static entityClasses = [SyncJob, Attachment, AttachmentLink]
     static springBeans = [
-        attachmentSupport:AttachmentSupport,
+        //attachmentSupport:AttachmentSupport,
         syncJobService:DefaultSyncJobService,
         maintenanceProps: MaintenanceProps
     ]

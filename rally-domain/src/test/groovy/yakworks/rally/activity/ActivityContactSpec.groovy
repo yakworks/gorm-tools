@@ -12,10 +12,11 @@ import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
+import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.DataRepoTest
 
-class ActivityContactSpec extends Specification implements DataRepoTest, SecurityTest {
+class ActivityContactSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [Activity, ActivityContact, ActivityNote, Contact, ContactSource, Org, Tag]
 
     @Shared
@@ -88,13 +89,14 @@ class ActivityContactSpec extends Specification implements DataRepoTest, Securit
 
         when: 'remove 1 by key'
         repo.remove(act, con2)
-
+        flush()
         then:
         !repo.exists(act, con2)
         repo.count(act) == 2
 
         when: 'remove all by org'
         repo.remove(act)
+        flush()
 
         then:
         repo.count(act) == 0

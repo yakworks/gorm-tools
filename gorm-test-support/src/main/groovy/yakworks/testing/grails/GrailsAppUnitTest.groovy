@@ -35,6 +35,9 @@ trait GrailsAppUnitTest extends GrailsUnitTest{
     boolean initialized
     private static Object _servletContext
 
+    //hack, see explanation on isDataRepoTest in GrailsAppBuilder. has to do with context.'annotation-config'() being needed
+    boolean getDataRepoTest(){false}
+
     /**
      * @return the servlet context
      */
@@ -61,7 +64,8 @@ trait GrailsAppUnitTest extends GrailsUnitTest{
                     doWithConfig: doWithConfig(),
                     includePlugins: getIncludePlugins(),
                     loadExternalBeans: loadExternalBeans(),
-                    localOverride: localOverride
+                    localOverride: localOverride,
+                    isDataRepoTest: getDataRepoTest()
             ).build()
             _grailsApp = builder.grailsApplication
             _servletContext = builder.servletContext

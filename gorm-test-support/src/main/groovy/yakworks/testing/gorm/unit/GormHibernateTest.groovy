@@ -44,7 +44,7 @@ import yakworks.testing.grails.GrailsAppUnitTest
 @CompileStatic
 trait GormHibernateTest implements GrailsAppUnitTest, BaseRepoEntityUnitTest, RepoTestDataBuilder {
     //trait order above is important, GormToolsSpecHelper should come last as it overrides methods in GrailsAppUnitTest
-
+    boolean is
     @Shared @AutoCleanup HibernateDatastore hibernateDatastore
     @Shared PlatformTransactionManager transactionManager
     /** The transaction status, setup before each test */

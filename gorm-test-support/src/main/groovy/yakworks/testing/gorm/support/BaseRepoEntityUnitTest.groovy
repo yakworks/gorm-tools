@@ -118,6 +118,7 @@ trait BaseRepoEntityUnitTest {
     }
 
     /**
+     * Overrides the one in GrailsAppUnitTest
      * if springBeans static prop or getter is defined then this will do the SpringBeanUtils.registerBeans
      * Overrides the one in GrailsAppUnitTest
      */
@@ -187,6 +188,7 @@ trait BaseRepoEntityUnitTest {
 
     /**
      * override this to add beans that are needed for security setups.
+     * See SecurityTest, that what this is primarily for.
      * just bean definitions that are added along with whats in doWithGormBeans
      * @return the bean builder closure.
      */

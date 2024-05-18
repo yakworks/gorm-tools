@@ -43,7 +43,7 @@ class TrxService {
         return this.transactionManager != null ? this.transactionManager : GormEnhancer.findSingleTransactionManager()
     }
 
-    @Autowired(required = false)
+    @Autowired //(required = false)
     void setTargetDatastore(Datastore... datastores) {
         Datastore defds = RuntimeSupport.findDefaultDatastore(datastores)
         this.targetDatastore = defds

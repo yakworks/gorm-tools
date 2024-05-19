@@ -21,8 +21,7 @@ trait SecService {
 
     Class<?> entityClass
 
-    @Inject @Nullable
-    CurrentUser currentUser
+    @Inject CurrentUser currentUser
 
     /**
      * Used in automation with a bot or system user, also usefull for tests

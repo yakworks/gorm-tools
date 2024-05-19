@@ -29,24 +29,27 @@ import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.rally.testing.OrgDimensionTesting
 import yakworks.testing.gorm.RepoTestData
 import yakworks.testing.gorm.unit.DataRepoTest
+import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
-class OrgCopierSpec extends Specification implements DataRepoTest, SecurityTest {
+class OrgCopierSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [
         Org, Contact, OrgFlex, OrgMember, OrgCalc, OrgSource, OrgTag, OrgInfo, OrgTypeSetup, Location, ContactPhone,
-        ContactEmail, ContactSource, ContactFlex, Activity, ActivityLink, AttachmentLink, MailMessage, Attachment]
+        ContactEmail, ContactSource, ContactFlex, Activity, ActivityLink, AttachmentLink, MailMessage, Attachment
+    ]
+
+    static List springBeans = [ActivityCopier, OrgCopier, OrgProps, OrgDimensionService ]
 
     @Autowired OrgCopier orgCopier
-    @Autowired OrgDimensionService orgDimensionService
 
-    Closure doWithGormBeans(){ { ->
-        orgDimensionService(OrgDimensionService)
-        orgCopier(OrgCopier)
-        activityCopier(ActivityCopier)
-        orgProps(OrgProps)
-        cacheManager(SimpleCacheManager)
-        attachmentSupport(AttachmentSupport)
-    }}
+    // Closure doWithGormBeans(){ { ->
+    //     orgDimensionService(OrgDimensionService)
+    //     orgCopier(OrgCopier)
+    //     activityCopier(ActivityCopier)
+    //     orgProps(OrgProps)
+    //     cacheManager(SimpleCacheManager)
+    //     attachmentSupport(AttachmentSupport)
+    // }}
 
     def "test copy"() {
         setup:

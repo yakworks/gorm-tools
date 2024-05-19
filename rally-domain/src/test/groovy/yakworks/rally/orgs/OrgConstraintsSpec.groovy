@@ -2,6 +2,7 @@ package yakworks.rally.orgs
 
 import gorm.tools.utils.GormMetaUtils
 import spock.lang.Specification
+import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
@@ -10,15 +11,13 @@ import yakworks.rally.orgs.model.OrgFlex
 import yakworks.rally.orgs.model.OrgInfo
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
+import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.DataRepoTest
 
-class OrgConstraintsSpec extends Specification implements DataRepoTest, SecurityTest {
+class OrgConstraintsSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo]
-
-    Closure doWithGormBeans(){{ ->
-        orgDimensionService(OrgDimensionService)
-    }}
+    static List springBeans = [OrgProps, OrgDimensionService ]
 
     void "sanity check build"() {
         when:

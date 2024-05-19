@@ -24,6 +24,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.AnnotationConfigUtils
 import org.springframework.context.support.ConversionServiceFactoryBean
 import org.springframework.context.support.StaticMessageSource
+import org.springframework.core.annotation.AnnotationAttributes
 import org.springframework.core.env.ConfigurableEnvironment
 
 import gorm.tools.ConfigDefaults
@@ -47,6 +48,19 @@ class GrailsAppBuilder extends GrailsApplicationBuilder {
     // ...No qualifying bean of type 'org.grails.datastore.gorm.validation.constraints.factory.ConstraintFactory<?>[]'
     boolean isDataRepoTest = true
 
+    @CompileStatic
+    static class NotRequiredAutowiredAnnotationBeanPostProcessor extends AutowiredAnnotationBeanPostProcessor{
+
+        NotRequiredAutowiredAnnotationBeanPostProcessor() {
+            super()
+        }
+
+        @Override
+        protected boolean determineRequiredStatus(AnnotationAttributes ann) {
+            return false
+        }
+    }
+
     @Override
     protected ConfigurableApplicationContext createMainContext(Object servletContext) {
         ConfigurableApplicationContext context = new AnnotationConfigApplicationContext()
@@ -63,12 +77,13 @@ class GrailsAppBuilder extends GrailsApplicationBuilder {
         context.register(TestConfiguration)
         context.scan("yakworks.gorm.config")
 
+
         //replace with the one that is required=false
         //context.removeBeanDefinition(AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME)
         //assert !context.getBeanDefinition(AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME)
         context.registerBeanDefinition(AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME,
             BeanDefinitionBuilder
-                .rootBeanDefinition(AutowiredAnnotationBeanPostProcessor.class)
+                .rootBeanDefinition(NotRequiredAutowiredAnnotationBeanPostProcessor)
                 .addPropertyValue("requiredParameterValue", "false")
                 .getBeanDefinition())
 
@@ -78,8 +93,10 @@ class GrailsAppBuilder extends GrailsApplicationBuilder {
         context
     }
 
-    @Override //so we can remove the context.'annotation-config'
-    @CompileDynamic @SuppressWarnings(['UnnecessarySelfAssignment'])
+    @Override
+    //so we can remove the context.'annotation-config'
+    @CompileDynamic
+    @SuppressWarnings(['UnnecessarySelfAssignment'])
     void registerBeans(GrailsApplication grailsApplication) {
 
         defineBeans(grailsApplication) { ->
@@ -96,7 +113,7 @@ class GrailsAppBuilder extends GrailsApplicationBuilder {
             //XXX when removing the the blow up happens in DataTestSetupSpecInterceptor.configureDataTest
             // this line:
             //   applicationContext.getBean('constraintRegistry', ConstraintRegistry).addConstraint(UniqueConstraint)
-            if(isDataRepoTest) {
+            if (isDataRepoTest) {
                 context.'annotation-config'()
             }
 
@@ -110,7 +127,8 @@ class GrailsAppBuilder extends GrailsApplicationBuilder {
         }
     }
 
-    @Override //overriden so we can add in the ConfigDefaults without messing with doWithConfig
+    @Override
+    //overriden so we can add in the ConfigDefaults without messing with doWithConfig
     @CompileDynamic
     protected void registerGrailsAppPostProcessorBean(ConfigurableBeanFactory beanFactory) {
 

@@ -24,7 +24,6 @@ import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.utils.GormMetaUtils
 import gorm.tools.validation.Rejector
-import jakarta.annotation.Nullable
 import yakworks.rally.orgs.OrgService
 import yakworks.rally.orgs.model.Company
 import yakworks.rally.orgs.model.Contact
@@ -38,16 +37,15 @@ import yakworks.rally.orgs.model.OrgType
  */
 @CompileStatic
 abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
-    //Making these nullable makes it easier to wire up for tests.
-    @Inject @Nullable LocationRepo locationRepo
+    @Inject LocationRepo locationRepo
 
-    @Inject @Nullable ContactRepo contactRepo
+    @Inject ContactRepo contactRepo
 
-    @Inject @Nullable OrgTagRepo orgTagRepo
+    @Inject OrgTagRepo orgTagRepo
 
-    @Inject @Nullable OrgSourceRepo orgSourceRepo
+    @Inject OrgSourceRepo orgSourceRepo
 
-    @Inject @Nullable OrgService orgService
+    @Inject OrgService orgService
 
     @RepoListener
     void beforeValidate(Org org, Errors errors) {

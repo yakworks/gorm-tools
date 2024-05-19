@@ -19,6 +19,7 @@ import yakworks.rally.activity.model.TaskType
 import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.OrgDimensionService
 import yakworks.rally.orgs.OrgService
+import yakworks.rally.orgs.model.Company
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
@@ -81,7 +82,8 @@ class RallySeed {
         rallySeed.buildAppUsers()
         rallySeed.createOrgTypeSetups()
         rallySeed.buildClientOrg()
-        rallySeed.buildCompanyBranchDiv(count, true)
+        rallySeed.buildCompanies()
+        rallySeed.buildBranchDiv(count, true)
         rallySeed.buildCusts(count)
         rallySeed.buildTags()
         rallySeed.createIndexes()
@@ -95,22 +97,36 @@ class RallySeed {
         }
     }
 
+    @Transactional
+    void buildCompanies(){
+        def company = createOrg([id: Company.DEFAULT_COMPANY_ID, name: 'Main Company', type: OrgType.Company], true)
+        company.location.kind = Location.Kind.remittance
+        company.location.persist()
+        //createOrg([id: 4 , name: 'Canadian Company', type: OrgType.Company], true)
+        //We have the darn
+        def company2 = createOrg([id: 3 , name: 'Canadian Company', type: OrgType.Company], true)
+        company2.location.kind = Location.Kind.remittance
+        company2.location.persist()
+
+        Org.repo.flush()
+    }
+
     /**
      * build the Organizations up to count.
-     * Will create 2 company accounts, 2 brnaches and 2 divisions first.
+     * Will create 4 branches and 2 divisions first.
      * the rest will be customers.
      * @param count the count to make
      * @param createContact if true will generate a default contact for each org as well.
      */
     @Transactional
-    void buildCompanyBranchDiv(int count, boolean createContact = false){
+    void buildBranchDiv(int count, boolean createContact = false){
         Org.withTransaction {
             //createOrgTypeSetups()
-            (2..3).each{ id ->
-                def company = createOrg([id: id , name: "Company$id", type: OrgType.Company], createContact)
-                company.location.kind = Location.Kind.remittance
-                company.location.persist()
-            }
+            // (2..3).each{ id ->
+            //     def company = createOrg([id: id , name: "Company$id", type: OrgType.Company], createContact)
+            //     company.location.kind = Location.Kind.remittance
+            //     company.location.persist()
+            // }
             Org.repo.flush()
             (4..5).each{ id ->
                 def division = createOrg([

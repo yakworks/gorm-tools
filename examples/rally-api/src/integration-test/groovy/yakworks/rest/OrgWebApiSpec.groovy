@@ -81,10 +81,11 @@ class OrgWebApiSpec extends Specification implements WebClientTrait {
 
     void "test qSearch"() {
         when:
+        //gets all that start with org 2
         Map body  = getBody("$path?q=org2")
 
-        then:
-        body.data.size() == 11
+        then: "should be 10 of them"
+        body.data.size() == 10
 
         when:
         body  = getBody("$path?q=flubber")

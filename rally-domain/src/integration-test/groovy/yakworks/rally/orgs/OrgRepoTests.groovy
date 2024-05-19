@@ -120,7 +120,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
     void "test create duplicate fail"() {
         when:
         def params = MockData.createOrg
-        params.num = '9' //should already exist in test db
+        params.num = '10' //should already exist in test db
         //flush during create so it forces the error catching
         def org = orgRepo.create(Maps.clone(params), [flush: true])
         // orgRepo.flush()
@@ -299,9 +299,9 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
     void "delete associated domains with org"() {
         when:
-        Org org = Org.get(9)
-        Contact contact = Contact.get(9)
-        Contact contact2 = Contact.findWhere(num: 'secondary9')
+        Org org = Org.get(10)
+        Contact contact = Contact.get(10)
+        Contact contact2 = Contact.findWhere(num: 'secondary10')
         OrgCalc calc = new OrgCalc(id:org.id).persist()
         org.calc = calc
         assert org.member
@@ -327,12 +327,12 @@ class OrgRepoTests extends Specification implements DomainIntTest {
        // flush()
 
         then:
-        !Org.get(9)
-        !Contact.exists(9)
-        !Contact.findWhere(num: 'secondary9')
+        !Org.get(10)
+        !Contact.exists(10)
+        !Contact.findWhere(num: 'secondary10')
         !Contact.findAllByOrg(org)
         !OrgFlex.get(org.id)
-        !OrgCalc.get(9)
+        !OrgCalc.get(10)
         !OrgSource.findByOrgId(org.id)
         !OrgMember.get(org.id)
         !OrgInfo.get(org.id)

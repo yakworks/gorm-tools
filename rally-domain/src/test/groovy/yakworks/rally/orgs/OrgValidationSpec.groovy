@@ -15,7 +15,7 @@ import yakworks.testing.gorm.unit.DataRepoTest
 
 class OrgValidationSpec extends Specification implements DataRepoTest, SecurityTest {
     static List entityClasses = [Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo]
-    static springBeans = [ orgDimensionService: OrgDimensionService ]
+    static springBeans = [ OrgDimensionService ]
 
     void "sanity check validation"() {
         when:

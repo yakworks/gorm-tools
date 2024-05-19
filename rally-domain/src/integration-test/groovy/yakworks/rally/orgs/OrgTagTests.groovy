@@ -153,15 +153,15 @@ class OrgTagTests extends Specification implements DomainIntTest {
 
     void addTagsForSearch(){
         setUpData()
-        orgTagRepo.create(8, 1)
-        orgTagRepo.create(9, 1)
         orgTagRepo.create(10, 1)
-        orgTagRepo.create(10, 2)
-        orgTagRepo.create(11, 2)
+        orgTagRepo.create(11, 1)
+        orgTagRepo.create(12, 1)
+        orgTagRepo.create(12, 2)
+        orgTagRepo.create(13, 2)
         orgTagRepo.flushAndClear()
         //sanity check
-        assert orgTagRepo.exists(Org.load(9), Tag.load(1))
         assert orgTagRepo.exists(Org.load(10), Tag.load(1))
+        assert orgTagRepo.exists(Org.load(11), Tag.load(1))
     }
 
 

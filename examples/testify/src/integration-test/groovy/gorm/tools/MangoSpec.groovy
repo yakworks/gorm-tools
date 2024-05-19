@@ -52,28 +52,26 @@ class MangoSpec extends Specification {
         List list = Org.repo.queryList(params)
         then:
         list.size() == 2
-        list[0].name == "Org9"
-        list[1].name == "Org12"
+        list[0].num == "9"
+        list[1].num == "12"
     }
 
     def "Filter by Name ilike"() {
         when: "eq"
         List list = Org.queryList([q: [name: "Org2%"], max: 150])
         then:
-        list.size() == 11
-        list[0].name == "Org2"
-        list[1].name == "Org20"
-        list[10].name == "Org29"
+        list.size() == 10
+        list[0].name == "Org20"
+        list[9].name == "Org29"
     }
 
     def "Filter by Name wildcard"() {
         when: "eq"
         List list = Org.queryList(name: "Org2*", max: 20)
         then:
-        list.size() == 11
-        list[0].name == "Org2"
-        list[1].name == "Org20"
-        list[10].name == "Org29"
+        list.size() == 10
+        list[0].name == "Org20"
+        list[9].name == "Org29"
     }
 
     def "Filter by nested id"() {
@@ -81,7 +79,7 @@ class MangoSpec extends Specification {
         List list = Org.repo.queryList(q: [flex: [id: 2]])
         then:
         list.size() == 1
-        list[0].name == "Org2"
+        list[0].num == "2"
         list[0].flex.id == 2
     }
 
@@ -90,7 +88,7 @@ class MangoSpec extends Specification {
         List list = Org.repo.queryList(q: ["flex.id": 2])
         then:
         list.size() == 1
-        list[0].name == "Org2"
+        list[0].num == "2"
         list[0].flex.id == 2
     }
 
@@ -99,7 +97,7 @@ class MangoSpec extends Specification {
         List list = Org.repo.queryList([q: [flex: [id: [24, 25, 26]]]])
         then:
         list.size() == 3
-        list[0].name == "Org24" //sanity check
+        list[0].num == "24" //sanity check
     }
 
     def "Filter by nested string"() {
@@ -114,7 +112,7 @@ class MangoSpec extends Specification {
         List list = Org.queryList('info.phone': "1-800-4")
         then:
         list.size() == 1
-        list[0].name == "Org4"
+        list[0].num == "4"
         list[0].info.phone == "1-800-4"
     }
 
@@ -150,7 +148,7 @@ class MangoSpec extends Specification {
         then:
         list.size() == 1
         list[0].flex.num1 == 2.50
-        list[0].name == "Org3"
+        list[0].num == "3"
     }
 
     def "Filter by BigDecimal in list"() {
@@ -159,9 +157,9 @@ class MangoSpec extends Specification {
         then:
         list.size() == 2
         list[0].flex.num1 == 2.50
-        list[0].name == "Org3"
+        list[0].num == "3"
         list[1].flex.num1 == 3.75
-        list[1].name == "Org4"
+        list[1].num == "4"
     }
 
     def "Filter by BigDecimal in list dot"() {
@@ -170,9 +168,9 @@ class MangoSpec extends Specification {
         then:
         list.size() == 2
         list[0].flex.num1 == 2.50
-        list[0].name == "Org3"
+        list[0].num == "3"
         list[1].flex.num1 == 3.75
-        list[1].name == "Org4"
+        list[1].num == "4"
     }
 
     def "Filter by LocDate"() {
@@ -198,22 +196,22 @@ class MangoSpec extends Specification {
         list[0].flexId == 2
     }
 
-    def "Filter with `or` "() {
+    def "Filter with `or`"() {
         when:
-        List list = Org.queryList('$or': ["name": "Org9", "flexId": 10])
+        List list = Org.queryList('$or': ["num": "9", "flexId": 10])
         then:
         list.size() == 2
-        list[0].name == "Org9"
-        list[1].name == "Org10"
+        list[0].num == "9"
+        list[1].num == "10"
     }
 
     def "Filter with `or` dot id"() {
         when:
-        List list = Org.queryList('$or': ["name": "Org9", "flex.id": 10])
+        List list = Org.queryList('$or': ["num": "9", "flex.id": 10])
         then:
         list.size() == 2
-        list[0].name == "Org9"
-        list[1].name == "Org10"
+        list[0].num == "9"
+        list[1].num == "10"
     }
 
     def "Filter with `or` on low level"() {
@@ -231,7 +229,7 @@ class MangoSpec extends Specification {
         def crit = Org.query(
             '$or': [
                 ["location.city": "City3"],
-                ["name": "Org4", "location.city": "City4"]
+                ["num": "4", "location.city": "City4"]
             ],
             sort: "contact.location.city"
         )
@@ -262,7 +260,7 @@ class MangoSpec extends Specification {
 
     def "Filter with `or` with like"() {
         when:
-        List list = Org.queryList('$or': ["name": "Org2%", "location.city": "City4"])
+        List list = Org.queryList('$or': ["num": "2%", "location.city": "City4"])
         then:
         list.size() == 12
     }
@@ -288,11 +286,11 @@ class MangoSpec extends Specification {
         list.size() == 2
     }
 
-    def "Filter by Name ilike()"() {
+    def "Filter by Name ilike explicit"() {
         when:
         List list = Org.queryList(name: ['$ilike': "Org2%"])
         then:
-        list.size() == 11
+        list.size() == 10
     }
 
     def "Filter with `gt()`"() {
@@ -456,7 +454,7 @@ class MangoSpec extends Specification {
         when:
         List list = Org.queryList(q: "Org2")
         then:
-        list.size() == 11
+        list.size() == 10
 
     }
 
@@ -464,7 +462,7 @@ class MangoSpec extends Specification {
         when:
         List list = Org.queryList(q: "Org2")
         then:
-        list.size() == 11
+        list.size() == 10
 
     }
 

@@ -124,11 +124,11 @@ trait BaseRepoEntityUnitTest {
      */
     @CompileDynamic
     void registerSpringBeansMap(){
-        def springBeans = PropertyTools.getOrNull(this, 'springBeans')
+        Map springBeanMap = getSpringBeanMap()
         // GrailsAppUnitTest calls this method in the getGrailsApplication but before it sets initialized = true,
         // so this wont run the first time its called from there, we want to only regiestser the beans when the defineRepoBeans is called
-        if(springBeans && getInitialized()){
-            SpringBeanUtils.registerBeans((BeanDefinitionRegistry)applicationContext, springBeans as Map<String, Object>)
+        if(springBeanMap && getInitialized()){
+            SpringBeanUtils.registerBeans((BeanDefinitionRegistry)applicationContext, springBeanMap as Map<String, Object>)
         }
     }
 

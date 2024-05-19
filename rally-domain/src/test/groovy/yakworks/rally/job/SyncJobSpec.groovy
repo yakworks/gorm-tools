@@ -20,9 +20,8 @@ import yakworks.testing.gorm.unit.SecurityTest
 class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTest {
     static entityClasses = [SyncJob, Attachment, AttachmentLink]
     static springBeans = [
-        //attachmentSupport:AttachmentSupport,
-        syncJobService:DefaultSyncJobService,
-        maintenanceProps: MaintenanceProps
+        MaintenanceProps,
+        [syncJobService: DefaultSyncJobService]
     ]
 
     @Autowired DefaultSyncJobService syncJobService

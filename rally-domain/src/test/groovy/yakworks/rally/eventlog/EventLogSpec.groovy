@@ -9,7 +9,7 @@ import yakworks.testing.gorm.unit.GormHibernateTest
 
 class EventLogSpec extends Specification implements GormHibernateTest {
     static List entityClasses = [EventLog]
-    static Map springBeans = [eventLogger: EventLogger]
+    static List springBeans = [EventLogger]
 
     @Autowired EventLogger eventLogger
 

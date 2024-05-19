@@ -13,7 +13,7 @@ import yakworks.rally.listeners.RallyEventListener
 
 class RallyEventListenerSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List<Class> entityClasses = [AppUser, SecRole, SecRoleUser]
-    static springBeans = [rallyEventListener: RallyEventListener]
+    static List springBeans = [RallyEventListener]
 
     void "test orgid assignment"() {
         setup:

@@ -19,7 +19,7 @@ import grails.web.servlet.mvc.GrailsParameterMap
 @CompileStatic
 trait RestResponderTrait {
 
-    @Autowired(required = false) RestResponderService restResponderService
+    @Autowired RestResponderService restResponderService
 
     //will get implemented by normal controller and WebAttributes
     //FIXME change to what we end up with with our override for getParamsMap()

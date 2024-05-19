@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service
 import gorm.tools.model.SourceType
 import gorm.tools.problem.ProblemHandler
 import grails.gorm.transactions.Transactional
-import jakarta.annotation.Nullable
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.Task
 import yakworks.rally.activity.model.TaskStatus
@@ -35,17 +34,13 @@ import yakworks.rally.orgs.model.Org
 @CompileStatic
 class ActivityBulk {
 
-    @Autowired @Nullable
-    ActivityRepo activityRepo
+    @Autowired ActivityRepo activityRepo
 
-    @Autowired @Nullable
-    ActivityLinkRepo activityLinkRepo
+    @Autowired ActivityLinkRepo activityLinkRepo
 
-    @Autowired @Nullable
-    AttachmentRepo attachmentRepo
+    @Autowired AttachmentRepo attachmentRepo
 
-    @Autowired @Nullable
-    ProblemHandler problemHandler
+    @Autowired ProblemHandler problemHandler
 
     /**
      * insert a single activity and note for a list of domains.

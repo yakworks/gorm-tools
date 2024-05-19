@@ -19,6 +19,7 @@ import grails.spring.BeanBuilder
 import grails.util.Holders
 import grails.validation.DeferredBindingActions
 import yakworks.commons.beans.PropertyTools
+import yakworks.commons.lang.NameUtils
 import yakworks.gorm.boot.SpringBeanUtils
 
 /**
@@ -34,6 +35,9 @@ trait GrailsAppUnitTest extends GrailsUnitTest{
     private static GrailsApplication _grailsApp
     boolean initialized
     private static Object _servletContext
+
+    //hack, see explanation on isDataRepoTest in GrailsAppBuilder. has to do with context.'annotation-config'() being needed
+    boolean getDataRepoTest(){false}
 
     /**
      * @return the servlet context
@@ -61,7 +65,8 @@ trait GrailsAppUnitTest extends GrailsUnitTest{
                     doWithConfig: doWithConfig(),
                     includePlugins: getIncludePlugins(),
                     loadExternalBeans: loadExternalBeans(),
-                    localOverride: localOverride
+                    localOverride: localOverride,
+                    isDataRepoTest: getDataRepoTest()
             ).build()
             _grailsApp = builder.grailsApplication
             _servletContext = builder.servletContext
@@ -76,10 +81,34 @@ trait GrailsAppUnitTest extends GrailsUnitTest{
      * if springBeans static prop or getter is defined then this will do the SpringBeanUtils.registerBeans
      */
     void registerSpringBeansMap(){
-        def springBeans = PropertyTools.getOrNull(this, 'springBeans')
-        if(springBeans){
-            SpringBeanUtils.registerBeans((BeanDefinitionRegistry)applicationContext, springBeans as Map<String, Object>)
+        Map springBeanMap = getSpringBeanMap()
+        if(springBeanMap){
+            SpringBeanUtils.registerBeans((BeanDefinitionRegistry)applicationContext, springBeanMap as Map<String, Object>)
         }
+    }
+
+    Map getSpringBeanMap(){
+        def springBeans = PropertyTools.getOrNull(this, 'springBeans')
+        Map springBeanMap = [:] as Map<String, Object>
+        if(springBeans) {
+            if (springBeans instanceof List) {
+                //assumes its a list of Classes or Maps. If Class then just use the simple property name for key.
+                //if its a Map then should be normal and will be merged in.
+                for (Object bentry : springBeans) {
+                    if (bentry instanceof Class) {
+                        String beanName = NameUtils.getPropertyName(bentry)
+                        springBeanMap[beanName] = bentry
+                    } else if (bentry instanceof Map) {
+                        springBeanMap.putAll(bentry)
+                    } else {
+                        throw new IllegalArgumentException("Items in springBeans List property must either be a Class or a Map")
+                    }
+                }
+            } else {
+                springBeanMap = springBeans as Map
+            }
+        }
+        return springBeanMap
     }
 
     /**

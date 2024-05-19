@@ -48,17 +48,10 @@ import static yakworks.rally.activity.model.Activity.VisibleTo
 @CompileStatic
 class ActivityRepo extends LongIdGormRepo<Activity> {
 
-    @Autowired(required = false)
-    ActivityLinkRepo activityLinkRepo
-
-    @Autowired(required = false)
-    AttachmentRepo attachmentRepo
-
-    @Autowired(required = false)
-    CurrentUser currentUser
-
-    @Autowired(required = false)
-    ProblemHandler problemHandler
+    @Autowired ActivityLinkRepo activityLinkRepo
+    @Autowired AttachmentRepo attachmentRepo
+    @Autowired CurrentUser currentUser
+    @Autowired ProblemHandler problemHandler
 
     @RepoListener
     void beforeValidate(Activity activity, Errors errors) {

@@ -52,9 +52,11 @@ trait RestRepoApiController<D> extends RestApiController {
     @SuppressWarnings(['LoggerWithWrongModifiers'])
     Logger log = LoggerFactory.getLogger(this.class)
 
+    /** Not required but if an entityResponder bean is setup then it will get get used */
     @Autowired(required = false)
     EntityResponder<D> entityResponder
 
+    /** Not required but if an bulkControllerSupport bean is setup then it will get get used */
     @Autowired(required = false)
     BulkControllerSupport<D> bulkControllerSupport
 

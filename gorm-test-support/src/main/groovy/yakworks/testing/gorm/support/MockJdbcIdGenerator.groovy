@@ -14,14 +14,15 @@ import org.springframework.transaction.annotation.Propagation
 import gorm.tools.idgen.IdGenerator
 import grails.gorm.transactions.Transactional
 
-/** testing stub for the IdGenerator
+/**
+ * testing stub for the IdGenerator
  */
 @SuppressWarnings('SynchronizedMethod')
 @CompileStatic
 class MockJdbcIdGenerator implements IdGenerator {
 
-    static long seedValue = 1 //the Id to start with if it does not exist in the table
-    ConcurrentMap<String, Long> table = new ConcurrentHashMap<String, Long>()
+    static long seedValue = 1000 //the Id to start with if it does not exist in the table
+    ConcurrentMap<String, Long> hashTable = new ConcurrentHashMap<String, Long>()
     //Map<String, Integer> table = new HashMap<String, Integer>()
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -32,13 +33,13 @@ class MockJdbcIdGenerator implements IdGenerator {
     //@Transactional(propagation = Propagation.REQUIRES_NEW)
     private long updateIncrement(String keyName, long increment) {
         long oid
-        if (table.containsKey(keyName)) {
-            oid = table.get(keyName)
-            table.put(keyName, oid + increment)
+        if (hashTable.containsKey(keyName)) {
+            oid = hashTable.get(keyName)
+            hashTable.put(keyName, oid + increment)
         } else { //no rows exist so create it
             oid = seedValue
             long futureId = seedValue + increment
-            table.put(keyName, futureId)
+            hashTable.put(keyName, futureId)
         }
         return oid
     }

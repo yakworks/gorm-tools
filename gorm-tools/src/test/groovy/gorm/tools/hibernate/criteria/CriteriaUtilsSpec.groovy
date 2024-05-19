@@ -8,7 +8,7 @@ import grails.persistence.Entity
 import spock.lang.Specification
 import yakworks.testing.gorm.unit.GormHibernateTest
 
-class CriteriaUtilsSpec extends Specification implements GormHibernateTest{
+class CriteriaUtilsSpec extends Specification implements GormHibernateTest {
     static List entityClasses = [Test, Test2]
 
     def setup() {
@@ -20,6 +20,7 @@ class CriteriaUtilsSpec extends Specification implements GormHibernateTest{
                 nestedField: new Test2(someField: value)
             ).save(failOnError: true)
         }
+        flush()
     }
 
     def "test order for one column"() {

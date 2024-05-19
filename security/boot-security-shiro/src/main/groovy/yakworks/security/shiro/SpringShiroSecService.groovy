@@ -26,10 +26,10 @@ import yakworks.spring.AppCtx
 @CompileStatic
 class SpringShiroSecService extends SpringSecService {
 
-    @Autowired(required = false)
+    @Autowired
     SpringSecurityRealm springSecurityRealm
 
-    @Autowired(required = false)
+    @Autowired
     WebSecurityManager shiroSecurityManager
 
     /**

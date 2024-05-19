@@ -19,6 +19,7 @@ check: lint
 	# $(gradlew) check --max-workers=3
 	$(gradlew) check
 
+## clean and remove the .build-cache/
 clean.all:
 	rm -rf .build-cache/
 	$(MAKE) clean

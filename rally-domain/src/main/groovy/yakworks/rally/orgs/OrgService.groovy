@@ -28,17 +28,12 @@ import yakworks.rally.orgs.repo.OrgRepo
 @CompileStatic
 class OrgService {
 
-    @Autowired(required = false)
-    OrgDimensionService orgDimensionService
-
-    @Autowired(required = false)
-    OrgProps orgProps
-
-    @Autowired(required = false)
-    OrgRepo orgRepo
+    @Autowired OrgDimensionService orgDimensionService
+    @Autowired OrgProps orgProps
+    @Autowired OrgRepo orgRepo
 
     boolean isOrgMemberEnabled(){
-        return orgProps?.members?.enabled
+        return orgProps.members.enabled
     }
 
     /** shortcut to config orgProps.partition */
@@ -79,7 +74,7 @@ class OrgService {
         //spin through orgTypes for immediate parents and update parents
         for (OrgType type : immediateParents) {
             Map orgParam = params[type.propertyName]
-            Validate.notEmpty(orgParam, "setupMember called but params does not contain ${type.propertyName}")
+            Validate.notEmpty(orgParam, "setupMember called for ${org.stamp} type:${org.type}, but params does not contain ${type.propertyName}")
             //add type for lookup
             orgParam.type = type
 

@@ -4,11 +4,12 @@ import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
+import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.TestDataJson
 import yakworks.testing.gorm.unit.DataRepoTest
 
-class LocationSpec extends Specification implements DataRepoTest, SecurityTest {
+class LocationSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [Org, Contact, Location]
 
     Map buildMap(Map args) {

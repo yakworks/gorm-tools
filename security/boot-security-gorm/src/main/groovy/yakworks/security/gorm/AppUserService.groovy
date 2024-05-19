@@ -29,11 +29,8 @@ import yakworks.security.user.CurrentUser
 @Transactional
 class AppUserService {
 
-    @Autowired
-    CurrentUser currentUser
-
-    @Autowired(required = false) //required = false so in case spring sec is not working
-    PasswordValidator passwordValidator
+    @Autowired CurrentUser currentUser
+    @Autowired PasswordValidator passwordValidator
 
     /**
      * Create new record in secLoginHistory with logged in user and date

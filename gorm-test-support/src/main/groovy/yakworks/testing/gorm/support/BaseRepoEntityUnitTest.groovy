@@ -118,16 +118,17 @@ trait BaseRepoEntityUnitTest {
     }
 
     /**
+     * Overrides the one in GrailsAppUnitTest
      * if springBeans static prop or getter is defined then this will do the SpringBeanUtils.registerBeans
      * Overrides the one in GrailsAppUnitTest
      */
     @CompileDynamic
     void registerSpringBeansMap(){
-        def springBeans = PropertyTools.getOrNull(this, 'springBeans')
+        Map springBeanMap = getSpringBeanMap()
         // GrailsAppUnitTest calls this method in the getGrailsApplication but before it sets initialized = true,
         // so this wont run the first time its called from there, we want to only regiestser the beans when the defineRepoBeans is called
-        if(springBeans && getInitialized()){
-            SpringBeanUtils.registerBeans((BeanDefinitionRegistry)applicationContext, springBeans as Map<String, Object>)
+        if(springBeanMap && getInitialized()){
+            SpringBeanUtils.registerBeans((BeanDefinitionRegistry)applicationContext, springBeanMap as Map<String, Object>)
         }
     }
 
@@ -187,6 +188,7 @@ trait BaseRepoEntityUnitTest {
 
     /**
      * override this to add beans that are needed for security setups.
+     * See SecurityTest, that what this is primarily for.
      * just bean definitions that are added along with whats in doWithGormBeans
      * @return the bean builder closure.
      */
@@ -196,14 +198,12 @@ trait BaseRepoEntityUnitTest {
 
     /**
      * doWithConfig is called early on the first setup of the AppCtx in the GrailsAppUnitTest.
-     * override this to modify config but dont forget to add in the gormConfigDefaults if doing so.
+     * override this to modify config.
      */
     @Override //in the GrailUnitTest
     @CompileDynamic //closure might have a weird delegate if this is not marked with CompileDynamic
     Closure doWithConfig() {
-        { cfg ->
-            gormConfigDefaults((PropertySourcesConfig)cfg)
-        }
+        null
     }
 
     /**

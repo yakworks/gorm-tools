@@ -22,8 +22,7 @@ import yakworks.rally.orgs.model.Org
 @Slf4j
 class OrgRepo extends AbstractOrgRepo {
 
-    @Autowired(required = false)
-    OrgTagRepo orgTagRepo
+    @Autowired OrgTagRepo orgTagRepo
 
 
     // add @Override

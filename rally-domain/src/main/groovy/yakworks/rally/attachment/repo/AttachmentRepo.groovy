@@ -42,11 +42,8 @@ import yakworks.rally.tag.model.TagLink
 class AttachmentRepo extends LongIdGormRepo<Attachment> {
     public static final String ATTACHMENT_LOCATION_KEY = "attachments.location"
 
-    @Autowired(required = false)
-    AttachmentSupport attachmentSupport
-
-    @Autowired(required = false)
-    AttachmentLinkRepo attachmentLinkRepo
+    @Autowired AttachmentSupport attachmentSupport
+    @Autowired AttachmentLinkRepo attachmentLinkRepo
 
     /**
      * wraps super.bindAndCreate in try catch so that on any exception

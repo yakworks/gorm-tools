@@ -31,9 +31,7 @@ class ActivityMailSpec extends Specification implements GormHibernateTest, Secur
         AttachmentLink, ActivityLink, MailMessage, Activity, TaskType, Org, OrgTag,
         Tag, TagLink, Attachment, ActivityNote, Contact, ActivityContact
     ]
-    static springBeans = [
-        attachmentSupport: AttachmentSupport
-    ]
+    static springBeans = [AttachmentSupport]
 
     @Shared Long orgId
 

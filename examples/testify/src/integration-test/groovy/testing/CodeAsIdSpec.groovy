@@ -32,6 +32,9 @@ class CodeAsIdSpec extends Specification implements DomainIntTest {
         thing.code == "t1"
         ThingStringId.findWhere(code:"t1")
 
+        and: "query"
+        ThingStringId.query("id":"t1").get()
+        
         when: "update"
         ThingStringId.update(id:"t1", name:"test-updated")
         flush()

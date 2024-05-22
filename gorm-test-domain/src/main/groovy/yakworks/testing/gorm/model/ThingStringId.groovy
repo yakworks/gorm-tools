@@ -4,14 +4,13 @@
 */
 package yakworks.testing.gorm.model
 
-import gorm.tools.mango.api.QueryMangoEntity
 import gorm.tools.model.NameCode
 import gorm.tools.repository.GormRepo
-import gorm.tools.repository.model.PersistableRepoEntity
+import gorm.tools.repository.model.StringIdRepoEntity
 import grails.persistence.Entity
 
 @Entity
-class ThingStringId implements NameCode<ThingStringId>, PersistableRepoEntity<ThingStringId, GormRepo, String>, QueryMangoEntity<ThingStringId> {
+class ThingStringId implements NameCode<ThingStringId>, StringIdRepoEntity<ThingStringId, GormRepo> {
     String id
 
     static mapping = {

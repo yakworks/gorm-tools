@@ -52,6 +52,12 @@ configurations.all {
     if (details.requested.group.startsWith('io.micronaut.spring')) {
       details.useVersion project['micronaut.spring.version']
     }
+    if (details.requested.group.startsWith('org.junit.jupiter')) {
+      details.useVersion project['vJunitJupiter']
+    }
+    if (details.requested.group.startsWith('org.junit.platform')) {
+      details.useVersion project['vJunitPlatform']
+    }
   }
 }
 

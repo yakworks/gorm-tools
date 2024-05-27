@@ -16,5 +16,5 @@ class ThingStringId implements NameCode<ThingStringId>, StringIdRepoEntity<Thing
     static mapping = {
         id generator: 'assigned', name: 'code', unique: true
     }
-    
+
 }

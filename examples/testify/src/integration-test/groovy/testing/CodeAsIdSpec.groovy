@@ -3,6 +3,7 @@ package testing
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+import yakworks.api.problem.data.DataProblemException
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.testing.gorm.model.ThingStringId
 
@@ -41,6 +42,20 @@ class CodeAsIdSpec extends Specification implements DomainIntTest {
 
         then:
         ThingStringId.findWhere(code:"t1").name == "test-updated"
+    }
+
+    void "test duplicate code"() {
+        when:
+        ThingStringId thing = new ThingStringId(name:"test", code:"t1")
+        thing.persist()
+        flushAndClear()
+
+        ThingStringId thing2 = new ThingStringId(name:"test2", code:"t1")
+        thing2.persist(flush:true)
+
+        then:
+        DataProblemException ex = thrown()
+        ex.detail.contains "Unique index or primary key violation"
     }
 
 }

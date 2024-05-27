@@ -14,13 +14,7 @@ class ThingStringId implements NameCode<ThingStringId>, StringIdRepoEntity<Thing
     String id
 
     static mapping = {
-        id generator: 'assigned'
-        code column: 'id', insertable: false, updateable: false
+        id generator: 'assigned', name: 'code', unique: true
     }
-
-    //need to set code from id, code is nullable:false
-    void beforeValidate() {
-        if(!this.code && this.id) this.code = this.id
-        if(!this.name && this.id) this.name = id.replaceAll('-', ' ')
-    }
+    
 }

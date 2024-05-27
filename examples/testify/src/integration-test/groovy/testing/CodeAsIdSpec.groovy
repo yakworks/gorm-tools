@@ -17,8 +17,7 @@ class CodeAsIdSpec extends Specification implements DomainIntTest {
 
     void "save and update"() {
         when:
-        ThingStringId thing = new ThingStringId(name:"test")
-        thing.id = "t1"
+        ThingStringId thing = new ThingStringId(name:"test", code:"t1")
         thing.persist(flush:true)
 
         then:

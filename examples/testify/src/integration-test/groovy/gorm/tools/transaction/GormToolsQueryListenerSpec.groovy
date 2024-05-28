@@ -43,6 +43,7 @@ class GormToolsQueryListenerSpec extends Specification {
         TransactionTimedOutException ex = thrown()
     }
 
+    @Ignore("Max not implemented")
     void "test max"() {
         setup:
         queryConfig.max = 5
@@ -57,6 +58,7 @@ class GormToolsQueryListenerSpec extends Specification {
         queryConfig.max = 100
     }
 
+    @Ignore("Max not implemented")
     void "test max with smaller value thn default max configured"() {
         when:
         List results = Org.list(max:10)
@@ -65,6 +67,7 @@ class GormToolsQueryListenerSpec extends Specification {
         results.size() == 10
     }
 
+    @Ignore("Max not implemented")
     void "user specific max"() {
         setup: "login as admin"
         userSecurityConfig.users['system'].queryMax = 20

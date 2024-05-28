@@ -38,9 +38,10 @@ class RallyPreQueryEventListener extends AbstractQueryListener implements Applic
                 setTimeout(event.query, userQueryConfig.queryTimeout)
             }
 
+            /* XXX @Josh setMax in AbstractQueryListener is commented?
             if (userQueryConfig.queryMax > 0) {
                 setMax(event.query, userQueryConfig.queryMax)
-            }
+            }*/
         }
     }
 

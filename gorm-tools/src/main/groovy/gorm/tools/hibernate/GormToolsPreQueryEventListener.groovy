@@ -28,12 +28,13 @@ class GormToolsPreQueryEventListener extends AbstractQueryListener implements Ap
             setTimeout(event.query, queryConfig.timeout)
         }
 
-        if(queryConfig.max > 0) {
-            setMax(event.query, queryConfig.max)
-        }
+        // if(queryConfig.max > 0) {
+        //     setMax(event.query, queryConfig.max)
+        // }
     }
 
-    //high precedence, so that it runs before RallyPreQueryEventListener
+    //highest precedence, so that this can run first and we can have others that run after this to be more specific
+    // for example, see RallyPreQueryEventListener
     @Override
     int getOrder() {
         return Ordered.HIGHEST_PRECEDENCE

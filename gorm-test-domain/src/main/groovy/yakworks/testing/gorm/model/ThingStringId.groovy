@@ -11,6 +11,10 @@ import grails.persistence.Entity
 
 @Entity
 class ThingStringId implements NameCode<ThingStringId>, StringIdRepoEntity<ThingStringId, GormRepo> {
+
+    //Need to have explicit String id field for class to compile.
+    //Otherwise, grails AST will add Long field by default, Persistable also requires getId() to match the generic type for ID
+    //Keeping ID field as alias to code also makes it possible to run ID based queries.
     String id
 
     static mapping = {

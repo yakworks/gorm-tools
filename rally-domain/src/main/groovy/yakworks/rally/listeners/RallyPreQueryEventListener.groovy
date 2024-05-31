@@ -11,7 +11,6 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.mapping.query.event.PreQueryEvent
 import org.springframework.context.ApplicationListener
 import org.springframework.core.Ordered
-import org.springframework.stereotype.Component
 
 import gorm.tools.hibernate.AbstractQueryListener
 import yakworks.rally.security.UserSecurityConfig
@@ -22,7 +21,7 @@ import yakworks.security.user.CurrentUser
  * Enables to set extended query timeout for specific users
  */
 @CompileStatic
-@Component
+//FIXME remove
 class RallyPreQueryEventListener extends AbstractQueryListener implements ApplicationListener<PreQueryEvent>, Ordered {
 
     @Inject CurrentUser currentUser

@@ -58,6 +58,11 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     List<String> systemAliases = [] as List<String>
 
     /**
+     * Query timeout in seconds. If value is set, the timeout would be set on hibernate criteria instance.
+     */
+    Integer timeout = 0
+
+    /**
      * Constructs a DetachedCriteria instance target the given class and alias for the name
      * The default is to use the short domain name with "_" appended to it.
      * @param targetClass The target class
@@ -116,6 +121,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         //use SimplePagedQuery so it can attach the totalCount
         PagedQuery hq = buildSimplePagedQuery()
         //def list = hq.list(queryInfo.query, queryInfo.paramMap, args)
+        args['timeout'] = timeout
         def list = hq.list(queryInfo.query, queryInfo.paramMap, args)
         return list as List<Map>
     }
@@ -388,8 +394,12 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
             if(session instanceof AbstractHibernateSession) {
                 // query = session.createQuery(targetClass, alias)
                 query = HibernateMangoQuery.createQuery( (AbstractHibernateSession)session, persistentEntity, alias)
+                if(timeout) {
+                    ((HibernateMangoQuery) query).getHibernateCriteria().setTimeout(timeout)
+                }
             }
             else {
+                //Can it ever be here - as we support only hibernate ?
                 query = session.createQuery(targetClass)
             }
 

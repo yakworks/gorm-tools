@@ -16,6 +16,7 @@ import org.springframework.core.Ordered
  * Sets query timeout for hibernate queries.
  */
 @CompileStatic
+//FIXME remove
 class GormToolsPreQueryEventListener extends AbstractQueryListener implements ApplicationListener<PreQueryEvent>, Ordered {
 
     @Inject QueryConfig queryConfig

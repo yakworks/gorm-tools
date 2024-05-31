@@ -1,3 +1,21 @@
+### v7.3.71
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.70...v7.3.71)
+- release [link](https://github.com/yakworks/gorm-tools/commit/0b45bb81b654538ec2bb8728b348b977fc11b83a)
+- Merge pull request #795 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/da3ad04120ed5d09449200edf6439455a72ce32c)
+- Tests for blankout values (#794) [link](https://github.com/yakworks/gorm-tools/commit/abf7668e49e1ddf9427521e4c25e8235da918056)
+-  Default query timeout (#790) [link](https://github.com/yakworks/gorm-tools/commit/0b04845978586a01b118ee6614809b9fbfcd7d85)
+- InvalidApiCallEvent cleanup (#789) [link](https://github.com/yakworks/gorm-tools/commit/acbd73258e9341cf83f4a678e4208c4cd9a5681d)
+- Api results renderer title fix (#788) [link](https://github.com/yakworks/gorm-tools/commit/22a334029ecec6c59c751864a0bc4e2d0d3aee9e)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/dfdb469da6db5a5ac123c464049918c4632b45b4)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/511e0e8464c2e723d65e7b062a590d1f1276028e)
+- Do not log stacktraces for invalid json payloads  (#771) [link](https://github.com/yakworks/gorm-tools/commit/d127d29f9dd44582328d6791f3781bb1b134bec9)
+- Phase 1 : Handle assertion errors in controllers (#781) [link](https://github.com/yakworks/gorm-tools/commit/93499a01d0bc8befa1c263c3fbe1cc3358b13aba)
+- Api results renderer (#784) [link](https://github.com/yakworks/gorm-tools/commit/323cf91802085d954ac9636d11621d849dea22e1)
+- use grid config and uiList for export to excel (#785) [link](https://github.com/yakworks/gorm-tools/commit/5bbf1eb2cdf5569eb7cf2ce22b84f20313416a3f)
+- remove logging that was in place for the SyncJob stuff [link](https://github.com/yakworks/gorm-tools/commit/8b147f5fb307cf57c3c0f14ec2695048cc9c7a35)
+-  Mango query : Throw error for invalid/missing prop (#783) [link](https://github.com/yakworks/gorm-tools/commit/d34e254890af9c945d02d7ae672ac1d205cd8f89)
+
 ### v7.3.70
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.69...v7.3.70)

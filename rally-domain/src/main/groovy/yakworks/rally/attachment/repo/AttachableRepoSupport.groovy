@@ -17,11 +17,8 @@ import gorm.tools.repository.events.RepositoryEvent
 @CompileStatic
 trait AttachableRepoSupport {
 
-    @Autowired(required = false)
-    AttachmentLinkRepo attachmentLinkRepo
-
-    @Autowired(required = false)
-    AttachmentRepo attachmentRepo
+    @Autowired AttachmentLinkRepo attachmentLinkRepo
+    @Autowired AttachmentRepo attachmentRepo
 
     // call in beforeRemove
     void removeAttachmentLinks(Persistable linkedEntity) {

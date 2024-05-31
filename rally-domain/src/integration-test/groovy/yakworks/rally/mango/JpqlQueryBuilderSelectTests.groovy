@@ -98,7 +98,7 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         List res = Org.executeQuery(query, queryInfo.paramMap)
 
         then:
-        res.size() == 4
+        res.size() == 3
         res[0]['type'] == OrgType.Client
         res[0]['calc_totalDue_sum'] < res[1]['calc_totalDue_sum']
         res[1]['calc_totalDue_sum'] < res[2]['calc_totalDue_sum']

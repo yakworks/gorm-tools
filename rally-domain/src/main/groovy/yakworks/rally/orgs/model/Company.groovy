@@ -15,10 +15,7 @@ import yakworks.security.audit.AuditStamp
 @GrailsCompileStatic
 class Company implements NameNum, RepoEntity<Company>, Serializable {
     public static final Long DEFAULT_COMPANY_ID = 2
-    public static final Long BAD_DEBT_COMPANY_ID = 5
 
-    String website //FIXME whats this for? can't we get it from org.info
-    String sourceId //FIXME whats this for?
     static belongsTo = [org: Org]
 
     static mapping = {
@@ -29,8 +26,8 @@ class Company implements NameNum, RepoEntity<Company>, Serializable {
 
     static constraintsMap = [
         name:[ d: 'Full name for this company', maxSize: 255],
-        website:[d: 'The company website', nullable: true],
-        sourceId:[d: 'The source identifier for this company', nullable: true, maxSize: 50]
+        //website:[d: 'The company website', nullable: true],
+        ///sourceId:[d: 'The source identifier for this company', nullable: true, maxSize: 50]
     ]
 
 }

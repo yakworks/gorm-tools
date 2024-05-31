@@ -35,7 +35,7 @@ class OrgControllerTests extends RestIntTest {
 
         then:
         response.status == 200
-        Maps.containsAll(body, [id:9, num: '9', name: 'Org9'])
+        Maps.containsAll(body, [id:9, num: '9', name: 'Branch9'])
     }
 
     void "post with empty data"() {

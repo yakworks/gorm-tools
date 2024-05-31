@@ -15,15 +15,16 @@ import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.config.JobProps
 import yakworks.rally.config.MaintenanceProps
 import yakworks.testing.gorm.unit.DataRepoTest
+import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
-class DefaultSyncJobServiceSpec extends Specification implements DataRepoTest, SecurityTest {
+class DefaultSyncJobServiceSpec extends Specification implements GormHibernateTest, SecurityTest {
     static entityClasses = [SyncJob, Attachment]
     static springBeans = [
-        attachmentSupport: AttachmentSupport,
-        syncJobService   : DefaultSyncJobService,
-        maintenanceProps : MaintenanceProps,
-        jobProps : JobProps
+        AttachmentSupport,
+        MaintenanceProps,
+        JobProps,
+        DefaultSyncJobService
     ]
 
     @Autowired DefaultSyncJobService syncJobService

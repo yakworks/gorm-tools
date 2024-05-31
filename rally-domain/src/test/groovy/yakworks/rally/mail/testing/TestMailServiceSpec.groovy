@@ -12,7 +12,7 @@ import yakworks.rally.mail.config.MailProps
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class TestMailServiceSpec extends Specification implements GormHibernateTest  {
-    static springBeans = [testMailService: TestMailService, mailProps: MailProps]
+    static springBeans = [TestMailService, MailProps]
     //static List entityClasses = [ValidationEntity]
 
     @Autowired TestMailService testMailService

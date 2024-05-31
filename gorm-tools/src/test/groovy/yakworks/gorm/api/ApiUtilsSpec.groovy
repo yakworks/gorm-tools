@@ -9,7 +9,7 @@ import yakworks.testing.grails.GrailsAppUnitTest
  * sanity checking that @ConfigurationProperties works
  */
 class ApiUtilsSpec extends Specification implements GrailsAppUnitTest {
-    static springBeans = [apiConfig: ApiConfig]
+    static List springBeans = [ApiConfig]
 
     @Autowired ApiConfig apiConfig
 

@@ -115,13 +115,15 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      *
      * @return A list of matching instances
      */
-    List<Map> mapList(Map args = Collections.emptyMap()) {
+    List<Map> mapList(Map args = [:]) {
         def builder = JpqlQueryBuilder.of(this) //.aliasToMap(true)
         JpqlQueryInfo queryInfo = builder.buildSelect()
         //use SimplePagedQuery so it can attach the totalCount
         PagedQuery hq = buildSimplePagedQuery()
         //def list = hq.list(queryInfo.query, queryInfo.paramMap, args)
-        args['timeout'] = timeout
+        if(timeout) {
+            args['timeout'] = timeout
+        }
         def list = hq.list(queryInfo.query, queryInfo.paramMap, args)
         return list as List<Map>
     }

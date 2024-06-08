@@ -400,6 +400,7 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
         setup:
         new TestSource(name:"test", source:"s1", sourceId: "sid1").save()
         new TestSource(name:"test2", source:"s2", sourceId: "sid2").save()
+        flush()
 
         when:
         List l = mangoBuilder.build(TestSource, [sourceId:"sid1"]).list()

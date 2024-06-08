@@ -4,10 +4,10 @@
 */
 package yakworks.rally.orgs.repo
 
-import javax.inject.Inject
 
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataRetrievalFailureException
 
 import gorm.tools.databinding.BindAction
@@ -23,7 +23,6 @@ import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.utils.GormUtils
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
-import jakarta.annotation.Nullable
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.commons.map.Maps
 import yakworks.rally.activity.model.ActivityContact
@@ -42,12 +41,8 @@ import yakworks.security.gorm.model.AppUser
 class ContactRepo extends LongIdGormRepo<Contact> {
     private static final String IS_PRIMARY = "isPrimary"
 
-    //Making this nullable makes it easier to wire up for tests.
-    @Inject @Nullable
-    LocationRepo locationRepo
-
-    @Inject @Nullable
-    ContactSourceRepo contactSourceRepo
+    @Autowired LocationRepo locationRepo
+    @Autowired ContactSourceRepo contactSourceRepo
 
     @RepoListener
     void beforeValidate(Contact contact) {

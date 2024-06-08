@@ -24,7 +24,7 @@ import static yakworks.json.groovy.JsonEngine.parseJson
 
 class BulkableRepoSpec extends Specification implements GormHibernateTest {
     static entityClasses = [KitchenSink, SinkExt, TestSyncJob]
-    static springBeans = [syncJobService: TestSyncJobService]
+    static springBeans = [TestSyncJobService]
 
     @Autowired AsyncConfig asyncConfig
     @Autowired AsyncService asyncService

@@ -15,7 +15,7 @@ import yakworks.testing.gorm.model.SinkExt
 import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.model.Thing
 
-class IncludesConfigSpec extends Specification  implements DataRepoTest  {
+class IncludesConfigSpec extends Specification implements DataRepoTest  {
     static List entityClasses = [KitchenSink, SinkExt, SinkItem, Thing, Enummy]
 
     @Autowired IncludesConfig includesConfig

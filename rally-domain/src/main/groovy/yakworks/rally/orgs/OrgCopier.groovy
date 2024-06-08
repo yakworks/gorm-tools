@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service
 
 import gorm.tools.utils.GormUtils
 import grails.gorm.transactions.Transactional
-import jakarta.annotation.Nullable
 import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.rally.activity.ActivityCopier
@@ -35,11 +34,11 @@ import yakworks.rally.orgs.repo.OrgTagRepo
 @CompileStatic
 class OrgCopier {
 
-    @Inject @Nullable ContactRepo contactRepo
-    @Inject @Nullable OrgTagRepo orgTagRepo
-    @Inject @Nullable AttachmentLinkRepo attachmentLinkRepo
-    @Inject @Nullable ActivityRepo activityRepo
-    @Inject @Nullable ActivityCopier activityCopier
+    @Inject ContactRepo contactRepo
+    @Inject OrgTagRepo orgTagRepo
+    @Inject AttachmentLinkRepo attachmentLinkRepo
+    @Inject ActivityRepo activityRepo
+    @Inject ActivityCopier activityCopier
 
     /**
      * Copies fields from the one Org entity to another, it copies associations as well.

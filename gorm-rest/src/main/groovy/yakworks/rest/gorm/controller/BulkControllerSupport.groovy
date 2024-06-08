@@ -4,7 +4,7 @@
 */
 package yakworks.rest.gorm.controller
 
-import javax.inject.Inject
+
 import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
@@ -37,16 +37,16 @@ import yakworks.spring.AppCtx
 @SuppressWarnings(['CatchRuntimeException'])
 class BulkControllerSupport<D> {
 
-    @Autowired(required = false)
+    @Autowired
     SyncJobService syncJobService
 
-    @Autowired(required = false)
+    @Autowired
     CsvToMapTransformer csvToMapTransformer
 
-    @Autowired(required = false)
+    @Autowired
     IncludesConfig includesConfig
 
-    @Inject ProblemHandler problemHandler
+    @Autowired ProblemHandler problemHandler
 
     Class<D> entityClass // the domain class this is for
 

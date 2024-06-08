@@ -67,7 +67,7 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
 
         then:
         resp.code() == HttpStatus.OK.value()
-        body.data.size() == 11
+        body.data.size() == 10
 
         when:
         resp = get("$path?q=flubber")

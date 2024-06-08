@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service
 
 import gorm.tools.repository.RepoUtil
 import grails.gorm.transactions.Transactional
-import jakarta.annotation.Nullable
 import yakworks.api.Result
 import yakworks.api.problem.Problem
 import yakworks.commons.lang.Validate
@@ -38,7 +37,7 @@ import yakworks.spring.AppCtx
 @CompileStatic
 class ActivityService {
 
-    @Inject @Nullable MailMessageSender mailMessageSender
+    @Inject MailMessageSender mailMessageSender
 
     /** static helper for ActivityUtils */
     static ActivityService bean(){

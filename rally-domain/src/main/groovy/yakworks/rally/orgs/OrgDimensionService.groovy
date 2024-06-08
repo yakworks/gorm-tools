@@ -33,7 +33,7 @@ class OrgDimensionService {
 
     @Autowired OrgProps orgProps
 
-    @Autowired(required = false) //required = false so unit tests work
+    @Autowired(required = false) //optional so integration tests dont need it setup to test
     CacheManager cacheManager
 
     protected boolean isInitialized = false

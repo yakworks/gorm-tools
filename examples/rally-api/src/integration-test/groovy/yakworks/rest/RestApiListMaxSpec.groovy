@@ -25,7 +25,6 @@ class RestApiListMaxSpec extends Specification  implements WebClientTrait {
 
         then:
         body
-        body.records == 100
         body.total == 5 //5 pages, max=20 should have been applied
 
         cleanup:

@@ -2,10 +2,7 @@ package yakworks.rest
 
 import org.springframework.http.HttpStatus
 import yakworks.commons.map.Maps
-import yakworks.rally.orgs.model.Contact
-import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Org
-import yakworks.rally.orgs.model.OrgType
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response

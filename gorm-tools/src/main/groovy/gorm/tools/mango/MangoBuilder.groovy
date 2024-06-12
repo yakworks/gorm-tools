@@ -4,8 +4,6 @@
 */
 package gorm.tools.mango
 
-import java.util.UUID
-
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j

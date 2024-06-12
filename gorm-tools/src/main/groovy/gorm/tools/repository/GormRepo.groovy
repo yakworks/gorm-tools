@@ -42,7 +42,7 @@ import yakworks.commons.lang.ClassUtils
  * @author Joshua Burnett (@basejump)
  * @since 6.x
  */
-@SuppressWarnings(['EmptyMethod'])
+@SuppressWarnings(['EmptyMethod', 'MethodCount'])
 @CompileStatic
 trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
 

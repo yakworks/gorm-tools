@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.beans.factory.config.BeanPostProcessor
 
 /**
+ * NOTE: THIS IS NOT USED BUT WE MIGHT COME BACK TO IT. KEPT FOR LATER USE
  * Sets default transaction timeout for GrailsHibernateTransactionManager
  * timeout value can be configured using `spring.transaction.default-timeout`
  */

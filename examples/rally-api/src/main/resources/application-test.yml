@@ -5,3 +5,4 @@ app.security.enabled: true
 spring.security.user.name: admin
 spring.security.user.password: 123
 spring.transaction.default-timeout: 60
+

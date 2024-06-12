@@ -33,7 +33,7 @@ class RestApiListMaxSpec extends Specification  implements WebClientTrait {
     }
 
     void "test list - admin user"() {
-        setup: "this user cant max > 20"
+        setup: "this user can max upto 100"
 
         when:
         ResponseEntity resp = get("$path?q=*&max=50")

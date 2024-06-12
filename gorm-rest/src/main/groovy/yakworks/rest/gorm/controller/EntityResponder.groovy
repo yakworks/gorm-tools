@@ -127,7 +127,13 @@ class EntityResponder<D> {
             //sets timeout on underlying hibernate criteria or hql query
             Integer timeout = userSecurityConfig.getQueryTimeout(currentUser)
             if(!timeout) timeout = queryConfig.timeout
-            qargs.timeout(timeout)
+            if(timeout) qargs.timeout(timeout)
+
+            Integer max = userSecurityConfig.getMax(currentUser)
+            if(!max) max = queryConfig.max
+            if(max && pager.max && pager.max > max) {
+                qargs.pager.max = max
+            }
 
             if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.buildCriteria()}")
             ((QueryMangoEntityApi) getRepo()).queryList(qargs, null, debugEnabled ? log : null)

@@ -27,12 +27,27 @@ class UserSecurityConfig {
         }
     }
 
+    Integer getMax(CurrentUser currentUser) {
+        if (!currentUser || !currentUser.loggedIn) null
+        else {
+            return getMax(currentUser.user.username)
+        }
+    }
+
     Integer getQueryTimeout(String username) {
         Integer timeout = null
         if(users && users.containsKey(username)) {
             timeout = users[username].queryTimeout
         }
         return timeout
+    }
+
+    Integer getMax(String username) {
+        Integer max = null
+        if(users && users.containsKey(username)) {
+            max = users[username].queryMax
+        }
+        return max
     }
 
     static class UserConfig {

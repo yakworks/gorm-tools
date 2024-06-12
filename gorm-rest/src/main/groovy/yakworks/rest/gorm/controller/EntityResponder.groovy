@@ -4,6 +4,7 @@
 */
 package yakworks.rest.gorm.controller
 
+import gorm.tools.hibernate.QueryConfig
 import groovy.json.JsonException
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -25,7 +26,11 @@ import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.PathItem
 import yakworks.meta.MetaMap
 import yakworks.meta.MetaMapList
+import yakworks.security.gorm.UserSecurityConfig
+import yakworks.security.user.CurrentUser
 import yakworks.spring.AppCtx
+
+import javax.inject.Inject
 
 /**
  * Helpers for a Restfull api type controller.
@@ -40,6 +45,9 @@ class EntityResponder<D> {
     @Autowired IncludesConfig includesConfig
     @Autowired ApiConfig apiConfig
     @Autowired MetaMapService metaMapService
+    @Autowired CurrentUser currentUser
+    @Autowired QueryConfig queryConfig
+    @Autowired UserSecurityConfig userSecurityConfig
 
     Class<D> entityClass
     // String logicalName
@@ -48,6 +56,8 @@ class EntityResponder<D> {
     PathItem pathItem
     //allows it to be turned on and off for controller
     boolean debugEnabled = false
+
+
 
     EntityResponder(Class<D> entityClass){
         this.entityClass = entityClass
@@ -113,6 +123,11 @@ class EntityResponder<D> {
             .build(parms)
             .defaultSortById()
             .validateQ()
+
+            //sets timeout on underlying hibernate criteria or hql query
+            Integer timeout = userSecurityConfig.getQueryTimeout(currentUser)
+            if(!timeout) timeout = queryConfig.timeout
+            qargs.timeout(timeout)
 
             if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.buildCriteria()}")
             ((QueryMangoEntityApi) getRepo()).queryList(qargs, null, debugEnabled ? log : null)

@@ -71,6 +71,7 @@ trait RestRepoApiController<D> extends RestApiController {
     /**
      * The gorm domain class. uses the {@link org.springframework.core.GenericTypeResolver} is not set during contruction
      */
+
     Class<D> getEntityClass() {
         if (!entityClass) this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), RestRepoApiController)
         return entityClass

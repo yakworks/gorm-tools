@@ -1,8 +1,8 @@
 package gorm.tools.transaction
 
-import gorm.tools.hibernate.GormToolsPreQueryEventListener
+
 import gorm.tools.hibernate.QueryConfig
-import yakworks.rally.security.UserSecurityConfig
+import yakworks.security.gorm.UserSecurityConfig
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import org.springframework.transaction.TransactionTimedOutException
@@ -17,7 +17,6 @@ import javax.inject.Inject
 @Rollback
 class GormToolsQueryListenerSpec extends Specification {
 
-    @Inject GormToolsPreQueryEventListener gormToolsPreQueryEventListener
     @Inject QueryConfig queryConfig
     @Inject UserSecurityConfig userSecurityConfig
     @Inject SecService secService
@@ -25,7 +24,6 @@ class GormToolsQueryListenerSpec extends Specification {
 
     void "sanity check"() {
         expect:
-        gormToolsPreQueryEventListener
         queryConfig.timeout == 60
         queryConfig.max == 100
         userSecurityConfig.users.size() == 1

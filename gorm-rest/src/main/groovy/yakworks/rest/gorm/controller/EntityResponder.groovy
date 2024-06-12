@@ -4,8 +4,6 @@
 */
 package yakworks.rest.gorm.controller
 
-import javax.inject.Inject
-
 import groovy.json.JsonException
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j

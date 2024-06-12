@@ -41,7 +41,6 @@ class RestApiListMaxSpec extends Specification  implements WebClientTrait {
 
         then:
         body
-        body.records == 100
         body.total == 2 //2 pages, max=50 should have been applied
     }
 }

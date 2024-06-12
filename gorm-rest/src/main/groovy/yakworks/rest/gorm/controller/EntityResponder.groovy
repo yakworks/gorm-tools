@@ -4,7 +4,8 @@
 */
 package yakworks.rest.gorm.controller
 
-import gorm.tools.hibernate.QueryConfig
+import javax.inject.Inject
+
 import groovy.json.JsonException
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -15,6 +16,7 @@ import org.springframework.dao.DataAccessException
 import org.springframework.http.HttpStatus
 
 import gorm.tools.beans.Pager
+import gorm.tools.hibernate.QueryConfig
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.metamap.services.MetaMapService
@@ -29,8 +31,6 @@ import yakworks.meta.MetaMapList
 import yakworks.security.gorm.UserSecurityConfig
 import yakworks.security.user.CurrentUser
 import yakworks.spring.AppCtx
-
-import javax.inject.Inject
 
 /**
  * Helpers for a Restfull api type controller.

@@ -13,9 +13,9 @@ import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Lazy
 
 import yakworks.rally.mail.MailSpringConfig
-import yakworks.security.gorm.UserSecurityConfig
 import yakworks.security.audit.AuditStampConfiguration
 import yakworks.security.gorm.SecurityGormConfiguration
+import yakworks.security.gorm.UserSecurityConfig
 import yakworks.security.spring.DefaultSecurityConfiguration
 
 @Configuration @Lazy

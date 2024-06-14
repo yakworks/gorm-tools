@@ -4,6 +4,7 @@ import grails.gorm.DetachedCriteria
 import org.springframework.dao.InvalidDataAccessResourceUsageException
 import spock.lang.Specification
 import yakworks.testing.gorm.model.KitchenSink
+import yakworks.testing.gorm.model.SinkExt
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 /**
@@ -51,6 +52,24 @@ class JpqlQueryBuilderSpec extends Specification implements GormHibernateTest  {
         queryInfo.query == 'UPDATE yakworks.testing.gorm.model.KitchenSink kitchenSink SET kitchenSink.name=:p1 WHERE (kitchenSink.amount NOT IN (SELECT kitchenSink1.amount as amount FROM yakworks.testing.gorm.model.KitchenSink kitchenSink1 WHERE kitchenSink1.name=:p2))'
         queryInfo.parameters == ["SinkUp", "Simpson"]
 
+    }
+
+    void "Test update query with exists"() {
+        given:
+        def existsQuery = SinkExt.query {
+            eqProperty("kitchenParent.id", "kitchenSink_.id")
+        }.id()
+
+        def criteria = KitchenSink.query {
+           exists existsQuery
+        }
+
+        when:
+        def builder = JpqlQueryBuilder.of(criteria)
+        def queryInfo = builder.buildUpdate(name:"SinkUp")
+
+        then:
+        noExceptionThrown()
     }
 
     void "Test exception is thrown in join with delete"() {

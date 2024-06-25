@@ -88,6 +88,9 @@ class MangoBuilder {
         if(qargs.projections){
             applyProjections(mangoCriteria, qargs.projections)
         }
+
+        if(qargs.timeout) mangoCriteria.setTimeout(qargs.timeout)
+
         return mangoCriteria
     }
 

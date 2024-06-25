@@ -1,6 +1,5 @@
 package gorm.tools.transaction
 
-
 import gorm.tools.hibernate.QueryConfig
 import yakworks.security.gorm.UserSecurityConfig
 import grails.gorm.transactions.Rollback
@@ -15,7 +14,7 @@ import javax.inject.Inject
 
 @Integration
 @Rollback
-class GormToolsQueryListenerSpec extends Specification {
+class GormToolsQueryTimeoutSpec extends Specification {
 
     @Inject QueryConfig queryConfig
     @Inject UserSecurityConfig userSecurityConfig

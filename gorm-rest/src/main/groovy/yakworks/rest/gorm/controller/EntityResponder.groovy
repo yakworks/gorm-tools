@@ -14,6 +14,7 @@ import org.springframework.dao.DataAccessException
 import org.springframework.http.HttpStatus
 
 import gorm.tools.beans.Pager
+import gorm.tools.hibernate.QueryConfig
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.metamap.services.MetaMapService
@@ -25,6 +26,8 @@ import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.PathItem
 import yakworks.meta.MetaMap
 import yakworks.meta.MetaMapList
+import yakworks.security.gorm.UserSecurityConfig
+import yakworks.security.user.CurrentUser
 import yakworks.spring.AppCtx
 
 /**
@@ -40,6 +43,9 @@ class EntityResponder<D> {
     @Autowired IncludesConfig includesConfig
     @Autowired ApiConfig apiConfig
     @Autowired MetaMapService metaMapService
+    @Autowired CurrentUser currentUser
+    @Autowired QueryConfig queryConfig
+    @Autowired UserSecurityConfig userSecurityConfig
 
     Class<D> entityClass
     // String logicalName
@@ -48,6 +54,8 @@ class EntityResponder<D> {
     PathItem pathItem
     //allows it to be turned on and off for controller
     boolean debugEnabled = false
+
+
 
     EntityResponder(Class<D> entityClass){
         this.entityClass = entityClass
@@ -113,6 +121,17 @@ class EntityResponder<D> {
             .build(parms)
             .defaultSortById()
             .validateQ()
+
+            //sets timeout on underlying hibernate criteria or hql query
+            Integer timeout = userSecurityConfig.getQueryTimeout(currentUser)
+            if(!timeout) timeout = queryConfig.timeout
+            if(timeout) qargs.timeout(timeout)
+
+            Integer max = userSecurityConfig.getMax(currentUser)
+            if(!max) max = queryConfig.max
+            if(max && pager.max && pager.max > max) {
+                qargs.pager.max = max
+            }
 
             if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.buildCriteria()}")
             ((QueryMangoEntityApi) getRepo()).queryList(qargs, null, debugEnabled ? log : null)

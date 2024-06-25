@@ -4,6 +4,7 @@
 */
 package gorm.tools.mango
 
+import gorm.tools.mango.hibernate.HibernateMangoQuery
 import spock.lang.Issue
 import testing.TestSource
 
@@ -653,6 +654,18 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
         res[0].id > res[1].id
         res[4].inactive > res[5].inactive
         res[5].id > res[6].id
+    }
+
+    void "test query timeout is set on hibernate criteria"() {
+        setup:
+        MangoDetachedCriteria criteria = build('$sort': 'inactive desc, id desc')
+        criteria.setTimeout(10)
+
+        when:
+        HibernateMangoQuery query = criteria.hibernateQuery
+
+        then:
+        query.getHibernateCriteria().timeout == 10
     }
 
 }

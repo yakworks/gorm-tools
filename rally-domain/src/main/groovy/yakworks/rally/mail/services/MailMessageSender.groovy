@@ -49,6 +49,7 @@ class MailMessageSender {
             updateMessageState(mailMessage, result)
         }catch(pex){
             //should not happen, unexpected
+            log.error("Failed to update message state", pex)
             result = Problem.of(pex)
         }
         return result

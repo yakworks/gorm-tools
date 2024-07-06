@@ -1,3 +1,28 @@
+### v7.3.73
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.72...v7.3.73)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/163b9003fbd89906b661e1f920bbd8909eaa00fe)
+- Merge pull request #805 from yakworks/mailgun-logs [link](https://github.com/yakworks/gorm-tools/commit/0bbea97e7728b41e5f437ba176c0ff4e01fbe8ea)
+- add log.error [link](https://github.com/yakworks/gorm-tools/commit/291ce37e59dbc6c9810342643bfac82efde16400)
+-  Mail gun error log [link](https://github.com/yakworks/gorm-tools/commit/594695e73fcdd852f9729ce7e39c6a01499c006f)
+
+### v7.3.72
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.71...v7.3.72)
+- release [link](https://github.com/yakworks/gorm-tools/commit/1f37c34f8446d900c64f7c908240f93b28640e2e)
+- Merge pull request #801 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/b0d190f582e817edb50b38ada8afc8eeb58d75d3)
+-  Code as String ID (#799) [link](https://github.com/yakworks/gorm-tools/commit/60482ebb885b3b85dd30a2a5bdd32a0830f39fc7)
+- Merge pull request #798 from yakworks/797-unit-test-autowired-required-false [link](https://github.com/yakworks/gorm-tools/commit/4df69ea5a0fec858076e2fb311f297ac9d002dfc)
+- remove contraints from Company [link](https://github.com/yakworks/gorm-tools/commit/e5bfb8240c291f128ecd78e22ef895f87345cf41)
+- Sync the core items from ArSeed [link](https://github.com/yakworks/gorm-tools/commit/49488e64d109d2f4e2cd6eb7e0c292230bf01745)
+- remove the @nullable [link](https://github.com/yakworks/gorm-tools/commit/d4fbe0639223e66c915557a20423c1c16da59f7a)
+- add feature to be able to List the springBeans to create. [link](https://github.com/yakworks/gorm-tools/commit/fbe263905b62fc01a7adf42f7b3ea12ff22b3961)
+- fix up tests now that we always use the SpringBeanIdGenerator for unit tests [link](https://github.com/yakworks/gorm-tools/commit/a03c7109d8de1518bf5d9e8a86fa41b65c4650ac)
+- Merge branch 'dev' into 797-unit-test-autowired-required-false [link](https://github.com/yakworks/gorm-tools/commit/582c5cf6e3a07f40ed1ac1e0fee24240dcc0dbbb)
+- Autowired default to required = false for unit tests only works for GormHibernateTests right now https://github.com/yakworks/gorm-tools/issues/797 [link](https://github.com/yakworks/gorm-tools/commit/ed68a34a5c242a81b4a662065c223f8142cc3ec3)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/735fe4354841afab99e540e8ebd29eaebec1ac18)
+- oapi comments [link](https://github.com/yakworks/gorm-tools/commit/f242bf459fdc9392a8967f8012b55c8cae58df2a)
+
 ### v7.3.71
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.70...v7.3.71)

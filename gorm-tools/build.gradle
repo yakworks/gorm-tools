@@ -10,7 +10,7 @@ dependencies {
   //here only for the HttpServletRequest, grail compile AST tries to add the EnableWebMvc to the Application if the servlet-api is found
   compileOnly "org.springframework:spring-webmvc"
   compileOnly "javax.servlet:javax.servlet-api:4.0.1"
-  api 'org.springframework.data:spring-data-commons'
+  // api 'org.springframework.data:spring-data-commons'
 
   // api project(":commons")
   // TODO use this standard for json converters

@@ -6,10 +6,15 @@ package yakworks.security.audit
 
 import groovy.transform.CompileStatic
 
+import org.grails.datastore.mapping.core.Datastore
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
+
+import grails.core.GrailsApplication
+import yakworks.security.auditable.AuditLogListener
+import yakworks.security.auditable.resolvers.SpringSecurityRequestResolver
 
 @Configuration @Lazy
 @ConditionalOnProperty(value="gorm.tools.audit.enabled", havingValue = "true", matchIfMissing = true)
@@ -31,6 +36,16 @@ class AuditStampConfiguration {
     @Bean
     DefaultAuditUserResolver auditUserResolver(){
         new DefaultAuditUserResolver()
+    }
+
+    @Bean
+    AuditLogListener auditLogListener() {
+        new AuditLogListener()
+    }
+
+    @Bean
+    SpringSecurityRequestResolver auditRequestResolver() {
+        return new SpringSecurityRequestResolver()
     }
 
 }

@@ -16,11 +16,11 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.NoSuchBeanDefinitionException
 
-import grails.plugins.orm.auditable.resolvers.AuditRequestResolver
 import grails.util.GrailsNameUtils
 import grails.util.Holders
+import yakworks.security.auditable.resolvers.AuditRequestResolver
 
-import static grails.plugins.orm.auditable.AuditLogListenerUtil.makeMap
+import static AuditLogListenerUtil.makeMap
 
 /**
  * Domain classes should implement this trait to provide auditing support

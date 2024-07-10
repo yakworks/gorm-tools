@@ -6,11 +6,16 @@ package yakworks.security.auditable.resolvers
 /**
  * Default resolver that uses the SpringSecurityService principal if available
  */
-class SpringSecurityRequestResolver extends DefaultAuditRequestResolver {
+class SpringSecurityRequestResolver implements AuditRequestResolver  {
     def springSecurityService
 
     @Override
     String getCurrentActor() {
         springSecurityService?.currentUser?.toString() ?: super.getCurrentActor()
+    }
+
+    @Override
+    String getCurrentURI() {
+        return null
     }
 }

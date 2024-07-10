@@ -1,3 +1,11 @@
+### v7.3.73
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.72...v7.3.73)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/163b9003fbd89906b661e1f920bbd8909eaa00fe)
+- Merge pull request #805 from yakworks/mailgun-logs [link](https://github.com/yakworks/gorm-tools/commit/0bbea97e7728b41e5f437ba176c0ff4e01fbe8ea)
+- add log.error [link](https://github.com/yakworks/gorm-tools/commit/291ce37e59dbc6c9810342643bfac82efde16400)
+-  Mail gun error log [link](https://github.com/yakworks/gorm-tools/commit/594695e73fcdd852f9729ce7e39c6a01499c006f)
+
 ### v7.3.72
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.71...v7.3.72)

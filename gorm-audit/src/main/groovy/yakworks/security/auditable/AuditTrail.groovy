@@ -21,7 +21,6 @@ package yakworks.security.auditable
 import grails.persistence.Entity
 import groovy.transform.ToString
 import yakworks.commons.transform.IdEqualsHashCode
-import yakworks.security.audit.AuditStamp
 
 /**
  * AuditTrails are reported to the AuditLog table.
@@ -29,7 +28,6 @@ import yakworks.security.audit.AuditStamp
  * Grails to create a table for you. (e.g. DDL or db-migration plugin)
  */
 @Entity
-@AuditStamp
 @IdEqualsHashCode
 @ToString(includes = 'id,className,actor,eventName,propertyName,oldValue,newValue')
 class AuditTrail implements Serializable {
@@ -72,13 +70,6 @@ class AuditTrail implements Serializable {
         table 'audit_log'
 
         cache usage: 'read-only', include: 'non-lazy'
-
-        // Set similiar when you used "auditLog.useDatasource" in < 1.1.0 plugin version.
-        // datasource "yourdatasource"
-        //
-        // Allow overriding datasource using environment variable
-        // Used to test different datasources on CI
-        datasource(System.getProperty("audit-test.AuditTrail.datasource", "second"))
 
         // no HQL queries package name import (was default in 1.x version)
         //autoImport false

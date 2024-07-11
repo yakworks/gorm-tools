@@ -98,6 +98,9 @@ class AuditLogListenerUtil {
      * Determine the truncateLength based on the configured truncateLength and the actual auditDomainClass maxSize constraint for newValue.
      */
     static Integer determineTruncateLength() {
+
+        //todo, we dont need to do it like this, we can configure it in config ?
+        /*
         String confAuditDomainClassName = AuditLoggingConfigUtils.auditConfig.getProperty('auditDomainClassName')
         if (!confAuditDomainClassName) {
             throw new IllegalArgumentException("Please configure auditLog.auditDomainClassName in Config.groovy")
@@ -119,6 +122,9 @@ class AuditLogListenerUtil {
         Integer maxSize = Math.min(oldValueMaxSize, newValueMaxSize)
         Integer configuredTruncateLength = (AuditLoggingConfigUtils.auditConfig.getProperty('truncateLength') ?: Integer.MAX_VALUE) as Integer
 
-        Math.min(maxSize, configuredTruncateLength)
+         */
+
+
+        Integer.MAX_VALUE
     }
 }

@@ -4,6 +4,8 @@
 */
 package yakworks.testing.gorm.model
 
+import yakworks.security.auditable.Auditable
+
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -24,7 +26,7 @@ import yakworks.security.audit.AuditStamp
 @Entity
 // @ManagedEntity //see ManagedEntitySinkSpec
 @GrailsCompileStatic
-class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRepo> {
+class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRepo>, Auditable  {
     //<- ext belong to KitchenSink
     // since ext also has an KitchenSink property (kitchenParent) it will confused
     // example of how to explcitly force the "belongsTo"  with the mappedBy

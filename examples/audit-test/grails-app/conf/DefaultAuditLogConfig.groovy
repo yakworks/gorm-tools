@@ -15,7 +15,7 @@
 
 // Default Plugin configuration
 defaultAuditLog {
-    auditDomainClassName = "yakworks.security.auditable.AuditTrail"
+    auditDomainClassName = "yakworks.rally.audit.AuditTrail"
 
     disabled = false
     verbose = true

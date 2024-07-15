@@ -13,11 +13,13 @@ import org.grails.datastore.gorm.timestamp.DefaultTimestampProvider
 import org.grails.datastore.gorm.timestamp.TimestampProvider
 import org.grails.datastore.mapping.engine.event.*
 import org.grails.datastore.mapping.model.PersistentEntity
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.event.GenericApplicationListener
 import org.springframework.core.ResolvableType
 
 import grails.core.GrailsApplication
+import yakworks.security.user.CurrentUser
 
 import static AuditLogListenerUtil.*
 
@@ -28,7 +30,10 @@ import static AuditLogListenerUtil.*
 @Slf4j
 @CompileStatic
 class AuditLogListener implements GenericApplicationListener  {
-    private GrailsApplication grailsApplication
+
+    @Autowired GrailsApplication grailsApplication
+    @Autowired CurrentUser currentUser
+
     private Integer truncateLength
     private TimestampProvider timestampProvider
 
@@ -45,7 +50,7 @@ class AuditLogListener implements GenericApplicationListener  {
     @Override
     boolean supportsEventType(ResolvableType resolvableType) {
         Class<?> eventType = resolvableType.getRawClass()
-        return PreInsertEvent.isAssignableFrom(eventType) || PreUpdateEvent.isAssignableFrom(eventType) || PreDeleteEvent.isAssignableFrom(eventType)
+        return PostInsertEvent.isAssignableFrom(eventType) || PreUpdateEvent.isAssignableFrom(eventType) || PreDeleteEvent.isAssignableFrom(eventType)
     }
 
     @Override
@@ -65,12 +70,17 @@ class AuditLogListener implements GenericApplicationListener  {
         }*/
 
         // Logging is disabled
+
         if (AuditLogContext.context.disabled) {
             return
         }
 
         if(event instanceof AbstractPersistenceEvent && event.entity) {
             try {
+
+                //XXX Fix
+                if(event.entityObject.class.simpleName == "AuditTrail") { return }
+
                 AuditEventType auditEventType = AuditEventType.forEventType(event.eventType)
                 Auditable domain = event.entityObject as Auditable
 
@@ -215,7 +225,7 @@ class AuditLogListener implements GenericApplicationListener  {
 
                 // Create a new entity for each property
                 GormEntity audit = createAuditLogDomainInstance(
-                    actor: domain.logCurrentUserName, uri: domain.logURI, className: domain.logClassName, eventName: eventType.name(),
+                    actor: (currentUser.isLoggedIn() ? currentUser.user.username : "N/A"), uri: domain.logURI, className: domain.logClassName, eventName: eventType.name(),
                     persistedObjectId: domain.logEntityId, persistedObjectVersion: persistedObjectVersion,
                     propertyName: propertyName, oldValue: oldValueAsString, newValue: newValueAsString,
                     dateCreated: timestamp, lastUpdated: timestamp

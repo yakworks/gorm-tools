@@ -4,6 +4,7 @@
 */
 package yakworks.testing.gorm.model
 
+import groovy.transform.ToString
 import yakworks.security.auditable.Auditable
 
 import java.time.LocalDate
@@ -26,6 +27,7 @@ import yakworks.security.audit.AuditStamp
 @Entity
 // @ManagedEntity //see ManagedEntitySinkSpec
 @GrailsCompileStatic
+@ToString(includeNames=true, includes = ["id", "num"])
 class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRepo>, Auditable  {
     //<- ext belong to KitchenSink
     // since ext also has an KitchenSink property (kitchenParent) it will confused

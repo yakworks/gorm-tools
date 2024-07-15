@@ -39,6 +39,7 @@ include 'gorm-test-support'
 include 'gorm-test-domain'
 include 'gorm-audit'
 
+
 include "security/boot-security"
 findProject(':security/boot-security').name = 'boot-security'
 
@@ -54,6 +55,9 @@ findProject(':security/security-core').name = 'security-core'
 // tests will be included in main runs but not deploy tasks and doc tasks
 include "examples/testify"
 findProject(':examples/testify').name = 'testify'
+
+include 'examples/audit-test'
+findProject(':examples/audit-test').name = 'audit-test'
 
 include 'examples/restify'
 findProject(':examples/restify').name = 'restify'

@@ -16,9 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
 */
-package yakworks.security.auditable
+package yakworks.rally.audit
 
-import grails.persistence.Entity
+import grails.gorm.annotation.Entity
 import groovy.transform.ToString
 import yakworks.commons.transform.IdEqualsHashCode
 
@@ -30,6 +30,7 @@ import yakworks.commons.transform.IdEqualsHashCode
 @Entity
 @IdEqualsHashCode
 @ToString(includes = 'id,className,actor,eventName,propertyName,oldValue,newValue')
+//@GrailsCompileStatic
 class AuditTrail implements Serializable {
     private static final long serialVersionUID = 1L
 
@@ -78,29 +79,6 @@ class AuditTrail implements Serializable {
         id generator: "uuid2", type: 'string', length: 36
 
         version false
-    }
-
-    static namedQueries = {
-        forQuery { String q ->
-            if (!q?.trim()) return // return all
-            def queries = q.tokenize()?.collect {
-                '%' + it.replaceAll('_', '\\\\_') + '%'
-            }
-            queries.each { query ->
-                or {
-                    ilike 'actor', query
-                    ilike 'persistedObjectId', query
-                    ilike 'propertyName', query
-                    ilike 'oldValue', query
-                    ilike 'newValue', query
-                }
-            }
-        }
-
-        forDateCreated { Date date ->
-            if (!date) return
-            gt 'dateCreated', date
-        }
     }
 
     /**

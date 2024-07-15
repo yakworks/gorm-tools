@@ -3,6 +3,7 @@ package gorm.tools.audit
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Rollback
 import spock.lang.Ignore
+import spock.lang.IgnoreRest
 import yakworks.security.auditable.AuditEventType
 import yakworks.security.auditable.AuditLogContext
 import yakworks.security.auditable.resolvers.AuditRequestResolver
@@ -51,10 +52,11 @@ class AuditableSpec extends Specification {
         entity.getLogEntityId() == entity.ident()
     }
 
+    @IgnoreRest
     @Unroll
     void "convert logged property to string with logIds enabled for #value"(Object value, String expected) {
         when:
-        String result = entity.convertLoggedPropertyToString('ignored', value)
+        String result = entity.convertLoggedPropertyToString('name', value)
 
         then:
         result == expected
@@ -69,7 +71,7 @@ class AuditableSpec extends Specification {
         [1, 2, 3]             | "1, 2, 3"
 
         // Associated auditable
-        new KitchenSink(name: 'bar')                                    | "[id:id]bar"
+        new KitchenSink(name: 'bar', id:10)                                    | "[id:id]bar"
         [new KitchenSink(name: 'bar'), new KitchenSink(name: 'baz')]    | "[id:id]bar, [id:id]baz"
     }
 

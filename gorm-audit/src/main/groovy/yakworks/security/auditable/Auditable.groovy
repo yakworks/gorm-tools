@@ -137,7 +137,7 @@ trait Auditable {
      */
     @Transient
     Collection<String> getAuditablePropertyNames() {
-        PersistentEntity entity = getClass().invokeMethod("getGormPersistentEntity", null) as PersistentEntity
+        PersistentEntity entity = gorm.tools.utils.GormMetaUtils.getPersistentEntity(getClass())
 
         // Start with all persistent properties
         Set<String> persistentProperties = entity.getPersistentProperties()*.name as Set<String>
@@ -232,7 +232,7 @@ trait Auditable {
         }
         if (value instanceof Auditable) {
             log.debug("    value instanceof Auditable")
-            return "[id:${((Auditable)value).logEntityId}]$value"
+            return "[id:${((Auditable)value).logEntityId}]${value.class.simpleName}"
         }
         if (value instanceof GormEntity) {
             log.debug("    value instanceof GormEntity")

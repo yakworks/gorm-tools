@@ -34,4 +34,5 @@ trait CSVRendererTrait<T> implements RendererTrait<T> {
         final mimeType = context.acceptMimeType ?: TEXT_CSV
         context.setContentType( GrailsWebUtil.getContentType(mimeType.name, encoding) )
     }
+
 }

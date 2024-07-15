@@ -11,6 +11,9 @@ import org.grails.plugins.web.rest.render.ServletRenderContext
 
 import gorm.tools.beans.Pager
 import grails.rest.render.RenderContext
+import grails.util.GrailsWebUtil
+import grails.web.mime.MimeType
+import yakworks.etl.csv.CSVMapWriter
 
 /**
  * Rederer for paged list data
@@ -19,10 +22,14 @@ import grails.rest.render.RenderContext
  * @since 7.0.8
  */
 @CompileStatic
-class CSVPagerRenderer implements CSVRendererTrait<Pager> {
+class CSVPagerRenderer implements RendererTrait<Pager> {
+
+    public static final MimeType TEXT_CSV = new MimeType('text/csv', "csv")
+
+    MimeType[] mimeTypes = [TEXT_CSV] as MimeType[]
 
     @Override
-    @CompileDynamic
+    //@CompileDynamic
     void render(Pager pager, RenderContext context) {
         setContentType(context)
         setContentDisposition(context)
@@ -34,6 +41,15 @@ class CSVPagerRenderer implements CSVRendererTrait<Pager> {
         def servletCtx = (ServletRenderContext)context
         def name = context.getControllerName()
         servletCtx.webRequest.response.setHeader("Content-Disposition", "attachment;filename=\"${name}.csv\"")
+    }
+
+    CSVMapWriter csvWriter(RenderContext context) {
+        return CSVMapWriter.of(context.writer)
+    }
+
+    void setContentType(RenderContext context){
+        final mimeType = context.acceptMimeType ?: TEXT_CSV
+        context.setContentType( GrailsWebUtil.getContentType(mimeType.name, encoding) )
     }
 
 }

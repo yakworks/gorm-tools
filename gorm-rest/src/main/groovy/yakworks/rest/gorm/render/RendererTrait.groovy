@@ -42,4 +42,6 @@ trait RendererTrait<T> implements Renderer<T> {
     Map<String, Object> getParams(RenderContext context){
         context.getArguments()?.params as Map<String, Object>
     }
+
+    abstract void render(T object, RenderContext context)
 }

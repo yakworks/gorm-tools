@@ -19,6 +19,7 @@ plugins.withId('groovy') {
   tasks.withType(GroovyCompile) {
     // options.debug = true
     configure(groovyOptions) {
+      configurationScript = file("${rootProject.projectDir.absolutePath}/gradle/config.groovy")
       // verbose = true
       // sets the path to sys properties so we can use it find grails-app/conf during AST
       forkOptions.jvmArgs = ['-Xmx1524m', '-Dproject.projectDir=' + project.projectDir.absolutePath]

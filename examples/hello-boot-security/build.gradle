@@ -94,6 +94,7 @@ bootRun {
 
 tasks.withType(GroovyCompile) {
   configure(groovyOptions) {
+    configurationScript = file("${rootProject.projectDir.absolutePath}/gradle/config.groovy")
     forkOptions.jvmArgs = ['-Xmx1024m']
   }
 }

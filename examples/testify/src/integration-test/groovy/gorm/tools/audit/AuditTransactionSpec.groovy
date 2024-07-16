@@ -18,9 +18,9 @@
 */
 package gorm.tools.audit
 
-import test.Author
-import test.Book
-import test.EntityInSecondDatastore
+import audit.test.Author
+import audit.test.Book
+import audit.test.EntityInSecondDatastore
 import yakworks.rally.audit.AuditTrail
 import yakworks.security.auditable.AuditLogContext
 import grails.testing.mixin.integration.Integration

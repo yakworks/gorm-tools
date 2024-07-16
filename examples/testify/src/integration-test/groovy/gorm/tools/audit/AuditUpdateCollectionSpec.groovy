@@ -18,8 +18,8 @@
 */
 package gorm.tools.audit
 
-import test.Author
-import test.Book
+import audit.test.Author
+import audit.test.Book
 import yakworks.rally.audit.AuditTrail
 import yakworks.security.auditable.AuditLogContext
 import grails.testing.mixin.integration.Integration

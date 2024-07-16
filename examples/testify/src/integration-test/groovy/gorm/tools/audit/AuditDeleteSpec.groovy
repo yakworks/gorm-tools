@@ -19,10 +19,10 @@
 package gorm.tools.audit
 
 import spock.lang.IgnoreRest
-import test.Author
-import test.Book
-import test.Publisher
-import test.Resolution
+import audit.test.Author
+import audit.test.Book
+import audit.test.Publisher
+import audit.test.Resolution
 import yakworks.security.auditable.AuditLogContext
 import yakworks.security.auditable.AuditLoggingConfigUtils
 import grails.testing.mixin.integration.Integration

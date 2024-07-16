@@ -19,7 +19,7 @@
 package gorm.tools.audit
 
 import grails.core.GrailsApplication
-import test.Tunnel
+import audit.test.Tunnel
 import yakworks.rally.audit.AuditTrail
 import yakworks.security.auditable.AuditLogListener
 import yakworks.security.auditable.AuditLoggingConfigUtils

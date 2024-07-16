@@ -19,10 +19,10 @@
 package gorm.tools.audit
 
 import org.apache.commons.math3.stat.inference.TestUtils
-import test.Author
-import test.Book
-import test.Publisher
-import test.Review
+import audit.test.Author
+import audit.test.Book
+import audit.test.Publisher
+import audit.test.Review
 import yakworks.rally.audit.AuditTrail
 import yakworks.security.auditable.AuditLogContext
 import yakworks.security.auditable.AuditLoggingConfigUtils

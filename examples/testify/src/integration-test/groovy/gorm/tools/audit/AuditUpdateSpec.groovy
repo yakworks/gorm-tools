@@ -18,10 +18,10 @@
 */
 package gorm.tools.audit
 
-import test.Author
-import test.Book
-import test.Heliport
-import test.Publisher
+import audit.test.Author
+import audit.test.Book
+import audit.test.Heliport
+import audit.test.Publisher
 import yakworks.security.auditable.AuditLogContext
 import grails.testing.mixin.integration.Integration
 import groovy.util.logging.Slf4j

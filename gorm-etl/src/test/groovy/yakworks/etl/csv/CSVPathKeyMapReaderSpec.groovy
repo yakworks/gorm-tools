@@ -1,6 +1,5 @@
 package yakworks.etl.csv
 
-import spock.lang.IgnoreRest
 import spock.lang.Shared
 import spock.lang.Specification
 

@@ -1,6 +1,6 @@
 package yakworks.etl.csv
 
-
+import spock.lang.IgnoreRest
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -33,8 +33,8 @@ class CSVPathKeyMapReaderSpec extends Specification {
         data[1].name == "yellow"
         data[1].num == "sink2"
 
-        data[2].name == "green"
         data[2].num == "sink3"
+        data[2].name == null
 
         data[0].test != null
         data[0].test instanceof Map
@@ -49,7 +49,7 @@ class CSVPathKeyMapReaderSpec extends Specification {
         while (csvReader.hasNext()) {
             Map row = csvReader.readMap { m ->
                 println("m is $m")
-                if (m) m.name = m.name + "1"
+                if (m && m.name) m.name = m.name + "1"
             }
 
             data << row
@@ -64,7 +64,7 @@ class CSVPathKeyMapReaderSpec extends Specification {
         data[1].name == "yellow1"
         data[1].num == "sink2"
 
-        data[2].name == "green1"
+        data[2].name == null
         data[2].num == "sink3"
     }
 

@@ -170,7 +170,7 @@ class BulkCsvSpec  extends RestIntTest {
         Contact.repo.lookup(num:"secondary11").lastName
 
         when: "create attachment"
-        def csvFile = BuildSupport.rootProjectPath.resolve("examples/resources/csv/org-update.csv")
+        def csvFile = BuildSupport.rootProjectPath.resolve("examples/resources/csv/contact-update.csv")
         Map params = [name: csvFile.fileName.toString(), sourcePath: csvFile]
         Attachment attachment
         Attachment.withNewTransaction {

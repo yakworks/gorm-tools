@@ -1,5 +1,6 @@
 package yakworks.rest
 
+
 import java.nio.file.Path
 
 import gorm.tools.transaction.TrxUtils
@@ -159,6 +160,56 @@ class BulkCsvSpec  extends RestIntTest {
             Contact.findAllByNumLike("bulk_").each {
                 it.remove()
             }
+        }
+    }
+
+
+    void "test bulk update with csv"() {
+
+        expect:
+        Contact.repo.lookup(num:"secondary11").lastName
+
+        when: "create attachment"
+        def csvFile = BuildSupport.rootProjectPath.resolve("examples/resources/csv/contact-update.csv")
+        Map params = [name: csvFile.fileName.toString(), sourcePath: csvFile]
+        Attachment attachment
+        Attachment.withNewTransaction {
+            attachment = Attachment.create(params)
+        }
+        TrxUtils.flush()
+
+        then: "make sure attachment is good"
+        noExceptionThrown()
+        attachment != null
+        attachment.id != null
+        attachment.resource.getFile().exists()
+
+        when:
+        controller.params.attachmentId = attachment.id
+        controller.params['async'] = false //disable promise for test
+
+        controller.bulkUpdate()
+        Map body = response.bodyToMap()
+        flushAndClear()
+
+        then:
+        body != null
+        body.state == "Finished"
+        body.ok == true
+        body.id != null
+
+        when: "Verify db records"
+        Contact c10 = Contact.repo.lookup(num:"secondary10")
+        Contact c11 = Contact.repo.lookup(num:"secondary11")
+
+        then:
+        c10.lastName == null //should have been nulled out.... rally seed data has org with comments
+        c11.lastName == "test" //should have been updated
+
+        cleanup: "cleanup db"
+        Attachment.withNewTransaction {
+            if(attachment) attachment.remove()
+            if(body.id) SyncJob.removeById(body.id as Long) //syncjob is created in new transaction
         }
     }
 }

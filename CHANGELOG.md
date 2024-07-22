@@ -1,3 +1,10 @@
+### v7.3.74
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.73...v7.3.74)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/b2d44519ac186e84f019c419bff534c9910deaf1)
+- Merge pull request #810 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/dca49067d030fbb986ad38cbb07895608444a7b9)
+- Csv Fix : convert "null" string to null (#809) [link](https://github.com/yakworks/gorm-tools/commit/56612783f2c27e478e4b407051762ce468f5554b)
+
 ### v7.3.73
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.72...v7.3.73)

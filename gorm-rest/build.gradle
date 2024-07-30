@@ -14,8 +14,8 @@ dependencies {
   api project(":gorm-etl")
   api project(":gorm-openapi")
 
-  //@FIXME - @JOSH we need access to CurrentUser in EntityResponder for user specific "max" configuration
-  api project(":boot-security-gorm")
+  //FIXME - @JOSH we need access to CurrentUser in EntityResponder for user specific "max" configuration
+  //api project(":boot-security-gorm")
 
   //FIXME remove this when we upgrade to spring 6 as its built in.
   // this uses the HttpClient thats built into java 11 for WebClient.

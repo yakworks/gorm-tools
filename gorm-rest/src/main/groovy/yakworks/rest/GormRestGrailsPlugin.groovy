@@ -16,7 +16,7 @@ import grails.core.GrailsControllerClass
 import grails.plugins.Plugin
 import yakworks.commons.lang.NameUtils
 import yakworks.rest.gorm.RestApi
-import yakworks.rest.gorm.controller.RestResponderService
+import yakworks.rest.gorm.responder.RestResponderService
 import yakworks.rest.gorm.mapping.RepoApiMappingsService
 import yakworks.rest.gorm.render.ApiResultsRenderer
 import yakworks.rest.gorm.render.CSVPagerRenderer

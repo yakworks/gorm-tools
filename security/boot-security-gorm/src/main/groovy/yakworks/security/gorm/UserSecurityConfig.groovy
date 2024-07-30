@@ -51,6 +51,7 @@ class UserSecurityConfig {
     }
 
     static class UserConfig {
+        //XXX keep consistent, this should contain a QueryConfig
         Integer queryMax
         Integer queryTimeout
     }

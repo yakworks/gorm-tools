@@ -4,5 +4,10 @@
   <!-- use yakworks's base that adds colors and method with line num, compatible with spring boot -->
   <include resource="yakworks/spring/logback/base.xml"/>
   <!-- Use application.yml to configure logging level-->
+
+  <!-- useful for debugging queries
+  <logger name="org.hibernate.SQL" level="DEBUG" />
+  <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
+  -->
 </configuration>
 

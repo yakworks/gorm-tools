@@ -24,7 +24,7 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
 
     @Autowired MangoBuilder mangoBuilder
 
-    MangoDetachedCriteria build(map, Closure closure = null) {
+    MangoDetachedCriteria build(map, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
         //DetachedCriteria detachedCriteria = new DetachedCriteria(Org)
         return mangoBuilder.build(Cust, map, closure)
     }

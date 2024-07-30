@@ -13,11 +13,7 @@ import yakworks.testing.gorm.unit.SecurityTest
 //@Ignore //see FIXME line 99 in GormHibernateTest
 class RallySeedSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = RallySeed.entityClasses
-
-    //RallySeedData.entityClasses
-    // static springBeans = [
-    //     activityService: ActivityService
-    // ]
+    static List springBeans = RallySeed.springBeanList
 
     @Autowired JdbcTemplate jdbcTemplate
 

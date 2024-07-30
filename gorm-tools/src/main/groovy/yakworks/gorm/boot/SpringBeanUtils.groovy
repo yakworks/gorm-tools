@@ -19,9 +19,12 @@ import gorm.tools.repository.model.UuidRepoEntity
 class SpringBeanUtils {
 
     /**
-     * Uses the beanDefMap to setup beans. similiar to the BeanBuilder but doesnt require closures.
+     * Uses the beanDefMap to setup beans. Similiar to the BeanBuilder but doesnt require closures.
+     * This is used in Unit tests when the springBeans property is set.
      * The key of of the beanDefMap is the bean name and the value is the Class or a List.
      * If its a List then the first item is the Class and the remianing items are what to pass to the constructor args.
+     * If its start with an `@` then its set as a bean reference, liek you would do with `ref("foo")`.
+     *
      */
     static void registerBeans(BeanDefinitionRegistry beanDefinitionRegistry, Map<String, Object> beanMap) {
         for (String beanName : beanMap.keySet()) {

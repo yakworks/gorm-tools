@@ -3,13 +3,12 @@ package yakworks.security.audit
 import java.time.LocalDateTime
 
 import org.grails.config.PropertySourcesConfig
-import org.grails.testing.GrailsUnitTest
 
-import yakworks.security.audit.ast.FieldProps
 import spock.lang.Specification
+import yakworks.security.audit.ast.FieldProps
+import yakworks.testing.grails.GrailsAppUnitTest
 
-class FieldPropsTests extends Specification implements GrailsUnitTest {
-
+class FieldPropsTests extends Specification implements GrailsAppUnitTest {
 
     void test_buildFiledPropsMap() {
         when:

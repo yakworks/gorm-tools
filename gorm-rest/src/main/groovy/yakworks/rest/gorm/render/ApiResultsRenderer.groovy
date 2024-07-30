@@ -25,9 +25,39 @@ class ApiResultsRenderer implements JsonRendererTrait<ApiResults>{
     @Override
     void render(ApiResults results, RenderContext context) {
         setContentType(context)
-        context.status = HttpStatus.MULTI_STATUS
+        //FIXME do we want this be automatically multi?
+        //context.status = HttpStatus.MULTI_STATUS
         var dataMap = results.asMap()
+
+        //FIXME do we need this?
+        //hack for now, this will try and get message from first item in the ApiResults list
+        if(!dataMap.title && results.list.size() != 0) {
+            //use msg form first item
+            dataMap.title = msgService.get(results.list[0].msg)
+        }
+        //FIXME do we need this?
+        if(!dataMap.containsKey("problems")) dataMap.problems = []
+
         jsonBuilder(context).call(dataMap)
     }
+
+    // @Override
+    // void render(ApiResults results, RenderContext context) {
+    //     setContentType(context)
+    //     jsonBuilder(context).call(
+    //         ok: results.ok,
+    //         status: results.status.code,
+    //         code: results.getCode(),
+    //         title: ResultUtils.getMessage(msgService, results),
+    //         problems: results.problems,
+    //         payload: results.payload
+    //     )
+    // }
+
+    //If not specified was getting Duplicate method name "getMimeTypes" with signature, even though it overriden in JsonRendererTrait
+    // @Override
+    // MimeType[] getMimeTypes(){
+    //     [MimeType.JSON, MimeType.TEXT_JSON] as MimeType[]
+    // }
 
 }

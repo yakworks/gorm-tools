@@ -26,6 +26,7 @@ class TestSeedData {
                 testIdent: index % 2 == 0 ? TestIdent.Num2 : TestIdent.Num4,
                 location: (
                     new Address(
+                        id: index,
                         address: "City$index",
                         nested: new AddyNested(
                             name: "Nested${2 * index}",

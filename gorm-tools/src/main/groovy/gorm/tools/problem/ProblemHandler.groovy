@@ -4,6 +4,7 @@
 */
 package gorm.tools.problem
 
+import groovy.json.JsonException
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSourceResolvable
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
@@ -99,7 +101,15 @@ class ProblemHandler {
                 log.error("MAYBE UNEXPECTED? Data Access Exception ${msgInfo}", StackTraceUtils.deepSanitize(e))
                 return DataProblem.of(e)
             }
-        } else {
+        }
+        else if (e instanceof HttpMessageNotReadableException || e instanceof JsonException) {
+            //this happens if request contains bad data / malformed json. we dont want to log stacktraces for these as they are expected
+            return DataProblem.of(e)
+        }
+        else if(e instanceof AssertionError) {
+            return DataProblem.of(e)
+        }
+        else {
             return handleUnexpected(e)
         }
     }

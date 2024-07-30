@@ -55,11 +55,19 @@ class EventLog implements RepoEntity<EventLog>, Serializable {
         //cache true
         // table 'EventLog'
         id generator: 'identity'
+        message sqlType:'TEXT'
+        stackTrace sqlType:'TEXT'
     }
 
     static constraints = {
         createdDate nullable:false, display:false, editable:false, bindable:false
+        stackTrace maxSize: 65535
     }
+
+    // static constraintsMap = [
+    //     state       : [d: 'State of the job', nullable: false],
+    //     message     : [d: 'Status message or log', maxSize: 500],
+    // ]
 
     //update the summary on save
     def beforeInsert() {

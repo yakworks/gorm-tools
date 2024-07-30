@@ -22,8 +22,7 @@ import yakworks.rally.orgs.model.OrgType
 @CompileStatic
 class OrgMemberRepo implements GormRepo<OrgMember> {
 
-    @Autowired(required = false)
-    OrgDimensionService orgDimensionService
+    @Autowired OrgDimensionService orgDimensionService
 
     @RepoListener
     void beforeValidate(OrgMember orgMember, Errors errors) {
@@ -33,6 +32,7 @@ class OrgMemberRepo implements GormRepo<OrgMember> {
     void validateMembers(OrgMember orgMember, Errors errors){
         // For OrgMember, All parents levels for the given orgtype is required
         OrgType memOrgType = orgMember.org.type
+        assert orgDimensionService
         List<OrgType> parents = orgDimensionService.getParentLevels(memOrgType)
 
         for(OrgType orgtype : parents){

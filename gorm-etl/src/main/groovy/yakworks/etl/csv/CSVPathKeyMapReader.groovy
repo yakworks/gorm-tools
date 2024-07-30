@@ -55,6 +55,7 @@ class CSVPathKeyMapReader extends CSVReaderHeaderAware {
     Map<String, Object> readMap() {
         Map data = super.readMap()
         data = prune && data ? Maps.prune(data) : data
+        data = convertNullStrings(data)
         // data = data as Map<String, String>
         return LazyPathKeyMap.of(data as Map<String, Object>, pathDelimiter)
     }
@@ -97,5 +98,17 @@ class CSVPathKeyMapReader extends CSVReaderHeaderAware {
             line = line.replaceAll("\uFEFF", "").trim()
         }
         return line
+    }
+
+    /**
+     * Converts, string with value "null" constant, to null
+     */
+     static <K, V> Map<K, V> convertNullStrings(Map<K, V> map) {
+        if(!map) return map
+        return map.collectEntries { k, v ->
+            if(v instanceof String && v.trim() == "null") v = null
+            else if(v instanceof Map) v = convertNullStrings(v)
+            return [k, v]
+        } as Map<K, V>
     }
 }

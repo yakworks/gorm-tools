@@ -121,11 +121,11 @@ class OrgServiceSpec extends Specification implements DomainIntTest {
 
         when: "find by num"
         OrgService.partition.type = OrgType.Division
-        Org org = OrgService.getPartitionOrgFromCriteria([org:[num:'7', type:"Division"]])
+        Org org = OrgService.getPartitionOrgFromCriteria([org:[num:'5', type:"Division"]])
 
         then:
         org
-        org.id == 7
+        org.id == 5
 
         when: "by id"
         OrgService.partition.type = OrgType.Company

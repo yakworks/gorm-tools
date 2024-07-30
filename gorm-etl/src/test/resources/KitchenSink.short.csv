@@ -1,4 +1,4 @@
 num,name,test.amount
 sink1,red,100
 sink2,yellow,100
-sink3,green,100
+sink3,null,100

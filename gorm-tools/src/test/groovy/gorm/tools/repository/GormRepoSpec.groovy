@@ -272,19 +272,23 @@ class GormRepoSpec extends Specification implements GormHibernateTest {
     def "test flush"() {
         setup:
         Cust org = build(Cust, name: 'test_flush')
-
+        //build saves and flushes by default
         expect:
         org.isAttached()
+        //should be there, it flushed
         Cust.findByName('test_flush') != null
 
         when:
         org.name = 'test_flush_updated'
 
         then:
+        //still same
         Cust.findByName('test_flush') != null
+        //updated but not flushed
         Cust.findByName('test_flush_updated') == null
 
         when:
+        //the update flushes through? even though we didnt save it
         Cust.repo.flush()
         assert org.isAttached()
 
@@ -382,20 +386,22 @@ class GormRepoSpec extends Specification implements GormHibernateTest {
         when:
         org.name = "changed"
 
-        /* persist is overridden in TestTrxRollbackRepo and throws a runtime exception.
-         * persist contains withTrx {} inside, so transaction should rollback */
+        /*
+         * persist is overridden in TestTrxRollbackRepo and throws a runtime exception.
+         * persist contains withTrx {} inside, so transaction should rollback
+         */
         TestTrxRollback.repo.persist(org)
 
         then:
         thrown RuntimeException
         TestTrxRollback.findByName("changed") == null
-
     }
 
     def "test update with transaction rollback"() {
         setup:
         // call save to bypass persist
         TestTrxRollback org = new TestTrxRollback(name: "test_update_withTrx").save(failOnError: true)
+        flush()
         Map params = [name: 'foo', id: org.id]
         TestTrxRollback.repo.clear()
 
@@ -406,6 +412,7 @@ class GormRepoSpec extends Specification implements GormHibernateTest {
         /* persist is overridden in TestTrxRollbackRepo and throws a runtime exception.
          * update contains withTrx {} inside, so transaction should rollback */
         TestTrxRollback.repo.update(params)
+        flushAndClear()
 
         then:
         thrown RuntimeException
@@ -416,7 +423,7 @@ class GormRepoSpec extends Specification implements GormHibernateTest {
     def "test remove with transaction rollback"() {
         setup:
         TestTrxRollback org = new TestTrxRollback(name: "test_remove_withTrx").save()
-        TestTrxRollback.repo.clear()
+        flushAndClear()
 
         expect:
         !org.isAttached()
@@ -425,6 +432,7 @@ class GormRepoSpec extends Specification implements GormHibernateTest {
         /* remove is overridden in TestTrxRollbackRepo and throws a runtime exception.
          * remove contains withTrx {} inside, so transaction should rollback */
         TestTrxRollback.repo.remove(org)
+        flushAndClear()
 
         then:
         thrown RuntimeException

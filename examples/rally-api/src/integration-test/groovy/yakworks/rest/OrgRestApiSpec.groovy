@@ -1,6 +1,8 @@
 package yakworks.rest
 
 import grails.gorm.transactions.Rollback
+import okhttp3.Request
+import okhttp3.RequestBody
 import org.springframework.http.HttpStatus
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
@@ -65,7 +67,7 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
 
         then:
         resp.code() == HttpStatus.OK.value()
-        body.data.size() == 11
+        body.data.size() == 10
 
         when:
         resp = get("$path?q=flubber")
@@ -338,6 +340,23 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
 
         cleanup:
         Org.removeById(body.id as Long)
+    }
 
+    void "malformed json in request"() {
+        setup:
+        Request request = getRequestBuilder(path)
+            .method("POST", RequestBody.create('{"num":"C1", name:"C1"}', null))
+            .build()
+
+        when:
+        Response resp = getHttpClient().newCall(request).execute()
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code() == 400
+        body.status == 400
+        !body.ok
+        body.code == "error.data.problem"
+        body.detail.contains "expecting '}'"
     }
 }

@@ -20,7 +20,7 @@ class OrgSourceRepoTests extends Specification implements DataIntegrationTest {
     void testSaveFail_WithDuplicateSourceId() {
         when:
 
-        Map createOrg = [sourceType:'App', sourceId:'9', orgId:9, orgType: [id: 1]]
+        Map createOrg = [sourceType:'App', sourceId:'10', orgId:10, orgType: [id: 1]]
         orgSourceRepo.create(createOrg, [flush:true])
         //orgSourceRepo.flushAndClear()
 

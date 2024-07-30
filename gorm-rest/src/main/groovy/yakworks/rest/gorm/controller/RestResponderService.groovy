@@ -26,7 +26,7 @@ import grails.web.mime.MimeType
 @CompileStatic
 class RestResponderService {
 
-    @Autowired(required = false) RendererRegistry rendererRegistry
+    @Autowired RendererRegistry rendererRegistry
 
     void respond(Object value, Map args, Object responseFormats) {
         //this should never happen unless config is messed somehow

@@ -37,14 +37,9 @@ class EntityResponder<D> {
     //common valida param keys to remove so that will not be considered a filter //TODO move this to external config
     List<String> whitelistKeys = ['controller', 'action', 'format', 'nd', '_search', 'includes', 'includesKey' ]
 
-    @Autowired(required = false)
-    IncludesConfig includesConfig
-
-    @Autowired(required = false)
-    ApiConfig apiConfig
-
-    @Autowired(required = false)
-    MetaMapService metaMapService
+    @Autowired IncludesConfig includesConfig
+    @Autowired ApiConfig apiConfig
+    @Autowired MetaMapService metaMapService
 
     Class<D> entityClass
     // String logicalName

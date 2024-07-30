@@ -22,8 +22,7 @@ import yakworks.rally.attachment.model.AttachmentLink
 @CompileStatic
 class AttachmentLinkRepo extends AbstractLinkedEntityRepo<AttachmentLink, Attachment> {
 
-    @Autowired(required = false)
-    ProblemHandler problemHandler
+    @Autowired ProblemHandler problemHandler
 
     AttachmentLinkRepo(){
         super(Attachment, 'attachment')

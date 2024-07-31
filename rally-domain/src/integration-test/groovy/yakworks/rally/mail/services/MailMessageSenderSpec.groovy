@@ -104,7 +104,7 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
     void "send : bad email"() {
         when:
         MailMessage mailMsg = MockData.mailMessage()
-        mailMsg.sendTo = mailMsg.sendTo + ", test@9ci.com."
+        mailMsg.sendTo = mailMsg.sendTo +  ', "jon Doe" <john@doe.com>,test@9ci.com.'
         flush()
         mailMessageSender.send(mailMsg)
 

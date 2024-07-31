@@ -38,8 +38,13 @@ class MailMessageSender {
         Result result
         try {
             mailTo = convertMailMessage(mailMessage)
-            // mailService.send should never throw ex and should return result
-            result = emailService.send(mailTo)
+            Result validationResult = emailService.isValidEmail(mailTo.to[0])
+            if(validationResult.ok) {
+                // mailService.send should never throw ex and should return result
+                result = emailService.send(mailTo)
+            } else {
+                result = validationResult
+            }
         } catch(ex){
             //in convertMailMessage might throw an ex if the attachmentId is bad or not found
             result = Problem.of(ex)

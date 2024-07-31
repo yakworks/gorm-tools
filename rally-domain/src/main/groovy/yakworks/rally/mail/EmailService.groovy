@@ -9,7 +9,10 @@ import javax.inject.Inject
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.apache.commons.validator.routines.EmailValidator
+
 import yakworks.api.Result
+import yakworks.api.problem.data.DataProblem
 import yakworks.rally.mail.config.MailProps
 
 /**
@@ -94,6 +97,21 @@ abstract class EmailService {
 
         /** Specify Reply-To address */
         String replyTo;
+    }
 
+    /**
+     * Verify if given email is valid
+     * Accepts single or comma seperated list of emails
+     */
+    Result isValidEmail(String mail) {
+        Result OK = Result.OK()
+        EmailValidator validator = EmailValidator.getInstance()
+        String[] mails = mail.split(",")
+        for(String m : mails) {
+            if(!validator.isValid(m)) {
+                return DataProblem.ofPayload(m).detail("Invalid email address : $m")
+            }
+        }
+        return OK
     }
 }

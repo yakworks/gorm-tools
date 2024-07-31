@@ -101,6 +101,19 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
         emailService.sentMail.size() == 1
     }
 
+    void "send : bad email"() {
+        when:
+        MailMessage mailMsg = MockData.mailMessage()
+        mailMsg.sendTo = mailMsg.sendTo + ", test@9ci.com."
+        flush()
+        mailMessageSender.send(mailMsg)
+
+        then:
+        mailMsg.state == MailMessage.MsgState.Error
+        mailMsg.msgResponse.contains("Invalid email address : test@9ci.com.")
+        emailService.sentMail.size() == 0
+    }
+
     void "send with attachment"() {
         when:
         MailMessage mailMsg = mailMessageWithAttachment()

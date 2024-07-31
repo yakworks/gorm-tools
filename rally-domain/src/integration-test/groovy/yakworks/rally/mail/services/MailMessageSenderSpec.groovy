@@ -164,18 +164,18 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
 
     void "validate addresses"() {
         expect: "valid"
-        emailService.isValidEmail("test@test.com").ok
-        emailService.isValidEmail('"John Doe" <test@test.com>').ok
-        emailService.isValidEmail('"John, Doe" <test@test.com>').ok
-        emailService.isValidEmail('one@one.com, two@two.om').ok
-        emailService.isValidEmail('"One one" <one@one.com>, "Two, two" <two@two.com>').ok
+        emailService.validateEmail("test@test.com").ok
+        emailService.validateEmail('"John Doe" <test@test.com>').ok
+        emailService.validateEmail('"John, Doe" <test@test.com>').ok
+        emailService.validateEmail('one@one.com, two@two.om').ok
+        emailService.validateEmail('"One one" <one@one.com>, "Two, two" <two@two.com>').ok
 
         and: "invalid"
-        !emailService.isValidEmail("test@test.com.").ok
-        !emailService.isValidEmail('John Doe').ok
+        !emailService.validateEmail("test@test.com.").ok
+        !emailService.validateEmail('John Doe').ok
 
         when:
-        Result r = emailService.isValidEmail('"John, Doe" <test@test.com>,test@test.com.')
+        Result r = emailService.validateEmail('"John, Doe" <test@test.com>,test@test.com.')
 
         then: "reports invalid email in detail"
         !r.ok

@@ -38,7 +38,7 @@ class MailMessageSender {
         Result result
         try {
             mailTo = convertMailMessage(mailMessage)
-            Result validationResult = emailService.isValidEmail(mailTo.to[0])
+            Result validationResult = emailService.validateEmail(mailTo.to[0])
             if(validationResult.ok) {
                 // mailService.send should never throw ex and should return result
                 result = emailService.send(mailTo)

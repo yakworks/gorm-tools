@@ -103,7 +103,7 @@ abstract class EmailService {
      * Verify if given email is valid
      * Accepts single or comma seperated list of emails
      */
-    Result isValidEmail(String mail) {
+    Result validateEmail(String mail) {
         Result OK = Result.OK()
         //Split by comma, only if comma is not in quotes, eg  "Blow, Joe" <joeb@9ci.com>
         //Based on : https://stackoverflow.com/questions/1757065/java-splitting-a-comma-separated-string-but-ignoring-commas-in-quotes

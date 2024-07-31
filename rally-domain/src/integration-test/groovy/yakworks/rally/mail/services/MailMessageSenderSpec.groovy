@@ -162,4 +162,24 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
         mailMsg.msgResponse.contains("does not exist")
     }
 
+    void "validate addresses"() {
+        expect: "valid"
+        emailService.isValidEmail("test@test.com").ok
+        emailService.isValidEmail('"John Doe" <test@test.com>').ok
+        emailService.isValidEmail('"John, Doe" <test@test.com>').ok
+        emailService.isValidEmail('one@one.com, two@two.om').ok
+        emailService.isValidEmail('"One one" <one@one.com>, "Two, two" <two@two.com>').ok
+
+        and: "invalid"
+        !emailService.isValidEmail("test@test.com.").ok
+        !emailService.isValidEmail('John Doe').ok
+
+        when:
+        Result r = emailService.isValidEmail('"John, Doe" <test@test.com>,test@test.com.')
+
+        then: "reports invalid email in detail"
+        !r.ok
+        r.detail == "Invalid email address : test@test.com."
+    }
+
 }

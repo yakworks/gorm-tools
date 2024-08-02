@@ -39,7 +39,7 @@ class EntityResponder<D> {
     @Autowired ApiConfig apiConfig
     @Autowired MetaMapService metaMapService
     @Autowired QueryConfig queryConfig
-    @Autowired EntityResponderValidator entityResponderValidator
+    @Autowired Set<EntityResponderValidator> entityResponderValidators
 
     Class<D> entityClass
 
@@ -103,7 +103,7 @@ class EntityResponder<D> {
             .defaultSortById()
             .validateQ()
 
-            entityResponderValidator.validate(qargs)
+            validateQueryArgs(qargs)
 
             if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.buildCriteria()}")
             ((QueryMangoEntityApi) getRepo()).queryList(qargs, null, debugEnabled ? log : null)
@@ -114,6 +114,14 @@ class EntityResponder<D> {
             throw DataProblem.ex("Invalid query $ex.message")
         } catch (DataAccessException ex) {
             throw DataProblem.of(ex).toException()
+        }
+    }
+
+    void validateQueryArgs(QueryArgs args) {
+        if(entityResponderValidators) {
+            for(EntityResponderValidator validator : entityResponderValidators) {
+                validator.validate(args)
+            }
         }
     }
 

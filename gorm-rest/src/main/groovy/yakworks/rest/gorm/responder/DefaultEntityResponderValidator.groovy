@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.hibernate.QueryConfig
 import gorm.tools.mango.api.QueryArgs
+import org.springframework.core.Ordered
+import org.springframework.core.annotation.Order
 
 
 /**
@@ -19,10 +21,10 @@ import gorm.tools.mango.api.QueryArgs
  */
 @Slf4j
 @CompileStatic
+@Order(Ordered.LOWEST_PRECEDENCE)
 class DefaultEntityResponderValidator implements EntityResponderValidator {
 
     @Autowired QueryConfig queryConfig
-    @Autowired UserSecurityConfig userSecurityConfig
 
     QueryArgs validate(QueryArgs qargs) {
         //defaults should be based on queryConfig

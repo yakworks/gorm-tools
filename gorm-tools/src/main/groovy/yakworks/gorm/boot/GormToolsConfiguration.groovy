@@ -108,12 +108,6 @@ class GormToolsConfiguration {
     @Bean
     TrxService trxService(){ new TrxService()}
 
-    /*
-    @Bean
-    GormToolsPreQueryEventListener gormToolsPreQueryEventListener() {
-        return new GormToolsPreQueryEventListener()
-    }*/
-
     @Bean @Lazy(false)
     ProblemHandler problemHandler(){
         new ProblemHandler()

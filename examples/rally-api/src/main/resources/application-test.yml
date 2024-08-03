@@ -8,12 +8,13 @@ spring.security.user.password: 123
 yakworks:
   gorm:
     query:
-      max: 20
+      max: 50
       timeout: 60
 
 app:
   security:
     users:
       admin:
-        query-max: 100
-        query-timeout: 120
+        query:
+          max: 100
+          timeout: 120

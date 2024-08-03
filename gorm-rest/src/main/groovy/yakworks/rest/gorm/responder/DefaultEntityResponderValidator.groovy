@@ -5,21 +5,14 @@
 package yakworks.rest.gorm.responder
 
 import groovy.transform.CompileStatic
-import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
-
-import gorm.tools.hibernate.QueryConfig
-import gorm.tools.mango.api.QueryArgs
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 
+import gorm.tools.hibernate.QueryConfig
+import gorm.tools.mango.api.QueryArgs
 
-/**
- * Helpers for a Restfull api type controller.
- * see grails-core/grails-plugin-rest/src/main/groovy/grails/artefact/controller/RestResponder.groovy
- */
-@Slf4j
 @CompileStatic
 @Order(Ordered.LOWEST_PRECEDENCE)
 class DefaultEntityResponderValidator implements EntityResponderValidator {
@@ -27,7 +20,15 @@ class DefaultEntityResponderValidator implements EntityResponderValidator {
     @Autowired QueryConfig queryConfig
 
     QueryArgs validate(QueryArgs qargs) {
-        //defaults should be based on queryConfig
-    }
+        if (queryConfig.timeout) {
+            qargs.timeout = queryConfig.timeout
+        }
 
+        //set max on qargs from query config. dont force query config max, if user supplied max is smaller thn query config
+        if (queryConfig.max && qargs.pager.max && qargs.pager.max > queryConfig.max) {
+            qargs.pager.max = queryConfig.max
+        }
+
+        qargs
+    }
 }

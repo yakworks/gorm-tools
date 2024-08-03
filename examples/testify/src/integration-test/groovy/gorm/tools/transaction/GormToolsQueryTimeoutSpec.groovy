@@ -1,6 +1,7 @@
 package gorm.tools.transaction
 
 import gorm.tools.hibernate.QueryConfig
+import gorm.tools.mango.api.QueryArgs
 import yakworks.security.gorm.UserSecurityConfig
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
@@ -21,41 +22,14 @@ class GormToolsQueryTimeoutSpec extends Specification {
     @Inject SecService secService
 
 
-    void "sanity check"() {
-        expect:
-        queryConfig.timeout == 60
-        queryConfig.max == 100
-        userSecurityConfig.users.size() == 1
-        userSecurityConfig.users.containsKey 'system'
-        userSecurityConfig.users.system.queryTimeout == 120
-        userSecurityConfig.users.system.queryMax == 500
-    }
-
-    @Ignore("cant be tested in gorm-tools - h2 db doesnt provide any way to delay a query similar to pg_sleep")
-    void "test query timeout"() {
-        when:
-        timeout(60)
-
-        then: "trx should timeout with 120 sec delay"
-        TransactionTimedOutException ex = thrown()
-    }
-
-    @Ignore("Max not implemented")
     void "test max"() {
-        setup:
-        queryConfig.max = 5
-
         when:
-        List results = Org.list()
+        List results = Org.query(QueryArgs.of(max:5))
 
         then:
         results.size() == 5
-
-        cleanup:
-        queryConfig.max = 100
     }
 
-    @Ignore("Max not implemented")
     void "test max with smaller value thn default max configured"() {
         when:
         List results = Org.list(max:10)

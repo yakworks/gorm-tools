@@ -9,6 +9,7 @@ import groovy.transform.CompileStatic
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Configuration
 
+import gorm.tools.hibernate.QueryConfig
 import yakworks.security.user.CurrentUser
 
 
@@ -37,7 +38,7 @@ class UserSecurityConfig {
     Integer getQueryTimeout(String username) {
         Integer timeout = null
         if(users && users.containsKey(username)) {
-            timeout = users[username].queryTimeout
+            timeout = users[username].query.timeout
         }
         return timeout
     }
@@ -45,15 +46,14 @@ class UserSecurityConfig {
     Integer getMax(String username) {
         Integer max = null
         if(users && users.containsKey(username)) {
-            max = users[username].queryMax
+            max = users[username].query.max
         }
         return max
     }
 
+
     static class UserConfig {
-        //XXX keep consistent, this should contain a QueryConfig
-        Integer queryMax
-        Integer queryTimeout
+       QueryConfig query = new QueryConfig()
     }
 
 }

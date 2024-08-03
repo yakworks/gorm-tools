@@ -6,15 +6,9 @@ package yakworks.rest.gorm.responder
 
 
 import groovy.transform.CompileStatic
-import groovy.util.logging.Slf4j
 
 import gorm.tools.mango.api.QueryArgs
 
-/**
- * Helpers for a Restfull api type controller.
- * see grails-core/grails-plugin-rest/src/main/groovy/grails/artefact/controller/RestResponder.groovy
- */
-@Slf4j
 @CompileStatic
 interface EntityResponderValidator {
 

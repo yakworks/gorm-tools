@@ -10,5 +10,6 @@ app:
   security:
     users:
       system:
-        query-max: 500
-        query-timeout: 120
+        query:
+          max: 500
+          timeout: 120

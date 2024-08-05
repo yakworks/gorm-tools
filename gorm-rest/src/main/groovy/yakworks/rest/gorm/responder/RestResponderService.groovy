@@ -2,7 +2,7 @@
 * Copyright 2014 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.rest.gorm.controller
+package yakworks.rest.gorm.responder
 
 import javax.servlet.http.HttpServletResponse
 
@@ -20,8 +20,8 @@ import grails.rest.render.RendererRegistry
 import grails.web.mime.MimeType
 
 /**
- * Copy of Grails RestResponder but without the magic stuff that keeps having errors picked up
- *
+ * Copy of Grails RestResponder trait but turned into a service so it can be used and tested easier
+ * removes the magic stuff around errors that keeps having errors picked up
  */
 @CompileStatic
 class RestResponderService {

@@ -2,7 +2,7 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.rest.gorm.controller
+package yakworks.rest.gorm.responder
 
 import groovy.json.JsonException
 import groovy.transform.CompileStatic
@@ -11,9 +11,9 @@ import groovy.util.logging.Slf4j
 import org.hibernate.QueryException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataAccessException
-import org.springframework.http.HttpStatus
 
 import gorm.tools.beans.Pager
+import gorm.tools.hibernate.QueryConfig
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.metamap.services.MetaMapService
@@ -34,16 +34,15 @@ import yakworks.spring.AppCtx
 @Slf4j
 @CompileStatic
 class EntityResponder<D> {
-    //common valida param keys to remove so that will not be considered a filter //TODO move this to external config
-    List<String> whitelistKeys = ['controller', 'action', 'format', 'nd', '_search', 'includes', 'includesKey' ]
 
     @Autowired IncludesConfig includesConfig
     @Autowired ApiConfig apiConfig
     @Autowired MetaMapService metaMapService
+    @Autowired QueryConfig queryConfig
+    @Autowired Set<EntityResponderValidator> entityResponderValidators
 
     Class<D> entityClass
-    // String logicalName
-    // String namespace
+
     /** the path item */
     PathItem pathItem
     //allows it to be turned on and off for controller
@@ -74,14 +73,6 @@ class EntityResponder<D> {
     }
 
     /**
-     * respond with instance, calls ctrl.respondWith after it creates and entityMap
-     */
-    void respondWith(RestResponderTrait ctrl, D instance, Map params, HttpStatus status = HttpStatus.OK){
-        MetaMap entityMap = createEntityMap(instance, params)
-        ctrl.respondWith(entityMap, [status: status, params: params])
-    }
-
-    /**
      * builds the response model with the EntityMap wrapper.
      *
      * @param instance the entity instance
@@ -104,15 +95,15 @@ class EntityResponder<D> {
     }
 
     List<D> query(Pager pager, Map parms) {
-        // Map pclone = Maps.clone(parms) as Map<String, Object>
-        //remove the fields that grails adds for controller and action
-        // pclone.removeAll {it.key in whitelistKeys }
+
         try {
             QueryArgs qargs = QueryArgs.of(pager)
             .qRequired(pathItem?.qRequired)
             .build(parms)
             .defaultSortById()
             .validateQ()
+
+            validateQueryArgs(qargs)
 
             if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.buildCriteria()}")
             ((QueryMangoEntityApi) getRepo()).queryList(qargs, null, debugEnabled ? log : null)
@@ -123,6 +114,14 @@ class EntityResponder<D> {
             throw DataProblem.ex("Invalid query $ex.message")
         } catch (DataAccessException ex) {
             throw DataProblem.of(ex).toException()
+        }
+    }
+
+    void validateQueryArgs(QueryArgs args) {
+        if(entityResponderValidators) {
+            for(EntityResponderValidator validator : entityResponderValidators) {
+                validator.validate(args)
+            }
         }
     }
 

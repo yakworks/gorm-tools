@@ -84,6 +84,11 @@ class QueryArgs {
     Map<String, String> projections
 
     /**
+     * Query timeout in seconds. If value is set, the timeout would be set on hibernate query/criteria instance.
+     */
+    Integer timeout = 0
+
+    /**
      * Construct from a pager
      */
     static QueryArgs of(Pager pager){

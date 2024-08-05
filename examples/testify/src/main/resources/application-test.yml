@@ -1,0 +1,15 @@
+
+# Longer query timeout for specific users.
+yakworks:
+  gorm:
+    query:
+      max: 100
+      timeout: 60
+
+app:
+  security:
+    users:
+      system:
+        query:
+          max: 500
+          timeout: 120

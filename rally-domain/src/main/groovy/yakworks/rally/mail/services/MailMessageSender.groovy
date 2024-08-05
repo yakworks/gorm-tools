@@ -19,6 +19,8 @@ import yakworks.rally.mail.EmailService.MailTo
 import yakworks.rally.mail.model.ContentType
 import yakworks.rally.mail.model.MailMessage
 
+import static yakworks.rally.mail.EmailUtils.validateEmail
+
 /**
  * Sends a MailMessage domain and updates it with appropriate state and msgReponse
  * FUTURE: This will also be reponsible for updating a MailMessage when we capture mailgu events and want to update Delivered, Opened, Complained
@@ -38,12 +40,10 @@ class MailMessageSender {
         Result result
         try {
             mailTo = convertMailMessage(mailMessage)
-            Result validationResult = emailService.validateEmail(mailTo.to[0])
-            if(validationResult.ok) {
+            boolean valid = validateEmail(mailTo.to[0]) //this will throw a problem when validation fails.
+            if(valid) {
                 // mailService.send should never throw ex and should return result
                 result = emailService.send(mailTo)
-            } else {
-                result = validationResult
             }
         } catch(ex){
             //in convertMailMessage might throw an ex if the attachmentId is bad or not found

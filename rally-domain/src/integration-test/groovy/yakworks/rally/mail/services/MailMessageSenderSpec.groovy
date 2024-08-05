@@ -101,16 +101,16 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
         emailService.sentMail.size() == 1
     }
 
-    void "send : bad email"() {
+    void "send : bad email fails validation"() {
         when:
         MailMessage mailMsg = MockData.mailMessage()
-        mailMsg.sendTo = mailMsg.sendTo +  ', "jon Doe" <john@doe.com>,test@9ci.com.'
+        mailMsg.sendTo = mailMsg.sendTo +  ', "jon Doe" <john@doe.com>,jimjoe.com'
         flush()
         mailMessageSender.send(mailMsg)
 
         then:
         mailMsg.state == MailMessage.MsgState.Error
-        mailMsg.msgResponse.contains("Invalid email address : test@9ci.com.")
+        mailMsg.msgResponse.contains("Invalid email address [jimjoe.com], Missing final '@domain'")
         emailService.sentMail.size() == 0
     }
 
@@ -160,26 +160,6 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
         !mailMsg.messageId
         mailMsg.state == MailMessage.MsgState.Error
         mailMsg.msgResponse.contains("does not exist")
-    }
-
-    void "validate addresses"() {
-        expect: "valid"
-        emailService.validateEmail("test@test.com").ok
-        emailService.validateEmail('"John Doe" <test@test.com>').ok
-        emailService.validateEmail('"John, Doe" <test@test.com>').ok
-        emailService.validateEmail('one@one.com, two@two.om').ok
-        emailService.validateEmail('"One one" <one@one.com>, "Two, two" <two@two.com>').ok
-
-        and: "invalid"
-        !emailService.validateEmail("test@test.com.").ok
-        !emailService.validateEmail('John Doe').ok
-
-        when:
-        Result r = emailService.validateEmail('"John, Doe" <test@test.com>,test@test.com.')
-
-        then: "reports invalid email in detail"
-        !r.ok
-        r.detail == "Invalid email address : test@test.com."
     }
 
 }

@@ -4,6 +4,7 @@ import javax.mail.internet.InternetAddress
 
 import spock.lang.Specification
 import yakworks.api.problem.ThrowableProblem
+import static yakworks.rally.mail.EmailUtils.validateEmail
 
 class EmailUtilsSpec extends Specification {
 
@@ -21,7 +22,7 @@ class EmailUtilsSpec extends Specification {
         then:
         ThrowableProblem ex = thrown()
         ex.code == "validation.problem"
-        ex.detail == "Missing final '@domain'"
+        ex.detail ==  "Invalid email address [jimjoe.com], Missing final '@domain'"
     }
 
     void "validate bad email in list"() {
@@ -30,7 +31,7 @@ class EmailUtilsSpec extends Specification {
         then:
         ThrowableProblem ex = thrown()
         ex.code == "validation.problem"
-        ex.detail == "Missing final '@domain'"
+        ex.detail.contains "Missing final '@domain'"
     }
 
     void "InternetAddress playground"() {
@@ -87,15 +88,27 @@ class EmailUtilsSpec extends Specification {
         }
     }
 
-    // void "InternetAddress single bad item"() {
-    //     when:
-    //     InternetAddress[] listAddy = InternetAddress.parse('jimjoe.com')
-    //
-    //     then:
-    //     listAddy.size() === 1
-    //     listAddy.each {
-    //         it.validate()
-    //         assert it.address
-    //     }
-    // }
+    void "validate addresses"() {
+        expect: "valid"
+        validateEmail("test@test.com")
+        validateEmail('"John Doe" <test@test.com>')
+        validateEmail('"John, Doe" <test@test.com>')
+        validateEmail('one@one.com, two@two.om')
+        validateEmail('"One one" <one@one.com>, "Two, two" <two@two.com>')
+
+        and: "invalid"
+        assetInvalid("test@test.com.")
+        assetInvalid('John Doe')
+        assetInvalid('test@test.com, jimjoe.com') //single bed item
+    }
+
+    boolean assetInvalid(String mail) {
+        try {
+            validateEmail(mail)
+            return false
+        } catch(ThrowableProblem ex) {
+            assert ex.code == "validation.problem"
+            return true
+        }
+    }
 }

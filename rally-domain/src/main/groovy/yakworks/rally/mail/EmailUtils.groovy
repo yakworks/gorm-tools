@@ -31,14 +31,21 @@ class EmailUtils {
         boolean isValid = false
         try {
             InternetAddress[] addys = InternetAddress.parse(emails)
-            addys.each{
-                it.validate()
+            for (InternetAddress addr : addys) {
+                try {
+                    addr.validate()
+                } catch (AddressException e) {
+                    throw Problem.of("validation.problem")
+                        .payload(addr)
+                        .detail("Invalid email address [$addr], " + e.message)
+                        .toException()
+                }
             }
-            isValid = true;
+            isValid = true
         } catch (AddressException e) {
-            throw Problem.of("validation.problem").detail(e.message).toException()
+            throw Problem.of("validation.problem").payload(emails).detail(e.message).toException()
         }
-        return isValid;
+        return isValid
     }
 
     public static String nameWithEmail(String name, String email) {

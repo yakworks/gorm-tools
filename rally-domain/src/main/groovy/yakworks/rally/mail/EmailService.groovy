@@ -5,14 +5,11 @@
 package yakworks.rally.mail
 
 import javax.inject.Inject
-import javax.mail.internet.AddressException
-import javax.mail.internet.InternetAddress
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import yakworks.api.Result
-import yakworks.api.problem.data.DataProblem
 import yakworks.rally.mail.config.MailProps
 
 /**
@@ -97,25 +94,5 @@ abstract class EmailService {
 
         /** Specify Reply-To address */
         String replyTo;
-    }
-
-    /**
-     * Verify if given email is valid
-     * Accepts single or comma seperated list of emails
-     */
-    Result validateEmail(String mail) {
-        Result OK = Result.OK()
-        //Split by comma, only if comma is not in quotes, eg  "Blow, Joe" <joeb@9ci.com>
-        //Based on : https://stackoverflow.com/questions/1757065/java-splitting-a-comma-separated-string-but-ignoring-commas-in-quotes
-        String[] mails = mail.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)", -1)
-        for(String m : mails) {
-            try {
-                InternetAddress address = new InternetAddress(m)
-                address.validate()
-            } catch(AddressException ex) {
-                return DataProblem.ofPayload(m).title("Invalid email address").detail("Invalid email address : $m")
-            }
-        }
-        return OK
     }
 }

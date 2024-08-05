@@ -16,8 +16,7 @@ class QueryConfigSpec extends Specification {
     @Inject QueryConfig queryConfig
     @Inject UserSecurityConfig userSecurityConfig
     @Inject SecService secService
-    @Inject SecurityVa
-
+    
     void "sanity check"() {
         expect:
         queryConfig.timeout == 60

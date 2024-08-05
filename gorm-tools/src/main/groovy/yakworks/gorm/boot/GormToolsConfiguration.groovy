@@ -21,7 +21,6 @@ import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelStreamTools
 import gorm.tools.async.ParallelTools
 import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.hibernate.GormToolsPreQueryEventListener
 import gorm.tools.hibernate.QueryConfig
 import gorm.tools.idgen.IdGenerator
 import gorm.tools.idgen.JdbcIdGenerator
@@ -108,11 +107,6 @@ class GormToolsConfiguration {
 
     @Bean
     TrxService trxService(){ new TrxService()}
-
-    @Bean
-    GormToolsPreQueryEventListener gormToolsPreQueryEventListener() {
-        return new GormToolsPreQueryEventListener()
-    }
 
     @Bean @Lazy(false)
     ProblemHandler problemHandler(){

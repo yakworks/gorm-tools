@@ -14,6 +14,11 @@ dependencies {
   api project(":gorm-etl")
   api project(":gorm-openapi")
 
+  //FIXME - @JOSH we need access to CurrentUser in EntityResponder for user specific "max" configuration
+  //@JOSH Putting it back temporary so i can proceed, later i can move SecurityEntityResponderValidator to another module
+  //As of now, can not put SecurityEntityResponderValidator in rally-domain, as it does not have dependency on gorm-rest
+  api project(":boot-security-gorm")
+
   //FIXME remove this when we upgrade to spring 6 as its built in.
   // this uses the HttpClient thats built into java 11 for WebClient.
   // compileOnly 'com.integralblue:java-httpclient-webclient-spring-boot-starter:1.0.0'

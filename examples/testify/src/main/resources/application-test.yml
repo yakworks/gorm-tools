@@ -1,4 +1,3 @@
-spring.transaction.default-timeout: 60
 
 # Longer query timeout for specific users.
 yakworks:
@@ -11,5 +10,6 @@ app:
   security:
     users:
       system:
-        query-max: 500
-        query-timeout: 120
+        query:
+          max: 500
+          timeout: 120

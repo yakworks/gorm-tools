@@ -35,28 +35,33 @@ class MailMessageSender {
      * calls mailgunMessagesApi.sendMessage using the MailgunConfig.defaultDomain
      *
      */
-    Result send(MailMessage mailMessage){
-        MailTo mailTo
+    Result send(MailMessage mailMessage) {
         Result result
+
         try {
-            mailTo = convertMailMessage(mailMessage)
-            boolean valid = validateEmail(mailTo.to[0]) //this will throw a problem when validation fails.
-            if(valid) {
+            MailTo mailTo = convertMailMessage(mailMessage)
+            Result validationR = validateEmail(mailTo.to[0]) //returns problem result with details if validation fails
+
+            if (validationR.ok) {
                 // mailService.send should never throw ex and should return result
                 result = emailService.send(mailTo)
+            } else {
+                result = validationR
             }
-        } catch(ex){
+
+        } catch (ex) {
             //in convertMailMessage might throw an ex if the attachmentId is bad or not found
             result = Problem.of(ex)
         }
 
-        try{
+        try {
             updateMessageState(mailMessage, result)
-        }catch(pex){
+        } catch (pex) {
             //should not happen, unexpected
             log.error("Failed to update message state", pex)
             result = Problem.of(pex)
         }
+
         return result
     }
 
@@ -65,8 +70,8 @@ class MailMessageSender {
      * Will assign the messageId and state=Sent on success
      */
     @Transactional
-    protected void updateMessageState(MailMessage mailMessage, Result result){
-        if(result instanceof Problem){
+    protected void updateMessageState(MailMessage mailMessage, Result result) {
+        if (result instanceof Problem) {
             mailMessage.state = MailMessage.MsgState.Error
             mailMessage.msgResponse = result.detail
         } else {
@@ -78,7 +83,7 @@ class MailMessageSender {
         mailMessage.persist()
     }
 
-    MailTo convertMailMessage(MailMessage mailMessage){
+    MailTo convertMailMessage(MailMessage mailMessage) {
         MailTo mailTo = new MailTo(
             from: mailMessage.sendFrom,
             replyTo: mailMessage.replyTo,
@@ -87,26 +92,26 @@ class MailMessageSender {
         )
 
         //TODO only html, plain handled, need to impl markdown
-        if(mailMessage.contentType == ContentType.html){
+        if (mailMessage.contentType == ContentType.html) {
             mailTo.html = mailMessage.body
         } else {
             mailTo.text = mailMessage.body
         }
 
-        if(mailMessage.cc) mailTo.cc = [mailMessage.cc]
-        if(mailMessage.bcc) mailTo.cc = [mailMessage.bcc]
+        if (mailMessage.cc) mailTo.cc = [mailMessage.cc]
+        if (mailMessage.bcc) mailTo.cc = [mailMessage.bcc]
 
-        if(mailMessage.attachmentIds) {
+        if (mailMessage.attachmentIds) {
             List attachFiles = [] as List<File>
-            mailMessage.attachmentIds.each{ Long id ->
+            mailMessage.attachmentIds.each { Long id ->
                 Attachment attach = Attachment.get(id)
-                if(!attach) throw new IllegalArgumentException("Attachment id:[$id] does not exist")
+                if (!attach) throw new IllegalArgumentException("Attachment id:[$id] does not exist")
                 attachFiles.add(attach.resource.getFile())
             }
-            if(attachFiles) mailTo.attachments = attachFiles
+            if (attachFiles) mailTo.attachments = attachFiles
         }
         //tags
-        if(mailMessage.tags) mailTo.tags = mailMessage.tags
+        if (mailMessage.tags) mailTo.tags = mailMessage.tags
         //TODO do inline
         return mailTo
     }

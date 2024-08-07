@@ -1,6 +1,7 @@
 package yakworks.rally.mail
 
 import yakworks.api.Result
+import yakworks.api.problem.ThrowableProblem
 
 import javax.mail.internet.InternetAddress
 
@@ -12,32 +13,32 @@ class EmailUtilsSpec extends Specification {
 
     void "validate emails fail"() {
         when:
-        Result r = validateEmail('jimjoe.com')
+        validateEmail('jimjoe.com')
 
         then:
-        !r.ok
-        r.code == "validation.problem"
-        r.detail ==  "Invalid email address [jimjoe.com], Missing final '@domain'"
+        ThrowableProblem ex = thrown()
+        ex.code == "validation.problem"
+        ex.detail ==  "Invalid email address [jimjoe.com], Missing final '@domain'"
     }
 
     void "validate bad email in list"() {
         when:
-        Result r = validateEmail('Account Services <rndc@greenbill.io>,jimjoe.com')
+        validateEmail('Account Services <rndc@greenbill.io>,jimjoe.com')
 
         then:
-        !r.ok
-        r.code == "validation.problem"
-        r.detail.contains "Missing final '@domain'"
+        ThrowableProblem ex = thrown()
+        ex.code == "validation.problem"
+        ex.detail.contains "Missing final '@domain'"
     }
 
     void "validate addresses"() {
         expect: "valid"
-        validateEmail("test@test.com").ok
-        validateEmail('"John Doe" <test@test.com>').ok
-        validateEmail('"John, Doe" <test@test.com>').ok
-        validateEmail('one@one.com, two@two.om').ok
-        validateEmail('"One one" <one@one.com>, "Two, two" <two@two.com>').ok
-        validateEmail('Account Services <rndc@greenbill.io>, "Blow, Joe" <josh2@yak.com>,joe@email.com').ok
+        validateEmail("test@test.com")
+        validateEmail('"John Doe" <test@test.com>')
+        validateEmail('"John, Doe" <test@test.com>')
+        validateEmail('one@one.com, two@two.om')
+        validateEmail('"One one" <one@one.com>, "Two, two" <two@two.com>')
+        validateEmail('Account Services <rndc@greenbill.io>, "Blow, Joe" <josh2@yak.com>,joe@email.com')
 
         and: "invalid"
         assertInvalid(null)
@@ -103,10 +104,12 @@ class EmailUtilsSpec extends Specification {
         }
     }
 
-    boolean assertInvalid(String mail) {
-        Result problem = validateEmail(mail)
-        assert !problem.ok
-        assert problem.code ==  "validation.problem"
-        return true
+    Result assertInvalid(String mail) {
+        try {
+            validateEmail(mail)
+        } catch(ThrowableProblem p) {
+            assert p.code == "validation.problem"
+            return p
+        }
     }
 }

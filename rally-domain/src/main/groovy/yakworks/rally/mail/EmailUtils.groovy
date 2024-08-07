@@ -11,7 +11,6 @@ import groovy.transform.CompileStatic
 
 import org.apache.commons.lang3.StringUtils
 
-import yakworks.api.Result
 import yakworks.api.problem.Problem
 
 /**
@@ -20,18 +19,17 @@ import yakworks.api.problem.Problem
 @CompileStatic
 class EmailUtils {
 
-
     /**
      * Accepts a string with 1 or more emails in a comma separated RFC 822 format. <br>
      * Examples: <br>
      * "joe@email.com" - simple single email <br>
      * "Account Services <tesla@greenbill.io>, "Galt, John" <galt@yak.works>, joe@email.com" - 3 valid emails
      *
-     * @return OK result, if all emails are valid, Problem result, with code:validation.problem if validation fails
+     * @throws ThrowableProblem if validation fails
      */
-    static Result validateEmail(String emails) {
+    static void validateEmail(String emails) {
         if(!emails?.trim()) {
-            return Problem.of("validation.problem").detail("Empty email")
+            throw Problem.of("validation.problem").detail("Empty email").toException()
         }
         try {
             InternetAddress[] addys = InternetAddress.parse(emails)
@@ -39,15 +37,14 @@ class EmailUtils {
                 try {
                     addr.validate()
                 } catch (AddressException e) {
-                    return Problem.of("validation.problem")
+                    throw Problem.of("validation.problem")
                         .payload(addr)
-                        .detail("Invalid email address [$addr], " + e.message)
+                        .detail("Invalid email address [$addr], " + e.message).toException()
                 }
             }
         } catch (AddressException e) {
-            return Problem.of("validation.problem").payload(emails).detail(e.message)
+            throw Problem.of("validation.problem").payload(emails).detail(e.message).toException()
         }
-        return Result.OK()
     }
 
     public static String nameWithEmail(String name, String email) {

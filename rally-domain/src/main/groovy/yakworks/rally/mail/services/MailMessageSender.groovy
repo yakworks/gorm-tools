@@ -13,6 +13,7 @@ import groovy.util.logging.Slf4j
 import grails.gorm.transactions.Transactional
 import yakworks.api.Result
 import yakworks.api.problem.Problem
+import yakworks.api.problem.ThrowableProblem
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.mail.EmailService
 import yakworks.rally.mail.EmailService.MailTo
@@ -40,16 +41,14 @@ class MailMessageSender {
 
         try {
             MailTo mailTo = convertMailMessage(mailMessage)
-            Result validationR = validateEmail(mailTo.to[0]) //returns problem result with details if validation fails
+            //validation throws a problem exception if validation fails
+            validateEmail(mailTo.to[0])
+            //mailService.send should never throw ex and should return result
+            result = emailService.send(mailTo)
 
-            if (validationR.ok) {
-                // mailService.send should never throw ex and should return result
-                result = emailService.send(mailTo)
-            } else {
-                result = validationR
-            }
-
-        } catch (ex) {
+        } catch(ThrowableProblem p ) {
+            result = p
+        }  catch (Exception ex) {
             //in convertMailMessage might throw an ex if the attachmentId is bad or not found
             result = Problem.of(ex)
         }

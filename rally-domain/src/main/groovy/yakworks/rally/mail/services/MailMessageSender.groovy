@@ -13,11 +13,14 @@ import groovy.util.logging.Slf4j
 import grails.gorm.transactions.Transactional
 import yakworks.api.Result
 import yakworks.api.problem.Problem
+import yakworks.api.problem.ThrowableProblem
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.mail.EmailService
 import yakworks.rally.mail.EmailService.MailTo
 import yakworks.rally.mail.model.ContentType
 import yakworks.rally.mail.model.MailMessage
+
+import static yakworks.rally.mail.EmailUtils.validateEmail
 
 /**
  * Sends a MailMessage domain and updates it with appropriate state and msgReponse
@@ -33,26 +36,43 @@ class MailMessageSender {
      * calls mailgunMessagesApi.sendMessage using the MailgunConfig.defaultDomain
      *
      */
-    Result send(MailMessage mailMessage){
-        MailTo mailTo
+    Result send(MailMessage mailMessage) {
         Result result
+
         try {
-            mailTo = convertMailMessage(mailMessage)
-            // mailService.send should never throw ex and should return result
+            MailTo mailTo = convertMailMessage(mailMessage)
+            //validation throws a problem exception if validation fails
+            validateMailMessage(mailTo)
+            //mailService.send should never throw ex and should return result
             result = emailService.send(mailTo)
-        } catch(ex){
+
+        } catch(ThrowableProblem p ) {
+            result = p
+        }  catch (Exception ex) {
             //in convertMailMessage might throw an ex if the attachmentId is bad or not found
             result = Problem.of(ex)
         }
 
-        try{
+        try {
             updateMessageState(mailMessage, result)
-        }catch(pex){
+        } catch (pex) {
             //should not happen, unexpected
             log.error("Failed to update message state", pex)
             result = Problem.of(pex)
         }
+
         return result
+    }
+
+    /**
+     * Validates mailto, throw DataProblem exception if validation fails
+     */
+    void validateMailMessage(MailTo mailTo) {
+        validateEmail(mailTo.to.join(","))
+        validateEmail(mailTo.from)
+        if(mailTo.replyTo) validateEmail(mailTo.replyTo)
+        if(mailTo.cc) validateEmail(mailTo.cc.join(","))
+        if(mailTo.bcc) validateEmail(mailTo.bcc.join(","))
     }
 
     /**
@@ -60,8 +80,8 @@ class MailMessageSender {
      * Will assign the messageId and state=Sent on success
      */
     @Transactional
-    protected void updateMessageState(MailMessage mailMessage, Result result){
-        if(result instanceof Problem){
+    protected void updateMessageState(MailMessage mailMessage, Result result) {
+        if (result instanceof Problem) {
             mailMessage.state = MailMessage.MsgState.Error
             mailMessage.msgResponse = result.detail
         } else {
@@ -73,7 +93,7 @@ class MailMessageSender {
         mailMessage.persist()
     }
 
-    MailTo convertMailMessage(MailMessage mailMessage){
+    MailTo convertMailMessage(MailMessage mailMessage) {
         MailTo mailTo = new MailTo(
             from: mailMessage.sendFrom,
             replyTo: mailMessage.replyTo,
@@ -82,26 +102,26 @@ class MailMessageSender {
         )
 
         //TODO only html, plain handled, need to impl markdown
-        if(mailMessage.contentType == ContentType.html){
+        if (mailMessage.contentType == ContentType.html) {
             mailTo.html = mailMessage.body
         } else {
             mailTo.text = mailMessage.body
         }
 
-        if(mailMessage.cc) mailTo.cc = [mailMessage.cc]
-        if(mailMessage.bcc) mailTo.cc = [mailMessage.bcc]
+        if (mailMessage.cc) mailTo.cc = [mailMessage.cc]
+        if (mailMessage.bcc) mailTo.cc = [mailMessage.bcc]
 
-        if(mailMessage.attachmentIds) {
+        if (mailMessage.attachmentIds) {
             List attachFiles = [] as List<File>
-            mailMessage.attachmentIds.each{ Long id ->
+            mailMessage.attachmentIds.each { Long id ->
                 Attachment attach = Attachment.get(id)
-                if(!attach) throw new IllegalArgumentException("Attachment id:[$id] does not exist")
+                if (!attach) throw new IllegalArgumentException("Attachment id:[$id] does not exist")
                 attachFiles.add(attach.resource.getFile())
             }
-            if(attachFiles) mailTo.attachments = attachFiles
+            if (attachFiles) mailTo.attachments = attachFiles
         }
         //tags
-        if(mailMessage.tags) mailTo.tags = mailMessage.tags
+        if (mailMessage.tags) mailTo.tags = mailMessage.tags
         //TODO do inline
         return mailTo
     }

@@ -11,7 +11,7 @@ import groovy.transform.CompileStatic
 
 import org.apache.commons.lang3.StringUtils
 
-import yakworks.api.problem.Problem
+import yakworks.api.problem.data.DataProblem
 
 /**
  * Misc utils for emails.
@@ -24,21 +24,27 @@ class EmailUtils {
      * Examples: <br>
      * "joe@email.com" - simple single email <br>
      * "Account Services <tesla@greenbill.io>, "Galt, John" <galt@yak.works>, joe@email.com" - 3 valid emails
-     * @return true is valid
-     * @throw ThrowableProblem with code:validation.problem
+     *
+     * @throws ThrowableProblem if validation fails
      */
-    static boolean validateEmail(String emails) {
-        boolean isValid = false
+    static void validateEmail(String emails) {
+        if (!emails?.trim()) {
+            throw DataProblem.of("error.data.empty").detail("Empty email").toException()
+        }
         try {
             InternetAddress[] addys = InternetAddress.parse(emails)
-            addys.each{
-                it.validate()
+            for (InternetAddress addr : addys) {
+                try {
+                    addr.validate()
+                } catch (AddressException e) {
+                    throw DataProblem.of(e)
+                        .payload(addr.address)
+                        .detail("Invalid email address [${addr.address}], " + e.message).toException()
+                }
             }
-            isValid = true;
         } catch (AddressException e) {
-            throw Problem.of("validation.problem").detail(e.message).toException()
+            throw DataProblem.of(e).payload(emails).toException()
         }
-        return isValid;
     }
 
     public static String nameWithEmail(String name, String email) {

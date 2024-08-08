@@ -11,7 +11,7 @@ import groovy.transform.CompileStatic
 
 import org.apache.commons.lang3.StringUtils
 
-import yakworks.api.problem.Problem
+import yakworks.api.problem.data.DataProblem
 
 /**
  * Misc utils for emails.
@@ -28,8 +28,8 @@ class EmailUtils {
      * @throws ThrowableProblem if validation fails
      */
     static void validateEmail(String emails) {
-        if(!emails?.trim()) {
-            throw Problem.of("validation.problem").detail("Empty email").toException()
+        if (!emails?.trim()) {
+            throw DataProblem.of("error.data.empty").detail("Empty email").toException()
         }
         try {
             InternetAddress[] addys = InternetAddress.parse(emails)
@@ -37,13 +37,13 @@ class EmailUtils {
                 try {
                     addr.validate()
                 } catch (AddressException e) {
-                    throw Problem.of("validation.problem")
-                        .payload(addr)
-                        .detail("Invalid email address [$addr], " + e.message).toException()
+                    throw DataProblem.of(e)
+                        .payload(addr.address)
+                        .detail("Invalid email address [${addr.address}], " + e.message).toException()
                 }
             }
         } catch (AddressException e) {
-            throw Problem.of("validation.problem").payload(emails).detail(e.message).toException()
+            throw DataProblem.of(e).payload(emails).toException()
         }
     }
 

@@ -42,7 +42,7 @@ class MailMessageSender {
         try {
             MailTo mailTo = convertMailMessage(mailMessage)
             //validation throws a problem exception if validation fails
-            validateEmail(mailTo.to[0])
+            validateMailMessage(mailTo)
             //mailService.send should never throw ex and should return result
             result = emailService.send(mailTo)
 
@@ -62,6 +62,17 @@ class MailMessageSender {
         }
 
         return result
+    }
+
+    /**
+     * Validates mailto, throw DataProblem exception if validation fails
+     */
+    void validateMailMessage(MailTo mailTo) {
+        validateEmail(mailTo.to.join(","))
+        validateEmail(mailTo.from)
+        if(mailTo.replyTo) validateEmail(mailTo.replyTo)
+        if(mailTo.cc) validateEmail(mailTo.cc.join(","))
+        if(mailTo.bcc) validateEmail(mailTo.bcc.join(","))
     }
 
     /**

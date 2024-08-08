@@ -12,23 +12,13 @@ import static yakworks.rally.mail.EmailUtils.validateEmail
 class EmailUtilsSpec extends Specification {
 
     void "validate emails fail"() {
-        when:
-        validateEmail('jimjoe.com')
-
-        then:
-        ThrowableProblem ex = thrown()
-        ex.code == "validation.problem"
-        ex.detail ==  "Invalid email address [jimjoe.com], Missing final '@domain'"
+        expect:
+        assertInvalid('jimjoe.com', null, "Invalid email address [jimjoe.com], Missing final '@domain'")
     }
 
     void "validate bad email in list"() {
-        when:
-        validateEmail('Account Services <rndc@greenbill.io>,jimjoe.com')
-
-        then:
-        ThrowableProblem ex = thrown()
-        ex.code == "validation.problem"
-        ex.detail.contains "Missing final '@domain'"
+        expect:
+        assertInvalid('Account Services <rndc@greenbill.io>,jimjoe.com', null, "Missing final '@domain'")
     }
 
     void "validate addresses"() {
@@ -41,9 +31,9 @@ class EmailUtilsSpec extends Specification {
         validateEmail('Account Services <rndc@greenbill.io>, "Blow, Joe" <josh2@yak.com>,joe@email.com')
 
         and: "invalid"
-        assertInvalid(null)
-        assertInvalid("")
-        assertInvalid(" ")
+        assertInvalid(null, "error.data.empty")
+        assertInvalid("", "error.data.empty")
+        assertInvalid(" ", "error.data.empty")
         assertInvalid('jimjoe.com')
         assertInvalid("test@test.com.")
         assertInvalid('John Doe')
@@ -104,11 +94,12 @@ class EmailUtilsSpec extends Specification {
         }
     }
 
-    Result assertInvalid(String mail) {
+    Result assertInvalid(String mail, String code = null, String detail = null) {
         try {
             validateEmail(mail)
         } catch(ThrowableProblem p) {
-            assert p.code == "validation.problem"
+            if(code) assert p.code == code
+            if(detail) assert p.detail.contains(detail)
             return p
         }
     }

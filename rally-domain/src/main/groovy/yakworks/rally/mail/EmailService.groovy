@@ -7,6 +7,7 @@ package yakworks.rally.mail
 import javax.inject.Inject
 
 import groovy.transform.CompileStatic
+import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 
 import yakworks.api.Result
@@ -48,6 +49,7 @@ abstract class EmailService {
     /**
      * The class is used for sending messages(emails) using the Email and Mailgun API.
      */
+    @ToString(includePackage = false, includeNames = true, ignoreNulls = true, excludes = "attachments,inline")
     static class MailTo {
 
         /** Email address for From header */

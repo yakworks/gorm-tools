@@ -16,7 +16,6 @@ import com.mailgun.model.message.Message
 import com.mailgun.model.message.MessageResponse
 import com.mailgun.util.ObjectMapperUtil
 import feign.FeignException
-import software.amazon.awssdk.services.s3.endpoints.internal.Value
 import yakworks.api.Result
 import yakworks.api.problem.Problem
 import yakworks.api.problem.data.DataProblem

@@ -42,8 +42,8 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
         MailTo mailTo = new MailTo(
             from: "test@9ci.com",
             replyTo: "test@9ci.com",
-            to: ["one@9ci.com"],
-            cc: ["invalid.9ci"], //invalid
+            to: ["one@9ci.com", "two@9ci.com"],
+            cc: ["valid@9ci.com", "invalid.9ci"], //2nd invalid
             subject: "test",
             text: "test"
         )

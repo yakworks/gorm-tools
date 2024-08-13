@@ -1,36 +1,44 @@
 package yakworks.rally.mail
 
+import yakworks.api.Result
+import yakworks.api.problem.ThrowableProblem
+
 import javax.mail.internet.InternetAddress
 
 import spock.lang.Specification
-import yakworks.api.problem.ThrowableProblem
+
+import static yakworks.rally.mail.EmailUtils.validateEmail
 
 class EmailUtilsSpec extends Specification {
 
-    void "validate emails"() {
-        expect:
-        EmailUtils.validateEmail('jim@joe.com')
-        //simple comma sep list
-        EmailUtils.validateEmail('jim@joe.com, bob@emaple.com')
-        EmailUtils.validateEmail('Account Services <rndc@greenbill.io>, "Blow, Joe" <josh2@yak.com>,joe@email.com')
-    }
-
     void "validate emails fail"() {
-        when:
-        EmailUtils.validateEmail('jimjoe.com')
-        then:
-        ThrowableProblem ex = thrown()
-        ex.code == "validation.problem"
-        ex.detail == "Missing final '@domain'"
+        expect:
+        assertInvalid('jimjoe.com', null, "Invalid email address [jimjoe.com], Missing final '@domain'")
     }
 
     void "validate bad email in list"() {
-        when:
-        EmailUtils.validateEmail('Account Services <rndc@greenbill.io>,jimjoe.com')
-        then:
-        ThrowableProblem ex = thrown()
-        ex.code == "validation.problem"
-        ex.detail == "Missing final '@domain'"
+        expect:
+        assertInvalid('Account Services <rndc@greenbill.io>,jimjoe.com', null, "Missing final '@domain'")
+    }
+
+    void "validate addresses"() {
+        expect: "valid"
+        validateEmail("test@test.com")
+        validateEmail('"John Doe" <test@test.com>')
+        validateEmail('"John, Doe" <test@test.com>')
+        validateEmail('one@one.com, two@two.om')
+        validateEmail('"One one" <one@one.com>, "Two, two" <two@two.com>')
+        validateEmail('Account Services <rndc@greenbill.io>, "Blow, Joe" <josh2@yak.com>,joe@email.com')
+
+        and: "invalid"
+        assertInvalid(null, "error.data.empty")
+        assertInvalid("", "error.data.empty")
+        assertInvalid(" ", "error.data.empty")
+        assertInvalid('jimjoe.com')
+        assertInvalid("test@test.com.")
+        assertInvalid('John Doe')
+        assertInvalid('test@test.com, jimjoe.com') //single bed item
+
     }
 
     void "InternetAddress playground"() {
@@ -59,7 +67,6 @@ class EmailUtilsSpec extends Specification {
         listAddy[2].toString() == "jim@joe.com"
         listAddy[2].address == "jim@joe.com"
         listAddy[2].personal == null
-
     }
 
     void "InternetAddress simple list"() {
@@ -87,15 +94,13 @@ class EmailUtilsSpec extends Specification {
         }
     }
 
-    // void "InternetAddress single bad item"() {
-    //     when:
-    //     InternetAddress[] listAddy = InternetAddress.parse('jimjoe.com')
-    //
-    //     then:
-    //     listAddy.size() === 1
-    //     listAddy.each {
-    //         it.validate()
-    //         assert it.address
-    //     }
-    // }
+    Result assertInvalid(String mail, String code = null, String detail = null) {
+        try {
+            validateEmail(mail)
+        } catch(ThrowableProblem p) {
+            if(code) assert p.code == code
+            if(detail) assert p.detail.contains(detail)
+            return p
+        }
+    }
 }

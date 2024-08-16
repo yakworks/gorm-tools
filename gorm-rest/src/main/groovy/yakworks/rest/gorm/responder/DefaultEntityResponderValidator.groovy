@@ -8,27 +8,36 @@ import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.Ordered
-import org.springframework.core.annotation.Order
 
 import gorm.tools.hibernate.QueryConfig
 import gorm.tools.mango.api.QueryArgs
+import yakworks.api.problem.data.DataProblem
+import yakworks.security.user.CurrentUser
 
 @CompileStatic
-@Order(Ordered.LOWEST_PRECEDENCE)
-class DefaultEntityResponderValidator implements EntityResponderValidator {
+class DefaultEntityResponderValidator implements EntityResponderValidator, Ordered {
 
     @Autowired QueryConfig queryConfig
+    @Autowired CurrentUser currentUser
 
     QueryArgs validate(QueryArgs qargs) {
+        if(currentUser && currentUser.loggedIn) return
+
         if (queryConfig.timeout) {
             qargs.timeout = queryConfig.timeout
         }
 
         //set max on qargs from query config. dont force query config max, if user supplied max is smaller thn query config
         if (queryConfig.max && qargs.pager.max && qargs.pager.max > queryConfig.max) {
-            qargs.pager.max = queryConfig.max
+            throw DataProblem.of("error.query.max", [max:queryConfig.max]).toException()
         }
 
         qargs
+    }
+
+    @Override
+    int getOrder() {
+        //should run before SecurityEntityResponderValidator
+        return Ordered.HIGHEST_PRECEDENCE
     }
 }

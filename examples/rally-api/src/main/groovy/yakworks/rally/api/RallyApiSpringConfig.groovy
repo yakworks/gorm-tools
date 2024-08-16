@@ -139,4 +139,9 @@ class RallyApiSpringConfig {
         return oag
     }
 
+    @Bean
+    TestTimeoutEntityResponderValidator timeoutTestValidator() {
+        return new TestTimeoutEntityResponderValidator()
+    }
+
 }

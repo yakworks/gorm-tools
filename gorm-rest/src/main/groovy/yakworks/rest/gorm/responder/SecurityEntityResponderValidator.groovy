@@ -11,6 +11,7 @@ import org.springframework.core.Ordered
 
 import gorm.tools.hibernate.QueryConfig
 import gorm.tools.mango.api.QueryArgs
+import yakworks.api.problem.data.DataProblem
 import yakworks.security.gorm.UserSecurityConfig
 import yakworks.security.user.CurrentUser
 
@@ -27,23 +28,33 @@ class SecurityEntityResponderValidator implements EntityResponderValidator, Orde
     @Override
     QueryArgs validate(QueryArgs qargs) {
 
-        Integer timeout = userSecurityConfig.getQueryTimeout(currentUser)
-        if(!timeout) timeout = queryConfig.timeout
+        Integer timeout = getTimeout()
         if(timeout) qargs.timeout(timeout)
 
-        Integer max = userSecurityConfig.getMax(currentUser)
-        if(!max) max = queryConfig.max
+        Integer max = getMax()
 
         if(max && qargs.pager.max && qargs.pager.max > max) {
-            qargs.pager.max = max
+            throw DataProblem.of("error.query.max", [max:max]).toException()
         }
 
         qargs
     }
 
+    int getTimeout() {
+        Integer timeout = userSecurityConfig.getQueryTimeout(currentUser)
+        if(!timeout) timeout = queryConfig.timeout
+        return timeout
+    }
+
+    int getMax() {
+        Integer max = userSecurityConfig.getMax(currentUser)
+        if(!max) max = queryConfig.max
+        return max
+    }
+
     @Override
     int getOrder() {
-        //bigger value = lower precedence, so this will run after DefaultEntityResponderValidator
-        return Ordered.LOWEST_PRECEDENCE + 1000
+        //higher value = lower precedence, so this will run after DefaultEntityResponderValidator
+        return Ordered.HIGHEST_PRECEDENCE + 1000
     }
 }

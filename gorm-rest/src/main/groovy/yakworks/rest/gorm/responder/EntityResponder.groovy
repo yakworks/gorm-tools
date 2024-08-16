@@ -39,7 +39,7 @@ class EntityResponder<D> {
     @Autowired ApiConfig apiConfig
     @Autowired MetaMapService metaMapService
     @Autowired QueryConfig queryConfig
-    @Autowired Set<EntityResponderValidator> entityResponderValidators
+    @Autowired List<EntityResponderValidator> entityResponderValidators
 
     Class<D> entityClass
 

@@ -3,6 +3,7 @@ package yakworks
 import gorm.tools.hibernate.QueryConfig
 import gorm.tools.mango.api.QueryArgs
 import spock.lang.Specification
+import yakworks.api.problem.data.DataProblemException
 import yakworks.rest.gorm.responder.EntityResponderValidator
 import yakworks.rest.gorm.responder.SecurityEntityResponderValidator
 import yakworks.security.gorm.UserSecurityConfig
@@ -22,9 +23,9 @@ class SecurityEntityResponderValidatorSpec extends Specification {
         when:
         validator.validate(args)
 
-        then: "this user can do max 500"
-        args.timeout == 500
-        args.pager.max == 500
+        then:
+        DataProblemException ex = thrown()
+        ex.code == "error.query.max"
 
         when: "user supplied max is smaller thn configured"
         args = QueryArgs.of(max:50)
@@ -38,9 +39,10 @@ class SecurityEntityResponderValidatorSpec extends Specification {
         args = QueryArgs.of(max:500)
         validator.validate(args)
 
-        then: "default query max is applied to all others"
-        args.pager.max == 100
-        args.timeout == 100
+        then:
+        ex = thrown()
+        ex.code == "error.query.max"
+
     }
 
 

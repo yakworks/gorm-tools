@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataAccessException
 
 import gorm.tools.beans.Pager
-import gorm.tools.hibernate.QueryConfig
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.metamap.services.MetaMapService
@@ -38,7 +37,6 @@ class EntityResponder<D> {
     @Autowired IncludesConfig includesConfig
     @Autowired ApiConfig apiConfig
     @Autowired MetaMapService metaMapService
-    @Autowired QueryConfig queryConfig
     @Autowired List<EntityResponderValidator> entityResponderValidators
 
     Class<D> entityClass

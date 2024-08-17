@@ -86,14 +86,9 @@ class PagedQuery {
             queryString = buildNamedParameterQueryFromGString((GString) queryString, params)
         }
 
-        Integer timeout = args.remove('timeout')
-
         List dataList = template.execute { Session session ->
             Query q = (Query) session.createQuery(queryString.toString())
             template.applySettings(q)
-            if(timeout) {
-                q.setTimeout(timeout)
-            }
             populateQueryArguments(q, params)
             populateQueryArguments(q, args)
             populateQueryWithNamedArguments(q, params)

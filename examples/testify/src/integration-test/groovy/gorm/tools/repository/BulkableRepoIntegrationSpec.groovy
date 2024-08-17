@@ -1,6 +1,5 @@
 package gorm.tools.repository
 
-import gorm.tools.hibernate.QueryConfig
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobState
 import gorm.tools.repository.model.DataOp
@@ -23,8 +22,6 @@ import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.repo.OrgRepo
 
-import javax.inject.Inject
-
 import static yakworks.json.groovy.JsonEngine.parseJson
 
 @Integration
@@ -34,15 +31,9 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
     JdbcTemplate jdbcTemplate
     OrgRepo orgRepo
     KitchenSinkRepo kitchenSinkRepo
-    @Inject QueryConfig queryConfig
-
-    void setup() {
-        queryConfig.max = 1000
-    }
 
     def cleanup() {
         //cleanup all orgs which would have been committed during tests because of parallel/async
-        queryConfig.max = 100
         Org.withNewTransaction {
             Org.query(num:[$like:"testorg-%"]).deleteAll()
             OrgSource.where({ sourceId ==~ "testorg-%"}).deleteAll()

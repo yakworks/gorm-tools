@@ -14,6 +14,9 @@ import org.springframework.context.annotation.Configuration
 @ConfigurationProperties(prefix="yakworks.gorm.query")
 class QueryConfig {
 
-    Integer max
-    Integer timeout
+    /** Max items, user cannot pass in a max higher that this, default is 100 */
+    Integer max = 100
+    
+    /** Query timeout in seconds, default is 30 */
+    Integer timeout = 30
 }

@@ -16,6 +16,10 @@ error:
     emptyPayload: Expected payload is null or empty, No operation performed.
     qRequired: q or qSearch parameter restriction is required
 
+  query:
+    max: 'Max parameter value is larger then allowed value {max}'
+    timeout: 'Query timeout has occurred'
+
   # Delete Errors
   delete:
     externalSource: '{name} cannot be deleted as its sourced externally'

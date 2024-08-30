@@ -24,6 +24,8 @@ import gorm.tools.repository.model.DataOp
 import grails.web.Action
 import yakworks.api.problem.Problem
 import yakworks.gorm.api.IncludesKey
+import yakworks.meta.MetaMap
+import yakworks.rest.gorm.responder.EntityResponder
 
 import static gorm.tools.problem.ProblemHandler.isBrokenPipe
 import static org.springframework.http.HttpStatus.CREATED
@@ -71,6 +73,7 @@ trait RestRepoApiController<D> extends RestApiController {
     /**
      * The gorm domain class. uses the {@link org.springframework.core.GenericTypeResolver} is not set during contruction
      */
+
     Class<D> getEntityClass() {
         if (!entityClass) this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), RestRepoApiController)
         return entityClass
@@ -226,7 +229,8 @@ trait RestRepoApiController<D> extends RestApiController {
     }
 
     void respondWithEntityMap(D instance, Map mParams, HttpStatus status = HttpStatus.OK){
-        getEntityResponder().respondWith(this, instance, mParams, status)
+        MetaMap entityMap = getEntityResponder().createEntityMap(instance, params)
+        respondWith(entityMap, [status: status, params: params])
     }
 
     /**

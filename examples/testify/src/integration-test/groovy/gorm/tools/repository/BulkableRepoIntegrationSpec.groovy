@@ -104,17 +104,18 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         list[5].num ="num1" //will fail (During flush) on this one as it already exists
 
         Long jobId = kitchenSinkRepo.bulk(list, setupSyncJobArgs())
-        def job, dbData
+        def job, dbData, successCount
 
         KitchenSink.withNewTransaction {
             job = SyncJob.get(jobId)
             dbData = KitchenSink.findAllWhere(comments: 'GoDogGo')
+            successCount = KitchenSink.countByComments("GoDogGo") //All except 1 should have been inserted
         }
 
         then: "verify job"
         job.state == SyncJobState.Finished
-        dbData.size() == 299 //All except 1 should have been inserted
         //first slice will have run through second time, make sure its good
+        successCount == 299
         dbData[0].name2 != null
         dbData[2].name2 != null
 
@@ -288,7 +289,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         then:
         json != null
         json.findAll({ it.ok == true}).size() == 299
-        OrgFlex.findAllWhere(text1: 'goGoGadget').size() == 299
+        OrgFlex.countByText1('goGoGadget') == 299
 
         when:
         Map failed =  json.find({ it.ok == false})
@@ -307,7 +308,6 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         failed.data.name == "org-2"
         failed.data.info instanceof Map
         failed.data.flex instanceof Map
-
 
         cleanup:
         Org.withNewTransaction {

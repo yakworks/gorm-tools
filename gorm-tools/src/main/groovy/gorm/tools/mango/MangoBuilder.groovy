@@ -4,8 +4,6 @@
 */
 package gorm.tools.mango
 
-import java.util.UUID
-
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -90,6 +88,9 @@ class MangoBuilder {
         if(qargs.projections){
             applyProjections(mangoCriteria, qargs.projections)
         }
+
+        if(qargs.timeout) mangoCriteria.setTimeout(qargs.timeout)
+
         return mangoCriteria
     }
 

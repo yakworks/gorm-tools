@@ -89,7 +89,6 @@ class PagedQuery {
         List dataList = template.execute { Session session ->
             Query q = (Query) session.createQuery(queryString.toString())
             template.applySettings(q)
-
             populateQueryArguments(q, params)
             populateQueryArguments(q, args)
             populateQueryWithNamedArguments(q, params)

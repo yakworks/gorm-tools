@@ -152,7 +152,7 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
         City city = City.create(name: 'Denver') //City.create(params)
         City city2 = City.create(name: 'Chicago') //City.create(params)
         city.remove()
-        City.removeById(city2.id)
+        City.repo.removeById(city2.id)
 
         then:
         sleep(100)

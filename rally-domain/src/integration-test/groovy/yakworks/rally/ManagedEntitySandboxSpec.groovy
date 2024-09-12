@@ -33,7 +33,7 @@ class ManagedEntitySandboxSpec extends Specification implements DataIntegrationT
             // ],
             // location: [city: "City$id"]
         ]
-        return Org.create(data, bindId: true)
+        return Org.repo.create(data, [bindId: true])
     }
     void "getting should return not proxy"() {
         when:

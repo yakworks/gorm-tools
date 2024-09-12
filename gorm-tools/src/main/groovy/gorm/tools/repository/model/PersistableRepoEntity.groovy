@@ -55,17 +55,21 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>, ID> extends GormEntity<D> 
      * Creates, binds and persists and instance
      * @return The created instance
      */
-    static D create(Map args = [:], Map data) {
-        return getRepo().create(data, args)
+    static D create(Map data) {
+        return getRepo().create(data)
     }
 
-    static D update(Map args = [:], Map data) {
-        getRepo().update(data, args)
+    // static D update(Map args, Map data) {
+    //     getRepo().update(data, args)
+    // }
+
+    static D update(Map data) {
+        getRepo().update(data)
     }
 
-    static void removeById(Map args = [:], Serializable id) {
-        getRepo().removeById(id, args)
-    }
+    // static void removeById(Map args = [:], Serializable id) {
+    //     getRepo().removeById(id, PersistArgs.of(args))
+    // }
 
     /**
      * default constraints static that calls findConstraints(delegate)

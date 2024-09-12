@@ -17,6 +17,8 @@ import org.grails.datastore.mapping.query.api.QueryArgumentsAware
 import org.grails.datastore.mapping.query.api.QueryableCriteria
 import org.grails.orm.hibernate.AbstractHibernateSession
 
+import gorm.tools.beans.Pager
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.hibernate.HibernateMangoQuery
 import gorm.tools.mango.jpql.JpqlQueryBuilder
 import gorm.tools.mango.jpql.JpqlQueryInfo
@@ -46,6 +48,9 @@ import yakworks.commons.lang.NameUtils
 @SuppressWarnings(['MethodCount', 'ClassSize']) //ok for this
 @GrailsCompileStatic
 class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
+
+    /** reference to QueryArgs used to build this if it exists */
+    QueryArgs queryArgs
 
     Map<String, String> propertyAliases = [:]
 
@@ -106,6 +111,26 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
             }
             return query.list()
         }
+    }
+
+    /**
+     * Calls paged list
+     */
+    List<T> pagedList(Pager pager) {
+        List resList
+        Map args = [max: pager.max, offset: pager.offset]
+        if(this.projections){
+            resList =  this.mapList(args)
+        } else {
+            //return standard list
+            resList =  this.list(args)
+        }
+        return resList as List<T>
+    }
+
+    List<T> pagedList() {
+        Pager pager = queryArgs?.pager ? queryArgs.pager : Pager.of([:])
+        return pagedList(pager)
     }
 
     /**

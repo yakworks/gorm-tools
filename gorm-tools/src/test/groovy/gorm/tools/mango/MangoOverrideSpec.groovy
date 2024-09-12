@@ -32,7 +32,7 @@ class MangoOverrideSpec extends Specification implements DataRepoTest {
         }
 
         when:
-        List list = MangoThing.repo.queryList()
+        List list = MangoThing.repo.query([:]).list()
         then:
         list.size() == 1
         list[0].id == 2

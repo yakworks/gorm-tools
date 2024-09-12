@@ -105,12 +105,15 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
         return create(params, args)
     }
 
+    /**
+     * Transactional wrap for {@link #doCreate}
+     */
     @Override
-    X create(Map data, Map args) {
+    X create(Map data, PersistArgs pargs) {
         X leInstance = (X) getEntityClass().newInstance(data)
         // default is to give it insert as a hint
-        def sargs = PersistArgs.of(args).insert(true)
-        doPersist leInstance, sargs
+        pargs.insert(true)
+        doPersist leInstance, pargs
         return leInstance
     }
 
@@ -340,7 +343,7 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
 
     // ***** some gormRepo methods should not be called with an XRef tables so blow errors for these
     @Override
-    void removeById(Serializable id, Map args) {
+    void removeById(Serializable id, PersistArgs args) {
         throw new UnsupportedOperationException("Method removeById is not supported by this implementation")
     }
 

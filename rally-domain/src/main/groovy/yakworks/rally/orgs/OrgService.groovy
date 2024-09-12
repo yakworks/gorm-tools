@@ -21,7 +21,7 @@ import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.repo.OrgRepo
 
 /**
- * event listener for afterbind to setup org member
+ * Service helper for the Org partition
  */
 @Service @Lazy
 @Slf4j
@@ -43,6 +43,10 @@ class OrgService {
 
     String getPartitionPropName(){
         return orgProps.partition.type.propertyName
+    }
+
+    String getPartitionIdFieldName(){
+        return orgProps.partition.type.idFieldName
     }
 
     String getMemberPartitionPath(){

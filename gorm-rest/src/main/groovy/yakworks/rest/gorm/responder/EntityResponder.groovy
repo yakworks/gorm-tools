@@ -14,7 +14,6 @@ import org.springframework.dao.DataAccessException
 
 import gorm.tools.beans.Pager
 import gorm.tools.mango.api.QueryArgs
-import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
@@ -104,7 +103,8 @@ class EntityResponder<D> {
             validateQueryArgs(qargs)
 
             if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.buildCriteria()}")
-            ((QueryMangoEntityApi) getRepo()).queryList(qargs, null, debugEnabled ? log : null)
+            //getRepo().queryList(qargs, null, debugEnabled ? log : null)
+            getRepo().query(qargs, null).pagedList(qargs.pager)
         } catch (JsonException | IllegalArgumentException | QueryException ex) {
             //See #1925 - Catch bad query in 'q' parameter and report back. So we dont pollute logs, and can differentiate that its not us.
             //Hibernate throws IllegalArgumentException when Antlr fails to parse query

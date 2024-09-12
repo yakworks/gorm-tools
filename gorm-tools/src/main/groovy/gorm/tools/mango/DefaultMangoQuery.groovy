@@ -86,6 +86,12 @@ class DefaultMangoQuery implements MangoQuery {
      */
     @Transactional(readOnly = true)
     public <D> List<D> list(MangoDetachedCriteria<D> criteria, Pager pager) {
+        // if(log){
+        //     log.debug("mangoCriteria criteriaSize: ${dcrit.criteria.size()}")
+        //     dcrit.criteria?.each{
+        //         log.debug("mangoCriteria criteria: ${it}")
+        //     }
+        // }
         return mangoBuilder.list(criteria, [max: pager.max, offset: pager.offset]) as List<D>
     }
 

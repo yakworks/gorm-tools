@@ -309,6 +309,6 @@ class OrgWebApiSpec extends Specification implements WebClientTrait {
         body.tags[0].id == tag1.id
 
         cleanup:
-        Org.removeById(body.id as Long)
+        Org.repo.removeById(body.id as Long)
     }
 }

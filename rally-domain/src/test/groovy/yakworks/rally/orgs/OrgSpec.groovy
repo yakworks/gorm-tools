@@ -120,7 +120,7 @@ class OrgSpec extends Specification implements GormHibernateTest, SecurityTest {
         Map params = TestDataJson.buildMap(Org) << [id: orgId, flex: flex, info: info, type: 'Customer']
 
         when: "create"
-        def org = Org.create(params, bindId: true)
+        def org = Org.repo.create(params, [bindId: true])
 
         then:
 

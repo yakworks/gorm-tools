@@ -59,7 +59,7 @@ class ActivityRestApiSpec  extends Specification implements OkHttpRestTrait {
         cleanup:
         if(act) {
             Activity.withNewTransaction {
-                Activity.removeById(act.id)
+                Activity.repo.removeById(act.id)
             }
         }
     }

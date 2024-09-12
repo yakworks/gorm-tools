@@ -92,7 +92,7 @@ class BulkCsvSpec  extends RestIntTest {
         attachmentRepo.removeById(syncJob.dataId as Long)
         Attachment.withNewTransaction {
             if(attachment) attachment.remove()
-            if(body.id) SyncJob.removeById(body.id as Long) //syncjob is created in new transaction
+            if(body.id) SyncJob.repo.removeById(body.id as Long) //syncjob is created in new transaction
             Contact.findAllByNumLike("bulk_").each {
                 it.remove()
             }
@@ -156,7 +156,7 @@ class BulkCsvSpec  extends RestIntTest {
         attachmentRepo.removeById(syncJob.dataId as Long)
         Attachment.withNewTransaction {
             if(attachment) attachment.remove()
-            if(body.id) SyncJob.removeById(body.id as Long) //syncjob is created in new transaction
+            if(body.id) SyncJob.repo.removeById(body.id as Long) //syncjob is created in new transaction
             Contact.findAllByNumLike("bulk_").each {
                 it.remove()
             }
@@ -209,7 +209,7 @@ class BulkCsvSpec  extends RestIntTest {
         cleanup: "cleanup db"
         Attachment.withNewTransaction {
             if(attachment) attachment.remove()
-            if(body.id) SyncJob.removeById(body.id as Long) //syncjob is created in new transaction
+            if(body.id) SyncJob.repo.removeById(body.id as Long) //syncjob is created in new transaction
         }
     }
 }

@@ -7,6 +7,7 @@ package gorm.tools.mango.api
 import groovy.transform.CompileDynamic
 
 import gorm.tools.mango.MangoDetachedCriteria
+import gorm.tools.repository.model.ApiMangoQueryRepo
 
 /**
  * a trait with statics for gorm domain entities that delegates the calls to the repository
@@ -25,7 +26,7 @@ trait QueryMangoEntity<D> {
      * @param closure optional closure
      */
     static MangoDetachedCriteria<D> query(Map params, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
-        ((QueryMangoEntityApi)getRepo()).query(params, closure)
+        ((ApiMangoQueryRepo)getRepo()).query(params, closure)
     }
 
     /**
@@ -43,7 +44,7 @@ trait QueryMangoEntity<D> {
      * @return a DetachedCriteria instance
      */
     static MangoDetachedCriteria<D> query(QueryArgs queryArgs) {
-        ((QueryMangoEntityApi)getRepo()).query(queryArgs)
+        ((ApiMangoQueryRepo)getRepo()).query(queryArgs)
     }
 
     /**
@@ -53,12 +54,12 @@ trait QueryMangoEntity<D> {
      * @param closure additional restriction for criteria
      * @return query of entities restricted by mango params
      */
-    static List<D> queryList(Map params, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
-        ((QueryMangoEntityApi)getRepo()).queryList(params, closure)
-    }
+    // static List<D> queryList(Map params, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
+    //     ((ApiMangoQueryRepo)getRepo()).queryList(params, closure)
+    // }
 
-    static List<D> queryList(@DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
-        ((QueryMangoEntityApi)getRepo()).queryList([:], closure)
-    }
+    // static List<D> queryList(@DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
+    //     ((QueryMangoEntityApi)getRepo()).queryList([:], closure)
+    // }
 
 }

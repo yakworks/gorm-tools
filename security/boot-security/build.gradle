@@ -42,14 +42,15 @@ dependencies {
   compileOnly "jakarta.annotation:jakarta.annotation-api:$vJakartaAnn"
   compileOnly "javax.inject:javax.inject:1"
 
-  compileOnly 'com.nimbusds:nimbus-jose-jwt:9.24.4'
+  compileOnly 'com.nimbusds:nimbus-jose-jwt'
 
   testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
   testImplementation "org.springframework.security:spring-security-test:$springSecurityVersion"
 
   testImplementation("org.spockframework:spock-core:${vSpock}")
   testImplementation("org.spockframework:spock-spring:${vSpock}")
-
+  //so we dont end up with multiple versions of jupiter in deps
+  //testImplementation("org.junit.jupiter:junit-jupiter:5.10.1")
 }
 
 // configurations.api {

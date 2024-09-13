@@ -4,4 +4,17 @@ app.security.enabled: true
 
 spring.security.user.name: admin
 spring.security.user.password: 123
-spring.transaction.default-timeout: 60
+
+yakworks:
+  gorm:
+    query:
+      max: 50
+      timeout: 60
+
+app:
+  security:
+    users:
+      admin:
+        query:
+          max: 100
+          timeout: 120

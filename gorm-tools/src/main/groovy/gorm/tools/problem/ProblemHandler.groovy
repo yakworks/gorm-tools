@@ -9,9 +9,11 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.codehaus.groovy.runtime.StackTraceUtils
+import org.hibernate.QueryTimeoutException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSourceResolvable
 import org.springframework.dao.DataAccessException
+import org.springframework.dao.DataAccessResourceFailureException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.validation.Errors
@@ -89,7 +91,11 @@ class ProblemHandler {
         } else if (e instanceof IllegalArgumentException) {
             //We use this all over to double as a validation error, Validate.notNull for example.
             return Problem.of('error.illegalArgument').status(status400).detail(e.message)
-        } else if (e instanceof DataAccessException) {
+        }
+        else if(isQueryTimeout(e)) {
+            return DataProblem.of("error.query.timeout")
+        }
+        else if (e instanceof DataAccessException) {
             //if its an unique index problem then 90% of time its validation issue and expected.
             if (isUniqueIndexViolation((DataAccessException) e)) {
                 return DataProblemCodes.UniqueConstraint.of(e)
@@ -163,6 +169,16 @@ class ProblemHandler {
             errors << fieldError
         }
         return errors as List<Violation>
+    }
+
+
+    /**
+     * returns true if the exception is a psql query timeout exception
+     */
+    static boolean isQueryTimeout(Throwable ex) {
+        //Criteria/Mango throws QueryTimeoutException, jdbcTemplate throws DataAccessResourceFailureException
+        return (ex instanceof QueryTimeoutException) ||
+            (ex instanceof DataAccessResourceFailureException && ex.message.contains('canceling statement due to statement timeout"'))
     }
 
     //Unique index unique constraint or primary key violation

@@ -4,34 +4,29 @@
 */
 package yakworks.rest.gorm.controller
 
-
 import groovy.transform.CompileStatic
 
-import org.codehaus.groovy.runtime.InvokerHelper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
-import org.springframework.http.HttpStatus
 
 import gorm.tools.beans.Pager
 import gorm.tools.job.JobUtils
-import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
-import gorm.tools.repository.GormRepo
-import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.DataOp
 import grails.web.Action
 import yakworks.api.problem.Problem
 import yakworks.etl.csv.CsvToMapTransformer
+import yakworks.gorm.api.CrudApi
+import yakworks.gorm.api.DefaultCrudApi
 import yakworks.gorm.api.IncludesKey
-import yakworks.meta.MetaMap
-import yakworks.rest.gorm.responder.EntityResponder
 
 import static gorm.tools.problem.ProblemHandler.isBrokenPipe
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.MULTI_STATUS
 import static org.springframework.http.HttpStatus.NO_CONTENT
+import static org.springframework.http.HttpStatus.OK
 
 /**
  * This is the CRUD controller for entities
@@ -55,13 +50,9 @@ trait CrudApiController<D> extends RestApiController {
     @SuppressWarnings(['LoggerWithWrongModifiers'])
     Logger log = LoggerFactory.getLogger(this.class)
 
-    /** Not required but if an entityResponder bean is setup then it will get get used */
+    /** Not required but if an CrudApi bean is setup then it will get get used */
     @Autowired(required = false)
-    EntityResponder<D> entityResponder
-
-    /** Not required but if an bulkControllerSupport bean is setup then it will get get used */
-    @Autowired(required = false)
-    BulkControllerSupport<D> bulkControllerSupport
+    CrudApi<D> crudApi
 
     @Autowired
     CsvToMapTransformer csvToMapTransformer
@@ -77,30 +68,15 @@ trait CrudApiController<D> extends RestApiController {
     /**
      * The gorm domain class. uses the {@link org.springframework.core.GenericTypeResolver} is not set during contruction
      */
-
     Class<D> getEntityClass() {
         if (!entityClass) this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), CrudApiController)
         return entityClass
     }
 
-    EntityResponder<D> getEntityResponder(){
-        if (!entityResponder) this.entityResponder = EntityResponder.of(getEntityClass())
-        entityResponder.debugEnabled = log.isDebugEnabled()
-        return entityResponder
-    }
-
-    BulkControllerSupport<D> getBulkControllerSupport(){
-        if (!bulkControllerSupport) this.bulkControllerSupport = BulkControllerSupport.of(getEntityClass())
-        return bulkControllerSupport
-    }
-
-    /**
-     * Gets the repository for the entityClass
-     * @return The repository
-     */
-    GormRepo<D> getRepo() {
-        //GrailsClassUtils.getStaticPropertyValue(getEntityClass(),'repo')
-        (GormRepo<D>) InvokerHelper.invokeStaticMethod(getEntityClass(), 'getRepo', null)
+    CrudApi<D> getCrudApi(){
+        if (!crudApi) this.crudApi = DefaultCrudApi.of(getEntityClass())
+        //crudApi.debugEnabled = log.isDebugEnabled()
+        return crudApi
     }
 
     /**
@@ -110,10 +86,9 @@ trait CrudApiController<D> extends RestApiController {
     @Action
     def post() {
         try {
-            Map gParams = getParamsMap()
-            Boolean bindId = gParams.getBoolean('bindId', false)
-            D instance = (D) getRepo().create(bodyAsMap(), [bindId:bindId])
-            respondWithEntityMap(instance, gParams, CREATED)
+            Map qParams = getParamsMap()
+            Map entityMap = getCrudApi().create(bodyAsMap(), qParams)
+            respondWith(entityMap, [status: CREATED, params: qParams])
         } catch (Exception | AssertionError e) {
             handleException(e)
         }
@@ -125,16 +100,13 @@ trait CrudApiController<D> extends RestApiController {
      */
     @Action
     def put() {
-        Map dataMap = bodyAsMap()
-        Map data = [id: params.id] //this should be fine since grails isnt loosing  params set via UrlMappings
-        data.putAll(dataMap) // json data may not contains id because it passed in params
         try {
-            D instance = (D) getRepo().update(data)
-            respondWithEntityMap(instance, getParamsMap())
+            Map qParams = getParamsMap()
+            Map entityMap = getCrudApi().update(bodyAsMap(), qParams)
+            respondWith(entityMap, [status: OK, params: qParams])
         } catch (Exception | AssertionError e) {
             handleException(e)
         }
-
     }
 
     /**
@@ -143,12 +115,12 @@ trait CrudApiController<D> extends RestApiController {
     @Action
     def delete() {
         try {
-            getRepo().removeById((Serializable) params.id) //this should be fine since grails isnt loosing the params set from UrlMappings
+            Map qParams = getParamsMap()
+            getCrudApi().removeById((Serializable) qParams.id, qParams) //this should be fine since grails isnt loosing the params set from UrlMappings
             callRender(status: NO_CONTENT) //204
         } catch (Exception | AssertionError e) {
             handleException(e)
         }
-
     }
 
     /**
@@ -157,10 +129,10 @@ trait CrudApiController<D> extends RestApiController {
     @Action
     def get() {
         try {
-            Serializable idx = params.id as Serializable //this should be fine since grails isnt loosing the params set from UrlMappings
-            D instance = (D) getRepo().read(idx)
-            RepoUtil.checkFound(instance, idx, getEntityClass().simpleName)
-            respondWithEntityMap(instance, getParamsMap())
+            Map qParams = getParamsMap()
+            Serializable idx = qParams.id as Serializable
+            Map entityMap = getCrudApi().get(idx, qParams)
+            respondWith(entityMap, [status: OK, params: qParams])
         } catch (Exception | AssertionError e) {
             handleException(e)
         }
@@ -179,11 +151,11 @@ trait CrudApiController<D> extends RestApiController {
     @Action
     def list() {
         try {
-            Map gParams = getParamsMap()
-            log.debug("list with gParams ${gParams}")
-            Pager pager = getEntityResponder().pagedQuery(gParams, [IncludesKey.list.name()])
+            Map qParams = getParamsMap()
+            log.debug("list with gParams ${qParams}")
+            Pager pager = getCrudApi().list(qParams, [IncludesKey.list.name()])
             //we pass in the params to args so it can get passed on to renderer, used in the excel renderer for example
-            respondWith(pager, [params: gParams])
+            respondWith(pager, [params: qParams])
         } catch (Exception | AssertionError e) {
             handleException(e)
         }
@@ -192,10 +164,10 @@ trait CrudApiController<D> extends RestApiController {
     @Action
     def picklist() {
         try {
-            Map gParams = getParamsMap()
-            Pager pager = picklistPagedQuery(gParams)
-            //we pass in the params to args so it can get passed on to renderer, used in the excel renderer for example
-            respondWith(pager, [params: gParams])
+            Map qParams = getParamsMap()
+            qParams.max = qParams.max ?: getPicklistMax() //default to 50 for picklists
+            Pager pager = getCrudApi().list(qParams, ['picklist', IncludesKey.stamp.name()])
+            respondWith(pager, [params: qParams])
         } catch (Exception | AssertionError e) {
             handleException(e)
         }
@@ -207,7 +179,9 @@ trait CrudApiController<D> extends RestApiController {
         try {
             bulkProcess(DataOp.add)
         } catch (Exception | AssertionError e) {
-            respondWith getBulkControllerSupport().handleBulkOperationException(request, e)
+            respondWith(
+                BulkExceptionHandler.of(getEntityClass(), problemHandler).handleBulkOperationException(request, e)
+            )
         }
     }
 
@@ -217,30 +191,31 @@ trait CrudApiController<D> extends RestApiController {
         try {
             bulkProcess(DataOp.update)
         } catch (Exception | AssertionError e) {
-            respondWith getBulkControllerSupport().handleBulkOperationException(request, e)
+            respondWith(
+                BulkExceptionHandler.of(getEntityClass(), problemHandler).handleBulkOperationException(request, e)
+            )
         }
     }
 
     void bulkProcess(DataOp dataOp) {
         List dataList = bodyAsList() as List<Map>
-        Map gParams = getParamsMap()
+        Map qParams = getParamsMap()
 
         String sourceId = JobUtils.requestToSourceId(request)
 
         //if attachmentId then assume its a csv
-        if(gParams.attachmentId) {
+        if(qParams.attachmentId) {
             // We set savePayload to false by default for CSV since we already have the csv file as attachment?
-            gParams.savePayload = false
+            qParams.savePayload = false
             //sets the datalist from the csv instead of body
-            dataList = transformCsvToBulkList(gParams)
+            dataList = transformCsvToBulkList(qParams)
         } else {
             //XXX dirty ugly hack since we were not consistent and now need to do clean up
             // RNDC expects async to be false by default when its not CSV
-            if(!gParams.containsKey('async')) gParams['async'] = false
+            if(!qParams.containsKey('async')) qParams['async'] = false
         }
 
-        SyncJobArgs syncJobArgs = getBulkControllerSupport().setupSyncJobArgs(dataOp, gParams, sourceId)
-        SyncJobEntity job = getBulkControllerSupport().process(dataList, syncJobArgs)
+        SyncJobEntity job = getCrudApi().bulk(dataOp, dataList, qParams, sourceId)
         respondWith(job, [status: MULTI_STATUS])
     }
 
@@ -259,20 +234,7 @@ trait CrudApiController<D> extends RestApiController {
      * @return the jobId
      */
     List<Map> transformCsvToBulkList(Map gParams) {
-        return csvToMapTransformer.process(gParams)
-    }
-
-    void respondWithEntityMap(D instance, Map gParams, HttpStatus status = HttpStatus.OK){
-        MetaMap entityMap = getEntityResponder().createEntityMap(instance, gParams)
-        respondWith(entityMap, [status: status, params: gParams])
-    }
-
-    /**
-     * picklist has defaults of 50 for max and
-     */
-    Pager picklistPagedQuery(Map mParams) {
-        mParams.max = mParams.max ?: getPicklistMax() //default to 50 for picklists
-        return getEntityResponder().pagedQuery(mParams, ['picklist', IncludesKey.stamp.name()])
+        return getCsvToMapTransformer().process(gParams)
     }
 
     void handleException(Throwable e) {
@@ -281,7 +243,9 @@ trait CrudApiController<D> extends RestApiController {
          * Once that happens, trying to write any response to output stream will result in broken pipe.
          * We have "caught" broken pipe, and now during "catch" here, if we again try "respondWith" it will again result in "broken pipe" error
          */
-        if (isBrokenPipe((Exception) e)) return
+        if (isBrokenPipe((Exception) e)) {
+            return
+        }
         else {
             assert getEntityClass()
             Problem apiError = problemHandler.handleException(getEntityClass(), e)

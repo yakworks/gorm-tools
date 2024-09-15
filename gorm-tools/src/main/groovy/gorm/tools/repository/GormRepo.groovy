@@ -56,7 +56,8 @@ trait GormRepo<D> implements ApiCrudRepo<D>, ApiMangoQueryRepo<D>, BulkableRepo<
 
     @Autowired ProxyHandler proxyHandler
 
-    @Autowired @Qualifier("mangoQuery") MangoQuery mangoQuery
+    @Autowired @Qualifier("mangoQuery")
+    MangoQuery mangoQuery
 
     /** default to true. If false only method events are invoked on the implemented Repository. */
     Boolean enableEvents = true

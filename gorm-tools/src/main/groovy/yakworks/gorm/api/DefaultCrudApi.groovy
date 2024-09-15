@@ -11,14 +11,12 @@ import org.grails.orm.hibernate.HibernateDatastore
 import org.hibernate.QueryException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataAccessException
-import org.springframework.http.HttpStatus
 
 import gorm.tools.beans.Pager
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.metamap.services.MetaMapService
-import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.RepoUtil

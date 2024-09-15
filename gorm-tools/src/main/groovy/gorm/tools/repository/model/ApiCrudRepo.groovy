@@ -84,7 +84,7 @@ interface ApiCrudRepo<D> {
     }
 
     /**
-     * simple call to the gormStaticApi get, not in a trx to avoid overhead
+     * read only get
      *
      * @param id required, the id to get
      * @return the retrieved entity

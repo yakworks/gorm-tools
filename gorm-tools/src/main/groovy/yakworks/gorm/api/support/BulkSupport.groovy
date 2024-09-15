@@ -40,7 +40,8 @@ class BulkSupport<D> {
     @Autowired
     IncludesConfig includesConfig
 
-    @Autowired ProblemHandler problemHandler
+    @Autowired
+    ProblemHandler problemHandler
 
     Class<D> entityClass // the domain class this is for
 

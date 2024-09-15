@@ -17,6 +17,7 @@ import gorm.tools.mango.api.QueryArgs
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
+import grails.gorm.transactions.Transactional
 import yakworks.api.problem.data.DataProblem
 import yakworks.gorm.api.ApiConfig
 import yakworks.gorm.api.IncludesConfig
@@ -40,8 +41,9 @@ class EntityResponder<D> {
 
     Class<D> entityClass
 
-    /** the path item */
+    /** the API path item this is for*/
     PathItem pathItem
+
     //allows it to be turned on and off for controller
     boolean debugEnabled = false
 
@@ -49,11 +51,11 @@ class EntityResponder<D> {
         this.entityClass = entityClass
     }
 
-    EntityResponder(Class<D> entityClass, IncludesConfig includesConfig, MetaMapService metaMapService){
-        this.entityClass = entityClass
-        this.includesConfig = includesConfig
-        this.metaMapService = metaMapService
-    }
+    // EntityResponder(Class<D> entityClass, IncludesConfig includesConfig, MetaMapService metaMapService){
+    //     this.entityClass = entityClass
+    //     this.includesConfig = includesConfig
+    //     this.metaMapService = metaMapService
+    // }
 
     public static <D> EntityResponder<D> of(Class<D> entityClass){
         def erInstance = new EntityResponder(entityClass)
@@ -70,28 +72,30 @@ class EntityResponder<D> {
     }
 
     /**
-     * builds the response model with the EntityMap wrapper.
+     * builds the response model with the MetaMap wrapper.
      *
      * @param instance the entity instance
      * @param params the the param map to lookup the includes on
      * @return the object to pass on to json views
      */
     MetaMap createEntityMap(Object instance, Map params){
-        flushIfSession() //in testing need to flush before generating entitymap
+        flushIfSession() //in testing need to flush before generating MetaMap
         List<String> incs = findIncludes(params)
         MetaMap emap = metaMapService.createMetaMap(instance, incs)
         return emap
     }
 
-    Pager pagedQuery(Map params, List<String> includesKeys, boolean requireQ = false) {
+    @Transactional(readOnly = true)
+    Pager pagedQuery(Map params, List<String> includesKeys) {
         Pager pager = Pager.of(params)
-        List dlist = query(pager, params)
+        List dlist = queryList(pager, params)
         List<String> incs = findIncludes(params, includesKeys)
         MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)
-        return pager.setMetaMapList(entityMapList)
+        pager.setMetaMapList(entityMapList)
+        return pager
     }
 
-    List<D> query(Pager pager, Map parms) {
+    List<D> queryList(Pager pager, Map parms) {
 
         try {
             QueryArgs qargs = QueryArgs.of(pager)

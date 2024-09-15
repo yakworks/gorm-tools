@@ -21,9 +21,7 @@ import org.springframework.transaction.TransactionDefinition
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.MangoQuery
-import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.jpql.KeyExistsQuery
 import gorm.tools.model.Lookupable
 import gorm.tools.model.Persistable
@@ -91,7 +89,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, ApiMangoQueryRepo<D>, BulkableRepo<
      * @param args the arguments to pass to save.
      * @throws DataAccessException if a validation or DataAccessException error happens
      */
-    D persist(D entity, PersistArgs args = PersistArgs.new()) {
+    D persist(D entity, PersistArgs args = PersistArgs.defaults()) {
         withTrx {
             return doPersist(entity, args)
         }
@@ -194,7 +192,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, ApiMangoQueryRepo<D>, BulkableRepo<
     /**
      * Transactional wrap for {@link #doCreate}
      */
-    D create(Map data, PersistArgs args = PersistArgs.new()) {
+    D create(Map data, PersistArgs args = PersistArgs.defaults()) {
         withTrx {
             return doCreate(data, args)
         }
@@ -231,7 +229,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, ApiMangoQueryRepo<D>, BulkableRepo<
     /**
      * Transactional wrap for {@link #doUpdate}
      */
-    D update(Map data, PersistArgs args = PersistArgs.new()) {
+    D update(Map data, PersistArgs args = PersistArgs.defaults()) {
         withTrx {
             return doUpdate(data, args)
         }
@@ -346,7 +344,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, ApiMangoQueryRepo<D>, BulkableRepo<
      *
      * @throws NotFoundProblem.Exception if its not found or DataProblemException if a DataIntegrityViolationException is thrown
      */
-    void removeById(Serializable id, PersistArgs args = PersistArgs.new()) {
+    void removeById(Serializable id, PersistArgs args = PersistArgs.defaults()) {
         try {
             withTrx {
                 D entity = get(id, null)

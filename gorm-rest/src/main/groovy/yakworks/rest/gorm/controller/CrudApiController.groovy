@@ -23,6 +23,7 @@ import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.DataOp
 import grails.web.Action
 import yakworks.api.problem.Problem
+import yakworks.etl.csv.CsvToMapTransformer
 import yakworks.gorm.api.IncludesKey
 import yakworks.meta.MetaMap
 import yakworks.rest.gorm.responder.EntityResponder
@@ -41,7 +42,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT
  */
 @CompileStatic
 @SuppressWarnings(['CatchRuntimeException'])
-trait RestRepoApiController<D> extends RestApiController {
+trait CrudApiController<D> extends RestApiController {
 
     static picklistMax = 50
 
@@ -62,6 +63,9 @@ trait RestRepoApiController<D> extends RestApiController {
     @Autowired(required = false)
     BulkControllerSupport<D> bulkControllerSupport
 
+    @Autowired
+    CsvToMapTransformer csvToMapTransformer
+
     /**
      * The java class for the Gorm domain (persistence entity). will generally get set in constructor or using the generic as
      * done in {@link gorm.tools.repository.GormRepo#getEntityClass}
@@ -75,7 +79,7 @@ trait RestRepoApiController<D> extends RestApiController {
      */
 
     Class<D> getEntityClass() {
-        if (!entityClass) this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), RestRepoApiController)
+        if (!entityClass) this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), CrudApiController)
         return entityClass
     }
 
@@ -122,11 +126,8 @@ trait RestRepoApiController<D> extends RestApiController {
     @Action
     def put() {
         Map dataMap = bodyAsMap()
-        Map data = [id: params.id] //this should be fine since grails isnt loosing the params set from UrlMappings
-        // json dataMap will normally not contain id because it passed in url params,
-        // but if it does it copies it in and overrides, so the id in the dataMap will win
-        // FIXME I dont think the above is the right default, the url id I think should always win
-        data.putAll(dataMap)
+        Map data = [id: params.id] //this should be fine since grails isnt loosing  params set via UrlMappings
+        data.putAll(dataMap) // json data may not contains id because it passed in params
         try {
             D instance = (D) getRepo().update(data)
             respondWithEntityMap(instance, getParamsMap())
@@ -225,16 +226,45 @@ trait RestRepoApiController<D> extends RestApiController {
         Map gParams = getParamsMap()
 
         String sourceId = JobUtils.requestToSourceId(request)
-        //String sourceId = "${request.method} ${request.requestURI}?${request.queryString}"
+
+        //if attachmentId then assume its a csv
+        if(gParams.attachmentId) {
+            // We set savePayload to false by default for CSV since we already have the csv file as attachment?
+            gParams.savePayload = false
+            //sets the datalist from the csv instead of body
+            dataList = transformCsvToBulkList(gParams)
+        } else {
+            //XXX dirty ugly hack since we were not consistent and now need to do clean up
+            // RNDC expects async to be false by default when its not CSV
+            if(!gParams.containsKey('async')) gParams['async'] = false
+        }
 
         SyncJobArgs syncJobArgs = getBulkControllerSupport().setupSyncJobArgs(dataOp, gParams, sourceId)
         SyncJobEntity job = getBulkControllerSupport().process(dataList, syncJobArgs)
         respondWith(job, [status: MULTI_STATUS])
     }
 
-    void respondWithEntityMap(D instance, Map mParams, HttpStatus status = HttpStatus.OK){
-        MetaMap entityMap = getEntityResponder().createEntityMap(instance, mParams)
-        respondWith(entityMap, [status: status, params: mParams])
+    /**
+     * transform csv to list of maps using csvToMapTransformer.
+     * Override this to provide a different method.
+     *
+     * Process flow to use attachment:
+     * 1. Zip data.csv
+     * 2. Call POST /api/upload?name=myZip.zip, take attachmentId from the result
+     * 3. Call POST /api/rally/<domain>/bulk with query params:
+     *  - attachmentId=<attachment-id>
+     *  - dataFilename= -- pass in data.csv and detail.csv as default of parameter for file names
+     *  - headerPathDelimiter -- default is '.', pass in '_' for underscore (this is path delimiter for header names, not csv delimiter)
+     * @param syncJobArgs the syncJobArgs that is setup, important to have params on it
+     * @return the jobId
+     */
+    List<Map> transformCsvToBulkList(Map gParams) {
+        return csvToMapTransformer.process(gParams)
+    }
+
+    void respondWithEntityMap(D instance, Map gParams, HttpStatus status = HttpStatus.OK){
+        MetaMap entityMap = getEntityResponder().createEntityMap(instance, gParams)
+        respondWith(entityMap, [status: status, params: gParams])
     }
 
     /**
@@ -251,9 +281,7 @@ trait RestRepoApiController<D> extends RestApiController {
          * Once that happens, trying to write any response to output stream will result in broken pipe.
          * We have "caught" broken pipe, and now during "catch" here, if we again try "respondWith" it will again result in "broken pipe" error
          */
-        if (isBrokenPipe((Exception) e)) {
-            return
-        }
+        if (isBrokenPipe((Exception) e)) return
         else {
             assert getEntityClass()
             Problem apiError = problemHandler.handleException(getEntityClass(), e)

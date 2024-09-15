@@ -30,7 +30,7 @@ interface ApiCrudRepo<D> {
     D create(Map data, PersistArgs args)
 
     default D create(Map data) {
-        create(data, PersistArgs.new())
+        create(data, PersistArgs.of())
     }
 
     /**
@@ -39,7 +39,7 @@ interface ApiCrudRepo<D> {
     D update(Map data, PersistArgs args)
 
     default D update(Map data) {
-        update(data, PersistArgs.new())
+        update(data, PersistArgs.defaults())
     }
 
     /**
@@ -53,7 +53,7 @@ interface ApiCrudRepo<D> {
     void removeById(Serializable id, PersistArgs args)
 
     default void removeById(Serializable id) {
-        removeById(id, PersistArgs.new())
+        removeById(id, PersistArgs.defaults())
     }
 
     /**
@@ -84,12 +84,14 @@ interface ApiCrudRepo<D> {
     }
 
     /**
-     * a read wrapped in a read-only transaction.
+     * simple call to the gormStaticApi get, not in a trx to avoid overhead
      *
      * @param id required, the id to get
      * @return the retrieved entity
      */
-    D read(Serializable id)
+    default D read(Serializable id) {
+        (D)gormStaticApi().read(id)
+    }
 
     /**
      * load without hydrating.

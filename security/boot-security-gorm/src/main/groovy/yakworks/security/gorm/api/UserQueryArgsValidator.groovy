@@ -9,6 +9,7 @@ import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 
 import yakworks.gorm.api.support.DefaultQueryArgsValidator
+import yakworks.gorm.config.QueryConfig
 import yakworks.security.user.CurrentUser
 
 /**
@@ -22,21 +23,26 @@ class UserQueryArgsValidator extends DefaultQueryArgsValidator {
 
     @Override
     int getTimeout() {
-        UserSecurityConfig.UserConfig userCfg = userSecurityConfig.getUserConfig(currentUser)
+        QueryConfig userQueryCfg = getUserQueryConfig()
         Integer userTimeout = queryConfig.timeout
-        if(userCfg?.query.timeout && userCfg.query.timeout > userTimeout) {
-            userTimeout = userCfg.query.timeout
+        if(userQueryCfg?.timeout && userQueryCfg.timeout > userTimeout) {
+            userTimeout = userQueryCfg.timeout
         }
         return userTimeout
     }
 
     @Override
     int getMax() {
-        UserSecurityConfig.UserConfig userCfg = userSecurityConfig.getUserConfig(currentUser)
+        QueryConfig userQueryCfg = getUserQueryConfig()
         Integer maxItems = queryConfig.max
-        if(userCfg?.query.max && userCfg.query.max > maxItems) {
-            maxItems = userCfg.query.max
+        if(userQueryCfg?.max && (userQueryCfg.max > maxItems)) {
+            maxItems = userQueryCfg.max
         }
         return maxItems
+    }
+
+    QueryConfig getUserQueryConfig(){
+        UserSecurityConfig.UserConfig userCfg = userSecurityConfig.getUserConfig(currentUser)
+        return userCfg?.query
     }
 }

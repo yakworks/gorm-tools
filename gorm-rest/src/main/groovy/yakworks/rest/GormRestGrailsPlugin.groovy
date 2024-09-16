@@ -24,9 +24,7 @@ import yakworks.rest.gorm.render.PagerRenderer
 import yakworks.rest.gorm.render.ProblemRenderer
 import yakworks.rest.gorm.render.SyncJobRenderer
 import yakworks.rest.gorm.render.XlsxPagerRenderer
-import yakworks.rest.gorm.responder.DefaultEntityResponderValidator
 import yakworks.rest.gorm.responder.RestResponderService
-import yakworks.rest.gorm.responder.SecurityEntityResponderValidator
 
 @SuppressWarnings(['UnnecessarySelfAssignment', 'Println', 'EmptyMethod', 'Indentation'])
 class GormRestGrailsPlugin extends Plugin {
@@ -58,8 +56,6 @@ class GormRestGrailsPlugin extends Plugin {
 
         csvPagerRenderer(CSVPagerRenderer)
         xlsxPagerRenderer(XlsxPagerRenderer)
-        defaultEntityResponderValidator(DefaultEntityResponderValidator)
-        securityEntityResponderValidator(SecurityEntityResponderValidator)
     } }
 
     //old

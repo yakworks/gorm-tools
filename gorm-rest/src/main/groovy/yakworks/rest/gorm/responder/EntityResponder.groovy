@@ -22,6 +22,7 @@ import yakworks.api.problem.data.DataProblem
 import yakworks.gorm.api.ApiConfig
 import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.PathItem
+import yakworks.gorm.api.support.QueryArgsValidator
 import yakworks.meta.MetaMap
 import yakworks.meta.MetaMapList
 import yakworks.spring.AppCtx
@@ -37,8 +38,9 @@ class EntityResponder<D> {
     @Autowired IncludesConfig includesConfig
     @Autowired ApiConfig apiConfig
     @Autowired MetaMapService metaMapService
-    @Autowired List<EntityResponderValidator> entityResponderValidators
-    
+    //@Autowired List<EntityResponderValidator> entityResponderValidators
+    @Autowired QueryArgsValidator queryArgsValidator
+
     Class<D> entityClass
 
     /** the API path item this is for*/
@@ -120,11 +122,7 @@ class EntityResponder<D> {
     }
 
     void validateQueryArgs(QueryArgs args) {
-        if(entityResponderValidators) {
-            for(EntityResponderValidator validator : entityResponderValidators) {
-                validator.validate(args)
-            }
-        }
+        queryArgsValidator.validate(args)
     }
 
     /**

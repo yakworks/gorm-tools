@@ -81,6 +81,21 @@ trait CrudApiController<D> extends RestApiController {
     }
 
     /**
+     * GET /api/entity/${id}
+     */
+    @Action
+    def get() {
+        try {
+            Map qParams = getParamsMap()
+            Serializable idx = qParams.id as Serializable
+            Map entityMap = getCrudApi().get(idx, qParams)
+            respondWith(entityMap, [status: OK, params: qParams])
+        } catch (Exception | AssertionError e) {
+            handleThrowable(e)
+        }
+    }
+
+    /**
      * POST /api/entity
      * Create with data
      */
@@ -91,7 +106,7 @@ trait CrudApiController<D> extends RestApiController {
             Map entityMap = getCrudApi().create(bodyAsMap(), qParams)
             respondWith(entityMap, [status: CREATED, params: qParams])
         } catch (Exception | AssertionError e) {
-            handleException(e)
+            handleThrowable(e)
         }
     }
 
@@ -106,7 +121,7 @@ trait CrudApiController<D> extends RestApiController {
             Map entityMap = getCrudApi().update(bodyAsMap(), qParams)
             respondWith(entityMap, [status: OK, params: qParams])
         } catch (Exception | AssertionError e) {
-            handleException(e)
+            handleThrowable(e)
         }
     }
 
@@ -120,22 +135,7 @@ trait CrudApiController<D> extends RestApiController {
             getCrudApi().removeById((Serializable) qParams.id, qParams) //this should be fine since grails isnt loosing the params set from UrlMappings
             callRender(status: NO_CONTENT) //204
         } catch (Exception | AssertionError e) {
-            handleException(e)
-        }
-    }
-
-    /**
-     * GET /api/entity/${id}
-     */
-    @Action
-    def get() {
-        try {
-            Map qParams = getParamsMap()
-            Serializable idx = qParams.id as Serializable
-            Map entityMap = getCrudApi().get(idx, qParams)
-            respondWith(entityMap, [status: OK, params: qParams])
-        } catch (Exception | AssertionError e) {
-            handleException(e)
+            handleThrowable(e)
         }
     }
 
@@ -158,7 +158,7 @@ trait CrudApiController<D> extends RestApiController {
             //we pass in the params to args so it can get passed on to renderer, used in the excel renderer for example
             respondWith(pager, [params: qParams])
         } catch (Exception | AssertionError e) {
-            handleException(e)
+            handleThrowable(e)
         }
     }
 
@@ -170,7 +170,7 @@ trait CrudApiController<D> extends RestApiController {
             Pager pager = getCrudApi().list(qParams, ['picklist', IncludesKey.stamp.name()])
             respondWith(pager, [params: qParams])
         } catch (Exception | AssertionError e) {
-            handleException(e)
+            handleThrowable(e)
         }
     }
 
@@ -242,23 +242,28 @@ trait CrudApiController<D> extends RestApiController {
      * Helper method to convert entity to map and respond
      */
     void respondWithEntityMap(D instance, Map mParams, HttpStatus status = HttpStatus.OK){
-        Map entityMap = getCrudApi().convertToEntityMap(instance, mParams)
+        Map entityMap = getCrudApi().entityToMap(instance, mParams)
         respondWith(entityMap, [status: status, params: mParams])
     }
 
-    void handleException(Throwable e) {
+    @Override
+    def handleException(Exception e) {
         /*
          * Broken pipe exception occurs when connection is closed before server has finished writing response.
          * Once that happens, trying to write any response to output stream will result in broken pipe.
          * We have "caught" broken pipe, and now during "catch" here, if we again try "respondWith" it will again result in "broken pipe" error
          */
-        if (isBrokenPipe((Exception) e)) {
+        if (isBrokenPipe(e)) {
             return
         }
         else {
-            assert getEntityClass()
-            Problem apiError = problemHandler.handleException(getEntityClass(), e)
+            Problem apiError = problemHandler.handleException(e, getEntityClass()?.simpleName)
             respondWith(apiError)
         }
+    }
+
+    void handleThrowable(Throwable e) {
+        Problem apiError = problemHandler.handleException(e, getEntityClass()?.simpleName)
+        respondWith(apiError)
     }
 }

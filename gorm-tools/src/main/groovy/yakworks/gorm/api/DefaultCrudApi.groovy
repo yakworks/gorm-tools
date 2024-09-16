@@ -50,19 +50,15 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     @Autowired(required = false)
     BulkSupport<D> bulkSupport
 
-    /** Not required but if an entityResponder bean is setup then it will get get used */
-    // @Autowired(required = false)
-    // EntityResponder<D> entityResponder
-
     DefaultCrudApi(Class<D> entityClass){
         this.entityClass = entityClass
     }
 
     public static <D> DefaultCrudApi<D> of(Class<D> entityClass){
-        def erInstance = new DefaultCrudApi(entityClass)
-        AppCtx.autowire(erInstance)
+        def capiInstance = new DefaultCrudApi(entityClass)
+        AppCtx.autowire(capiInstance)
         //erInstance.pathItem = erInstance.apiConfig.pathsByEntity[entityClass.name]
-        return erInstance
+        return capiInstance
     }
 
     /**
@@ -100,7 +96,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     Map get(Serializable id, Map qParams){
         D instance = (D) getApiCrudRepo().read(id)
         RepoUtil.checkFound(instance, id, getEntityClass().simpleName)
-        Map eMap = convertToEntityMap(instance, qParams)
+        Map eMap = entityToMap(instance, qParams)
         return eMap
     }
 
@@ -112,7 +108,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         Boolean bindId = qParams.getBoolean('bindId', false)
         var args = PersistArgs.of(bindId: bindId)
         D instance = (D) getApiCrudRepo().create(data, args)
-        Map eMap = convertToEntityMap(instance, qParams)
+        Map eMap = entityToMap(instance, qParams)
         return eMap
     }
 
@@ -127,7 +123,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         // FIXME I dont think the above is the right default, the url id I think should always win
         dataMap.putAll(data)
         D instance = (D) getApiCrudRepo().update(dataMap, PersistArgs.of())
-        Map eMap = convertToEntityMap(instance, qParams)
+        Map eMap = entityToMap(instance, qParams)
         return eMap
     }
 
@@ -165,34 +161,13 @@ class DefaultCrudApi<D> implements CrudApi<D> {
      */
     @Override
     Pager list(Map qParams, List<String> includesKeys){
-        Pager pager = Pager.of(qParams)
-        List dlist = queryList(pager, qParams)
-        List<String> incs = findIncludes(qParams, includesKeys)
-        MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)
-        pager.setMetaMapList(entityMapList)
-        return pager
-    }
-
-    @Override
-    SyncJobEntity bulk(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
-        SyncJobArgs syncJobArgs = getBulkSupport().setupSyncJobArgs(dataOp, qParams, sourceId)
-        SyncJobEntity job = getBulkSupport().process(dataList, syncJobArgs)
-        return job
-    }
-
-    protected List<D> queryList(Pager pager, Map qParams) {
         try {
-            QueryArgs qargs = QueryArgs.of(pager)
-                .qRequired(qRequired())
-                .build(qParams)
-                .defaultSortById()
-                .validateQ()
-
-            validateQueryArgs(qargs)
-
-            //if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.buildCriteria()}")
-
-            getApiCrudRepo().query(qargs, null).pagedList(qargs.pager)
+            Pager pager = Pager.of(qParams)
+            List dlist = queryList(pager, qParams)
+            List<String> incs = findIncludes(qParams, includesKeys)
+            MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)
+            pager.setMetaMapList(entityMapList)
+            return pager
         } catch (JsonException | IllegalArgumentException | QueryException ex) {
             //See #1925 - Catch bad query in 'q' parameter and report back. So we dont pollute logs, and can differentiate that its not us.
             //Hibernate throws IllegalArgumentException when Antlr fails to parse query
@@ -203,6 +178,31 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         }
     }
 
+    @Override
+    SyncJobEntity bulk(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
+        SyncJobArgs syncJobArgs = getBulkSupport().setupSyncJobArgs(dataOp, qParams, sourceId)
+        SyncJobEntity job = getBulkSupport().process(dataList, syncJobArgs)
+        return job
+    }
+
+    protected List<D> queryList(Pager pager, Map qParams) {
+        QueryArgs qargs = createQueryArgs(pager, qParams)
+        //if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.buildCriteria()}")
+        return getApiCrudRepo().query(qargs, null).pagedList(qargs.pager)
+    }
+
+    protected QueryArgs createQueryArgs(Pager pager, Map qParams) {
+        QueryArgs qargs = QueryArgs.of(pager)
+            .qRequired(qRequired())
+            .build(qParams)
+            .defaultSortById()
+            .validateQ()
+
+        validateQueryArgs(qargs)
+
+        return qargs
+    }
+
     /**
      * Converts the instance to Map using the MetaMap wrapper with metaMapService.
      *
@@ -211,7 +211,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
      * @return the object to pass on to json views
      */
     @Override
-    Map convertToEntityMap(D instance, Map qParams){
+    Map entityToMap(D instance, Map qParams){
         flushIfSession() //in testing need to flush before generating MetaMap
         List<String> incs = findIncludes(qParams)
         MetaMap emap = metaMapService.createMetaMap(instance, incs)

@@ -71,5 +71,5 @@ interface CrudApi<D> {
 
     SyncJobEntity bulk(DataOp dataOp, List<Map> dataList, Map params, String sourceId)
 
-    Map convertToEntityMap(D instance, Map qParams)
+    Map entityToMap(D instance, Map qParams)
 }

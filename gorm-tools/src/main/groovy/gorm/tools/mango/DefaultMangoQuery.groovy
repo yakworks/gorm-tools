@@ -60,22 +60,6 @@ class DefaultMangoQuery implements MangoQuery {
     }
 
     /**
-     * List of entities restricted by mango map and criteria closure
-     *
-     * @param params mango language criteria map
-     * @param closure additional restriction for criteria
-     * @return query of entities restricted by mango params
-     */
-    // public <D> List<D> queryList(Class<D> domainClass, Map params, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
-    //     return queryList(domainClass, QueryArgs.of(params), closure)
-    // }
-
-    // public <D> List<D> queryList(Class<D> domainClass, QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
-    //     DetachedCriteria<D> dcrit = query(domainClass, qargs, closure)
-    //     list(dcrit, qargs.pager)
-    // }
-
-    /**
      * call list on the criteria with the pager params inside a readOnly transaction.
      * If it has projections then it will use the JpqlQueryBuilder so that there is more flexibility in
      * using the having clause.
@@ -85,14 +69,16 @@ class DefaultMangoQuery implements MangoQuery {
      * @return list of entities
      */
     @Transactional(readOnly = true)
-    public <D> List<D> list(MangoDetachedCriteria<D> criteria, Pager pager) {
-        // if(log){
-        //     log.debug("mangoCriteria criteriaSize: ${dcrit.criteria.size()}")
-        //     dcrit.criteria?.each{
-        //         log.debug("mangoCriteria criteria: ${it}")
-        //     }
-        // }
-        return mangoBuilder.list(criteria, [max: pager.max, offset: pager.offset]) as List<D>
+    public List pagedList(MangoDetachedCriteria criteria, Pager pager) {
+        Map args = [max: pager.max, offset: pager.offset]
+        List resList
+        if(criteria.projections){
+            resList =  criteria.mapList(args)
+        } else {
+            //return standard list
+            resList =  criteria.list(args)
+        }
+        return resList
     }
 
     /**

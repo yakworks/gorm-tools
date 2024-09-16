@@ -58,7 +58,7 @@ class NewMangoQuery implements MangoQuery {
     }
 
     @Override
-    List list(MangoDetachedCriteria criteria, Pager pager) {
+    List pagedList(MangoDetachedCriteria criteria, Pager pager) {
         criteria.list(max: pager.max, offset: pager.offset)
     }
 

@@ -172,7 +172,7 @@ abstract class BenchProcessData implements BenchConfig, WithTrx  {
     void testQuery4(Map map){
         Map<String, Object> p = QueryArgs.of(map).buildCriteria()
         DetachedCriteria dcrit = mangoQuery.query(Region, p.criteria as Map, null)
-        mangoQuery.list(dcrit, p.pager as Pager)
+        mangoQuery.pagedList(dcrit, p.pager as Pager)
         //DetachedCriteria criteria = MangoBuilder.build(Region, map, null)
         //criteria.list(max: 10, offset: 0)
     }

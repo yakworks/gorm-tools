@@ -8,7 +8,7 @@ import yakworks.security.gorm.api.UserQueryArgsValidator
 /*
  * Overrides to test the query timeout
  */
-class TestTimeoutEntityResponderValidator extends UserQueryArgsValidator {
+class TestTimeoutQueryArgsValidator extends UserQueryArgsValidator {
 
     @Override
     QueryArgs validate(QueryArgs qargs) {

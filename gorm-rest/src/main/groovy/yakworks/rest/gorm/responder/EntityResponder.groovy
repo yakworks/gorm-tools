@@ -30,7 +30,10 @@ import yakworks.spring.AppCtx
 /**
  * Helpers for a Restfull api type controller.
  * see grails-core/grails-plugin-rest/src/main/groovy/grails/artefact/controller/RestResponder.groovy
+ *
+ * NO LONGER IN USE, SEE CrudApi
  */
+@Deprecated
 @Slf4j
 @CompileStatic
 class EntityResponder<D> {

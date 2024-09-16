@@ -142,7 +142,7 @@ class RallyApiSpringConfig {
 
     @Bean
     QueryArgsValidator queryArgsValidator() {
-        return new TestTimeoutEntityResponderValidator()
+        return new TestTimeoutQueryArgsValidator()
     }
 
 }

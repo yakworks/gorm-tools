@@ -50,13 +50,5 @@ class CSVWriterSpec extends Specification implements GormHibernateTest {
         BenchmarkHelper.printEndTimeMsg("CSVMapWriter for $SINK_COUNT items")
     }
 
-    //copied  from rest EntityResponder
-    // Pager pagedQuery(Map params, List<String> includesKeys) {
-    //     Pager pager = new Pager(params)
-    //     List dlist = query(pager, params)
-    //     List<String> incs = findIncludes(params, includesKeys)
-    //     MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)
-    //     return pager.setEntityMapList(entityMapList)
-    // }
 
 }

@@ -10,6 +10,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
+import org.springframework.http.HttpStatus
 
 import gorm.tools.beans.Pager
 import gorm.tools.job.JobUtils
@@ -235,6 +236,14 @@ trait CrudApiController<D> extends RestApiController {
      */
     List<Map> transformCsvToBulkList(Map gParams) {
         return getCsvToMapTransformer().process(gParams)
+    }
+
+    /**
+     * Helper method to convert entity to map and respond
+     */
+    void respondWithEntityMap(D instance, Map mParams, HttpStatus status = HttpStatus.OK){
+        Map entityMap = getCrudApi().convertToEntityMap(instance, mParams)
+        respondWith(entityMap, [status: status, params: mParams])
     }
 
     void handleException(Throwable e) {

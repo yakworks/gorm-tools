@@ -70,4 +70,6 @@ interface CrudApi<D> {
     Pager list(Map params, List<String> includesKeys)
 
     SyncJobEntity bulk(DataOp dataOp, List<Map> dataList, Map params, String sourceId)
+
+    Map convertToEntityMap(D instance, Map qParams)
 }

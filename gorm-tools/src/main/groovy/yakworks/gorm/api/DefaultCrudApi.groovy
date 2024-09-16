@@ -203,15 +203,6 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         }
     }
 
-    void validateQueryArgs(QueryArgs args) {
-        queryArgsValidator.validate(args)
-    }
-
-    protected boolean qRequired(){
-        PathItem pathItem = apiConfig.pathsByEntity[entityClass.name]
-        return pathItem?.qRequired
-    }
-
     /**
      * Converts the instance to Map using the MetaMap wrapper with metaMapService.
      *
@@ -219,11 +210,21 @@ class DefaultCrudApi<D> implements CrudApi<D> {
      * @param params the the param map to lookup the includes on
      * @return the object to pass on to json views
      */
-    protected Map convertToEntityMap(D instance, Map qParams){
+    @Override
+    Map convertToEntityMap(D instance, Map qParams){
         flushIfSession() //in testing need to flush before generating MetaMap
         List<String> incs = findIncludes(qParams)
         MetaMap emap = metaMapService.createMetaMap(instance, incs)
         return emap
+    }
+
+    void validateQueryArgs(QueryArgs args) {
+        queryArgsValidator.validate(args)
+    }
+
+    protected boolean qRequired(){
+        PathItem pathItem = apiConfig.pathsByEntity[entityClass.name]
+        return pathItem?.qRequired
     }
 
     /**

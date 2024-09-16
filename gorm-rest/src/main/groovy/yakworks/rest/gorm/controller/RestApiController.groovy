@@ -100,7 +100,7 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRespon
      * @return a new copy of the grails params
      */
     Map getParamsMap() {
-        //the grailsParams are the normal stock params, has values added in from UrlMappings and path
+        //the grailsParams are the normal stock params, it also has values added in from UrlMappings and path
         Map grailsParams = getParams()
         Map pMap = [:]
         //if this hack is enabled, on my default right now, can turn off later or make optional later if needed

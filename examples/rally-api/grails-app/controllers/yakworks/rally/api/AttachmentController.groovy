@@ -7,10 +7,10 @@ package yakworks.rally.api
 import groovy.transform.CompileStatic
 
 import yakworks.rally.attachment.model.Attachment
-import yakworks.rest.gorm.controller.RestRepoApiController
+import yakworks.rest.gorm.controller.CrudApiController
 
 @CompileStatic
-class AttachmentController implements RestRepoApiController<Attachment> {
+class AttachmentController implements CrudApiController<Attachment> {
 
     static namespace = 'rally'
 

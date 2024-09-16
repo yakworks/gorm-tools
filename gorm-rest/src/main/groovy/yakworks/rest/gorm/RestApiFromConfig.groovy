@@ -11,6 +11,7 @@ import java.lang.annotation.Target
 
 import org.codehaus.groovy.transform.GroovyASTTransformationClass
 
+import yakworks.rest.gorm.controller.CrudApiController
 import yakworks.rest.gorm.controller.RestRepoApiController
 
 /**
@@ -32,5 +33,5 @@ import yakworks.rest.gorm.controller.RestRepoApiController
     /**
      * @return The Controller class to generate. Can be set to null to skip the generation
      */
-    Class<?> controllerTrait() default RestRepoApiController
+    Class<?> controllerTrait() default CrudApiController
 }

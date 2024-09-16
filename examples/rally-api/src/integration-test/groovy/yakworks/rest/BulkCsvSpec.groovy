@@ -12,14 +12,14 @@ import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Contact
-import yakworks.rest.gorm.controller.RestRepoApiController
+import yakworks.rest.gorm.controller.CrudApiController
 import yakworks.testing.rest.RestIntTest
 
 @Rollback
 @Integration
 class BulkCsvSpec  extends RestIntTest {
 
-    RestRepoApiController<Contact> controller
+    CrudApiController<Contact> controller
     AttachmentRepo attachmentRepo
 
     void setup() {

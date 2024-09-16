@@ -2,7 +2,7 @@ package yakworks.rest
 
 import yakworks.rally.orgs.model.ContactFlex
 import yakworks.rally.orgs.model.OrgFlex
-import yakworks.rest.gorm.controller.RestRepoApiController
+import yakworks.rest.gorm.controller.CrudApiController
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import yakworks.commons.map.Maps
@@ -14,7 +14,7 @@ import yakworks.rally.tag.model.Tag
 @Integration
 class OrgControllerTests extends RestIntTest {
 
-    RestRepoApiController<Org> controller
+    CrudApiController<Org> controller
 
     void setup() {
         controllerName = 'OrgController'

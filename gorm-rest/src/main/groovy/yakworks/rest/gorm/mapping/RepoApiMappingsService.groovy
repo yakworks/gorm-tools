@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import yakworks.commons.lang.ClassUtils
+import yakworks.rest.gorm.controller.CrudApiController
 import yakworks.rest.gorm.controller.RestRepoApiController
 
 /**
@@ -42,7 +43,8 @@ class RepoApiMappingsService {
             // println "controler $controller.fullName"
             String ctrlName = controller.logicalPropertyName
             boolean isApi = RestRepoApiController.isAssignableFrom(controller.clazz)
-            if (isApi) {
+            boolean isCrudApi = CrudApiController.isAssignableFrom(controller.clazz)
+            if (isApi || isCrudApi) {
                 String nspace = ClassUtils.getStaticPropertyValue(controller.clazz, 'namespace', String)
                 CrudUrlMappingsBuilder.of(contextPath, nspace, ctrlName).build(builderDelegate)
 

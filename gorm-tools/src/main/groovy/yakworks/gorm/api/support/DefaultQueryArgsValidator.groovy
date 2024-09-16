@@ -12,6 +12,9 @@ import gorm.tools.mango.api.QueryArgs
 import yakworks.api.problem.data.DataProblem
 import yakworks.gorm.config.QueryConfig
 
+/**
+ * Validate the query args for the max and timeout settings
+ */
 @CompileStatic
 class DefaultQueryArgsValidator implements QueryArgsValidator {
 

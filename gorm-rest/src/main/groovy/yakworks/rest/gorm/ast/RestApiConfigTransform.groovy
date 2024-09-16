@@ -66,6 +66,7 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
 
         Map restApi = config.getProperty('api', Map) as Map<String, Map>
         String defaultPackage = restApi.defaultPackage as String
+        String defaultControllerTrait = restApi.defaultControllerTrait as String
         Map namespaces = (Map)restApi.namespaces
 
         Map paths = restApi.paths as Map<String, Map>
@@ -75,15 +76,15 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
                 String namespace = key
                 for(entry in val){
                     String resourceName = "${namespace}/${entry.key}"
-                    generateController(source, defaultPackage, resourceName, (Map)entry.value)
+                    generateController(source, defaultPackage, defaultControllerTrait, resourceName, (Map)entry.value)
                 }
             } else { //normal not namespaced
-                generateController(source, defaultPackage, key, val)
+                generateController(source, defaultPackage, defaultControllerTrait, key, val)
             }
         }
     }
 
-    void generateController(SourceUnit source, String defaultPackage, String resourceName, Map ctrlConfig) {
+    void generateController(SourceUnit source, String defaultPackage, String defaultControllerTrait, String resourceName, Map ctrlConfig) {
         String entityClassName = (String)ctrlConfig['entityClass']
         //exit fast if not entityClassName
         if(!entityClassName) return
@@ -102,9 +103,12 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
         assert entityClassNode, "entityClass not found with name: ${entityClassName}"
 
         ClassNode traitNode
-        String superClassName = (String)ctrlConfig['controllerTrait']
-        if (superClassName) {
-            traitNode = ClassHelper.make(getClass().classLoader.loadClass(superClassName))
+        String controllerTrait = (String)ctrlConfig['controllerTrait']
+        if (controllerTrait) {
+            traitNode = ClassHelper.make(getClass().classLoader.loadClass(controllerTrait))
+        }
+        else if (defaultControllerTrait) {
+            traitNode = ClassHelper.make(getClass().classLoader.loadClass(defaultControllerTrait))
         } else {
             traitNode = ClassHelper.make(CrudApiController)
             //traitNode = ClassHelper.make(RestRepoApiController)

@@ -21,6 +21,8 @@ import yakworks.rest.gorm.controller.RestRepoApiController
  * @author Joshua Burnett
  *
  * based on Grails' @Resource annotation
+ *
+ * NOTE: THIS IS NOT USED ANYWHERE RIGHT NOW. KEPT FOR REFERENCE
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target([ElementType.TYPE])

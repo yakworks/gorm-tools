@@ -17,11 +17,11 @@ import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.metamap.services.MetaMapService
+import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.ApiCrudRepo
-import gorm.tools.repository.model.ApiMangoQueryRepo
 import gorm.tools.repository.model.DataOp
 import gorm.tools.transaction.TrxUtils
 import yakworks.api.problem.data.DataProblem
@@ -73,11 +73,8 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         RepoLookup.findRepo(getEntityClass())
     }
 
-    /**
-     * Gets the repository for the entityClass
-     * @return The repository
-     */
-    ApiMangoQueryRepo<D> getApiQueryRepo() {
+    //FIXME temporary until we refactor
+    GormRepo<D> getRepo() {
         RepoLookup.findRepo(getEntityClass())
     }
 
@@ -195,7 +192,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
 
             //if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.buildCriteria()}")
 
-            getApiQueryRepo().query(qargs, null).pagedList(qargs.pager)
+            getApiCrudRepo().query(qargs, null).pagedList(qargs.pager)
         } catch (JsonException | IllegalArgumentException | QueryException ex) {
             //See #1925 - Catch bad query in 'q' parameter and report back. So we dont pollute logs, and can differentiate that its not us.
             //Hibernate throws IllegalArgumentException when Antlr fails to parse query

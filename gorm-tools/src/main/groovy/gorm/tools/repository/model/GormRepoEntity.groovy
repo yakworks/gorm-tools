@@ -6,7 +6,6 @@ package gorm.tools.repository.model
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.mango.api.QueryMangoEntity
 import gorm.tools.repository.GormRepo
 
 /**
@@ -16,6 +15,6 @@ import gorm.tools.repository.GormRepo
  * @since 6.1
  */
 @CompileStatic
-trait GormRepoEntity<D, R extends GormRepo<D>> implements PersistableRepoEntity<D, R, Long>, QueryMangoEntity<D> {
+trait GormRepoEntity<D, R extends GormRepo<D>> implements PersistableRepoEntity<D, R, Long>{
 
 }

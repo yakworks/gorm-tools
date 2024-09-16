@@ -6,11 +6,9 @@ package gorm.tools.repository.model
 
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.gorm.GormEnhancer
-import org.grails.datastore.gorm.GormInstanceApi
-import org.grails.datastore.gorm.GormStaticApi
-import org.grails.datastore.gorm.GormValidationApi
-
+import gorm.tools.mango.MangoDetachedCriteria
+import gorm.tools.mango.api.MangoQuery
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.RepoUtil
@@ -23,6 +21,8 @@ import yakworks.api.problem.data.NotFoundProblem
 interface ApiCrudRepo<D> {
 
     Class<D> getEntityClass()
+
+    MangoQuery getMangoQuery()
 
     /**
      * Transactional wrap for {@link #doCreate}
@@ -79,9 +79,7 @@ interface ApiCrudRepo<D> {
      * @param id required, the id to get
      * @return the retrieved entity
      */
-    default D get(Serializable id) {
-        (D)gormStaticApi().get(id)
-    }
+    D get(Serializable id)
 
     /**
      * read only get
@@ -89,9 +87,7 @@ interface ApiCrudRepo<D> {
      * @param id required, the id to get
      * @return the retrieved entity
      */
-    default D read(Serializable id) {
-        (D)gormStaticApi().read(id)
-    }
+    D read(Serializable id)
 
     /**
      * load without hydrating.
@@ -99,22 +95,40 @@ interface ApiCrudRepo<D> {
      * @param id required, the id to get
      * @return the retrieved entity
      */
-    default D load(Serializable id) {
-        (D) gormStaticApi().load(id)
-    }
-
-    default GormInstanceApi<D> gormInstanceApi() {
-        (GormInstanceApi<D>)GormEnhancer.findInstanceApi(getEntityClass())
-    }
-
-    default GormStaticApi<D> gormStaticApi() {
-        (GormStaticApi<D>)GormEnhancer.findStaticApi(getEntityClass())
-    }
-
-    default GormValidationApi gormValidationApi() {
-        GormEnhancer.findValidationApi(getEntityClass())
-    }
+    D load(Serializable id)
 
     boolean exists(Serializable id)
 
+    //--------------------Mango Query -------------------
+
+    /**
+     * Primary method. Builds detached criteria for repository's domain based on mango criteria language and additional criteria
+     * Override this one in repo for any special handling
+     *
+     * @param queryArgs mango query args.
+     * @param closure additional restriction for criteria
+     * @return Detached criteria build based on mango language params and criteria closure
+     */
+    default MangoDetachedCriteria<D> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
+        getMangoQuery().query(getEntityClass(), queryArgs, closure)
+    }
+
+    default MangoDetachedCriteria<D> query(QueryArgs queryArgs) {
+        query(queryArgs, null)
+    }
+
+    /**
+     * Builds detached criteria for repository's domain based on mango criteria language and additional criteria
+     *
+     * @param params mango language criteria map
+     * @param closure additional restriction for criteria
+     * @return Detached criteria build based on mango language params and criteria closure
+     */
+    default MangoDetachedCriteria<D> query(Map params, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
+        query(QueryArgs.of(params), closure)
+    }
+
+    default MangoDetachedCriteria<D> query(Map params) {
+        query(QueryArgs.of(params), null)
+    }
 }

@@ -11,15 +11,16 @@ import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEntity
 
+import gorm.tools.mango.MangoDetachedCriteria
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.RepoLookup
-import gorm.tools.utils.GormMetaUtils
 import gorm.tools.validation.ApiConstraints
 
 /**
- * core trait for repo methods that use the repo for persistance
+ * core Gorm trait for repo methods that use the repo for persistance
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.1
@@ -91,21 +92,38 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>, ID> extends GormEntity<D> 
         apiConstraints(this, builder)
     }
 
-    // static ApiConstraints getApiConstraints(){
-    //     ApiConstraints.findApiConstraints(this)
-    // }
-
-    /**
-     * @return The constrained properties for this domain class
-     */
-    // @CompileDynamic //so it can access getGormPersistentEntity, FIXME look into implementing GormEntity
-    // static Map<String, ConstrainedProperty> getConstrainedProperties() {
-    //     GormMetaUtils.findConstrainedProperties(getGormPersistentEntity())
-    // }
-
     @Transient
     boolean isNewOrDirty() {
         findRepo().isNewOrDirty((GormEntity) this)
     }
 
+    //--------------Mango query helpers, mostly for testing-------------
+
+    /**
+     * Builds detached criteria for repository's domain based on mango criteria language and additional optional criteria
+     * call get or list on returned object to fire it
+     * @param params the mango criteria language map
+     * @param closure optional closure
+     */
+    static MangoDetachedCriteria<D> query(Map params, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
+        ((ApiCrudRepo)getRepo()).query(params, closure)
+    }
+
+    /**
+     * Builds detached criteria for domain, call get or list on it.
+     *
+     * @return a DetachedCriteria instance
+     */
+    static MangoDetachedCriteria<D> query(@DelegatesTo(MangoDetachedCriteria) Closure closure) {
+        ((ApiCrudRepo)getRepo()).query([:], closure)
+    }
+
+    /**
+     * Builds detached criteria for domain, call get or list on it.
+     *
+     * @return a DetachedCriteria instance
+     */
+    static MangoDetachedCriteria<D> query(QueryArgs queryArgs) {
+        ((ApiCrudRepo)getRepo()).query(queryArgs)
+    }
 }

@@ -8,6 +8,7 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.beans.Pager
 import gorm.tools.job.SyncJobEntity
+import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.ApiCrudRepo
 import gorm.tools.repository.model.DataOp
@@ -23,7 +24,8 @@ interface CrudApi<D> {
 
     ApiCrudRepo<D> getApiCrudRepo()
 
-    //MangoQuery getMangoQuery()
+    //FIXME here temporarily until we get rid of getRepo() refs
+    GormRepo<D> getRepo()
 
     /**
      * Create entity from data and return the MetaMap of what was created

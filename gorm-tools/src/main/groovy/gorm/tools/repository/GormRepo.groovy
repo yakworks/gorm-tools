@@ -30,7 +30,6 @@ import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.ApiCrudRepo
-import gorm.tools.repository.model.ApiMangoQueryRepo
 import gorm.tools.repository.model.PersistableRepoEntity
 import gorm.tools.transaction.TrxUtils
 import gorm.tools.utils.GormMetaUtils
@@ -48,7 +47,7 @@ import yakworks.commons.lang.ClassUtils
  */
 @SuppressWarnings(['EmptyMethod', 'MethodCount'])
 @CompileStatic
-trait GormRepo<D> implements ApiCrudRepo<D>, ApiMangoQueryRepo<D>, BulkableRepo<D> {
+trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
 
     @Autowired EntityMapBinder entityMapBinder
 

@@ -2,14 +2,14 @@
 * Copyright 2024 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.security.gorm
+package yakworks.security.gorm.api
 
 import groovy.transform.CompileStatic
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Configuration
 
-import gorm.tools.hibernate.QueryConfig
+import yakworks.gorm.config.QueryConfig
 import yakworks.security.user.CurrentUser
 
 
@@ -20,6 +20,14 @@ class UserSecurityConfig {
 
     //User specific timeouts
     Map<String, UserConfig> users
+
+    UserConfig getUserConfig(CurrentUser currentUser) {
+        if (!currentUser || !currentUser.loggedIn){
+            null
+        } else {
+            users[currentUser.user.username]
+        }
+    }
 
     Integer getQueryTimeout(CurrentUser currentUser) {
         if (!currentUser || !currentUser.loggedIn) null
@@ -53,7 +61,7 @@ class UserSecurityConfig {
 
 
     static class UserConfig {
-       QueryConfig query = new QueryConfig()
+        QueryConfig query = new QueryConfig()
     }
 
 }

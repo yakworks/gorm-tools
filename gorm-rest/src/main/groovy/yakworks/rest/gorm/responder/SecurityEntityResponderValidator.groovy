@@ -9,10 +9,10 @@ import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.Ordered
 
-import gorm.tools.hibernate.QueryConfig
 import gorm.tools.mango.api.QueryArgs
 import yakworks.api.problem.data.DataProblem
-import yakworks.security.gorm.UserSecurityConfig
+import yakworks.gorm.config.QueryConfig
+import yakworks.security.gorm.api.UserSecurityConfig
 import yakworks.security.user.CurrentUser
 
 /**

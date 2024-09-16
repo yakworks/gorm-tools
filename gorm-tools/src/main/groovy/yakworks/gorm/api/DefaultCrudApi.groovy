@@ -27,6 +27,7 @@ import gorm.tools.transaction.TrxUtils
 import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.NotFoundProblem
 import yakworks.gorm.api.support.BulkSupport
+import yakworks.gorm.api.support.QueryArgsValidator
 import yakworks.meta.MetaMap
 import yakworks.meta.MetaMapList
 import yakworks.spring.AppCtx
@@ -43,6 +44,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     @Autowired IncludesConfig includesConfig
     @Autowired ApiConfig apiConfig
     @Autowired MetaMapService metaMapService
+    @Autowired QueryArgsValidator queryArgsValidator
 
     /** Not required but if an BulkSupport bean is setup then it will get get used */
     @Autowired(required = false)
@@ -55,12 +57,6 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     DefaultCrudApi(Class<D> entityClass){
         this.entityClass = entityClass
     }
-
-    // EntityResponder(Class<D> entityClass, IncludesConfig includesConfig, MetaMapService metaMapService){
-    //     this.entityClass = entityClass
-    //     this.includesConfig = includesConfig
-    //     this.metaMapService = metaMapService
-    // }
 
     public static <D> DefaultCrudApi<D> of(Class<D> entityClass){
         def erInstance = new DefaultCrudApi(entityClass)
@@ -211,7 +207,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     }
 
     void validateQueryArgs(QueryArgs args) {
-
+        queryArgsValidator.validate(args)
     }
 
     protected boolean qRequired(){

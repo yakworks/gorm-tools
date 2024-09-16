@@ -21,7 +21,6 @@ import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelStreamTools
 import gorm.tools.async.ParallelTools
 import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.hibernate.QueryConfig
 import gorm.tools.idgen.IdGenerator
 import gorm.tools.idgen.JdbcIdGenerator
 import gorm.tools.idgen.PooledIdGenerator
@@ -37,9 +36,12 @@ import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.transaction.TrxService
 import yakworks.gorm.api.ApiConfig
 import yakworks.gorm.api.IncludesConfig
+import yakworks.gorm.api.support.DefaultQueryArgsValidator
+import yakworks.gorm.api.support.QueryArgsValidator
 import yakworks.gorm.config.AsyncConfig
 import yakworks.gorm.config.GormConfig
 import yakworks.gorm.config.IdGeneratorConfig
+import yakworks.gorm.config.QueryConfig
 
 @Configuration(proxyBeanMethods = false)
 @Lazy
@@ -113,4 +115,9 @@ class GormToolsConfiguration {
         new ProblemHandler()
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    QueryArgsValidator queryArgsValidator(){
+        new DefaultQueryArgsValidator()
+    }
 }

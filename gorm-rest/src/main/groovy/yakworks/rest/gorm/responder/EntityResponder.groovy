@@ -38,7 +38,7 @@ class EntityResponder<D> {
     @Autowired ApiConfig apiConfig
     @Autowired MetaMapService metaMapService
     @Autowired List<EntityResponderValidator> entityResponderValidators
-
+    
     Class<D> entityClass
 
     /** the API path item this is for*/

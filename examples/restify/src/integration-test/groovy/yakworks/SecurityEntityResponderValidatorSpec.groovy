@@ -1,12 +1,12 @@
 package yakworks
 
-import gorm.tools.hibernate.QueryConfig
+import yakworks.gorm.config.QueryConfig
 import gorm.tools.mango.api.QueryArgs
 import spock.lang.Specification
 import yakworks.api.problem.data.DataProblemException
 import yakworks.rest.gorm.responder.EntityResponderValidator
 import yakworks.rest.gorm.responder.SecurityEntityResponderValidator
-import yakworks.security.gorm.UserSecurityConfig
+import yakworks.security.gorm.api.UserSecurityConfig
 import yakworks.testing.gorm.CurrentTestUser
 
 class SecurityEntityResponderValidatorSpec extends Specification {

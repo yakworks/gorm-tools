@@ -25,6 +25,7 @@ import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.ApiCrudRepo
 import gorm.tools.repository.model.DataOp
 import gorm.tools.transaction.TrxUtils
+import grails.gorm.transactions.Transactional
 import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.NotFoundProblem
 import yakworks.gorm.api.support.BulkSupport
@@ -93,6 +94,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         return includesConfig.getIncludes(entityClass)
     }
 
+    @Transactional(readOnly = true)
     @Override
     EntityResult<D> get(Serializable id, Map qParams){
         D instance = (D) getApiCrudRepo().read(id)
@@ -108,6 +110,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     /**
      * Create entity from data and return the MetaMap of what was created
      */
+    @Transactional
     @Override
     EntityResult<D> create(Map data, Map qParams){
         Boolean bindId = qParams.getBoolean('bindId', false)
@@ -119,6 +122,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     /**
      * Update entity from data
      */
+    @Transactional
     @Override
     EntityResult<D> update(Map data, Map qParams){
         Map dataMap = [id: qParams.id]
@@ -133,6 +137,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     /**
      * Create or Update entity from data. Checks if key exists and updates, otherwise inserts
      */
+    @Transactional
     @Override
     EntityResult<D> upsert(Map data, Map qParams){
         //TODO
@@ -146,6 +151,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
      *
      * @throws NotFoundProblem.Exception if its not found or DataProblemException if a DataIntegrityViolationException is thrown
      */
+    @Transactional
     @Override
     void removeById(Serializable id, Map qParams){
         getApiCrudRepo().removeById(id)
@@ -154,6 +160,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     /**
      * Checks if the id exists
      */
+    @Transactional(readOnly = true)
     @Override
     boolean exists(Serializable id){
         getApiCrudRepo().exists(id)
@@ -162,6 +169,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     /**
      * Mango Query that returns a paged list
      */
+    @Transactional(readOnly = true)
     @Override
     Pager list(Map qParams, List<String> includesKeys){
         try {

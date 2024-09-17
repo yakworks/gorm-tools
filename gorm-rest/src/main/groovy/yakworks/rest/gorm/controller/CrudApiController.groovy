@@ -241,9 +241,9 @@ trait CrudApiController<D> extends RestApiController {
     }
 
     /**
-     * Helper method to convert entity to map and respond
+     * Helper method to convert entity instance to map and respond
      */
-    void respondWithEntityMap(D instance, Map mParams, HttpStatus status = HttpStatus.OK){
+    void respondWithMap(D instance, Map mParams, HttpStatus status = HttpStatus.OK){
         Map entityMap = getCrudApi().entityToMap(instance, IncludesProps.of(mParams))
         respondWith(entityMap, [status: status, params: mParams])
     }

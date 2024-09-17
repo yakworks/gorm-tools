@@ -84,16 +84,4 @@ class BulkSupport<D> {
         RepoLookup.findRepo(getEntityClass())
     }
 
-    /**
-     * Special handler for bulk operations, so that we can log/highight every bulk error we send.
-     * Its here, because we cant have more thn one exception handler for "Exception" in controller
-     */
-    Problem handleBulkOperationException(HttpServletRequest req, Throwable e) {
-        Problem apiError = problemHandler.handleException(getEntityClass(), e)
-        if (apiError.status.code == 500) {
-            String requestInfo = "requestURI=[${req.requestURI}], method=[${req.method}], queryString=[${req.queryString}]"
-            log.warn("⛔️ 👉 Bulk operation exception ⛔️ \n $requestInfo \n $apiError.cause?.message")
-        }
-        return apiError
-    }
 }

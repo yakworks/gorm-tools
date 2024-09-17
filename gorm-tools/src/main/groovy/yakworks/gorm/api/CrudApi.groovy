@@ -24,9 +24,9 @@ interface CrudApi<D> {
 
     ApiCrudRepo<D> getApiCrudRepo()
 
-    //FIXME here temporarily until we get rid of getRepo() refs
-    GormRepo<D> getRepo()
-
+    /**
+     * Wrapper/Holder for the result. Allows to have entity reference and chain method to do asMap
+     */
     interface EntityResult<D>{
         IncludesProps getIncludesProps()
         D getEntity()
@@ -73,12 +73,36 @@ interface CrudApi<D> {
 
     /**
      * Mango Query that returns a paged list
+     *
+     * @param params: the query params
+     * @param includesKeys: the default fallback includesKeys as params will normally not be passed in
+     * @return the Pager with the data populated with the requested page
      */
     Pager list(Map params, List<String> includesKeys)
 
+    /**
+     * bulk operations on entity
+     *
+     * @param dataOp: the data operation
+     * @param dataList: the dataList to bulk update or insert
+     * @param params: query string params. Will be used to build SyncJobArgs
+     * @param sourceId: sourceId for the Job, controller uses JobUtils.requestToSourceId to set it.
+     * @return the created SyncJobEntity, normally async=true and syncJob.state will be 'Running'
+     */
     SyncJobEntity bulk(DataOp dataOp, List<Map> dataList, Map params, String sourceId)
 
+    /**
+     * Converts the instance to Map using the MetaMap wrapper with {@link gorm.tools.metamap.services.MetaMapService}.
+     *
+     * @param instance the entity instance
+     * @param includesProps the includes list or keys to use to generate the meta map
+     * @return the MetaMap that can be converted to json
+     */
     Map entityToMap(D instance, IncludesProps incProps)
 
+    /**
+     * Creates the EntityResult.
+     * This is called bu crud methods and makes it easy to override to return custom implementation
+     */
     EntityResult<D> createEntityResult(D instance, Map qParams)
 }

@@ -57,7 +57,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
 
     public static <D> DefaultCrudApi<D> of(Class<D> entityClass){
         def capiInstance = new DefaultCrudApi(entityClass)
-        AppCtx.autowire(capiInstance)
+        AppCtx.autowire(capiInstance) //wire up the @Autowired
         //erInstance.pathItem = erInstance.apiConfig.pathsByEntity[entityClass.name]
         return capiInstance
     }
@@ -77,16 +77,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         }
     }
 
-    /**
-     * Gets the repository for the entityClass
-     * @return The repository
-     */
     ApiCrudRepo<D> getApiCrudRepo() {
-        RepoLookup.findRepo(getEntityClass())
-    }
-
-    //FIXME temporary until we refactor
-    GormRepo<D> getRepo() {
         RepoLookup.findRepo(getEntityClass())
     }
 
@@ -102,12 +93,6 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         return includesConfig.getIncludes(entityClass)
     }
 
-    /**
-     * gets the entity by id
-     *
-     * @param id required, the id to get
-     * @return the retrieved entity
-     */
     @Override
     EntityResult<D> get(Serializable id, Map qParams){
         D instance = (D) getApiCrudRepo().read(id)
@@ -221,13 +206,6 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         return qargs
     }
 
-    /**
-     * Converts the instance to Map using the MetaMap wrapper with metaMapService.
-     *
-     * @param instance the entity instance
-     * @param includesProps the includes keys to use to generate the meta map
-     * @return the object to pass on to json views
-     */
     @Override
     Map entityToMap(D instance, IncludesProps includesProps){
         flushIfSession() //in testing need to flush before generating MetaMap

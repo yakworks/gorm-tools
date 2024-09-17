@@ -246,13 +246,6 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     }
 
     /**
-     * calls includesConfig.findIncludes. See javadocs there for more info
-     */
-    protected List<String> findIncludes(Map qParams, List<String> fallbackKeys = []){
-        return includesConfig.findIncludes(entityClass.name, qParams, fallbackKeys)
-    }
-
-    /**
      * In certain rare cases controller action will be inside a hibernate session
      * primarily needed for testing but there are some edge cases where this is needed
      * checks if repo datastore has a session and flushes if so

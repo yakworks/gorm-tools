@@ -44,12 +44,12 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>, ID> extends GormEntity<D> 
         return findRepo().persist((D) this, args)
     }
 
-    void remove(Map args = [:]) {
-        findRepo().remove((D) this, args)
+    void remove() {
+        findRepo().remove((D) this)
     }
 
-    void bind(Map args = [:], Map data) {
-        findRepo().getEntityMapBinder().bind(args, (D) this, data)
+    void bind(Map data) {
+        findRepo().getEntityMapBinder().bind([:], (D) this, data)
     }
 
     /**
@@ -64,16 +64,16 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>, ID> extends GormEntity<D> 
     //     getRepo().update(data, args)
     // }
 
-    static D update(Map data) {
-        getRepo().update(data)
-    }
+    // static D update(Map data) {
+    //     getRepo().update(data)
+    // }
 
     // static void removeById(Map args = [:], Serializable id) {
     //     getRepo().removeById(id, PersistArgs.of(args))
     // }
 
     /**
-     * default constraints static that calls findConstraints(delegate)
+     * default constraints static that calls apiConstraints(delegate)
      */
     @CompileDynamic
     static Closure getConstraints(){

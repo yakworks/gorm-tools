@@ -96,17 +96,7 @@ class ProblemHandler {
             return DataProblem.of("error.query.timeout")
         }
         else if (e instanceof DataAccessException) {
-            //if its an unique index problem then 90% of time its validation issue and expected.
-            if (isUniqueIndexViolation((DataAccessException) e)) {
-                return DataProblemCodes.UniqueConstraint.of(e)
-            } else {
-                //For now turn to warn in case we want to turn it off.
-                String rootMessage = e.rootCause?.getMessage()
-                String msgInfo = "===  message: ${e.message} \n === rootMessage: ${rootMessage} "
-
-                log.error("MAYBE UNEXPECTED? Data Access Exception ${msgInfo}", StackTraceUtils.deepSanitize(e))
-                return DataProblem.of(e)
-            }
+            return buildFromDataAccessException(e)
         }
         else if (e instanceof HttpMessageNotReadableException || e instanceof JsonException) {
             //this happens if request contains bad data / malformed json. we dont want to log stacktraces for these as they are expected
@@ -135,6 +125,28 @@ class ProblemHandler {
         }
         else {
             return new UnexpectedProblem().cause(e).detail(e.message)
+        }
+    }
+
+    //XXX for OptimisticLockingFailureException there are times when its valid I think
+    // but then times when its our processes (autocash for example). How do we parse that out?
+    // OptimisticLockingFailureException is a DataAccessException so it hits the else below
+    // and we always log it out as error.
+    static DataProblem buildFromDataAccessException(DataAccessException e) {
+        // Root of the hierarchy of data access exceptions
+        if(isUniqueIndexViolation((DataAccessException) e)){
+            return DataProblemCodes.UniqueConstraint.of(e)
+        }
+        else if(isForeignKeyViolation((DataAccessException) e)){
+            return DataProblemCodes.ReferenceKey.of(e)
+        }
+        else {
+            //For now turn to warn in case we want to turn it off.
+            String rootMessage = e.rootCause?.getMessage()
+            String msgInfo = "===  message: ${e.message} \n === rootMessage: ${rootMessage} "
+
+            log.error("MAYBE UNEXPECTED? Data Access Exception ${msgInfo}", StackTraceUtils.deepSanitize(e))
+            return DataProblem.of(e)
         }
     }
 

@@ -130,7 +130,7 @@ class ActivityMailSpec extends Specification implements GormHibernateTest, Secur
         def params = [kind:"Note", id:activity.id]
         flushAndClear()
         params.name = RandomStringUtils.randomAlphabetic(300)
-        Activity updatedActivity = Activity.update(params)
+        Activity updatedActivity = Activity.repo.update(params)
 
         then:
         updatedActivity.note != null

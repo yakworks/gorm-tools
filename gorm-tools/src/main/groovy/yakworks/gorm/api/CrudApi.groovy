@@ -8,8 +8,6 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.beans.Pager
 import gorm.tools.job.SyncJobEntity
-import gorm.tools.repository.GormRepo
-import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.ApiCrudRepo
 import gorm.tools.repository.model.DataOp
 import yakworks.api.problem.data.NotFoundProblem

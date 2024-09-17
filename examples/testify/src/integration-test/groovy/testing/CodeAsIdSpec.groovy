@@ -37,7 +37,7 @@ class CodeAsIdSpec extends Specification implements DomainIntTest {
         ThingStringId.query("code":"t1").get()
 
         when: "update"
-        ThingStringId.update(id:"t1", name:"test-updated")
+        ThingStringId.repo.update(id:"t1", name:"test-updated")
         flush()
 
         then:

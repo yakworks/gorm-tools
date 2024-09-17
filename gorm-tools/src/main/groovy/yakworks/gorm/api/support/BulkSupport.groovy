@@ -4,7 +4,6 @@
 */
 package yakworks.gorm.api.support
 
-import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -18,7 +17,6 @@ import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.DataOp
-import yakworks.api.problem.Problem
 import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.IncludesKey
 import yakworks.spring.AppCtx

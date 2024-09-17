@@ -50,7 +50,7 @@ class ActivityService {
     @Transactional
     Activity createLog(Long orgId, String message){
         def params = [kind: Activity.Kind.Log, orgId: orgId, name: message]
-        Activity activity = Activity.create(params)
+        Activity activity = Activity.repo.create(params)
         return activity
     }
 
@@ -60,7 +60,7 @@ class ActivityService {
     @Transactional
     Activity createNote(Long orgId, String note){
         def params = [orgId: orgId, note:[body: 'foo'], linkedId: 1, linkedEntity:'Contact']
-        Activity activity = Activity.create(params)
+        Activity activity = Activity.repo.create(params)
         return activity
     }
 

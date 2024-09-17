@@ -135,7 +135,9 @@ class OrgSpec extends Specification implements GormHibernateTest, SecurityTest {
         org.info.website
 
         when: "update"
-        org = Org.update([id: org.id, flex: [text1: 'yyy'], info: [phone: '555-1234', fax: '555-1234', website: 'www.test.com']])
+        org = Org.repo.update(
+            [id: org.id, flex: [text1: 'yyy'], info: [phone: '555-1234', fax: '555-1234', website: 'www.test.com']]
+        )
 
         then:
         org.flex.text1 == 'yyy'

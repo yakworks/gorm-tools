@@ -1,5 +1,6 @@
 package yakworks.rally.activity
 
+import yakworks.json.groovy.JsonEngine
 import yakworks.testing.gorm.integration.SecuritySpecHelper
 import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
@@ -17,10 +18,10 @@ import yakworks.rally.orgs.model.Contact
 @Rollback
 class ActivityContactOpTests extends Specification implements DataIntegrationTest, SecuritySpecHelper {
 
-    List createSomeContacts(){
+    List<Contact> createSomeContacts(){
         List items = []
         (0..9).each { eid ->
-            items <<  Contact.create(firstName: "Name$eid", org:[id: 1])
+            items <<  Contact.create(firstName: "Name$eid", org:[id: 1], sourceId:"Test$eid")
         }
         flushAndClear()
         return items
@@ -77,7 +78,7 @@ class ActivityContactOpTests extends Specification implements DataIntegrationTes
 
     }
 
-    void "if a tag already exists then will simple keep it and not add it"() {
+    void "if a contact already exists then will simply keep it and not add it"() {
         when:
         def tags = createSomeContacts()
         def att = setupData(tags)
@@ -192,4 +193,114 @@ class ActivityContactOpTests extends Specification implements DataIntegrationTes
         contacts[3].name == 'Name3'
         contacts[4].name == 'Name4'
     }
+
+    void "op:update and remove with lookup"() {
+        setup:
+        List<Contact> contacts = createSomeContacts()
+        Activity activity = setupData(contacts)
+
+        when:
+        def dta = [
+            id      : activity.id,
+            contacts: [
+                op  : 'update',
+                data: [
+                    [sourceId: "Test3"], //should lookup contact from sourceid
+                    [sourceId: "Test4"],
+                ]
+            ]
+        ]
+
+        def updatedAtt = Activity.update(dta)
+        flush()
+        def updatedContacts = updatedAtt.contacts
+
+        then: "should add 2 new contacts, should lookup contacts by sourceid"
+        updatedContacts.size() == 5
+        updatedContacts[3].id == contacts[3].id
+        updatedContacts[4].id == contacts[4].id
+
+        when: "op:remove with lookup"
+        dta = [
+            id      : activity.id,
+            contacts: [
+                op  : 'remove',
+                data: [
+                    [sourceId: "Test1"],//should lookup contact1 and 2 from sourceid and remove
+                    [sourceId: "Test2"],
+                ]
+            ]
+        ]
+
+        updatedAtt = Activity.update(dta)
+        flush()
+        updatedContacts = updatedAtt.contacts
+
+        then: "should add 2 new contacts, should lookup contacts by sourceid"
+        updatedContacts.size() == 3
+    }
+
+    void "replace with lookup"() {
+        when:
+        def cons = createSomeContacts()
+        def att = setupData(cons)
+
+        def dta = [
+            id: att.id,
+            contacts: [
+                [sourceId: "Test3"], //should look up by sourceid
+                [sourceId: "Test4"],
+            ]
+        ]
+
+        def updatedAtt = Activity.update(dta)
+        flush()
+
+        then:
+        updatedAtt.contacts.size() == 2
+        updatedAtt.contacts[0].id == cons[3].id
+        updatedAtt.contacts[1].id == cons[4].id
+    }
+
+    void "test update with json string"() {
+        setup:
+        List<Contact> contacts = createSomeContacts()
+        Activity activity = setupData(contacts)
+
+        when: "data contains ids"
+        def dta = [
+            id  : activity.id,
+            contacts: JsonEngine.toJson([[id: contacts[3].id], [id: contacts[4].id]])
+        ]
+        def updatedAtt = Activity.update(dta)
+        flush()
+        def updatedContacts = updatedAtt.contacts
+
+        then:
+        updatedContacts.size() == 2
+        updatedContacts[0].id == contacts[3].id
+        updatedContacts[1].id == contacts[4].id
+    }
+
+    void "test update with json :  lookup"() {
+        setup:
+        List<Contact> contacts = createSomeContacts()
+        Activity activity = setupData(contacts)
+
+        when: "data contains ids"
+        def dta = [
+            id  : activity.id,
+            contacts: JsonEngine.toJson([[sourceId: "Test3"], [sourceId: "Test4"]])
+        ]
+
+        def updatedAtt = Activity.update(dta)
+        flush()
+        def updatedContacts = updatedAtt.contacts
+
+        then:
+        updatedContacts.size() == 2
+        updatedContacts[0].id == contacts[3].id
+        updatedContacts[1].id == contacts[4].id
+    }
+
 }

@@ -67,6 +67,7 @@ interface CrudApi<D> {
 
     /**
      * Checks if the id exists
+     * NOTE: Not used yet
      */
     boolean exists(Serializable id)
 

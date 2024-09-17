@@ -18,7 +18,7 @@ class StampedEntity implements RepoEntity<StampedEntity>{
     }
 
     static constraints = {
-        apiConstraints(StampedEntity, delegate)
+        apiConstraints(delegate)
         name nullable: false
     }
 

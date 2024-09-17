@@ -42,9 +42,9 @@ class RepoApiMappingsService {
         for (controller in controllerClasses) {
             // println "controler $controller.fullName"
             String ctrlName = controller.logicalPropertyName
-            boolean isApi = RestRepoApiController.isAssignableFrom(controller.clazz)
+            boolean isRestRepoApi = RestRepoApiController.isAssignableFrom(controller.clazz)
             boolean isCrudApi = CrudApiController.isAssignableFrom(controller.clazz)
-            if (isApi || isCrudApi) {
+            if (isRestRepoApi || isCrudApi) {
                 String nspace = ClassUtils.getStaticPropertyValue(controller.clazz, 'namespace', String)
                 CrudUrlMappingsBuilder.of(contextPath, nspace, ctrlName).build(builderDelegate)
 

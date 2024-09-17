@@ -21,7 +21,6 @@ import org.grails.config.CodeGenConfig
 import yakworks.commons.util.BuildSupport
 import yakworks.gorm.api.ApiUtils
 import yakworks.rest.gorm.controller.CrudApiController
-import yakworks.rest.gorm.controller.RestRepoApiController
 
 //import grails.rest.Resource
 //import grails.rest.RestfulController

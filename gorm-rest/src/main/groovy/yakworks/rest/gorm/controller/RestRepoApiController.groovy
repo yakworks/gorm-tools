@@ -13,6 +13,7 @@ import groovy.transform.CompileStatic
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
+@Deprecated
 @CompileStatic
 @SuppressWarnings(['CatchRuntimeException'])
 trait RestRepoApiController<D> extends CrudApiController<D> {

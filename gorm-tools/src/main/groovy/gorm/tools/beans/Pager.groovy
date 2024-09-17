@@ -174,12 +174,12 @@ class Pager {
      * @param includes list of fields names which values should be in the result list based on dlist
      * @return new list with values selected from dlist based on fieldLists field names
      */
-    @Deprecated //use setupList
-    Pager setupData(List dlist, List includes = null) {
-        MetaMapList entityMapList = AppCtx.get('metaMapService', MetaMapService).createMetaMapList(dlist, includes)
-        setMetaMapList(entityMapList)
-        return this
-    }
+    // @Deprecated //use setupList
+    // Pager setupData(List dlist, List includes = null) {
+    //     MetaMapList entityMapList = AppCtx.get('metaMapService', MetaMapService).createMetaMapList(dlist, includes)
+    //     setMetaMapList(entityMapList)
+    //     return this
+    // }
 
     /**
      * Setup the list as a EntityMapList passing in the includes which prepares it to be ready for

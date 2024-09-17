@@ -5,6 +5,7 @@
 package yakworks.gorm.api
 
 import groovy.json.JsonException
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.orm.hibernate.HibernateDatastore
@@ -61,6 +62,21 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         return capiInstance
     }
 
+    class EntityResultImpl<D> implements EntityResult<D> {
+        IncludesProps includesProps
+        D entity
+
+        EntityResultImpl(D entity, IncludesProps includesProps){
+            this.entity = entity
+            this.includesProps = includesProps
+        }
+
+        @CompileDynamic //getting goody error in intellij about casting entity to D
+        Map asMap(){
+            entityToMap(this.entity, includesProps)
+        }
+    }
+
     /**
      * Gets the repository for the entityClass
      * @return The repository
@@ -93,47 +109,49 @@ class DefaultCrudApi<D> implements CrudApi<D> {
      * @return the retrieved entity
      */
     @Override
-    Map get(Serializable id, Map qParams){
+    EntityResult<D> get(Serializable id, Map qParams){
         D instance = (D) getApiCrudRepo().read(id)
         RepoUtil.checkFound(instance, id, getEntityClass().simpleName)
-        Map eMap = entityToMap(instance, qParams)
-        return eMap
+        return createEntityResult(instance, qParams)
+    }
+
+    @Override
+    EntityResult<D> createEntityResult(D instance, Map params){
+        new EntityResultImpl(instance, IncludesProps.of(params))
     }
 
     /**
      * Create entity from data and return the MetaMap of what was created
      */
     @Override
-    Map create(Map data, Map qParams){
+    EntityResult<D> create(Map data, Map qParams){
         Boolean bindId = qParams.getBoolean('bindId', false)
         var args = PersistArgs.of(bindId: bindId)
         D instance = (D) getApiCrudRepo().create(data, args)
-        Map eMap = entityToMap(instance, qParams)
-        return eMap
+        return createEntityResult(instance, qParams)
     }
 
     /**
      * Update entity from data
      */
     @Override
-    Map update(Map data, Map qParams){
+    EntityResult<D> update(Map data, Map qParams){
         Map dataMap = [id: qParams.id]
         // json dataMap will normally not contain id because it passed in url params,
         // but if it does it copies it in and overrides, so the id in the dataMap will win
         // FIXME I dont think the above is the right default, the url id I think should always win
         dataMap.putAll(data)
         D instance = (D) getApiCrudRepo().update(dataMap, PersistArgs.of())
-        Map eMap = entityToMap(instance, qParams)
-        return eMap
+        return createEntityResult(instance, qParams)
     }
 
     /**
      * Create or Update entity from data. Checks if key exists and updates, otherwise inserts
      */
     @Override
-    Map upsert(Map data, Map qParams){
+    EntityResult<D> upsert(Map data, Map qParams){
         //TODO
-        return [:]
+        return createEntityResult(null, qParams)
     }
 
     /**
@@ -164,7 +182,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         try {
             Pager pager = Pager.of(qParams)
             List dlist = queryList(pager, qParams)
-            List<String> incs = findIncludes(qParams, includesKeys)
+            List<String> incs = includesConfig.findIncludes(entityClass.name, IncludesProps.of(qParams), includesKeys)
             MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)
             pager.setMetaMapList(entityMapList)
             return pager
@@ -207,13 +225,13 @@ class DefaultCrudApi<D> implements CrudApi<D> {
      * Converts the instance to Map using the MetaMap wrapper with metaMapService.
      *
      * @param instance the entity instance
-     * @param params the the param map to lookup the includes on
+     * @param includesProps the includes keys to use to generate the meta map
      * @return the object to pass on to json views
      */
     @Override
-    Map entityToMap(D instance, Map qParams){
+    Map entityToMap(D instance, IncludesProps includesProps){
         flushIfSession() //in testing need to flush before generating MetaMap
-        List<String> incs = findIncludes(qParams)
+        List<String> incs = includesConfig.findIncludes(entityClass.name, includesProps, [])
         MetaMap emap = metaMapService.createMetaMap(instance, incs)
         return emap
     }

@@ -10,6 +10,7 @@ import groovy.transform.CompileStatic
 import org.springframework.stereotype.Component
 
 import yakworks.gorm.api.DefaultCrudApi
+import yakworks.gorm.api.IncludesProps
 
 /**
  * Used by CrudApiController for rest api.
@@ -23,7 +24,7 @@ class SyncJobCrudApi extends DefaultCrudApi<SyncJob> {
     }
 
     @Override
-    Map entityToMap(SyncJob job, Map qParams){
+    Map entityToMap(SyncJob job, IncludesProps incProps){
         // gets the raw json string and use the unescaped to it just dumps it to writer without any round robin conversion
         String jobData = job.dataToString()
         JsonOutput.JsonUnescaped rawDataJson = JsonOutput.unescaped(jobData)

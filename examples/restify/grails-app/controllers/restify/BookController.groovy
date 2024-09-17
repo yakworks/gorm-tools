@@ -19,7 +19,7 @@ class BookController implements CrudApiController<Book> {
             Map q = bodyAsMap()
             String comments = q.comments ?: ""
             q.comments = "$comments - post was here"
-            Map entityMap = getCrudApi().create(q, params)
+            Map entityMap = getCrudApi().create(q, params).asMap()
             respondWith(entityMap, [status: CREATED])
             // respond instance, [status: CREATED] //201
         } catch (RuntimeException e) {

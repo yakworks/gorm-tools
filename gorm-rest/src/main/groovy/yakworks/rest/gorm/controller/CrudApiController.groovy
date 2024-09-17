@@ -21,7 +21,9 @@ import yakworks.api.problem.Problem
 import yakworks.etl.csv.CsvToMapTransformer
 import yakworks.gorm.api.CrudApi
 import yakworks.gorm.api.DefaultCrudApi
+import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.IncludesKey
+import yakworks.gorm.api.IncludesProps
 
 import static gorm.tools.problem.ProblemHandler.isBrokenPipe
 import static org.springframework.http.HttpStatus.CREATED
@@ -88,7 +90,7 @@ trait CrudApiController<D> extends RestApiController {
         try {
             Map qParams = getParamsMap()
             Serializable idx = qParams.id as Serializable
-            Map entityMap = getCrudApi().get(idx, qParams)
+            Map entityMap = getCrudApi().get(idx, qParams).asMap()
             respondWith(entityMap, [status: OK, params: qParams])
         } catch (Exception | AssertionError e) {
             handleThrowable(e)
@@ -103,7 +105,7 @@ trait CrudApiController<D> extends RestApiController {
     def post() {
         try {
             Map qParams = getParamsMap()
-            Map entityMap = getCrudApi().create(bodyAsMap(), qParams)
+            Map entityMap = getCrudApi().create(bodyAsMap(), qParams).asMap()
             respondWith(entityMap, [status: CREATED, params: qParams])
         } catch (Exception | AssertionError e) {
             handleThrowable(e)
@@ -118,7 +120,7 @@ trait CrudApiController<D> extends RestApiController {
     def put() {
         try {
             Map qParams = getParamsMap()
-            Map entityMap = getCrudApi().update(bodyAsMap(), qParams)
+            Map entityMap = getCrudApi().update(bodyAsMap(), qParams).asMap()
             respondWith(entityMap, [status: OK, params: qParams])
         } catch (Exception | AssertionError e) {
             handleThrowable(e)
@@ -242,7 +244,7 @@ trait CrudApiController<D> extends RestApiController {
      * Helper method to convert entity to map and respond
      */
     void respondWithEntityMap(D instance, Map mParams, HttpStatus status = HttpStatus.OK){
-        Map entityMap = getCrudApi().entityToMap(instance, mParams)
+        Map entityMap = getCrudApi().entityToMap(instance, IncludesProps.of(mParams))
         respondWith(entityMap, [status: status, params: mParams])
     }
 

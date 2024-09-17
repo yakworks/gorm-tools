@@ -19,7 +19,7 @@ class LocationController implements CrudApiController<Location> {
     def post() {
         Map q = bodyAsMap()
         q.street = q.street == null ? null : "foo street"
-        Map emap = getCrudApi().create(q, params)
+        Map emap = getCrudApi().create(q, params).asMap()
         respondWith emap, [status: CREATED] //201
     }
 

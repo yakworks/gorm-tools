@@ -27,20 +27,34 @@ interface CrudApi<D> {
     //FIXME here temporarily until we get rid of getRepo() refs
     GormRepo<D> getRepo()
 
+    interface EntityResult<D>{
+        IncludesProps getIncludesProps()
+        D getEntity()
+        Map asMap()
+    }
+
+    /**
+     * gets the entity by id
+     *
+     * @param id required, the id to get
+     * @return the retrieved entity
+     */
+    EntityResult<D> get(Serializable id, Map params)
+
     /**
      * Create entity from data and return the MetaMap of what was created
      */
-    Map create(Map data, Map params)
+    EntityResult<D> create(Map data, Map params)
 
     /**
      * Update entity from data
      */
-    Map update(Map data, Map params)
+    EntityResult<D> update(Map data, Map params)
 
     /**
      * Create or Update entity from data. Checks if key exists and updates, otherwise inserts
      */
-    Map upsert(Map data, Map params)
+    EntityResult<D> upsert(Map data, Map params)
 
     /**
      * Remove by ID
@@ -50,14 +64,6 @@ interface CrudApi<D> {
      * @throws NotFoundProblem.Exception if its not found or DataProblemException if a DataIntegrityViolationException is thrown
      */
     void removeById(Serializable id, Map params)
-
-    /**
-     * gets the entity by id
-     *
-     * @param id required, the id to get
-     * @return the retrieved entity
-     */
-    Map get(Serializable id, Map params)
 
     /**
      * Checks if the id exists
@@ -71,5 +77,7 @@ interface CrudApi<D> {
 
     SyncJobEntity bulk(DataOp dataOp, List<Map> dataList, Map params, String sourceId)
 
-    Map entityToMap(D instance, Map qParams)
+    Map entityToMap(D instance, IncludesProps incProps)
+
+    EntityResult<D> createEntityResult(D instance, Map qParams)
 }

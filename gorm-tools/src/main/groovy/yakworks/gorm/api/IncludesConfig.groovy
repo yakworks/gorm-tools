@@ -78,13 +78,17 @@ class IncludesConfig {
      * @param params the request params
      * @return the List of includes field that can be passed to the MetaMap creation
      */
-    List<String> findIncludes(String entityClassName, Map params, List<String> fallbackKeys = []){
+    List<String> findIncludes(String entityClassName, Map includesParams, List<String> fallbackKeys = []){
+        return findIncludes(entityClassName, IncludesProps.of(includesParams), fallbackKeys)
+    }
+
+    List<String> findIncludes(String entityClassName, IncludesProps incProps, List<String> fallbackKeys = []){
         List<String> keyList = []
         //if it has a includes then just parse that and pass it back
-        if(params.containsKey('includes')) {
-            return (params['includes'] as String).tokenize(',')*.trim()
-        } else if(params.containsKey('includesKey')){
-            keyList << (params['includesKey'] as String)
+        if(incProps?.includes) {
+            return incProps.includes
+        } else if(incProps?.includesKey){
+            keyList << incProps.includesKey
         }
         keyList.addAll(fallbackKeys)
         def incMap = getIncludes(entityClassName)

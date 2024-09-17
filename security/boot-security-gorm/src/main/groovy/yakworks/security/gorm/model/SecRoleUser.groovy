@@ -4,8 +4,6 @@
 */
 package yakworks.security.gorm.model
 
-import groovy.transform.CompileDynamic
-
 import org.codehaus.groovy.util.HashCodeHelper
 
 import gorm.tools.repository.model.GormRepoEntity

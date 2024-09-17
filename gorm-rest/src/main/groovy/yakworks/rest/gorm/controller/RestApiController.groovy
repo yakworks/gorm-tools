@@ -71,13 +71,15 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRespon
         ClassUtils.getStaticPropertyValue(this.class.metaClass, 'namespace') as String
     }
 
-    void handleException(Exception e) {
+    def handleException(Exception e) {
         /*
          * Broken pipe exception occurs when connection is closed before server has finished writing response.
          * Once that happens, trying to write any response to output stream will result in broken pipe.
          * We have "caught" broken pipe, and now during "catch" here, if we again try "respondWith" it will again result in "broken pipe" error
          */
-        if(isBrokenPipe(e)) return
+        if(isBrokenPipe(e)) {
+            return
+        }
         else {
             Problem apiError = problemHandler.handleException(e)
             respondWith(apiError)
@@ -98,7 +100,7 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRespon
      * @return a new copy of the grails params
      */
     Map getParamsMap() {
-        //the grailsParams are the normal stock params, has values added in from UrlMappings and path
+        //the grailsParams are the normal stock params, it also has values added in from UrlMappings and path
         Map grailsParams = getParams()
         Map pMap = [:]
         //if this hack is enabled, on my default right now, can turn off later or make optional later if needed

@@ -127,7 +127,7 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
             thing: [id: id],
             sinkItems: [[name: "red"], [name: "blue"]]
         ])
-        def ks = KitchenSink.create(data, bindId: true)
+        def ks = create(data, [bindId: true])
         if(flushIt) flush()
         return ks
     }

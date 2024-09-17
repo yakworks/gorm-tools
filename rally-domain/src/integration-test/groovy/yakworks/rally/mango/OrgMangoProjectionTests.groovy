@@ -198,7 +198,7 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
     def "sum with QueryArgs"() {
         when:
         def args = QueryArgs.withProjections('calc.totalDue':'sum', 'type':'group')
-        def qry = Org.query(args)
+        def qry = Org.repo.query(args)
         def sumbObj = qry.list()
 
         then:

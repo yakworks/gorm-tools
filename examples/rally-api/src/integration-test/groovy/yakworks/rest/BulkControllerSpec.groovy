@@ -1,6 +1,6 @@
 package yakworks.rest
 
-import yakworks.rest.gorm.controller.RestRepoApiController
+import yakworks.rest.gorm.controller.CrudApiController
 import grails.testing.mixin.integration.Integration
 import org.apache.commons.lang3.StringUtils
 import yakworks.testing.rest.RestIntTest
@@ -13,7 +13,7 @@ import static org.springframework.http.HttpStatus.MULTI_STATUS
 @Integration
 class BulkControllerSpec extends RestIntTest {
 
-    RestRepoApiController<Org> controller
+    CrudApiController<Org> controller
 
     void setup() {
         controllerName = 'OrgController'

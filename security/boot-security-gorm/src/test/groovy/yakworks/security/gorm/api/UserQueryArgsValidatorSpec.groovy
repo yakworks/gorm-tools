@@ -1,19 +1,16 @@
-package yakworks
+package yakworks.security.gorm.api
 
-import gorm.tools.hibernate.QueryConfig
 import gorm.tools.mango.api.QueryArgs
 import spock.lang.Specification
 import yakworks.api.problem.data.DataProblemException
-import yakworks.rest.gorm.responder.EntityResponderValidator
-import yakworks.rest.gorm.responder.SecurityEntityResponderValidator
-import yakworks.security.gorm.UserSecurityConfig
+import yakworks.gorm.config.QueryConfig
 import yakworks.testing.gorm.CurrentTestUser
 
-class SecurityEntityResponderValidatorSpec extends Specification {
+class UserQueryArgsValidatorSpec extends Specification {
 
     void "sanity check"() {
         setup:
-        EntityResponderValidator validator = new SecurityEntityResponderValidator()
+        UserQueryArgsValidator validator = new UserQueryArgsValidator()
         validator.userSecurityConfig = userSecurityConfig
         validator.queryConfig = new QueryConfig(max:100, timeout:100)
         validator.currentUser = new CurrentTestUser()

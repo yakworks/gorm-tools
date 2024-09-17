@@ -1,7 +1,7 @@
 package gorm.tools.transaction
 
-import gorm.tools.hibernate.QueryConfig
-import yakworks.security.gorm.UserSecurityConfig
+import yakworks.gorm.config.QueryConfig
+import yakworks.security.gorm.api.UserSecurityConfig
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification

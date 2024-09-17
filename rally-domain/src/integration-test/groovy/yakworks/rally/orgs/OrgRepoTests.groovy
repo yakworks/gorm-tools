@@ -463,7 +463,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         Map params = TestDataJson.buildMap(Org) << [id: orgId, name: 'name', num: 'foo', type: 'Customer']
 
         when: "create"
-        def org = Org.create(params, bindId: true)
+        def org = Org.repo.create(params, [bindId: true])
         orgRepo.flush()
 
         then: "make sure source is assigned properly"
@@ -501,7 +501,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         Long orgId = 1111
 
         Map params = TestDataJson.buildMap(Org) << [id: orgId, name: 'name', num: 'foo', type: 'Customer', member: [branch: [id: branch.id ]]]
-        def org = Org.create(params, bindId: true)
+        def org = Org.repo.create(params, [bindId: true])
         orgRepo.flush()
 
         then: "make sure member is created with branch"

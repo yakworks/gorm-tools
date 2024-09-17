@@ -102,7 +102,7 @@ class ActivityMailSpec extends Specification implements GormHibernateTest, Secur
         // add another activity
         Activity.create(params)
         flush()
-        def linkedActs = Activity.repo.queryList([linkedId: 1, linkedEntity:'Contact'])
+        def linkedActs = Activity.repo.query([linkedId: 1, linkedEntity:'Contact']).list()
 
         then:
         linkedActs.size() == 2

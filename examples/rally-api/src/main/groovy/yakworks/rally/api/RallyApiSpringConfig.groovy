@@ -29,6 +29,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
 
+import yakworks.gorm.api.support.QueryArgsValidator
 import yakworks.openapi.gorm.OpenApiGenerator
 import yakworks.rally.RallyConfiguration
 import yakworks.rest.grails.AppInfoBuilder
@@ -140,8 +141,8 @@ class RallyApiSpringConfig {
     }
 
     @Bean
-    TestTimeoutEntityResponderValidator timeoutTestValidator() {
-        return new TestTimeoutEntityResponderValidator()
+    QueryArgsValidator queryArgsValidator() {
+        return new TestTimeoutQueryArgsValidator()
     }
 
 }

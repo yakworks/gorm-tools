@@ -74,7 +74,7 @@ class RestApiAstUtils {
             return
         }
 
-        LinkableTransform.addLinkingMethods(entityClassNode)
+        // LinkableTransform.addLinkingMethods(entityClassNode)
 
         final newControllerClassNode = new ClassNode(className, PUBLIC, ClassHelper.OBJECT_TYPE)
         //add the trait

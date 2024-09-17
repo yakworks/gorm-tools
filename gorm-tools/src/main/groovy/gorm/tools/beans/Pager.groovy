@@ -13,7 +13,7 @@ import yakworks.meta.MetaMapList
 import yakworks.spring.AppCtx
 
 /**
- * a holder object for paged data, used mostly in the rest and views
+ * a holder object for both pager settings and the paged data, used mostly in the rest and views
  * but can also be used for paging through and processing data
  */
 @Slf4j
@@ -174,25 +174,24 @@ class Pager {
      * @param includes list of fields names which values should be in the result list based on dlist
      * @return new list with values selected from dlist based on fieldLists field names
      */
-    @Deprecated //use setupList
-    Pager setupData(List dlist, List includes = null) {
-        MetaMapList entityMapList = AppCtx.get('metaMapService', MetaMapService).createMetaMapList(dlist, includes)
-        setMetaMapList(entityMapList)
-        return this
-    }
+    // @Deprecated //use setupList
+    // Pager setupData(List dlist, List includes = null) {
+    //     MetaMapList entityMapList = AppCtx.get('metaMapService', MetaMapService).createMetaMapList(dlist, includes)
+    //     setMetaMapList(entityMapList)
+    //     return this
+    // }
 
     /**
-     * Setup the list as a EntityMapList passing in the includes which prepares it to be ready for
-     * an export to json
+     * Sets the data from a MetaMapList.
+     * Does nothing special to data but sets the RecordCount from getTotalCount()
      *
-     * @param dlist list of entities
-     * @param includes list of fields names which values should be in the result list based on dlist
-     * @return new list with values selected from dlist based on fieldLists field names
+     * @param metaMapList the list to use for the data
+     * @return reference to this Pager
      */
-    Pager setMetaMapList(MetaMapList entityMapList) {
-        if(entityMapList){
-            setRecordCount(entityMapList.getTotalCount())
-            setData(entityMapList)
+    Pager setMetaMapList(MetaMapList metaMapList) {
+        if(metaMapList){
+            setRecordCount(metaMapList.getTotalCount())
+            setData(metaMapList)
         } else {
             setRecordCount(0)
             setData([])

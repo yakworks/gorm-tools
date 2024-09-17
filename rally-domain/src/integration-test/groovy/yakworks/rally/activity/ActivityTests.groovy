@@ -88,7 +88,7 @@ class ActivityTests extends Specification implements DomainIntTest {
         setup:
         //possible another note added one so only do if nothing there.
         if(!Activity.get(10)){
-            Activity.create([id: 10, org: Org.load(10), note: [body: 'Test note']], bindId: true)
+            Activity.repo.create([id: 10, org: Org.load(10), note: [body: 'Test note']], [bindId: true])
             flushAndClear()
         }
 

@@ -1,17 +1,14 @@
 package yakworks.rally.api
 
 import org.hibernate.QueryTimeoutException
-import org.springframework.core.Ordered
-import org.springframework.core.annotation.Order
 
 import gorm.tools.mango.api.QueryArgs
-import yakworks.rest.gorm.responder.EntityResponderValidator
+import yakworks.security.gorm.api.UserQueryArgsValidator
 
 /*
- * Allows to test query timeout
+ * Overrides to test the query timeout
  */
-@Order(Ordered.HIGHEST_PRECEDENCE)
-class TestTimeoutEntityResponderValidator implements EntityResponderValidator {
+class TestTimeoutQueryArgsValidator extends UserQueryArgsValidator {
 
     @Override
     QueryArgs validate(QueryArgs qargs) {
@@ -19,5 +16,6 @@ class TestTimeoutEntityResponderValidator implements EntityResponderValidator {
         if(qargs.qCriteria['timeout']) {
             throw new QueryTimeoutException("Test query timeout", null, null)
         }
+        super.validate(qargs)
     }
 }

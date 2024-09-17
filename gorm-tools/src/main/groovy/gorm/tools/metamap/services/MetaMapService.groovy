@@ -16,8 +16,9 @@ import yakworks.meta.MetaMapList
 
 /**
  * MetaMapService contains a set of helpers, which will create the MetaMap and Lists from Gorm Domains.
+ * A MetaMap is a Map that wraps an object tree and reads properties from a entity based on list of includes/excludes
  * The flow is to create a MetaEntity first (which is the meta data about the entity, what to include, titles, etc..)
- * and then uses that to instantiate the MetaMap or MetaList
+ * and then uses that to instantiate the MetaMap or MetaList.
  */
 @Slf4j
 @CompileStatic

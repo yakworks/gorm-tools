@@ -152,6 +152,25 @@ class MangoTidyMapSpec extends Specification {
 
     }
 
+    void "test % converted to ilike"() {
+        when: 'NOT using $eq specifically it will convert to $ilike with %'
+        def mmap = tidy([
+            'foo.name': "Name%"
+        ])
+
+        then:
+        mmap == [foo: [name: ['$ilike': "Name%"]]]
+
+        when: 'using $eq specifically it will NOT convert to $ilike with %'
+        mmap = tidy([
+            'foo.name.$eq': "Name%"
+        ])
+
+        then:
+        mmap == [foo: [name: ['$eq': "Name%"]]]
+
+    }
+
     void "test \$or with and"() {
         when:
         def mmap = tidy(['$or': [["address.id": 5], ["name": "Org#1", "address.id": 4]]])
@@ -200,6 +219,15 @@ class MangoTidyMapSpec extends Specification {
 
         then:
         mmap == [foo: [name: ['$like': "Name"]]]
+
+        when:
+        mmap = tidy([
+            'foo.name.$eq': "Name%"
+        ])
+
+        then:
+        mmap == [foo: [name: ['$eq': "Name%"]]]
+
     }
 
     void "test sort"() {

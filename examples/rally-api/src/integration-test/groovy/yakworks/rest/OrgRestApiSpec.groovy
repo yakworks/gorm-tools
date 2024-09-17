@@ -339,7 +339,7 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         body.tags[0].id == tag1.id
 
         cleanup:
-        Org.removeById(body.id as Long)
+        Org.repo.removeById(body.id as Long)
     }
 
     void "malformed json in request"() {

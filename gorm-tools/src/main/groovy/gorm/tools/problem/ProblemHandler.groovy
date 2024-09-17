@@ -211,7 +211,7 @@ class ProblemHandler {
      * Broken pipe exception happens when client has closed the socket and server tries to write/send any response byte on the output stream.
      * Server Can write nothing to output stream once we encounter Broken pipe exception
      */
-    static boolean isBrokenPipe(Exception ex) {
+    static boolean isBrokenPipe(Throwable ex) {
         return ex.message && ex.message.toLowerCase().contains("broken pipe")
     }
 

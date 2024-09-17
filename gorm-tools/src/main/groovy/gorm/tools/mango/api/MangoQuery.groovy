@@ -38,6 +38,6 @@ interface MangoQuery {
     /**
      * shortcut to call query and then list with the pager fields in params
      */
-    public <D> List<D> list(MangoDetachedCriteria<D> criteria, Pager pager)
+    public List pagedList(MangoDetachedCriteria criteria, Pager pager)
 
 }

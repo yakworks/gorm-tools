@@ -13,6 +13,8 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
 import org.springframework.security.core.userdetails.UserDetailsService
 
+import yakworks.gorm.api.support.QueryArgsValidator
+import yakworks.security.gorm.api.UserQueryArgsValidator
 import yakworks.security.gorm.store.GormTokenStore
 import yakworks.security.spring.token.store.TokenStore
 
@@ -50,5 +52,8 @@ class SecurityGormConfiguration {
         new GormTokenStore()
     }
 
-
+    @Bean
+    QueryArgsValidator queryArgsValidator(){
+        new UserQueryArgsValidator()
+    }
 }

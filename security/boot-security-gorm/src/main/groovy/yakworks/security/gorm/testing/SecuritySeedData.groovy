@@ -35,7 +35,10 @@ class SecuritySeedData {
 
         custUser.addRole(Roles.CUSTOMER, true)
 
-        AppUser noRoleUser = AppUser.create([id: 3L, username: "noroles", email: "noroles@yak.com", password:"123", orgId: 3], bindId: true)
+        AppUser noRoleUser = AppUser.repo.create(
+            [id: 3L, username: "noroles", email: "noroles@yak.com", password:"123", orgId: 3],
+            [bindId: true]
+        )
         assert noRoleUser.id == 3
         SecRole.repo.flush()
     }

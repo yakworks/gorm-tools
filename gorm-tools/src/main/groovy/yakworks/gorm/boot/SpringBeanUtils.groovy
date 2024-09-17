@@ -59,7 +59,9 @@ class SpringBeanUtils {
         for(Class entityClass: entityClasses){
             String repoName = RepoLookup.getRepoBeanName(entityClass)
             // def hasRepo = repoClasses.find { NameUtils.getPropertyName(it.simpleName) == repoName }
+            // look for Entities that dont have a Repo registered.
             if (!registry.containsBeanDefinition(repoName)) {
+                //if its not found then set a default one up.
                 Class repoClass = DefaultGormRepo
                 if(UuidRepoEntity.isAssignableFrom(entityClass)) {
                     repoClass = UuidGormRepo

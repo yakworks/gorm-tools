@@ -87,7 +87,7 @@ class ContactSpec extends Specification implements GormHibernateTest, SecurityTe
 
         when:
         Map params = [id:contact.id, firstName:'Peter', email:'abc@walmart.com', tagForReminders:'on']
-        Contact.update(params)
+        Contact.repo.update(params)
 
         Contact updatedContact = Contact.get(contact.id)
 

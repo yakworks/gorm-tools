@@ -1,5 +1,6 @@
 package yakworks.rest
 
+import gorm.tools.transaction.WithTrx
 import grails.gorm.transactions.Rollback
 import okhttp3.Request
 import okhttp3.RequestBody
@@ -14,7 +15,7 @@ import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
 
 @Integration
-class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
+class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
 
     String path = "/api/rally/org"
     String contactApiPath = "/api/rally/contact"
@@ -339,7 +340,9 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         body.tags[0].id == tag1.id
 
         cleanup:
-        Org.repo.removeById(body.id as Long)
+        withTrx {
+            Org.repo.removeById(body.id as Long)
+        }
     }
 
     void "malformed json in request"() {

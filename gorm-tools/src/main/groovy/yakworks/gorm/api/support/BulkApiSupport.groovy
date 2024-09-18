@@ -4,7 +4,6 @@
 */
 package yakworks.gorm.api.support
 
-import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -18,21 +17,18 @@ import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.DataOp
-import yakworks.api.problem.Problem
 import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.IncludesKey
 import yakworks.spring.AppCtx
 
 /**
- * This is the CRUD controller for entities
- * @param <D> Object
+ * Helper for getting things setup for bulk calls
  *
  * @author Joshua Burnett (@basejump)
- * @since 6.1
  */
 @Slf4j
 @CompileStatic
-class BulkSupport<D> {
+class BulkApiSupport<D> {
 
     @Autowired
     SyncJobService syncJobService
@@ -45,12 +41,12 @@ class BulkSupport<D> {
 
     Class<D> entityClass // the domain class this is for
 
-    BulkSupport(Class<D> entityClass){
+    BulkApiSupport(Class<D> entityClass){
         this.entityClass = entityClass
     }
 
-    public static <D> BulkSupport<D> of(Class<D> entityClass){
-        def bcs = new BulkSupport(entityClass)
+    public static <D> BulkApiSupport<D> of(Class<D> entityClass){
+        def bcs = new BulkApiSupport(entityClass)
         AppCtx.autowire(bcs)
         // bcs.syncJobService = AppCtx.get('syncJobService', SyncJobService)
         // if(AppCtx.ctx.containsBean('csvToMapTransformer')) bcs.csvToMapTransformer = AppCtx.get('csvToMapTransformer', CsvToMapTransformer)
@@ -67,7 +63,7 @@ class BulkSupport<D> {
      * sets up the SyncJobArgs from whats passed in from params
      */
     SyncJobArgs setupSyncJobArgs(DataOp dataOp, Map params, String sourceId){
-        Map includesMap = includesConfig.getIncludes(entityClass)
+        Map includesMap = includesConfig.getIncludes(getEntityClass())
         List bulkIncludes = IncludesConfig.getFieldIncludes(includesMap, [IncludesKey.bulk.name()])
         List bulkErrorIncludes = includesMap['bulkError'] as List<String>
 

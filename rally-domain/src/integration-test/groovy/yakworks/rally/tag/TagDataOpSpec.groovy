@@ -75,7 +75,7 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
                 [id: tags[4].id]
             ]
         ]
-        def updatedAtt = Attachment.update(dta)
+        def updatedAtt = Attachment.repo.update(dta)
         flush()
         then:
         updatedAtt.tags.size() == 2
@@ -96,7 +96,7 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
                 [id: tags[4].id]
             ]
         ]
-        def updatedAtt = Attachment.update(dta)
+        def updatedAtt = Attachment.repo.update(dta)
         flush()
         then:
         updatedAtt.tags.size() == 3
@@ -115,7 +115,7 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
                 op:'update', data: []
             ]
         ]
-        def updatedAtt = Attachment.update(dta)
+        def updatedAtt = Attachment.repo.update(dta)
 
         then: "still has them"
         updatedAtt.hasTags()
@@ -132,7 +132,7 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
             id: att.id,
             tags: []
         ]
-        def updatedAtt = Attachment.update(dta)
+        def updatedAtt = Attachment.repo.update(dta)
 
         then: "still has them"
         !updatedAtt.hasTags()
@@ -158,7 +158,7 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
                 ]
             ]
         ]
-        def updatedAtt = Attachment.update(dta)
+        def updatedAtt = Attachment.repo.update(dta)
         flushAndClear()
         updatedAtt.refresh()
 
@@ -182,7 +182,7 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
                 ]
             ]
         ]
-        def updatedAtt = Attachment.update(dta)
+        def updatedAtt = Attachment.repo.update(dta)
 
         then:
         updatedAtt.tags.size() == 2
@@ -208,7 +208,7 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
                 //so the above data only adds 2, there is 1 that exists not mentioned and it will remain
             ]
         ]
-        def updatedAtt = Attachment.update(dta)
+        def updatedAtt = Attachment.repo.update(dta)
         flush()
         then: "it kept the 2 existing and added 2 to the 3 that existed"
         updatedAtt.tags.size() == 5

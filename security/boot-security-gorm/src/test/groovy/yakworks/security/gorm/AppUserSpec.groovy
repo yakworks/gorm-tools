@@ -119,7 +119,7 @@ class AppUserSpec extends Specification implements GormHibernateTest, SecurityTe
         when:
         AppUser user = build(AppUser)
         Map params = [id: user.id, username: null]
-        AppUser.update(params)
+        AppUser.repo.update(params)
 
         then:
         thrown ValidationProblem.Exception
@@ -173,7 +173,7 @@ class AppUserSpec extends Specification implements GormHibernateTest, SecurityTe
             roles: [[id: 2], [id: 3]]
         ]
         //update it to 2 and 3.
-        AppUser.update(updateParams)
+        AppUser.repo.update(updateParams)
         flushAndClear()
 
         then:

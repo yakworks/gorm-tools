@@ -244,6 +244,9 @@ class GormRepoSpec extends Specification implements GormHibernateTest {
     def "test remove by Id"() {
         setup:
         Cust org = build(Cust)
+        flushAndClear()
+        assert Cust.get(org.id)
+        flushAndClear()
 
         when:
         Cust.repo.removeById(org.id)

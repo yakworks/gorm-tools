@@ -241,7 +241,7 @@ class RallySeed {
             org.contact = contact
             org.persist()
         }
-        Activity act = Activity.create([kind: Activity.Kind.Log, orgId: id, name: "created Org ${id}"])
+        Activity act = Activity.repo.create([kind: Activity.Kind.Log, orgId: id, name: "created Org ${id}"])
         //add link to test
         act.link(org)
         return org
@@ -293,7 +293,7 @@ class RallySeed {
 
     @Transactional
     Activity makeNote(Org org, String note = 'Test note') {
-        return Activity.create(org: org, note: [body: note])
+        return Activity.repo.create(org: org, note: [body: note])
     }
 
     @Transactional

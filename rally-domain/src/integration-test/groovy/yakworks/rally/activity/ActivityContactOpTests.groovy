@@ -70,7 +70,7 @@ class ActivityContactOpTests extends Specification implements DataIntegrationTes
                 [id: cons[4].id]
             ]
         ]
-        def updatedAtt = Activity.update(dta)
+        def updatedAtt = Activity.repo.update(dta)
         flush()
         then:
         updatedAtt.contacts.size() == 2
@@ -91,7 +91,7 @@ class ActivityContactOpTests extends Specification implements DataIntegrationTes
                 [id: tags[4].id]
             ]
         ]
-        def updatedAtt = Activity.update(dta)
+        def updatedAtt = Activity.repo.update(dta)
         flush()
         then:
         updatedAtt.contacts.size() == 3
@@ -111,7 +111,7 @@ class ActivityContactOpTests extends Specification implements DataIntegrationTes
                 op:'update', data: []
             ]
         ]
-        def updatedAtt = Activity.update(dta)
+        def updatedAtt = Activity.repo.update(dta)
         flush()
 
         then:
@@ -129,7 +129,7 @@ class ActivityContactOpTests extends Specification implements DataIntegrationTes
             id: att.id,
             contacts: []
         ]
-        def updatedAtt = Activity.update(dta)
+        def updatedAtt = Activity.repo.update(dta)
         flush()
 
         then:
@@ -153,7 +153,7 @@ class ActivityContactOpTests extends Specification implements DataIntegrationTes
                 ]
             ]
         ]
-        def updatedAtt = Activity.update(dta)
+        def updatedAtt = Activity.repo.update(dta)
 
         then:
         updatedAtt.contacts.size() == 2
@@ -179,7 +179,7 @@ class ActivityContactOpTests extends Specification implements DataIntegrationTes
                 //so the above data only adds 2, there is 1 that exists not mentioned and it will remain
             ]
         ]
-        def updatedAtt = Activity.update(dta)
+        def updatedAtt = Activity.repo.update(dta)
         flush()
         def contacts = updatedAtt.contacts
 

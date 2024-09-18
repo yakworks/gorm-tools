@@ -19,8 +19,8 @@ class OrgTagTests extends Specification implements DomainIntTest {
     OrgTagRepo orgTagRepo
 
     protected void setUpData() {
-        Tag.update(id: 1, entityName: 'Customer')
-        Tag.update(id: 2, entityName: 'Customer')
+        Tag.repo.update(id: 1, entityName: 'Customer')
+        Tag.repo.update(id: 2, entityName: 'Customer')
         flushAndClear()
     }
 

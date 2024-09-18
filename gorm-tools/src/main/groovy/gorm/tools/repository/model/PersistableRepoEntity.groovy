@@ -44,52 +44,16 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>, ID> extends GormEntity<D> 
         return findRepo().persist((D) this, args)
     }
 
-    void remove(Map args = [:]) {
+    void remove() {
+        findRepo().remove((D) this)
+    }
+
+    void remove(PersistArgs args) {
         findRepo().remove((D) this, args)
     }
 
-    void bind(Map args = [:], Map data) {
-        findRepo().getEntityMapBinder().bind(args, (D) this, data)
-    }
-
-    /**
-     * Creates, binds and persists and instance
-     * @return The created instance
-     */
-    static D create(Map data) {
-        return getRepo().create(data)
-    }
-
-    // static D update(Map args, Map data) {
-    //     getRepo().update(data, args)
-    // }
-
-    static D update(Map data) {
-        getRepo().update(data)
-    }
-
-    // static void removeById(Map args = [:], Serializable id) {
-    //     getRepo().removeById(id, PersistArgs.of(args))
-    // }
-
-    /**
-     * default constraints static that calls findConstraints(delegate)
-     */
-    @CompileDynamic
-    static Closure getConstraints(){
-        //groovy 3.0.11 hack, the `this` is not working in traits when inside the closure
-        Class clazz = this
-        return {
-            apiConstraints(clazz, getDelegate())
-        }
-    }
-
-    static void apiConstraints(Class cls, Object builder){
-        ApiConstraints.processConstraints(cls, builder)
-    }
-
-    static void apiConstraints(Object builder){
-        apiConstraints(this, builder)
+    void bind(Map data) {
+        findRepo().getEntityMapBinder().bind([:], (D) this, data)
     }
 
     @Transient
@@ -97,7 +61,32 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>, ID> extends GormEntity<D> 
         findRepo().isNewOrDirty((GormEntity) this)
     }
 
-    //--------------Mango query helpers, mostly for testing-------------
+    static D create(Map data) {
+        return getRepo().create(data)
+    }
+
+    static D update(Map data) {
+        getRepo().update(data)
+    }
+
+    /**
+     * default constraints static that calls apiConstraints(delegate)
+     */
+    @CompileDynamic
+    static Closure getConstraints() {
+        //groovy 3.0.11 hack, the `this` is not working in traits when inside the closure
+        Class clazz = this
+        return {
+            ApiConstraints.processConstraints(clazz, getDelegate())
+        }
+    }
+
+    //use this one at beginning of normal 'static constraints = {' block
+    static void apiConstraints(Object builder){
+        ApiConstraints.processConstraints(this, builder)
+    }
+
+    //--------------static Mango query helpers ------------
 
     /**
      * Builds detached criteria for repository's domain based on mango criteria language and additional optional criteria

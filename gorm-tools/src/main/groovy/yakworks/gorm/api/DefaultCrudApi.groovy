@@ -18,7 +18,6 @@ import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.metamap.services.MetaMapService
-import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.RepoUtil
@@ -27,8 +26,7 @@ import gorm.tools.repository.model.DataOp
 import gorm.tools.transaction.TrxUtils
 import grails.gorm.transactions.Transactional
 import yakworks.api.problem.data.DataProblem
-import yakworks.api.problem.data.NotFoundProblem
-import yakworks.gorm.api.support.BulkSupport
+import yakworks.gorm.api.support.BulkApiSupport
 import yakworks.gorm.api.support.QueryArgsValidator
 import yakworks.meta.MetaMap
 import yakworks.meta.MetaMapList
@@ -50,7 +48,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
 
     /** Not required but if an BulkSupport bean is setup then it will get get used */
     @Autowired(required = false)
-    BulkSupport<D> bulkSupport
+    BulkApiSupport<D> bulkApiSupport
 
     DefaultCrudApi(Class<D> entityClass){
         this.entityClass = entityClass
@@ -82,9 +80,9 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         RepoLookup.findRepo(getEntityClass())
     }
 
-    BulkSupport<D> getBulkSupport(){
-        if (!bulkSupport) this.bulkSupport = BulkSupport.of(getEntityClass())
-        return bulkSupport
+    BulkApiSupport<D> getBulkApiSupport(){
+        if (!bulkApiSupport) this.bulkApiSupport = BulkApiSupport.of(getEntityClass())
+        return bulkApiSupport
     }
 
     /**
@@ -148,8 +146,6 @@ class DefaultCrudApi<D> implements CrudApi<D> {
      * Remove by ID
      * @param id - the id to delete
      * @param args - the PersistArgs to pass to delete. flush being the most common
-     *
-     * @throws NotFoundProblem.Exception if its not found or DataProblemException if a DataIntegrityViolationException is thrown
      */
     @Transactional
     @Override
@@ -191,8 +187,8 @@ class DefaultCrudApi<D> implements CrudApi<D> {
 
     @Override
     SyncJobEntity bulk(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
-        SyncJobArgs syncJobArgs = getBulkSupport().setupSyncJobArgs(dataOp, qParams, sourceId)
-        SyncJobEntity job = getBulkSupport().process(dataList, syncJobArgs)
+        SyncJobArgs syncJobArgs = getBulkApiSupport().setupSyncJobArgs(dataOp, qParams, sourceId)
+        SyncJobEntity job = getBulkApiSupport().process(dataList, syncJobArgs)
         return job
     }
 

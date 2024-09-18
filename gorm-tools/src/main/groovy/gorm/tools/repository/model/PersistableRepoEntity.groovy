@@ -48,6 +48,10 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>, ID> extends GormEntity<D> 
         findRepo().remove((D) this)
     }
 
+    void remove(PersistArgs args) {
+        findRepo().remove((D) this, args)
+    }
+
     void bind(Map data) {
         findRepo().getEntityMapBinder().bind([:], (D) this, data)
     }

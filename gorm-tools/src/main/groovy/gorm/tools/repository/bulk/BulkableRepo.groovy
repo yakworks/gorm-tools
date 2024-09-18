@@ -55,8 +55,6 @@ trait BulkableRepo<D> {
     ProblemHandler problemHandler
 
     //Here for @CompileStatic - GormRepo implements these
-    abstract D create(Map data, Map args)
-    abstract D update(Map data, Map args)
     abstract D doCreate(Map data, PersistArgs args)
     abstract D doUpdate(Map data, PersistArgs args)
     abstract  Class<D> getEntityClass()

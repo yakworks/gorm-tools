@@ -100,6 +100,14 @@ class PersistArgs {
     }
 
     /**
+     * Flush: true is a very common args. This allows new one to be created by doing
+     * PersistArgs.flush()
+     */
+    static PersistArgs flush(){
+        PersistArgs.of(flush: true)
+    }
+
+    /**
      * convert to Map to pass to gorm args. filters out nulls so only set properties will have keys set
      * @return the Map
      */

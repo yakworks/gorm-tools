@@ -215,7 +215,8 @@ trait BulkableRepo<D> {
 
     /**
      * uses metaMapService to create the map for the includes in the jobContext.args
-     * Will return a clone to ensure that all properties are called and its a clean, unwrapped map
+     * Will return a clone to ensure that all properties are called
+     * and its a clean, unwrapped, no proxies, map
      */
     Map createMetaMap(D entityInstance, List<String> includes){
         MetaMap entityMapData = metaMapService.createMetaMap(entityInstance, includes)

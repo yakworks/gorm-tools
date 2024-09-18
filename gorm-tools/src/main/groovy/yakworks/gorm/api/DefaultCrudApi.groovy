@@ -48,7 +48,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
 
     /** Not required but if an BulkSupport bean is setup then it will get get used */
     @Autowired(required = false)
-    BulkApiSupport<D> bulkSupport
+    BulkApiSupport<D> bulkApiSupport
 
     DefaultCrudApi(Class<D> entityClass){
         this.entityClass = entityClass
@@ -80,9 +80,9 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         RepoLookup.findRepo(getEntityClass())
     }
 
-    BulkApiSupport<D> getBulkSupport(){
-        if (!bulkSupport) this.bulkSupport = BulkApiSupport.of(getEntityClass())
-        return bulkSupport
+    BulkApiSupport<D> getBulkApiSupport(){
+        if (!bulkApiSupport) this.bulkApiSupport = BulkApiSupport.of(getEntityClass())
+        return bulkApiSupport
     }
 
     /**
@@ -187,10 +187,8 @@ class DefaultCrudApi<D> implements CrudApi<D> {
 
     @Override
     SyncJobEntity bulk(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
-        SyncJobArgs syncJobArgs = getBulkSupport().setupSyncJobArgs(dataOp, qParams, sourceId)
-        Long jobId = getRepo().bulk(dataList, syncJobArgs)
-        SyncJobEntity job = syncJobService.getJob(jobId)
-        SyncJobEntity job = getBulkSupport().process(dataList, syncJobArgs)
+        SyncJobArgs syncJobArgs = getBulkApiSupport().setupSyncJobArgs(dataOp, qParams, sourceId)
+        SyncJobEntity job = getBulkApiSupport().process(dataList, syncJobArgs)
         return job
     }
 

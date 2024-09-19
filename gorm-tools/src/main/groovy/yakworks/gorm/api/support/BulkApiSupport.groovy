@@ -17,6 +17,7 @@ import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.DataOp
+import yakworks.commons.lang.EnumUtils
 import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.IncludesKey
 import yakworks.spring.AppCtx
@@ -72,6 +73,10 @@ class BulkApiSupport<D> {
         syncJobArgs.includes = bulkIncludes
         syncJobArgs.errorIncludes = bulkErrorIncludes
         syncJobArgs.sourceId = sourceId
+
+        //for upsert they can pass in op=upsert to params.
+        DataOp paramsOp = EnumUtils.getEnumIgnoreCase(DataOp, params.op as String)
+        if(paramsOp == DataOp.upsert) syncJobArgs.op = paramsOp
 
         return syncJobArgs
     }

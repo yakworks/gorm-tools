@@ -182,5 +182,27 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
             [id: 999999, num: "fox2", name: "Fox2", type: "Customer"]
         ]
 
+        when:
+        Response resp = post("$path&op=upsert", jsonList)
+
+        Map body = bodyToMap(resp)
+
+        then: "sanity check json structure"
+        body.id != null
+        body.ok == false //has one failure
+        body.state == "Finished"
+        body.source == "Oracle" //should have been picked from query string
+        body.sourceId == "POST /api/rally/org/bulk?jobSource=Oracle&savePayload=false&op=upsert"
+        resp.code() == HttpStatus.MULTI_STATUS.value()
+        body.data.size() == 5
+
+        when:
+        List data = body.data
+        int success = data.count { it.ok}
+        int failed = data.count { !it.ok}
+
+        then:
+        success == 4
+        failed == 1
     }
 }

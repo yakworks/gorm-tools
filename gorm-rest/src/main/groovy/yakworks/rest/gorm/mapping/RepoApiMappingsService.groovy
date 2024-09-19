@@ -48,6 +48,11 @@ class RepoApiMappingsService {
                 String nspace = ClassUtils.getStaticPropertyValue(controller.clazz, 'namespace', String)
                 CrudUrlMappingsBuilder.of(contextPath, nspace, ctrlName).build(builderDelegate)
 
+                //UPSERT
+                SimpleUrlMappingBuilder.of(contextPath, nspace, ctrlName)
+                    .httpMethod('POST').action('upsert').suffix('/upsert')
+                    .urlMappingBuilder(builderDelegate).build()
+
                 // bulks ops at /bulk
                 SimpleUrlMappingBuilder.of(contextPath, nspace, ctrlName)
                     .httpMethod('POST').action('bulkCreate').suffix('/bulk')

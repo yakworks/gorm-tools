@@ -13,6 +13,7 @@ import org.hibernate.QueryException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataAccessException
 
+import gorm.tools.beans.EntityResult
 import gorm.tools.beans.Pager
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
@@ -61,11 +62,12 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         return capiInstance
     }
 
-    class EntityResultImpl<D> implements EntityResult<D> {
+    class DefaultApiResult<D> implements CrudApiResult<D> {
         IncludesProps includesProps
         D entity
+        int status
 
-        EntityResultImpl(D entity, IncludesProps includesProps){
+        DefaultApiResult(D entity, IncludesProps includesProps){
             this.entity = entity
             this.includesProps = includesProps
         }
@@ -94,15 +96,15 @@ class DefaultCrudApi<D> implements CrudApi<D> {
 
     @Transactional(readOnly = true)
     @Override
-    EntityResult<D> get(Serializable id, Map qParams){
+    CrudApiResult<D> get(Serializable id, Map qParams){
         D instance = (D) getApiCrudRepo().read(id)
         RepoUtil.checkFound(instance, id, getEntityClass().simpleName)
-        return createEntityResult(instance, qParams)
+        return createApiResult(instance, qParams)
     }
 
     @Override
-    EntityResult<D> createEntityResult(D instance, Map params){
-        new EntityResultImpl(instance, IncludesProps.of(params))
+    CrudApiResult<D> createApiResult(D instance, Map params){
+        new DefaultApiResult(instance, IncludesProps.of(params))
     }
 
     /**
@@ -110,11 +112,11 @@ class DefaultCrudApi<D> implements CrudApi<D> {
      */
     @Transactional
     @Override
-    EntityResult<D> create(Map data, Map qParams){
+    CrudApiResult<D> create(Map data, Map qParams){
         Boolean bindId = qParams.getBoolean('bindId', false)
         var args = PersistArgs.of(bindId: bindId)
         D instance = (D) getApiCrudRepo().create(data, args)
-        return createEntityResult(instance, qParams)
+        return createApiResult(instance, qParams)
     }
 
     /**
@@ -122,14 +124,14 @@ class DefaultCrudApi<D> implements CrudApi<D> {
      */
     @Transactional
     @Override
-    EntityResult<D> update(Map data, Map qParams){
+    CrudApiResult<D> update(Map data, Map qParams){
         Map dataMap = [id: qParams.id]
         // json dataMap will normally not contain id because it passed in url params,
         // but if it does it copies it in and overrides, so the id in the dataMap will win
         // FIXME I dont think the above is the right default, the url id I think should always win
         dataMap.putAll(data)
         D instance = (D) getApiCrudRepo().update(dataMap, PersistArgs.of())
-        return createEntityResult(instance, qParams)
+        return createApiResult(instance, qParams)
     }
 
     /**
@@ -137,9 +139,11 @@ class DefaultCrudApi<D> implements CrudApi<D> {
      */
     @Transactional
     @Override
-    EntityResult<D> upsert(Map data, Map qParams){
-        //TODO
-        return createEntityResult(null, qParams)
+    CrudApiResult<D> upsert(Map data, Map qParams){
+        EntityResult<D> entityResult = getApiCrudRepo().upsert(data, PersistArgs.of())
+        var apiRes = createApiResult(entityResult.entity, qParams)
+        apiRes.status = entityResult.status.code
+        return apiRes
     }
 
     /**

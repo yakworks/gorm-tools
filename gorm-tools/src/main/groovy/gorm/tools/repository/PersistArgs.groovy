@@ -108,6 +108,14 @@ class PersistArgs {
     }
 
     /**
+     * bindId: true true is a very common arg. This allows new one to be created quickly for testing etc
+     * by doing PersistArgs.withBindId()
+     */
+    static PersistArgs withBindId(){
+        PersistArgs.of(bindId: true)
+    }
+
+    /**
      * convert to Map to pass to gorm args. filters out nulls so only set properties will have keys set
      * @return the Map
      */

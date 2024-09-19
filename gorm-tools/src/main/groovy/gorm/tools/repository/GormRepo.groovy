@@ -35,6 +35,8 @@ import gorm.tools.transaction.TrxUtils
 import gorm.tools.utils.GormMetaUtils
 import grails.core.support.proxy.ProxyHandler
 import grails.validation.ValidationException
+import yakworks.api.HttpStatus
+import yakworks.api.Result
 import yakworks.api.problem.ThrowableProblem
 import yakworks.api.problem.data.NotFoundProblem
 import yakworks.commons.lang.ClassUtils
@@ -259,7 +261,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
      * DOES NOT do anything with data.op operations.
      * NOT transactional so should be wrapped in a transaction.
      */
-    D upsert(Map data, PersistArgs args) {
+    D upsert(Map data, PersistArgs args = PersistArgs.of()) {
         if (!data) return
         D instance
         try {
@@ -271,6 +273,29 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
             // when bindId is not set then we throw the exception.
             if(!args.bindId) throw nfe
         }
+        HttpStatus status
+        if (instance) {
+            //dont call update or doUpdate as it will do findWithData again.
+            bindAndUpdate(instance, data, args)
+            status = HttpStatus.OK
+        } else {
+            instance = doCreate(data, args)
+            status = HttpStatus.CREATED
+        }
+        // Result.OK().status(status).payload(instance)
+        return instance
+    }
+
+    /**
+     * Simple helper to updating from data.
+     * Uses findWithData and if instance is found then considers it an update.
+     * If not found then considers it a create.
+     * DOES NOT do anything with data.op operations.
+     * NOT transactional so should be wrapped in a transaction.
+     */
+    D createOrUpdateItem(Map data, PersistArgs args = PersistArgs.defaults()) {
+        if (!data) return
+        D instance = findWithData(data, false)
         if (instance) {
             //dont call update or doUpdate as it will do findWithData again.
             bindAndUpdate(instance, data, args)

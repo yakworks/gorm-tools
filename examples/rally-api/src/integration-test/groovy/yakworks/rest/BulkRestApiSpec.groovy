@@ -115,6 +115,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
             OrgSource.findBySourceIdLike("ORG-1%") == null
         }
     }
+
     void "one fails - verify success & error includes"() {
         List<Map> jsonList =  [[num: "foox1", name: "Foox1", type: "Customer"], [num: "Foox2", name: "Foox2", type: "Customer"]]
         jsonList[0].num = StringUtils.rightPad("ORG-1-", 110, "Z")
@@ -156,5 +157,30 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         json[1].data.source.sourceId ==  "Foox2"
 
         delete("/api/rally/org", json.data[1].id)
+    }
+
+    def "upsert"() {
+
+        setup:
+        int orgCount
+        OrgSource.withTransaction {
+            orgCount = Org.count()
+            def list = Org.list()
+            assert list
+        }
+
+        List<Map> jsonList = [
+            // this should update based on num
+            [num: "1", name: "updated"],
+            //this should update based on id
+            [id: "2", name: "updated2"],
+            //this should update based on sourceId
+            [sourceId: "3", name: "updated3"],
+            //this should be inserted
+            [num: "fox1", name: "Fox1", type: "Customer"],
+            //this should fail because it doesn't have bindId
+            [id: 999999, num: "fox2", name: "Fox2", type: "Customer"]
+        ]
+
     }
 }

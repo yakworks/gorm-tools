@@ -171,11 +171,11 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
 
         List<Map> jsonList = [
             // this should update based on num
-            [num: "1", name: "updated"],
+            [num: "91", name: "updated"],
             //this should update based on id
-            [id: "2", name: "updated2"],
+            [id: "92", name: "updated2"],
             //this should update based on sourceId
-            [sourceId: "3", name: "updated3"],
+            [sourceId: "93", name: "updated3"],
             //this should be inserted
             [num: "fox1", name: "Fox1", type: "Customer"],
             //this should fail because it doesn't have bindId

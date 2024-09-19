@@ -288,7 +288,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
             status = HttpStatus.CREATED
         }
         // Result.OK().status(status).payload(instance)
-        return instance
+        return EntityResult.of(instance).status(status)
     }
 
     /**

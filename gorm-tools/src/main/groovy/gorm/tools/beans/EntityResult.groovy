@@ -1,6 +1,6 @@
 /*
-* Copyright 2021 original authors
-* SPDX-License-Identifier: Apache-2.0
+* Copyright 2021 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
+* You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
 package gorm.tools.beans
 
@@ -32,10 +32,10 @@ class EntityResult<D> implements ResultTrait<EntityResult<D>>, Serializable {
 
     // ** BUILDERS STATIC OVERRIDES **
     static EntityResult OK(){ throw new UnsupportedOperationException("use generics") }
-    static EntityResult<D> of(D entity) {
+    static <D> EntityResult<D> of(D entity) {
         return new EntityResult(entity)
     }
-    static EntityResult<D> ofPayload(D entity) {
+    static <D> EntityResult<D> ofPayload(D entity) {
         return new EntityResult(entity)
     }
 

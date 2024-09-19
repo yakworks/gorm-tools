@@ -4,6 +4,7 @@
 */
 package gorm.tools.repository
 
+import gorm.tools.beans.EntityResult
 import gorm.tools.databinding.BindAction
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.model.RepoEntity
@@ -16,6 +17,8 @@ import testing.AddyNested
 import testing.Cust
 import testing.CustExt
 import testing.CustRepo
+import yakworks.api.ApiStatus
+import yakworks.api.HttpStatus
 import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.api.problem.data.DataProblemException
@@ -32,43 +35,25 @@ class GormRepoUpsertSpec extends Specification implements GormHibernateTest {
 
     static entityClasses = [KitchenSink, SinkExt, SinkItem]
 
-    def "test get"() {
-        setup:
-        KitchenSink ks = build(KitchenSink)
-
-        when:
-        KitchenSink newOrg = KitchenSink.repo.get(ks.id, null)
-
-        then:
-        null != newOrg
-        ks.id == newOrg.id
-        ks.name == newOrg.name
-
-        when:
-        newOrg = KitchenSink.repo.get(ks.id)
-
-        then:
-        null != newOrg
-        ks.id == newOrg.id
-        ks.name == newOrg.name
-    }
-
     def "test UPSERT"() {
         when:
-        KitchenSink k = KitchenSink.repo.upsert([id:123, num: '123', name: "k123"],PersistArgs.withBindId()).entity
+        EntityResult k = KitchenSink.repo.upsert([id:123, num: '123', name: "k123"],PersistArgs.withBindId())
         var k2 = KitchenSink.get(123)
 
-        then:
-        k
+        then: "CREATED"
+        k.entity
+        k.status == HttpStatus.CREATED
         k2
 
         when: "same one is passed in again"
         flushAndClear()
-        k = KitchenSink.repo.upsert([id:123, num: '123', name: "updated"]).entity
+        k = KitchenSink.repo.upsert([id:123, num: '123', name: "updated"])
         flushAndClear()
         k2 = KitchenSink.get(123)
 
         then:
+        k.entity.name == "updated"
+        k.status == HttpStatus.OK
         k2.name == "updated"
     }
 

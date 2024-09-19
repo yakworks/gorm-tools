@@ -11,6 +11,7 @@ import groovy.util.logging.Slf4j
 
 import org.codehaus.groovy.runtime.InvokerHelper
 
+import gorm.tools.beans.EntityResult
 import gorm.tools.databinding.BindAction
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.model.Persistable
@@ -337,7 +338,7 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     // ***** Unsupported some gormRepo methods should not be called with an XRef tables so blow errors for these
 
     @Override
-    X upsert(Map data, PersistArgs args){
+    EntityResult<X> upsert(Map data, PersistArgs args){
         throw new UnsupportedOperationException("Method createOrUpdate is not supported by this implementation")
     }
 

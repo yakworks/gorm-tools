@@ -28,6 +28,7 @@ import gorm.tools.repository.events.BeforeBulkSaveEntityEvent
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.DataOp
 import yakworks.api.ApiResults
+import yakworks.api.HttpStatus
 import yakworks.api.Result
 import yakworks.api.problem.data.DataProblem
 import yakworks.commons.map.LazyPathKeyMap
@@ -145,8 +146,8 @@ trait BulkableRepo<D> {
         ApiResults results = ApiResults.create(false)
         for (Map item : dataList) {
             try {
-                Map entityMapData = bulkSaveEntity(item, syncJobArgs, transactionPerItem)
-                results << Result.OK().payload(entityMapData).status(syncJobArgs.isCreate() ? 201 : 200)
+                EntityResult<Map> entResult = bulkSaveEntity(item, syncJobArgs, transactionPerItem)
+                results << Result.OK().payload(entResult.entity).status(entResult.status)
             } catch(Exception e) {
                 // if trx by item then collect the exceptions, otherwise throw so it can rollback
                 if(transactionPerItem){
@@ -173,9 +174,10 @@ trait BulkableRepo<D> {
      * @param data the item data
      * @param syncJobArgs - persistArgs and isCreate will be pulled from here
      * @param transactional true if should be wraped in withTrx
-     * @return the data map after bing run through buildSuccessMap using the includes in the syncJobArgs
+     * @return the EntityResult with the data map as entity after being run through buildSuccessMap
+     *         using the includes in the syncJobArgs
      */
-    Map bulkSaveEntity(Map data, SyncJobArgs syncJobArgs, boolean transactional) {
+    EntityResult<Map> bulkSaveEntity(Map data, SyncJobArgs syncJobArgs, boolean transactional) {
         //need to copy the incoming map, as during create(), repos may remove entries from the data map
         //or it can create circular references - eg org.contact.org - which would result in Stackoverflow when converting to json
         Map dataClone
@@ -191,18 +193,24 @@ trait BulkableRepo<D> {
             PersistArgs pargs = syncJobArgs.persistArgs
             D entityInstance
             DataOp op = syncJobArgs.op
+            int statusCode
             if(op == DataOp.add) { // create
                 entityInstance = doCreate(dataClone, pargs)
+                statusCode = HttpStatus.CREATED.code
             } else if (op == DataOp.update) { // update
                 entityInstance = doUpdate(dataClone, pargs)
+                statusCode = HttpStatus.OK.code
             } else if (op == DataOp.upsert) { // upsert (insert or update)
-                entityInstance = upsert(dataClone, pargs).entity
+                EntityResult res = upsert(dataClone, pargs)
+                entityInstance = res.entity
+                statusCode = res.status.code
             } else {
                 throw new UnsupportedOperationException("DataOp $op not supported")
             }
             doAfterBulkSaveEntity(entityInstance, dataClone, syncJobArgs)
-            return buildSuccessMap(entityInstance, syncJobArgs.includes)
-        } as Closure<Map>
+            Map successMap = buildSuccessMap(entityInstance, syncJobArgs.includes)
+            return EntityResult.of(successMap).status(statusCode)
+        } as Closure<EntityResult<Map>>
 
         return transactional ? withTrx(closure) : closure()
     }

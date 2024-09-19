@@ -131,8 +131,13 @@ class SyncJobArgs {
      */
     Map persistArgs
 
-    /** returns new PersistArgs instance on each call */
-    PersistArgs getPersistArgs() { return this.persistArgs ? PersistArgs.of(this.persistArgs) : new PersistArgs() }
+    /**
+     * returns new PersistArgs instance on each call.
+     * GormRepo make changes as it goes so we dont want the same one going through multiple cylces
+     */
+    PersistArgs getPersistArgs() {
+        return this.persistArgs ? PersistArgs.of(this.persistArgs) : new PersistArgs()
+    }
 
     /**
      * When params include a mango query this is the QueryArgs that are created from it. Used for the ExportSyncArgs.

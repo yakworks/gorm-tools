@@ -261,7 +261,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
      * DOES NOT do anything with data.op operations.
      * NOT transactional so should be wrapped in a transaction.
      */
-    D upsert(Map data, PersistArgs args = PersistArgs.of()) {
+    D upsert(Map data, PersistArgs pargs = PersistArgs.of()) {
         if (!data) return
         D instance
         try {
@@ -271,37 +271,18 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
             // and it fails on the get then will throws a NotFoundProblem Ex.
             //if we want them inserted then args.bindId must be true as well, just like on an insert.
             // when bindId is not set then we throw the exception.
-            if(!args.bindId) throw nfe
+            if(!pargs.bindId) throw nfe
         }
         HttpStatus status
         if (instance) {
             //dont call update or doUpdate as it will do findWithData again.
-            bindAndUpdate(instance, data, args)
+            bindAndUpdate(instance, data, pargs)
             status = HttpStatus.OK
         } else {
-            instance = doCreate(data, args)
+            instance = doCreate(data, pargs)
             status = HttpStatus.CREATED
         }
         // Result.OK().status(status).payload(instance)
-        return instance
-    }
-
-    /**
-     * Simple helper to updating from data.
-     * Uses findWithData and if instance is found then considers it an update.
-     * If not found then considers it a create.
-     * DOES NOT do anything with data.op operations.
-     * NOT transactional so should be wrapped in a transaction.
-     */
-    D createOrUpdateItem(Map data, PersistArgs args = PersistArgs.defaults()) {
-        if (!data) return
-        D instance = findWithData(data, false)
-        if (instance) {
-            //dont call update or doUpdate as it will do findWithData again.
-            bindAndUpdate(instance, data, args)
-        } else {
-            instance = doCreate(data, args)
-        }
         return instance
     }
 
@@ -588,11 +569,11 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
      * @param dataList the list of data maps to create/update
      * @return the list of created or updated entities
      */
-    List<D> createOrUpdate(List<Map> dataList, PersistArgs args = PersistArgs.of()){
+    List<D> createOrUpdate(List<Map> dataList, PersistArgs pargs = PersistArgs.of()){
         List resultList = [] as List<D>
 
         dataList.each { Map item ->
-            resultList << upsert(item, args)
+            resultList << upsert(item, pargs.clone())
         }
 
         return resultList

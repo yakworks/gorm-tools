@@ -72,4 +72,22 @@ class GormRepoUpsertSpec extends Specification implements GormHibernateTest {
         k2.name == "updated"
     }
 
+    void "test upsert"() {
+        when: "data has no identifier"
+        def ks = KitchenSink.repo.upsert([num: 1, name: "foo"])
+        flushAndClear()
+
+        then:
+        KitchenSink.get(ks.id)
+
+        when: "data has identifier"
+        flushAndClear()
+        def ksu = KitchenSink.repo.upsert([id: ks.id, name: "foo2"])
+        flushAndClear()
+
+        def updated = KitchenSink.get(ksu.id)
+
+        then:
+        updated.name == "foo2"
+    }
 }

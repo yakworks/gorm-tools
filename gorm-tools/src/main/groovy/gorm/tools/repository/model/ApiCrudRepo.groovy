@@ -6,6 +6,7 @@ package gorm.tools.repository.model
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.beans.EntityResult
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.MangoQuery
@@ -46,9 +47,9 @@ interface ApiCrudRepo<D> {
     /**
      * Create or Update the data
      */
-    D upsert(Map data, PersistArgs args)
+    EntityResult<D> upsert(Map data, PersistArgs args)
 
-    default D upsert(Map data) {
+    default EntityResult<D> upsert(Map data) {
         upsert(data, PersistArgs.defaults())
     }
 

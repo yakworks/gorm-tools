@@ -6,27 +6,8 @@ package yakworks.gorm.api
 
 import org.springframework.beans.factory.annotation.Autowired
 
-import gorm.tools.databinding.BindAction
-import gorm.tools.problem.ValidationProblem
-import gorm.tools.repository.DefaultGormRepo
-import gorm.tools.repository.GormRepo
-import gorm.tools.repository.PersistArgs
-import gorm.tools.repository.model.RepoEntity
 import gorm.tools.utils.BenchmarkHelper
-import grails.artefact.Artefact
-import grails.compiler.GrailsCompileStatic
-import grails.persistence.Entity
 import spock.lang.Specification
-import testing.Address
-import testing.AddyNested
-import testing.Cust
-import testing.CustExt
-import testing.CustRepo
-import yakworks.api.problem.data.DataProblem
-import yakworks.api.problem.data.DataProblemCodes
-import yakworks.api.problem.data.DataProblemException
-import yakworks.api.problem.data.NotFoundProblem
-import yakworks.testing.gorm.RepoTestData
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.testing.gorm.model.SinkExt
@@ -72,7 +53,7 @@ class CrudApiSpec extends Specification implements GormHibernateTest {
     def "test get"() {
         when:
         var crudApi = createCrudApi()
-        CrudApi.EntityResult res = crudApi.get(1, [:])
+        CrudApi.CrudApiResult res = crudApi.get(1, [:])
         Map data = res.asMap()
 
         then:

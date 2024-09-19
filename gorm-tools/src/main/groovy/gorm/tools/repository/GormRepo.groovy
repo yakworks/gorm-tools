@@ -6,6 +6,7 @@ package gorm.tools.repository
 
 import groovy.transform.CompileStatic
 
+import org.apache.commons.lang3.tuple.Pair
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.gorm.GormInstanceApi
@@ -19,6 +20,7 @@ import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
 import org.springframework.transaction.TransactionDefinition
 
+import gorm.tools.beans.EntityResult
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.MangoQuery
@@ -257,11 +259,14 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
     /**
      * Update if it can find it with findWithData, otherwise it inserts it.
      * Uses findWithData and if instance is found then considers it an update.
-     * If not found then considers it a create.
-     * DOES NOT do anything with data.op operations.
      * NOT transactional so should be wrapped in a transaction.
+     *
+     * @param data what to update or insert
+     * @param pargs the PersistArgs
+     * @return The result with the entity
      */
-    D upsert(Map data, PersistArgs pargs = PersistArgs.of()) {
+    @Override
+    EntityResult<D> upsert(Map data, PersistArgs pargs = PersistArgs.of()) {
         if (!data) return
         D instance
         try {
@@ -573,7 +578,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
         List resultList = [] as List<D>
 
         dataList.each { Map item ->
-            resultList << upsert(item, pargs.clone())
+            resultList << upsert(item, pargs.clone()).entity
         }
 
         return resultList

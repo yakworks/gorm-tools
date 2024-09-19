@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 
 import gorm.tools.async.AsyncArgs
 import gorm.tools.async.ParallelTools
+import gorm.tools.beans.EntityResult
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobService
@@ -58,7 +59,7 @@ trait BulkableRepo<D> {
     //Here for @CompileStatic - GormRepo implements these
     abstract D doCreate(Map data, PersistArgs args)
     abstract D doUpdate(Map data, PersistArgs args)
-    abstract D upsert(Map data, PersistArgs args)
+    abstract EntityResult<D> upsert(Map data, PersistArgs args)
     abstract  Class<D> getEntityClass()
     abstract void flushAndClear()
     abstract void clear()
@@ -195,7 +196,7 @@ trait BulkableRepo<D> {
             } else if (op == DataOp.update) { // update
                 entityInstance = doUpdate(dataClone, pargs)
             } else if (op == DataOp.upsert) { // upsert (insert or update)
-                entityInstance = upsert(dataClone, pargs)
+                entityInstance = upsert(dataClone, pargs).entity
             } else {
                 throw new UnsupportedOperationException("DataOp $op not supported")
             }

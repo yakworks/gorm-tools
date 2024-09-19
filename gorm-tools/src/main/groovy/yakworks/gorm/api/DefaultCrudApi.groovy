@@ -61,7 +61,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         return capiInstance
     }
 
-    class EntityResultImpl<D> implements EntityResult<D> {
+    class EntityResultImpl<D> implements CrudApiResult<D> {
         IncludesProps includesProps
         D entity
 
@@ -94,14 +94,14 @@ class DefaultCrudApi<D> implements CrudApi<D> {
 
     @Transactional(readOnly = true)
     @Override
-    EntityResult<D> get(Serializable id, Map qParams){
+    CrudApiResult<D> get(Serializable id, Map qParams){
         D instance = (D) getApiCrudRepo().read(id)
         RepoUtil.checkFound(instance, id, getEntityClass().simpleName)
         return createEntityResult(instance, qParams)
     }
 
     @Override
-    EntityResult<D> createEntityResult(D instance, Map params){
+    CrudApiResult<D> createEntityResult(D instance, Map params){
         new EntityResultImpl(instance, IncludesProps.of(params))
     }
 
@@ -110,7 +110,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
      */
     @Transactional
     @Override
-    EntityResult<D> create(Map data, Map qParams){
+    CrudApiResult<D> create(Map data, Map qParams){
         Boolean bindId = qParams.getBoolean('bindId', false)
         var args = PersistArgs.of(bindId: bindId)
         D instance = (D) getApiCrudRepo().create(data, args)
@@ -122,7 +122,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
      */
     @Transactional
     @Override
-    EntityResult<D> update(Map data, Map qParams){
+    CrudApiResult<D> update(Map data, Map qParams){
         Map dataMap = [id: qParams.id]
         // json dataMap will normally not contain id because it passed in url params,
         // but if it does it copies it in and overrides, so the id in the dataMap will win
@@ -137,7 +137,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
      */
     @Transactional
     @Override
-    EntityResult<D> upsert(Map data, Map qParams){
+    CrudApiResult<D> upsert(Map data, Map qParams){
         //TODO
         return createEntityResult(null, qParams)
     }

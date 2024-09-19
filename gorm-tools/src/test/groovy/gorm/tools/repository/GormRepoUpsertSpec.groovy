@@ -55,7 +55,7 @@ class GormRepoUpsertSpec extends Specification implements GormHibernateTest {
 
     def "test UPSERT"() {
         when:
-        KitchenSink k = KitchenSink.repo.upsert([id:123, num: '123', name: "k123"],PersistArgs.withBindId())
+        KitchenSink k = KitchenSink.repo.upsert([id:123, num: '123', name: "k123"],PersistArgs.withBindId()).entity
         var k2 = KitchenSink.get(123)
 
         then:
@@ -64,7 +64,7 @@ class GormRepoUpsertSpec extends Specification implements GormHibernateTest {
 
         when: "same one is passed in again"
         flushAndClear()
-        k = KitchenSink.repo.upsert([id:123, num: '123', name: "updated"])
+        k = KitchenSink.repo.upsert([id:123, num: '123', name: "updated"]).entity
         flushAndClear()
         k2 = KitchenSink.get(123)
 
@@ -74,7 +74,7 @@ class GormRepoUpsertSpec extends Specification implements GormHibernateTest {
 
     void "test upsert"() {
         when: "data has no identifier"
-        def ks = KitchenSink.repo.upsert([num: 1, name: "foo"])
+        def ks = KitchenSink.repo.upsert([num: 1, name: "foo"]).entity
         flushAndClear()
 
         then:
@@ -82,7 +82,7 @@ class GormRepoUpsertSpec extends Specification implements GormHibernateTest {
 
         when: "data has identifier"
         flushAndClear()
-        def ksu = KitchenSink.repo.upsert([id: ks.id, name: "foo2"])
+        def ksu = KitchenSink.repo.upsert([id: ks.id, name: "foo2"]).entity
         flushAndClear()
 
         def updated = KitchenSink.get(ksu.id)

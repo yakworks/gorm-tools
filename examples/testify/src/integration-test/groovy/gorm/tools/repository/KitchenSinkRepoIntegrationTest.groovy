@@ -19,7 +19,7 @@ class KitchenSinkRepoIntegrationTest extends Specification implements DomainIntT
     JdbcTemplate jdbcTemplate
 
     //not transactional, so that the "remove" runs in own transaction, just how it would run when called from controller
-    @NotTransactional
+    // @NotTransactional
     void "delete violates fk constraint"() {
         setup:
         KitchenSink sink
@@ -33,7 +33,7 @@ class KitchenSinkRepoIntegrationTest extends Specification implements DomainIntT
         }
 
         when:
-        KitchenSink.repo.removeById(sink.id)
+        KitchenSink.repo.removeById(sink.id, PersistArgs.flush())
 
         then:
         //GormRepo catches fk violations exceptions and uses RepoExceptionSupport, which converts it to DataProblemException

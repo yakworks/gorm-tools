@@ -31,7 +31,7 @@ class RepositoryEventsSpec extends Specification {
         org.id != null
 
         when:
-        org = Org.update([id: org.id, name: "updated"])
+        org = Org.repo.update([id: org.id, name: "updated"])
 
         then:
         org.comments == "BeforeBindEvent Update"

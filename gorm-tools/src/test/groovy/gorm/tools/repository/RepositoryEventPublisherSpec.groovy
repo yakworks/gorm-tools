@@ -42,7 +42,7 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
         //make sure one is there
         City city1 = City.create(name: 'Denver')
         Map tdata = [id: city1.id, name: "test update"]
-        City city = City.update(tdata)
+        City city = City.repo.update(tdata)
 
         then:
         city.name == "test update"
@@ -168,7 +168,7 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
         city.events = [:]
 
         when:
-        City.update([id: city.id, name: "test1"])
+        City.repo.update([id: city.id, name: "test1"])
 
         then:
         sleep(100)
@@ -180,7 +180,7 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
 
         when:
         city.events = [:]
-        City.update([id: city.id, name: "test2"])
+        City.repo.update([id: city.id, name: "test2"])
 
         then:
         City.get(city.id).name == "test2"

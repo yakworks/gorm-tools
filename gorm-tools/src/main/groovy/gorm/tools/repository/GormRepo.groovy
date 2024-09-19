@@ -337,40 +337,39 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
     }
 
     /**
-     * Remove by ID
+     * Remove by ID, this does not wrap a trx
      *
      * @param id - the id to delete
      * @param args - the args to pass to delete. flush being the most common
      *
      * @throws NotFoundProblem.Exception if its not found or DataProblemException if a DataIntegrityViolationException is thrown
      */
-    void removeById(Serializable id, PersistArgs args = PersistArgs.defaults()) {
+    void removeById(Serializable id, PersistArgs args) {
         try {
-            withTrx {
-                D entity = get(id, null)
-                doRemove(entity, args)
-            }
+            D entity = get(id)
+            RepoUtil.checkFound(entity, id, getEntityClass().name)
+            doRemove(entity, args)
         }
         catch (DataAccessException ex) {
+            // attempt to catch exception (eg fk violation), if occurs, but most of the time this wont if its wrapped in a Trx
+            // would occur during flush (either if passed in or at commit in end of transaction).
+            // So this removeById either needs to be wrapped in try/catch with problemHandler or flush should be passed in here
             throw RepoExceptionSupport.translateException(ex, id)
         }
     }
 
     /**
-     * Transactional, Calls delete always with flush = true so we can intercept any DataIntegrityViolationExceptions.
+     * Calls delete, if you want the error handling to pic up and translate fk error then pass in flush()
      *
      * @param entity the domain entity
      * @throws ThrowableProblem if a DataIntegrityViolationException is thrown
      */
-    void remove(D entity, Map args = [:]) {
+    void remove(D entity, PersistArgs args = PersistArgs.defaults()) {
         try {
-            //Wrap the withTrx in try/catch
-            //Because the exception (eg fk violation), if occurs, would occur in withTrx when transaction gets commited. not occur during doRemove.
-            withTrx {
-                doRemove(entity, PersistArgs.of(args))
-            }
+            doRemove(entity, args)
         }
         catch (DataAccessException ex) {
+            //see comments in removeById about when or if this ever gets picked up
             throw RepoExceptionSupport.translateException(ex, entity)
         }
     }
@@ -415,8 +414,8 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
     }
 
     /**
-     * wraps get in a trx. NOT a read only trx like read as that messes with dirty tracking
-     * @param id required, the id to get
+     * wraps get in a trx, usefull for testing. NOT a read only trx like read as that messes with dirty tracking
+     * @param id the id to get
      * @return the retrieved entity
      */
     D getWithTrx(Serializable id) {
@@ -433,9 +432,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
      * @return the retrieved entity
      */
     D read(Serializable id) {
-        withReadOnlyTrx {
-            (D) gormStaticApi().read(id)
-        }
+        (D) gormStaticApi().read(id)
     }
 
     /**
@@ -568,6 +565,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
 
     /**
      * Performant way to check if id exists in database.
+     * Wrapped in read-only trx so dont need to setup a @Transactional method to do a quick check in code
      */
     @Override
     boolean exists(Serializable id) {

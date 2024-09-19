@@ -476,7 +476,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         res.size() == 1
 
         when: "update"
-        org = Org.update([source: [sourceId: 'foo', orgType: 'Customer'], name: 'new name'])
+        org = Org.repo.update([source: [sourceId: 'foo', orgType: 'Customer'], name: 'new name'])
 
         then:
         org.name == 'new name'

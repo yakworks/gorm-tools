@@ -74,7 +74,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
          */
 
         when: "Verify created org"
-        Org org = Org.repo.read( body.data[0].data.id as Long)
+        Org org = Org.repo.get( body.data[0].data.id as Long)
 
         then:
         org != null

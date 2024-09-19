@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 
 import gorm.tools.beans.Pager
+import gorm.tools.transaction.WithTrx
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -20,7 +21,7 @@ import static yakworks.json.groovy.JsonEngine.parseJson
  * Requires
  */
 @Integration
-class OrgWebApiSpec extends Specification implements WebClientTrait {
+class OrgWebApiSpec extends Specification implements WebClientTrait, WithTrx {
 
     String path = "/api/rally/org"
     String contactApiPath = "/api/rally/contact"
@@ -309,6 +310,8 @@ class OrgWebApiSpec extends Specification implements WebClientTrait {
         body.tags[0].id == tag1.id
 
         cleanup:
-        Org.repo.removeById(body.id as Long)
+        withTrx {
+            Org.repo.removeById(body.id as Long)
+        }
     }
 }

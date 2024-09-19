@@ -112,6 +112,11 @@ class JpqlQueryBuilder {
         return jqb
     }
 
+    JpqlQueryBuilder entityAlias(String v){
+        this.entityAlias = v
+        return this
+    }
+
     /**
      * wraps the SELECT in a new map( ...)
      */
@@ -180,7 +185,11 @@ class JpqlQueryBuilder {
         }
 
         appendOrder(queryString, entityAlias)
-        return new JpqlQueryInfo(queryString.toString(), parameters)
+
+        var jqInfo = new JpqlQueryInfo(queryString.toString(), parameters)
+        jqInfo.where = whereClause.toString()
+
+        return jqInfo
     }
 
     void buildGroup(StringBuilder queryString){
@@ -722,15 +731,15 @@ class JpqlQueryBuilder {
 
             //if it didn't build anything then dont add it
             if(tempWhereClause.toString()) {
-                whereClause.append(" WHERE ")
+                q.append(" WHERE ")
                 if (criteria instanceof Query.Negation) {
                     whereClause.append(" NOT")
                 }
                 whereClause.append("(")
                 whereClause.append(tempWhereClause.toString())
+                whereClause.append(")")
 
                 q.append(whereClause.toString())
-                q.append(")")
             }
         }
         return parameters

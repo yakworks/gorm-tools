@@ -13,7 +13,11 @@ import groovy.transform.CompileStatic
 @SuppressWarnings("rawtypes")
 class JpqlQueryInfo {
 
+    //full query
     String query
+    //where clause
+    String where
+
     List parameters
 
     JpqlQueryInfo(String query, List parameters) {

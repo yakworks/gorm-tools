@@ -93,4 +93,26 @@ class JpqlQueryBuilderCriteriaMapSpec extends Specification implements GormHiber
         criteria.list().size() == 2
     }
 
+    @Ignore
+    void "Test eqf"() {
+        given:
+        def criteria = KitchenSink.query(
+            num: 123, name: 'blue',
+            name2:['$eqf': 'bar.baz.name2']
+        )
+
+        when: "A jpa query is built"
+        def builder = JpqlQueryBuilder.of(criteria).entityAlias("foo")
+        builder.projectionAliases['bar.baz.name2'] = 'eq'
+        final queryInfo = builder.buildSelect()
+
+        then: "The query is valid"
+        queryInfo.query == strip("""
+            SELECT DISTINCT foo FROM yakworks.testing.gorm.model.KitchenSink AS foo
+            WHERE (foo.num=:p1 AND foo.name=:p2)
+        """)
+        queryInfo.where == "(foo.num=:p1 AND foo.name=:p2)"
+        queryInfo.parameters == ['123', 'blue']
+    }
+
 }

@@ -200,6 +200,34 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
         delete(path, body.id)
     }
 
+    void "testing UPSERT insert"() {
+        when:
+        Response resp = post("$path/upsert", [num: "upsert1", name: "upsert1", type: "Customer"])
+
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code() == HttpStatus.CREATED.value()
+        body.id
+        body.name == 'upsert1'
+
+        cleanup:
+        delete(path, body.id)
+    }
+
+    void "testing UPSERT update"() {
+        when:
+        Response resp = post("$path/upsert", [id: 89, name: "upsert2", type: "Customer"])
+
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code() == HttpStatus.OK.value()
+        body.id
+        body.name == 'upsert2'
+
+    }
+
     @Rollback
     void "testing post with contacts"() {
         when:

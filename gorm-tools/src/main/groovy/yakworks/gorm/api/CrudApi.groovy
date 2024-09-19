@@ -25,10 +25,19 @@ interface CrudApi<D> {
     /**
      * Wrapper/Holder for the result. Allows to have entity reference and chain method to do asMap
      */
-    interface CrudApiResult<D>{
+    interface CrudApiResult<D> {
+        /** The include properties to use for creating json map */
         IncludesProps getIncludesProps()
+
+        /** The entity that was operated on (created or updated) */
         D getEntity()
+
+        /** convert to a map using MetMap */
         Map asMap()
+
+        /** http status code, used for upsert so we know if it updated or inserted */
+        int getStatus()
+        void setStatus(int v)
     }
 
     /**
@@ -102,5 +111,5 @@ interface CrudApi<D> {
      * Creates the EntityResult.
      * This is called bu crud methods and makes it easy to override to return custom implementation
      */
-    CrudApiResult<D> createEntityResult(D instance, Map qParams)
+    CrudApiResult<D> createApiResult(D instance, Map qParams)
 }

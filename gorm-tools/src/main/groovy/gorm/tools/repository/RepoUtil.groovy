@@ -22,15 +22,9 @@ import yakworks.api.problem.data.NotFoundProblem
 @CompileStatic
 @SuppressWarnings(["FieldName"])
 class RepoUtil {
-    public static final String SUFFIX = "Repo"
 
     // static List<Class> getRepoClasses(){
     //     GrailsHolder.grailsApplication.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz
-    // }
-
-    // Deprecated, moved to RepoLookup
-    // static String getRepoBeanName(Class domainClass) {
-    //     return "${NameUtils.getPropertyName(domainClass.name)}$SUFFIX"
     // }
 
     /**

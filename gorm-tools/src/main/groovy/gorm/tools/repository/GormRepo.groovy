@@ -137,7 +137,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
      * called from doPersist. calls validate and save, no try catch so Exceptions bubble out.
      * Can be
      */
-    D gormSave(D entity, PersistArgs args = PersistArgs.defaults()) {
+    D gormSave(D entity, PersistArgs args) {
         gormInstanceApi().save(entity, args as Map)
     }
 
@@ -253,13 +253,41 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
     }
 
     /**
+     * Update if it can find it with findWithData, otherwise it inserts it.
+     * Uses findWithData and if instance is found then considers it an update.
+     * If not found then considers it a create.
+     * DOES NOT do anything with data.op operations.
+     * NOT transactional so should be wrapped in a transaction.
+     */
+    D upsert(Map data, PersistArgs args) {
+        if (!data) return
+        D instance
+        try {
+            instance = findWithData(data, false)
+        } catch(NotFoundProblem.Exception nfe){
+            //we pass mustExist=false to findWithData but if data has an 'id' prop
+            // and it fails on the get then will throws a NotFoundProblem Ex.
+            //if we want them inserted then args.bindId must be true as well, just like on an insert.
+            // when bindId is not set then we throw the exception.
+            if(!args.bindId) throw nfe
+        }
+        if (instance) {
+            //dont call update or doUpdate as it will do findWithData again.
+            bindAndUpdate(instance, data, args)
+        } else {
+            instance = doCreate(data, args)
+        }
+        return instance
+    }
+
+    /**
      * Uses the items in the data to find the entity.
      * If data has an id key the use that.
      * otherwise it will see if entity has lookupable or if the concrete repo has a lookup method
      *
-     * @param data - the map with the keys for lookup
-     * @param boolean mustExist - if the record must exist, default true
-     * @return the found entity
+     * @param data: the map with the keys for lookup
+     * @param mustExist: if the record must exist. If true then throws error if can't be found.
+     * @return the found entity. If mustExist=false then can return null
      * @throws NotFoundProblem.Exception if mustExist is true, and entity not found
      */
     D findWithData(Map data, boolean mustExist = true) {
@@ -267,7 +295,8 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
         def ident = data['id'] as Serializable
         //check by id first
         if(ident){
-            //return it fast if its good to go, will have blown and error if not found
+            //return it fast if its good to go, will blown an error if not found
+            //if this is an upsert though we want to create it with the id if bindId=true
             return get(ident, data['version'] as Long)
         }
         if(Lookupable.isAssignableFrom(getEntityClass())){
@@ -436,7 +465,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
     }
 
     /**
-     * a read wrapped in a read-only transaction.
+     * load without hydrating
      *
      * @param id required, the id to get
      * @return the retrieved entity
@@ -525,7 +554,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
     }
 
     /**
-     * Creates or updates a list of items.
+     * Calls upsert on a list of items.
      * Use for small datasets, use bulk operations for larger datasets.
      * iterates and just calls createOrUpdateItem, no special handling for data.op
      * NOT Transactional, so should be wrapped in a trx to function properly.
@@ -534,33 +563,14 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
      * @param dataList the list of data maps to create/update
      * @return the list of created or updated entities
      */
-    List<D> createOrUpdate(List<Map> dataList){
+    List<D> createOrUpdate(List<Map> dataList, PersistArgs args = PersistArgs.of()){
         List resultList = [] as List<D>
 
         dataList.each { Map item ->
-            resultList << createOrUpdateItem(item)
+            resultList << upsert(item, args)
         }
 
         return resultList
-    }
-
-    /**
-     * Simple helper to updating from data.
-     * Uses findWithData and if instance is found then considers it an update.
-     * If not found then considers it a create.
-     * DOES NOT do anything with data.op operations.
-     * NOT transactional so should be wrapped in a transaction.
-     */
-    D createOrUpdateItem(Map data, PersistArgs args = PersistArgs.defaults()) {
-        if (!data) return
-        D instance = findWithData(data, false)
-        if (instance) {
-            //dont call update or doUpdate as it will do findWithData again.
-            bindAndUpdate(instance, data, args)
-        } else {
-            instance = doCreate(data, args)
-        }
-        return instance
     }
 
     /**

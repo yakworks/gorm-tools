@@ -167,7 +167,7 @@ class GormRepoSpec extends Specification implements GormHibernateTest {
 
     void "test createOrUpdateItem"() {
         when: "data has no identifier"
-        def ks = KitchenSink.repo.createOrUpdateItem([num: 1, name: "foo"])
+        def ks = KitchenSink.repo.upsert([num: 1, name: "foo"])
         flushAndClear()
 
         then:
@@ -175,7 +175,7 @@ class GormRepoSpec extends Specification implements GormHibernateTest {
 
         when: "data has identifier"
         flushAndClear()
-        def ksu = KitchenSink.repo.createOrUpdateItem([id: ks.id, name: "foo2"])
+        def ksu = KitchenSink.repo.upsert([id: ks.id, name: "foo2"])
         flushAndClear()
 
         def updated = KitchenSink.get(ksu.id)

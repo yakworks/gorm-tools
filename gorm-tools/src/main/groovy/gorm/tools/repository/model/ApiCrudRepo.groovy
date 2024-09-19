@@ -6,6 +6,7 @@ package gorm.tools.repository.model
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.job.SyncJobArgs
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.MangoQuery
 import gorm.tools.mango.api.QueryArgs
@@ -25,7 +26,7 @@ interface ApiCrudRepo<D> {
     MangoQuery getMangoQuery()
 
     /**
-     * Transactional wrap for {@link #doCreate}
+     * Inserts data, transactional wrap for doCreate
      */
     D create(Map data, PersistArgs args)
 
@@ -34,12 +35,21 @@ interface ApiCrudRepo<D> {
     }
 
     /**
-     * Transactional wrap for {@link #doUpdate}
+     * Updates the data, Transactional wrap doUpdate
      */
     D update(Map data, PersistArgs args)
 
     default D update(Map data) {
         update(data, PersistArgs.defaults())
+    }
+
+    /**
+     * Create or Update the data
+     */
+    D upsert(Map data, PersistArgs args)
+
+    default D upsert(Map data) {
+        upsert(data, PersistArgs.defaults())
     }
 
     /**
@@ -98,6 +108,18 @@ interface ApiCrudRepo<D> {
     D load(Serializable id)
 
     boolean exists(Serializable id)
+
+    //-------------------- Bulk -------------------
+
+    /**
+     * creates a supplier to wrap doBulkParallel and calls bulk
+     * if syncJobArgs.async = true will return right away
+     *
+     * @param dataList the list of data maps to create
+     * @param syncJobArgs the args object to pass on to doBulk
+     * @return Job id
+     */
+    Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs)
 
     //--------------------Mango Query -------------------
 

@@ -25,6 +25,7 @@ import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.events.AfterBulkSaveEntityEvent
 import gorm.tools.repository.events.BeforeBulkSaveEntityEvent
 import gorm.tools.repository.events.RepoEventPublisher
+import gorm.tools.repository.model.DataOp
 import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.api.problem.data.DataProblem
@@ -57,6 +58,7 @@ trait BulkableRepo<D> {
     //Here for @CompileStatic - GormRepo implements these
     abstract D doCreate(Map data, PersistArgs args)
     abstract D doUpdate(Map data, PersistArgs args)
+    abstract D upsert(Map data, PersistArgs args)
     abstract  Class<D> getEntityClass()
     abstract void flushAndClear()
     abstract void clear()
@@ -156,7 +158,7 @@ trait BulkableRepo<D> {
         }
         // flush and clear here so easier to debug problems and clear for memory to help garbage collection
         if(getDatastore().hasCurrentSession()) {
-            // if trx is at item then only clear
+            // if trx is per item then it already flushes at trx commit so only clear.
             transactionPerItem ? clear() : flushAndClear()
         }
 
@@ -186,7 +188,17 @@ trait BulkableRepo<D> {
         def closure = {
             doBeforeBulkSaveEntity(dataClone, syncJobArgs)
             PersistArgs pargs = syncJobArgs.persistArgs
-            D entityInstance = syncJobArgs.isCreate() ? doCreate(dataClone, pargs) : doUpdate(dataClone, pargs)
+            D entityInstance
+            DataOp op = syncJobArgs.op
+            if(op == DataOp.add) { // create
+                entityInstance = doCreate(dataClone, pargs)
+            } else if (op == DataOp.update) { // update
+                entityInstance = doUpdate(dataClone, pargs)
+            } else if (op == DataOp.upsert) { // upsert (insert or update)
+                entityInstance = upsert(dataClone, pargs)
+            } else {
+                throw new UnsupportedOperationException("DataOp $op not supported")
+            }
             doAfterBulkSaveEntity(entityInstance, dataClone, syncJobArgs)
             return buildSuccessMap(entityInstance, syncJobArgs.includes)
         } as Closure<Map>

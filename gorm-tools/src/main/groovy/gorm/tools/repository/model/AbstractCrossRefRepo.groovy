@@ -337,7 +337,7 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     // ***** Unsupported some gormRepo methods should not be called with an XRef tables so blow errors for these
 
     @Override
-    X createOrUpdateItem(Map data, PersistArgs args){
+    X upsert(Map data, PersistArgs args){
         throw new UnsupportedOperationException("Method createOrUpdate is not supported by this implementation")
     }
 
@@ -353,7 +353,8 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
             "Standard Method bind(entity,data,bindAction ) is not supported by this implementation")
     }
 
-    X doUpdate(Map data, Map args) {
+    @Override
+    X doUpdate(Map data, PersistArgs args){
         throw new UnsupportedOperationException(
             "Method doUpdate(entity,data,bindAction ) is not supported, these ar immutable and should only ever get inserted or removed")
     }

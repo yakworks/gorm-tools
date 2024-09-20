@@ -222,7 +222,7 @@ class ContactRepo extends LongIdGormRepo<Contact> {
         data.orgId = contact.orgId
         data.contact = contact
         // if it had an op of remove then will return null and this set primary location to null
-        contact.location = locationRepo.createOrUpdateItem(data)
+        contact.location = locationRepo.upsert(data).entity
         return contact.location
     }
     /*

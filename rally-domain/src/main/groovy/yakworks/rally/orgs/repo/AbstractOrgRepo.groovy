@@ -188,7 +188,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         data.remove('isPrimary')
 
         data.orgId = org.getId()
-        org.contact = contactRepo.createOrUpdateItem(data)
+        org.contact = contactRepo.upsert(data).entity
         return org.contact
     }
 
@@ -197,7 +197,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         //make sure params has org key
         data.orgId = org.getId()
         // if it had an op of remove then will return null and this set primary location to null
-        org.location = locationRepo.createOrUpdateItem(data)
+        org.location = locationRepo.upsert(data).entity
         return org.location
     }
 

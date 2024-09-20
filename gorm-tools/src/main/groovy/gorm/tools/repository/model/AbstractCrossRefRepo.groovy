@@ -11,6 +11,7 @@ import groovy.util.logging.Slf4j
 
 import org.codehaus.groovy.runtime.InvokerHelper
 
+import gorm.tools.beans.EntityResult
 import gorm.tools.databinding.BindAction
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.model.Persistable
@@ -376,7 +377,7 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     // ***** Unsupported some gormRepo methods should not be called with an XRef tables so blow errors for these
 
     @Override
-    X createOrUpdateItem(Map data, PersistArgs args){
+    EntityResult<X> upsert(Map data, PersistArgs args){
         throw new UnsupportedOperationException("Method createOrUpdate is not supported by this implementation")
     }
 
@@ -392,7 +393,8 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
             "Standard Method bind(entity,data,bindAction ) is not supported by this implementation")
     }
 
-    X doUpdate(Map data, Map args) {
+    @Override
+    X doUpdate(Map data, PersistArgs args){
         throw new UnsupportedOperationException(
             "Method doUpdate(entity,data,bindAction ) is not supported, these ar immutable and should only ever get inserted or removed")
     }

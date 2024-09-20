@@ -217,19 +217,23 @@ class JpqlQueryBuilderSpec extends Specification implements GormHibernateTest  {
         queryInfo.parameters == []
     }
 
-    void "Test build UPDATE with an empty criteria or build {}"() {
+    void "Test with alias"() {
         given:
-        def criteria = KitchenSink.query{}
+        def criteria = KitchenSink.query(
+            num: 123, name: 'blue'
+        )
 
         when: "A jpa query is built"
-        def builder = JpqlQueryBuilder.of(criteria)
-        final queryInfo = builder.buildUpdate(name:"SinkUp")
+        def builder = JpqlQueryBuilder.of(criteria).entityAlias("foo")
+        final queryInfo = builder.buildSelect()
 
         then: "The query is valid"
-        queryInfo.query!=null
-        queryInfo.query == 'UPDATE yakworks.testing.gorm.model.KitchenSink kitchenSink SET kitchenSink.name=:p1'
-        queryInfo.parameters == ["SinkUp"]
+        queryInfo.query == strip("""
+            SELECT DISTINCT foo FROM yakworks.testing.gorm.model.KitchenSink AS foo
+            WHERE (foo.num=:p1 AND foo.name=:p2)
+        """)
+        queryInfo.where == "(foo.num=:p1 AND foo.name=:p2)"
+        queryInfo.parameters == ['123', 'blue']
     }
-
 
 }

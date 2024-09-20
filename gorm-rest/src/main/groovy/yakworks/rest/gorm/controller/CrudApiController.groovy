@@ -128,6 +128,22 @@ trait CrudApiController<D> extends RestApiController {
     }
 
     /**
+     * UPSERT /api/entity/upsert
+     * Create or Update with data
+     */
+    @Action
+    def upsert() {
+        try {
+            Map qParams = getParamsMap()
+            CrudApi.CrudApiResult res = getCrudApi().upsert(bodyAsMap(), qParams)
+            Map entityMap = res.asMap()
+            respondWith(entityMap, [status: res.status, params: qParams])
+        } catch (Exception | AssertionError e) {
+            handleThrowable(e)
+        }
+    }
+
+    /**
      * DELETE /api/entity/${id}
      */
     @Action

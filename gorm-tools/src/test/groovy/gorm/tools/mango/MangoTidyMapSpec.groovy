@@ -6,6 +6,7 @@ package gorm.tools.mango
 
 import spock.lang.Specification
 import testing.Address
+import yakworks.testing.gorm.model.KitchenSink
 
 import static gorm.tools.mango.MangoTidyMap.tidy
 
@@ -92,6 +93,38 @@ class MangoTidyMapSpec extends Specification {
 
         then:
         mmap == [foo: [name: ['$ilike': "Name%"]]]
+
+        when: "wrapped in a not"
+        mmap = tidy([
+            '$not':[
+                'foo':[
+                    name: "Name%"
+                ]
+            ]
+        ])
+
+        then: "converts it to a list"
+        mmap == [
+            '$not': [ //list
+                [foo: [name: ['$ilike': "Name%"]]]
+            ]
+        ]
+
+        when: "wrapped in a not shortcut"
+        mmap = tidy([
+            '$not':[
+                'foo.name': "Name%",
+                'buzz.boo': "bar%"
+            ]
+        ])
+
+        then: "converts it to a list or maps"
+        mmap == [
+            '$not': [
+                [foo: [name: ['$ilike': "Name%"]]],
+                [buzz: [boo: ['$ilike': 'bar%']]]
+            ]
+        ]
     }
 
     void "test eq"() {
@@ -271,6 +304,48 @@ class MangoTidyMapSpec extends Specification {
         then:
         mmap == ['$sort':[name: 'asc', foo: 'desc']]
     }
+
+    void "test exists"() {
+
+        when:
+        def crit = new MangoDetachedCriteria(KitchenSink)
+        def mmap = tidy([
+            '$exists': crit
+        ])
+
+        then:
+        mmap == [ '$exists': crit]
+
+        when:
+        mmap = tidy([
+            '$not': [ '$exists': crit]
+        ])
+
+        then: "converts not to a list of maps"
+        mmap == [
+            '$not': [
+                [ '$exists': crit ]
+            ]
+        ]
+
+        when:
+        mmap = tidy([
+            '$not':[
+                '$exists': crit,
+                'name': 'org4%'
+            ]
+        ])
+
+        then: "converts not to a list of maps"
+        mmap == [
+            '$not': [
+                [ '$exists': crit ],
+                ['name': ['$ilike': "org4%"]]
+            ]
+        ]
+
+    }
+
 
     Map flatten(Map m, String separator = '.') {
         m.collectEntries { k, v -> v instanceof Map ? flatten(v, separator).collectEntries { q, r -> [(k + separator + q): r] } : [(k): v] }

@@ -27,7 +27,6 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.validation.Rejector
-import grails.gorm.DetachedCriteria
 import yakworks.commons.io.PathTools
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
@@ -144,14 +143,8 @@ class AttachmentRepo extends LongIdGormRepo<Attachment> {
     MangoDetachedCriteria<Attachment> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
         Map criteriaMap = queryArgs.qCriteria
         //if its has tags keys then this returns something to add to exists, REMOVES the keys as well so work off qCriteria
-        DetachedCriteria tagExistsCrit = TagLink.getExistsCriteria(criteriaMap, Attachment, 'attachment_.id')
-
-        MangoDetachedCriteria<Attachment> detCrit = getMangoQuery().query(Attachment, queryArgs, closure)
-        //if it has tags key
-        if(tagExistsCrit != null) {
-            detCrit.exists(tagExistsCrit.id())
-        }
-        return detCrit
+        TagLink.repo.doExistsCriteria(criteriaMap, Attachment, 'attachment_.id')
+        return getMangoQuery().query(Attachment, queryArgs, closure)
     }
 
     /**

@@ -1,10 +1,14 @@
 package yakworks.rally.orgs
 
+import java.time.LocalDate
 
+import gorm.tools.mango.MangoDetachedCriteria
+import gorm.tools.mango.jpql.JpqlQueryBuilder
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+import yakworks.commons.beans.Transform
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
@@ -22,6 +26,10 @@ class OrgTagTests extends Specification implements DomainIntTest {
         Tag.repo.update(id: 1, entityName: 'Customer')
         Tag.repo.update(id: 2, entityName: 'Customer')
         flushAndClear()
+    }
+
+    String strip(String val){
+        val.stripIndent().replace('\n',' ').trim()
     }
 
     void "test create orgTag with id"() {
@@ -233,12 +241,13 @@ class OrgTagTests extends Specification implements DomainIntTest {
 
         def orgCrit = { tagList ->
             DetachedCriteria orgCrit = Org.query {
-                exists OrgTag.buildExistsCriteria(tagList)
+                exists OrgTag.repo.buildExistsCriteria(tagList)
             }
             return orgCrit
         }
 
-        List hasTag1 = orgCrit([1]).list()
+        def crit = orgCrit([1])
+        List hasTag1 = crit.list()
         List hasTag2 = orgCrit([2]).list()
         List has1or2 = orgCrit([1, 2]).list()
 
@@ -254,18 +263,18 @@ class OrgTagTests extends Specification implements DomainIntTest {
         3 == orgs.size()
     }
 
-    void "criteria default org map" () {
+    void "criteria with list of id objects" () {
         when: "filter where orgs contain ANY of the tags"
         addTagsForSearch()
 
-        def orgCrit = { tagList ->
-            return Org.query(tags: tagList)
-        }
-
-
-        List hasTag1 = orgCrit([[id:1]]).list()
-        List hasTag2 = orgCrit([[id:2]]).list()
-        List has1or2 = orgCrit([[id:1], [id:2]]).list()
+        List hasTag1 = Org.query(tags: [[id:1]]).list()
+        List hasTag2 = Org.query(tags: [[id:2]]).list()
+        List has1or2 = Org.query(
+            tags:[
+                [id:1],
+                [id:2]
+            ]
+        ).list()
 
         then:
         hasTag1.size() == 3
@@ -274,24 +283,81 @@ class OrgTagTests extends Specification implements DomainIntTest {
 
     }
 
-    void "criteria with list of id objects" () {
+    void "criteria JpqlQueryBuilder" () {
+        given:
+        addTagsForSearch()
+        // def otags = OrgTag.query([:]).id().list()
+        // assert otags.size() == 10
+
+        def criteria = Org.query([
+            tags: [ [id:1], [id:2]  ]
+        ])
+        assert criteria.list().size() == 4
+
+        when: "A jpa query is built"
+        def builder = JpqlQueryBuilder.of(criteria)
+        final queryInfo = builder.buildSelect()
+
+        then: "The query is valid"
+        queryInfo.query == strip("""
+            SELECT DISTINCT org FROM yakworks.rally.orgs.model.Org AS org
+            WHERE (EXISTS (
+            SELECT DISTINCT orgTag0 FROM yakworks.rally.orgs.model.OrgTag orgTag0
+            WHERE orgTag0.linkedId = org.id AND orgTag0.tag.id IN (:p1,:p2)
+            ) )
+        """)
+
+        queryInfo.parameters == [1,2]
+    }
+
+    void "not exists using closure and buildExistsCriteria" () {
         when: "filter where orgs contain ANY of the tags"
         addTagsForSearch()
 
-        def orgCrit = { tagList ->
-            return Org.query(tags: tagList)
+        //filter out tags
+        MangoDetachedCriteria criteria = Org.query {
+            not {
+                //there are 4 orgs with these tags
+                exists OrgTag.repo.buildExistsCriteria([1,2] )
+                //filter out org40-org49, so  10 more orgs
+                ilike('name', 'org4%')
+            }
         }
 
+        List hasTag1 = criteria.list()
 
-        List hasTag1 = orgCrit([ [id:1] ]).list()
-        List hasTag2 = orgCrit([ [id:2] ]).list()
-        List has1or2 = orgCrit([ [id:1] , [id:2] ]).list()
+        def builder = JpqlQueryBuilder.of(criteria)
+        def queryInfo = builder.buildSelect()
 
         then:
-        hasTag1.size() == 3
-        hasTag2.size() == 2
-        has1or2.size() == 4
+        //there are 50, we filtered out 14
+        hasTag1.size() == 36
+        //queryInfo.query == 'foo'
+    }
 
+    void "not exists using MangoMao and buildExistsCriteria" () {
+        when: "filter where orgs contain ANY of the tags"
+        addTagsForSearch()
+
+        //filter out tags
+        MangoDetachedCriteria criteria = Org.query([
+            '$not':[
+                //there are 4 orgs with these tags
+                '$exists': OrgTag.repo.buildExistsCriteria([1,2]),
+                //filter out org40-org49, so  10 more orgs
+                'name': 'org4%'
+            ]
+        ])
+
+        List hasTag1 = criteria.list()
+
+        def builder = JpqlQueryBuilder.of(criteria)
+        def queryInfo = builder.buildSelect()
+
+        then:
+        //there are 50, we filtered out 14
+        hasTag1.size() == 36
+        //queryInfo.query == 'foo'
     }
 
 }

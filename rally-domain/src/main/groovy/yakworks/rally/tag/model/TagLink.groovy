@@ -38,8 +38,8 @@ class TagLink implements TagLinkTrait<TagLink>, GormRepoEntity<TagLink, TagLinkR
      * Add exists criteria to a DetachedCriteria if its has tags
      * in the criteriaMap
      */
-    static DetachedCriteria getExistsCriteria(Map criteriaMap, Class linkedEntityClazz, String linkedIdJoinProperty){
-        getRepo().getExistsCriteria(criteriaMap, linkedEntityClazz, linkedIdJoinProperty)
-    }
+    // static DetachedCriteria getExistsCriteria(Map criteriaMap, Class linkedEntityClazz, String linkedIdJoinProperty){
+    //     getRepo().getExistsCriteria(criteriaMap, linkedEntityClazz, linkedIdJoinProperty)
+    // }
 
 }

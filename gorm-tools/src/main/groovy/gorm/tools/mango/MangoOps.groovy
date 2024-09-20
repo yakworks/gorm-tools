@@ -83,6 +83,18 @@ class MangoOps {
     }
 
     @CompileStatic
+    static enum SubQueryOp {
+        $exists
+
+        private final String op //private for security
+        String getOp(){ return op }
+
+        SubQueryOp() {
+            this.op = name().substring(1) //remove $
+        }
+    }
+
+    @CompileStatic
     static enum ExistOp {
         $isNull, $isNotNull
 

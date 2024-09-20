@@ -36,6 +36,8 @@ import static gorm.tools.utils.GormUtils.listToIdMap
  * @param <X> the cross ref domain this Repo is for
  * @param <P> the the Primary or main entity that will have the items as "children"
  * @param <R> the Related entity
+ *
+ * NOTE: SEE ActivityContactOpTests for tests
  */
 @Slf4j
 @CompileStatic
@@ -250,15 +252,13 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
         //check specifically for null, to support empty list which should remove all refs.
         if(itemParams == null) return []
 
-        //handle if it's a json array in string, largely for CSV support and the binding that occurs during that process, such as creating orgs with tags
+        //handle if it's a json array in string, largely for CSV support and the binding that occurs during that process,
+        // such as creating orgs with tags
         if(itemParams instanceof String) {
             Validate.isTrue(itemParams.trim().startsWith('['), "bind data of type string must be a json array")
             itemParams = jsonSlurper.parseText(itemParams) as List
-            if(itemParams && itemParams[0] instanceof Map) {
-                //If its a list of map, convert it to regular maps
-                //parseText returns LazyValueMap which will throw `Not that kind of map` when trying to add new key (eg lookup() methods does modify the maps)
-                itemParams = itemParams.collect { return Maps.clone((Map)it)}
-            }
+            //parseText returns LazyValueMap which will throw `Not that kind of map` when trying to add new key (eg lookup() methods does modify the maps)
+            itemParams = Maps.clone(itemParams)
         }
 
         Validate.isTrue(itemParams instanceof List || itemParams instanceof Map, "bind data must be map or list: %s", itemParams.class)

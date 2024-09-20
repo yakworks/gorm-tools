@@ -270,7 +270,7 @@ class ActivityContactOpTests extends Specification implements DataIntegrationTes
         when: "data contains ids"
         def dta = [
             id  : activity.id,
-            contacts: "[{\"id\": \"${contacts[3].id}\"}, {\"id\": \"${contacts[4].id}\"}]".toString()
+            contacts: """[{"id": "${contacts[3].id}"}, {"id": "${contacts[4].id}"}]""".toString()
         ]
         def updatedAtt = Activity.update(dta)
         flush()
@@ -290,7 +290,7 @@ class ActivityContactOpTests extends Specification implements DataIntegrationTes
         when: "data contains ids"
         def dta = [
             id  : activity.id,
-            contacts: "[{\"sourceId\": \"Test3\"}, {\"sourceId\": \"Test4\"}]"
+            contacts: """[{"sourceId": "Test3"}, {"sourceId": "Test4"}]"""
         ]
 
         def updatedAtt = Activity.update(dta)

@@ -25,11 +25,11 @@ class ActivityContactSpec extends Specification implements GormHibernateTest, Se
     void setupSpec() {
         //setup remover
         repo = ActivityContact.repo
-        repo.criteriaRemover = new CriteriaRemover(){
-            void deleteAll(DetachedCriteria crit) {
-                crit.list()*.delete()
-            }
-        }
+        // repo.criteriaRemover = new CriteriaRemover(){
+        //     void deleteAll(DetachedCriteria crit) {
+        //         crit.list()*.delete()
+        //     }
+        // }
     }
 
     List createSomeContacts(Long orgId){

@@ -244,6 +244,7 @@ class JpqlQueryBuilder {
                     queryString.append(logicalName)
                             .append(DOT)
                             .append(entity.getIdentity().getName())
+                    //queryString.append("1")
                 }
                 else if (projection instanceof Query.PropertyProjection) {
                     Query.PropertyProjection pp = (Query.PropertyProjection) projection
@@ -440,7 +441,7 @@ class JpqlQueryBuilder {
             public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
                               String logicalName, int position, List parameters) {
 
-                whereClause.append(" NOT(")
+                whereClause.append("NOT (")
 
                 final Query.Negation negation = (Query.Negation)criterion
                 position = buildWhereClauseForCriterion(entity, negation, q, whereClause, logicalName, negation.getCriteria(), position,
@@ -522,6 +523,7 @@ class JpqlQueryBuilder {
             }
         })
 
+        // ILIKE SQL SERVER
         queryHandlers.put(Query.ILike, new QueryHandler() {
             public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
                               String logicalName, int position, List parameters) {
@@ -586,7 +588,7 @@ class JpqlQueryBuilder {
                 whereClause.append("EXISTS ( ")
                 QueryableCriteria subquery = existsQuery.getSubquery()
                 if (subquery != null) {
-                    buildSubQuery(q, whereClause, position, parameters, subquery)
+                    position = buildSubQuery(q, whereClause, position, parameters, subquery)
                 }
                 whereClause.append(" ) ")
                 return position
@@ -609,7 +611,7 @@ class JpqlQueryBuilder {
         return position
     }
 
-    void buildSubQuery(StringBuilder q, StringBuilder whereClause, int position, List parameters,
+    int buildSubQuery(StringBuilder q, StringBuilder whereClause, int position, List parameters,
                        QueryableCriteria subquery) {
         PersistentEntity associatedEntity = subquery.getPersistentEntity()
         String associatedEntityName = associatedEntity.getName()
@@ -622,7 +624,7 @@ class JpqlQueryBuilder {
         var conj = new Query.Conjunction(criteria)
         position = buildWhereClauseForCriterion(associatedEntity, conj, q, whereClause, associatedEntityLogicalName,
             criteria, position, parameters)
-
+        return position
         // JpqlQueryBuilder subQueryBuilder = new  JpqlQueryBuilder(associatedEntity)
     }
 
@@ -733,7 +735,7 @@ class JpqlQueryBuilder {
             if(tempWhereClause.toString()) {
                 q.append(" WHERE ")
                 if (criteria instanceof Query.Negation) {
-                    whereClause.append(" NOT")
+                    whereClause.append("NOT")
                 }
                 whereClause.append("(")
                 whereClause.append(tempWhereClause.toString())

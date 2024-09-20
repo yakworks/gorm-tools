@@ -26,6 +26,7 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
     @Autowired MangoBuilder mangoBuilder
 
     MangoDetachedCriteria build(map, Closure closure = null) {
+        assert map instanceof Map
         //DetachedCriteria detachedCriteria = new DetachedCriteria(Org)
         return mangoBuilder.build(Cust, map, closure)
     }
@@ -462,13 +463,99 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
     }
 
     def "test not"() {
-        when:
-
-
-        List res = build((['$not': [[id: ['$eq': 1]]]])).list()
+        when: "not is a map"
+        List res = build([
+            '$not': [
+                id: ['$eq': 1]
+            ]
+        ]).list()
 
         then:
         res.size() == 9
+
+        when: "not is a map with eq short cut"
+        res = build([
+            '$not': [
+                id: 1
+            ]
+        ]).list()
+
+        then:
+        res.size() == 9
+
+        when: "not is nested"
+        res = build([
+            'location': [
+                '$not': [
+                    id: ['$eq': 1]
+                ]
+            ]
+        ]).list()
+
+        then:
+        res.size() == 9
+
+        when: "not is a list"
+        res = build([
+            '$not': [
+                [id: ['$eq': 1]],
+                [id: ['$eq': 2]]
+            ]
+        ]).list()
+
+        then:
+        res.size() == 8
+    }
+
+    def "test not nested"() {
+        when:
+        List res = build([
+            '$not': [
+                ['location.id': ['$eq': 1]],
+                ['location.id': ['$eq': 2]]
+            ]
+        ]).list()
+
+        then:
+        res.size() == 8
+
+        when:
+        res = build([
+            '$not': [
+                [
+                    'location': [
+                        id:  ['$eq': 1]
+                    ]
+                ],
+                [
+                    'location': [
+                        id:  ['$eq': 2]
+                    ]
+                ]
+            ]
+        ]).list()
+
+        then:
+        res.size() == 8
+    }
+
+    def "test not with in"() {
+        when:
+        List res = build([
+            '$not': [
+                [
+                    'location': [
+                        id:  ['$in': [1,2] ]
+                    ]
+                ],
+                [
+                    id:  ['$in': [3,4] ]
+                ]
+            ]
+        ]).list()
+
+        then:
+        res.size() == 6
     }
 
 

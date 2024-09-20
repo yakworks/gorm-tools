@@ -145,11 +145,10 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
     @Override
     MangoDetachedCriteria<Activity> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
         Map crit = queryArgs.qCriteria
-        DetachedCriteria tagExistsCrit
         DetachedCriteria actLinkExists
-        if(crit.tags || crit.tagIds) {
+        if(crit.tags) {
             //if its has tags keys then this returns something to add to exists, will remove the keys as well
-            tagExistsCrit = TagLink.getExistsCriteria(crit, Activity, 'activity_.id')
+            TagLink.repo.doExistsCriteria(crit, Activity, 'activity_.id')
         }
         if(crit.linkedId && crit.linkedEntity) {
             Long linkedId = crit.remove('linkedId') as Long //remove so they dont flow through to query
@@ -158,9 +157,9 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
         }
         MangoDetachedCriteria<Activity> detCrit = getMangoQuery().query(Activity, queryArgs, closure)
         //if it has tags key
-        if(tagExistsCrit != null) {
-            detCrit.exists(tagExistsCrit.id())
-        }
+        // if(tagExistsCrit != null) {
+        //     detCrit.exists(tagExistsCrit.id())
+        // }
         if(actLinkExists != null) {
             detCrit.exists(actLinkExists.id())
         }

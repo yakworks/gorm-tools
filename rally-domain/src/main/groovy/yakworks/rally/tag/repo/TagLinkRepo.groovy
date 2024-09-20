@@ -67,14 +67,23 @@ class TagLinkRepo extends AbstractLinkedEntityRepo<TagLink, Tag> {
      * Add exists criteria to a DetachedCriteria if its has tags
      * in the criteriaMap
      */
-    DetachedCriteria getExistsCriteria(Map criteriaMap, Class linkedEntityClazz, String linkedIdJoinProperty){
-        DetachedCriteria existsCrit
-        if(criteriaMap.tags){
-            //convert to id long list
-            List<Long> tagIds = Transform.objectToLongList((List)criteriaMap.remove('tags'), 'id')
-            existsCrit = buildExistsCriteria(tagIds, linkedEntityClazz, linkedIdJoinProperty)
+    void doExistsCriteria(Map criteriaMap, Class linkedEntityClazz, String linkedIdJoinProperty){
+        Map mapWithTags = criteriaMap
+        //convert to id long list, this assumes its in this format - {"tags": [{"id":1}, ..]}
+        if (criteriaMap.containsKey('$not')) {
+            Object notData = criteriaMap['$not']
+            if (notData instanceof List){
+                (notData as List<Map>).each {
+                    if (it.containsKey('tags')) mapWithTags = it
+                }
+            } else if(notData instanceof Map){
+                if (notData['tags']) mapWithTags = (Map)notData
+            }
         }
-        return existsCrit
+        List<Long> tagIds = Transform.objectToLongList((List)mapWithTags.remove('tags'), 'id')
+        if(tagIds){
+            mapWithTags['$exists'] = buildExistsCriteria(tagIds, linkedEntityClazz, linkedIdJoinProperty)
+        }
     }
 
 }

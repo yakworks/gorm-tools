@@ -14,7 +14,6 @@ import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
-import grails.gorm.DetachedCriteria
 import yakworks.rally.orgs.model.Org
 
 @GormRepository
@@ -50,15 +49,7 @@ class OrgRepo extends AbstractOrgRepo {
      */
     @Override
     MangoDetachedCriteria<Org> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure = null) {
-
-        DetachedCriteria tagCriteria = orgTagRepo.getExistsCriteria(queryArgs.qCriteria)
-        DetachedCriteria<Org> detCrit = getMangoQuery().query(Org, queryArgs, closure)
-
-        //if it has tags key
-        if(tagCriteria != null) {
-            detCrit.exists(tagCriteria)
-        }
-
-        return detCrit
+        orgTagRepo.doExistsCriteria(queryArgs.qCriteria)
+        return getMangoQuery().query(Org, queryArgs, closure)
     }
 }

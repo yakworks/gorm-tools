@@ -735,11 +735,15 @@ class JpqlQueryBuilder {
             if(tempWhereClause.toString()) {
                 q.append(" WHERE ")
                 if (criteria instanceof Query.Negation) {
-                    whereClause.append("NOT")
+                    whereClause.append("NOT (")
                 }
-                whereClause.append("(")
+                //whereClause.append("(")
                 whereClause.append(tempWhereClause.toString())
-                whereClause.append(")")
+                //whereClause.append(")")
+                //close parens
+                if (criteria instanceof Query.Negation) {
+                    whereClause.append(")")
+                }
 
                 q.append(whereClause.toString())
             }

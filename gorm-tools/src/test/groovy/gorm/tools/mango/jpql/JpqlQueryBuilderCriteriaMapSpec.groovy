@@ -9,6 +9,8 @@ import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.unit.GormHibernateTest
 
+import static gorm.tools.mango.jpql.JpqlCompareUtils.formatAndStrip
+
 /**
  * Test for JPA builder with closures not map builder
  */
@@ -16,8 +18,9 @@ class JpqlQueryBuilderCriteriaMapSpec extends Specification implements GormHiber
 
     static List entityClasses = [KitchenSink, SinkItem]
 
-    String strip(String val){
-        val.stripIndent().replace('\n',' ').trim()
+    boolean compareQuery(String hql, String expected){
+        assert formatAndStrip(hql) == formatAndStrip(expected)
+        return true
     }
 
     void setupSpec(){
@@ -39,12 +42,12 @@ class JpqlQueryBuilderCriteriaMapSpec extends Specification implements GormHiber
         )
         def crit = criteria.where([num: '1'])
 
-        def query = JpqlQueryBuilder.of(crit).buildSelect().query
+        def queryInfo = JpqlQueryBuilder.of(crit).buildSelect()
 
         then:"The query is valid"
-        query == strip("""
+        compareQuery(queryInfo.query, """
             SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-            WHERE (kitchenSink.name=:p1 AND kitchenSink.num=:p2)
+            WHERE kitchenSink.name=:p1 AND kitchenSink.num=:p2
         """)
 
         when:
@@ -84,9 +87,9 @@ class JpqlQueryBuilderCriteriaMapSpec extends Specification implements GormHiber
         then:"The query is valid"
         queryInfo.query!= null
         //NOTE TODO, see the same query using closure, this adds extra parens
-        queryInfo.query == strip("""
+        compareQuery(queryInfo.query, """
         SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-        WHERE (((kitchenSink.num=:p1) OR (kitchenSink.num=:p2)))
+        WHERE ((kitchenSink.num=:p1) OR (kitchenSink.num=:p2))
         """)
         queryInfo.parameters == ['1', '2']
 

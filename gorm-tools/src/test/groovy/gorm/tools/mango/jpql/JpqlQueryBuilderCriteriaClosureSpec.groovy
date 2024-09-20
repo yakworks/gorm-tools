@@ -10,6 +10,9 @@ import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.unit.GormHibernateTest
 
+import static gorm.tools.mango.jpql.JpqlCompareUtils.formatAndStrip
+import static gorm.tools.mango.jpql.JpqlCompareUtils.formatAndStrip
+
 
 /**
  * Test for JPA builder with closures not map builder
@@ -18,8 +21,9 @@ class JpqlQueryBuilderCriteriaClosureSpec extends Specification implements GormH
 
     static List entityClasses = [KitchenSink, SinkItem]
 
-    String strip(String val){
-        val.stripIndent().replace('\n',' ').trim()
+    boolean compareQuery(String hql, String expected){
+        assert formatAndStrip(hql) == formatAndStrip(expected)
+        return true
     }
 
     void setupSpec(){
@@ -42,11 +46,12 @@ class JpqlQueryBuilderCriteriaClosureSpec extends Specification implements GormH
         when:"A jpa query is built"
         def builder = JpqlQueryBuilder.of(criteria)
         //builder.hibernateCompatible = true
-        def query = builder.buildSelect().query
+        def queryInfo = builder.buildSelect()
 
         then:"The query is valid"
-        query != null
-        query == 'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE (kitchenSink.name=:p1)'
+        compareQuery(queryInfo.query,
+            'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE kitchenSink.name=:p1'
+        )
     }
 
     void "Mango Map testing for adding map to an existing criteria instance"() {
@@ -56,10 +61,13 @@ class JpqlQueryBuilderCriteriaClosureSpec extends Specification implements GormH
         )
         def crit = criteria.where([name2: 'foo'])
 
-        def query = JpqlQueryBuilder.of(crit).buildSelect().query
+        def queryInfo = JpqlQueryBuilder.of(crit).buildSelect()
 
         then:"The query is valid"
-        query == 'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE (kitchenSink.name=:p1 AND kitchenSink.name2=:p2)'
+        compareQuery(queryInfo.query,
+            '''SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
+               WHERE kitchenSink.name=:p1 AND kitchenSink.name2=:p2'''
+        )
     }
 
     void "Mango Map testing for adding map with applyMapOrList"() {
@@ -84,9 +92,9 @@ class JpqlQueryBuilderCriteriaClosureSpec extends Specification implements GormH
         def query = JpqlQueryBuilder.of(crit).buildSelect().query
 
         then:"The query is not valid"
-        query == strip("""\
+        compareQuery(query, """\
         SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-        WHERE (kitchenSink.name=:p1 AND kitchenSink.name2=:p2 AND kitchenSink.comments=:p3)
+        WHERE kitchenSink.name=:p1 AND kitchenSink.name2=:p2 AND kitchenSink.comments=:p3
         """)
         //query == 'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE (kitchenSink.name=:p1 AND kitchenSink.name2=:p2)'
     }
@@ -104,7 +112,7 @@ class JpqlQueryBuilderCriteriaClosureSpec extends Specification implements GormH
 
         then:"The query is valid"
         query != null
-        query == 'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE (kitchenSink.name=:p1)'
+        compareQuery(query, 'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE kitchenSink.name=:p1')
     }
 
     void "Test build select with or"() {
@@ -122,7 +130,10 @@ class JpqlQueryBuilderCriteriaClosureSpec extends Specification implements GormH
 
         then:"The query is valid"
         queryInfo.query!= null
-        queryInfo.query == 'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE ((kitchenSink.name=:p1 OR kitchenSink.name=:p2))'
+        compareQuery(queryInfo.query,'''
+            SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
+            WHERE (kitchenSink.name=:p1 OR kitchenSink.name=:p2)
+            ''')
         queryInfo.parameters == ['Bob', 'Fred']
 
     }
@@ -142,7 +153,7 @@ class JpqlQueryBuilderCriteriaClosureSpec extends Specification implements GormH
 
         then:"The query is valid"
         query != null
-        query == strip("""\
+        compareQuery(queryInfo.query, """\
         SELECT new map( SUM(kitchenSink.amount) as amount_sum, kitchenSink.kind as kind, kitchenSink.ext.name as ext_name )
         FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
         GROUP BY kitchenSink.kind,kitchenSink.ext.name
@@ -172,7 +183,7 @@ class JpqlQueryBuilderCriteriaClosureSpec extends Specification implements GormH
 
         then: "The query is valid"
         query != null
-        query.trim() == strip('''\
+        compareQuery(queryInfo.query, '''\
         SELECT SUM(kitchenSink.sinkLink.amount) as sinkLink_amount_sum, kitchenSink.kind as kind
         FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
         GROUP BY kitchenSink.kind
@@ -195,10 +206,10 @@ class JpqlQueryBuilderCriteriaClosureSpec extends Specification implements GormH
 
         then:
         query
-        query.trim() == strip('''
+        compareQuery(queryInfo.query, '''
             SELECT SUM(kitchenSink.amount) as amount_sum
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-            WHERE (kitchenSink.amount >= :p1)
+            WHERE kitchenSink.amount >= :p1
         ''')
     }
 
@@ -217,10 +228,10 @@ class JpqlQueryBuilderCriteriaClosureSpec extends Specification implements GormH
 
         then:
         query
-        query.trim() == strip('''
+        compareQuery(queryInfo.query, '''
             SELECT kitchenSink.kind as kind, SUM(kitchenSink.amount) as amount_sum
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-            WHERE (kitchenSink.kind IN (:p1,:p2) AND kitchenSink.amount >= :p3)
+            WHERE kitchenSink.kind IN (:p1,:p2) AND kitchenSink.amount >= :p3
             GROUP BY kitchenSink.kind
         ''')
 
@@ -241,7 +252,7 @@ class JpqlQueryBuilderCriteriaClosureSpec extends Specification implements GormH
 
         then:"The query is valid"
         query != null
-        query == strip("""\
+        compareQuery(queryInfo.query, """\
         SELECT SUM(kitchenSink.amount) as x, kitchenSink.kind as y, kitchenSink.ext.name as name
         FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
         GROUP BY kitchenSink.kind,kitchenSink.ext.name
@@ -272,7 +283,7 @@ class JpqlQueryBuilderCriteriaClosureSpec extends Specification implements GormH
 
         then:"The query is valid"
         query != null
-        query == strip("""\
+        compareQuery(queryInfo.query, """\
         SELECT COUNT(DISTINCT kitchenSink.id) as cnt, MAX(kitchenSink.amount) as maxam, MIN(kitchenSink.amount) as minam,
         AVG(kitchenSink.amount) as avgam, kitchenSink.kind as y, kitchenSink.ext.name as name
         FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
@@ -305,10 +316,10 @@ class JpqlQueryBuilderCriteriaClosureSpec extends Specification implements GormH
 
         then:"The query is valid"
         query != null
-        query == strip("""\
+        compareQuery(queryInfo.query, """\
         SELECT MAX(kitchenSink.sinkLink.amount) as maxam, kitchenSink.ext.name as name
         FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-        WHERE (kitchenSink.sinkLink.amount > :p1 AND kitchenSink.sinkLink.kind=:p2)
+        WHERE kitchenSink.sinkLink.amount > :p1 AND kitchenSink.sinkLink.kind=:p2
         GROUP BY kitchenSink.ext.name
         """)
         //
@@ -333,7 +344,9 @@ class JpqlQueryBuilderCriteriaClosureSpec extends Specification implements GormH
 
         then:"The query is valid"
         query != null
-        query == 'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE (kitchenSink.name=:p1)'
+        compareQuery(queryInfo.query,
+            'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE (kitchenSink.name=:p1)'
+        )
     }
 
     void "Test select using property method"() {
@@ -377,7 +390,7 @@ class JpqlQueryBuilderCriteriaClosureSpec extends Specification implements GormH
         listNormal.size() == 10
 
         when:
-        queryInfo.query = strip("""
+        compareQuery(queryInfo.query, """
             SELECT kitchenSink.id as id, kitchenSink.name as name, kitchenSink.thing.name as thing_name
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
             LEFT JOIN kitchenSink.thing

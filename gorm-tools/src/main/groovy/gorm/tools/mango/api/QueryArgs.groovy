@@ -61,6 +61,7 @@ class QueryArgs {
 
     /**
      * Criteria map to pass to the MangoBuilder. when QueryArgs is built from query params, then this is the q=...
+     * This is the one to modify if making changes in an override.
      */
     Map<String, Object> qCriteria = [:] as Map<String, Object>
 

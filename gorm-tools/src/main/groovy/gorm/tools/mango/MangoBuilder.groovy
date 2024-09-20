@@ -31,6 +31,7 @@ import static gorm.tools.mango.MangoOps.OverrideOp
 import static gorm.tools.mango.MangoOps.PropertyOp
 import static gorm.tools.mango.MangoOps.QSEARCH
 import static gorm.tools.mango.MangoOps.SORT
+import static gorm.tools.mango.MangoOps.SubQueryOp
 
 /**
  * the main builder to turn Mango QL Maps or json into DetachedCriteria for Gorm
@@ -168,7 +169,17 @@ class MangoBuilder {
             JunctionOp jop = EnumUtils.getEnum(JunctionOp, key)
             if (jop) {
                 //tidyMap should have ensured all ops have a List for a value
+                // or if its an instance of
                 invoke(jop.op, criteria, (List) val)
+                continue
+            }
+
+            //subquery, value should be preprocessed and be a QueryableCriteria
+            //exists is one example we are using here
+            SubQueryOp subOp = EnumUtils.getEnum(SubQueryOp, key)
+            if (subOp && val instanceof QueryableCriteria) {
+                //invoke(subOp.op, (QueryableCriteria) val)
+                InvokerHelper.invokeMethod(criteria, subOp.op, val)
                 continue
             }
 

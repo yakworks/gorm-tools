@@ -4,13 +4,12 @@
 */
 package yakworks.rally.job
 
-import groovy.json.JsonOutput
+
 import groovy.transform.CompileStatic
 
 import org.springframework.stereotype.Component
 
 import gorm.tools.job.JobUtils
-import gorm.tools.job.SyncJobEntity
 import yakworks.gorm.api.DefaultCrudApi
 import yakworks.gorm.api.IncludesProps
 

@@ -4,7 +4,6 @@
 */
 package yakworks.rally.orgs.repo
 
-
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,7 +20,6 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.utils.GormUtils
-import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.commons.map.Maps
@@ -162,14 +160,8 @@ class ContactRepo extends LongIdGormRepo<Contact> {
     MangoDetachedCriteria<Contact> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
         Map criteriaMap = queryArgs.qCriteria
         //if its has tags keys then this returns something to add to exists, will remove the keys as well
-        DetachedCriteria tagExistsCrit = TagLink.getExistsCriteria(criteriaMap, Contact, 'contact_.id')
-
-        MangoDetachedCriteria<Contact> detCrit = getMangoQuery().query(Contact, queryArgs, closure)
-        //if it has tags key
-        if(tagExistsCrit != null) {
-            detCrit.exists(tagExistsCrit.id())
-        }
-        return detCrit
+        TagLink.repo.doExistsCriteria(criteriaMap, Contact, 'contact_.id')
+        return getMangoQuery().query(Contact, queryArgs, closure)
     }
 
     void removeAll(Org org) {

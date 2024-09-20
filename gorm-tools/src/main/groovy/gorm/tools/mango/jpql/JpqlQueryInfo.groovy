@@ -32,6 +32,7 @@ class JpqlQueryInfo {
     List getParameters() {
         return parameters
     }
+
     Map getParamMap() {
         Map pmap = [:]
         parameters.eachWithIndex{ v, i ->

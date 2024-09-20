@@ -128,6 +128,8 @@ interface ApiCrudRepo<D> {
      * Primary method. Builds detached criteria for repository's domain based on mango criteria language and additional criteria
      * Override this one in repo for any special handling
      *
+     * main method, all comes here so only need to override this one for custom logic
+     *
      * @param queryArgs mango query args.
      * @param closure additional restriction for criteria
      * @return Detached criteria build based on mango language params and criteria closure

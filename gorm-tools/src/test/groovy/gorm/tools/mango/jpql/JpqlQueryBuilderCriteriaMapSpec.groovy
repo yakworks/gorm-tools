@@ -96,7 +96,7 @@ class JpqlQueryBuilderCriteriaMapSpec extends Specification implements GormHiber
         criteria.list().size() == 2
     }
 
-    @Ignore
+    @Ignore //blowing up on unknown field, which is should bu we need a way to override
     void "Test eqf"() {
         given:
         def criteria = KitchenSink.query(

@@ -85,6 +85,11 @@ class QueryArgs {
     Map<String, String> projections
 
     /**
+     * holder for select list
+     */
+    List<String> select
+
+    /**
      * Query timeout in seconds. If value is set, the timeout would be set on hibernate query/criteria instance.
      */
     Integer timeout = 0
@@ -171,6 +176,10 @@ class QueryArgs {
         //projections
         def projField = params.remove('projections')
         if(projField) projections = buildProjections(projField)
+
+        //projections
+        var selField = params.remove('select')
+        if(selField) select = buildSelectList(selField)
 
         // check for and remove the q param
         // whatever is in q if its parsed as a map and set to the criteria so it overrides everything
@@ -273,6 +282,18 @@ class QueryArgs {
     }
 
     /**
+     * if the string is known to be json then parse the json and returns the map
+     * also adds in the includes if its has a $qSearch prop
+     */
+    List parseJsonList(String qString){
+        //jsonSlurper LAX allows fields to not be quoted
+        JsonSlurper jsonSlurper = new JsonSlurper().setType(JsonParserType.LAX)
+        List parsedList = jsonSlurper.parseText(qString) as List
+
+        return parsedList
+    }
+
+    /**
      * parses the sort string. if its just a simple string without , or : then creates a
      * asc sort map. if its starts with { then parses as json.
      * sort string should be in one of the following formats
@@ -341,6 +362,33 @@ class QueryArgs {
         } else {
             log.error("projection argument must be map or string")
             return [:]
+        }
+
+    }
+
+    /**
+     * parses the projection string. If it start with { and will parse as json.
+     * parse string should be in one of the following formats
+     *  - fields seperated by comma, ex: 'id,name,num,foo.bar'
+     *  - json in same format as above, ex '["id","name"]'
+     *
+     * @param qSelect see above for valid options
+     * @return the list or null if failed
+     */
+    List<String> buildSelectList(Object qSelect){
+        if(qSelect instanceof List) {
+            return qSelect
+        } else if(qSelect instanceof String){
+            //make sure its trimmed
+            String selectText = (qSelect as String).trim()
+            //for convienience we allow the [ to be left off so we add it if it is
+            if (!selectText.startsWith('[')) selectText = "[$selectText]"
+
+            List parsedList = parseJsonList(selectText) as List<String>
+            return parsedList
+        } else {
+            log.error("projection argument must be map or string")
+            return [] as List<String>
         }
 
     }

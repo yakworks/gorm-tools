@@ -4,21 +4,20 @@
 */
 package yakworks.rally.orgs
 
-import gorm.tools.metamap.MetaGormEntityBuilder
-import gorm.tools.metamap.services.MetaMapService
 import org.springframework.beans.factory.annotation.Autowired
 
+import gorm.tools.metamap.MetaGormEntityBuilder
+import gorm.tools.metamap.services.MetaMapService
 import spock.lang.Ignore
-import yakworks.rally.orgs.model.ContactSource
-import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
-import yakworks.testing.gorm.unit.GormHibernateTest
-import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail
 import yakworks.rally.orgs.model.ContactPhone
+import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.testing.MockData
+import yakworks.testing.gorm.unit.GormHibernateTest
+import yakworks.testing.gorm.unit.SecurityTest
 
 class ContactIncludesSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [Org, Contact, ContactSource, ContactPhone, ContactEmail]

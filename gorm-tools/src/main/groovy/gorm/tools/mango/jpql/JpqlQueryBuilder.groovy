@@ -4,6 +4,8 @@
 */
 package gorm.tools.mango.jpql
 
+import javax.persistence.criteria.JoinType
+
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.model.AbstractPersistentEntity
@@ -22,6 +24,7 @@ import org.springframework.dao.InvalidDataAccessResourceUsageException
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.utils.GormMetaUtils
 import grails.gorm.DetachedCriteria
+import yakworks.commons.map.Maps
 
 /**
  * Builds JPQL String-based queries from the DetachedCriteria.
@@ -52,6 +55,7 @@ class JpqlQueryBuilder {
     boolean hibernateCompatible
     //wraps the SELECT in a new map( ...) when true
     boolean aliasToMap
+    Map<String, JoinType> joinTypes
     Map<String, String> projectionAliases = [:]
     Map<String, String> propertyAliases = [:]
     List<String> groupByList = []
@@ -101,6 +105,8 @@ class JpqlQueryBuilder {
         // List<Query.Criterion> criteria = crit.getCriteria()
         // jqb.criteria = new Query.Conjunction(criteria)
         jqb.propertyAliases = crit.propertyAliases
+
+        jqb.joinTypes = Maps.clone(crit.getJoinTypes())
 
         List<Query.Projection> projections = crit.getProjections()
         for (Query.Projection projection : projections) {
@@ -212,6 +218,11 @@ class JpqlQueryBuilder {
         buildSelect(queryString, projectionList.getProjectionList(), logicalName, entity)
 
         queryString.append(" FROM ${entity.getName()} AS ${logicalName}")
+        joinTypes.each { k, v ->
+            if(v == JoinType.LEFT){
+                queryString.append(" LEFT JOIN ${logicalName}.${k}")
+            }
+        }
     }
 
     void appendAlias( StringBuilder queryString, String projField, String name, String aliasPrefix){
@@ -268,10 +279,14 @@ class JpqlQueryBuilder {
                         String projField = "COUNT(DISTINCT ${logicalName}.${pp.getPropertyName()})"
                         appendAlias(queryString, projField, pp.getPropertyName(), 'COUNT')
                     }
-                    else {
+                    else if (projection instanceof Query.GroupPropertyProjection) {
                         String projField = "${logicalName}.${pp.getPropertyName()}"
                         appendAlias(queryString, projField, pp.getPropertyName(), '')
                         groupByList << "${logicalName}.${pp.getPropertyName()}".toString()
+                    }
+                    else { //property
+                        String projField = "${logicalName}.${pp.getPropertyName()}"
+                        appendAlias(queryString, projField, pp.getPropertyName(), '')
                     }
                 }
 

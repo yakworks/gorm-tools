@@ -12,7 +12,8 @@ import org.grails.datastore.gorm.GormEntity
 import gorm.tools.utils.GormMetaUtils
 
 /**
- * Fall through if GormEntity makes it to Json conversion. With the special fields added in with AST it will get a
+ * Fall through if a GormEntity makes it through to Json conversion.
+ * With the special fields added in with AST it will get a
  * stackoverflow if the groovy json engine tries to convert it.
  * Uses GormMetaUtils.getProperties to only get the relavent props.
  *

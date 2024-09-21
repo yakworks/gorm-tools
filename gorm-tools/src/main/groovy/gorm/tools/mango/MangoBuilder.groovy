@@ -91,6 +91,11 @@ class MangoBuilder {
             applyProjections(mangoCriteria, qargs.projections)
         }
 
+        //apply select properties, this should not
+        if(qargs.select){
+            applySelect(mangoCriteria, qargs.select)
+        }
+
         if(qargs.timeout) mangoCriteria.setTimeout(qargs.timeout)
 
         return mangoCriteria
@@ -133,6 +138,18 @@ class MangoBuilder {
             } else if (v == 'max'){
                 criteria.max(k)
             }
+        }
+    }
+
+    /**
+     * Apply projections from map in form [key:type] where type is sum, group, count, min, max or avg
+     *
+     * @param criteria the criteria to apply the project
+     * @param projs the map of projections to apply
+     */
+    void applySelect(MangoDetachedCriteria criteria, List<String> projs) {
+        for(String prop : projs){
+            criteria.property(prop)
         }
     }
 

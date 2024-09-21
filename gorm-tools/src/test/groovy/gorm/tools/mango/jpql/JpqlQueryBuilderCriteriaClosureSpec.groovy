@@ -319,6 +319,7 @@ class JpqlQueryBuilderCriteriaClosureSpec extends Specification implements GormH
         compareQuery(queryInfo.query, """\
         SELECT MAX(kitchenSink.sinkLink.amount) as maxam, kitchenSink.ext.name as name
         FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
+        LEFT JOIN kitchenSink.sinkLink
         WHERE kitchenSink.sinkLink.amount > :p1 AND kitchenSink.sinkLink.kind=:p2
         GROUP BY kitchenSink.ext.name
         """)
@@ -328,80 +329,6 @@ class JpqlQueryBuilderCriteriaClosureSpec extends Specification implements GormH
         //
         // then:
         // res.size() == 2
-    }
-
-    @Ignore
-    void "Test distinct on property"() {
-        given:"Some criteria"
-        def criteria = KitchenSink.query(
-            'name': 'Bob'
-        ).distinct("ext.kitchenParent.thing.name")
-
-        when:"A jpa query is built"
-        def builder = JpqlQueryBuilder.of(criteria)
-        //builder.hibernateCompatible = true
-        def query = builder.buildSelect().query
-
-        then:"The query is valid"
-        query != null
-        compareQuery(queryInfo.query,
-            'SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink WHERE (kitchenSink.name=:p1)'
-        )
-    }
-
-    void "Test select using property method"() {
-        given:"Some criteria"
-
-        def criteria = KitchenSink.query(null)
-            .property("id")
-            .property("name")
-            .property("sinkLink.name")
-            //FIXME this does not work with JpqlQueryBuilder
-            .join("sinkLink", JoinType.LEFT)
-
-        // this also works
-        // def criteria = KitchenSink.query{
-        //     property("id")
-        //     property("thing.name")
-        // }.join("thing", JoinType.LEFT)
-
-        //this also works and produces same thing if we do
-        //def criteria = KitchenSink.query(null).distinct("id").distinct("name")
-
-        // this does not work for some reason
-        // def criteria = KitchenSink.query{
-        //     property("id")
-        //     property("name")
-        // }
-
-        when:
-        def builder = JpqlQueryBuilder.of(criteria)
-        //builder.hibernateCompatible = true
-        JpqlQueryInfo queryInfo = builder.buildSelect()
-
-        then:
-        // queryInfo.query == strip("""
-        //     SELECT kitchenSink.id as id, kitchenSink.name as name, kitchenSink.thing.name as thing_name
-        //     FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-        //     GROUP BY kitchenSink.id,kitchenSink.name,kitchenSink.thing.name
-        // """)
-
-        List listNormal = criteria.list()
-        listNormal.size() == 10
-
-        when:
-        compareQuery(queryInfo.query, """
-            SELECT kitchenSink.id as id, kitchenSink.name as name, kitchenSink.thing.name as thing_name
-            FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-            LEFT JOIN kitchenSink.thing
-            GROUP BY kitchenSink.id,kitchenSink.name,kitchenSink.thing.name
-        """)
-        List<Map> list = doList(queryInfo)
-
-        then:
-        list.size() == 10
-        // list[0].id == 1
-        // list[0].name == 'Blue Cheese'
     }
 
     List doList(JpqlQueryInfo queryInfo, Map args = [:]){

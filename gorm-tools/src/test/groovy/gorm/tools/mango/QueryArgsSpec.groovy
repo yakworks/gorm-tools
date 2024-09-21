@@ -134,6 +134,17 @@ class QueryArgsSpec extends Specification {
         qargs.buildProjections('{name:"group", amount: "sum"}') == [name: 'group', amount: 'sum']
     }
 
+    def "test buildSelect"() {
+
+        when: 'simple'
+        def qargs = new QueryArgs()
+
+        then:
+        qargs.buildSelectList('name, "num"') == ['name', 'num']
+        qargs.buildSelectList('''[id,'name', "num"]''') == ['id', 'name', "num"]
+        //qargs.buildSelectList('{name:"group", amount: "sum"}') == [name: 'group', amount: 'sum']
+    }
+
     def "validate success with q"() {
         when:
         def qjson = "{id: 1, name: 'joe'}"

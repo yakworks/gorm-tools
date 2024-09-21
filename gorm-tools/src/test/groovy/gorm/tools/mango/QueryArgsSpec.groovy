@@ -187,7 +187,6 @@ class QueryArgsSpec extends Specification {
 
     }
 
-    @Ignore
     def "validate success with qSearch quick search"() {
         when:
         def qargs = new QueryArgs().build(qSearch:'foo', sort:"foo:asc")
@@ -195,7 +194,7 @@ class QueryArgsSpec extends Specification {
 
         then:
         noExceptionThrown()
-        qargs.qCriteria == [$qSearch:'foo', qSearch:'foo']
+        qargs.qCriteria == [$qSearch:'foo']
         qargs.buildCriteria() == ['$qSearch': 'foo', '$sort': ['foo':'asc']]
 
     }
@@ -260,7 +259,7 @@ class QueryArgsSpec extends Specification {
 
     void "defaultSortById"() {
         when:
-        QueryArgs qargs = new QueryArgs().defaultSortById()
+        QueryArgs qargs = QueryArgs.of().defaultSortById()
 
         then:
 
@@ -287,8 +286,17 @@ class QueryArgsSpec extends Specification {
 
     def "parJson sanity check"() {
         when:
-        Map res = QueryArgs.parseJson('{str: bar*, num: 1, bool: false, dec: 1.01, dlr: $isNotNull, list: [x,y,z,1,2], dot1.dot2.dot3: dot4.dot5 }', Map)
+        Map res = QueryArgs.parseJson('''{
+            str: bar*, num: 1, bool: false, dec: 1.01, dlr: $isNotNull, list: [x,y,z,1,2],
+            dot1.dot2.dot3: dot4.dot5,
+            'foo': "Bar"
+        }''', Map)
+
         then:
-        res == [str:"bar*", num:1, bool:false, dec: 1.01, dlr: '$isNotNull', list: ["x","y","z",1,2], 'dot1.dot2.dot3': 'dot4.dot5']
+        res == [
+            str:"bar*", num:1, bool:false, dec: 1.01, dlr: '$isNotNull', list: ["x","y","z",1,2],
+            'dot1.dot2.dot3': 'dot4.dot5',
+            "foo": "Bar"
+        ]
     }
 }

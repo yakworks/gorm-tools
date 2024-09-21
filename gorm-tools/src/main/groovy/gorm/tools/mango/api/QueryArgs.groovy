@@ -237,7 +237,8 @@ class QueryArgs {
         }
         //if no q was passed in then use whatever is left in the params as the criteria if strict is false
         else if(!strict){
-            qCriteria = new HashMap<String, Object>(params)
+            //FIXME should we not be making a copy of this?
+            qCriteria = params
         }
 
         //now check if qSearch was passed as a separate param and its doesn't already exists in the criteria
@@ -311,7 +312,6 @@ class QueryArgs {
 
     /**
      * if the string is known to be json then parse the json and returns the map
-     * also adds in the includes if its has a $qSearch prop
      */
     static <T> T parseJson(String text, Class<T> clazz) {
         //jsonSlurper LAX allows fields to not be quoted

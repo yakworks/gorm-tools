@@ -14,7 +14,7 @@ import yakworks.testing.gorm.unit.GormHibernateTest
 import static gorm.tools.mango.jpql.JpqlCompareUtils.formatAndStrip
 
 /**
- * Test for JPA builder with closures not map builder
+ * Tests the select list
  */
 class MangoSelectSpec extends Specification implements GormHibernateTest  {
 

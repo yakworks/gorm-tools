@@ -44,9 +44,11 @@ class JpqlQueryBuilderSpec extends Specification implements GormHibernateTest  {
     void "Test update query with subquery"() {
         given:"Some criteria"
         def criteria = KitchenSink.query {
-            notIn("amount", new DetachedCriteria(KitchenSink).build {
-                eq('name', 'Simpson')
-            }.distinct('amount'))
+            notIn("amount",
+                new DetachedCriteria(KitchenSink).build {
+                    eq('name', 'Simpson')
+                }.distinct('amount')
+            )
         }
 
         when:"A jpa query is built"
@@ -57,7 +59,7 @@ class JpqlQueryBuilderSpec extends Specification implements GormHibernateTest  {
         compareQuery(queryInfo.query,
             '''UPDATE yakworks.testing.gorm.model.KitchenSink kitchenSink SET kitchenSink.name=:p1
                WHERE kitchenSink.amount NOT IN (
-                SELECT kitchenSink1.amount as amount
+                SELECT DISTINCT kitchenSink1.amount as amount
                 FROM yakworks.testing.gorm.model.KitchenSink kitchenSink1 WHERE kitchenSink1.name=:p2
                )
             ''')

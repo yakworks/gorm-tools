@@ -279,12 +279,16 @@ class JpqlQueryBuilder {
                         String projField = "COUNT(DISTINCT ${logicalName}.${pp.getPropertyName()})"
                         appendAlias(queryString, projField, pp.getPropertyName(), 'COUNT')
                     }
+                    else if (projection instanceof Query.DistinctPropertyProjection) {
+                        String projField = "DISTINCT ${logicalName}.${pp.getPropertyName()}"
+                        appendAlias(queryString, projField, pp.getPropertyName(), '')
+                    }
                     else if (projection instanceof Query.GroupPropertyProjection) {
                         String projField = "${logicalName}.${pp.getPropertyName()}"
                         appendAlias(queryString, projField, pp.getPropertyName(), '')
                         groupByList << "${logicalName}.${pp.getPropertyName()}".toString()
                     }
-                    else { //property
+                    else { //assume its just a property to add to the select
                         String projField = "${logicalName}.${pp.getPropertyName()}"
                         appendAlias(queryString, projField, pp.getPropertyName(), '')
                     }

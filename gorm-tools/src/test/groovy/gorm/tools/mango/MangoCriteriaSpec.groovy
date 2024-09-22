@@ -40,7 +40,10 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
 
     void "test field that does not exist"() {
         when:
-        List res = build([nonExistingFooBar: true]).list()
+        List good = build([name: "Name1"]).list()
+        assert good
+        //bad
+        List bad = build([nonExistingFooBar: true]).list()
 
         then: "fails with query exception"
         thrown(QueryException)

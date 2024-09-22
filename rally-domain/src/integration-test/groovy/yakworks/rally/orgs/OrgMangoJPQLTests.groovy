@@ -1,6 +1,10 @@
 package yakworks.rally.orgs
 
+import javax.persistence.criteria.JoinType
 
+import gorm.tools.mango.MangoDetachedCriteria
+import gorm.tools.mango.jpql.JpqlQueryBuilder
+import gorm.tools.mango.jpql.JpqlQueryInfo
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import org.hibernate.criterion.Projections
@@ -9,6 +13,10 @@ import spock.lang.Specification
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
+import yakworks.testing.gorm.model.KitchenSink
+
+import static gorm.tools.mango.jpql.JpqlCompareUtils.formatAndStrip
+import static gorm.tools.mango.jpql.JpqlCompareUtils.formatAndStrip
 
 @Integration
 @Rollback
@@ -78,6 +86,35 @@ class OrgMangoJPQLTests extends Specification implements DomainIntTest {
         then:
         sumbObj.size() == 10
         // sumbObj[0]['type'] == OrgType.Customer
+    }
+
+    boolean compareQuery(String hql, String expected){
+        assert formatAndStrip(hql) == formatAndStrip(expected)
+        return true
+    }
+
+    void "list of properties"() {
+        when:"Some criteria"
+
+        MangoDetachedCriteria criteria = Org.query(null)
+            .property("id")
+            .property("name")
+            .join("flex", JoinType.LEFT)
+
+        List listNormal = criteria.list()
+
+        def builder = JpqlQueryBuilder.of(criteria)
+        //builder.hibernateCompatible = true
+        JpqlQueryInfo queryInfo = builder.buildSelect()
+
+        then:
+        listNormal.size() == 50
+        compareQuery(queryInfo.query, """
+            SELECT org.id as id, org.name as name
+            FROM yakworks.rally.orgs.model.Org AS org
+            LEFT JOIN org.flex
+        """)
+
     }
 
 }

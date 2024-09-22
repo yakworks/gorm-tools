@@ -1,17 +1,15 @@
 package yakworks.security.gorm
 
-import gorm.tools.problem.ValidationProblem
-import gorm.tools.utils.GormMetaUtils
 import org.apache.commons.lang3.RandomStringUtils
 
-import grails.gorm.transactions.Rollback
+import gorm.tools.problem.ValidationProblem
+import gorm.tools.utils.GormMetaUtils
 import spock.lang.Specification
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRoleUser
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
-import yakworks.testing.gorm.unit.DataRepoTest
 
 class AppUserSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [AppUser, SecRole, SecRoleUser]

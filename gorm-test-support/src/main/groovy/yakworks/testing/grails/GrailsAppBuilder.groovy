@@ -48,6 +48,7 @@ class GrailsAppBuilder extends GrailsApplicationBuilder {
     // ...No qualifying bean of type 'org.grails.datastore.gorm.validation.constraints.factory.ConstraintFactory<?>[]'
     boolean isDataRepoTest = true
 
+    //Treats all @Autowired as @Autowired(required = false)
     @CompileStatic
     static class NotRequiredAutowiredAnnotationBeanPostProcessor extends AutowiredAnnotationBeanPostProcessor{
 

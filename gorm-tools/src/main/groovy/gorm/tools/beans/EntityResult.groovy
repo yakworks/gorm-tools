@@ -6,9 +6,6 @@ package gorm.tools.beans
 
 import groovy.transform.CompileStatic
 
-import yakworks.api.ApiStatus
-import yakworks.api.HttpStatus
-import yakworks.api.Result
 import yakworks.api.ResultSupport
 import yakworks.api.ResultTrait
 

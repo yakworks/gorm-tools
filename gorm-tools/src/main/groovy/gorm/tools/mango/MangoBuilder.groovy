@@ -91,6 +91,11 @@ class MangoBuilder {
             applyProjections(mangoCriteria, qargs.projections)
         }
 
+        //apply select properties, this should not
+        if(qargs.select){
+            applySelect(mangoCriteria, qargs.select)
+        }
+
         if(qargs.timeout) mangoCriteria.setTimeout(qargs.timeout)
 
         return mangoCriteria
@@ -133,6 +138,18 @@ class MangoBuilder {
             } else if (v == 'max'){
                 criteria.max(k)
             }
+        }
+    }
+
+    /**
+     * Apply projections from map in form [key:type] where type is sum, group, count, min, max or avg
+     *
+     * @param criteria the criteria to apply the project
+     * @param projs the map of projections to apply
+     */
+    void applySelect(MangoDetachedCriteria criteria, List<String> projs) {
+        for(String prop : projs){
+            criteria.property(prop)
         }
     }
 
@@ -214,7 +231,7 @@ class MangoBuilder {
                 return
             }
         }
-        // if field ends in Id then try removing the Id postfix and see if its a property
+        // ID Helper, if field ends in Id then try removing the Id postfix and see if its a property
         else if (!prop && field.matches(/.*[^.]Id/) && criteria.persistentEntity.getPropertyByName(field.replaceAll("Id\$", ""))) {
             applyFieldMap(criteria, field.replaceAll("Id\$", ".id"), fieldVal as Map)
             //applyField(criteria, field.replaceAll("Id\$", ".id"), fieldVal)
@@ -222,19 +239,23 @@ class MangoBuilder {
         else if (!(fieldVal instanceof Map) && !(fieldVal instanceof List && prop != null)) {
             criteria.eq(field, toType(criteria, field, fieldVal))
         }
+        //ENUMS
         else if (prop && IdEnum.isAssignableFrom(prop.type) && fieldVal instanceof Map && fieldVal.containsKey('id')) {
             //&& fieldVal instanceof Map && fieldVal.containsKey('id')
             applyField(criteria, field, fieldVal['id'])
         }
-        //just pass it on through, prop might be null but that might be because its a dot notation ending in id ex: "foo.id"
-        else if (fieldVal instanceof Map) { // && (prop || field.endsWith('.id'))) { field=name fieldVal=['$like': 'foo%']
+        //its common a MangoOp, for example fieldVal=['$eq': 'foo']
+        else if (fieldVal instanceof Map) {
             applyFieldMap(criteria, field, fieldVal)
         }
-        // else if (fieldVal instanceof Map && (prop || field.endsWith('.id'))) { // field=name fieldVal=['$like': 'foo%']
-        //     applyFieldMap(criteria, field, fieldVal)
-        // }
-        //I think we should not blow up an error if some field isnt in domain, just add message to log
-        log.debug "No match in applyField for [field:$field, entity:${getTargetClass(criteria).name}, fieldVal: $fieldVal, fieldVal.class: ${fieldVal?.class}"
+        else { //will get here if fieldVal is not a Map and prop is null. maybe only blow error if prop is null?
+            //fieldVal is bad somehow so blow an error
+            String msg = "Not Found [field:$field, entity:${getTargetClass(criteria).name}, fieldVal: $fieldVal]"
+            //XXX log it out for now, remove this once we know its ok
+            log.error(msg)
+            throw new IllegalArgumentException(msg)
+            //log.debug "No match in applyField for [field:$field, entity:${getTargetClass(criteria).name}, fieldVal: $fieldVal, fieldVal.class: ${fieldVal?.class}"
+        }
 
     }
 
@@ -281,7 +302,7 @@ class MangoBuilder {
                 continue
             } else {
                 //field is not an association, but value is a map and key doesnt match any of the operator ?
-                //It is invalid query eg ("Source.sourceId = "xx")
+                //It is invalid query example ("Source.sourceId = "xx"), case matters so wont find Source
                 throw new IllegalArgumentException("Invalid criteria for field:$field value:$fieldVal")
             }
 

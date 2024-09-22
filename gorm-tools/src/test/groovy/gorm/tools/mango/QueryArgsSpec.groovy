@@ -6,6 +6,7 @@ package gorm.tools.mango
 
 
 import gorm.tools.mango.api.QueryArgs
+import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.api.problem.data.DataProblemException
 
@@ -13,7 +14,13 @@ class QueryArgsSpec extends Specification {
 
     def "parseParams q is map"() {
         when:
-        QueryArgs qargs = QueryArgs.of(q: [id: 24], max: 10, sort:'foo', page: 2, offset: 10)
+        QueryArgs qargs = QueryArgs.of(
+            q: [id: 24],
+            max: 10,
+            sort:'foo',
+            page: 2,
+            offset: 10
+        )
         then:
         //parsed.criteria.id == 24
         qargs.buildCriteria() == [id: 24, '$sort': ['foo':'asc']]
@@ -39,14 +46,17 @@ class QueryArgsSpec extends Specification {
         QueryArgs qargs = QueryArgs.of(q: "{id: 24, something: 'testing'}", sort:'foo:desc' )
 
         then: 'it should have them in criteria'
-        //parsed.criteria.id == 24
+        //sort not in the qCriteria
+        qargs.qCriteria == [id:24, something: 'testing']
+        //sort is in the buildCriteria()
         qargs.buildCriteria() == [id: 24, something: 'testing', '$sort': ['foo':'desc']]
 
-        when: 'not using q'
-        //when not using q or criteria t
+        when: 'not using q and strict=false default'
+        //when not using q or criteria
         qargs = QueryArgs.of(name: 'joe', sort:'foo', page: 2)
 
-        then:
+        then: "adds the params to the criteria"
+        qargs.qCriteria == [name: 'joe']
         qargs.buildCriteria() == [name: 'joe', '$sort': ['foo':'asc']]
 
         qargs.pager.max == 20
@@ -54,14 +64,14 @@ class QueryArgsSpec extends Specification {
         qargs.pager.page == 2
 
 
-        when:
+        when: "strict is false by default"
         qargs = QueryArgs.of(name: 'joe')
-        then:
+        then: "so q param is not required and props will be added"
         qargs.buildCriteria() == [name: 'joe']
         qargs.pager
     }
 
-    def "parseParams no q, just a map"() {
+    def "parseParams when no q and strict=false, just a map"() {
 
         when: 'not using q'
         //when not using q then it pulls out the sort, order and pager info and leaves the rest as is
@@ -85,6 +95,26 @@ class QueryArgsSpec extends Specification {
         qargs.buildCriteria() == ['$qSearch': 'foo']
         qargs.pager
     }
+
+    def "parseParams when no q and strict=true"() {
+
+        when:
+        QueryArgs qargs = new QueryArgs().strict(true).build(name: 'joe')
+        then:
+        qargs.qCriteria == [:]
+        qargs.buildCriteria() == [:]
+
+        when: 'not using q'
+        //when not using q then it pulls out the sort, order and pager info and leaves the rest as is
+        qargs = new QueryArgs().strict(true).build(id: 123, name: 'joe', max: 10, sort:'bar')
+
+        then: "the params wont get added to criteria"
+        qargs.qCriteria == [:]
+        qargs.buildCriteria() == [$sort:[bar:'asc']]
+        qargs.pager.max == 10
+
+    }
+
 
     def "build with both q and qsearch"() {
 
@@ -134,11 +164,22 @@ class QueryArgsSpec extends Specification {
         qargs.buildProjections('{name:"group", amount: "sum"}') == [name: 'group', amount: 'sum']
     }
 
+    def "test buildSelect"() {
+
+        when: 'simple'
+        def qargs = new QueryArgs()
+
+        then:
+        qargs.buildSelectList('name, "num"') == ['name', 'num']
+        qargs.buildSelectList('''[id,'name', "num"]''') == ['id', 'name', "num"]
+        //qargs.buildSelectList('{name:"group", amount: "sum"}') == [name: 'group', amount: 'sum']
+    }
+
     def "validate success with q"() {
         when:
         def qjson = "{id: 1, name: 'joe'}"
-        def qargs = new QueryArgs(qRequired: true).build(q: qjson, sort:"foo:asc")
-        qargs.validateQ()
+        def qargs = new QueryArgs().build(q: qjson, sort:"foo:asc")
+        qargs.validateQ(true)
 
         then:
         noExceptionThrown()
@@ -148,11 +189,12 @@ class QueryArgsSpec extends Specification {
 
     def "validate success with qSearch quick search"() {
         when:
-        def qargs = new QueryArgs(qRequired: true).build(qSearch:'foo', sort:"foo:asc")
-        qargs.validateQ()
+        def qargs = new QueryArgs().build(qSearch:'foo', sort:"foo:asc")
+        qargs.validateQ(true)
 
         then:
         noExceptionThrown()
+        qargs.qCriteria == [$qSearch:'foo']
         qargs.buildCriteria() == ['$qSearch': 'foo', '$sort': ['foo':'asc']]
 
     }
@@ -160,14 +202,16 @@ class QueryArgsSpec extends Specification {
     def "validateQ fails"() {
 
         when: 'no q or qsearch'
-        QueryArgs qargs = new QueryArgs(qRequired: true).build(max: 10, sort:'foo:asc')
+        QueryArgs qargs = new QueryArgs()
+            .build(max: 10, sort:'foo:asc')
             //QueryArgs.of(max: 10, sort:'foo:asc').qRequired(true)
-        qargs.validateQ()
+        qargs.validateQ(true)
 
         then: 'should throw error'
         def ex = thrown(DataProblemException)
         ex.status.code == 418
-        qargs.buildCriteria() == ['$sort': ['foo':'asc']]
+        //qargs wont even have been built because
+        //qargs.buildCriteria() == ['$sort': ['foo':'asc']]
 
     }
 
@@ -215,9 +259,10 @@ class QueryArgsSpec extends Specification {
 
     void "defaultSortById"() {
         when:
-        QueryArgs qargs = new QueryArgs().defaultSortById()
+        QueryArgs qargs = QueryArgs.of().defaultSortById()
 
         then:
+
         qargs.sort
         qargs.sort['id'] == 'asc'
 
@@ -241,9 +286,17 @@ class QueryArgsSpec extends Specification {
 
     def "parJson sanity check"() {
         when:
-        QueryArgs qargs = new QueryArgs()
-        Map res = qargs.parseJson('{str: bar*, num: 1, bool: false, dec: 1.01, dlr: $isNotNull, list: [x,y,z,1,2], dot1.dot2.dot3: dot4.dot5 }')
+        Map res = QueryArgs.parseJson('''{
+            str: bar*, num: 1, bool: false, dec: 1.01, dlr: $isNotNull, list: [x,y,z,1,2],
+            dot1.dot2.dot3: dot4.dot5,
+            'foo': "Bar"
+        }''', Map)
+
         then:
-        res == [str:"bar*", num:1, bool:false, dec: 1.01, dlr: '$isNotNull', list: ["x","y","z",1,2], 'dot1.dot2.dot3': 'dot4.dot5']
+        res == [
+            str:"bar*", num:1, bool:false, dec: 1.01, dlr: '$isNotNull', list: ["x","y","z",1,2],
+            'dot1.dot2.dot3': 'dot4.dot5',
+            "foo": "Bar"
+        ]
     }
 }

@@ -4,6 +4,8 @@
 */
 package gorm.tools.mango.api
 
+import groovy.transform.CompileStatic
+
 import gorm.tools.beans.Pager
 import gorm.tools.mango.MangoDetachedCriteria
 
@@ -13,6 +15,7 @@ import gorm.tools.mango.MangoDetachedCriteria
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
+@CompileStatic
 interface MangoQuery {
 
     /**
@@ -23,7 +26,9 @@ interface MangoQuery {
      * @param closure extra criterai closure
      * @return the detached criteria to call list or get on
      */
-    public <D> MangoDetachedCriteria<D> query(Class<D> entityClass, Map params, Closure closure)
+    default <D> MangoDetachedCriteria<D> query(Class<D> entityClass, Map params, Closure closure){
+        return query(entityClass, QueryArgs.of(params), closure)
+    }
 
     /**
      *  Builds detached criteria for repository's domain based on mango criteria language
@@ -33,11 +38,11 @@ interface MangoQuery {
      * @param closure extra criterai closure
      * @return the detached criteria to call list or get on
      */
-    public <D> MangoDetachedCriteria<D> query(Class<D> entityClass, QueryArgs qargs, Closure closure)
+    <D> MangoDetachedCriteria<D> query(Class<D> entityClass, QueryArgs qargs, Closure closure)
 
     /**
      * shortcut to call query and then list with the pager fields in params
      */
-    public List pagedList(MangoDetachedCriteria criteria, Pager pager)
+    List pagedList(MangoDetachedCriteria criteria, Pager pager)
 
 }

@@ -294,12 +294,7 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
             //skip the listForCriteria
             //return criteria.list()
         }
-        // FUTURE set a reasonable timeout to this
-        // FIXME get from external config
-        // criteria.setTimeout(15)
-        //listForCriteria fires Pre and PostQueryEvent, TODO might want to skip this if firing the events hurt performance
         return listForCriteria()
-
     }
 
     //hack to access the private hasJoins in super

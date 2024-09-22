@@ -2,6 +2,8 @@ package yakworks.rally.orgs
 
 import java.time.LocalDateTime
 
+import org.hibernate.engine.jdbc.internal.BasicFormatterImpl
+
 import gorm.tools.mango.jpql.JpqlQueryBuilder
 import gorm.tools.mango.jpql.JpqlQueryInfo
 import grails.gorm.transactions.Rollback
@@ -16,12 +18,20 @@ import yakworks.rally.orgs.repo.ContactRepo
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.repo.TagLinkRepo
 
+import static gorm.tools.mango.jpql.JpqlCompareUtils.formatAndStrip
+
+
 @Integration
 @Rollback
 class ContactTagTests extends Specification implements DomainIntTest {
 
     ContactRepo contactRepo
     TagLinkRepo tagLinkRepo
+
+    boolean compareQuery(String hql, String expected){
+        assert formatAndStrip(hql) == formatAndStrip(expected)
+        return true
+    }
 
     void addTagsForSearch(){
         def tagMgr = new Tag(id:9, code:'manager', entityName: 'Contact').persist(flush: true)
@@ -117,13 +127,14 @@ class ContactTagTests extends Specification implements DomainIntTest {
         //     SELECT DISTINCT arTran FROM nine.ar.tran.model.ArTran AS arTran
         //     WHERE (arTran.refnum=:p1)
         // """)
-        queryInfo.where == strip("""
-            (contact.name like :p1 AND
-            NOT ((contact.org.name like :p2) OR
-            (EXISTS ( SELECT DISTINCT tagLink2 FROM yakworks.rally.tag.model.TagLink tagLink2
-            WHERE tagLink2.linkedId = contact.id AND tagLink2.linkedEntity=:p3 AND tagLink2.tag.id IN (:p4,:p5) )
-            )) AND contact.editedDate <= :p6)
+        compareQuery(queryInfo.where, """
+            contact.name like :p1
+            AND NOT ((contact.org.name like :p2)
+            OR (EXISTS ( SELECT DISTINCT tagLink2 FROM yakworks.rally.tag.model.TagLink tagLink2
+            WHERE tagLink2.linkedId = contact.id AND tagLink2.linkedEntity=:p3 AND tagLink2.tag.id IN (:p4,:p5) ) ))
+            AND contact.editedDate <= :p6
         """)
+
         queryInfo.paramMap == [
             p1: 'John4%',
             p2: '%PUBLIX%',

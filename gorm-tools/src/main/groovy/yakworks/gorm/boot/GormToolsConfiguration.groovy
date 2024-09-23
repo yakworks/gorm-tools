@@ -10,10 +10,10 @@ import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.model.AbstractMappingContext
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.DependsOn
+import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Lazy
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -38,14 +38,12 @@ import yakworks.gorm.api.ApiConfig
 import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.support.DefaultQueryArgsValidator
 import yakworks.gorm.api.support.QueryArgsValidator
-import yakworks.gorm.config.AsyncConfig
-import yakworks.gorm.config.GormConfig
-import yakworks.gorm.config.IdGeneratorConfig
-import yakworks.gorm.config.QueryConfig
+import yakworks.gorm.config.GormToolsPropertiesConfiguration
 
 @Configuration(proxyBeanMethods = false)
 @Lazy
-@EnableConfigurationProperties([AsyncConfig, GormConfig, IdGeneratorConfig, QueryConfig])
+//@EnableConfigurationProperties([AsyncConfig, GormConfig, IdGeneratorConfig, QueryConfig])
+@Import([GormToolsPropertiesConfiguration])
 @CompileStatic
 class GormToolsConfiguration {
 

@@ -2,6 +2,14 @@ app.security.enabled: true
 #server:
 #  port: 8080
 
+# "test" is the environment profile. this application-test.yml is picked up because it ends in "-test"
+# application.yml is what configures the spring.config.import and profile files like this one
+# are processed after all the others and anything set here wins over what is in the application.yml
+
+# if we set this here then it will win
+# foo:
+#  message: "from rally-api/application-test.yml"
+
 spring.security.user.name: admin
 spring.security.user.password: 123
 

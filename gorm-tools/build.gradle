@@ -23,7 +23,8 @@ dependencies {
     exclude group:"com.vladmihalcea", module: "hibernate-types-55"
   }
 
-  api ("org.yakworks:grails-kit:$vSpringGrailsKit")
+  //api ("org.yakworks:grails-kit:$vSpringGrailsKit")
+  api ("org.yakworks:spring-kit:$vSpringGrailsKit")
   api "org.yakworks:grails-icu4j:$vYakICU4J"
   api "org.yakworks:groovy-commons:$vGroovyCommons"
 

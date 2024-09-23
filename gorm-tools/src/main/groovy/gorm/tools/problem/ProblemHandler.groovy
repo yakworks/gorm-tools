@@ -17,7 +17,6 @@ import org.springframework.dao.DataAccessResourceFailureException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.validation.Errors
-import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 
 import gorm.tools.repository.errors.EmptyErrors
@@ -27,8 +26,6 @@ import yakworks.api.problem.GenericProblem
 import yakworks.api.problem.Problem
 import yakworks.api.problem.ThrowableProblem
 import yakworks.api.problem.UnexpectedProblem
-import yakworks.api.problem.Violation
-import yakworks.api.problem.ViolationFieldError
 import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.i18n.icu.ICUMessageSource
@@ -76,7 +73,11 @@ class ProblemHandler {
                 //this is some other exception wrapped in validation exception
                 valProblem.detail(e.cause?.message)
             }
-            valProblem.violations(transateErrorsToViolations(valProblem.errors))
+            //translate the errors
+            if(!valProblem.violations && valProblem.errors.hasErrors()){
+                //we do this late, not done when created with RepoExceptionSupport
+                valProblem.violations(ValidationProblem.transateErrorsToViolations(valProblem.errors))
+            }
             return valProblem
         }
         else if (e instanceof ThrowableProblem) {
@@ -154,7 +155,7 @@ class ProblemHandler {
         Errors ers = valEx['errors'] as Errors
         def valProb = ValidationProblem.of(valEx).errors(ers)
         if(entityName) valProb.name(entityName)
-        return valProb.violations(transateErrorsToViolations(ers))
+        return valProb.violations(ValidationProblem.transateErrorsToViolations(ers))
     }
 
     String getMsg(MessageSourceResolvable msr) {
@@ -166,23 +167,6 @@ class ProblemHandler {
             return msr.codes[0]
         }
     }
-
-    /**
-     * Returns list of errors in the format [{field:name, message:error}]
-     * @param errs the erros object to convert
-     */
-    List<Violation> transateErrorsToViolations(Errors errs) {
-        List<ViolationFieldError> errors = []
-        if(!errs?.allErrors) return errors as List<Violation>
-
-        for (ObjectError err : errs.allErrors) {
-            ViolationFieldError fieldError = ViolationFieldError.of(err.code, getMsg(err))
-            if (err instanceof FieldError) fieldError.field = err.field
-            errors << fieldError
-        }
-        return errors as List<Violation>
-    }
-
 
     /**
      * returns true if the exception is a psql query timeout exception

@@ -29,6 +29,7 @@ import yakworks.api.problem.UnexpectedProblem
 import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.i18n.icu.ICUMessageSource
+import yakworks.message.MsgServiceRegistry
 
 /**
  * Service to prepare ApiError / ApiValidationError for given a given exception
@@ -158,13 +159,15 @@ class ProblemHandler {
         return valProb.violations(ValidationProblem.transateErrorsToViolations(ers))
     }
 
-    String getMsg(MessageSourceResolvable msr) {
+    static String getMsg(MessageSourceResolvable msr) {
         //FIXME this should be generalized somehwere?
         try {
-            return messageSource.getMessage(msr)
+            //cast so we can use the getMessage(MessageSourceResolvable resolvable), which works
+            ICUMessageSource msgService = MsgServiceRegistry.service as ICUMessageSource//get static msgService that should have been set in icu4j plugin
+            return msgService.getMessage(msr)
         }
         catch (e) {
-            return msr.codes[0]
+            return msr.defaultMessage
         }
     }
 

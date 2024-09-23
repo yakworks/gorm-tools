@@ -6,6 +6,7 @@ package gorm.tools.problem
 
 import groovy.transform.CompileStatic
 
+import org.springframework.context.MessageSourceResolvable
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
@@ -19,6 +20,7 @@ import yakworks.api.problem.Violation
 import yakworks.api.problem.ViolationFieldError
 import yakworks.api.problem.data.DataProblemException
 import yakworks.api.problem.data.DataProblemTrait
+import yakworks.i18n.icu.ICUMessageSource
 import yakworks.message.MsgServiceRegistry
 import yakworks.message.spi.MsgService
 
@@ -85,9 +87,9 @@ class ValidationProblem implements DataProblemTrait<ValidationProblem> {
     static List<Violation> transateErrorsToViolations(Errors errs) {
         List<ViolationFieldError> errors = []
         if(!errs?.allErrors) return errors as List<Violation>
-        MsgService msgService = MsgServiceRegistry.service //get static msgService that should have been set in icu4j plugin
+
         for (ObjectError err : errs.allErrors) {
-            String message = msgService ? msgService.get(err.code, [], err.defaultMessage) : err.defaultMessage
+            String message = ProblemHandler.getMsg(err)
             ViolationFieldError fieldError = ViolationFieldError.of(err.code, message)
             if (err instanceof FieldError) fieldError.field = err.field
             errors << fieldError

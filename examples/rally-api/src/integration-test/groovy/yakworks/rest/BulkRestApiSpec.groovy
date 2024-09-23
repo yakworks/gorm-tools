@@ -200,9 +200,13 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         List data = body.data
         int success = data.count { it.ok}
         int failed = data.count { !it.ok}
+        int inserted = data.count { it.status == 201}
+        int updated = data.count { it.status == 200}
 
         then:
         success == 4
         failed == 1
+        inserted == 1
+        updated == 3
     }
 }

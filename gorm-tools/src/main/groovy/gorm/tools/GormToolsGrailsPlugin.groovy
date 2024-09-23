@@ -44,11 +44,11 @@ class GormToolsGrailsPlugin extends Plugin {
     }}
 
     //This is kind of equivalent to init in bootstrap
-    @Override
-    void doWithApplicationContext() {
-        HibernateDatastore datastore = applicationContext.getBean("hibernateDatastore", HibernateDatastore)
-        RepoValidatorRegistry.init(datastore, applicationContext.getBean('messageSource', MessageSource))
-    }
+    // @Override
+    // void doWithApplicationContext() {
+    //     HibernateDatastore datastore = applicationContext.getBean("hibernateDatastore", HibernateDatastore)
+    //     RepoValidatorRegistry.init(datastore, applicationContext.getBean('messageSource', MessageSource))
+    // }
 
     /**
      * Invoked in a phase where plugins can add dynamic methods. Subclasses should override

@@ -310,6 +310,33 @@ class OrgTagTests extends Specification implements DomainIntTest {
         queryInfo.parameters == [1,2]
     }
 
+    void "criteria JpqlQueryBuilder with alias" () {
+        given:
+        addTagsForSearch()
+        // def otags = OrgTag.query([:]).id().list()
+        // assert otags.size() == 10
+
+        def criteria = Org.query([
+            tags: [ [id:1], [id:2]  ]
+        ])
+        assert criteria.list().size() == 4
+
+        when: "A jpa query is built"
+        def builder = JpqlQueryBuilder.of(criteria).entityAlias("orgAlias")
+        final queryInfo = builder.buildSelect()
+
+        then: "The query is valid"
+        queryInfo.query.trim() == strip("""
+            SELECT DISTINCT orgAlias FROM yakworks.rally.orgs.model.Org AS orgAlias
+            WHERE EXISTS (
+            SELECT DISTINCT orgTag0 FROM yakworks.rally.orgs.model.OrgTag orgTag0
+            WHERE orgTag0.linkedId = orgAlias.id AND orgTag0.tag.id IN (:p1,:p2)
+            )
+        """)
+
+        queryInfo.parameters == [1,2]
+    }
+
     void "not exists using closure and buildExistsCriteria" () {
         when: "filter where orgs contain ANY of the tags"
         addTagsForSearch()

@@ -14,7 +14,6 @@ import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
-import yakworks.testing.gorm.unit.DataRepoTest
 
 class ActivityContactSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [Activity, ActivityContact, ActivityNote, Contact, ContactSource, Org, Tag]

@@ -1,13 +1,11 @@
 package yakworks.rally.orgs
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.cache.support.SimpleCacheManager
 
 import spock.lang.Specification
 import yakworks.rally.activity.ActivityCopier
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
-import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.config.OrgProps
@@ -28,7 +26,6 @@ import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.rally.testing.OrgDimensionTesting
 import yakworks.testing.gorm.RepoTestData
-import yakworks.testing.gorm.unit.DataRepoTest
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 

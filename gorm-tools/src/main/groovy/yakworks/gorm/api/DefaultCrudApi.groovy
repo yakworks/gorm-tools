@@ -203,11 +203,11 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     }
 
     protected QueryArgs createQueryArgs(Pager pager, Map qParams) {
-        QueryArgs qargs = QueryArgs.of(pager)
-            .qRequired(qRequired())
+        QueryArgs qargs = QueryArgs.withPager(pager)
+            .strict(true) //only use criteria if its under the q query param
             .build(qParams)
-            .defaultSortById()
-            .validateQ()
+            .defaultSortById() //add default id sort if none exists
+            .validateQ(qRequired()) //if q is required then blows error if nothing was parsed out
 
         validateQueryArgs(qargs)
 

@@ -7,6 +7,7 @@ package gorm.tools.mango.api
 import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
+import groovy.transform.Generated
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 import groovy.util.logging.Slf4j
@@ -17,6 +18,7 @@ import yakworks.api.HttpStatus
 import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemException
 import yakworks.commons.map.Maps
+import yakworks.json.groovy.JsonEngine
 
 import static gorm.tools.mango.MangoOps.CRITERIA
 import static gorm.tools.mango.MangoOps.QSEARCH
@@ -35,7 +37,11 @@ import static gorm.tools.mango.MangoOps.SORT
  *
  * contains some intermediary fields such as 'q' that are used to parse it into what we need
  */
-@Builder(builderStrategy= SimpleStrategy, prefix="")
+@Builder(
+    builderStrategy=SimpleStrategy, prefix="",
+    includes=['strict','projections','select','timeout'],
+    useSetters=true
+)
 @Slf4j
 @CompileStatic
 class QueryArgs {
@@ -44,32 +50,46 @@ class QueryArgs {
 
     /**
      * extra closure that can be passed to MangoCriteria
+     * future
      */
-    Closure closure
+    // Closure closure
 
     /**
-     * when true , in build method, will only add params under q.
-     * When false(default) and no q is present build will add any param thats not special(like max, sort, page, etc)
+     * when true in build method, will only add params that are under q.
+     * When false(default) and no q is present in the params
+     * then build will add any param that are not special(like max, sort, page, etc)
      * into q as a criteria param.
      */
-    boolean isStrict = false
+    boolean strict = false
+    private void setStrict(boolean v) {
+        ensureNotBuilt()
+        strict = v
+    }
 
     /**
-     * when true, then criteria is required.
+     * when true, then q criteria is required and will fail if its not provided so it cant list without it
      */
-    boolean qRequired = false
+    // boolean qRequired = false
+    // private void setQRequired(boolean v) {
+    //     ensureNotBuilt()
+    //     qRequired = v
+    // }
 
     /**
      * Criteria map to pass to the MangoBuilder. when QueryArgs is built from query params, then this is the q=...
      * This is the one to modify if making changes in an override.
      */
-    Map<String, Object> qCriteria = [:] as Map<String, Object>
-
+    private Map<String, Object> qCriteria = [:] as Map<String, Object>
+    Map<String, Object> getqCriteria() {
+        return this.qCriteria
+    }
     /**
      * The Pager instance for paged list queries
      */
-    Pager pager
-
+    private Pager pager
+    Pager getPager() {
+        pager
+    }
     /**
      * holder for sort configuration to make it easier to grok
      * The key is the field, can be dot path for nested like foo.bar.baz
@@ -85,21 +105,29 @@ class QueryArgs {
     Map<String, String> projections
 
     /**
+     * holder for select list
+     */
+    List<String> select
+
+    /**
      * Query timeout in seconds. If value is set, the timeout would be set on hibernate query/criteria instance.
      */
     Integer timeout = 0
 
+    private boolean isBuilt = false
+
     /**
      * Construct from a pager
+     * DOES NOT BUILD
      */
-    static QueryArgs of(Pager pager){
+    static QueryArgs withPager(Pager pager){
         def qa = new QueryArgs()
         qa.pager = pager
         return qa
     }
 
     /**
-     * Construct from a controller style params object where each key has as string value
+     * Construct AND Build from a controller style params object where each key has as string value
      * just as if it came from a url
      */
     static QueryArgs of(Map params){
@@ -109,16 +137,22 @@ class QueryArgs {
 
     /**
      * Construct from a mango closure
+     * Future concept
      */
-    static QueryArgs of(@DelegatesTo(MangoDetachedCriteria) Closure closure){
-        def qa = new QueryArgs()
-        return qa.query(closure)
-    }
+    // static QueryArgs of(@DelegatesTo(MangoDetachedCriteria) Closure closure){
+    //     def qa = new QueryArgs()
+    //     return qa.query(closure)
+    // }
 
-    static QueryArgs withProjections(Map<String, String> projs){
-        def qa = new QueryArgs()
-        return qa.projections(projs)
-    }
+    /**
+     * Construct with projections, used mostly for testing
+     * Does not build, should call .build after if more is needed
+     * Future concept
+     */
+    // static QueryArgs withProjections(Map<String, String> projs){
+    //     def qa = new QueryArgs()
+    //     return qa.projections(projs)
+    // }
 
     /**
      * Intelligent defaults to setup the criteria and pager from the controller style params map
@@ -148,6 +182,7 @@ class QueryArgs {
      * @return this instance
      */
     QueryArgs build(Map<String, ?> paramsMap){
+        if(isBuilt) throw new UnsupportedOperationException("build has already been called and cant be called again")
         //copy it
         Map params = Maps.clone(paramsMap) as Map<String, Object>
 
@@ -172,6 +207,10 @@ class QueryArgs {
         def projField = params.remove('projections')
         if(projField) projections = buildProjections(projField)
 
+        //projections
+        var selField = params.remove('select')
+        if(selField) select = buildSelectList(selField)
+
         // check for and remove the q param
         // whatever is in q if its parsed as a map and set to the criteria so it overrides everything
         def qParam = params.q ? params.remove('q') : params.remove(CRITERIA)
@@ -184,7 +223,8 @@ class QueryArgs {
                 //if the q param start with { then assume its json and parse it
                 //the parsed map will be set to the criteria.
                 if (qString.trim().startsWith('{')) {
-                    qCriteria = parseJson(qString)
+                    qCriteria = parseJson(qString, Map)
+                    qCriteria = Maps.clone(qCriteria) //clone so it can me modified later
                 } else {
                     //if its just a string then its assumed its a quick search, see below as it can be explicitely passed too
                     qCriteria[QSEARCH] = qString
@@ -192,11 +232,12 @@ class QueryArgs {
             }
             //as is, mostly for testing and programtic stuff
             else if(qParam instanceof Map) {
-                qCriteria = qParam as Map
+                qCriteria = qParam as Map<String, Object>
             }
         }
         //if no q was passed in then use whatever is left in the params as the criteria if strict is false
-        else if(!isStrict){
+        else if(!strict){
+            //FIXME should we not be making a copy of this?
             qCriteria = params
         }
 
@@ -211,6 +252,12 @@ class QueryArgs {
         //     criteria[MangoOps.SORT] = sort
         // }
 
+        //set that it was built
+        isBuilt = true
+
+        //validate if qRequired
+        //if(qRequired) validateQ()
+
         return this
     }
 
@@ -218,6 +265,7 @@ class QueryArgs {
      * builds a COPY of qCrieria merged with sort if it exists and removes the $qSearch=* if it exists
      */
     Map<String, Object> buildCriteria(){
+        ensureBuilt()
         Map<String, Object> criterium = qCriteria
         // if sort was populated, add it to the criteria with the $sort if its doesn't exist
         if(sort && !qCriteria.containsKey(SORT) ) {
@@ -234,8 +282,9 @@ class QueryArgs {
      * Can bypass this by passing in q=* or qSearch=*
      * @throws DataProblemException
      */
-    QueryArgs validateQ(){
-        //FIXME we wouldnt need it if manual query parsing / lost params issue is fixed - See #1924
+    QueryArgs validateQ(boolean qRequired){
+        ensureBuilt()
+        //put in initially because we loose params query parsing / lost params issue is fixed - See #1924
         if(qRequired && !qCriteria){
             throw DataProblem.of('error.data.qRequired')
                 .status(HttpStatus.I_AM_A_TEAPOT) //TODO 418 error for now so its easy to add to retry as it gets droppped sometimes
@@ -245,14 +294,16 @@ class QueryArgs {
     }
 
     /**
-      Applies Default sort by id:asc if no sort is provided in params
-      Does not apply default sort if
-      - $sort is provided in `q` criteria
-      - If params has projections - because thn there's no id column. In this case, if required, params should explicitely pass sort
-
-      when paging we need a sort so rows dont show up next page see https://github.com/9ci/domain9/issues/2280
+     * Applies Default sort by id:asc if no sort is provided in params
+     * Does not apply default sort if
+     * - $sort is provided in `q` criteria
+     * - If params has projections - because then there's no id column.
+     *   In this case, if required, params should explicitely pass sort
+     *
+     * when paging we need a sort so rows dont show up next page see https://github.com/9ci/domain9/issues/2280
      */
     QueryArgs defaultSortById() {
+        ensureBuilt()
         if(!sort && !projections) {
             sort = ['id':'asc']
         }
@@ -261,15 +312,13 @@ class QueryArgs {
 
     /**
      * if the string is known to be json then parse the json and returns the map
-     * also adds in the includes if its has a $qSearch prop
      */
-    Map parseJson(String qString){
+    static <T> T parseJson(String text, Class<T> clazz) {
         //jsonSlurper LAX allows fields to not be quoted
         JsonSlurper jsonSlurper = new JsonSlurper().setType(JsonParserType.LAX)
-        // parseText returns LazyValueMap which will throw `Not that kind of map` when trying to add new key
-        Map parsedMap = new HashMap(jsonSlurper.parseText(qString) as Map)
-
-        return parsedMap
+        Object parsedObj = jsonSlurper.parseText(text)
+        JsonEngine.validateExpectedClass(clazz, parsedObj)
+        return (T)parsedObj
     }
 
     /**
@@ -285,7 +334,7 @@ class QueryArgs {
      * @param orderBy only relevant if sortText is a single sort string with field name
      * @return the sort Map or null if failed
      */
-    Map buildSort(Object sortObj, String orderBy = 'asc'){
+    protected Map buildSort(Object sortObj, String orderBy = 'asc'){
         if(sortObj instanceof Map) {
             return sortObj
         } else if(sortObj instanceof String) {
@@ -325,18 +374,16 @@ class QueryArgs {
      * @param projText see above for valid options
      * @return the projection Map or null if failed
      */
-    Map buildProjections(Object projectionsObj){
+    protected Map buildProjections(Object projectionsObj){
         if(projectionsObj instanceof Map) {
             return projectionsObj
         } else if(projectionsObj instanceof String){
             //make sure its trimmed
             String projText = (projectionsObj as String).trim()
-            Map projMap = [:] as Map<String, String>
             //for convienience we allow the { to be left off so we add it if it is
             if (!projText.startsWith('{')) projText = "{$projText}"
-
-            projMap = parseJson(projText) as Map<String, String>
-
+            // clone since parseText returns LazyValueMap which will throw `Not that kind of map` when trying to add new key
+            Map projMap = Maps.clone(parseJson(projText, Map))
             return projMap
         } else {
             log.error("projection argument must be map or string")
@@ -345,10 +392,48 @@ class QueryArgs {
 
     }
 
-    QueryArgs query(@DelegatesTo(MangoDetachedCriteria) Closure closure) {
-        this.closure = closure
-        return this
+    /**
+     * If its a list then just returns it.
+     * Otherwise parses the select string. If it start with [ and is a string it will parse as json.
+     *
+     * parse string should be in one of the following formats
+     *  - fields seperated by comma, ex: 'id,name,num,foo.bar'
+     *  - json in same format as above, ex '["id","name"]'
+     *
+     * @param qSelect see above for valid options
+     * @return the list or null if failed
+     */
+    protected List<String> buildSelectList(Object qSelect){
+        if(qSelect instanceof List) {
+            return qSelect
+        } else if(qSelect instanceof String){
+            //make sure its trimmed
+            String selectText = (qSelect as String).trim()
+            //for convenience we allow the [ to be left off so we add it if it is
+            if (!selectText.startsWith('[')) selectText = "[$selectText]"
+
+            List parsedList = (List<String>)parseJson(selectText, List)
+            return parsedList
+        } else {
+            log.error("projection argument must be map or string")
+            return [] as List<String>
+        }
+
     }
+
+    // throws error if its not built yet
+    private void ensureBuilt(){
+        if(!isBuilt) throw new UnsupportedOperationException("Can only be called after this has been built")
+    }
+    // throws error if its already built
+    private void ensureNotBuilt(){
+        if(isBuilt) throw new UnsupportedOperationException("Can't be called after its already built")
+    }
+
+    // QueryArgs query(@DelegatesTo(MangoDetachedCriteria) Closure closure) {
+    //     this.closure = closure
+    //     return this
+    // }
 
     /**
      * looks for the qsearch fields for this entity and returns the map

@@ -6,7 +6,6 @@ package gorm.tools.repository
 
 import groovy.transform.CompileStatic
 
-import org.apache.commons.lang3.tuple.Pair
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.gorm.GormInstanceApi
@@ -38,7 +37,6 @@ import gorm.tools.utils.GormMetaUtils
 import grails.core.support.proxy.ProxyHandler
 import grails.validation.ValidationException
 import yakworks.api.HttpStatus
-import yakworks.api.Result
 import yakworks.api.problem.ThrowableProblem
 import yakworks.api.problem.data.NotFoundProblem
 import yakworks.commons.lang.ClassUtils

@@ -4,9 +4,12 @@
 */
 package yakworks.gorm.api
 
+import groovy.transform.CompileStatic
+
 /**
  * The props passed in from params.
  */
+@CompileStatic
 class IncludesProps {
     List<String> includes
     String includesKey
@@ -19,5 +22,12 @@ class IncludesProps {
             incProps.includesKey = params['includesKey'] as String
         }
         return incProps
+    }
+
+    /**
+     * Default keys for the includesKey
+     */
+    enum Keys {
+        qSearch, get, picklist, list, stamp, bulk, bulkError
     }
 }

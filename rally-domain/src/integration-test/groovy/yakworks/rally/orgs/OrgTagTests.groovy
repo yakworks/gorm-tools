@@ -299,12 +299,12 @@ class OrgTagTests extends Specification implements DomainIntTest {
         final queryInfo = builder.buildSelect()
 
         then: "The query is valid"
-        queryInfo.query == strip("""
+        queryInfo.query.trim() == strip("""
             SELECT DISTINCT org FROM yakworks.rally.orgs.model.Org AS org
-            WHERE (EXISTS (
+            WHERE EXISTS (
             SELECT DISTINCT orgTag0 FROM yakworks.rally.orgs.model.OrgTag orgTag0
             WHERE orgTag0.linkedId = org.id AND orgTag0.tag.id IN (:p1,:p2)
-            ) )
+            )
         """)
 
         queryInfo.parameters == [1,2]

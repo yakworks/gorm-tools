@@ -7,13 +7,11 @@ package gorm.tools.mango.api
 import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
-import groovy.transform.Generated
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 import groovy.util.logging.Slf4j
 
 import gorm.tools.beans.Pager
-import gorm.tools.mango.MangoDetachedCriteria
 import yakworks.api.HttpStatus
 import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemException
@@ -39,7 +37,7 @@ import static gorm.tools.mango.MangoOps.SORT
  */
 @Builder(
     builderStrategy=SimpleStrategy, prefix="",
-    includes=['strict','projections','select','timeout'],
+    includes=['strict', 'projections', 'select', 'timeout'],
     useSetters=true
 )
 @Slf4j

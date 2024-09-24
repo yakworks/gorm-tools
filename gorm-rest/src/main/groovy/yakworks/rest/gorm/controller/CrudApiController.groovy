@@ -4,6 +4,8 @@
 */
 package yakworks.rest.gorm.controller
 
+import javax.servlet.http.HttpServletRequest
+
 import groovy.transform.CompileStatic
 
 import org.slf4j.Logger
@@ -220,7 +222,7 @@ trait CrudApiController<D> extends RestApiController {
         List dataList = bodyAsList() as List<Map>
         Map qParams = getParamsMap()
 
-        String sourceId = JobUtils.requestToSourceId(request)
+        String sourceId = requestToSourceId(request)
 
         //if attachmentId then assume its a csv
         if(qParams.attachmentId) {
@@ -236,6 +238,12 @@ trait CrudApiController<D> extends RestApiController {
 
         SyncJobEntity job = getCrudApi().bulk(dataOp, dataList, qParams, sourceId)
         respondWith(job, [status: MULTI_STATUS])
+    }
+
+    String requestToSourceId(HttpServletRequest req){
+        String sourceId = "${req.method} ${req.requestURI}"
+        if(req.queryString) sourceId = "${sourceId}?${req.queryString}"
+        return sourceId
     }
 
     /**

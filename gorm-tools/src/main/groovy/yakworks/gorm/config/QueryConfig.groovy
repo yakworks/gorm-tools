@@ -7,11 +7,9 @@ package yakworks.gorm.config
 import groovy.transform.CompileStatic
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.context.annotation.Configuration
 
-@CompileStatic
-@Configuration(proxyBeanMethods = false)
 @ConfigurationProperties(prefix="yakworks.gorm.query")
+@CompileStatic
 class QueryConfig {
 
     /** Max items, user cannot pass in a max higher that this, default is 100 */

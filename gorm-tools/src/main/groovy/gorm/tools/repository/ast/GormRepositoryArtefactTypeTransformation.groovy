@@ -26,7 +26,9 @@ import grails.artefact.Artefact
 
 /**
  * A transformation that makes the GormRepository class into an @Artefact and adds the @Component annotation for scan
+ * No longer used, Just using a custom Spring annotation.
  */
+@Deprecated
 @CompileStatic
 @GroovyASTTransformation(phase = CompilePhase.CANONICALIZATION)
 class GormRepositoryArtefactTypeTransformation extends ArtefactTypeAstTransformation {
@@ -37,11 +39,11 @@ class GormRepositoryArtefactTypeTransformation extends ArtefactTypeAstTransforma
     // this gets called from visit. the one in ArtefactTypeAstTransformation super doesn't work as condition check is broken
     @Override
     protected void postProcess(SourceUnit sourceUnit, AnnotationNode annotationNode, ClassNode classNode, String artefactType) {
-        if(!hasAnnotation(classNode, ClassHelper.make(Artefact))) {
-            AnnotationNode annotation = new AnnotationNode(new ClassNode(Artefact))
-            annotation.addMember("value", new ConstantExpression(artefactType))
-            classNode.addAnnotation(annotation)
-        }
+        // if(!hasAnnotation(classNode, ClassHelper.make(Artefact))) {
+        //     AnnotationNode annotation = new AnnotationNode(new ClassNode(Artefact))
+        //     annotation.addMember("value", new ConstantExpression(artefactType))
+        //     classNode.addAnnotation(annotation)
+        // }
         //now add the Component annotation
         if(!hasAnnotation(classNode, COMPONENT_CLASS_NODE) && !hasAnnotation(classNode, SERVICE_CLASS_NODE) && !hasAnnotation(classNode, NAMED_CLASS_NODE)){
             classNode.addAnnotation(COMPONENT_ANN_NODE)

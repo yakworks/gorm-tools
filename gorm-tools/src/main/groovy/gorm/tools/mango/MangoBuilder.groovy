@@ -250,11 +250,10 @@ class MangoBuilder {
         }
         else { //will get here if fieldVal is not a Map and prop is null. maybe only blow error if prop is null?
             //fieldVal is bad somehow so blow an error
-            String msg = "Not Found [field:$field, entity:${getTargetClass(criteria).name}, fieldVal: $fieldVal]"
+            String msg = "No Match [field:$field, entity:${getTargetClass(criteria).name}, fieldVal: $fieldVal]"
             //XXX log it out for now, remove this once we know its ok
             log.error(msg)
             throw new IllegalArgumentException(msg)
-            //log.debug "No match in applyField for [field:$field, entity:${getTargetClass(criteria).name}, fieldVal: $fieldVal, fieldVal.class: ${fieldVal?.class}"
         }
 
     }

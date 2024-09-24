@@ -4,7 +4,7 @@
 */
 package gorm.tools.job
 
-import javax.servlet.http.HttpServletRequest
+//import javax.servlet.http.HttpServletRequest
 
 import groovy.json.JsonOutput
 import groovy.transform.CompileStatic
@@ -15,9 +15,10 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class JobUtils {
 
-    static String requestToSourceId(HttpServletRequest req){
-        String sourceId = "${req.method} ${req.requestURI}"
-        if(req.queryString) sourceId = "${sourceId}?${req.queryString}"
+    @Deprecated //removed the servlet api dependency
+    static String requestToSourceId(Object req){
+        String sourceId = "${req['method']} ${req['requestURI']}"
+        if(req['queryString']) sourceId = "${sourceId}?${req['queryString']}"
         return sourceId
     }
 

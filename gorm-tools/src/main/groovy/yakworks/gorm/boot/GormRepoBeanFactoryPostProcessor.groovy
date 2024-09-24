@@ -7,9 +7,14 @@ package yakworks.gorm.boot
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.model.AbstractMappingContext
+import org.grails.orm.hibernate.HibernateDatastore
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
+import org.springframework.context.MessageSource
+
+import gorm.tools.validation.RepoValidatorRegistry
 
 /**
  * Sets up the spring beans for the GormRepos.
@@ -23,6 +28,9 @@ class GormRepoBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
     List<Class> entityClasses
 
     AbstractMappingContext grailsDomainClassMappingContext
+
+    // @Autowired HibernateDatastore hibernateDatastore
+    // @Autowired MessageSource messageSource
 
     // GormRepoBeanFactoryPostProcessor(List<Class> entityClasses){
     //     this.entityClasses = entityClasses
@@ -49,6 +57,7 @@ class GormRepoBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
         SpringBeanUtils.registerRepos(registry, entityClasses)
 
+        //RepoValidatorRegistry.init(hibernateDatastore, messageSource)
     }
 
 }

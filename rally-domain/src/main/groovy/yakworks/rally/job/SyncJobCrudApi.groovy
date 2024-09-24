@@ -4,6 +4,7 @@
 */
 package yakworks.rally.job
 
+import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
 
@@ -28,6 +29,10 @@ class SyncJobCrudApi extends DefaultCrudApi<SyncJob> {
     Map entityToMap(SyncJob job, IncludesProps incProps){
         Map response = JobUtils.convertToMap(job)
         return response
+    }
+
+    static String requestToSourceId(HttpServletRequest req){
+        JobUtils.requestToSourceId(req)
     }
 
 }

@@ -105,7 +105,7 @@ class RepoTestUtils {
         metaMapService(MetaMapService, lazy())
         problemHandler(ProblemHandler, lazy())
         messageSource(GrailsICUMessageSource, lazy())
-        externalConfigLoader(ExternalConfigLoader, lazy())
+        //externalConfigLoader(ExternalConfigLoader, lazy())
     }}
 
     @CompileDynamic

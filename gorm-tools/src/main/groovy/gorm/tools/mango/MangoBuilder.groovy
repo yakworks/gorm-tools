@@ -101,6 +101,51 @@ class MangoBuilder {
         return mangoCriteria
     }
 
+    <D> MangoDetachedCriteria<D> createCriteria(Class<D> clazz, QueryArgs qargs){
+        MangoDetachedCriteria<D> mangoCriteria = new MangoDetachedCriteria<D>(clazz)
+        mangoCriteria.queryArgs = qargs
+        Map criteria = qargs.buildCriteria()
+        //will be copy if sort exists
+        def tidyMap = MangoTidyMap.tidy(criteria)
+        mangoCriteria.tidyMap = tidyMap
+        return mangoCriteria
+    }
+
+    <D> MangoDetachedCriteria<D> applyCriteria(MangoDetachedCriteria<D> mangoCriteria){
+        QueryArgs qargs = mangoCriteria.queryArgs
+        //will be copy if sort exists
+        Map tidyMap = mangoCriteria.tidyMap
+        Closure applyClosure = mangoCriteria.applyClosure
+
+        //apply the map
+        applyMapOrList(mangoCriteria, tidyMap)
+
+        //apply the closure
+        if (applyClosure) {
+            final Closure clonedClosure = (Closure) applyClosure.clone()
+            clonedClosure.setResolveStrategy(Closure.DELEGATE_FIRST)
+            mangoCriteria.with(clonedClosure)
+        }
+        //
+        //$sort was probably on the criteria as its added in QueryArgs?? but if not then use the property
+        if(qargs.sort && !tidyMap.containsKey(SORT)){
+            order(mangoCriteria, qargs.sort)
+        }
+
+        if(qargs.projections){
+            applyProjections(mangoCriteria, qargs.projections)
+        }
+
+        //apply select properties, this should not
+        if(qargs.select){
+            applySelect(mangoCriteria, qargs.select)
+        }
+
+        if(qargs.timeout) mangoCriteria.setTimeout(qargs.timeout)
+
+        return mangoCriteria
+    }
+
     /**
      * calls list for the criteria, if criteria has projections then calls mapList
      * which uses JpqlQueryBuilder
@@ -371,13 +416,14 @@ class MangoBuilder {
         return includesConfig.getIncludes(entityClazz, IncludesKey.qSearch.name())
     }
 
-    //@CompileDynamic
+    @CompileDynamic
     DetachedCriteria notIn(DetachedCriteria criteria, String propertyName, List params) {
         Map val = [:]
         val.put(propertyName, ['$in': params])
-        DetachedCriteria builtCrit = build(getTargetClass(criteria), val)
-        def qryCrit = builtCrit[propertyName] as QueryableCriteria
-        return criteria.notIn(propertyName, qryCrit)
+        // DetachedCriteria builtCrit = build(getTargetClass(criteria), val)
+        // def qryCrit = builtCrit[propertyName] as QueryableCriteria
+        // return criteria.notIn(propertyName, qryCrit)
+        return not(criteria, [val])
     }
 
     /**

@@ -52,6 +52,10 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     /** reference to QueryArgs used to build this if it exists */
     QueryArgs queryArgs
 
+    Map tidyMap
+
+    Closure applyClosure //main closure to apply
+
     Map<String, String> propertyAliases = [:]
 
     /**

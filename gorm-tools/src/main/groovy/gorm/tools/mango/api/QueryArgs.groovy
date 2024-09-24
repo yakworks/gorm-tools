@@ -47,6 +47,12 @@ class QueryArgs {
     List<String> ignoreKeys = ['controller', 'action', 'format', 'nd', '_search', 'includes', 'includesKey' ]
 
     /**
+     * the alias for the root entity of the query.
+     * MangoDetachedCriteria will default to entity name with "_" suffix ("${entityClass.simpleName}_")
+     */
+    String rootAlias
+
+    /**
      * extra closure that can be passed to MangoCriteria
      * future
      */
@@ -262,7 +268,12 @@ class QueryArgs {
     /**
      * builds a COPY of qCrieria merged with sort if it exists and removes the $qSearch=* if it exists
      */
+    @Deprecated
     Map<String, Object> buildCriteria(){
+        return buildCriteriaMap()
+    }
+
+    Map<String, Object> buildCriteriaMap(){
         ensureBuilt()
         Map<String, Object> criterium = qCriteria
         // if sort was populated, add it to the criteria with the $sort if its doesn't exist
@@ -273,7 +284,6 @@ class QueryArgs {
         if(criterium.containsKey(QSEARCH) && criterium[QSEARCH] == "*") criterium.remove(QSEARCH)
         return criterium
     }
-
     /**
      * Throws IllegalArgumentException if qRequired is true.
      * This forces it to pick up the q params in case it accidentally or inadvertantly dropped off.

@@ -49,6 +49,7 @@ class OrgRepo extends AbstractOrgRepo {
      */
     @Override
     MangoDetachedCriteria<Org> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure = null) {
+        //var crit = getMangoQuery().query(Org, queryArgs, closure)
         orgTagRepo.doExistsCriteria(queryArgs.qCriteria)
         return getMangoQuery().query(Org, queryArgs, closure)
     }

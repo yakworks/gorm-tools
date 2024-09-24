@@ -75,7 +75,7 @@ class ProblemHandler {
                 valProblem.detail(e.cause?.message)
             }
             //translate the errors
-            if(!valProblem.violations && valProblem.errors.hasErrors()){
+            if(!valProblem.violations && valProblem.errors?.hasErrors()){
                 //we do this late, not done when created with RepoExceptionSupport
                 valProblem.violations(ValidationProblem.transateErrorsToViolations(valProblem.errors))
             }

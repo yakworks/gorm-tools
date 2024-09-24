@@ -87,7 +87,6 @@ class GormToolsConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     JdbcIdGenerator jdbcIdGenerator(){ new JdbcIdGenerator() }
 
     @Bean

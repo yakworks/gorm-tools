@@ -96,10 +96,10 @@ class RestApiQueryValidationSpec extends Specification implements OkHttpRestTrai
     void "list with format xlsx"() {
         when:
         def resp = get("$path?q=*&max=1000&format=xlsx")
-        Map body = bodyToMap(resp)
 
         then: "should have allowed it"
-        body.ok
+        resp.code == 200
+        resp.header('Content-Disposition') == 'attachment;filename="org.xlsx"'
     }
 
     //returns the number of pages for org, based on given max

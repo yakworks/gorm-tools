@@ -27,6 +27,7 @@ import gorm.tools.repository.model.DataOp
 import gorm.tools.transaction.TrxUtils
 import grails.gorm.transactions.Transactional
 import yakworks.api.problem.data.DataProblem
+import yakworks.api.problem.data.DataProblemException
 import yakworks.gorm.api.support.BulkApiSupport
 import yakworks.gorm.api.support.QueryArgsValidator
 import yakworks.gorm.config.QueryConfig
@@ -228,12 +229,18 @@ class DefaultCrudApi<D> implements CrudApi<D> {
 
     void validateQueryArgs(QueryArgs args, Map params) {
         //FIXME, export to xlsx passes large number for max eg 10K at RNDC, below hack is to allow tht max for export
-        if(params && params['format'] == FORMAT_XLSX) {
-            if(args.pager.max > queryConfig.exportMax) {
-                args.pager.max = queryConfig.exportMax
-            }
-        } else {
+
+        boolean isExcelExport = params && params['format'] == FORMAT_XLSX
+
+        try {
             queryArgsValidator.validate(args)
+        } catch(DataProblemException ex) {
+            //For excel export, ui can send max=10,000 : if thts the case dont fail, catch and move on to override max to exportMax
+            if(isExcelExport && ex.code == "error.query.max") {
+                args.pager.max = queryConfig.exportMax
+            } else {
+                throw ex
+            }
         }
     }
 

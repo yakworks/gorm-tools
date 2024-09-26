@@ -13,7 +13,6 @@ class RestApiQueryValidationSpec extends Specification implements OkHttpRestTrai
 
     String path = "/api/rally/org"
 
-
     void setup(){
         login()
     }

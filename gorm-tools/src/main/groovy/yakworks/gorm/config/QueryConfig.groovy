@@ -17,4 +17,7 @@ class QueryConfig {
 
     /** Query timeout in seconds, default is 30 */
     Integer timeout = 30
+
+    /** Default to 1000, RNDC can have 10K **/
+    Integer exportMax = 1000
 }

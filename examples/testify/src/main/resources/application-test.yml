@@ -5,6 +5,7 @@ yakworks:
     query:
       max: 100
       timeout: 60
+      exportMax: 1000
 
 app:
   security:

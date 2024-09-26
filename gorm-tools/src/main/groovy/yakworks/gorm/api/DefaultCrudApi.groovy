@@ -29,6 +29,7 @@ import grails.gorm.transactions.Transactional
 import yakworks.api.problem.data.DataProblem
 import yakworks.gorm.api.support.BulkApiSupport
 import yakworks.gorm.api.support.QueryArgsValidator
+import yakworks.gorm.config.QueryConfig
 import yakworks.meta.MetaMap
 import yakworks.meta.MetaMapList
 import yakworks.spring.AppCtx
@@ -39,6 +40,8 @@ import yakworks.spring.AppCtx
 @CompileStatic
 class DefaultCrudApi<D> implements CrudApi<D> {
 
+    private static final String FORMAT_XLSX = "xlsx"
+
     Class<D> entityClass
 
     @Autowired HibernateDatastore hibernateDatastore
@@ -46,6 +49,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     @Autowired ApiConfig apiConfig
     @Autowired MetaMapService metaMapService
     @Autowired QueryArgsValidator queryArgsValidator
+    @Autowired QueryConfig queryConfig
 
     /** Not required but if an BulkSupport bean is setup then it will get get used */
     @Autowired(required = false)
@@ -209,21 +213,28 @@ class DefaultCrudApi<D> implements CrudApi<D> {
             .defaultSortById() //add default id sort if none exists
             .validateQ(qRequired()) //if q is required then blows error if nothing was parsed out
 
-        validateQueryArgs(qargs)
+        validateQueryArgs(qargs, qParams)
 
         return qargs
     }
 
     @Override
-    Map entityToMap(D instance, IncludesProps includesProps){
+    Map entityToMap(D instance, IncludesProps includesProps) {
         flushIfSession() //in testing need to flush before generating MetaMap
         List<String> incs = includesConfig.findIncludes(entityClass.name, includesProps, [])
         MetaMap emap = metaMapService.createMetaMap(instance, incs)
         return emap
     }
 
-    void validateQueryArgs(QueryArgs args) {
-        queryArgsValidator.validate(args)
+    void validateQueryArgs(QueryArgs args, Map params) {
+        //FIXME, export to xlsx passes large number for max eg 10K at RNDC, below hack is to allow tht max for export
+        if(params && params['format'] == FORMAT_XLSX) {
+            if(args.pager.max > queryConfig.exportMax) {
+                args.pager.max = queryConfig.exportMax
+            }
+        } else {
+            queryArgsValidator.validate(args)
+        }
     }
 
     protected boolean qRequired(){

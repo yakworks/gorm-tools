@@ -93,6 +93,15 @@ class RestApiQueryValidationSpec extends Specification implements OkHttpRestTrai
         body.title == "Query timeout has occurred"
     }
 
+    void "list with format xlsx"() {
+        when:
+        def resp = get("$path?q=*&max=1000&format=xlsx")
+        Map body = bodyToMap(resp)
+
+        then: "should have allowed it"
+        body.ok
+    }
+
     //returns the number of pages for org, based on given max
     int countPages(int max) {
         return Math.ceil((Double) (Org.count() / max)).intValue()

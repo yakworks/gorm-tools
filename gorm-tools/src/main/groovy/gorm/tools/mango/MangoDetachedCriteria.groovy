@@ -52,9 +52,12 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     /** reference to QueryArgs used to build this if it exists */
     QueryArgs queryArgs
 
-    Map tidyMap
+    /** the root map to apply. Wont neccesarily be same as whats in the QueryArgs as it will have been run through the tidy operation*/
+    Map criteriaMap
 
-    Closure applyClosure //main closure to apply
+    /** the root criteriaClosure to apply */
+    Closure criteriaClosure
+
 
     Map<String, String> propertyAliases = [:]
 
@@ -87,6 +90,15 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         new MangoDetachedCriteria(targetClass, alias)
     }
 
+    //make junctions accesible
+    List<Query.Junction> getJunctions(){
+        super.@junctions
+    }
+
+    //make target class accesible
+    Class getEntityClass(){
+        super.@targetClass
+    }
     /**
      * Returns a single result matching the criterion contained within this DetachedCriteria instance
      *

@@ -6,7 +6,6 @@ package gorm.tools.problem
 
 import groovy.transform.CompileStatic
 
-import org.springframework.context.MessageSourceResolvable
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
@@ -20,9 +19,6 @@ import yakworks.api.problem.Violation
 import yakworks.api.problem.ViolationFieldError
 import yakworks.api.problem.data.DataProblemException
 import yakworks.api.problem.data.DataProblemTrait
-import yakworks.i18n.icu.ICUMessageSource
-import yakworks.message.MsgServiceRegistry
-import yakworks.message.spi.MsgService
 
 /**
  * an extension of the default ValidationException so you can pass the entity and the message source

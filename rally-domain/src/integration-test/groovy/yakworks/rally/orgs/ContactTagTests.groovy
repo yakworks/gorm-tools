@@ -72,14 +72,14 @@ class ContactTagTests extends Specification implements DomainIntTest {
 
         List hasTag1 = Contact.query([
             '$not':[
-                [tags: [ [id:9] ]]
+                [tags: [ [id:9], [id:10]  ]]
                 //[name: 'foo']
                 //['$exists': TagLink.repo.buildExistsCriteria([9], Contact, 'contact_.id')]
             ]
         ]).list()
 
         then:
-        hasTag1.size() == 97
+        hasTag1.size() == 96
 
     }
 
@@ -98,6 +98,29 @@ class ContactTagTests extends Specification implements DomainIntTest {
 
         then:
         hasTag1.size() == 96
+
+    }
+
+    void "test Jpql with simple not"() {
+        when:
+        addTagsForSearch()
+
+        def criteria = Contact.query([
+            '$not':[
+                id: 1, name: 'bill'
+            ]
+        ])
+
+        def qlist = criteria.list()
+
+        def builder = JpqlQueryBuilder.of(criteria)
+        JpqlQueryInfo queryInfo = builder.buildSelect()
+
+        then: "The query is valid"
+        qlist.size() == 99
+        compareQuery(queryInfo.where, """
+            NOT (contact.id=:p1 OR contact.name=:p2)
+        """)
 
     }
 
@@ -129,9 +152,9 @@ class ContactTagTests extends Specification implements DomainIntTest {
         // """)
         compareQuery(queryInfo.where, """
             contact.name like :p1
-            AND NOT ((contact.org.name like :p2)
-            OR (EXISTS ( SELECT DISTINCT tagLink2 FROM yakworks.rally.tag.model.TagLink tagLink2
-            WHERE tagLink2.linkedId = contact.id AND tagLink2.linkedEntity=:p3 AND tagLink2.tag.id IN (:p4,:p5) ) ))
+            AND NOT (contact.org.name like :p2
+            OR EXISTS ( SELECT DISTINCT tagLink2 FROM yakworks.rally.tag.model.TagLink tagLink2
+            WHERE tagLink2.linkedId = contact.id AND tagLink2.linkedEntity=:p3 AND tagLink2.tag.id IN (:p4,:p5) ) )
             AND contact.editedDate <= :p6
         """)
 

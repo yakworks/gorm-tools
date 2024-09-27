@@ -11,7 +11,9 @@ import groovy.transform.CompileStatic
  */
 @CompileStatic
 class IncludesProps {
+    /** specified list of fields, ex [id, num, name, etc..] */
     List<String> includes
+    /** the key name to find includes on the api config */
     String includesKey
 
     static IncludesProps of(Map params){

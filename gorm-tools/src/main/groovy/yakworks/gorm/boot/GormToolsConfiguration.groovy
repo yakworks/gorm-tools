@@ -29,9 +29,8 @@ import gorm.tools.idgen.IdGenerator
 import gorm.tools.idgen.JdbcIdGenerator
 import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.jdbc.DbDialectService
-import gorm.tools.mango.DefaultMangoQuery
 import gorm.tools.mango.MangoBuilder
-import gorm.tools.mango.api.MangoQuery
+import gorm.tools.mango.api.QueryService
 import gorm.tools.metamap.services.MetaEntityService
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
@@ -92,8 +91,8 @@ class GormToolsConfiguration {
     @Bean
     IdGenerator idGenerator(JdbcIdGenerator jdbcIdGenerator){ new PooledIdGenerator(jdbcIdGenerator)}
 
-    @Bean
-    MangoQuery mangoQuery(){ new DefaultMangoQuery()}
+    // @Bean
+    // QueryService mangoQuery(){ new DefaultQueryService()}
 
     @Bean
     @ConditionalOnMissingBean

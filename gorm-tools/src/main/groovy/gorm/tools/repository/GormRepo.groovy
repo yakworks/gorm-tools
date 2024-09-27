@@ -14,7 +14,6 @@ import org.grails.datastore.gorm.GormValidationApi
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
 import org.springframework.transaction.TransactionDefinition
@@ -22,7 +21,8 @@ import org.springframework.transaction.TransactionDefinition
 import gorm.tools.beans.EntityResult
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.mango.api.MangoQuery
+import gorm.tools.mango.DefaultQueryService
+import gorm.tools.mango.api.QueryService
 import gorm.tools.mango.jpql.KeyExistsQuery
 import gorm.tools.model.Lookupable
 import gorm.tools.model.Persistable
@@ -57,8 +57,12 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
 
     @Autowired ProxyHandler proxyHandler
 
-    @Autowired @Qualifier("mangoQuery")
-    MangoQuery mangoQuery
+    @Autowired(required=false) // @Qualifier("mangoQuery")
+    QueryService<D> queryService
+
+    //legacy call, can remove once refactored
+    @Deprecated
+    QueryService<D> getMangoQuery(){ return getQueryService() }
 
     /** default to true. If false only method events are invoked on the implemented Repository. */
     Boolean enableEvents = true
@@ -81,6 +85,13 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
     Class<D> getEntityClass() {
         if (!entityClass) this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormRepo)
         return entityClass
+    }
+
+    @Autowired
+    QueryService getQueryService(){
+        if (!this.queryService) this.queryService = DefaultQueryService.of(getEntityClass())
+        //crudApi.debugEnabled = log.isDebugEnabled()
+        return this.queryService
     }
 
     /**

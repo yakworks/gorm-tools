@@ -1,6 +1,5 @@
 package yakworks.rally.mango
 
-import groovy.transform.CompileStatic
 
 import gorm.tools.mango.MangoBuilder
 import gorm.tools.mango.MangoTidyMap
@@ -57,7 +56,7 @@ class OrgMangoBench{
     void mangoBuilderBuild() {
         def start = BenchmarkHelper.startTime()
         for (int i = 0; i < cnt; i++) {
-            def crit = mangoBuilder.buildWithQueryArgs(Org, QueryArgs.of([name: "Org23"]), null)
+            def crit = mangoBuilder.build(Org, QueryArgs.of([name: "Org23"]), null)
             assert crit != null
         }
         println BenchmarkHelper.endTimeMsg("For loop", start)

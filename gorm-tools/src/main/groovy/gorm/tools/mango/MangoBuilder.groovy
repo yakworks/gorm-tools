@@ -46,76 +46,51 @@ class MangoBuilder {
 
     @Autowired IncludesConfig includesConfig
 
-    public <D> MangoDetachedCriteria<D> build(Class<D> clazz, Map map, @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
-        MangoDetachedCriteria<D> detachedCriteria = new MangoDetachedCriteria<D>(clazz)
-        return build(detachedCriteria, map, callable)
-    }
-
-    public <D> MangoDetachedCriteria<D> build(MangoDetachedCriteria<D> criteria, Map map,
-                                         @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
-        MangoDetachedCriteria newCriteria = cloneCriteria(criteria)
-        def tidyMap = MangoTidyMap.tidy(map)
-        applyMapOrList(newCriteria, tidyMap)
-        if (callable) {
-            final Closure clonedClosure = (Closure) callable.clone()
-            clonedClosure.setResolveStrategy(Closure.DELEGATE_FIRST)
-            newCriteria.with(clonedClosure)
-        }
-        return newCriteria
-    }
+    // public <D> MangoDetachedCriteria<D> build(Class<D> clazz, Map map, @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
+    //     MangoDetachedCriteria<D> detachedCriteria = new MangoDetachedCriteria<D>(clazz)
+    //     return build(detachedCriteria, map, callable)
+    // }
+    //
+    // public <D> MangoDetachedCriteria<D> build(MangoDetachedCriteria<D> criteria, Map map,
+    //                                      @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
+    //     MangoDetachedCriteria newCriteria = cloneCriteria(criteria)
+    //     def tidyMap = MangoTidyMap.tidy(map)
+    //     applyMapOrList(newCriteria, tidyMap)
+    //     if (callable) {
+    //         final Closure clonedClosure = (Closure) callable.clone()
+    //         clonedClosure.setResolveStrategy(Closure.DELEGATE_FIRST)
+    //         newCriteria.with(clonedClosure)
+    //     }
+    //     return newCriteria
+    // }
 
     @CompileDynamic //dynamic so it can access the protected criteria.clone
     static <D> MangoDetachedCriteria<D> cloneCriteria(DetachedCriteria<D> criteria) {
         (MangoDetachedCriteria)criteria.clone()
     }
 
-    public <D> MangoDetachedCriteria<D> buildWithQueryArgs(Class<D> clazz, QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
-        MangoDetachedCriteria<D> mangoCriteria = new MangoDetachedCriteria<D>(clazz)
-        mangoCriteria.queryArgs = qargs
-        Map criteria = qargs.buildCriteria()
-        //will be copy if sort exists
-        def tidyMap = MangoTidyMap.tidy(criteria)
-        applyMapOrList(mangoCriteria, tidyMap)
+    public <D> MangoDetachedCriteria<D> build(Class<D> clazz, QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
+        MangoDetachedCriteria<D> mangoCriteria = createCriteria(clazz, qargs, callable)
 
-        if (callable) {
-            final Closure clonedClosure = (Closure) callable.clone()
-            clonedClosure.setResolveStrategy(Closure.DELEGATE_FIRST)
-            mangoCriteria.with(clonedClosure)
-        }
-        //$sort was probably on the criteria as its added in QueryArgs?? but if not then use the property
-        if(qargs.sort && !criteria.containsKey(SORT)){
-            order(mangoCriteria, qargs.sort)
-        }
-
-        if(qargs.projections){
-            applyProjections(mangoCriteria, qargs.projections)
-        }
-
-        //apply select properties, this should not
-        if(qargs.select){
-            applySelect(mangoCriteria, qargs.select)
-        }
-
-        if(qargs.timeout) mangoCriteria.setTimeout(qargs.timeout)
+        applyCriteria(mangoCriteria)
 
         return mangoCriteria
     }
 
-    <D> MangoDetachedCriteria<D> createCriteria(Class<D> clazz, QueryArgs qargs){
+    <D> MangoDetachedCriteria<D> createCriteria(Class<D> clazz, QueryArgs qargs, Closure applyClosure){
         MangoDetachedCriteria<D> mangoCriteria = new MangoDetachedCriteria<D>(clazz)
         mangoCriteria.queryArgs = qargs
-        Map criteria = qargs.buildCriteria()
-        //will be copy if sort exists
-        def tidyMap = MangoTidyMap.tidy(criteria)
-        mangoCriteria.tidyMap = tidyMap
+        Map criteria = qargs.buildCriteriaMap()
+        mangoCriteria.criteriaMap = MangoTidyMap.tidy(criteria)
+        mangoCriteria.criteriaClosure = applyClosure
         return mangoCriteria
     }
 
     <D> MangoDetachedCriteria<D> applyCriteria(MangoDetachedCriteria<D> mangoCriteria){
         QueryArgs qargs = mangoCriteria.queryArgs
         //will be copy if sort exists
-        Map tidyMap = mangoCriteria.tidyMap
-        Closure applyClosure = mangoCriteria.applyClosure
+        Map tidyMap = mangoCriteria.criteriaMap
+        Closure applyClosure = mangoCriteria.criteriaClosure
 
         //apply the map
         applyMapOrList(mangoCriteria, tidyMap)
@@ -432,7 +407,7 @@ class MangoBuilder {
      * @return This criterion
      */
     DetachedCriteria and(DetachedCriteria criteria, List andList) {
-        criteria.junctions << new Query.Conjunction()
+        getJunctions(criteria) << new Query.Conjunction()
         handleJunction(criteria, andList)
         return criteria
     }
@@ -443,7 +418,7 @@ class MangoBuilder {
      * @return This criterion
      */
     DetachedCriteria or(DetachedCriteria criteria, List orList) {
-        criteria.junctions << new Query.Disjunction()
+        getJunctions(criteria) << new Query.Disjunction()
         handleJunction(criteria, orList)
         return criteria
     }
@@ -454,7 +429,7 @@ class MangoBuilder {
      * @return This criterion
      */
     DetachedCriteria not(DetachedCriteria criteria, List notList) {
-        criteria.junctions << new Query.Negation()
+        getJunctions(criteria) << new Query.Negation()
         handleJunction(criteria, notList)
         return criteria
     }
@@ -468,7 +443,8 @@ class MangoBuilder {
             applyMapOrList(criteria, list)
         }
         finally {
-            Query.Junction lastJunction = criteria.junctions.remove(criteria.junctions.size() - 1)
+            var junctions = getJunctions(criteria)
+            Query.Junction lastJunction = junctions.remove(junctions.size() - 1)
             criteria.add lastJunction
         }
     }
@@ -518,5 +494,10 @@ class MangoBuilder {
 
     static getEnumWithGet(Class<?> enumClass, Number id){
         return ClassUtils.callStaticMethod(enumClass, 'get', id)
+    }
+
+    @CompileDynamic
+    List<Query.Junction> getJunctions(DetachedCriteria criteria){
+        criteria.@junctions
     }
 }

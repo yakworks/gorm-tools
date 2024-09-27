@@ -5,7 +5,6 @@
 package yakworks.rally.activity.repo
 
 import java.time.LocalDateTime
-import javax.persistence.criteria.JoinType
 
 import groovy.transform.CompileStatic
 
@@ -15,6 +14,7 @@ import org.springframework.validation.Errors
 
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
+import gorm.tools.mango.api.QueryService
 import gorm.tools.model.Persistable
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepository
@@ -42,7 +42,6 @@ import yakworks.rally.tag.model.TagLink
 import yakworks.security.user.CurrentUser
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKind
-import static yakworks.rally.activity.model.Activity.VisibleTo
 
 @GormRepository
 @CompileStatic
@@ -142,8 +141,8 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
     /**
      * Override query for custom search for Tags and ActivityLinks
      */
-    @Override
-    MangoDetachedCriteria<Activity> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
+
+    MangoDetachedCriteria<Activity> queryOld(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
         Map crit = queryArgs.qCriteria
         DetachedCriteria actLinkExists
         if(crit.tags) {
@@ -155,7 +154,7 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
             String linkedEntity = crit.remove('linkedEntity') as String
             actLinkExists = getActivityLinkCriteria(linkedId, linkedEntity)
         }
-        MangoDetachedCriteria<Activity> detCrit = getMangoQuery().query(Activity, queryArgs, closure)
+        MangoDetachedCriteria<Activity> detCrit = getQueryService().query(queryArgs, closure)
         //if it has tags key
         // if(tagExistsCrit != null) {
         //     detCrit.exists(tagExistsCrit.id())
@@ -283,33 +282,6 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
             eqProperty("activity.id", "activity_.id")
             eq("linkedId", linkedId)
             eq("linkedEntity", linkedEntity)
-        }
-    }
-
-    @Deprecated //unused, here for reference on custArea
-    DetachedCriteria<Activity> zzzgetActivityByLinkedCriteria(Long linkedId,  String linkedEntity, boolean custArea = false) {
-        def actLinkExists = getActivityLinkCriteria(linkedId, linkedEntity)
-
-        return Activity.query {
-            setAlias 'activity_' //match default
-            createAlias('task', 'task')
-            join('task', JoinType.LEFT)
-            exists actLinkExists.id()
-            or {
-                isNull("task")
-                le("task.state", 1)
-            }
-            or {
-                eq("visibleTo", VisibleTo.Everyone)
-                if (!custArea) {
-                    ne("visibleTo", VisibleTo.Owner)
-                    and {
-                        eq("visibleTo", VisibleTo.Owner)
-                        eq("createdBy", currentUser.userId)
-                    }
-                }
-            }
-
         }
     }
 

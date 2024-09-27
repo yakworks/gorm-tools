@@ -263,6 +263,20 @@ class OrgTagTests extends Specification implements DomainIntTest {
         3 == orgs.size()
     }
 
+    void "criteria with list of ids" () {
+        when:
+        addTagsForSearch()
+        List has1or2 = Org.query(
+            tags:[
+                [id:1],
+                [id:2]
+            ]
+        ).list()
+
+        then:
+        has1or2.size() == 4
+    }
+
     void "criteria with list of id objects" () {
         when: "filter where orgs contain ANY of the tags"
         addTagsForSearch()

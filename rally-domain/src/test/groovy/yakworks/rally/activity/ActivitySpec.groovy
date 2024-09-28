@@ -18,7 +18,6 @@ import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
-import yakworks.rally.orgs.repo.OrgQuery
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
 import yakworks.rally.testing.MockData
@@ -32,9 +31,7 @@ class ActivitySpec extends Specification implements GormHibernateTest, SecurityT
         AttachmentLink, ActivityLink, Activity, MailMessage, TaskType, Attachment, ActivityNote, ActivityContact,
         Org, OrgTag, Tag, TagLink, Contact
     ]
-    static springBeans = [
-        ActivityQuery, OrgQuery
-    ]
+    static springBeans = [ ActivityQuery ]
 
     @Shared Long orgId
 

@@ -9,7 +9,7 @@ import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.testing.gorm.integration.DomainIntTest
 
-//@Ignore //un-ignore to see performance diffs
+@Ignore //un-ignore to see performance diffs
 @Integration
 @Rollback
 class OrgMangoBenchTests extends Specification implements DomainIntTest {

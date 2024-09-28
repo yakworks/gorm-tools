@@ -25,14 +25,14 @@ class SpringBeanUtils {
      * The key of of the beanDefMap is the bean name and the value is the Class or a List.
      * If its a List then the first item is the Class and the remianing items are what to pass to the constructor args.
      * If its start with an `@` then its set as a bean reference, liek you would do with `ref("foo")`.
-     *
+     * NOTE: lazy=false by default as its assumed you want them ready in tests.
      */
     static void registerBeans(BeanDefinitionRegistry beanDefinitionRegistry, Map<String, Object> beanMap) {
         for (String beanName : beanMap.keySet()) {
             Object val = beanMap.get(beanName)
             BeanDefinition bdef
             if(val instanceof Class){
-                bdef = BeanDefinitionBuilder.rootBeanDefinition(val).setLazyInit(true).getBeanDefinition()
+                bdef = BeanDefinitionBuilder.rootBeanDefinition(val).setLazyInit(false).getBeanDefinition()
             } else if (val instanceof List){
                 Class beanClass = val.pop()
                 def bdb = BeanDefinitionBuilder.rootBeanDefinition(beanClass)
@@ -43,7 +43,7 @@ class SpringBeanUtils {
                         bdb.addConstructorArgValue(arg)
                     }
                 }
-                bdef = bdb.setLazyInit(true).getBeanDefinition()
+                bdef = bdb.setLazyInit(false).getBeanDefinition()
             } else {
                 throw new IllegalArgumentException("bean map value must either be a class or a list where arg[0] is class and the rest are const args")
             }

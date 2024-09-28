@@ -62,10 +62,6 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
     //@Autowired(required=false)  can't autowire, the DefaultGormRepo beans dont retain the D generic
     QueryService<D> queryService
 
-    //legacy call, can remove once refactored
-    @Deprecated
-    QueryService<D> getMangoQuery(){ return getQueryService() }
-
     /** default to true. If false only method events are invoked on the implemented Repository. */
     Boolean enableEvents = true
 

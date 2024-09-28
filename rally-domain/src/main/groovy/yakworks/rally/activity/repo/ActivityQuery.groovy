@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
+import gorm.tools.mango.DefaultQueryService
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.model.Persistable
 import grails.gorm.DetachedCriteria
@@ -20,7 +21,6 @@ import grails.gorm.transactions.ReadOnly
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.attachment.model.AttachmentLink
-import yakworks.rally.tag.TaggableQueryService
 import yakworks.security.user.CurrentUser
 
 import static yakworks.rally.activity.model.Activity.VisibleTo
@@ -28,7 +28,7 @@ import static yakworks.rally.activity.model.Activity.VisibleTo
 @Service @Lazy
 @CompileStatic
 @Slf4j
-class ActivityQuery extends TaggableQueryService<Activity> {
+class ActivityQuery extends DefaultQueryService<Activity> {
 
     @Autowired ActivityLinkRepo activityLinkRepo
     @Autowired CurrentUser currentUser

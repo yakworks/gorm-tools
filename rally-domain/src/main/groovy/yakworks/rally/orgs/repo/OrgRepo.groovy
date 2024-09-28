@@ -10,6 +10,8 @@ import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.validation.Errors
 
+import gorm.tools.mango.MangoDetachedCriteria
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.api.QueryService
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
@@ -50,10 +52,14 @@ class OrgRepo extends AbstractOrgRepo {
     /**
      * special handling for tags
      */
-    // @Override
-    // MangoDetachedCriteria<Org> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure = null) {
-    //     //var crit = getMangoQuery().query(Org, queryArgs, closure)
-    //     orgTagRepo.doExistsCriteria(queryArgs.qCriteria)
-    //     return getMangoQuery().query(Org, queryArgs, closure)
-    // }
+    @Override
+    MangoDetachedCriteria<Org> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure applyClosure) {
+        MangoDetachedCriteria<Org> mangoCriteria = getQueryService().createCriteria(queryArgs, applyClosure)
+        //do the tags
+        orgTagRepo.doExistsCriteria(mangoCriteria.criteriaMap)
+        //apply as normal
+        getQueryService().applyCriteria(mangoCriteria)
+        return mangoCriteria
+    }
+
 }

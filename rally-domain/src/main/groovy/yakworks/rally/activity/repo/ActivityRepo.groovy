@@ -14,7 +14,6 @@ import org.springframework.validation.Errors
 
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
-import gorm.tools.mango.api.QueryService
 import gorm.tools.model.Persistable
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepository

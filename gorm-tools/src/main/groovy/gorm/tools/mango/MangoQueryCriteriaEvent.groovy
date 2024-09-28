@@ -13,29 +13,28 @@ import org.springframework.core.ResolvableTypeProvider
 //import org.springframework.core.GenericTypeResolver
 
 /**
- * Event fired after the MangoDetachedCriteria has been built.
- * Meaning criteriaMap has been run through tidymap
- *
+ * Event fired right before the criteriaMap and criteriaClosure are applied.
+ * Allows to intercept and modify whats in the criteriaMap.
  */
-//WIP
 @CompileStatic
-class MangoQueryGeneratedEvent<D> extends ApplicationEvent implements ResolvableTypeProvider {
+class MangoQueryCriteriaEvent<D> extends ApplicationEvent implements ResolvableTypeProvider {
 
     Class<D> entityClass // the domain class this is for
 
-    MangoDetachedCriteria<D> criteria
+    //MangoDetachedCriteria<D> criteria
 
-    MangoQueryGeneratedEvent(Class<D> entityClass, MangoDetachedCriteria<D> criteria) {
+    MangoQueryCriteriaEvent(Class<D> entityClass, MangoDetachedCriteria<D> criteria) {
         super(criteria)
         this.entityClass = entityClass
-        this.criteria = criteria
+        //this.criteria = criteria
+    }
+
+    MangoDetachedCriteria<D> getMangoCriteria(){
+        (MangoDetachedCriteria<D>) getSource()
     }
 
     /**
      * done per the spring docs so that listeners can bind to the generic of the event.
-     * ex: implements ApplicationListener<BeforeBindEvent<City>>
-     * or @EventListener
-     *    void beforeBind(BeforeBindEvent<City> event)
      */
     @Override
     ResolvableType getResolvableType() {

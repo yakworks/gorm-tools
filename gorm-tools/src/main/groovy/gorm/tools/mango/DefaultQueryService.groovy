@@ -69,7 +69,7 @@ class DefaultQueryService<D> implements QueryService<D> {
             // mangoBuilder.applyCriteria(mangoCriteria)
             return mangoCriteria
 
-        } catch (JsonException | InvokerInvocationException | IllegalArgumentException | DateTimeParseException ex) {
+        } catch (InvokerInvocationException | IllegalArgumentException | DateTimeParseException ex) {
             //See #1925 - Catch bad qargs
             throw DataProblem.ex("Invalid query string $ex.message")
         }
@@ -88,7 +88,17 @@ class DefaultQueryService<D> implements QueryService<D> {
      */
     @Override
     void applyCriteria(MangoDetachedCriteria<D> mangoCriteria){
-        mangoBuilder.applyCriteria(mangoCriteria)
+        publishCriteriaEvent(mangoCriteria)
+        try {
+            mangoBuilder.applyCriteria(mangoCriteria)
+        } catch (InvokerInvocationException | IllegalArgumentException | DateTimeParseException ex) {
+            //See #1925 - Catch bad qargs
+            throw DataProblem.ex("Invalid query string - $ex.message")
+        }
+    }
+
+    protected void publishCriteriaEvent(MangoDetachedCriteria<D> mangoCriteria){
+        AppCtx.publishEvent(new MangoQueryCriteriaEvent<>(getEntityClass(), mangoCriteria))
     }
 
     /**

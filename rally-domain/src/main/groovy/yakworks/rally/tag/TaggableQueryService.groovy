@@ -35,7 +35,7 @@ class TaggableQueryService<D> extends DefaultQueryService<D> {
     <D> void applyCriteria(MangoDetachedCriteria<D> mangoCriteria){
         Map crit = mangoCriteria.criteriaMap
         //if its has tags keys then this returns something to add to exists, will remove the keys as well
-        tagLinkRepo.doExistsCriteria(crit, mangoCriteria.entityClass, "${mangoCriteria.alias}.id")
+        //tagLinkRepo.doExistsCriteria(crit, mangoCriteria.entityClass, "${mangoCriteria.alias}.id")
         super.applyCriteria(mangoCriteria)
     }
 

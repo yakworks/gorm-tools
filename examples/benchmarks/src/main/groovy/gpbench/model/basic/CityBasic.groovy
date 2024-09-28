@@ -1,21 +1,19 @@
 package gpbench.model.basic
 
-import gorm.tools.repository.model.GormRepoEntity
+import gorm.tools.repository.model.RepoEntity
 import gpbench.model.Country
 import gpbench.model.Region
 import gpbench.model.traits.CityTrait
 import gpbench.model.traits.DateUserStamp
-import gpbench.repo.CityBasicRepo
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-import yakworks.commons.transform.IdEqualsHashCode
 
 /**
  * repo Baseline. This has a repo and has been touched by the gorm-tools AST
  */
 @Entity
 @GrailsCompileStatic
-class CityBasic implements CityTrait, DateUserStamp, GormRepoEntity<CityBasic, CityBasicRepo> {
+class CityBasic implements CityTrait, DateUserStamp, RepoEntity<CityBasic> {
 
     // static belongsTo = [region: Region, country: Country]
 

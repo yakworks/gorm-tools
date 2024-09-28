@@ -15,6 +15,8 @@ import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
+import org.springframework.core.ResolvableType
+import org.springframework.core.ResolvableTypeProvider
 import org.springframework.dao.DataAccessException
 import org.springframework.transaction.TransactionDefinition
 
@@ -23,6 +25,7 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.DefaultQueryService
 import gorm.tools.mango.api.QueryService
+import gorm.tools.mango.api.QueryServiceLookup
 import gorm.tools.mango.jpql.KeyExistsQuery
 import gorm.tools.model.Lookupable
 import gorm.tools.model.Persistable
@@ -40,6 +43,7 @@ import yakworks.api.HttpStatus
 import yakworks.api.problem.ThrowableProblem
 import yakworks.api.problem.data.NotFoundProblem
 import yakworks.commons.lang.ClassUtils
+import yakworks.spring.AppCtx
 
 /**
  * A trait that turns a class into a Repository
@@ -49,7 +53,7 @@ import yakworks.commons.lang.ClassUtils
  */
 @SuppressWarnings(['EmptyMethod', 'MethodCount'])
 @CompileStatic
-trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
+trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProvider  {
 
     @Autowired EntityMapBinder entityMapBinder
 
@@ -57,7 +61,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
 
     @Autowired ProxyHandler proxyHandler
 
-    @Autowired(required=false) // @Qualifier("mangoQuery")
+    //@Autowired(required=false) // @Qualifier("mangoQuery")
     QueryService<D> queryService
 
     //legacy call, can remove once refactored
@@ -87,11 +91,17 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
         return entityClass
     }
 
-    @Autowired
-    QueryService getQueryService(){
-        if (!this.queryService) this.queryService = DefaultQueryService.of(getEntityClass())
-        //crudApi.debugEnabled = log.isDebugEnabled()
+    QueryService<D> getQueryService(){
+        if (!this.queryService) {
+            this.queryService = QueryServiceLookup.lookup(getEntityClass())
+        }
         return this.queryService
+    }
+
+    @Override
+    ResolvableType getResolvableType() {
+        // return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forInstance(getEntity()))
+        return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forClass(getEntityClass()))
     }
 
     /**

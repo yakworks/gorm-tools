@@ -106,7 +106,7 @@ class Org implements NameNum, RepoEntity<Org>, HasTags, CreateCriteriaSupport, S
         // formulaz insertable: false, updateable: false , column:'id', lazy: true
     }
 
-    static OrgRepo getRepo() { RepoLookup.findRepo(this) as OrgRepo }
+    static OrgRepo getRepo() { (OrgRepo) RepoLookup.findRepo(this) }
 
     //gorm event
     def beforeInsert() {

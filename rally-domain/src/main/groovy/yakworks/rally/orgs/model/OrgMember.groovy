@@ -4,7 +4,8 @@
 */
 package yakworks.rally.orgs.model
 
-import gorm.tools.repository.model.GormRepoEntity
+import gorm.tools.repository.RepoLookup
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
@@ -14,7 +15,7 @@ import yakworks.security.audit.AuditStamp
 @Entity @AuditStamp
 @IdEqualsHashCode
 @GrailsCompileStatic
-class OrgMember implements GormRepoEntity<OrgMember, OrgMemberRepo>, Serializable {
+class OrgMember implements RepoEntity<OrgMember>, Serializable {
     static belongsTo = [Org]
     static transients = ['org']
 
@@ -64,6 +65,8 @@ class OrgMember implements GormRepoEntity<OrgMember, OrgMemberRepo>, Serializabl
                  oapi:[read: true, create: ['id', 'num']]
         ],
     ]
+
+    static OrgMemberRepo getRepo() { return (OrgMemberRepo) RepoLookup.findRepo(this) }
 
     OrgMember copy() {
         return new OrgMember(branch: this.branch, division: this.division, business: this.business,

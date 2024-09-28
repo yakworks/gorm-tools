@@ -49,8 +49,9 @@ class QueryArgs {
     /**
      * the alias for the root entity of the query.
      * MangoDetachedCriteria will default to entity name with "_" suffix ("${entityClass.simpleName}_")
+     * NOT USED, POC
      */
-    String rootAlias
+    //String rootAlias
 
     /**
      * extra closure that can be passed to MangoCriteria

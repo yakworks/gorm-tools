@@ -15,7 +15,7 @@ import yakworks.commons.lang.EnumUtils
 class MangoTidyMap {
 
     /**
-     * Transforms passed params map to normalized mango criteria map
+     * Normalizes and transforms passed params map to normalized mango criteria map
      *
      * @param map params that should be transformed to mango language
      * @return normalized mango map

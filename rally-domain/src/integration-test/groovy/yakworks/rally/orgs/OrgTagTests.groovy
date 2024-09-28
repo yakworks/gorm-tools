@@ -3,6 +3,7 @@ package yakworks.rally.orgs
 import java.time.LocalDate
 
 import gorm.tools.mango.MangoDetachedCriteria
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.jpql.JpqlQueryBuilder
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Rollback
@@ -173,7 +174,7 @@ class OrgTagTests extends Specification implements DomainIntTest {
     }
 
 
-    void "get all orgs that have ANY tags" () {
+    void "SANDBOX get all orgs that have ANY tags" () {
         when: "filter where orgs contain ANY of the tags"
         addTagsForSearch()
 
@@ -204,7 +205,7 @@ class OrgTagTests extends Specification implements DomainIntTest {
 
     }
 
-    void "get all orgs that have ALL of the  tags" () {
+    void "SANDBOX get all orgs that have ALL of the  tags" () {
 
         when: "filter where orgs contain ALL of the tags"
         addTagsForSearch()
@@ -235,7 +236,7 @@ class OrgTagTests extends Specification implements DomainIntTest {
         hasBoth.size() == 1
     }
 
-    void "criteria get all orgs that have ANY tags" () {
+    void "testing exists in the closure" () {
         when: "filter where orgs contain ANY of the tags"
         addTagsForSearch()
 
@@ -372,6 +373,38 @@ class OrgTagTests extends Specification implements DomainIntTest {
         //there are 50, we filtered out 14
         hasTag1.size() == 36
         //queryInfo.query == 'foo'
+    }
+
+    void "test setting alias on the MangoDetatchedCriteria and JpqlQueryBuilder" () {
+        given:
+        addTagsForSearch()
+        // def otags = OrgTag.query([:]).id().list()
+        // assert otags.size() == 10
+
+        Map criteriaMap = [
+            tags: [ [id:1], [id:2]  ]
+        ]
+        MangoDetachedCriteria mangoCriteria = Org.repo.queryService.createCriteria(QueryArgs.of(criteriaMap), null)
+        mangoCriteria.setAlias("someOrgAlias")
+        orgTagRepo.doExistsCriteria(mangoCriteria.criteriaMap, "${mangoCriteria.alias}.id")
+        Org.repo.queryService.applyCriteria(mangoCriteria)
+
+        assert mangoCriteria.list().size() == 4
+
+        when: "A jpa query is built"
+        def builder = JpqlQueryBuilder.of(mangoCriteria).entityAlias("someOrgAlias")
+        final queryInfo = builder.buildSelect()
+
+        then: "The query is valid"
+        queryInfo.query.trim() == strip("""
+            SELECT DISTINCT someOrgAlias FROM yakworks.rally.orgs.model.Org AS someOrgAlias
+            WHERE EXISTS (
+            SELECT DISTINCT orgTag0 FROM yakworks.rally.orgs.model.OrgTag orgTag0
+            WHERE orgTag0.linkedId = someOrgAlias.id AND orgTag0.tag.id IN (:p1,:p2)
+            )
+        """)
+
+        queryInfo.parameters == [1,2]
     }
 
 }

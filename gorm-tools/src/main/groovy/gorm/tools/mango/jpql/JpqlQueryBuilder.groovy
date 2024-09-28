@@ -698,7 +698,8 @@ class JpqlQueryBuilder {
          .append(propertyName)
          .append(operator)
 
-        //FIXME hack for now, if the other property ends with _ and removnig that matches the logicalName then its the alias
+        //FIXME hack for now, MangoDetachedCriteria defualt to the alias = enityName with _ suffix
+        // if the other property ends with _ and removnig that matches the logicalName then its the alias
         // used in EXISTS query where there is a subquery and we are tying it together.
         int dotIdx = otherProperty.indexOf(".")
         String rootObj = dotIdx > -1 ? otherProperty.substring(0, dotIdx) : otherProperty
@@ -707,7 +708,13 @@ class JpqlQueryBuilder {
             //[0..-2] removes last char from string
             q.append(rootObj[0..-2])
                 .append(restOfPath)
-        } else {
+        }
+        else if (rootObj == this.entityAlias){
+            String restOfPath = dotIdx > -1 ? otherProperty.substring(dotIdx) : ""
+            q.append(rootObj)
+                .append(restOfPath)
+        }
+        else {
             q.append(logicalName).append(DOT).append(otherProperty)
         }
 

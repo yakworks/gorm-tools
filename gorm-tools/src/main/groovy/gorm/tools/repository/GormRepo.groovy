@@ -23,7 +23,6 @@ import org.springframework.transaction.TransactionDefinition
 import gorm.tools.beans.EntityResult
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.mango.DefaultQueryService
 import gorm.tools.mango.api.QueryService
 import gorm.tools.mango.api.QueryServiceLookup
 import gorm.tools.mango.jpql.KeyExistsQuery
@@ -43,7 +42,6 @@ import yakworks.api.HttpStatus
 import yakworks.api.problem.ThrowableProblem
 import yakworks.api.problem.data.NotFoundProblem
 import yakworks.commons.lang.ClassUtils
-import yakworks.spring.AppCtx
 
 /**
  * A trait that turns a class into a Repository
@@ -61,7 +59,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
 
     @Autowired ProxyHandler proxyHandler
 
-    //@Autowired(required=false) // @Qualifier("mangoQuery")
+    //@Autowired(required=false)  can't autowire, the DefaultGormRepo beans dont retain the D generic
     QueryService<D> queryService
 
     //legacy call, can remove once refactored
@@ -93,6 +91,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
 
     QueryService<D> getQueryService(){
         if (!this.queryService) {
+            //creates a DefaultQueryService if one cant be found
             this.queryService = QueryServiceLookup.lookup(getEntityClass())
         }
         return this.queryService

@@ -46,24 +46,6 @@ class MangoBuilder {
 
     @Autowired IncludesConfig includesConfig
 
-    // public <D> MangoDetachedCriteria<D> build(Class<D> clazz, Map map, @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
-    //     MangoDetachedCriteria<D> detachedCriteria = new MangoDetachedCriteria<D>(clazz)
-    //     return build(detachedCriteria, map, callable)
-    // }
-    //
-    // public <D> MangoDetachedCriteria<D> build(MangoDetachedCriteria<D> criteria, Map map,
-    //                                      @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
-    //     MangoDetachedCriteria newCriteria = cloneCriteria(criteria)
-    //     def tidyMap = MangoTidyMap.tidy(map)
-    //     applyMapOrList(newCriteria, tidyMap)
-    //     if (callable) {
-    //         final Closure clonedClosure = (Closure) callable.clone()
-    //         clonedClosure.setResolveStrategy(Closure.DELEGATE_FIRST)
-    //         newCriteria.with(clonedClosure)
-    //     }
-    //     return newCriteria
-    // }
-
     @CompileDynamic //dynamic so it can access the protected criteria.clone
     static <D> MangoDetachedCriteria<D> cloneCriteria(DetachedCriteria<D> criteria) {
         (MangoDetachedCriteria)criteria.clone()
@@ -71,21 +53,29 @@ class MangoBuilder {
 
     public <D> MangoDetachedCriteria<D> build(Class<D> clazz, QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
         MangoDetachedCriteria<D> mangoCriteria = createCriteria(clazz, qargs, callable)
-
         applyCriteria(mangoCriteria)
-
         return mangoCriteria
     }
 
-    <D> MangoDetachedCriteria<D> createCriteria(Class<D> clazz, QueryArgs qargs, Closure applyClosure){
+    /**
+     * Creates the MangoDetachedCriteria object with the queryArgs.
+     * Does NOT apply or set it up yet.
+     */
+    <D> MangoDetachedCriteria<D> createCriteria(Class<D> clazz, QueryArgs queryArgs, Closure applyClosure){
         MangoDetachedCriteria<D> mangoCriteria = new MangoDetachedCriteria<D>(clazz)
-        mangoCriteria.queryArgs = qargs
-        Map criteria = qargs.buildCriteriaMap()
+        //assign the queryArgs for use later if needed
+        mangoCriteria.queryArgs = queryArgs
+        //assign the the criteriaMap and run the tidy on it to normalize it.
+        Map criteria = queryArgs.buildCriteriaMap()
+        //normalize the map and assign it
         mangoCriteria.criteriaMap = MangoTidyMap.tidy(criteria)
         mangoCriteria.criteriaClosure = applyClosure
         return mangoCriteria
     }
 
+    /**
+     * Applies the criteriaMap and criteriaClosure to setup the MangoDetachedCriteria
+     */
     <D> MangoDetachedCriteria<D> applyCriteria(MangoDetachedCriteria<D> mangoCriteria){
         QueryArgs qargs = mangoCriteria.queryArgs
         //will be copy if sort exists

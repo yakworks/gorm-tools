@@ -22,7 +22,7 @@ logging:
     org.springframework: INFO
     org.hibernate.orm.deprecation: OFF # turns off deprecation notices
     org.springframework.security: DEBUG
-
+    org.springframework.boot.autoconfigure: DEBUG
     yakworks.rally.api.rally.OrgController: DEBUG
     gorm.tools.mango.MangoDetachedCriteria: DEBUG
 

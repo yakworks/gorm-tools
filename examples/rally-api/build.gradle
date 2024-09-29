@@ -1,6 +1,4 @@
-apply plugin:"war"
-apply plugin:"org.grails.grails-web"
-// apply plugin:"org.grails.plugins.views-json"
+apply plugin:'yakworks.grails-web'
 
 apply from: "${rootDir}/gradle/compile.gradle"
 apply from: "${rootDir}/gradle/hibernate.gradle"
@@ -96,10 +94,14 @@ bootRun {
 }
 
 bootJar.enabled = true
-bootJar.archiveFileName = 'restify.jar'
+bootJar.archiveFileName = 'rally-api.jar'
 
 integrationTest.doFirst {
   //fix hazel cast Not supported: "http://javax.xml.XMLConstants/property/accessExternalDTD"
   // TODO the pac4j dependency adds some XML lib that is screwing this up
   systemProperty 'hazelcast.ignoreXxeProtectionFailures', true
+}
+
+springBoot {
+  mainClass = 'yakworks.rally.api.SpringApplication'
 }

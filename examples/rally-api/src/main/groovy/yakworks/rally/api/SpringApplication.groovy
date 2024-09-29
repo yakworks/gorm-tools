@@ -7,6 +7,9 @@ package yakworks.rally.api
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
@@ -14,11 +17,14 @@ import org.springframework.context.annotation.Import
 
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
+import grails.util.BuildSettings
 import yakworks.rally.RallyConfiguration
 import yakworks.rest.gorm.RestApiFromConfig
 
-// the component scan here does not seem to be the same as the packageNames and is needed to pick up the
-// the services marked with @Component
+/**
+ * Grails adds the @EnableWebMvc to the Application class. This annotation imports DelegatingWebMvcConfiguration and doesn't allow
+ * us to import ours. See the WebMvcConfiguration which is needed to create our custom RequestMappingHandlerAdapter.
+ */
 @ComponentScan(['yakworks.testing.gorm.model'])
 @RestApiFromConfig
 // caching will use hazelcast for spring caching too, look into how to use caffiene for spring stuff and hazel for hibernate.
@@ -27,8 +33,12 @@ import yakworks.rest.gorm.RestApiFromConfig
 // might want to do this if we are trying to force cache to use caffiene and only use hazel for hibernate.
 // @EnableAutoConfiguration(exclude = [HazelcastAutoConfiguration]) // in order to avoid autoconfiguring an extra Hazelcast instance
 @Import([RallyApiSpringConfig, WebMvcConfiguration])
+@EnableAutoConfiguration(
+    exclude = [DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class]
+)
+//@SpringBootApplication
 @CompileStatic
-class Application extends GrailsAutoConfiguration {
+class SpringApplication extends GrailsAutoConfiguration {
 
     /** add packages here where the @Entity classes are */
     @Override
@@ -37,7 +47,12 @@ class Application extends GrailsAutoConfiguration {
     }
 
     static void main(String[] args) {
-        GrailsApp.run(Application, args)
+        GrailsApp.run(SpringApplication, args)
+    }
+
+    // not sure if this is needed but grails adds it to the Application with the transformation
+    static {
+        System.setProperty(BuildSettings.MAIN_CLASS_NAME, "yakworks.rally.api.SpringApplication")
     }
 
     /*

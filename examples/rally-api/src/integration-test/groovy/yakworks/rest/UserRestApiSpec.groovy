@@ -1,13 +1,14 @@
 package yakworks.rest
 
-import org.springframework.boot.test.context.SpringBootTest
+
 import org.springframework.http.HttpStatus
 
-import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+import yakworks.rally.api.SpringApplication
+import yakworks.rest.client.OkHttpRestTrait
 
-@Integration
+@Integration(applicationClass = SpringApplication)
 class UserRestApiSpec extends Specification implements OkHttpRestTrait {
 
     String endpoint = "/api/rally/user"

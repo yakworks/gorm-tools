@@ -1,5 +1,6 @@
 package yakworks.rest
 
+import yakworks.rally.api.SpringApplication
 import yakworks.rest.gorm.controller.CrudApiController
 import grails.testing.mixin.integration.Integration
 import org.apache.commons.lang3.StringUtils
@@ -10,7 +11,7 @@ import yakworks.rally.orgs.model.Org
 import static org.springframework.http.HttpStatus.MULTI_STATUS
 
 // @Rollback
-@Integration
+@Integration(applicationClass = SpringApplication)
 class BulkControllerSpec extends RestIntTest {
 
     CrudApiController<Org> controller

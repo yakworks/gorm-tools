@@ -11,13 +11,14 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
 import spock.lang.Specification
+import yakworks.rally.api.SpringApplication
 import yakworks.rest.client.OkAuth
 import yakworks.rest.client.OkHttpRestTrait
 import yakworks.security.gorm.model.AppUserToken
 import yakworks.security.spring.token.store.TokenStore
 
 // @Ignore
-@Integration
+@Integration(applicationClass = SpringApplication)
 class OpaqueRestApiSpec extends Specification implements OkHttpRestTrait {
 
     @Autowired TokenStore tokenStore

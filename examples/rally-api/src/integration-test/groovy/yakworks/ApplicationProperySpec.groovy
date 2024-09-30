@@ -5,10 +5,11 @@ import org.springframework.beans.factory.annotation.Value
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+import yakworks.rally.api.SpringApplication
 import yakworks.rally.orgs.model.Org
 import yakworks.testing.gorm.integration.DomainIntTest
 
-@Integration
+@Integration(applicationClass = SpringApplication)
 @Rollback
 class ApplicationProperySpec extends Specification {
 

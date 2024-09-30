@@ -9,16 +9,17 @@ import groovy.transform.CompileStatic
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
+
+import yakworks.spring.CustomRequestMappingHandlerAdapter
 
 // @EnableWebMvc <- Remove annotation and extend from DelegatingWebMvcConfiguration directly
 @Configuration(proxyBeanMethods = false)
 @CompileStatic
 class WebMvcConfiguration extends DelegatingWebMvcConfiguration {
-    @Override
-    RequestMappingHandlerMapping createRequestMappingHandlerMapping() {
-        return new CustomRequestMappingHandlerMapping();
-    }
+    // @Override
+    // RequestMappingHandlerMapping createRequestMappingHandlerMapping() {
+    //     return new CustomRequestMappingHandlerMapping();
+    // }
 
     @Override
     RequestMappingHandlerAdapter createRequestMappingHandlerAdapter() {

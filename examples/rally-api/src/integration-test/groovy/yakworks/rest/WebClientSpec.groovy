@@ -6,9 +6,10 @@ import org.springframework.http.ResponseEntity
 
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+import yakworks.rally.api.SpringApplication
 import yakworks.rest.client.WebClientTrait
 
-@Integration
+@Integration(applicationClass = SpringApplication)
 class WebClientSpec extends Specification implements WebClientTrait {
 
     String endpoint = "/api/rally/user"

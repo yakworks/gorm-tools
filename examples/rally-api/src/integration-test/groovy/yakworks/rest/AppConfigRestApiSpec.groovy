@@ -2,6 +2,7 @@ package yakworks.rest
 
 import org.springframework.http.HttpStatus
 
+import yakworks.rally.api.SpringApplication
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
@@ -10,7 +11,7 @@ import yakworks.json.groovy.JsonEngine
 
 // import grails.gorm.transactions.Rollback
 
-@Integration
+@Integration(applicationClass = SpringApplication)
 class AppConfigRestApiSpec extends Specification implements OkHttpRestTrait {
 
     def setup(){

@@ -2,11 +2,12 @@ package yakworks.rest
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import yakworks.rally.api.SpringApplication
 import yakworks.testing.rest.RestIntTest
 import yakworks.rally.api.ApiResultsTestController
 
 @Rollback
-@Integration
+@Integration(applicationClass = SpringApplication)
 class ApiResultsTestControllerTests extends RestIntTest {
 
     ApiResultsTestController controller

@@ -8,6 +8,7 @@ import groovy.transform.CompileDynamic
 
 //see http://plugins.grails.org/plugin/grails/spring-security-appinfo
 // for app that shows app-info
+@SuppressWarnings('ThrowRuntimeException')
 @CompileDynamic
 class SecurityTestsController {
 

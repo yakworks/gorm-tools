@@ -6,6 +6,7 @@ package yakworks.rally.api
 
 
 import groovy.transform.CompileStatic
+import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 
 import org.springframework.http.HttpStatus
@@ -27,8 +28,25 @@ import org.springframework.web.bind.annotation.RestController
 class SmokeController {
 
     @GetMapping()
-    String home(@RequestParam String foo) {
-        "hello " + foo
+    String home(@RequestParam String foo, @RequestParam String bar) {
+        "hello foo:$foo bar:$bar"
+    }
+
+    //optional params without annotations are not required.
+    @GetMapping("optionals")
+    String noParams(String foo, String bar) {
+        "hello foo:$foo bar:$bar"
+    }
+
+    @GetMapping("model")
+    String modelTest(ParmsModel pmodel) {
+        "hello " + pmodel
+    }
+
+    @ToString(includePackage = false)
+    static class ParmsModel {
+        String foo
+        String bar
     }
 
     @PostMapping()
@@ -36,7 +54,7 @@ class SmokeController {
     Map smokeTestPost(@RequestParam String foo,
                       @RequestParam Map<String,String> params,
                       @RequestBody Map payload) {
-        assert foo == "bar"
+        assert foo == "buzz"
         params + payload
     }
 }

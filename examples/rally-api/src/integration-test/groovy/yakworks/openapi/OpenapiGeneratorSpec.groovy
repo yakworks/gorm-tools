@@ -5,8 +5,9 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
+import yakworks.rally.api.SpringApplication
 
-@Integration
+@Integration(applicationClass = SpringApplication)
 @Rollback
 class OpenapiGeneratorSpec extends Specification {
 

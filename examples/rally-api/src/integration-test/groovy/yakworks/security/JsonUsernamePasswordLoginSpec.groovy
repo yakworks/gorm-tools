@@ -4,12 +4,13 @@ import grails.testing.mixin.integration.Integration
 import okhttp3.Request
 import okhttp3.Response
 import spock.lang.Specification
+import yakworks.rally.api.SpringApplication
 import yakworks.rest.client.OkHttpRestTrait
 
 /**
  * test the legacy login with post username and password to login endpoint.
  */
-@Integration
+@Integration(applicationClass = SpringApplication)
 class JsonUsernamePasswordLoginSpec extends Specification implements OkHttpRestTrait {
 
     String endpoint = "/api/login"

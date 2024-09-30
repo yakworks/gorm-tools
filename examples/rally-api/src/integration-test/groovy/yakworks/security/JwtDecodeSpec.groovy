@@ -4,11 +4,11 @@ import org.springframework.http.HttpStatus
 
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import yakworks.rally.api.SpringApplication
+
 import yakworks.rest.client.OkAuth
 import yakworks.rest.client.OkHttpRestTrait
 
-@Integration(applicationClass = SpringApplication)
+@Integration
 class JwtDecodeSpec extends Specification implements OkHttpRestTrait {
 
     //default has an iss of https://yak.works

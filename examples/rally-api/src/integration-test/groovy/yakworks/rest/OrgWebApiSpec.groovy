@@ -10,7 +10,7 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import spock.lang.Specification
-import yakworks.rally.api.SpringApplication
+
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
@@ -21,7 +21,7 @@ import static yakworks.json.groovy.JsonEngine.parseJson
  * POC that Uses WebClient for testing instead of OkHttp
  * Requires
  */
-@Integration(applicationClass = SpringApplication)
+@Integration
 class OrgWebApiSpec extends Specification implements WebClientTrait, WithTrx {
 
     String path = "/api/rally/org"

@@ -4,12 +4,12 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
 import spock.lang.Specification
-import yakworks.rally.api.SpringApplication
+
 import yakworks.rally.orgs.model.Org
 import yakworks.rest.client.OkAuth
 import yakworks.rest.client.OkHttpRestTrait
 
-@Integration(applicationClass = SpringApplication)
+@Integration
 class RestApiQueryValidationSpec extends Specification implements OkHttpRestTrait {
 
     String path = "/api/rally/org"

@@ -1,6 +1,6 @@
 package yakworks.rest
 
-import yakworks.rally.api.SpringApplication
+
 import yakworks.rest.gorm.controller.CrudApiController
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
@@ -9,7 +9,7 @@ import yakworks.testing.rest.RestIntTest
 import yakworks.rally.orgs.model.Contact
 
 @Rollback
-@Integration(applicationClass = SpringApplication)
+@Integration
 class ContactControllerTests extends RestIntTest {
 
     CrudApiController<Contact> controller

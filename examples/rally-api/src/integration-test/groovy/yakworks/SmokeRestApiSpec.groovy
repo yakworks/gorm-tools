@@ -1,17 +1,14 @@
 package yakworks
 
-
 import org.springframework.http.HttpStatus
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
-import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.rally.api.SpringApplication
 import yakworks.rest.client.OkHttpRestTrait
 
-@Integration(applicationClass = SpringApplication)
+@Integration //
 @Rollback
 class SmokeRestApiSpec extends Specification implements OkHttpRestTrait {
 

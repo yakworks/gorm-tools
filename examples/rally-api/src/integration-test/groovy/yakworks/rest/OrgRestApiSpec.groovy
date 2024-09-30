@@ -6,7 +6,7 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import org.springframework.http.HttpStatus
 
-import yakworks.rally.api.SpringApplication
+
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.HttpUrl
@@ -16,7 +16,7 @@ import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
 
-@Integration(applicationClass = SpringApplication)
+@Integration
 class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
 
     String path = "/api/rally/org"

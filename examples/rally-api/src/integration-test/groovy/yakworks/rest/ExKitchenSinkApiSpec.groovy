@@ -2,7 +2,7 @@ package yakworks.rest
 
 import org.springframework.http.HttpStatus
 
-import yakworks.rally.api.SpringApplication
+
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
@@ -10,7 +10,7 @@ import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.json.groovy.JsonEngine
 
-@Integration(applicationClass = SpringApplication)
+@Integration
 class ExKitchenSinkApiSpec extends Specification implements OkHttpRestTrait {
 
     String path = "/api/kitchen"

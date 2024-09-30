@@ -7,13 +7,13 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.Response
 import spock.lang.Specification
-import yakworks.rally.api.SpringApplication
+
 import yakworks.rest.client.OkHttpRestTrait
 
 /**
  * Uses basic auth to login
  */
-@Integration(applicationClass = SpringApplication)
+@Integration
 class BasicAuthLoginSpec extends Specification implements OkHttpRestTrait {
 
     //String endpoint = "/api/token"

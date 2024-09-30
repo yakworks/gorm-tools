@@ -6,11 +6,11 @@ import org.springframework.security.oauth2.jwt.Jwt
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import yakworks.rally.api.SpringApplication
+
 import yakworks.security.spring.token.generator.JwtTokenExchanger
 import yakworks.testing.gorm.integration.DataIntegrationTest
 
-@Integration(applicationClass = SpringApplication)
+@Integration
 @Rollback
 class JwtTokenExchangerTest extends Specification implements DataIntegrationTest {
 

@@ -6,14 +6,14 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.Response
 import spock.lang.Specification
-import yakworks.rally.api.SpringApplication
+
 import yakworks.rest.client.OkAuth
 import yakworks.rest.client.OkHttpRestTrait
 
 /**
  * test the controller
  */
-@Integration(applicationClass = SpringApplication)
+@Integration
 class TokenRestApiSpec extends Specification implements OkHttpRestTrait {
 
     def setup(){

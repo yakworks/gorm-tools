@@ -5,10 +5,10 @@ import org.springframework.http.HttpStatus
 
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import yakworks.rally.api.SpringApplication
+
 import yakworks.rest.client.OkHttpRestTrait
 
-@Integration(applicationClass = SpringApplication)
+@Integration
 class UserRestApiSpec extends Specification implements OkHttpRestTrait {
 
     String endpoint = "/api/rally/user"

@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils
 import org.springframework.http.HttpStatus
 
 import gorm.tools.job.SyncJobState
-import yakworks.rally.api.SpringApplication
+
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
@@ -16,7 +16,7 @@ import yakworks.rally.orgs.model.OrgSource
 
 import static yakworks.json.groovy.JsonEngine.parseJson
 
-@Integration(applicationClass = SpringApplication)
+@Integration
 @Rollback
 class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
 

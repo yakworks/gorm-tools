@@ -2,7 +2,7 @@ package yakworks.rest
 
 import org.springframework.http.HttpStatus
 import yakworks.commons.map.Maps
-import yakworks.rally.api.SpringApplication
+
 import yakworks.rally.orgs.model.Org
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
@@ -15,7 +15,7 @@ import yakworks.security.gorm.model.AppUser
  * Sanity checks to hit the main endpoints. KISS, keep it simple
  * any special testing logic for an entity should be in its own test
  */
-@Integration(applicationClass = SpringApplication)
+@Integration
 class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
     String getPath(String entity) { "/api/${entity}" }

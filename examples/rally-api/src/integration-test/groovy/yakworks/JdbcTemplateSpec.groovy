@@ -10,10 +10,10 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import org.springframework.jdbc.core.JdbcTemplate
 import spock.lang.Specification
-import yakworks.rally.api.SpringApplication
+
 import yakworks.testing.gorm.model.KitchenSink
 
-@Integration(applicationClass = SpringApplication)
+@Integration
 @Rollback
 class JdbcTemplateSpec extends Specification {
 

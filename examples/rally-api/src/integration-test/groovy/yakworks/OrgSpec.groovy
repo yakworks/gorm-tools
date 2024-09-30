@@ -1,13 +1,12 @@
 package yakworks
 
-import yakworks.rally.api.SpringApplication
-import yakworks.testing.gorm.integration.DataIntegrationTest
-import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Org
+import yakworks.testing.gorm.integration.DataIntegrationTest
 
-@Integration(applicationClass = SpringApplication)
+@Integration
 @Rollback
 class OrgSpec extends Specification implements DataIntegrationTest {
 

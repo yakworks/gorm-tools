@@ -2,7 +2,7 @@ package yakworks.rest
 
 import org.springframework.http.HttpStatus
 
-import yakworks.rally.api.SpringApplication
+
 import yakworks.rally.orgs.model.ContactFlex
 import yakworks.rally.orgs.model.OrgFlex
 import yakworks.rest.gorm.controller.CrudApiController
@@ -14,7 +14,7 @@ import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
 
 @Rollback
-@Integration(applicationClass = SpringApplication)
+@Integration
 class OrgControllerTests extends RestIntTest {
 
     CrudApiController<Org> controller

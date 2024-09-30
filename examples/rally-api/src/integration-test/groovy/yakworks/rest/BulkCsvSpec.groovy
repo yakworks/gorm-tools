@@ -8,7 +8,7 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import yakworks.commons.io.ZipUtils
 import yakworks.commons.util.BuildSupport
-import yakworks.rally.api.SpringApplication
+
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.job.SyncJob
@@ -17,7 +17,7 @@ import yakworks.rest.gorm.controller.CrudApiController
 import yakworks.testing.rest.RestIntTest
 
 @Rollback
-@Integration(applicationClass = SpringApplication)
+@Integration
 class BulkCsvSpec  extends RestIntTest {
 
     CrudApiController<Contact> controller

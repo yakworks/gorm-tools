@@ -7,10 +7,10 @@ import grails.testing.mixin.integration.Integration
 import okhttp3.Response
 import spock.lang.Specification
 import yakworks.json.groovy.JsonEngine
-import yakworks.rally.api.SpringApplication
+
 import yakworks.rest.client.OkHttpRestTrait
 
-@Integration(applicationClass = SpringApplication)
+@Integration
 class RestErrorsSpec extends Specification implements OkHttpRestTrait {
     JdbcTemplate jdbcTemplate
 

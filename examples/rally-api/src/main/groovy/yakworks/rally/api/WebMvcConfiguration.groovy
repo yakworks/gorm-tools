@@ -10,21 +10,20 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter
 
-import yakworks.spring.CustomRequestMappingHandlerAdapter
+import yakworks.spring.params.ParamsHackRequestMappingHandlerAdapter
 
-// @EnableWebMvc <- Remove annotation and extend from DelegatingWebMvcConfiguration directly
+/**
+ * Params Hack
+ * @EnableWebMvc <- Need to remove the EnableWebMvc annotation and extend from DelegatingWebMvcConfiguration directly.
+ * EnableWebMvc imports the DelegatingWebMvcConfiguration so cant do both.
+ * With Grail this means that we can't use the normal grails-app/init/Application class since the transformation adds the EnableWebMvc
+ */
 @Configuration(proxyBeanMethods = false)
 @CompileStatic
 class WebMvcConfiguration extends DelegatingWebMvcConfiguration {
-    // @Override
-    // RequestMappingHandlerMapping createRequestMappingHandlerMapping() {
-    //     return new CustomRequestMappingHandlerMapping();
-    // }
 
     @Override
     RequestMappingHandlerAdapter createRequestMappingHandlerAdapter() {
-        RequestMappingHandlerAdapter handlerAdapter = new CustomRequestMappingHandlerAdapter();
-        //handlerMapping.setUseTrailingSlashMatch(false);
-        return handlerAdapter;
+        return new ParamsHackRequestMappingHandlerAdapter()
     }
 }

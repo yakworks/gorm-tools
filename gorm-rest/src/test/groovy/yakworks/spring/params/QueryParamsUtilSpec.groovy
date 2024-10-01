@@ -1,11 +1,8 @@
-package yakworks.spring
+package yakworks.spring.params
 
-import org.springframework.beans.factory.annotation.Autowired
 
 import spock.lang.Specification
-import yakworks.gorm.api.ApiConfig
-import yakworks.gorm.api.ApiUtils
-import yakworks.testing.grails.GrailsAppUnitTest
+import yakworks.spring.params.QueryParamsUtil
 
 /**
  * sanity checking that @ConfigurationProperties works

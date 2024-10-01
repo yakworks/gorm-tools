@@ -2,7 +2,7 @@
 * Copyright 2024 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.spring
+package yakworks.spring.params
 
 import java.nio.charset.StandardCharsets
 
@@ -28,6 +28,16 @@ class QueryParamsUtil {
         return toArrayMap(queryParams)
     }
 
+    private static Map<String, String> toSingleValueMap(Map<String, String[]> paramsMap) {
+        Map<String, String> svMap = [:] as Map<String, String>
+        //just gets first value
+        paramsMap.each { k,v ->
+            svMap[k] = v[0]
+        }
+        return svMap;
+    }
+
+    // convert to what stock request.getParameterMap would return. decode each value
     private static Map<String, String[]> toArrayMap(MultiValueMap<String, String> mvMap) {
         Map decodedMap = [:] as Map<String, String[]>
         //decode each one now

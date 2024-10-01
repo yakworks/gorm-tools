@@ -56,30 +56,8 @@ class ApiUtils {
             }
     }
 
-    /**
-     * Parses name=xyz&size=123 query string into a map
-     * Uses springs UriComponentsBuilder
-     * @param queryString the query params string to parse
-     * @return Map<String,String> the map version of the parsed string
-     */
-    static Map parseQueryParamsSpring(String queryString) {
-        if(!queryString) return [:]
-        MultiValueMap<String, String> queryParams = UriComponentsBuilder.fromUriString('?'+queryString).build().getQueryParams()
-        Map<String, String> singleValMap = toSingleValueMap(queryParams)
-        return singleValMap
-    }
-
     private static String decode(String s) {
         URLDecoder.decode(s, StandardCharsets.UTF_8.toString())
-    }
-
-    private static Map<String, String> toSingleValueMap(MultiValueMap<String, String> mvMap) {
-        Map<String, String> decodedMap = [:] as Map<String, String>
-        //decode each one now
-        mvMap.toSingleValueMap().each { k,v ->
-            decodedMap[decode(k)] = decode(v ?: '')
-        }
-        return decodedMap;
     }
 
 }

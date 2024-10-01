@@ -9,10 +9,12 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletRequestWrapper
 
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 
 /**
  * Wraps the request and re-parses the query string when the params are empty.
  */
+@Slf4j
 @CompileStatic
 class ParamsFixRequestWrapper extends HttpServletRequestWrapper {
 
@@ -81,6 +83,7 @@ class ParamsFixRequestWrapper extends HttpServletRequestWrapper {
         //possibly from an async operation, still investigating, the params in the request get lost or dropped, but queryString still there
         if(!hasRequestParameters() && httpRequest.queryString) {
             cachedParams = QueryParamsUtil.parseQueryString(httpRequest.queryString)
+            logDetails()
         } else {
             cachedParams = httpRequest.getParameterMap()
         }
@@ -90,6 +93,17 @@ class ParamsFixRequestWrapper extends HttpServletRequestWrapper {
         //always return false if we want to test with the parser
         //false
         httpRequest.getParameterMap()
+    }
+
+    void logDetails(){
+        if(log.isWarnEnabled()) {
+            String msg = """
+                ⚠️ - SPRING LOST PARAMS - REPARSED - ⚠️
+                queryString=[${httpRequest.queryString}] , method=[${httpRequest.method}] , requestURI=[${httpRequest.requestURI}], contentType:[${httpRequest.getContentType()}]
+            """.stripIndent()
+            //msg + "\n  params parsed from queryString - ${parsedParams}"
+            log.warn(msg)
+        }
     }
 
 }

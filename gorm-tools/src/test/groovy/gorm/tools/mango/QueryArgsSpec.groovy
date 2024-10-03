@@ -6,6 +6,7 @@ package gorm.tools.mango
 
 
 import gorm.tools.mango.api.QueryArgs
+import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.api.problem.data.DataProblemException
 
@@ -93,7 +94,7 @@ class QueryArgsSpec extends Specification {
         qargs.buildCriteriaMap() == [name: 'joe']
     }
 
-    @Ignore
+    @Ignore //this will no longer work. Requires qSearch to be used now so we can validate q.
     void "parseParams q is string so its quick search"() {
         when: 'no qSearchFields are passed in params'
         QueryArgs qargs = QueryArgs.of(q:"foo")

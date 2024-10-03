@@ -94,7 +94,7 @@ class OrgWebApiSpec extends Specification implements WebClientTrait, WithTrx {
         body.data.size() == 0
 
         when: 'num search'
-        body  = getBody("$path?q=11")
+        body  = getBody("$path?qSearch=11")
 
         then:
         body.data.size() == 1

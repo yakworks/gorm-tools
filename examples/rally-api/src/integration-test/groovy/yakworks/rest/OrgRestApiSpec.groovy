@@ -108,6 +108,19 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
         body.data[0].name == "Org20"
     }
 
+    void "test q used like qSearch"() {
+        when:
+        def resp = get("$path/picklist?q=foo")
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code == 400
+        !body.ok
+        body.title == "Data Problem"
+        body.code == "error.data.problem"
+        body.detail.contains "Invalid query Json parsing expected"
+    }
+
     void "test invalid q"() {
         when:
         String q = '({name: "Org20"})'

@@ -217,15 +217,19 @@ class QueryArgs {
         if(qParam) {
             if (qParam instanceof String) {
                 String qString = qParam as String
-                Map parsedMap
-                //if the q param start with { then assume its json and parse it
-                //the parsed map will be set to the criteria.
-                if (qString.trim().startsWith('{')) {
-                    qCriteria = parseJson(qString, Map)
-                    qCriteria = Maps.clone(qCriteria) //clone so it can me modified later
-                } else {
-                    //if its just a string then its assumed its a quick search, see below as it can be explicitely passed too
+
+                //FIXME
+                //if q=* just put it as QSEARCH, it will get removed whn building criteria
+                //Its used by Rest tests, otherwise because of qRequired, rests tests cant query without passing any criterias
+                if(qString.trim() == "*") {
                     qCriteria[QSEARCH] = qString
+                } else {
+                    //if the q param start with { then assume its json and parse it
+                    //the parsed map will be set to the criteria.
+                    qCriteria = parseJson(qString, Map)
+
+                    //clone so it can me modified later
+                    qCriteria = Maps.clone(qCriteria)
                 }
             }
             //as is, mostly for testing and programtic stuff

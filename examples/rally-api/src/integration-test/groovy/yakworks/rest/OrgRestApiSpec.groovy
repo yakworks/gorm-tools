@@ -63,7 +63,7 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
 
     void "test qSearch"() {
         when:
-        Response resp = get("$path?q=org2")
+        Response resp = get("$path?qSearch=org2")
         Map body = bodyToMap(resp)
 
         then:
@@ -71,14 +71,14 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
         body.data.size() == 10
 
         when:
-        resp = get("$path?q=flubber")
+        resp = get("$path?qSearch=flubber")
         body = bodyToMap(resp)
 
         then:
         body.data.size() == 0
 
         when: 'num search'
-        resp = get("$path?q=11")
+        resp = get("$path?qSearch=11")
         body = bodyToMap(resp)
 
         then:
@@ -86,7 +86,7 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
         body.data[0].num == '11'
 
         when: 'picklist search'
-        resp = get("$path/picklist?q=org12")
+        resp = get("$path/picklist?qSearch=org12")
         body = bodyToMap(resp)
 
         then:
@@ -107,6 +107,23 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
         body.data.size() == 1
         body.data[0].name == "Org20"
     }
+
+    void "test invalid q"() {
+        when:
+        String q = '({name: "Org20"})'
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(getUrl(path)).newBuilder()
+        urlBuilder.addQueryParameter("q", q)
+        def resp = get(urlBuilder.build().toString())
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code == 400
+        !body.ok
+        body.title == "Data Problem"
+        body.code == "error.data.problem"
+        body.detail.contains "Invalid query Json parsing expected"
+    }
+
 
     void "default sort by id"() {
 

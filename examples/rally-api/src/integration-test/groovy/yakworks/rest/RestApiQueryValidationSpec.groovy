@@ -14,7 +14,6 @@ class RestApiQueryValidationSpec extends Specification implements OkHttpRestTrai
 
     String path = "/api/rally/org"
 
-
     void setup(){
         login()
     }
@@ -92,6 +91,15 @@ class RestApiQueryValidationSpec extends Specification implements OkHttpRestTrai
         !body.ok
         body.code == "error.query.timeout"
         body.title == "Query timeout has occurred"
+    }
+
+    void "list with format xlsx"() {
+        when:
+        def resp = get("$path?q=*&max=1000&format=xlsx")
+
+        then: "should have allowed it"
+        resp.code == 200
+        resp.header('Content-Disposition') == 'attachment;filename="org.xlsx"'
     }
 
     //returns the number of pages for org, based on given max

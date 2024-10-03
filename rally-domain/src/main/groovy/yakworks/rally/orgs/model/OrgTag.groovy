@@ -4,9 +4,9 @@
 */
 package yakworks.rally.orgs.model
 
-import gorm.tools.repository.model.GormRepoEntity
+import gorm.tools.repository.RepoLookup
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
-import grails.gorm.DetachedCriteria
 import grails.persistence.Entity
 import yakworks.rally.orgs.repo.OrgTagRepo
 import yakworks.rally.tag.model.Tag
@@ -14,7 +14,7 @@ import yakworks.rally.tag.model.TagLinkTrait
 
 @Entity
 @GrailsCompileStatic
-class OrgTag implements TagLinkTrait<OrgTag>, GormRepoEntity<OrgTag, OrgTagRepo>, Serializable {
+class OrgTag implements TagLinkTrait<OrgTag>, RepoEntity<OrgTag>, Serializable {
 
     static transients = ['linkedEntity']
     static belongsTo = [tag: Tag]
@@ -33,6 +33,8 @@ class OrgTag implements TagLinkTrait<OrgTag>, GormRepoEntity<OrgTag, OrgTagRepo>
     static constraintsMap = [
         linkedEntity:[ description: 'dummy placeholder, will always be Org'],
     ]
+
+    static OrgTagRepo getRepo() { return (OrgTagRepo) RepoLookup.findRepo(this) }
 
     /**
      * Add exists criteria to a DetachedCriteria if its has tags

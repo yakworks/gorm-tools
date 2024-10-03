@@ -6,13 +6,9 @@ package gorm.tools.mango
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.stereotype.Component
 
 import gorm.tools.beans.Pager
-
-import javax.inject.Inject
-
-import gorm.tools.mango.api.MangoQuery
+import gorm.tools.mango.api.QueryService
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
@@ -49,11 +45,15 @@ class MangoThing implements RepoEntity<MangoThing> {
     String name
 }
 
-class NewMangoQuery implements MangoQuery {
+class NewMangoQuery extends DefaultQueryService<MangoThing> {
+
+    NewMangoQuery() {
+        super(MangoThing)
+    }
 
     @Override
-    MangoDetachedCriteria query(Class domainClass, QueryArgs qargs, Closure closure = null) {
-        new MangoDetachedCriteria(domainClass).build { eq "id", 2 }
+    MangoDetachedCriteria query(QueryArgs qargs, Closure closure = null) {
+        new MangoDetachedCriteria(MangoThing).build { eq "id", 2 }
     }
 
     @Override
@@ -66,8 +66,8 @@ class NewMangoQuery implements MangoQuery {
 @GormRepository
 class MangoThingRepo implements GormRepo<MangoThing> {
 
-    @Autowired @Qualifier("newMangoQuery")
-    MangoQuery mangoQuery
+    // @Autowired
+    // QueryService queryService
 
     //MangoQuery getMangoQuery(){ newMangoQuery }
 }

@@ -1,13 +1,13 @@
 package gpbench.model
 
-import gorm.tools.repository.model.GormRepoEntity
-import gpbench.repo.CountryRepo
+
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
 @Entity
 @GrailsCompileStatic
-class Country implements GormRepoEntity<Country, CountryRepo>{
+class Country implements RepoEntity<Country> {
     String name
     String capital
     String fips104

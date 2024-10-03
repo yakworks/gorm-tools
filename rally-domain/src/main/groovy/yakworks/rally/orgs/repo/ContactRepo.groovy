@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataRetrievalFailureException
 
 import gorm.tools.databinding.BindAction
-import gorm.tools.mango.MangoDetachedCriteria
-import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.events.AfterBindEvent
@@ -154,14 +152,6 @@ class ContactRepo extends LongIdGormRepo<Contact> {
         if(data.phones) super.persistToManyData(contact, ContactPhone.repo, data.phones as List<Map>, "contact")
         if(data.emails) super.persistToManyData(contact, ContactEmail.repo, data.emails as List<Map>, "contact")
         if(data.tags != null) TagLink.addOrRemoveTags(contact, data.tags)
-    }
-
-    @Override
-    MangoDetachedCriteria<Contact> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
-        Map criteriaMap = queryArgs.qCriteria
-        //if its has tags keys then this returns something to add to exists, will remove the keys as well
-        TagLink.repo.doExistsCriteria(criteriaMap, Contact, 'contact_.id')
-        return getMangoQuery().query(Contact, queryArgs, closure)
     }
 
     void removeAll(Org org) {

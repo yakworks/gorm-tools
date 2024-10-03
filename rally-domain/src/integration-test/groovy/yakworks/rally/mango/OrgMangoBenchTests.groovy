@@ -9,7 +9,7 @@ import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.testing.gorm.integration.DomainIntTest
 
-@Ignore
+@Ignore //un-ignore to see performance diffs
 @Integration
 @Rollback
 class OrgMangoBenchTests extends Specification implements DomainIntTest {
@@ -22,15 +22,41 @@ class OrgMangoBenchTests extends Specification implements DomainIntTest {
         OrgMangoBench.forLoopBaseLine()
     }
 
-    def "findByName"() {
+    //This is the fastest and sets baseline
+    def "get - JPQL"() {
+        expect:
+        OrgMangoBench.findWithHQL()
+    }
+
+    def "get - findByName"() {
         expect:
         OrgMangoBench.findByName()
     }
 
-    def "findWhere"() {
+    def "get - findWhere"() {
         expect:
         OrgMangoBench.findWhere()
     }
+
+    def "get - mangoOrgQuery with map"() {
+        expect:
+        OrgMangoBench.mangoOrgQueryGetWithMap()
+    }
+
+    def "get - mangoOrgQuery with closure"() {
+        expect:
+        OrgMangoBench.mangoOrgQueryGetWithClosure()
+    }
+
+    //------------ check the building of the MangoCriteria
+
+
+    // @IgnoreRest
+    def "tidyMap"() {
+        expect:
+        OrgMangoBench.tidyMap()
+    }
+
 
     //@IgnoreRest
     def "mangoBuilderBuild"() {
@@ -40,26 +66,23 @@ class OrgMangoBenchTests extends Specification implements DomainIntTest {
         orgMangoBench.mangoBuilderBuild()
     }
 
-    // @IgnoreRest
-    def "tidyMap"() {
-        expect:
-        OrgMangoBench.tidyMap()
-    }
-
     //@IgnoreRest
-    def "mangoOrgQuery no get"() {
+    def "mangoOrgQuery"() {
+        //should be almost same as mangoBuilderBuild
         expect:
         OrgMangoBench.mangoOrgQuery()
     }
 
-    def "mangoOrgQuery get with map"() {
+    def "mangoOrgQuery repo call"() {
+        //should be almost same as mangoBuilderBuild
         expect:
-        OrgMangoBench.mangoOrgQueryGetWithMap()
+        OrgMangoBench.mangoOrgQueryWithRepo()
     }
 
-    def "mangoOrgQuery get with closure"() {
+    def "mangoOrgQuery with closure"() {
+        //builds query with closure instead of map
         expect:
-        OrgMangoBench.mangoOrgQueryGetWithClosure()
+        OrgMangoBench.mangoOrgQueryWithClosure()
     }
 
 

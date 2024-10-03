@@ -7,19 +7,18 @@ package gorm.tools.mango
 import java.time.format.DateTimeParseException
 
 import groovy.json.JsonException
-import groovy.json.JsonParserType
-import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.InvokerInvocationException
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.beans.Pager
-import gorm.tools.mango.api.MangoQuery
 import gorm.tools.mango.api.QueryArgs
+import gorm.tools.mango.api.QueryService
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
 import yakworks.api.problem.data.DataProblem
+import yakworks.spring.AppCtx
 
 /**
  * Default implementation of MangoQuery. Setup as spring bean that is used by all the repos
@@ -28,17 +27,28 @@ import yakworks.api.problem.data.DataProblem
  * @since 6.1
  */
 @CompileStatic
-class DefaultMangoQuery implements MangoQuery {
+class DefaultQueryService<D> implements QueryService<D> {
 
     @Autowired
     MangoBuilder mangoBuilder
 
-    JsonSlurper jsonSlurper = new JsonSlurper().setType(JsonParserType.LAX)
+    Class<D> entityClass
+
+    DefaultQueryService(){}
+
+    DefaultQueryService(Class<D> entityClass){
+        this.entityClass = entityClass
+    }
+
+    public static <D> DefaultQueryService<D> of(Class<D> entityClass){
+        def qsInstance = new DefaultQueryService(entityClass)
+        AppCtx.autowire(qsInstance) //wire up the @Autowired
+        return qsInstance
+    }
 
     @Override
-    public <D> MangoDetachedCriteria<D> query(Class<D> entityClass, Map params,
-                                              @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
-        return query(entityClass, QueryArgs.of(params), closure)
+    MangoDetachedCriteria<D> query(Map params, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
+        return query(QueryArgs.of(params), closure)
     }
 
     /**
@@ -49,14 +59,46 @@ class DefaultMangoQuery implements MangoQuery {
      * @param closure extra criterai closure
      * @return the detached criteria to call list or get on
      */
-    public <D> MangoDetachedCriteria<D> query(Class<D> entityClass, QueryArgs qargs,
-                                              @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
+    @Override
+    MangoDetachedCriteria<D> query(QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure applyClosure = null) {
         try {
-            return mangoBuilder.buildWithQueryArgs(entityClass, qargs, closure)
-        } catch (JsonException | InvokerInvocationException | IllegalArgumentException | DateTimeParseException ex) {
+
+            MangoDetachedCriteria<D> mangoCriteria = createCriteria(qargs, applyClosure)
+            applyCriteria(mangoCriteria)
+            // MangoDetachedCriteria<D> mangoCriteria = mangoBuilder.createCriteria(getEntityClass() as Class<D>, qargs, applyClosure)
+            // mangoBuilder.applyCriteria(mangoCriteria)
+            return mangoCriteria
+
+        } catch (InvokerInvocationException | IllegalArgumentException | DateTimeParseException ex) {
             //See #1925 - Catch bad qargs
             throw DataProblem.ex("Invalid query string $ex.message")
         }
+    }
+
+    /**
+     * passes on to the mangoBuilder, allows sub-classes to override and modify
+     */
+    @Override
+    MangoDetachedCriteria<D> createCriteria(QueryArgs qargs, Closure applyClosure){
+        return mangoBuilder.createCriteria(getEntityClass() as Class<D>, qargs, applyClosure)
+    }
+
+    /**
+     * passes on to the mangoBuilder, allows sub-classes to override and modify
+     */
+    @Override
+    void applyCriteria(MangoDetachedCriteria<D> mangoCriteria){
+        publishCriteriaEvent(mangoCriteria)
+        try {
+            mangoBuilder.applyCriteria(mangoCriteria)
+        } catch (InvokerInvocationException | IllegalArgumentException | DateTimeParseException ex) {
+            //See #1925 - Catch bad qargs
+            throw DataProblem.ex("Invalid query string - $ex.message")
+        }
+    }
+
+    protected void publishCriteriaEvent(MangoDetachedCriteria<D> mangoCriteria){
+        AppCtx.publishEvent(new MangoQueryCriteriaEvent<>(getEntityClass(), mangoCriteria))
     }
 
     /**
@@ -90,9 +132,9 @@ class DefaultMangoQuery implements MangoQuery {
      * @return map where keys are names of fields and value - sum for restricted entities
      */
     @Transactional(readOnly = true)
-    Map countTotals(Class domainClass, Map params = [:], List<String> sums, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
+    Map countTotals(Map params = [:], List<String> sums, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
 
-        DetachedCriteria mangoCriteria = query(domainClass, params, closure)
+        DetachedCriteria mangoCriteria = query(params, closure)
 
         List totalList
         totalList = mangoCriteria.list {

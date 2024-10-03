@@ -61,6 +61,8 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>, ID> extends GormEntity<D> 
         findRepo().isNewOrDirty((GormEntity) this)
     }
 
+    //--------------static helpers ------------
+
     static D create(Map data) {
         return getRepo().create(data)
     }

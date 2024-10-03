@@ -6,7 +6,6 @@ package gorm.tools.mango
 
 
 import gorm.tools.mango.api.QueryArgs
-import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.api.problem.data.DataProblemException
 
@@ -23,7 +22,7 @@ class QueryArgsSpec extends Specification {
         )
         then:
         //parsed.criteria.id == 24
-        qargs.buildCriteria() == [id: 24, '$sort': ['foo':'asc']]
+        qargs.buildCriteriaMap() == [id: 24, '$sort': ['foo':'asc']]
         qargs.pager
 
         when: 'q is used and reserved pager is passed'
@@ -31,7 +30,7 @@ class QueryArgsSpec extends Specification {
 
         then: 'it should have them in criteria'
         //parsed.criteria.id == 24
-        qargs.buildCriteria() == [id: 24, offset: 'testing', '$sort': ['foo':'asc']]
+        qargs.buildCriteriaMap() == [id: 24, offset: 'testing', '$sort': ['foo':'asc']]
 
         qargs.pager.max == 10
         qargs.pager.offset == 10
@@ -47,7 +46,7 @@ class QueryArgsSpec extends Specification {
         //sort not in the qCriteria
         qargs.qCriteria == [id:24, something: 'testing']
         //sort is in the buildCriteria()
-        qargs.buildCriteria() == [id: 24, something: 'testing', '$sort': ['foo':'desc']]
+        qargs.buildCriteriaMap() == [id: 24, something: 'testing', '$sort': ['foo':'desc']]
 
         when: 'not using q and strict=false default'
         //when not using q or criteria
@@ -55,7 +54,7 @@ class QueryArgsSpec extends Specification {
 
         then: "adds the params to the criteria"
         qargs.qCriteria == [name: 'joe']
-        qargs.buildCriteria() == [name: 'joe', '$sort': ['foo':'asc']]
+        qargs.buildCriteriaMap() == [name: 'joe', '$sort': ['foo':'asc']]
 
         qargs.pager.max == 20
         qargs.pager.offset == 20 //(max * (page - 1))
@@ -65,7 +64,7 @@ class QueryArgsSpec extends Specification {
         when: "strict is false by default"
         qargs = QueryArgs.of(name: 'joe')
         then: "so q param is not required and props will be added"
-        qargs.buildCriteria() == [name: 'joe']
+        qargs.buildCriteriaMap() == [name: 'joe']
         qargs.pager
     }
 
@@ -85,13 +84,13 @@ class QueryArgsSpec extends Specification {
         QueryArgs qargs = QueryArgs.of(id: 123, name: 'joe', max: 10, sort:'bar:desc,foo:asc')
 
         then:
-        qargs.buildCriteria() == [id: 123, name: 'joe', '$sort': ['foo':'asc', bar:'desc']]
+        qargs.buildCriteriaMap() == [id: 123, name: 'joe', '$sort': ['foo':'asc', bar:'desc']]
         qargs.pager.max == 10
 
         when:
         qargs = QueryArgs.of(name: 'joe')
         then:
-        qargs.buildCriteria() == [name: 'joe']
+        qargs.buildCriteriaMap() == [name: 'joe']
     }
 
     @Ignore
@@ -100,7 +99,7 @@ class QueryArgsSpec extends Specification {
         QueryArgs qargs = QueryArgs.of(q:"foo")
 
         then:
-        qargs.buildCriteria() == ['$qSearch': 'foo']
+        qargs.buildCriteriaMap() == ['$qSearch': 'foo']
         qargs.pager
     }
 
@@ -110,7 +109,7 @@ class QueryArgsSpec extends Specification {
         QueryArgs qargs = new QueryArgs().strict(true).build(name: 'joe')
         then:
         qargs.qCriteria == [:]
-        qargs.buildCriteria() == [:]
+        qargs.buildCriteriaMap() == [:]
 
         when: 'not using q'
         //when not using q then it pulls out the sort, order and pager info and leaves the rest as is
@@ -118,7 +117,7 @@ class QueryArgsSpec extends Specification {
 
         then: "the params wont get added to criteria"
         qargs.qCriteria == [:]
-        qargs.buildCriteria() == [$sort:[bar:'asc']]
+        qargs.buildCriteriaMap() == [$sort:[bar:'asc']]
         qargs.pager.max == 10
 
     }
@@ -133,7 +132,7 @@ class QueryArgsSpec extends Specification {
         qargs.build(q: qjson, qSearch:'foo')
 
         then:
-        qargs.buildCriteria() == [id: 1, name: 'joe', '$qSearch': 'foo']
+        qargs.buildCriteriaMap() == [id: 1, name: 'joe', '$qSearch': 'foo']
         qargs.pager
 
     }
@@ -191,7 +190,7 @@ class QueryArgsSpec extends Specification {
 
         then:
         noExceptionThrown()
-        qargs.buildCriteria() == [id: 1, name: 'joe', '$sort': ['foo':'asc']]
+        qargs.buildCriteriaMap() == [id: 1, name: 'joe', '$sort': ['foo':'asc']]
 
     }
 
@@ -203,7 +202,7 @@ class QueryArgsSpec extends Specification {
         then:
         noExceptionThrown()
         qargs.qCriteria == [$qSearch:'foo']
-        qargs.buildCriteria() == ['$qSearch': 'foo', '$sort': ['foo':'asc']]
+        qargs.buildCriteriaMap() == ['$qSearch': 'foo', '$sort': ['foo':'asc']]
 
     }
 
@@ -231,7 +230,7 @@ class QueryArgsSpec extends Specification {
         //should keep the order
         keys[0] == "bar"
         keys[1] == "foo"
-        qargs.buildCriteria() == ['$sort': ['foo':'asc', bar:'desc']]
+        qargs.buildCriteriaMap() == ['$sort': ['foo':'asc', bar:'desc']]
 
         when:
         qargs = QueryArgs.of(sort:'{"xxx\': "desc", zzz: "asc"}')
@@ -240,7 +239,7 @@ class QueryArgsSpec extends Specification {
         //should keep the order
         keys[0] == "xxx"
         keys[1] == "zzz"
-        qargs.buildCriteria() == ['$sort': ['xxx':'desc', zzz:'asc']]
+        qargs.buildCriteriaMap() == ['$sort': ['xxx':'desc', zzz:'asc']]
     }
 
     def "sorts with only comma separted list of fields"() {
@@ -253,7 +252,7 @@ class QueryArgsSpec extends Specification {
         keys[0] == "foo"
         keys[1] == "bar"
         keys[2] == "baz"
-        qargs.buildCriteria() == ['$sort': ['foo':'asc', bar:'asc', baz:'asc']]
+        qargs.buildCriteriaMap() == ['$sort': ['foo':'asc', bar:'asc', baz:'asc']]
 
         when: "sanity check a single sort"
         qargs = QueryArgs.of(sort:"foo")
@@ -262,7 +261,7 @@ class QueryArgsSpec extends Specification {
         //should keep the order
         keys[0] == "foo"
         keys.size() == 1
-        qargs.buildCriteria() == ['$sort': ['foo':'asc']]
+        qargs.buildCriteriaMap() == ['$sort': ['foo':'asc']]
     }
 
     void "defaultSortById"() {

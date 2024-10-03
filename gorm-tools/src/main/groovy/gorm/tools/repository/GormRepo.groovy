@@ -14,15 +14,17 @@ import org.grails.datastore.gorm.GormValidationApi
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.GenericTypeResolver
+import org.springframework.core.ResolvableType
+import org.springframework.core.ResolvableTypeProvider
 import org.springframework.dao.DataAccessException
 import org.springframework.transaction.TransactionDefinition
 
 import gorm.tools.beans.EntityResult
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.mango.api.MangoQuery
+import gorm.tools.mango.api.QueryService
+import gorm.tools.mango.api.QueryServiceLookup
 import gorm.tools.mango.jpql.KeyExistsQuery
 import gorm.tools.model.Lookupable
 import gorm.tools.model.Persistable
@@ -49,7 +51,7 @@ import yakworks.commons.lang.ClassUtils
  */
 @SuppressWarnings(['EmptyMethod', 'MethodCount'])
 @CompileStatic
-trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
+trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProvider  {
 
     @Autowired EntityMapBinder entityMapBinder
 
@@ -57,8 +59,8 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
 
     @Autowired ProxyHandler proxyHandler
 
-    @Autowired @Qualifier("mangoQuery")
-    MangoQuery mangoQuery
+    //@Autowired(required=false)  can't autowire, the DefaultGormRepo beans dont retain the D generic
+    QueryService<D> queryService
 
     /** default to true. If false only method events are invoked on the implemented Repository. */
     Boolean enableEvents = true
@@ -81,6 +83,20 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D> {
     Class<D> getEntityClass() {
         if (!entityClass) this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormRepo)
         return entityClass
+    }
+
+    QueryService<D> getQueryService(){
+        if (!this.queryService) {
+            //creates a DefaultQueryService if one cant be found
+            this.queryService = QueryServiceLookup.lookup(getEntityClass())
+        }
+        return this.queryService
+    }
+
+    @Override
+    ResolvableType getResolvableType() {
+        // return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forInstance(getEntity()))
+        return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forClass(getEntityClass()))
     }
 
     /**

@@ -12,6 +12,7 @@ import org.springframework.validation.Errors
 
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
+import gorm.tools.mango.api.QueryService
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
 import yakworks.rally.orgs.model.Org
@@ -21,8 +22,12 @@ import yakworks.rally.orgs.model.Org
 @Slf4j
 class OrgRepo extends AbstractOrgRepo {
 
-    @Autowired OrgTagRepo orgTagRepo
+    //@Autowired OrgQuery orgQuery
 
+    // @Override
+    // QueryService getQueryService(){
+    //     orgQuery
+    // }
 
     // add @Override
     @RepoListener
@@ -48,8 +53,13 @@ class OrgRepo extends AbstractOrgRepo {
      * special handling for tags
      */
     @Override
-    MangoDetachedCriteria<Org> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure = null) {
-        orgTagRepo.doExistsCriteria(queryArgs.qCriteria)
-        return getMangoQuery().query(Org, queryArgs, closure)
+    MangoDetachedCriteria<Org> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure applyClosure) {
+        MangoDetachedCriteria<Org> mangoCriteria = getQueryService().createCriteria(queryArgs, applyClosure)
+        //do the tags
+        orgTagRepo.doExistsCriteria(mangoCriteria.criteriaMap)
+        //apply as normal
+        getQueryService().applyCriteria(mangoCriteria)
+        return mangoCriteria
     }
+
 }

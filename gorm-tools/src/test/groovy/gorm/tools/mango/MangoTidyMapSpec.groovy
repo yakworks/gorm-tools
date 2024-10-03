@@ -118,13 +118,123 @@ class MangoTidyMapSpec extends Specification {
             ]
         ])
 
-        then: "converts it to a list or maps"
+        then: "converts it to a list of maps"
         mmap == [
             '$not': [
                 [foo: [name: ['$ilike': "Name%"]]],
                 [buzz: [boo: ['$ilike': 'bar%']]]
             ]
         ]
+    }
+
+    void "test not simple"() {
+        when: 'the $not is a simple map'
+        def mmap = tidy([
+            '$not': [
+                id: 123
+            ]
+        ])
+
+        then: 'has single item in the list'
+        mmap == [
+            '$not': [
+                [ id: ['$eq':123] ]
+            ]
+        ]
+    }
+
+    void "test not multiple keys in map"() {
+        when: 'the $not is map with multiple keys'
+        def mmap = tidy([
+            '$not': [
+                id: 123, name: 'bill'
+            ]
+        ])
+
+        then: 'has 2 items in list'
+        mmap == [
+            '$not': [
+                [   id: ['$eq': 123] ],
+                [ name: ['$eq': 'bill'] ]
+            ]
+        ]
+    }
+
+    void "test not with list"() {
+        when: 'the $not is map with multiple keys'
+        def mmap = tidy([
+            '$not': [
+                [id: ['$eq': 1]],
+                [id: ['$eq': 2]]
+            ]
+        ])
+
+        then: 'has same items in list'
+        mmap == [
+            '$not': [
+                [id: ['$eq': 1]],
+                [id: ['$eq': 2]]
+            ]
+        ]
+    }
+
+    void "test not tags"() {
+        when: 'the $not is a map'
+        def mmap = tidy([
+            '$not':[
+                tags:[
+                    [id:9], [id:10]
+                ]
+            ]
+        ])
+
+        then: 'has single item in the list'
+        mmap == [
+            '$not':[
+                [tags:[
+                    id:[ $in:[9, 10] ]
+                ]]
+            ]
+        ]
+
+        when: 'the $not is a single item in list'
+        mmap = tidy([
+            '$not':[
+                [ id: [9,10]]
+            ]
+        ])
+
+        then: 'has just the single item'
+        mmap == [
+            '$not':[
+                [
+                    id:[ $in:[9, 10] ]
+                ]
+            ]
+        ]
+
+        when: 'the $not is a list'
+        mmap = tidy([
+            '$not':[
+                [ tags:[ [id:9], [id:10] ] ],
+                //[ id: 123 ]
+            ]
+        ])
+
+        then: 'has single item in the list'
+        mmap == [
+            '$not':[
+                [
+                    tags:[
+                        id:[ $in:[9, 10] ]
+                    ]
+                ],
+                // [
+                //     id: ['$eq': 123]
+                // ]
+            ]
+        ]
+
     }
 
     void "test eq"() {
@@ -181,7 +291,53 @@ class MangoTidyMapSpec extends Specification {
 
         then:
 
-        mmap == ['$or': [[id: ['$eq': 101]], [name: ['$ilike': 'Wal%']]]]
+        mmap == ['$or': [
+            [id: ['$eq': 101]],
+            [name: ['$ilike': 'Wal%']]
+        ]]
+
+    }
+
+    void "test \$and"() {
+        when:
+        def mmap = tidy([
+            '$and': [
+                "id"  : 101,
+                "name": "Wal%"
+            ]
+        ])
+
+        then:
+
+        mmap == ['$and': [
+            [id: ['$eq': 101]],
+            [name: ['$ilike': 'Wal%']]
+        ]]
+
+    }
+
+    void "test \$or with implied \$and "() {
+        when:
+        def mmap = tidy([
+            '$or': [
+                ["location.id": 5],
+                ["name": "Name1", "num": "num1"] //implied nested $and
+            ]
+        ])
+
+        then:
+
+        mmap == [
+            '$or':[
+                ['location.id':[$eq:5]],
+                [
+                    $and:[
+                        [name:[$eq: 'Name1']],
+                        [num:[$eq: 'num1']]
+                    ]
+                ]
+            ]
+        ]
 
     }
 
@@ -210,21 +366,31 @@ class MangoTidyMapSpec extends Specification {
 
         then:
 
-        flatten(mmap) == flatten([
-            '$or': [
+        // flatten(mmap) == flatten([
+        //     '$or': [
+        //         [
+        //             [ 'address.id': ['$eq': 5] ]
+        //         ],
+        //         [
+        //             '$and': [
+        //                 [name: ['$eq': "Org#1"] ],
+        //                 ['address.id': ['$eq': 4] ]
+        //             ]
+        //         ]
+        //     ]
+        // ])
+
+        flatten(mmap) == flatten(
+            $or: [
+                [ 'address.id': [$eq: 5] ],
                 [
-                    '$and': [
-                        [ 'address.id': ['$eq': 5] ]
-                    ]
-                ],
-                [
-                    '$and': [
-                        [name: ['$eq': "Org#1"] ],
-                        ['address.id': ['$eq': 4] ]
+                    $and: [
+                        [name: [$eq: "Org#1"] ],
+                        ['address.id': [$eq: 4] ]
                     ]
                 ]
             ]
-        ])
+        )
     }
 
 

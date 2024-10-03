@@ -96,7 +96,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
      * calls the IncludesConfig's getIncludes passing in any controller overrides
      */
     Map getIncludesMap(){
-        return includesConfig.getIncludes(entityClass)
+        return includesConfig.getIncludesMap(entityClass)
     }
 
     @Transactional(readOnly = true)
@@ -180,10 +180,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         try {
             Pager pager = Pager.of(qParams)
             List dlist = queryList(pager, qParams)
-            List<String> incs = includesConfig.findIncludes(entityClass.name, IncludesProps.of(qParams), includesKeys)
-            MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)
-            pager.setMetaMapList(entityMapList)
-            return pager
+            return createPagerResult(pager, includesKeys, qParams, dlist)
         } catch (JsonException | IllegalArgumentException | QueryException ex) {
             //See #1925 - Catch bad query in 'q' parameter and report back. So we dont pollute logs, and can differentiate that its not us.
             //Hibernate throws IllegalArgumentException when Antlr fails to parse query
@@ -205,6 +202,13 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         QueryArgs qargs = createQueryArgs(pager, qParams)
         //if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.buildCriteria()}")
         return getApiCrudRepo().query(qargs, null).pagedList(qargs.pager)
+    }
+
+    protected Pager createPagerResult(Pager pager, List<String> includesKeys, Map qParams, List dlist) {
+        List<String> incs = includesConfig.findIncludes(entityClass.name, IncludesProps.of(qParams), includesKeys)
+        MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)
+        pager.setMetaMapList(entityMapList)
+        return pager
     }
 
     protected QueryArgs createQueryArgs(Pager pager, Map qParams) {

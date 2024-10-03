@@ -89,7 +89,7 @@ class JpqlQueryBuilderCriteriaMapSpec extends Specification implements GormHiber
         //NOTE TODO, see the same query using closure, this adds extra parens
         compareQuery(queryInfo.query, """
         SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-        WHERE ((kitchenSink.num=:p1) OR (kitchenSink.num=:p2))
+        WHERE (kitchenSink.num=:p1 OR kitchenSink.num=:p2)
         """)
         queryInfo.parameters == ['1', '2']
 

@@ -9,8 +9,8 @@ import groovy.transform.CompileStatic
 import gorm.tools.beans.EntityResult
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.mango.MangoDetachedCriteria
-import gorm.tools.mango.api.MangoQuery
 import gorm.tools.mango.api.QueryArgs
+import gorm.tools.mango.api.QueryService
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.RepoUtil
@@ -24,7 +24,7 @@ interface ApiCrudRepo<D> {
 
     Class<D> getEntityClass()
 
-    MangoQuery getMangoQuery()
+    QueryService getQueryService()
 
     /**
      * Inserts data, transactional wrap for doCreate
@@ -135,7 +135,7 @@ interface ApiCrudRepo<D> {
      * @return Detached criteria build based on mango language params and criteria closure
      */
     default MangoDetachedCriteria<D> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
-        getMangoQuery().query(getEntityClass(), queryArgs, closure)
+        getQueryService().query(queryArgs, closure)
     }
 
     default MangoDetachedCriteria<D> query(QueryArgs queryArgs) {

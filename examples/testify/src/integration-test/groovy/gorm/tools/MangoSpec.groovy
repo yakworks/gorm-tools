@@ -389,7 +389,7 @@ class MangoSpec extends Specification {
         when:
         List list = Org.repo.query([q: [id: ['$nin': [2, 3, 4, 5]]]]).list(max: 150)
         then:
-        list.size() == Org.createCriteria().list() { not { inList "id", [2L, 3L, 4L, 5L] } }.size()
+        list.size() == Org.executeQuery("from Org where id not in (2, 3, 4, 5)").size()
     }
 
     def "Filter on enums"() {
@@ -449,7 +449,7 @@ class MangoSpec extends Specification {
 
     def "test quick search"() {
         when:
-        List list = Org.repo.query(q: "Org2").pagedList()
+        List list = Org.repo.query(qSearch: "Org2").pagedList()
         then:
         list.size() == 10
 
@@ -457,7 +457,7 @@ class MangoSpec extends Specification {
 
     def "test quick search with q"() {
         when:
-        List list = Org.repo.query(q: "Org2").list()
+        List list = Org.repo.query(qSearch: "Org2").list()
         then:
         list.size() == 10
 

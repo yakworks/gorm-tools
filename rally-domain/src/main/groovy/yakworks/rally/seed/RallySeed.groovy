@@ -16,6 +16,7 @@ import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.model.TaskType
+import yakworks.rally.activity.repo.ActivityQuery
 import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.OrgDimensionService
 import yakworks.rally.orgs.OrgService
@@ -60,7 +61,7 @@ class RallySeed {
     }
 
     //extra spring beans when orgMember and orgDimensionService is being used.
-    static List springBeanList = [OrgProps, OrgDimensionService, OrgService]
+    static List springBeanList = [OrgProps, OrgDimensionService, OrgService, ActivityQuery ]
 
     // see good explanation of thread safe static instance stratgey https://stackoverflow.com/a/16106598/6500859
     @SuppressWarnings('UnusedPrivateField')

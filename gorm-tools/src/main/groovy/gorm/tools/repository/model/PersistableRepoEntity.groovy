@@ -61,12 +61,23 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>, ID> extends GormEntity<D> 
         findRepo().isNewOrDirty((GormEntity) this)
     }
 
+    //--------------static helpers ------------
+
     static D create(Map data) {
         return getRepo().create(data)
     }
 
     static D update(Map data) {
         getRepo().update(data)
+    }
+
+    /**
+     * REPLACE the one in GormEntity as it has a bug and is creating a very bad cross join on same table
+     * Checks whether an entity exists
+     * @Override GormEntity.exists
+     */
+    static boolean exists(Serializable id) {
+        getRepo().exists(id)
     }
 
     /**

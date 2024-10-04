@@ -12,6 +12,7 @@ import gorm.tools.repository.GormRepository
 import gorm.tools.repository.model.AbstractLinkedEntityRepo
 import grails.gorm.DetachedCriteria
 import yakworks.commons.beans.Transform
+import yakworks.commons.map.Maps
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
 
@@ -80,7 +81,13 @@ class TagLinkRepo extends AbstractLinkedEntityRepo<TagLink, Tag> {
                 if (notData['tags']) mapWithTags = (Map)notData
             }
         }
-        List<Long> tagIds = Transform.objectToLongList((List)mapWithTags.remove('tags'), 'id')
+        //if it has nothing then exit
+        if(!mapWithTags.containsKey('tags')) return
+
+        List tagIds = Maps.value(mapWithTags, 'tags.id.$in') as List
+        tagIds = Transform.toLongList(tagIds) //make it long list
+        mapWithTags.remove('tags') //remove it so its not picked up
+
         if(tagIds){
             mapWithTags['$exists'] = buildExistsCriteria(tagIds, linkedEntityClazz, linkedIdJoinProperty)
         }

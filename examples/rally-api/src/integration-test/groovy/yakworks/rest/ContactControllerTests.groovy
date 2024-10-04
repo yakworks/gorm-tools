@@ -63,7 +63,7 @@ class ContactControllerTests extends RestIntTest {
     }
 
     void "pick list"() {
-        controller.params << [q:"John100", max:20]
+        controller.params << [qSearch:"John100", max:20]
 
         when:
         controller.picklist()

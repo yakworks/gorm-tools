@@ -5,7 +5,8 @@
 package yakworks.rally.orgs.model
 
 import gorm.tools.model.SourceTrait
-import gorm.tools.repository.model.GormRepoEntity
+import gorm.tools.repository.RepoLookup
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
@@ -16,7 +17,7 @@ import yakworks.security.audit.AuditStamp
 @AuditStamp
 @IdEqualsHashCode
 @GrailsCompileStatic
-class OrgSource implements GormRepoEntity<OrgSource, OrgSourceRepo>, SourceTrait, Serializable {
+class OrgSource implements RepoEntity<OrgSource>, SourceTrait, Serializable {
     //Org org //belongsTo org but since it is both a 1toMany and and association on the org we dont use the belongsTo
     Long orgId
 
@@ -42,6 +43,7 @@ class OrgSource implements GormRepoEntity<OrgSource, OrgSourceRepo>, SourceTrait
         orgType column: 'orgTypeId', enumType: 'identity'
     }
 
+    static OrgSourceRepo getRepo() { return (OrgSourceRepo) RepoLookup.findRepo(this) }
 
     //just in case validation and repo are bypassed during creation make sure its gets an id
     // def beforeInsert() {

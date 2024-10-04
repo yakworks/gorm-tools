@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 import groovy.transform.CompileDynamic
 
 import gorm.tools.model.NameNum
-import gorm.tools.repository.model.GormRepoEntity
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
@@ -24,7 +24,7 @@ import yakworks.security.audit.AuditStamp
 @Entity
 // @ManagedEntity //see ManagedEntitySinkSpec
 @GrailsCompileStatic
-class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRepo> {
+class KitchenSink implements NameNum, RepoEntity<KitchenSink> {
     //<- ext belong to KitchenSink
     // since ext also has an KitchenSink property (kitchenParent) it will confused
     // example of how to explcitly force the "belongsTo"  with the mappedBy

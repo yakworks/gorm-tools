@@ -328,7 +328,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
         then:
         !Org.get(10)
-        !Contact.exists(10)
+        !Contact.exists(10L)
         !Contact.findWhere(num: 'secondary10')
         !Contact.findAllByOrg(org)
         !OrgFlex.get(org.id)

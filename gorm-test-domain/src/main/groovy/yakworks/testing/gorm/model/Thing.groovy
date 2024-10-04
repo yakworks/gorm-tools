@@ -14,7 +14,7 @@ import yakworks.commons.transform.IdEqualsHashCode
 @IdEqualsHashCode
 @GrailsCompileStatic
 // @ManagedEntity
-class Thing implements NamedEntity, RepoEntity<Thing> {
+class Thing implements NamedEntity, RepoEntity<Thing>, Serializable {
 
     // address fields
     String name

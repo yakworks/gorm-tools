@@ -12,6 +12,7 @@ import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.InvokerInvocationException
+import org.codehaus.groovy.runtime.typehandling.GroovyCastException
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.beans.Pager
@@ -53,7 +54,7 @@ class DefaultMangoQuery implements MangoQuery {
                                               @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
         try {
             return mangoBuilder.buildWithQueryArgs(entityClass, qargs, closure)
-        } catch (JsonException | InvokerInvocationException | IllegalArgumentException | DateTimeParseException ex) {
+        } catch (JsonException | InvokerInvocationException | IllegalArgumentException | DateTimeParseException | GroovyCastException ex) {
             //See #1925 - Catch bad qargs
             throw DataProblem.ex("Invalid query string $ex.message")
         }

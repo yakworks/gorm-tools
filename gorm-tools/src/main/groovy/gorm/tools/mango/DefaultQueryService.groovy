@@ -70,7 +70,7 @@ class DefaultQueryService<D> implements QueryService<D> {
             // mangoBuilder.applyCriteria(mangoCriteria)
             return mangoCriteria
 
-        } catch (InvokerInvocationException | IllegalArgumentException | DateTimeParseException ex) {
+        } catch (InvokerInvocationException | IllegalArgumentException | DateTimeParseException | GroovyCastException ex) {
             //See #1925 - Catch bad qargs
             throw DataProblem.ex("Invalid query string $ex.message")
         }

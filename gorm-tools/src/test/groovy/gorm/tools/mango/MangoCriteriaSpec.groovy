@@ -313,14 +313,6 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
         results[1] == two
     }
 
-    void "invalid type"() {
-        when:
-        List results = build(uid:['$eq': 1]).list()
-
-        then:
-        noExceptionThrown()
-    }
-
     def "test gt"() {
         when:
 

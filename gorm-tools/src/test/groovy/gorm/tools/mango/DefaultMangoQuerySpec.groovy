@@ -11,6 +11,7 @@ import testing.AddyNested
 import testing.Cust
 import testing.CustRepo
 import testing.TestSeedData
+import yakworks.api.problem.data.DataProblemException
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class DefaultMangoQuerySpec extends Specification implements GormHibernateTest {
@@ -158,6 +159,16 @@ class DefaultMangoQuerySpec extends Specification implements GormHibernateTest {
         o.id == 2
         o.location.address == 'City2'
 
+    }
+
+    void "invalid type"() {
+        when:
+        List results = Cust.query(uid:['$eq': 1]).list()
+
+        then:
+        DataProblemException ex = thrown()
+        ex.code == 'error.data.problem'
+        ex.detail.contains 'Invalid query string Cannot cast object'
     }
 
 }

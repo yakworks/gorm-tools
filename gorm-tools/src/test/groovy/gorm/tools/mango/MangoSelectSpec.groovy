@@ -2,11 +2,13 @@ package gorm.tools.mango
 
 import javax.persistence.criteria.JoinType
 
+import gorm.tools.mango.hibernate.PathKeyMapPagedList
 import gorm.tools.mango.jpql.JpqlQueryBuilder
 import gorm.tools.mango.jpql.JpqlQueryInfo
 import gorm.tools.mango.jpql.PagedQuery
 import spock.lang.Ignore
 import spock.lang.Specification
+import yakworks.commons.model.SimplePagedList
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.unit.GormHibernateTest
@@ -41,65 +43,97 @@ class MangoSelectSpec extends Specification implements GormHibernateTest  {
 
     }
 
-    // this also works
-    // def criteria = KitchenSink.query{
-    //     property("id")
-    //     property("thing.name")
-    // }.join("thing", JoinType.LEFT)
-
-    //this also works and produces same thing if we do
-    //def criteria = KitchenSink.query(null).distinct("id").distinct("name")
-
-    // this does not work for some reason
-    // def criteria = KitchenSink.query{
-    //     property("id")
-    //     property("name")
-    // }
-
-    void "Test select using property method"() {
+    void "Test property and join - 1 level down"() {
         when:"🎯props are set on the criteria"
-            def criteria = KitchenSink.query(null)
-                .property("id").property("thing.name")
-
-            List list = criteria.list()
+        def criteria = KitchenSink.query(null)
+            .property("id")
+            .property("thing.name")
+            // FAILS if nested to deep, need to use mapList which uses the JPQL
+            //.property("ext.thing.name")
+        //uses the hibernate query list
+        List list = criteria.list()
+        List listJpql = criteria.mapList()
 
         then:
-            //since join is not specified it only shows 9 rows since one thing is null, should show 10 if we want
-            // all the kitchen sinks
-            list.size() == 9
-            Map row1 = list[0] as Map
-            row1.keySet() == ['id', 'thing_name'] as Set
+        //since join is not specified it only shows 9 rows since one thing is null, should show 10 if we want
+        // all the kitchen sinks
+        list.size() == 9
+        listJpql.size() == 9
 
+        Map row1 = list[0] as Map
+        row1.keySet() == ['id', 'thing_name'] as Set
+
+        //jpql uses the pathKeyMap so [thing_name:..] will be [thing:[name:..]
+        Map row1Jpql = listJpql[0] as Map
+        row1Jpql.keySet() == ['id', 'thing'] as Set
+        row1Jpql['thing'].keySet() == ['name'] as Set
 
         when: "🎯add left join to thing"
-            list = KitchenSink.query(null)
-                .property("id").property("thing.name")
-                .join("thing", JoinType.LEFT)
-                .list()
+        criteria = KitchenSink.query(null)
+            .property("id").property("thing.name")
+            .join("thing", JoinType.LEFT)
+
+        list = criteria.list()
+        listJpql = criteria.mapList()
 
         then: "will return the 10 rows"
-            list.size() == 10
-
+        list.size() == 10
+        listJpql.size() == 10
 
         when: "🎯sort does not add join and needs it too"
-            list = KitchenSink.query(null)
+        criteria = KitchenSink.query(null)
                 .property("id")
                 .order("thing.name")
-                .list()
+
+        list = criteria.list()
+        listJpql = criteria.mapList()
 
         then: "will only return the 9 rows without specifying join"
-            list.size() == 9
+        list.size() == 9
+        listJpql.size() == 9
 
 
         when: "🎯adding in the join will fix it"
-            list = KitchenSink.query(null)
+        criteria = KitchenSink.query(null)
                 .property("id")
                 .order("thing.name")
                 .join("thing", JoinType.LEFT)
-                .list()
+
+        list = criteria.list()
+        listJpql = criteria.mapList()
 
         then: "will return all 10 rows now"
-            list.size() == 10
+        list.size() == 10
+        listJpql.size() == 10
+
+    }
+
+    void "Test property - 2 levels deep"() {
+        when:"🎯props are set on the criteria"
+        def criteria = KitchenSink.query(null)
+            .property("id")
+            .property("ext.thing.name")
+
+        // FAILS if nested to deep, need to use the mapList which uses the JPQL
+        // List list = criteria.list()
+
+        List listJpql = criteria.mapList()
+
+        then:
+        listJpql.size() == 10
+        listJpql instanceof PathKeyMapPagedList
+        //jpql uses the pathKeyMap so [thing_name:..] will be [thing:[name:..]
+        Map row1Jpql = listJpql[0] as Map
+        row1Jpql.keySet() == ['id', 'ext'] as Set
+
+        row1Jpql == [
+            id:1,
+            ext:[
+                thing:[
+                    name: 'Thing1'
+                ]
+            ]
+        ]
 
     }
 

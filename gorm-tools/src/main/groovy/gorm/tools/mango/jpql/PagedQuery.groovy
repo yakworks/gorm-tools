@@ -11,6 +11,8 @@ import org.grails.datastore.gorm.GormStaticApi
 import org.grails.orm.hibernate.GrailsHibernateTemplate
 import org.grails.orm.hibernate.HibernateGormStaticApi
 import org.grails.orm.hibernate.query.HibernateHqlQuery
+import org.hibernate.LockMode
+import org.hibernate.ScrollMode
 import org.hibernate.ScrollableResults
 import org.hibernate.Session
 import org.hibernate.query.Query
@@ -65,11 +67,14 @@ class PagedQuery {
             q.setReadOnly(true)
             // MIN_VALUE gives hint to JDBC driver to stream results
             q.setFetchSize(50) // double normal paging size
-            ScrollableResults results = q.scroll()
+            //.setLockMode('a', LockMode.NONE)
+            ScrollableResults results = q.scroll(ScrollMode.FORWARD_ONLY)
             results.last()
             int total = results.getRowNumber() + 1
             results.close()
             return total
+            //https://www.postgresql.org/message-id/4B30FAE3.1040100@xebia.com
+            //https://jdbc.postgresql.org/documentation/query/#getting-results-based-on-a-cursor
         }
     }
 

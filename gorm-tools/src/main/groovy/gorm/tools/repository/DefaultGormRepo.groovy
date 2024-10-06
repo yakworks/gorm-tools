@@ -6,11 +6,7 @@ package gorm.tools.repository
 
 import groovy.transform.CompileStatic
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
-
-import gorm.tools.mango.api.QueryService
-import yakworks.spring.AppCtx
 
 /**
  * A concrete implementation of the GormRepo

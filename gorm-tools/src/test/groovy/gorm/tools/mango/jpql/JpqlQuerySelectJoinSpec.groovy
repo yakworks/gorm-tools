@@ -13,9 +13,9 @@ import yakworks.testing.gorm.unit.GormHibernateTest
 import static gorm.tools.mango.jpql.JpqlCompareUtils.formatAndStrip
 
 /**
- * Test for JPA builder with closures not map builder
+ * Test for property and selects. Also tests joins
  */
-class JpqlQueryJoinSpec extends Specification implements GormHibernateTest  {
+class JpqlQuerySelectJoinSpec extends Specification implements GormHibernateTest  {
 
     static List entityClasses = [KitchenSink, SinkItem]
 
@@ -66,6 +66,42 @@ class JpqlQueryJoinSpec extends Specification implements GormHibernateTest  {
         List<Map> jpqlList = doList(queryInfo)
         then:
         jpqlList.size() == 10
+
+    }
+
+    void "Test select with restrictions"() {
+        when:"🎯props are set on the criteria"
+        def criteria = KitchenSink.query([
+            select: ['id', 'name', 'ext.name'],
+            q:[
+                id: [
+                    '$in': [5, 9]
+                ],
+                'amount.$gt': 2
+            ],
+            sort: 'thing.name'
+        ]).join("thing", JoinType.LEFT)
+
+        List list = criteria.list()
+
+        def builder = JpqlQueryBuilder.of(criteria)
+        JpqlQueryInfo queryInfo = builder.buildSelect()
+
+        then:
+        list.size() == 2
+
+        compareQuery(queryInfo.query, """
+            SELECT kitchenSink.id as id, kitchenSink.name as name, kitchenSink.ext.name as ext_name
+            FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
+            LEFT JOIN kitchenSink.thing
+            WHERE kitchenSink.id IN ( :p1,:p2 ) AND kitchenSink.amount > :p3
+            ORDER BY kitchenSink.thing.name ASC
+        """)
+
+        when:
+        List<Map> jpqlList = doList(queryInfo)
+        then:
+        jpqlList.size() == 2
 
     }
 

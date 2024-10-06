@@ -137,6 +137,28 @@ class MangoSelectSpec extends Specification implements GormHibernateTest  {
 
     }
 
+    void "Test property - aliasToMap"() {
+        when:"🎯props are set on the criteria"
+        def criteria = KitchenSink.query(null)
+            .property("id")
+            .property("ext.thing.name")
+
+        List listJpql = criteria.mapList(aliasToMap: true)
+
+        then:
+        listJpql.size() == 10
+        listJpql instanceof PathKeyMapPagedList
+        //jpql uses the pathKeyMap so [thing_name:..] will be [thing:[name:..]
+        Map row1Jpql = listJpql[0] as Map
+        row1Jpql.keySet() == ['id', 'ext_thing_name'] as Set
+
+        row1Jpql == [
+            id:1,
+            ext_thing_name: 'Thing1'
+        ]
+
+    }
+
     void "test select single column"() {
         when: "selecting single property"
         def list = KitchenSink.query([

@@ -127,6 +127,7 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
             thing: [id: id],
             sinkItems: [[name: "red"], [name: "blue"]]
         ])
+
         def ks = create(data, [bindId: true])
         if(flushIt) flush()
         return ks
@@ -148,7 +149,7 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
             // actDate: LocalDateTime.now().plusDays(id).toDate(),
             localDate: IsoDateUtil.format(LocalDate.now().plusDays(id)),
             localDateTime: IsoDateUtil.format(LocalDateTime.now().plusDays(id)),
-            ext:[ name: "SinkExt$id", totalDue: id * 10.25],
+            ext:[ name: "SinkExt$id", totalDue: id * 10.25, thing: [id: id]],
             bazMap: [foo: 'bar']
             // thing: [id: id]
         ]

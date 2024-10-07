@@ -449,7 +449,7 @@ class MangoSpec extends Specification {
 
     def "test quick search"() {
         when:
-        List list = Org.repo.query(q: "Org2").pagedList()
+        List list = Org.repo.query(qSearch: "Org2").pagedList()
         then:
         list.size() == 10
 
@@ -457,7 +457,7 @@ class MangoSpec extends Specification {
 
     def "test quick search with q"() {
         when:
-        List list = Org.repo.query(q: "Org2").list()
+        List list = Org.repo.query(qSearch: "Org2").list()
         then:
         list.size() == 10
 

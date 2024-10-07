@@ -83,26 +83,26 @@ class OrgWebApiSpec extends Specification implements WebClientTrait, WithTrx {
     void "test qSearch"() {
         when:
         //gets all that start with org 2
-        Map body  = getBody("$path?q=org2")
+        Map body  = getBody("$path?qSearch=org2")
 
         then: "should be 10 of them"
         body.data.size() == 10
 
         when:
-        body  = getBody("$path?q=flubber")
+        body  = getBody("$path?qSearch=flubber")
 
         then:
         body.data.size() == 0
 
         when: 'num search'
-        body  = getBody("$path?q=11")
+        body  = getBody("$path?qSearch=11")
 
         then:
         body.data.size() == 1
         body.data[0].num == '11'
 
         when: 'picklist search'
-        body  = getBody("$path/picklist?q=org12")
+        body  = getBody("$path/picklist?qSearch=org12")
 
         then:
         body.data.size() == 1

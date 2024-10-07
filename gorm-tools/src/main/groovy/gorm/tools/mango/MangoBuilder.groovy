@@ -152,10 +152,7 @@ class MangoBuilder {
     }
 
     /**
-     * Apply projections from map in form [key:type] where type is sum, group, count, min, max or avg
-     *
-     * @param criteria the criteria to apply the project
-     * @param projs the map of projections to apply
+     * list of properties that will go in the select clause
      */
     void applySelect(MangoDetachedCriteria criteria, List<String> projs) {
         for(String prop : projs){

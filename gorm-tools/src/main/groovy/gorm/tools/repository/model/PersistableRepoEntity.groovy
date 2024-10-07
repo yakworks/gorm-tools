@@ -72,6 +72,15 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>, ID> extends GormEntity<D> 
     }
 
     /**
+     * REPLACE the one in GormEntity as it has a bug and is creating a very bad cross join on same table
+     * Checks whether an entity exists
+     * @Override GormEntity.exists
+     */
+    static boolean exists(Serializable id) {
+        getRepo().exists(id)
+    }
+
+    /**
      * default constraints static that calls apiConstraints(delegate)
      */
     @CompileDynamic

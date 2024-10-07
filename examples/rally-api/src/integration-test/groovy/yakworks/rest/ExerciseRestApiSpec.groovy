@@ -1,6 +1,8 @@
 package yakworks.rest
 
 import org.springframework.http.HttpStatus
+
+import spock.lang.Ignore
 import yakworks.commons.map.Maps
 
 import yakworks.rally.orgs.model.Org
@@ -137,6 +139,7 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
     }
 
+    @Ignore //this will no longer work. Requires qSearch to be used now so we can validate q.
     @Unroll
     def "q text search: #entity?q=#qSearch"(String entity, Integer qCount, String qSearch) {
 

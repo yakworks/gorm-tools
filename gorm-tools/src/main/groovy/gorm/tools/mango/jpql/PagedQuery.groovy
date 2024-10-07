@@ -65,11 +65,14 @@ class PagedQuery {
             q.setReadOnly(true)
             // MIN_VALUE gives hint to JDBC driver to stream results
             q.setFetchSize(50) // double normal paging size
+            //.setLockMode('a', LockMode.NONE)
             ScrollableResults results = q.scroll()
             results.last()
             int total = results.getRowNumber() + 1
             results.close()
             return total
+            //https://www.postgresql.org/message-id/4B30FAE3.1040100@xebia.com
+            //https://jdbc.postgresql.org/documentation/query/#getting-results-based-on-a-cursor
         }
     }
 
@@ -94,7 +97,11 @@ class PagedQuery {
             populateQueryWithNamedArguments(q, params)
             //sets the transformer to remove the _sum, _avg, etc.. systemAliases
             //q.setResultTransformer(new AliasProjectionResultTransformer(systemAliases))
-            q.setResultTransformer(new PathKeyMapResultTransformer(systemAliases))
+
+            //if aliasToMap is set then it will be wrapping the the jpql select with "new map(..." and we dont transform
+            if(!args.aliasToMap){
+                q.setResultTransformer(new PathKeyMapResultTransformer(systemAliases))
+            }
 
             def qry = createHqlQuery(session, q)
             def list = qry.list()
@@ -102,7 +109,9 @@ class PagedQuery {
         }
         //only do the count query if its needed
         int rowCount = dataList.size()
-        if(rowCount >= 1 && maxCount){
+        //fails on last page
+        // if(rowCount >= 1 && maxCount && !(rowCount < maxCount)){
+        if(rowCount >= 1 && maxCount ){
             rowCount = countQuery(queryString, params)
         }
         PathKeyMapPagedList pagedList = new PathKeyMapPagedList(dataList, rowCount)

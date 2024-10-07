@@ -331,6 +331,25 @@ class JpqlQueryBuilderCriteriaClosureSpec extends Specification implements GormH
         // res.size() == 2
     }
 
+    void "enum eq"() {
+        when: "having with in"
+        MangoDetachedCriteria criteria = KitchenSink.repo.query([:]) {
+            eq "kind", "CLIENT"
+        }
+        def builder = JpqlQueryBuilder.of(criteria) //.aliasToMap(true)
+        def queryInfo = builder.buildSelect()
+        def query = queryInfo.query
+
+        then:
+        query
+        compareQuery(queryInfo.query, '''
+            SELECT DISTINCT kitchenSink
+            FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
+            WHERE kitchenSink.kind=:p1
+        ''')
+
+    }
+
     List doList(JpqlQueryInfo queryInfo, Map args = [:]){
         def staticApi = KitchenSink.repo.gormStaticApi()
         def spq = new PagedQuery(staticApi)

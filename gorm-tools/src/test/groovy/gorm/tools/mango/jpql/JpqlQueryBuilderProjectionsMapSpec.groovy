@@ -178,7 +178,7 @@ class JpqlQueryBuilderProjectionsMapSpec extends Specification implements GormHi
         list[0].amount == 21.25
     }
 
-    void "projections having with in"() {
+    void "projections with WHERE criteria, not HAVING"() {
         when: "having with in"
         MangoDetachedCriteria criteria = KitchenSink.repo.query(
             projections: [kind:'group', amount:'sum'],

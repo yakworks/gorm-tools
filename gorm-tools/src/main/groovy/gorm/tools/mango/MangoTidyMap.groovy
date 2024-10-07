@@ -43,7 +43,8 @@ class MangoTidyMap {
             return tidySort(path, val, map)
         }
         //deal with the nest if it has a dot but leave the '.id's as is so it doesn't create joins
-        else if (path.contains(".") && !path.endsWith('.id')) {
+        //else if (path.contains(".") && !( path.endsWith('.id') && path.count('.') == 1)  ) {
+        else if (path.contains(".")) {
             String[] splitPath = path.split("[.]")
             //get first thing in dot ex: foo.bar this will be foo
             String newKey = splitPath[0]

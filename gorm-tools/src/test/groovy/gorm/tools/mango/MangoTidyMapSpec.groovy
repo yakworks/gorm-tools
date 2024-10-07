@@ -28,6 +28,31 @@ class MangoTidyMapSpec extends Specification {
         [a: [b: [c: ['$eq': 1]]]] == tidy([a: [b: [c: 1]]])
     }
 
+    void "test id not broken out"() {
+
+        when: 'deep nesting'
+        def mmap = tidy([
+            'foo.bar.baz.id'  : 1,
+            'foo.bar.baz.sid' : 2,
+            'foo.bar.baz.sad' : 3
+
+        ])
+
+        then: 'doesnt do it with id?'
+        mmap == [
+            foo:[
+                bar:[
+                    baz:[
+                        id:[$eq:1],
+                        sid:[$eq:2],
+                        sad:[$eq:3]
+                    ]
+                ]
+            ]
+        ]
+    }
+
+
     void "test in"() {
 
         when:
@@ -38,11 +63,11 @@ class MangoTidyMapSpec extends Specification {
 
         then:
         mmap == [
-            'foo.id' : [
-                '$in': [1, 2, 3]
+            foo: [
+                id: ['$in': [1, 2, 3] ]
             ],
-            'customer.id': [
-                '$in': [1, 2, 3]
+            customer: [
+                id: ['$in': [1, 2, 3]]
             ]
         ]
 
@@ -52,13 +77,13 @@ class MangoTidyMapSpec extends Specification {
         ])
 
         then:
-        flatten(mmap) == flatten([
+        mmap == [
             customer: [
                 id: [
                     '$in': [1, 2, 3]
                 ]
             ]
-        ])
+        ]
 
         when: "id is not 1st key"
         mmap = tidy([
@@ -66,13 +91,13 @@ class MangoTidyMapSpec extends Specification {
         ])
 
         then:
-        flatten(mmap) == flatten([
+        mmap == [
             customer: [
                 id: [
                     '$in': [1, 2, 3]
                 ]
             ]
-        ])
+        ]
 
     }
 
@@ -275,8 +300,7 @@ class MangoTidyMapSpec extends Specification {
         ])
 
         then:
-
-        flatten(mmap) == flatten([customer: [id: ['$eq': 101], name: ['$ilike': 'Wal%']]])
+        mmap == [customer: [id: ['$eq': 101], name: ['$ilike': 'Wal%']]]
 
     }
 
@@ -297,6 +321,25 @@ class MangoTidyMapSpec extends Specification {
         ]]
 
     }
+
+    void "test deep \$or"() {
+        when:
+        def mmap = tidy([
+            '$or': [
+                ['ext.thing.name': 'Thing1'],
+                ['ext.thing.id': 123]
+            ]
+        ])
+
+        then:
+
+        mmap == ['$or': [
+            [ext:[thing:[name:[$eq:'Thing1']]]],
+            [ext:[thing:[id:[$eq:123]]]]
+        ]]
+
+    }
+
 
     void "test \$and"() {
         when:
@@ -329,7 +372,11 @@ class MangoTidyMapSpec extends Specification {
 
         mmap == [
             '$or':[
-                ['location.id':[$eq:5]],
+                [
+                    'location':[
+                        id: [$eq:5]
+                    ]
+                ],
                 [
                     $and:[
                         [name:[$eq: 'Name1']],
@@ -380,17 +427,17 @@ class MangoTidyMapSpec extends Specification {
         //     ]
         // ])
 
-        flatten(mmap) == flatten(
+        mmap == [
             $or: [
-                [ 'address.id': [$eq: 5] ],
+                [ address: [id: [$eq: 5] ] ],
                 [
                     $and: [
                         [name: [$eq: "Org#1"] ],
-                        ['address.id': [$eq: 4] ]
+                        [address: [id: [$eq: 4] ] ]
                     ]
                 ]
             ]
-        )
+        ]
     }
 
 

@@ -6,7 +6,6 @@ package gorm.tools.mango
 
 import java.time.format.DateTimeParseException
 
-import groovy.json.JsonException
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.InvokerInvocationException

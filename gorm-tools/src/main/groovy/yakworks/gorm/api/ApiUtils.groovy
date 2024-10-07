@@ -4,12 +4,10 @@
 */
 package yakworks.gorm.api
 
-
 import java.nio.charset.StandardCharsets
 
 import groovy.transform.CompileStatic
 
-import org.springframework.util.CollectionUtils
 import org.springframework.util.MultiValueMap
 import org.springframework.web.util.UriComponentsBuilder
 
@@ -76,7 +74,7 @@ class ApiUtils {
     private static Map<String, String> toSingleValueMap(MultiValueMap<String, String> mvMap) {
         Map<String, String> decodedMap = [:] as Map<String, String>
         //decode each one now
-        mvMap.toSingleValueMap().each { k,v ->
+        mvMap.toSingleValueMap().each { k, v ->
             decodedMap[decode(k)] = decode(v ?: '')
         }
         return decodedMap;

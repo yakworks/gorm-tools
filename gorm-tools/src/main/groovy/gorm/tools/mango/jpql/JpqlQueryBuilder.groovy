@@ -17,6 +17,7 @@ import org.grails.datastore.mapping.query.AssociationQuery
 import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.api.AssociationCriteria
 import org.grails.datastore.mapping.query.api.QueryableCriteria
+import org.springframework.boot.convert.ApplicationConversionService
 import org.springframework.core.convert.ConversionService
 import org.springframework.core.convert.support.GenericConversionService
 import org.springframework.dao.InvalidDataAccessResourceUsageException
@@ -59,8 +60,10 @@ class JpqlQueryBuilder {
     Map<String, String> projectionAliases = [:]
     Map<String, String> propertyAliases = [:]
     List<String> groupByList = []
+    List<String> selectList = []
     boolean allowJoins = true
-    ConversionService conversionService = new GenericConversionService()
+    ConversionService conversionService = ApplicationConversionService.getSharedInstance()
+    //ConversionService conversionService = new GenericConversionService()
 
     // JpqlQueryBuilder(QueryableCriteria criteria) {
     //     this(criteria.getPersistentEntity(), criteria.getCriteria())
@@ -291,6 +294,7 @@ class JpqlQueryBuilder {
                     else { //assume its just a property to add to the select
                         String projField = "${logicalName}.${pp.getPropertyName()}"
                         appendAlias(queryString, projField, pp.getPropertyName(), '')
+                        selectList << "${logicalName}.${pp.getPropertyName()}".toString()
                     }
                 }
 
@@ -827,10 +831,13 @@ class JpqlQueryBuilder {
             //TODO handle it for situations like below
             //select sum(amount) as amount from artran where amount> 100 group by trantypeid ; VS
             //select sum(amount) as amount from artran group by trantypeid having sum(amount) > 100;
+
+            //makes sure not to pick up criteria that should be going into the HAVING clause
             if(criterion instanceof Query.PropertyNameCriterion){
                 String prop = criterion.getProperty()
                 String groupProp = logicalName ? "${logicalName}.${prop}" : prop
-                if(projectionAliases.containsKey(prop) && !groupByList.contains(groupProp)){
+                //groupBy should never be in HAVING and if they are just property selects dont skip either
+                if(projectionAliases.containsKey(prop) && !groupByList.contains(groupProp) && !selectList.contains(groupProp)){
                     continue
                 }
             }
@@ -890,9 +897,10 @@ class JpqlQueryBuilder {
                 String prop = (criterion as Query.PropertyNameCriterion).getProperty()
                 String groupProp = logicalName ? "${logicalName}.${prop}" : prop
                 boolean isGrouped = groupByList.contains(groupProp)
+                boolean isSelect = selectList.contains(groupProp)
                 boolean hasAlias = projectionAliases.containsKey(prop)
 
-                if(isGrouped || !hasAlias){
+                if(isGrouped || isSelect || !hasAlias){
                     continue
                 }
             } else {

@@ -480,16 +480,16 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
     @Override
     MangoDetachedCriteria<T> eq(String propertyName, Object propertyValue) {
-        //nestedPathPropCall(propertyName, propertyValue, "eq")
-        ensureAliases(propertyName)
-        return (MangoDetachedCriteria<T>)super.eq(propertyName, propertyValue)
+        //still needed here for some reason. tests failing in domain9
+        nestedPathPropCall(propertyName, propertyValue, "eq")
+        //return (MangoDetachedCriteria<T>)super.eq(propertyName, propertyValue)
     }
 
     @Override
     MangoDetachedCriteria<T> ne(String propertyName, Object propertyValue) {
-        //nestedPathPropCall(propertyName, propertyValue, "ne")
-        ensureAliases(propertyName)
-        return (MangoDetachedCriteria<T>)super.ne(propertyName, propertyValue)
+        nestedPathPropCall(propertyName, propertyValue, "ne")
+        // ensureAliases(propertyName)
+        // return (MangoDetachedCriteria<T>)super.ne(propertyName, propertyValue)
     }
 
     @CompileDynamic

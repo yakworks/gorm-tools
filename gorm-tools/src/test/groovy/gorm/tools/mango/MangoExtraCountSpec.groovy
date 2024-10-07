@@ -75,7 +75,8 @@ class MangoExtraCountSpec extends Specification implements GormHibernateTest  {
             // ]
             $or: [
                 ['ext.thing.name': 'Thing1'],
-                ['ext.thing.country': "ME"]
+                //['ext.thing.country': "ME"],
+                ['ext.thing.id': 2]
             ]
         ])
 

@@ -313,6 +313,7 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
         results[1] == two
     }
 
+
     def "test gt"() {
         when:
 

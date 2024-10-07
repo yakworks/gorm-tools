@@ -163,12 +163,30 @@ class DefaultMangoQuerySpec extends Specification implements GormHibernateTest {
 
     void "invalid type"() {
         when:
-        List results = Cust.query(uid:['$eq': 1]).list()
+        def query = Cust.query(uid:['$eq': 1])
 
         then:
         DataProblemException ex = thrown()
         ex.code == 'error.data.problem'
-        ex.detail.contains 'Invalid query string Cannot cast object'
+        ex.detail.contains 'Invalid query string - Cannot cast object'
+    }
+
+    void "test non existent association field"() {
+        when:
+        def res =  Cust.query("Missing.name":"test")
+
+        then:
+        DataProblemException ex = thrown()
+        ex.message.contains "Invalid query string"
+    }
+
+    void "test invalid date"() {
+        when:
+        List res =  Cust.query("locDate":"xxx")
+
+        then:
+        DataProblemException ex = thrown()
+        ex.message.contains "Invalid query string"
     }
 
 }

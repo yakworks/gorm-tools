@@ -22,12 +22,12 @@ import yakworks.spring.AppCtx
 class Pager {
 
     /**
-     * The page we are on
+     * The page we are on, pageNumber
      */
     Integer page = 1
 
     /**
-     * Max rows to show
+     * Max rows to show, the pageSize
      */
     Integer max = 20
 

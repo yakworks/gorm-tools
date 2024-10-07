@@ -23,9 +23,6 @@ import grails.gorm.DetachedCriteria
 @CompileStatic
 class MangoDetachedAssociationCriteria<T> extends DetachedAssociationCriteria<T> {
 
-    final Association association
-    final String associationPath
-
     MangoDetachedAssociationCriteria(Class<T> targetClass, Association association) {
         super(targetClass, association)
     }
@@ -128,8 +125,6 @@ class MangoDetachedAssociationCriteria<T> extends DetachedAssociationCriteria<T>
 
         associationCriteriaMap[methodName] = associationCriteria
         add associationCriteria
-
-
 
         def lastArg = args[-1]
         if(lastArg instanceof Closure) {

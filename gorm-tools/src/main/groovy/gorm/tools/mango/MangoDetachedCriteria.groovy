@@ -480,12 +480,16 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
     @Override
     MangoDetachedCriteria<T> eq(String propertyName, Object propertyValue) {
-        nestedPathPropCall(propertyName, propertyValue, "eq")
+        //nestedPathPropCall(propertyName, propertyValue, "eq")
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.eq(propertyName, propertyValue)
     }
 
     @Override
     MangoDetachedCriteria<T> ne(String propertyName, Object propertyValue) {
-        nestedPathPropCall(propertyName, propertyValue, "ne")
+        //nestedPathPropCall(propertyName, propertyValue, "ne")
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.ne(propertyName, propertyValue)
     }
 
     @CompileDynamic
@@ -677,7 +681,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         String field = props.removeLast()
 
         //make sure there are nested criterias for the order
-        DetachedCriteria currentCriteria = this as DetachedCriteria
+        DetachedCriteria currentCriteria = this// as DetachedCriteria
         props.each { path ->
             currentCriteria = currentCriteria.createAlias(path, path) as DetachedCriteria
         }
@@ -730,8 +734,12 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
     @Override
     MangoDetachedCriteria<T> inList(String propertyName, Collection values) {
-        ensureAliases(propertyName)
+        //ensureAliases(propertyName)
+        //org.hibernate.HibernateException: Unknown entity: null
+        // at app//org.hibernate.loader.criteria.CriteriaQueryTranslator.getPropertyMapping(CriteriaQueryTranslator.java:727)
+        //For some reason this is one spot where this is still needed. get the above error in RallyUserServiceSpec if not
         nestedPathPropCall(propertyName, values, "inList")
+        //return (MangoDetachedCriteria<T>)super.inList(propertyName, values)
     }
 
     @Override

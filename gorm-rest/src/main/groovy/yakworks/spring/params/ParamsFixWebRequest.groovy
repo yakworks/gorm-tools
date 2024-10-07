@@ -17,6 +17,11 @@ import org.springframework.web.context.request.ServletWebRequest
 /**
  * Wraps the servletWebRequest and then wraps the HttpServletRequest
  * so it can re-parses the query string when the params are empty.
+ *
+ * Some parts of spring mvc like the RequestParamMethodArgumentResolver that handles the @RequestParam
+ * use the getParameterMap in the  servletWebRequest to resolve.
+ * Others like the @ModelAttributes will get the ServletRequest and use that directly which is why we wrap the request
+ * and dont just onverride this. So we need both.
  */
 @CompileStatic
 class ParamsFixWebRequest implements NativeWebRequest {

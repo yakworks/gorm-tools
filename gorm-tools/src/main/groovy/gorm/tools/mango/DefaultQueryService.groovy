@@ -88,7 +88,7 @@ class DefaultQueryService<D> implements QueryService<D> {
             //DateTimeParseException would get thrown when a date value is bad
             //IllegalArgumentException gets thrown when trying query a non existing association field
             //GroovyCastException gets thrown when value doesnt match field type, eg string val for an int type field
-        } catch (InvokerInvocationException | IllegalArgumentException | DateTimeParseException  | GroovyCastException ex) {
+        } catch (Exception ex) {
             //See #1925 - Catch bad qargs
             throw DataProblem.ex("Invalid query string - $ex.message")
         }

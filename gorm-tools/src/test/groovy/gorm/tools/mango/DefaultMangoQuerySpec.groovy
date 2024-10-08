@@ -163,7 +163,7 @@ class DefaultMangoQuerySpec extends Specification implements GormHibernateTest {
 
     void "invalid type"() {
         when:
-        def query = Cust.query(uid:['$eq': 1])
+        Cust.query(uid:['$eq': 1])
 
         then:
         DataProblemException ex = thrown()
@@ -173,20 +173,20 @@ class DefaultMangoQuerySpec extends Specification implements GormHibernateTest {
 
     void "test non existent association field"() {
         when:
-        def res =  Cust.query("Missing.name":"test")
+        Cust.query("foo.name":"test")
 
         then:
         DataProblemException ex = thrown()
-        ex.message.contains "Invalid query string"
+        ex.message.contains("Invalid query string - Invalid criteria for field:foo")
     }
 
     void "test invalid date"() {
         when:
-        List res =  Cust.query("locDate":"xxx")
+        Cust.query("locDate":"xxx")
 
         then:
         DataProblemException ex = thrown()
-        ex.message.contains "Invalid query string"
+        ex.message.contains("Invalid query string - Text 'xxx' could not be parsed")
     }
 
 }

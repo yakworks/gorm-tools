@@ -4,11 +4,10 @@
 */
 package yakworks.security.gorm.model
 
-import groovy.transform.CompileDynamic
-
 import org.codehaus.groovy.util.HashCodeHelper
 
-import gorm.tools.repository.model.GormRepoEntity
+import gorm.tools.repository.RepoLookup
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
@@ -16,7 +15,7 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 
 @Entity
 @GrailsCompileStatic
-class SecRoleUser implements GormRepoEntity<SecRoleUser, SecRoleUserRepo>, Serializable {
+class SecRoleUser implements RepoEntity<SecRoleUser>, Serializable {
 
     AppUser user
     SecRole role
@@ -48,6 +47,7 @@ class SecRoleUser implements GormRepoEntity<SecRoleUser, SecRoleUserRepo>, Seria
         roleId: [d: 'The role id']
     ]
 
+    static SecRoleUserRepo getRepo() { (SecRoleUserRepo) RepoLookup.findRepo(this) }
 
     String getRoleName() {
         this.role.name

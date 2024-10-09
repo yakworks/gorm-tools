@@ -4,6 +4,8 @@
 */
 package gorm.tools.mango
 
+import gorm.tools.mango.api.QueryArgs
+import gorm.tools.mango.hibernate.HibernateMangoQuery
 import spock.lang.Issue
 import testing.TestSource
 
@@ -25,8 +27,9 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
     @Autowired MangoBuilder mangoBuilder
 
     MangoDetachedCriteria build(map, Closure closure = null) {
+        assert map instanceof Map
         //DetachedCriteria detachedCriteria = new DetachedCriteria(Org)
-        return mangoBuilder.build(Cust, map, closure)
+        return mangoBuilder.build(Cust, QueryArgs.of(map), closure)
     }
 
     void setupSpec() {
@@ -38,7 +41,10 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
 
     void "test field that does not exist"() {
         when:
-        List res = build([nonExistingFooBar: true]).list()
+        List good = build([name: "Name1"]).list()
+        assert good
+        //bad
+        List bad = build([nonExistingFooBar: true]).list()
 
         then: "fails with query exception"
         thrown(QueryException)
@@ -403,14 +409,14 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
         flush()
 
         when:
-        List l = mangoBuilder.build(TestSource, [sourceId:"sid1"]).list()
+        List l = mangoBuilder.build(TestSource, QueryArgs.of([sourceId:"sid1"])).list()
 
         then:
         noExceptionThrown()
         l.size() == 1
 
         when:
-        l = mangoBuilder.build(TestSource, [sourceId:['$ne': 'sid1']]).list()
+        l = mangoBuilder.build(TestSource, QueryArgs.of([sourceId:['$ne': 'sid1']])).list()
 
         then:
         l.size() == 1
@@ -450,6 +456,29 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
         res.size() == 6
     }
 
+    def "test not in list id"() {
+        when:
+
+
+        List res = build([
+            id: ['$nin': [1, 2, 3, 4]]
+        ]).list()
+
+        then:
+        res.size() == 6
+    }
+
+    def "test not in list with other"() {
+        when:
+        List res = build([
+            id: ['$nin': [1, 2, 3, 4]],
+            name: "Name5"
+        ]).list()
+
+        then:
+        res.size() == 1
+    }
+
     def "test in list"() {
         when:
 
@@ -461,13 +490,102 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
     }
 
     def "test not"() {
-        when:
-
-
-        List res = build((['$not': [[id: ['$eq': 1]]]])).list()
+        when: "not is a map"
+        List res = build([
+            '$not': [
+                id: ['$eq': 1]
+            ]
+        ]).list()
 
         then:
         res.size() == 9
+
+        when: "not is a map with eq short cut"
+        res = build([
+            '$not': [
+                id: 1
+            ]
+        ]).list()
+
+        then:
+        res.size() == 9
+
+        when: "not is nested"
+        res = build([
+            'location': [
+                '$not': [
+                    id: ['$eq': 1]
+                ]
+            ]
+        ]).list()
+
+        then:
+        res.size() == 9
+
+    }
+
+    def "test not with list"() {
+        when: "not is a list"
+        def res = build([
+            '$not': [
+                [id: ['$eq': 1]],
+                [id: ['$eq': 2]]
+            ]
+        ]).list()
+
+        then:
+        res.size() == 8
+    }
+
+    def "test not nested"() {
+        when:
+        List res = build([
+            '$not': [
+                ['location.id': ['$eq': 1]],
+                ['location.id': ['$eq': 2]]
+            ]
+        ]).list()
+
+        then:
+        res.size() == 8
+
+        when:
+        res = build([
+            '$not': [
+                [
+                    'location': [
+                        id:  ['$eq': 1]
+                    ]
+                ],
+                [
+                    'location': [
+                        id:  ['$eq': 2]
+                    ]
+                ]
+            ]
+        ]).list()
+
+        then:
+        res.size() == 8
+    }
+
+    def "test not with in"() {
+        when:
+        List res = build([
+            '$not': [
+                [
+                    'location': [
+                        id:  ['$in': [1,2] ]
+                    ]
+                ],
+                [
+                    id:  ['$in': [3,4] ]
+                ]
+            ]
+        ]).list()
+
+        then:
+        res.size() == 6
     }
 
 
@@ -587,7 +705,10 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
 
     def "test with `or` on one level"() {
         when:
-        List res = build((['$or': [["location.id": 5], ["name": "Name1", "location.id": 4]]])).list()
+        List res = build(['$or': [
+            ["location.id": 5],
+            ["name": "Name1", "location.id": 4] //false
+        ]]).list()
 
         then:
         res.size() == 1
@@ -653,6 +774,18 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
         res[0].id > res[1].id
         res[4].inactive > res[5].inactive
         res[5].id > res[6].id
+    }
+
+    void "test query timeout is set on hibernate criteria"() {
+        setup:
+        MangoDetachedCriteria criteria = build('$sort': 'inactive desc, id desc')
+        criteria.setTimeout(10)
+
+        when:
+        HibernateMangoQuery query = criteria.hibernateQuery
+
+        then:
+        query.getHibernateCriteria().timeout == 10
     }
 
 }

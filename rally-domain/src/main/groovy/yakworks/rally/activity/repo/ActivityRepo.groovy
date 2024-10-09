@@ -5,7 +5,6 @@
 package yakworks.rally.activity.repo
 
 import java.time.LocalDateTime
-import javax.persistence.criteria.JoinType
 
 import groovy.transform.CompileStatic
 
@@ -42,7 +41,6 @@ import yakworks.rally.tag.model.TagLink
 import yakworks.security.user.CurrentUser
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKind
-import static yakworks.rally.activity.model.Activity.VisibleTo
 
 @GormRepository
 @CompileStatic
@@ -142,25 +140,20 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
     /**
      * Override query for custom search for Tags and ActivityLinks
      */
-    @Override
-    MangoDetachedCriteria<Activity> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
+
+    MangoDetachedCriteria<Activity> queryOld(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
         Map crit = queryArgs.qCriteria
-        DetachedCriteria tagExistsCrit
         DetachedCriteria actLinkExists
-        if(crit.tags || crit.tagIds) {
-            //if its has tags keys then this returns something to add to exists, will remove the keys as well
-            tagExistsCrit = TagLink.getExistsCriteria(crit, Activity, 'activity_.id')
-        }
+
+        //NOTE: tags are handled in the TagsMangoCriteriaEventListener
+
         if(crit.linkedId && crit.linkedEntity) {
             Long linkedId = crit.remove('linkedId') as Long //remove so they dont flow through to query
             String linkedEntity = crit.remove('linkedEntity') as String
             actLinkExists = getActivityLinkCriteria(linkedId, linkedEntity)
         }
-        MangoDetachedCriteria<Activity> detCrit = getMangoQuery().query(Activity, queryArgs, closure)
-        //if it has tags key
-        if(tagExistsCrit != null) {
-            detCrit.exists(tagExistsCrit.id())
-        }
+        MangoDetachedCriteria<Activity> detCrit = getQueryService().query(queryArgs, closure)
+
         if(actLinkExists != null) {
             detCrit.exists(actLinkExists.id())
         }
@@ -284,33 +277,6 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
             eqProperty("activity.id", "activity_.id")
             eq("linkedId", linkedId)
             eq("linkedEntity", linkedEntity)
-        }
-    }
-
-    @Deprecated //unused, here for reference on custArea
-    DetachedCriteria<Activity> zzzgetActivityByLinkedCriteria(Long linkedId,  String linkedEntity, boolean custArea = false) {
-        def actLinkExists = getActivityLinkCriteria(linkedId, linkedEntity)
-
-        return Activity.query {
-            setAlias 'activity_' //match default
-            createAlias('task', 'task')
-            join('task', JoinType.LEFT)
-            exists actLinkExists.id()
-            or {
-                isNull("task")
-                le("task.state", 1)
-            }
-            or {
-                eq("visibleTo", VisibleTo.Everyone)
-                if (!custArea) {
-                    ne("visibleTo", VisibleTo.Owner)
-                    and {
-                        eq("visibleTo", VisibleTo.Owner)
-                        eq("createdBy", currentUser.userId)
-                    }
-                }
-            }
-
         }
     }
 

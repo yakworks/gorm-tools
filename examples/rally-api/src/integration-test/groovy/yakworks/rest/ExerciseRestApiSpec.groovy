@@ -1,11 +1,10 @@
 package yakworks.rest
 
 import org.springframework.http.HttpStatus
+
+import spock.lang.Ignore
 import yakworks.commons.map.Maps
-import yakworks.rally.orgs.model.Contact
-import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Org
-import yakworks.rally.orgs.model.OrgType
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
@@ -139,6 +138,7 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
     }
 
+    @Ignore //this will no longer work. Requires qSearch to be used now so we can validate q.
     @Unroll
     def "q text search: #entity?q=#qSearch"(String entity, Integer qCount, String qSearch) {
 

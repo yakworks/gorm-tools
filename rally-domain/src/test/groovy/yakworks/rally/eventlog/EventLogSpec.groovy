@@ -3,8 +3,8 @@ package yakworks.rally.eventlog
 import java.time.LocalDateTime
 
 import org.springframework.beans.factory.annotation.Autowired
+
 import spock.lang.Specification
-import yakworks.testing.gorm.unit.DataRepoTest
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class EventLogSpec extends Specification implements GormHibernateTest {

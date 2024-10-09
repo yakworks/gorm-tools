@@ -43,6 +43,7 @@ import org.hibernate.type.BasicType
 import org.hibernate.type.TypeResolver
 import org.springframework.context.ApplicationEventPublisher
 
+import gorm.tools.mango.MangoDetachedAssociationCriteria
 import grails.orm.HibernateCriteriaBuilder
 import grails.orm.RlikeExpression
 
@@ -60,7 +61,7 @@ import grails.orm.RlikeExpression
 @CompileStatic
 class HibernateMangoQuery extends AbstractHibernateQuery  {
 
-    public static final HibernateCriterionAdapter HIBERNATE_CRITERION_ADAPTER = new HibernateCriterionAdapter();
+    public static final HibernateCriterionAdapter HIBERNATE_CRITERION_ADAPTER = new HibernateCriterionAdapter()
 
     HibernateAliasProjectionList hibernateAliasProjectionList
 
@@ -96,7 +97,11 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
 
     /** implements abstract, copied in from HibernateQuery */
     @Override
+    @CompileDynamic
     protected AbstractHibernateCriterionAdapter createHibernateCriterionAdapter() {
+        //add the link to MangoDetachedAssociationCriteria
+        HIBERNATE_CRITERION_ADAPTER.@criterionAdaptors.put(MangoDetachedAssociationCriteria.class,
+            HIBERNATE_CRITERION_ADAPTER.@criterionAdaptors.get(DetachedAssociationCriteria.class))
         return HIBERNATE_CRITERION_ADAPTER
     }
 
@@ -294,12 +299,7 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
             //skip the listForCriteria
             //return criteria.list()
         }
-        // FUTURE set a reasonable timeout to this
-        // FIXME get from external config
-        // criteria.setTimeout(15)
-        //listForCriteria fires Pre and PostQueryEvent, TODO might want to skip this if firing the events hurt performance
         return listForCriteria()
-
     }
 
     //hack to access the private hasJoins in super

@@ -15,7 +15,7 @@ import yakworks.commons.lang.EnumUtils
 class MangoTidyMap {
 
     /**
-     * Transforms passed params map to normalized mango criteria map
+     * Normalizes and transforms passed params map to normalized mango criteria map
      *
      * @param map params that should be transformed to mango language
      * @return normalized mango map
@@ -43,7 +43,8 @@ class MangoTidyMap {
             return tidySort(path, val, map)
         }
         //deal with the nest if it has a dot but leave the '.id's as is so it doesn't create joins
-        else if (path.contains(".") && !path.endsWith('.id')) {
+        //else if (path.contains(".") && !( path.endsWith('.id') && path.count('.') == 1)  ) {
+        else if (path.contains(".")) {
             String[] splitPath = path.split("[.]")
             //get first thing in dot ex: foo.bar this will be foo
             String newKey = splitPath[0]
@@ -72,15 +73,31 @@ class MangoTidyMap {
      * @param result map that should contain mango results
      * @return map with mango criteria params
      */
+    @SuppressWarnings(['NestedBlockDepth'])
     static Map toMangoOperator(Map map, Map result = [:]) {
         map.each { key, val ->
             result[key] = [:]
+            //and, or, not
             if (EnumUtils.isValidEnum(MangoOps.JunctionOp, key as String)) {
                 if (val instanceof Map) {
                     result[key] = (val as Map).collect { k, v -> tidy([(k.toString()): v]) }
                 }
                 else if (val instanceof List) {
-                    result[key] = (val as List).collect { v -> tidy(['$and': v]) }
+                    List<Map> newList = [] as List<Map>
+                    for( Object item: (val as List)){
+                        if(item instanceof Map){
+                            //item = (Map)item
+                            if((item as Map).size() == 1 ){
+                                newList << tidy(item)
+                            } else {
+                                newList << tidy(['$and': item] as Map)
+                            }
+                        } else {
+                            newList << tidy(['$and': item] as Map)
+                        }
+                    }
+                    result[key] = newList
+                    //result[key] = (val as List).collect { v -> tidy(['$and': v]) }
                 }
             }
             else if (val instanceof Map && key != MangoOps.SORT && key != MangoOps.QSEARCH) {

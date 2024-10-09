@@ -7,18 +7,20 @@ package yakworks.rally.api
 import groovy.transform.CompileStatic
 
 import yakworks.rally.orgs.model.Location
-import yakworks.rest.gorm.controller.RestRepoApiController
+import yakworks.rest.gorm.controller.CrudApiController
 
 import static org.springframework.http.HttpStatus.CREATED
 
 @CompileStatic
-class LocationController implements RestRepoApiController<Location> {
+class LocationController implements CrudApiController<Location> {
     static String namespace = 'rally'
+
+    @Override
     def post() {
         Map q = bodyAsMap()
         q.street = q.street == null ? null : "foo street"
-        Location instance = getRepo().create(q)
-        respondWith instance, [status: CREATED] //201
+        Map emap = getCrudApi().create(q, params).asMap()
+        respondWith emap, [status: CREATED] //201
     }
 
 }

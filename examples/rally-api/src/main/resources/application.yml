@@ -4,9 +4,17 @@ spring.main.allow-bean-definition-overriding: true
 #server.port: 8081
 server.servlet.context-path: /api
 
-spring.config.import: classpath:config/security.yml, classpath:config/grails.yml, classpath:config/datasource.yml
+spring.config.import: >-
+  classpath:config/security.yml,
+  classpath:config/grails.yml,
+  classpath:config/datasource.yml,
+  classpath:config/foo.yml,
+  file://${app.resources.rootLocation}/application.yml
 
 api.config.import: classpath:/restapi-config.yml,classpath*:/restapi/**/*.yml
+
+foo:
+  message: "from rally-api/application.yml"
 
 logging:
   level:
@@ -16,7 +24,6 @@ logging:
     org.springframework.security: DEBUG
 
     yakworks.rally.api.rally.OrgController: DEBUG
-    yakworks.rest.gorm.controller.EntityResponder: DEBUG
     gorm.tools.mango.MangoDetachedCriteria: DEBUG
 
 #    gorm.tools.mango.MangoBuilder: DEBUG

@@ -1,16 +1,16 @@
 package gpbench.model.basic
 
-import gorm.tools.repository.model.GormRepoEntity
+
+import gorm.tools.repository.model.RepoEntity
 import gpbench.model.Country
 import gpbench.model.Region
-import gpbench.repo.CityDynamicRepo
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.security.user.CurrentUserHolder
 
 @Entity
 @IdEqualsHashCode
-class CityDynamic implements GormRepoEntity<CityDynamic, CityDynamicRepo> {
+class CityDynamic implements RepoEntity<CityDynamic> {
     //transient springSecurityService
 
     String name

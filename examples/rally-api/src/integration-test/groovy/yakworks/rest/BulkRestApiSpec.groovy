@@ -74,7 +74,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
          */
 
         when: "Verify created org"
-        Org org = Org.repo.read( body.data[0].data.id as Long)
+        Org org = Org.repo.get( body.data[0].data.id as Long)
 
         then:
         org != null
@@ -115,6 +115,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
             OrgSource.findBySourceIdLike("ORG-1%") == null
         }
     }
+
     void "one fails - verify success & error includes"() {
         List<Map> jsonList =  [[num: "foox1", name: "Foox1", type: "Customer"], [num: "Foox2", name: "Foox2", type: "Customer"]]
         jsonList[0].num = StringUtils.rightPad("ORG-1-", 110, "Z")
@@ -156,5 +157,56 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         json[1].data.source.sourceId ==  "Foox2"
 
         delete("/api/rally/org", json.data[1].id)
+    }
+
+    def "upsert"() {
+
+        setup:
+        int orgCount
+        OrgSource.withTransaction {
+            orgCount = Org.count()
+            def list = Org.list()
+            assert list
+        }
+
+        List<Map> jsonList = [
+            // this should update based on num
+            [num: "91", name: "updated"],
+            //this should update based on id
+            [id: "92", name: "updated2"],
+            //this should update based on sourceId
+            [sourceId: "93", name: "updated3"],
+            //this should be inserted
+            [num: "fox1", name: "Fox1", type: "Customer"],
+            //this should fail because it doesn't have bindId
+            [id: 999999, num: "fox2", name: "Fox2", type: "Customer"]
+        ]
+
+        when:
+        Response resp = post("$path&op=upsert", jsonList)
+
+        Map body = bodyToMap(resp)
+
+        then: "sanity check json structure"
+        body.id != null
+        body.ok == false //has one failure
+        body.state == "Finished"
+        body.source == "Oracle" //should have been picked from query string
+        body.sourceId == "POST /api/rally/org/bulk?jobSource=Oracle&savePayload=false&op=upsert"
+        resp.code() == HttpStatus.MULTI_STATUS.value()
+        body.data.size() == 5
+
+        when:
+        List data = body.data
+        int success = data.count { it.ok}
+        int failed = data.count { !it.ok}
+        int inserted = data.count { it.status == 201}
+        int updated = data.count { it.status == 200}
+
+        then:
+        success == 4
+        failed == 1
+        inserted == 1
+        updated == 3
     }
 }

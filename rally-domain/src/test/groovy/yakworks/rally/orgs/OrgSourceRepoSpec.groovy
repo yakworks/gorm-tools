@@ -7,7 +7,6 @@ import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgType
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
-import yakworks.testing.gorm.unit.DataRepoTest
 
 class OrgSourceRepoSpec extends Specification implements GormHibernateTest, SecurityTest {
 

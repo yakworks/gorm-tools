@@ -10,7 +10,7 @@ import groovy.transform.CompileStatic
 import yakworks.api.problem.Violation
 
 /**
- * Stop stack overflow on ApiResults renderer.
+ * Groovy json converter for Violation
  */
 @CompileStatic
 class ViolationConverter implements JsonGenerator.Converter {
@@ -23,12 +23,7 @@ class ViolationConverter implements JsonGenerator.Converter {
     @Override
     Object convert(Object value, String key) {
         def v = (Violation)value
-        Map props = [
-            code: v.code,
-            message: v.message,
-            field: v.field
-        ] as Map<String, Object>
-        return props
+        return v.asMap()
     }
 
 }

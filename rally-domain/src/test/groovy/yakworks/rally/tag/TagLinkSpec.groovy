@@ -6,7 +6,6 @@ import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
-import yakworks.testing.gorm.unit.DataRepoTest
 
 class TagLinkSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [TagLink, Tag, Attachment]

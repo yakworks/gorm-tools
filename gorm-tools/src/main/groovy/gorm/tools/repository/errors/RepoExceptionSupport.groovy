@@ -8,12 +8,11 @@ import groovy.transform.CompileStatic
 
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.OptimisticLockingFailureException
+import org.springframework.validation.Errors
 
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.problem.ValidationProblem
 import yakworks.api.problem.Problem
-import yakworks.api.problem.data.DataProblem
-import yakworks.api.problem.data.DataProblemCodes
 
 /**
  * Handler and translator for exceptions thrown by the Repository
@@ -23,6 +22,10 @@ import yakworks.api.problem.data.DataProblemCodes
  */
 @CompileStatic
 class RepoExceptionSupport {
+
+    // XXX Do we still need this? this was done well before the ProblemHandler, can we just use the ProblemHandler?
+    //  not clear what this provides over ProblemHandler,
+    //  if we need this lets get description in javadocs above and explain why we need this or why its beneficcial
 
     /**
      * Translates grails ValidationException and springs DataAccessException and DataIntegrityViolationException
@@ -45,44 +48,29 @@ class RepoExceptionSupport {
         if (ex instanceof Problem ) {
             return ex
         }
-        else if (ex instanceof grails.validation.ValidationException) {
-            def ve = (grails.validation.ValidationException) ex
-            return ValidationProblem.of(entity, ve).errors(ve.errors).toException()
+        else if (ex instanceof grails.validation.ValidationException
+            || ex instanceof org.grails.datastore.mapping.validation.ValidationException) {
+            Errors ers = ex['errors'] as Errors
+            def valProb = ValidationProblem.of(ex).entity(entity).errors(ers)
+            return valProb.toException()
         }
-        else if (ex instanceof org.grails.datastore.mapping.validation.ValidationException) {
-            // Gorm's stock ValidationException
-            def ve = (org.grails.datastore.mapping.validation.ValidationException) ex
-            return ValidationProblem.of(entity, ve).errors(ve.errors).toException()
-        }
+        // else if (ex instanceof grails.validation.ValidationException) {
+        //     def ve = (grails.validation.ValidationException) ex
+        //     return ValidationProblem.of(entity, ve).errors(ve.errors).toException()
+        // }
+        // else if (ex instanceof org.grails.datastore.mapping.validation.ValidationException) {
+        //     // Gorm's stock ValidationException
+        //     def ve = (org.grails.datastore.mapping.validation.ValidationException) ex
+        //     return ValidationProblem.of(entity, ve).errors(ve.errors).toException()
+        // }
         else if (ex instanceof OptimisticLockingFailureException) {
             return ex //just return unchanged
             // return new OptimisticLockingFailureException(RepoMessage.optimisticLockingFailure(entity, true).defaultMessage as String)
         }
         else if (ex instanceof DataAccessException) {
-            // Root of the hierarchy of data access exceptions
-            if(ProblemHandler.isUniqueIndexViolation(ex)){
-                return DataProblemCodes.UniqueConstraint.of(ex).entity(entity).toException()
-            }
-            else if(ProblemHandler.isForeignKeyViolation(ex)){
-                return DataProblemCodes.ReferenceKey.of(ex).entity(entity).toException()
-            }
-            else {
-                return DataProblem.of(ex).entity(entity).toException()
-            }
+            return ProblemHandler.buildFromDataAccessException((DataAccessException)ex).entity(entity).toException()
         }
         return ex
     }
-
-    // static List<Map<String, String>> toErrorList(Errors errs) {
-    //     List<Map<String, String>> errors = []
-    //     MessageSource messageSource =  AppCtx.getCtx()
-    //     errs.allErrors.each {def err ->
-    //         Map m = [message:messageSource.getMessage(err, LocaleContextHolder.getLocale())]
-    //         if(err instanceof FieldError) m['field'] = err.field
-    //         errors << m
-    //     }
-    //     return errors
-    // }
-
 
 }

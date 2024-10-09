@@ -1,17 +1,15 @@
 package yakworks.security.gorm
 
-import gorm.tools.problem.ValidationProblem
-import gorm.tools.utils.GormMetaUtils
 import org.apache.commons.lang3.RandomStringUtils
 
-import grails.gorm.transactions.Rollback
+import gorm.tools.problem.ValidationProblem
+import gorm.tools.utils.GormMetaUtils
 import spock.lang.Specification
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRoleUser
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
-import yakworks.testing.gorm.unit.DataRepoTest
 
 class AppUserSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [AppUser, SecRole, SecRoleUser]
@@ -119,7 +117,7 @@ class AppUserSpec extends Specification implements GormHibernateTest, SecurityTe
         when:
         AppUser user = build(AppUser)
         Map params = [id: user.id, username: null]
-        AppUser.update(params)
+        AppUser.repo.update(params)
 
         then:
         thrown ValidationProblem.Exception
@@ -173,7 +171,7 @@ class AppUserSpec extends Specification implements GormHibernateTest, SecurityTe
             roles: [[id: 2], [id: 3]]
         ]
         //update it to 2 and 3.
-        AppUser.update(updateParams)
+        AppUser.repo.update(updateParams)
         flushAndClear()
 
         then:

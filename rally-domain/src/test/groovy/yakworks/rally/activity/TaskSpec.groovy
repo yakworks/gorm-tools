@@ -19,7 +19,6 @@ import yakworks.rally.orgs.model.Org
 import yakworks.rally.testing.MockData
 import yakworks.security.gorm.model.AppUser
 import yakworks.testing.gorm.RepoTestData
-import yakworks.testing.gorm.unit.DataRepoTest
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 

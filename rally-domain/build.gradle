@@ -14,7 +14,7 @@ dependencies {
   api project(":boot-security-gorm")
   api project(":gorm-etl")
 
-  api "org.yakworks:grails-external-config:$vSpringGrailsKit"
+  //api "org.yakworks:grails-external-config:$vSpringGrailsKit"
   api 'jakarta.annotation:jakarta.annotation-api:2.1.0'
 
   //lock the compatible hibernate version here

@@ -328,7 +328,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
         then:
         !Org.get(10)
-        !Contact.exists(10)
+        !Contact.exists(10L)
         !Contact.findWhere(num: 'secondary10')
         !Contact.findAllByOrg(org)
         !OrgFlex.get(org.id)
@@ -463,7 +463,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         Map params = TestDataJson.buildMap(Org) << [id: orgId, name: 'name', num: 'foo', type: 'Customer']
 
         when: "create"
-        def org = Org.create(params, bindId: true)
+        def org = Org.repo.create(params, [bindId: true])
         orgRepo.flush()
 
         then: "make sure source is assigned properly"
@@ -476,7 +476,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         res.size() == 1
 
         when: "update"
-        org = Org.update([source: [sourceId: 'foo', orgType: 'Customer'], name: 'new name'])
+        org = Org.repo.update([source: [sourceId: 'foo', orgType: 'Customer'], name: 'new name'])
 
         then:
         org.name == 'new name'
@@ -501,7 +501,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         Long orgId = 1111
 
         Map params = TestDataJson.buildMap(Org) << [id: orgId, name: 'name', num: 'foo', type: 'Customer', member: [branch: [id: branch.id ]]]
-        def org = Org.create(params, bindId: true)
+        def org = Org.repo.create(params, [bindId: true])
         orgRepo.flush()
 
         then: "make sure member is created with branch"

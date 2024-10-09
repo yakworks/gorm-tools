@@ -36,12 +36,12 @@ class IncludesConfig {
      * @return the list or empty if not found
      */
     List<String> getIncludes(Class entityClass, String key){
-        Map incsMap = getIncludes(entityClass)
+        Map incsMap = getIncludesMap(entityClass)
         return (incsMap ? incsMap[key] : []) as List<String>
     }
 
-    @Cacheable('ApiConfig.includesByClass')
-    Map getIncludes(Class entityClass){
+    @Cacheable('IncludesConfig.includesByClass')
+    Map getIncludesMap(Class entityClass){
         Map includesMap = getClassStaticIncludes(entityClass)
         //if anything in yml config then they win
         Map includesConfigMap = apiConfig.getIncludesForEntity(entityClass.name)
@@ -57,7 +57,7 @@ class IncludesConfig {
     Map getIncludes(String entityClassName){
         ClassLoader classLoader = getClass().getClassLoader()
         Class entityClass = classLoader.loadClass(entityClassName)
-        return getIncludes(entityClass)
+        return getIncludesMap(entityClass)
     }
 
     /**
@@ -71,20 +71,23 @@ class IncludesConfig {
     /**
      * finds the right includes.
      *   - looks for includes param and uses that if passed in
-     *   - looks for includesKey param and uses that if set, falling back to the defaultIncludesKey
-     *   - falls back to the passed fallbackKeys if not set
+     *   - looks for includesKey param and uses that if set, falling back to the fallbackKeys
      *   - the fallbackKeys will itself unlimately fallback to the 'get' includes if it can't be found
      *
      * @param params the request params
      * @return the List of includes field that can be passed to the MetaMap creation
      */
-    List<String> findIncludes(String entityClassName, Map params, List<String> fallbackKeys = []){
+    List<String> findIncludes(String entityClassName, Map includesParams, List<String> fallbackKeys = []){
+        return findIncludes(entityClassName, IncludesProps.of(includesParams), fallbackKeys)
+    }
+
+    List<String> findIncludes(String entityClassName, IncludesProps incProps, List<String> fallbackKeys = []){
         List<String> keyList = []
         //if it has a includes then just parse that and pass it back
-        if(params.containsKey('includes')) {
-            return (params['includes'] as String).tokenize(',')*.trim()
-        } else if(params.containsKey('includesKey')){
-            keyList << (params['includesKey'] as String)
+        if(incProps?.includes) {
+            return incProps.includes
+        } else if(incProps?.includesKey){
+            keyList << incProps.includesKey
         }
         keyList.addAll(fallbackKeys)
         def incMap = getIncludes(entityClassName)
@@ -112,7 +115,8 @@ class IncludesConfig {
             if(includesMap.containsKey(key)) {
                 def incs = includesMap[key]
                 //they get merged in as Maps when coming from external configs with the key being index, [0:id, 1:name, etc..], just need vals
-                return (incs instanceof Map ? incs.values() : incs ) as List<String>
+                //return (incs instanceof Map ? incs.values() : incs ) as List<String>
+                return incs as List<String>
             }
         }
         //its should never get here but in case it does and config is messed then fall back *

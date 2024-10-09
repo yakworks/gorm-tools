@@ -20,7 +20,7 @@ class ActivityRepoTests extends Specification implements DomainIntTest {
         when:
         //query is overriden in ActivityRepo, its the method thats called by the controller eventually
         // see controller tests as well, this is just closer to the wire
-        List<Activity> acts = activityRepo.queryList([q:[linkedId: 10, linkedEntity:'Org'], sort:'id'])
+        List<Activity> acts = activityRepo.query([q:[linkedId: 10, linkedEntity:'Org'], sort:'id']).list()
 
         then:
         acts.size() == 1

@@ -4,6 +4,8 @@
 */
 package gorm.tools.mango.jpql
 
+import javax.persistence.criteria.JoinType
+
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.model.AbstractPersistentEntity
@@ -15,6 +17,7 @@ import org.grails.datastore.mapping.query.AssociationQuery
 import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.api.AssociationCriteria
 import org.grails.datastore.mapping.query.api.QueryableCriteria
+import org.springframework.boot.convert.ApplicationConversionService
 import org.springframework.core.convert.ConversionService
 import org.springframework.core.convert.support.GenericConversionService
 import org.springframework.dao.InvalidDataAccessResourceUsageException
@@ -22,6 +25,7 @@ import org.springframework.dao.InvalidDataAccessResourceUsageException
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.utils.GormMetaUtils
 import grails.gorm.DetachedCriteria
+import yakworks.commons.map.Maps
 
 /**
  * Builds JPQL String-based queries from the DetachedCriteria.
@@ -52,11 +56,14 @@ class JpqlQueryBuilder {
     boolean hibernateCompatible
     //wraps the SELECT in a new map( ...) when true
     boolean aliasToMap
+    Map<String, JoinType> joinTypes
     Map<String, String> projectionAliases = [:]
     Map<String, String> propertyAliases = [:]
     List<String> groupByList = []
+    List<String> selectList = []
     boolean allowJoins = true
-    ConversionService conversionService = new GenericConversionService()
+    ConversionService conversionService = ApplicationConversionService.getSharedInstance()
+    //ConversionService conversionService = new GenericConversionService()
 
     // JpqlQueryBuilder(QueryableCriteria criteria) {
     //     this(criteria.getPersistentEntity(), criteria.getCriteria())
@@ -102,6 +109,8 @@ class JpqlQueryBuilder {
         // jqb.criteria = new Query.Conjunction(criteria)
         jqb.propertyAliases = crit.propertyAliases
 
+        jqb.joinTypes = Maps.clone(crit.getJoinTypes())
+
         List<Query.Projection> projections = crit.getProjections()
         for (Query.Projection projection : projections) {
             jqb.projectionList.add(projection)
@@ -110,6 +119,11 @@ class JpqlQueryBuilder {
         jqb.orders = crit.getOrders()
 
         return jqb
+    }
+
+    JpqlQueryBuilder entityAlias(String v){
+        this.entityAlias = v
+        return this
     }
 
     /**
@@ -180,7 +194,11 @@ class JpqlQueryBuilder {
         }
 
         appendOrder(queryString, entityAlias)
-        return new JpqlQueryInfo(queryString.toString(), parameters)
+
+        var jqInfo = new JpqlQueryInfo(queryString.toString(), parameters)
+        jqInfo.where = whereClause.toString()
+
+        return jqInfo
     }
 
     void buildGroup(StringBuilder queryString){
@@ -203,6 +221,11 @@ class JpqlQueryBuilder {
         buildSelect(queryString, projectionList.getProjectionList(), logicalName, entity)
 
         queryString.append(" FROM ${entity.getName()} AS ${logicalName}")
+        joinTypes.each { k, v ->
+            if(v == JoinType.LEFT){
+                queryString.append(" LEFT JOIN ${logicalName}.${k}")
+            }
+        }
     }
 
     void appendAlias( StringBuilder queryString, String projField, String name, String aliasPrefix){
@@ -235,6 +258,7 @@ class JpqlQueryBuilder {
                     queryString.append(logicalName)
                             .append(DOT)
                             .append(entity.getIdentity().getName())
+                    //queryString.append("1")
                 }
                 else if (projection instanceof Query.PropertyProjection) {
                     Query.PropertyProjection pp = (Query.PropertyProjection) projection
@@ -258,10 +282,19 @@ class JpqlQueryBuilder {
                         String projField = "COUNT(DISTINCT ${logicalName}.${pp.getPropertyName()})"
                         appendAlias(queryString, projField, pp.getPropertyName(), 'COUNT')
                     }
-                    else {
+                    else if (projection instanceof Query.DistinctPropertyProjection) {
+                        String projField = "DISTINCT ${logicalName}.${pp.getPropertyName()}"
+                        appendAlias(queryString, projField, pp.getPropertyName(), '')
+                    }
+                    else if (projection instanceof Query.GroupPropertyProjection) {
                         String projField = "${logicalName}.${pp.getPropertyName()}"
                         appendAlias(queryString, projField, pp.getPropertyName(), '')
                         groupByList << "${logicalName}.${pp.getPropertyName()}".toString()
+                    }
+                    else { //assume its just a property to add to the select
+                        String projField = "${logicalName}.${pp.getPropertyName()}"
+                        appendAlias(queryString, projField, pp.getPropertyName(), '')
+                        selectList << "${logicalName}.${pp.getPropertyName()}".toString()
                     }
                 }
 
@@ -431,7 +464,7 @@ class JpqlQueryBuilder {
             public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
                               String logicalName, int position, List parameters) {
 
-                whereClause.append(" NOT(")
+                whereClause.append("NOT (")
 
                 final Query.Negation negation = (Query.Negation)criterion
                 position = buildWhereClauseForCriterion(entity, negation, q, whereClause, logicalName, negation.getCriteria(), position,
@@ -513,6 +546,7 @@ class JpqlQueryBuilder {
             }
         })
 
+        // ILIKE SQL SERVER
         queryHandlers.put(Query.ILike, new QueryHandler() {
             public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
                               String logicalName, int position, List parameters) {
@@ -577,7 +611,7 @@ class JpqlQueryBuilder {
                 whereClause.append("EXISTS ( ")
                 QueryableCriteria subquery = existsQuery.getSubquery()
                 if (subquery != null) {
-                    buildSubQuery(q, whereClause, position, parameters, subquery)
+                    position = buildSubQuery(q, whereClause, position, parameters, subquery)
                 }
                 whereClause.append(" ) ")
                 return position
@@ -600,7 +634,7 @@ class JpqlQueryBuilder {
         return position
     }
 
-    void buildSubQuery(StringBuilder q, StringBuilder whereClause, int position, List parameters,
+    int buildSubQuery(StringBuilder q, StringBuilder whereClause, int position, List parameters,
                        QueryableCriteria subquery) {
         PersistentEntity associatedEntity = subquery.getPersistentEntity()
         String associatedEntityName = associatedEntity.getName()
@@ -613,7 +647,7 @@ class JpqlQueryBuilder {
         var conj = new Query.Conjunction(criteria)
         position = buildWhereClauseForCriterion(associatedEntity, conj, q, whereClause, associatedEntityLogicalName,
             criteria, position, parameters)
-
+        return position
         // JpqlQueryBuilder subQueryBuilder = new  JpqlQueryBuilder(associatedEntity)
     }
 
@@ -668,7 +702,8 @@ class JpqlQueryBuilder {
          .append(propertyName)
          .append(operator)
 
-        //FIXME hack for now, if the other property ends with _ and removnig that matches the logicalName then its the alias
+        //FIXME hack for now, MangoDetachedCriteria defualt to the alias = enityName with _ suffix
+        // if the other property ends with _ and removnig that matches the logicalName then its the alias
         // used in EXISTS query where there is a subquery and we are tying it together.
         int dotIdx = otherProperty.indexOf(".")
         String rootObj = dotIdx > -1 ? otherProperty.substring(0, dotIdx) : otherProperty
@@ -677,7 +712,13 @@ class JpqlQueryBuilder {
             //[0..-2] removes last char from string
             q.append(rootObj[0..-2])
                 .append(restOfPath)
-        } else {
+        }
+        else if (rootObj == this.entityAlias){
+            String restOfPath = dotIdx > -1 ? otherProperty.substring(dotIdx) : ""
+            q.append(rootObj)
+                .append(restOfPath)
+        }
+        else {
             q.append(logicalName).append(DOT).append(otherProperty)
         }
 
@@ -722,15 +763,19 @@ class JpqlQueryBuilder {
 
             //if it didn't build anything then dont add it
             if(tempWhereClause.toString()) {
-                whereClause.append(" WHERE ")
+                q.append(" WHERE ")
                 if (criteria instanceof Query.Negation) {
-                    whereClause.append(" NOT")
+                    whereClause.append("NOT (")
                 }
-                whereClause.append("(")
+                //whereClause.append("(")
                 whereClause.append(tempWhereClause.toString())
+                //whereClause.append(")")
+                //close parens
+                if (criteria instanceof Query.Negation) {
+                    whereClause.append(")")
+                }
 
                 q.append(whereClause.toString())
-                q.append(")")
             }
         }
         return parameters
@@ -786,10 +831,13 @@ class JpqlQueryBuilder {
             //TODO handle it for situations like below
             //select sum(amount) as amount from artran where amount> 100 group by trantypeid ; VS
             //select sum(amount) as amount from artran group by trantypeid having sum(amount) > 100;
+
+            //makes sure not to pick up criteria that should be going into the HAVING clause
             if(criterion instanceof Query.PropertyNameCriterion){
                 String prop = criterion.getProperty()
                 String groupProp = logicalName ? "${logicalName}.${prop}" : prop
-                if(projectionAliases.containsKey(prop) && !groupByList.contains(groupProp)){
+                //groupBy should never be in HAVING and if they are just property selects dont skip either
+                if(projectionAliases.containsKey(prop) && !groupByList.contains(groupProp) && !selectList.contains(groupProp)){
                     continue
                 }
             }
@@ -849,9 +897,10 @@ class JpqlQueryBuilder {
                 String prop = (criterion as Query.PropertyNameCriterion).getProperty()
                 String groupProp = logicalName ? "${logicalName}.${prop}" : prop
                 boolean isGrouped = groupByList.contains(groupProp)
+                boolean isSelect = selectList.contains(groupProp)
                 boolean hasAlias = projectionAliases.containsKey(prop)
 
-                if(isGrouped || !hasAlias){
+                if(isGrouped || isSelect || !hasAlias){
                     continue
                 }
             } else {

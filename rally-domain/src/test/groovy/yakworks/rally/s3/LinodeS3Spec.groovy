@@ -28,8 +28,9 @@ class LinodeS3Spec extends Specification  {
 
     @Shared S3Client client
     @Shared Map<String, String> env
-    static String accessKey = "8CLJE0A09Q812QCBM36G"
-    static String secretKey = "EKCw5Zp3kiiaPMCyDgOQCuir7aFGtAzU5cClaXkV"
+    //DO NOT CHECK THESE IN
+    static String accessKey = "8CL...."
+    static String secretKey = "EKC...."
 
     void setupSpec() {
         // System.setProperty("aws.accessKeyId", accessKey)

@@ -6,12 +6,12 @@ package restify
 
 import groovy.transform.CompileStatic
 
-import yakworks.rest.gorm.controller.RestRepoApiController
+import yakworks.rest.gorm.controller.CrudApiController
 
 import static org.springframework.http.HttpStatus.CREATED
 
 @CompileStatic
-class BookController implements RestRepoApiController<Book> {
+class BookController implements CrudApiController<Book> {
 
     @Override
     def post() {
@@ -19,8 +19,7 @@ class BookController implements RestRepoApiController<Book> {
             Map q = bodyAsMap()
             String comments = q.comments ?: ""
             q.comments = "$comments - post was here"
-            Book instance = getRepo().create(q)
-            def entityMap = entityResponder.createEntityMap(instance, params)
+            Map entityMap = getCrudApi().create(q, params).asMap()
             respondWith(entityMap, [status: CREATED])
             // respond instance, [status: CREATED] //201
         } catch (RuntimeException e) {

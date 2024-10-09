@@ -14,7 +14,6 @@ import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
-import yakworks.testing.gorm.unit.DataRepoTest
 
 class ActivityContactSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [Activity, ActivityContact, ActivityNote, Contact, ContactSource, Org, Tag]
@@ -25,11 +24,11 @@ class ActivityContactSpec extends Specification implements GormHibernateTest, Se
     void setupSpec() {
         //setup remover
         repo = ActivityContact.repo
-        repo.criteriaRemover = new CriteriaRemover(){
-            void deleteAll(DetachedCriteria crit) {
-                crit.list()*.delete()
-            }
-        }
+        // repo.criteriaRemover = new CriteriaRemover(){
+        //     void deleteAll(DetachedCriteria crit) {
+        //         crit.list()*.delete()
+        //     }
+        // }
     }
 
     List createSomeContacts(Long orgId){

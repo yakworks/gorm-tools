@@ -164,7 +164,7 @@ class OrgControllerTests extends RestIntTest {
         then:
         response.status == 418
         !body.ok
-        body.code == "error.data.qRequired"
+        body.code == "error.query.qRequired"
 
         //data[0].name == 'Org10'
     }

@@ -299,7 +299,7 @@ class QueryArgs {
         ensureBuilt()
         //put in initially because we loose params query parsing / lost params issue is fixed - See #1924
         if(qRequired && !qCriteria){
-            throw DataProblem.of('error.data.qRequired')
+            throw DataProblem.of('error.query.qRequired')
                 .status(HttpStatus.I_AM_A_TEAPOT) //TODO 418 error for now so its easy to add to retry as it gets droppped sometimes
                 .title("q or qSearch parameter restriction is required").toException()
         }

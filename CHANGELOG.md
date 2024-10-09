@@ -1,3 +1,29 @@
+### v7.3.76
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.74...v7.3.76)
+- release [link](https://github.com/yakworks/gorm-tools/commit/c81500897a6573b9551e8f2a4fd789a15a50de27)
+- Merge pull request #837 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/226285812f15b3234f8fa30890653e359f705f42)
+- basejump [link](https://github.com/yakworks/gorm-tools/commit/b0798f5fe58b13b16a117dd2608177d776a697cc)
+- version 7.3.76 sync [link](https://github.com/yakworks/gorm-tools/commit/7fac4ab51a60856c3ae9b9f1733486fd4c123dbc)
+- stop excluding id in mango tiday (#835) [link](https://github.com/yakworks/gorm-tools/commit/8fc504d43e31493356f3a358ddfee33f41cdc398)
+- Mango jpql list (#834) [link](https://github.com/yakworks/gorm-tools/commit/ef538d9c394e976d3bf85c39d5a83ff4900d333a)
+- Fix static exists on entity (#832) [link](https://github.com/yakworks/gorm-tools/commit/a8222091e6ace6de8de5b5b3edcecc1508ac0968)
+- Q search validation (#830) [link](https://github.com/yakworks/gorm-tools/commit/21e80d9c6ce0508f5f1543d851ecfb741f781964)
+- Mango alias (#829) [link](https://github.com/yakworks/gorm-tools/commit/f8c0be2cd447a52199762f5c6fabb09abe7df8fa)
+- Support exportMax for xlsx export (#828) [link](https://github.com/yakworks/gorm-tools/commit/5b117f7a0eeed32fae44b51c681f92dc6f35270c)
+- remove ConditionalOnMissingBean from JdbcIdGenerator [link](https://github.com/yakworks/gorm-tools/commit/73a6be33ccfee18e93b29fdd7064a0860e5f3cd1)
+- App config (#826) [link](https://github.com/yakworks/gorm-tools/commit/a156a5b3a27be6e081a2b8a8cb584a21203795bc)
+- Jpql testing cleanup and QueryArgs has tighter restrictions on how to use it (#824) [link](https://github.com/yakworks/gorm-tools/commit/d4c2fca4482897f6f8e332aacdd329c45150ce64)
+- basejump [link](https://github.com/yakworks/gorm-tools/commit/4ff7e79fd9ca359d276e2ac428610802b0a14138)
+- jpql and exists (#823) [link](https://github.com/yakworks/gorm-tools/commit/c3ea2def2bcd067ae6ff990b66899fa1cfa91459)
+- add where clause to make it easier to parse out (#822) [link](https://github.com/yakworks/gorm-tools/commit/41f9e1c3b68bacc88a6a545cc24b809800f946b9)
+- Upsert functionality (#821) [link](https://github.com/yakworks/gorm-tools/commit/3ad089f662c0b12447e2fee9aef24999dca188f9)
+- Crud api repo fixes (#820) [link](https://github.com/yakworks/gorm-tools/commit/b3add351e882d97648d61ec2f65ae82e69f3c0a3)
+- CrudApiRepo (#818) [link](https://github.com/yakworks/gorm-tools/commit/53de92d3e932744229cc5816105f0f1d17147e34)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/441987e7e7a38ca2262c607951c193228ceee885)
+- 1791 query timeout  (#793) [link](https://github.com/yakworks/gorm-tools/commit/d8dbdb32389561e96b8e36b185abb74a157156ef)
+- Mail validation (#813) [link](https://github.com/yakworks/gorm-tools/commit/26f0bf428f7ea6172c55b46ef1c15db727d0b4c5)
+
 ### v7.3.74
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.73...v7.3.74)

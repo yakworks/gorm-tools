@@ -9,7 +9,7 @@ spring.config.import: >-
   classpath:config/grails.yml,
   classpath:config/datasource.yml,
   classpath:config/foo.yml,
-  file://${app.resources.rootLocation}/application.yml
+  optional:file://${app.resources.rootLocation}/application.yml
 
 api.config.import: classpath:/restapi-config.yml,classpath*:/restapi/**/*.yml
 
@@ -22,7 +22,7 @@ logging:
     org.springframework: INFO
     org.hibernate.orm.deprecation: OFF # turns off deprecation notices
     org.springframework.security: DEBUG
-    org.springframework.boot.autoconfigure: DEBUG
+    #org.springframework.boot.autoconfigure: DEBUG
     yakworks.rally.api.rally.OrgController: DEBUG
     gorm.tools.mango.MangoDetachedCriteria: DEBUG
 

@@ -11,6 +11,7 @@ import groovy.util.logging.Slf4j
 
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -39,7 +40,17 @@ class SmokeController {
     }
 
     @GetMapping("model")
-    String modelTest(ParmsModel pmodel) {
+    String modelTest(@ModelAttribute ParmsModel pmodel,
+                     ParmsModel2 pmodel2,
+                     @RequestParam String foo,
+                     String bar
+    ) {
+        //works with and without the @ModelAttributes and @RequestParamx`
+        //binds the model
+        assert pmodel.foo
+        assert pmodel.foo == pmodel2.foo
+        //also binds the foor param
+        assert foo == 'buzz'
         "hello " + pmodel
     }
 
@@ -47,6 +58,12 @@ class SmokeController {
     static class ParmsModel {
         String foo
         String bar
+    }
+
+    @ToString(includePackage = false)
+    static class ParmsModel2 {
+        String foo
+        String test
     }
 
     @PostMapping()

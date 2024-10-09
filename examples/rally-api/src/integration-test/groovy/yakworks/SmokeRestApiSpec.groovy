@@ -46,8 +46,8 @@ class SmokeRestApiSpec extends Specification implements OkHttpRestTrait {
         Response resp = get("$path/smoke/model?foo=buzz&bar=baz")
 
         then:
-        resp.code() == HttpStatus.OK.value()
         resp.body().string() == 'hello SmokeController$ParmsModel(buzz, baz)'
+        resp.code() == HttpStatus.OK.value()
     }
 
     void "testing post"() {

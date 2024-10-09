@@ -523,10 +523,10 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
     void persistToOneAssociations(D entity, List<String> assoctiations){
         for(String assocName: assoctiations){
             def assoc = entity[assocName]
-            //use the getAssociationId as it deals with proxies and it doesn't hydrate the proxy
             if (assoc) {
                 //if its a proxy then its already setup and not new
                 //so check that its not a proxy and that it doesnt have an id for it already
+                //use the getAssociationId as it deals with proxies and it doesn't hydrate the proxy
                 if(!proxyHandler.isProxy(assoc) && !((GormEntity)entity).getAssociationId(assocName)){
                     PersistableRepoEntity assocEntity = assoc as PersistableRepoEntity
                     assocEntity.id = ((PersistableRepoEntity)entity).getId()

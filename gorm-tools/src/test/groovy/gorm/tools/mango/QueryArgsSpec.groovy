@@ -9,6 +9,7 @@ import gorm.tools.mango.api.QueryArgs
 import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.api.problem.data.DataProblemException
+import yakworks.json.groovy.JsonEngine
 
 class QueryArgsSpec extends Specification {
 
@@ -76,6 +77,35 @@ class QueryArgsSpec extends Specification {
         then:
         IllegalArgumentException ex = thrown()
         ex.message.contains 'Json parsing expected'
+    }
+
+    void "q with invalid json"() {
+        when:
+        QueryArgs.of(q:'''({'state': [0], 'createdDate': {'$between': ['2024-10-02', '2024-10-03']})''')
+
+        then:
+        IllegalArgumentException ex = thrown()
+        ex.message.contains 'Json parsing expected'
+    }
+
+    void "q with invalid json 2"() {
+        when:
+        QueryArgs qargs = QueryArgs.of(q:'''{"$or":[{"docType":{"$ne":"PA"},"tranDate":{"$gte":"2024-07-11","$lte":"2024-10-09",},"state":0,"status.id":{"$ne":29},"customer.num":"10099718"}]''')
+
+        then:
+        qargs.qCriteria == [
+            $or:[
+                [
+                    tranDate:[$lte:'2024-10-09', $gte:'2024-07-11'],
+                    state:0,
+                    'status.id':[$ne:29],
+                    docType:[$ne:'PA'],
+                    'customer.num':'10099718'
+                ]
+            ]
+        ]
+        JsonEngine.toJson(qargs.qCriteria) == '''{"$or":[{"tranDate":{"$lte":"2024-10-09","$gte":"2024-07-11"},"state":0,"status.id":{"$ne":29},"docType":{"$ne":"PA"},"customer.num":"10099718"}]}'''
+
     }
 
     void "parseParams when no q and strict=false, just a map"() {

@@ -6,11 +6,11 @@ package gorm.tools.beans
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Slf4j
 
-import gorm.tools.metamap.services.MetaMapService
+import yakworks.commons.model.TotalCount
 import yakworks.meta.MetaMapList
-import yakworks.spring.AppCtx
 
 /**
  * a holder object for both pager settings and the paged data, used mostly in the rest and views
@@ -19,7 +19,8 @@ import yakworks.spring.AppCtx
 @Slf4j
 @CompileStatic
 @SuppressWarnings('ConfusingMethodName') //for max and page
-class Pager {
+@EqualsAndHashCode
+class Pager implements Serializable{
 
     /**
      * The page we are on, pageNumber
@@ -49,7 +50,7 @@ class Pager {
     /**
      * List of elements
      */
-    List data
+    List<Map> data
 
     /**
      * Parameters
@@ -166,21 +167,6 @@ class Pager {
 
     }
 
-
-    /**
-     * Setup totalCount property for list, if it absent and fill values that are listed in fieldList
-     *
-     * @param dlist list of entities
-     * @param includes list of fields names which values should be in the result list based on dlist
-     * @return new list with values selected from dlist based on fieldLists field names
-     */
-    // @Deprecated //use setupList
-    // Pager setupData(List dlist, List includes = null) {
-    //     MetaMapList entityMapList = AppCtx.get('metaMapService', MetaMapService).createMetaMapList(dlist, includes)
-    //     setMetaMapList(entityMapList)
-    //     return this
-    // }
-
     /**
      * Sets the data from a MetaMapList.
      * Does nothing special to data but sets the RecordCount from getTotalCount()
@@ -188,15 +174,25 @@ class Pager {
      * @param metaMapList the list to use for the data
      * @return reference to this Pager
      */
-    Pager setMetaMapList(MetaMapList metaMapList) {
+    Pager setDataList(List<Map> metaMapList) {
         if(metaMapList){
-            setRecordCount(metaMapList.getTotalCount())
-            setData(metaMapList)
+            if(metaMapList instanceof TotalCount) {
+                setRecordCount(((TotalCount) metaMapList).getTotalCount())
+            } else {
+                setRecordCount(metaMapList.size())
+            }
+
+            setData(metaMapList as List<Map>)
         } else {
             setRecordCount(0)
             setData([])
         }
         return this
+    }
+
+    @Deprecated
+    Pager setMetaMapList(MetaMapList metaMapList) {
+        return setDataList(metaMapList as List<Map>)
     }
 
 

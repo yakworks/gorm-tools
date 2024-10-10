@@ -207,7 +207,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     protected Pager createPagerResult(Pager pager, List<String> includesKeys, Map qParams, List dlist) {
         List<String> incs = includesConfig.findIncludes(entityClass.name, IncludesProps.of(qParams), includesKeys)
         MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)
-        pager.setMetaMapList(entityMapList)
+        pager.setDataList(entityMapList as List<Map>)
         return pager
     }
 

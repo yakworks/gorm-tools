@@ -29,9 +29,6 @@ import yakworks.rest.gorm.RestApiFromConfig
 @RestApiFromConfig
 // caching will use hazelcast for spring caching too, look into how to use caffiene for spring stuff and hazel for hibernate.
 @EnableCaching
-// this does not appear to be needed if hibernateDatastore depends on hazelcastInstance, see below hack
-// might want to do this if we are trying to force cache to use caffiene and only use hazel for hibernate.
-// @EnableAutoConfiguration(exclude = [HazelcastAutoConfiguration]) // in order to avoid autoconfiguring an extra Hazelcast instance
 @Import([RallyApiSpringConfig, WebMvcConfiguration])
 @EnableAutoConfiguration(
     exclude = [DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class]

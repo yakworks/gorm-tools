@@ -24,6 +24,7 @@ logging:
     org.springframework.security: DEBUG
     #org.springframework.boot.autoconfigure: DEBUG
     yakworks.rally.api.rally.OrgController: DEBUG
+    yakworks.rally.api.OrgCrudApi: DEBUG
     gorm.tools.mango.MangoDetachedCriteria: DEBUG
 
 #    gorm.tools.mango.MangoBuilder: DEBUG
@@ -35,7 +36,7 @@ logging:
     # org.hibernate: INFO
     # for stats and sql logging
     # org.hibernate.stat: DEBUG
-    org.hibernate.SQL: ERROR
+    org.hibernate.SQL: DEBUG
     # this one is very noisy but if neede will show the values passed to sql statements
     # org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     yakity.security: TRACE

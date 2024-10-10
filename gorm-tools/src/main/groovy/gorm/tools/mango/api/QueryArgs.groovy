@@ -60,6 +60,11 @@ class QueryArgs {
     // Closure closure
 
     /**
+     * The query string is useful for a cache key and for logging
+     */
+    String queryString
+
+    /**
      * when true in build method, will only add params that are under q.
      * When false(default) and no q is present in the params
      * then build will add any param that are not special(like max, sort, page, etc)

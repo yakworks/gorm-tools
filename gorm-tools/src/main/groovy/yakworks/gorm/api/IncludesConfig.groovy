@@ -40,7 +40,7 @@ class IncludesConfig {
         return (incsMap ? incsMap[key] : []) as List<String>
     }
 
-    @Cacheable('IncludesConfig.includesByClass')
+    //@Cacheable('IncludesConfig.includesByClass')
     Map getIncludesMap(Class entityClass){
         Map includesMap = getClassStaticIncludes(entityClass)
         //if anything in yml config then they win

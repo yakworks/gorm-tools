@@ -37,6 +37,10 @@ Authorization: {{Authorization}}
 GET {{base_url}}/rally/org?format=xlsx
 Authorization: {{Authorization}}
 
+### Org list sleep
+GET {{base_url}}/rally/org?qSearch=org&sleep=true
+Authorization: {{Authorization}}
+
 ### Org list
 GET {{base_url}}/rally/org?qSearch=org
 Authorization: {{Authorization}}

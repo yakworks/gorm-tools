@@ -19,6 +19,7 @@ import testing.AddyNested
 import testing.Cust
 import testing.TestIdent
 import testing.TestSeedData
+import yakworks.api.problem.data.DataProblemException
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
@@ -46,8 +47,10 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
         //bad
         List bad = build([nonExistingFooBar: true]).list()
 
-        then: "fails with query exception"
-        thrown(QueryException)
+        then:
+        def e = thrown(DataProblemException)
+        e.code == 'error.query.invalid'
+        e.detail.contains('could not resolve property: nonExistingFooBar')
     }
 
     void "test non existent association field"() {
@@ -429,7 +432,9 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
         List res = build((["xxx": ['$eq': 6]])).list()
 
         then:
-        thrown(QueryException)
+        def e = thrown(DataProblemException)
+        e.code == 'error.query.invalid'
+        e.detail.contains('could not resolve property: xxx of: testing.Cust')
     }
 
     def "test or"() {

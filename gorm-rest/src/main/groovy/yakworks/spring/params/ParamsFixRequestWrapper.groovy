@@ -80,7 +80,8 @@ class ParamsFixRequestWrapper extends HttpServletRequestWrapper {
     void ensureParams(){
         if(cachedParams) return
 
-        //possibly from an async operation, still investigating, the params in the request get lost or dropped, but queryString still there
+        //possibly from an async operation, still investigating, the params in the request get lost or dropped,
+        // but queryString still there
         if(!hasRequestParameters() && httpRequest.queryString) {
             cachedParams = QueryParamsUtil.parseQueryString(httpRequest.queryString)
             logDetails()
@@ -95,6 +96,7 @@ class ParamsFixRequestWrapper extends HttpServletRequestWrapper {
         httpRequest.getParameterMap()
     }
 
+    @SuppressWarnings('LineLength')
     void logDetails(){
         if(log.isWarnEnabled()) {
             String msg = """

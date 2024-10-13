@@ -23,6 +23,7 @@ import org.grails.datastore.mapping.query.api.Criteria
 import org.grails.datastore.mapping.query.api.QueryArgumentsAware
 import org.grails.datastore.mapping.query.api.QueryableCriteria
 import org.grails.orm.hibernate.AbstractHibernateSession
+import org.hibernate.QueryException
 
 import gorm.tools.beans.Pager
 import gorm.tools.mango.api.QueryArgs
@@ -33,6 +34,8 @@ import gorm.tools.mango.jpql.PagedQuery
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 import grails.gorm.PagedResultList
+import yakworks.api.problem.ThrowableProblem
+import yakworks.api.problem.data.DataProblem
 import yakworks.commons.lang.NameUtils
 
 /**
@@ -238,14 +241,20 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      */
     @Override
     List<T> list(Map args = Collections.emptyMap(), @DelegatesTo(DetachedCriteria) Closure additionalCriteria = null) {
-        (List)withQueryInstance(args, additionalCriteria) { Query query ->
-            if(log.debugEnabled){
-                log.debug("Query criteria: ${query.criteria}")
+        try {
+            (List)withQueryInstance(args, additionalCriteria) { Query query ->
+                if(log.debugEnabled){
+                    log.debug("Query criteria: ${query.criteria}")
+                }
+                if (args?.max) {
+                    return new PagedResultList(query)
+                }
+                return query.list()
             }
-            if (args?.max) {
-                return new PagedResultList(query)
-            }
-            return query.list()
+        } catch (IllegalArgumentException | QueryException ex) {
+            //Hibernate throws IllegalArgumentException when Antlr fails to parse query
+            //and throws QueryException when hibernate fails to execute query
+            throw toDataProblem(ex)
         }
     }
 
@@ -288,8 +297,22 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         if(timeout) {
             args['timeout'] = timeout
         }
-        def list = hq.list(queryInfo.query, queryInfo.paramMap, args)
-        return list as List<Map>
+
+        try {
+            def list = hq.list(queryInfo.query, queryInfo.paramMap, args)
+            return list as List<Map>
+        } catch (IllegalArgumentException | QueryException ex) {
+            //Hibernate throws IllegalArgumentException when Antlr fails to parse query
+            //and throws QueryException when hibernate fails to execute query
+            throw toDataProblem(ex)
+        }
+    }
+
+    ThrowableProblem toDataProblem(Throwable ex){
+        var dp = DataProblem.of(ex).msg('error.query.invalid')
+        //SECURITY, shorten the desc, gives to much info about query and
+        dp.detail(dp.detail.take(50))
+        return dp.toException()
     }
 
     PagedQuery buildSimplePagedQuery(){

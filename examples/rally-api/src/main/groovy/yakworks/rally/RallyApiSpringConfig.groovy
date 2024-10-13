@@ -2,7 +2,7 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.rally.api
+package yakworks.rally
 
 import groovy.transform.CompileStatic
 
@@ -24,6 +24,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import yakworks.gorm.api.support.QueryArgsValidator
 import yakworks.openapi.gorm.OpenApiGenerator
 import yakworks.rally.RallyConfiguration
+import yakworks.rally.api.TestTimeoutQueryArgsValidator
 import yakworks.rest.grails.AppInfoBuilder
 import yakworks.security.spring.DefaultSecurityConfiguration
 import yakworks.security.spring.token.CookieAuthSuccessHandler

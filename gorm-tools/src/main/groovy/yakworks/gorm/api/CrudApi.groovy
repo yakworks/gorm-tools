@@ -4,6 +4,8 @@
 */
 package yakworks.gorm.api
 
+import java.net.http.HttpRequest
+
 import groovy.transform.CompileStatic
 
 import gorm.tools.beans.Pager
@@ -82,10 +84,17 @@ interface CrudApi<D> {
      * Mango Query that returns a paged list
      *
      * @param params: the query params
-     * @param includesKeys: the default fallback includesKeys as params will normally not be passed in
      * @return the Pager with the data populated with the requested page
      */
-    Pager list(Map params, List<String> includesKeys)
+    Pager list(Map params)
+
+    /**
+     * Mango Query that returns a paged list
+     *
+     * @param params: the query params
+     * @return the Pager with the data populated with the requested page
+     */
+    Pager pickList(Map params)
 
     /**
      * bulk operations on entity

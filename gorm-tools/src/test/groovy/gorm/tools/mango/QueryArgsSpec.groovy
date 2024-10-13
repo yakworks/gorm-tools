@@ -74,21 +74,16 @@ class QueryArgsSpec extends Specification {
         when:
         QueryArgs.of(q:'''({'state': [0], 'createdDate': {'$between': ['2024-10-02', '2024-10-03']})''')
 
+        // then:
+        // IllegalArgumentException ex = thrown()
+        // ex.message.contains 'Json parsing expected'
         then:
-        IllegalArgumentException ex = thrown()
-        ex.message.contains 'Json parsing expected'
+        def e = thrown(DataProblemException)
+        e.code == 'error.query.invalid'
+        e.detail.startsWith("Invalid JSON. Error parsing query")
     }
 
-    void "q with invalid json"() {
-        when:
-        QueryArgs.of(q:'''({'state': [0], 'createdDate': {'$between': ['2024-10-02', '2024-10-03']})''')
-
-        then:
-        IllegalArgumentException ex = thrown()
-        ex.message.contains 'Json parsing expected'
-    }
-
-    void "q with invalid json 2"() {
+    void "q with crazy ERNDC query"() {
         when:
         QueryArgs qargs = QueryArgs.of(q:'''{"$or":[{"docType":{"$ne":"PA"},"tranDate":{"$gte":"2024-07-11","$lte":"2024-10-09",},"state":0,"status.id":{"$ne":29},"customer.num":"10099718"}]''')
 

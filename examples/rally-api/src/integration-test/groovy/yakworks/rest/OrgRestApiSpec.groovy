@@ -118,9 +118,9 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
         then:
         resp.code == 400
         !body.ok
-        body.title == "Data Problem"
-        body.code == "error.data.problem"
-        body.detail.contains "Invalid query Json parsing expected"
+        body.title == "Invalid Query"
+        body.code == "error.query.invalid"
+        body.detail.contains "Invalid JSON"
     }
 
     void "test invalid q"() {
@@ -134,9 +134,9 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
         then:
         resp.code == 400
         !body.ok
-        body.title == "Data Problem"
-        body.code == "error.data.problem"
-        body.detail.contains "Invalid query Json parsing expected"
+        body.title == "Invalid Query"
+        body.code == "error.query.invalid"
+        body.detail.contains "Invalid JSON"
     }
 
 

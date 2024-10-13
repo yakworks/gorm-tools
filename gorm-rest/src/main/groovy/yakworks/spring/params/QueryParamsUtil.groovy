@@ -28,14 +28,14 @@ class QueryParamsUtil {
         return toArrayMap(queryParams)
     }
 
-    private static Map<String, String> toSingleValueMap(Map<String, String[]> paramsMap) {
-        Map<String, String> svMap = [:] as Map<String, String>
-        //just gets first value
-        paramsMap.each { k,v ->
-            svMap[k] = v[0]
-        }
-        return svMap;
-    }
+    // private static Map<String, String> toSingleValueMap(Map<String, String[]> paramsMap) {
+    //     Map<String, String> svMap = [:] as Map<String, String>
+    //     //just gets first value
+    //     paramsMap.each { k,v ->
+    //         svMap[k] = v[0]
+    //     }
+    //     return svMap;
+    // }
 
     // convert to what stock request.getParameterMap would return. decode each value
     private static Map<String, String[]> toArrayMap(MultiValueMap<String, String> mvMap) {
@@ -48,8 +48,13 @@ class QueryParamsUtil {
         return decodedMap
     }
 
-    private static String decode(String s) {
+    static String decode(String s) {
         if(!s) return ""
         URLDecoder.decode(s, StandardCharsets.UTF_8)
+    }
+
+    static String encode(String s) {
+        if(!s) return ""
+        URLEncoder.encode(s, StandardCharsets.UTF_8)
     }
 }

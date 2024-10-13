@@ -19,7 +19,8 @@ import yakworks.meta.MetaMapList
 @Slf4j
 @CompileStatic
 @SuppressWarnings('ConfusingMethodName') //for max and page
-@EqualsAndHashCode
+//XXX VOODOO Security and logging sometimes fails when this has and EqualsAndHashCode
+@EqualsAndHashCode //(includes=["page", "max", "data", "params"])
 class Pager implements Serializable{
 
     /**

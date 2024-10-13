@@ -16,16 +16,24 @@ api.config.import: classpath:/restapi-config.yml,classpath*:/restapi/**/*.yml
 foo:
   message: "from rally-api/application.yml"
 
+#spring.cache.cache-names: customers,customersSearch
+#spring:
+#  cache:
+#    type: CAFFEINE # can set to NONE for testing dev
+#    caffeine:
+#      spec: initialCapacity=10,maximumSize=100,expireAfterAccess=1h
+
 logging:
   level:
     root: INFO
     org.springframework: INFO
     org.hibernate.orm.deprecation: OFF # turns off deprecation notices
-    org.springframework.security: DEBUG
+    #org.springframework.security: DEBUG
     #org.springframework.boot.autoconfigure: DEBUG
     yakworks.rally.api.rally.OrgController: DEBUG
     yakworks.rally.api.OrgCrudApi: DEBUG
-    gorm.tools.mango.MangoDetachedCriteria: DEBUG
+    yakworks.hazelcast: DEBUG
+    #gorm.tools.mango.MangoDetachedCriteria: DEBUG
 
 #    gorm.tools.mango.MangoBuilder: DEBUG
     org.hibernate: OFF # turns off all
@@ -36,10 +44,10 @@ logging:
     # org.hibernate: INFO
     # for stats and sql logging
     # org.hibernate.stat: DEBUG
-    org.hibernate.SQL: DEBUG
+    #org.hibernate.SQL: DEBUG
     # this one is very noisy but if neede will show the values passed to sql statements
     # org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    yakity.security: TRACE
+    #yakity.security: TRACE
 
 ---
 

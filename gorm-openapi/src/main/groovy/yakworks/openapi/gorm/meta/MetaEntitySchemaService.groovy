@@ -30,7 +30,7 @@ class MetaEntitySchemaService extends MetaEntityService {
     /**
      * Overrides MetaEntityService to add the Oapi schema and return the extended MetaMapSchemaIncludes
      */
-    @Cacheable('MetaEntity')
+    //@Cacheable('MetaEntity')
     @Override
     MetaEntity getMetaEntity(String entityClassName, List<String> includes, List<String> excludes) {
         //gets base

@@ -4,14 +4,12 @@
 */
 package yakworks.gorm.api
 
-import groovy.json.JsonException
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.orm.hibernate.HibernateDatastore
-import org.hibernate.QueryException
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.dao.DataAccessException
 
 import gorm.tools.beans.EntityResult
 import gorm.tools.beans.Pager
@@ -26,7 +24,6 @@ import gorm.tools.repository.model.ApiCrudRepo
 import gorm.tools.repository.model.DataOp
 import gorm.tools.transaction.TrxUtils
 import grails.gorm.transactions.Transactional
-import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemException
 import yakworks.gorm.api.support.BulkApiSupport
 import yakworks.gorm.api.support.QueryArgsValidator
@@ -77,7 +74,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
             this.includesProps = includesProps
         }
 
-        @CompileDynamic //getting goody error in intellij about casting entity to D
+        @CompileDynamic //getting goofy error in intellij about casting entity to D
         Map asMap(){
             entityToMap(this.entity, includesProps)
         }
@@ -176,19 +173,21 @@ class DefaultCrudApi<D> implements CrudApi<D> {
      */
     @Transactional(readOnly = true)
     @Override
-    Pager list(Map qParams, List<String> includesKeys){
-        try {
-            Pager pager = Pager.of(qParams)
-            List dlist = queryList(pager, qParams)
-            return createPagerResult(pager, includesKeys, qParams, dlist)
-        } catch (JsonException | IllegalArgumentException | QueryException ex) {
-            //See #1925 - Catch bad query in 'q' parameter and report back. So we dont pollute logs, and can differentiate that its not us.
-            //Hibernate throws IllegalArgumentException when Antlr fails to parse query
-            //and throws QueryException when hibernate fails to execute query
-            throw DataProblem.ex("Invalid query $ex.message")
-        } catch (DataAccessException ex) {
-            throw DataProblem.of(ex).toException()
-        }
+    Pager list(Map qParams){
+        Pager pager = Pager.of(qParams)
+        List dlist = queryList(pager, qParams)
+        return createPagerResult(pager, qParams, dlist, [IncludesKey.list.name()])
+    }
+
+    /**
+     * Mango Query that returns a paged list
+     */
+    @Transactional(readOnly = true)
+    @Override
+    Pager pickList(Map qParams){
+        Pager pager = Pager.of(qParams)
+        List dlist = queryList(pager, qParams)
+        return createPagerResult(pager, qParams, dlist, ['picklist', IncludesKey.stamp.name()])
     }
 
     @Override
@@ -204,8 +203,8 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         return getApiCrudRepo().query(qargs, null).pagedList(qargs.pager)
     }
 
-    protected Pager createPagerResult(Pager pager, List<String> includesKeys, Map qParams, List dlist) {
-        List<String> incs = includesConfig.findIncludes(entityClass.name, IncludesProps.of(qParams), includesKeys)
+    protected Pager createPagerResult(Pager pager, Map qParams, List dlist, List<String> fallbackIncludesKeys) {
+        List<String> incs = includesConfig.findIncludes(entityClass.name, IncludesProps.of(qParams), fallbackIncludesKeys)
         MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)
         pager.setDataList(entityMapList as List<Map>)
         return pager
@@ -233,7 +232,6 @@ class DefaultCrudApi<D> implements CrudApi<D> {
 
     void validateQueryArgs(QueryArgs args, Map params) {
         //FIXME, export to xlsx passes large number for max eg 10K at RNDC, below hack is to allow tht max for export
-
         boolean isExcelExport = params && params['format'] == FORMAT_XLSX
 
         try {

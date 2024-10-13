@@ -4,12 +4,15 @@
 */
 package gorm.tools.mango.api
 
+import groovy.json.JsonException
 import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 import groovy.util.logging.Slf4j
+
+import org.hibernate.QueryException
 
 import gorm.tools.beans.Pager
 import yakworks.api.HttpStatus
@@ -332,11 +335,19 @@ class QueryArgs {
      * if the string is known to be json then parse the json and returns the map
      */
     static <T> T parseJson(String text, Class<T> clazz) {
-        //jsonSlurper LAX allows fields to not be quoted
-        JsonSlurper jsonSlurper = new JsonSlurper().setType(JsonParserType.LAX)
-        Object parsedObj = jsonSlurper.parseText(text)
-        JsonEngine.validateExpectedClass(clazz, parsedObj)
-        return (T)parsedObj
+        try {
+            //jsonSlurper LAX allows fields to not be quoted
+            JsonSlurper jsonSlurper = new JsonSlurper().setType(JsonParserType.LAX)
+            Object parsedObj = jsonSlurper.parseText(text)
+            JsonEngine.validateExpectedClass(clazz, parsedObj)
+            return (T)parsedObj
+        } catch (ex) {
+            //JsonException
+            throw DataProblem.of('error.query.invalid')
+                .detail("Invalid JSON. Error parsing query - $ex.message")
+                .toException()
+        }
+
     }
 
     /**

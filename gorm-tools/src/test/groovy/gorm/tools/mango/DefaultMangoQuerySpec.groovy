@@ -11,6 +11,7 @@ import testing.AddyNested
 import testing.Cust
 import testing.CustRepo
 import testing.TestSeedData
+import yakworks.api.problem.data.DataProblemException
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class DefaultMangoQuerySpec extends Specification implements GormHibernateTest {
@@ -158,6 +159,34 @@ class DefaultMangoQuerySpec extends Specification implements GormHibernateTest {
         o.id == 2
         o.location.address == 'City2'
 
+    }
+
+    void "invalid type"() {
+        when:
+        Cust.query(uid:['$eq': 1])
+
+        then:
+        DataProblemException ex = thrown()
+        ex.code == 'error.data.problem'
+        ex.detail.contains 'Invalid query string - Cannot cast object'
+    }
+
+    void "test non existent association field"() {
+        when:
+        Cust.query("foo.name":"test")
+
+        then:
+        DataProblemException ex = thrown()
+        ex.message.contains("Invalid query string - Invalid criteria for field:foo")
+    }
+
+    void "test invalid date"() {
+        when:
+        Cust.query("locDate":"xxx")
+
+        then:
+        DataProblemException ex = thrown()
+        ex.message.contains("Invalid query string - Text 'xxx' could not be parsed")
     }
 
 }

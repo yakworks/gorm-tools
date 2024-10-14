@@ -50,6 +50,7 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
         thrown(QueryException)
     }
 
+
     void "test non existent association field"() {
         when:
         List res = build(['Type.name': "test"]).list()
@@ -311,6 +312,7 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
         results[0] == one
         results[1] == two
     }
+
 
     def "test gt"() {
         when:

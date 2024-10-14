@@ -305,6 +305,7 @@ trait CrudApiController<D> extends RestApiController {
         }
     }
 
+    @Override
     void handleThrowable(Throwable e) {
         Problem apiError = problemHandler.handleException(e, getEntityClass()?.simpleName)
         respondWith(apiError)

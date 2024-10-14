@@ -123,8 +123,9 @@ class ProblemHandler {
         }
         else if (e instanceof NullPointerException) {
             //deal with the dreaded null pointer
-            String stackLine1 = e.stackTrace[0].toString()
-            return new UnexpectedProblem().cause(e).detail("NullPointerException at ${stackLine1}")
+            //Check if there's stacktrace, in certain cases stacktrace is coming up empty, which is causing Arrayoutofbound ex - see #2712
+            String stackLine1 = e.stackTrace ? "at ${e.stackTrace[0].toString()}" : ""
+            return new UnexpectedProblem().cause(e).detail("NullPointerException $stackLine1")
         }
         else {
             return new UnexpectedProblem().cause(e).detail(e.message)

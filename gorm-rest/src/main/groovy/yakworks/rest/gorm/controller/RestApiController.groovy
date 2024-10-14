@@ -86,9 +86,10 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRespon
         }
     }
 
-    // Map getGrailsParams() {
-    //     getParamsMap()
-    // }
+    void handleThrowable(Throwable e) {
+        Problem apiError = problemHandler.handleException(e)
+        respondWith(apiError)
+    }
 
     /**
      * Sometimes the stock getParams will loose the query params that are passed in. Its not clear why.

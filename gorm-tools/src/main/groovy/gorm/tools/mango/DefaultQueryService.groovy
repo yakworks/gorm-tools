@@ -9,6 +9,7 @@ import java.time.format.DateTimeParseException
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.InvokerInvocationException
+import org.codehaus.groovy.runtime.typehandling.GroovyCastException
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.beans.Pager
@@ -60,18 +61,11 @@ class DefaultQueryService<D> implements QueryService<D> {
      */
     @Override
     MangoDetachedCriteria<D> query(QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure applyClosure = null) {
-        try {
-
-            MangoDetachedCriteria<D> mangoCriteria = createCriteria(qargs, applyClosure)
-            applyCriteria(mangoCriteria)
-            // MangoDetachedCriteria<D> mangoCriteria = mangoBuilder.createCriteria(getEntityClass() as Class<D>, qargs, applyClosure)
-            // mangoBuilder.applyCriteria(mangoCriteria)
-            return mangoCriteria
-
-        } catch (InvokerInvocationException | IllegalArgumentException | DateTimeParseException ex) {
-            //See #1925 - Catch bad qargs
-            throw DataProblem.ex("Invalid query string $ex.message")
-        }
+        MangoDetachedCriteria<D> mangoCriteria = createCriteria(qargs, applyClosure)
+        applyCriteria(mangoCriteria)
+        // MangoDetachedCriteria<D> mangoCriteria = mangoBuilder.createCriteria(getEntityClass() as Class<D>, qargs, applyClosure)
+        // mangoBuilder.applyCriteria(mangoCriteria)
+        return mangoCriteria
     }
 
     /**
@@ -90,7 +84,11 @@ class DefaultQueryService<D> implements QueryService<D> {
         publishCriteriaEvent(mangoCriteria)
         try {
             mangoBuilder.applyCriteria(mangoCriteria)
-        } catch (InvokerInvocationException | IllegalArgumentException | DateTimeParseException ex) {
+
+            //DateTimeParseException would get thrown when a date value is bad
+            //IllegalArgumentException gets thrown when trying query a non existing association field
+            //GroovyCastException gets thrown when value doesnt match field type, eg string val for an int type field
+        } catch (Exception ex) {
             //See #1925 - Catch bad qargs
             throw DataProblem.ex("Invalid query string - $ex.message")
         }

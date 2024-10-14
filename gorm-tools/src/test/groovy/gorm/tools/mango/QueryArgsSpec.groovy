@@ -24,7 +24,8 @@ class QueryArgsSpec extends Specification {
         )
         then:
         //parsed.criteria.id == 24
-        qargs.buildCriteriaMap() == [id: 24, '$sort': ['foo':'asc']]
+        qargs.sort == ['foo':'asc']
+        qargs.buildCriteriaMap() == [id: 24]
         qargs.pager
 
         when: 'q is used and reserved pager is passed'
@@ -32,7 +33,8 @@ class QueryArgsSpec extends Specification {
 
         then: 'it should have them in criteria'
         //parsed.criteria.id == 24
-        qargs.buildCriteriaMap() == [id: 24, offset: 'testing', '$sort': ['foo':'asc']]
+        qargs.sort == ['foo':'asc']
+        qargs.buildCriteriaMap() == [id: 24, offset: 'testing']
 
         qargs.pager.max == 10
         qargs.pager.offset == 10
@@ -46,17 +48,19 @@ class QueryArgsSpec extends Specification {
 
         then: 'it should have them in criteria'
         //sort not in the qCriteria
-        qargs.qCriteria == [id:24, something: 'testing']
+        qargs.criteriaMap == [id:24, something: 'testing']
         //sort is in the buildCriteria()
-        qargs.buildCriteriaMap() == [id: 24, something: 'testing', '$sort': ['foo':'desc']]
+        qargs.sort == ['foo':'desc']
+        qargs.buildCriteriaMap() == [id: 24, something: 'testing']
 
         when: 'not using q and strict=false default'
         //when not using q or criteria
         qargs = QueryArgs.of(name: 'joe', sort:'foo', page: 2)
 
         then: "adds the params to the criteria"
-        qargs.qCriteria == [name: 'joe']
-        qargs.buildCriteriaMap() == [name: 'joe', '$sort': ['foo':'asc']]
+        qargs.criteriaMap == [name: 'joe']
+        qargs.sort == ['foo':'asc']
+        qargs.buildCriteriaMap() == [name: 'joe']
 
         qargs.pager.max == 20
         qargs.pager.offset == 20 //(max * (page - 1))
@@ -88,7 +92,7 @@ class QueryArgsSpec extends Specification {
         QueryArgs qargs = QueryArgs.of(q:'''{"$or":[{"docType":{"$ne":"PA"},"tranDate":{"$gte":"2024-07-11","$lte":"2024-10-09",},"state":0,"status.id":{"$ne":29},"customer.num":"10099718"}]''')
 
         then:
-        qargs.qCriteria == [
+        qargs.criteriaMap == [
             $or:[
                 [
                     tranDate:[$lte:'2024-10-09', $gte:'2024-07-11'],
@@ -99,7 +103,7 @@ class QueryArgsSpec extends Specification {
                 ]
             ]
         ]
-        JsonEngine.toJson(qargs.qCriteria) == '''{"$or":[{"tranDate":{"$lte":"2024-10-09","$gte":"2024-07-11"},"state":0,"status.id":{"$ne":29},"docType":{"$ne":"PA"},"customer.num":"10099718"}]}'''
+        JsonEngine.toJson(qargs.criteriaMap) == '''{"$or":[{"tranDate":{"$lte":"2024-10-09","$gte":"2024-07-11"},"state":0,"status.id":{"$ne":29},"docType":{"$ne":"PA"},"customer.num":"10099718"}]}'''
 
     }
 
@@ -110,7 +114,8 @@ class QueryArgsSpec extends Specification {
         QueryArgs qargs = QueryArgs.of(id: 123, name: 'joe', max: 10, sort:'bar:desc,foo:asc')
 
         then:
-        qargs.buildCriteriaMap() == [id: 123, name: 'joe', '$sort': ['foo':'asc', bar:'desc']]
+        qargs.sort == ['foo':'asc', bar:'desc']
+        qargs.buildCriteriaMap() == [id: 123, name: 'joe']
         qargs.pager.max == 10
 
         when:
@@ -134,7 +139,7 @@ class QueryArgsSpec extends Specification {
         when:
         QueryArgs qargs = new QueryArgs().strict(true).build(name: 'joe')
         then:
-        qargs.qCriteria == [:]
+        qargs.criteriaMap == [:]
         qargs.buildCriteriaMap() == [:]
 
         when: 'not using q'
@@ -142,8 +147,9 @@ class QueryArgsSpec extends Specification {
         qargs = new QueryArgs().strict(true).build(id: 123, name: 'joe', max: 10, sort:'bar')
 
         then: "the params wont get added to criteria"
-        qargs.qCriteria == [:]
-        qargs.buildCriteriaMap() == [$sort:[bar:'asc']]
+        qargs.criteriaMap == [:]
+        qargs.sort == [bar:'asc']
+        qargs.buildCriteriaMap()  == [:]
         qargs.pager.max == 10
 
     }
@@ -216,7 +222,8 @@ class QueryArgsSpec extends Specification {
 
         then:
         noExceptionThrown()
-        qargs.buildCriteriaMap() == [id: 1, name: 'joe', '$sort': ['foo':'asc']]
+        qargs.sort == ['foo':'asc']
+        qargs.buildCriteriaMap() == [id: 1, name: 'joe']
 
     }
 
@@ -227,8 +234,9 @@ class QueryArgsSpec extends Specification {
 
         then:
         noExceptionThrown()
-        qargs.qCriteria == [$qSearch:'foo']
-        qargs.buildCriteriaMap() == ['$qSearch': 'foo', '$sort': ['foo':'asc']]
+        qargs.criteriaMap == [$qSearch:'foo']
+        qargs.sort == ['foo':'asc']
+        qargs.buildCriteriaMap() == ['$qSearch': 'foo']
 
     }
 
@@ -256,16 +264,19 @@ class QueryArgsSpec extends Specification {
         //should keep the order
         keys[0] == "bar"
         keys[1] == "foo"
-        qargs.buildCriteriaMap() == ['$sort': ['foo':'asc', bar:'desc']]
+        qargs.sort == ['foo':'asc', bar:'desc']
+        //qargs.buildCriteriaMap() == ['$sort': ['foo':'asc', bar:'desc']]
 
         when:
+        //goofy mixed quotes
         qargs = QueryArgs.of(sort:'{"xxx\': "desc", zzz: "asc"}')
         keys = qargs.sort.keySet()
         then:
         //should keep the order
         keys[0] == "xxx"
         keys[1] == "zzz"
-        qargs.buildCriteriaMap() == ['$sort': ['xxx':'desc', zzz:'asc']]
+        qargs.sort == ['xxx':'desc', zzz:'asc']
+        //qargs.buildCriteriaMap() == ['$sort': ['xxx':'desc', zzz:'asc']]
     }
 
     def "sorts with only comma separted list of fields"() {
@@ -278,7 +289,8 @@ class QueryArgsSpec extends Specification {
         keys[0] == "foo"
         keys[1] == "bar"
         keys[2] == "baz"
-        qargs.buildCriteriaMap() == ['$sort': ['foo':'asc', bar:'asc', baz:'asc']]
+        qargs.sort == ['foo':'asc', bar:'asc', baz:'asc']
+        // qargs.buildCriteriaMap() == ['$sort': ['foo':'asc', bar:'asc', baz:'asc']]
 
         when: "sanity check a single sort"
         qargs = QueryArgs.of(sort:"foo")
@@ -287,7 +299,8 @@ class QueryArgsSpec extends Specification {
         //should keep the order
         keys[0] == "foo"
         keys.size() == 1
-        qargs.buildCriteriaMap() == ['$sort': ['foo':'asc']]
+        qargs.sort == ['foo':'asc']
+        //qargs.buildCriteriaMap() == ['$sort': ['foo':'asc']]
     }
 
     void "defaultSortById"() {

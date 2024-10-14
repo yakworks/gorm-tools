@@ -20,7 +20,7 @@ class TestTimeoutQueryArgsValidator extends UserQueryArgsValidator {
     @Override
     QueryArgs validate(QueryArgs qargs) {
         //throw timeout if param is present in qarg
-        if(qargs.qCriteria['timeout']) {
+        if(qargs.criteriaMap['timeout']) {
             throw new QueryTimeoutException("Test query timeout", null, null)
         }
         super.validate(qargs)

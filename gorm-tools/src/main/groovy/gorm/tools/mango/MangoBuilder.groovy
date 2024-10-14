@@ -79,11 +79,11 @@ class MangoBuilder {
     <D> MangoDetachedCriteria<D> applyCriteria(MangoDetachedCriteria<D> mangoCriteria){
         QueryArgs qargs = mangoCriteria.queryArgs
         //will be copy if sort exists
-        Map tidyMap = mangoCriteria.criteriaMap
+        Map criteriaMap = mangoCriteria.criteriaMap
         Closure applyClosure = mangoCriteria.criteriaClosure
 
         //apply the map
-        applyMapOrList(mangoCriteria, tidyMap)
+        applyMapOrList(mangoCriteria, criteriaMap)
 
         //apply the closure
         if (applyClosure) {
@@ -91,9 +91,9 @@ class MangoBuilder {
             clonedClosure.setResolveStrategy(Closure.DELEGATE_FIRST)
             mangoCriteria.with(clonedClosure)
         }
-        //
-        //$sort was probably on the criteria as its added in QueryArgs?? but if not then use the property
-        if(qargs.sort && !tidyMap.containsKey(SORT)){
+
+        //do the queryArgs but only if $sort not in criteria map
+        if(qargs.sort && !criteriaMap.containsKey(SORT)){
             order(mangoCriteria, qargs.sort)
         }
 
@@ -356,6 +356,9 @@ class MangoBuilder {
         else if (val instanceof String){
             qText = val as String
             qSearchFields = getQSearchFields(criteria)
+            //FIXME hack for testing when qRequired=true
+            // continue if qSearch=* if its been passed in.
+            if(qText == "*") return criteria
         }
 
         if(qSearchFields) {

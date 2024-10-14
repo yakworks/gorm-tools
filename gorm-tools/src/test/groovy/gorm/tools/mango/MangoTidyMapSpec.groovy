@@ -477,16 +477,6 @@ class MangoTidyMapSpec extends Specification {
     }
 
     void "test sort"() {
-        // when:
-        // def mmap = tidy(
-        //     location: [
-        //         '$sort':['address': "desc"]
-        //     ]
-        // )
-        //
-        // then:
-        // mmap == [location: [$sort: ['address': "desc"]]]
-
         when:
         def mmap = tidy('$sort':['location.address': "desc"])
 

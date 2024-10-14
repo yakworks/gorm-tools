@@ -736,7 +736,7 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
 
     def "test order simple"() {
         when:
-        List res = build(['$sort': 'descId']).list()
+        List res = build(['sort': 'descId']).list()
 
         then: 'sanity check first few'
         res[0].descId < res[1].descId
@@ -745,7 +745,7 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
 
     def "test order desc"() {
         when:
-        List res = build('$sort': [id: "desc"]).list()
+        List res = build('sort': [id: "desc"]).list()
 
         then:
         res[0].id > res[1].id
@@ -754,7 +754,7 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
 
     def "test order association"() {
         when:
-        List res = build('$sort':['location.address': 'desc'] ).list()
+        List res = build('sort':['location.address': 'desc'] ).list()
 
         then:
         res[0].location.address > res[1].location.address
@@ -763,7 +763,7 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
 
     def "test order multi"() {
         when:
-        List res = build('$sort': [inactive: "desc", id: "desc"]).list()
+        List res = build('sort': [inactive: "desc", id: "desc"]).list()
 
         then:
         // inactive is split 50/50 true false in test data, first 5 should be true
@@ -775,7 +775,7 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
 
     def "test multisort string"() {
         when:
-        List res = build('$sort': 'inactive desc, id desc').list()
+        List res = build('sort': 'inactive desc, id desc').list()
         then:
         res[0].inactive == res[4].inactive
         res[0].id > res[1].id
@@ -785,7 +785,7 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
 
     void "test query timeout is set on hibernate criteria"() {
         setup:
-        MangoDetachedCriteria criteria = build('$sort': 'inactive desc, id desc')
+        MangoDetachedCriteria criteria = build('sort': 'inactive desc, id desc')
         criteria.setTimeout(10)
 
         when:

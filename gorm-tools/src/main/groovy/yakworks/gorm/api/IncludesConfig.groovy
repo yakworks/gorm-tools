@@ -25,6 +25,7 @@ import yakworks.spring.AppCtx
 class IncludesConfig {
 
     @Autowired ApiConfig apiConfig
+    @Autowired IncludesConfig self //inject self so can call methods and get caching
 
     //static cheater to get the bean, use sparingly if at all
     static IncludesConfig bean(){
@@ -36,11 +37,11 @@ class IncludesConfig {
      * @return the list or empty if not found
      */
     List<String> getIncludes(Class entityClass, String key){
-        Map incsMap = getIncludesMap(entityClass)
+        Map incsMap = self.getIncludesMap(entityClass)
         return (incsMap ? incsMap[key] : []) as List<String>
     }
 
-    //@Cacheable('IncludesConfig.includesByClass')
+    @Cacheable(cacheNames="includesConfig.includesByClass",key="{#entityClass}")
     Map getIncludesMap(Class entityClass){
         Map includesMap = getClassStaticIncludes(entityClass)
         //if anything in yml config then they win

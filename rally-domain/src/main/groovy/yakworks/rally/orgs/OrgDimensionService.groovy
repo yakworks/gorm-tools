@@ -70,7 +70,7 @@ class OrgDimensionService {
     /**
      * Get all parent levels for given orgtype
      */
-    //@Cacheable('OrgDimension.parentLevels')
+    @Cacheable('OrgDimension.parentLevels')
     List<OrgType> getParentLevels(OrgType type) {
         return getLevels(DimLevel.PARENTS, type)
     }
@@ -79,7 +79,7 @@ class OrgDimensionService {
      * Get all child levels for given orgtype
      * NOT USED OUTSIDE TESTS RIGHT NOW
      */
-    //@Cacheable('OrgDimension.childLevels')
+    @Cacheable('OrgDimension.childLevels')
     List<OrgType> getChildLevels(OrgType typeEnum) {
         return getLevels(DimLevel.CHILDREN, typeEnum)
     }

@@ -36,7 +36,7 @@ class MetaEntityService {
      * @param excludes the excludes list in dot notation
      * @return the created EntityMapIncludes
      */
-    //@Cacheable('MetaEntity')
+    @Cacheable('MetaEntity')
     MetaEntity getMetaEntity(String entityClassName, List<String> includes, List<String> excludes) {
         return MetaGormEntityBuilder.build(entityClassName, includes, excludes)
     }

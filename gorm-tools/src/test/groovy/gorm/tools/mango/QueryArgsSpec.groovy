@@ -190,6 +190,8 @@ class QueryArgsSpec extends Specification {
         qargs.buildSort('name:asc, num: desc') == [name: 'asc', num: 'desc']
 
         qargs.buildSort('{name:"asc", num: "desc"}') == [name: 'asc', num: 'desc']
+        qargs.buildSort('name, num') == [name: 'asc', num: 'asc']
+        qargs.buildSort('inactive desc, id desc') == [inactive: 'desc', id: 'desc']
     }
 
     def "test buildProjections"() {

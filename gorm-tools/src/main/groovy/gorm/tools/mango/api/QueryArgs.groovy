@@ -376,10 +376,15 @@ class QueryArgs {
             //will only be one item in list if no ',' token
             List sortList = sortText.tokenize(',')*.trim() as List<String>
             for (String sortEntry : sortList) {
-                if (sortText.contains(':')) {
+                if (sortEntry.contains(':')) {
                     List sortTokens = sortEntry.tokenize(':')*.trim() as List<String>
                     sortMap[sortTokens[0]] = sortTokens[1]
-                } else {
+                } else if (sortEntry.contains(' ')){
+                    //could be in format sort:"foo desc,bar asc"
+                    String[] sorting = sortEntry.trim().split(" ")
+                    sortMap[(sorting[0])] = sorting[1] ?: orderBy
+                }
+                else {
                     //its should just a field name
                     sortMap[sortEntry] = orderBy
                 }

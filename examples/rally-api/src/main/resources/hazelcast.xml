@@ -13,6 +13,13 @@
   <cluster-name>dev</cluster-name>
   <instance-name>hz-member-1</instance-name>
 
+  <network>
+    <rest-api enabled="true">
+      <endpoint-group name="HEALTH_CHECK" enabled="true"/>
+      <endpoint-group name="DATA" enabled="true"/>
+    </rest-api>
+  </network>
+
   <properties>
     <!--set to 80 (default it 70) to reduce somen noise
       see https://docs.hazelcast.com/hazelcast/5.2/maintain-cluster/monitoring#health-check-and-monitoring-->
@@ -32,14 +39,14 @@
         will get automatically evicted from the map.
         Any integer between 0 and Integer.MAX_VALUE. 0 means infinite. Default is 0
     -->
-    <time-to-live-seconds>10</time-to-live-seconds>
+    <time-to-live-seconds>1200</time-to-live-seconds>
     <!--
         Maximum number of seconds for each entry to stay idle in the map. Entries that are
         idle(not touched) for more than <max-idle-seconds> will get
         automatically evicted from the map. Entry is touched if get, put or containsKey is called.
         Any integer between 0 and Integer.MAX_VALUE. 0 means infinite. Default is 0.
     -->
-    <max-idle-seconds>10</max-idle-seconds>
+    <max-idle-seconds>1200</max-idle-seconds>
 
   </map>
 

@@ -64,8 +64,8 @@ trait CrudApiController<D> extends RestApiController {
     @Autowired
     CsvToMapTransformer csvToMapTransformer
 
-    @Autowired
-    ObjectProvider<CrudApi<D>> crudApiProvider
+    // @Autowired
+    // ObjectProvider<CrudApi<D>> crudApiProvider
 
     /**
      * The java class for the Gorm domain (persistence entity). will generally get set in constructor or using the generic as

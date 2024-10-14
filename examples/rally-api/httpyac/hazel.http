@@ -1,31 +1,22 @@
 # Use Httyak plugin https://github.com/AnWeber/vscode-httpyac
-@host = http://localhost:8080
-@base_url = {{host}}/api
+@host = http://localhost:5701
+@base_url = {{host}}/hazelcast
 @contentType = application/json
-@Authorization=Bearer {{login.access_token}}
-# @Authorization=token 1234
 
-### ****** IF SEC ENABLED RUN THIS FIRST TO LOGIN, see login.http for more*******
-# @name login
-POST {{base_url}}/login
-Content-Type: application/json
+### See https://docs.hazelcast.com/hazelcast/5.3/maintain-cluster/rest-api
+### cluster state
+GET {{base_url}}/health/cluster-state
 
-{"username":"admin","password":"123"}
+GET {{base_url}}/health/cluster-size
 
-### basic auth
-# @name login
-POST http://admin:123@localhost:8080/api/oauth/token
-Content-Type: application/json
+GET {{base_url}}/health/node-state
 
-### VALIDATE WTF
-# @ref login
-GET {{base_url}}/validate
-Authorization: {{Authorization}}
+GET {{base_url}}/rest/cluster
 
-### Org
-# @ref login
-GET {{base_url}}/rally/org
-Authorization: {{Authorization}}
+GET {{base_url}}/rest/maps/
+
+### maos
+GET {{base_url}}/rest/maps
 
 ### Org get first
 # @no-cookie-jar

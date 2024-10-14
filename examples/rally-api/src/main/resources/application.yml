@@ -17,6 +17,7 @@ foo:
   message: "from rally-api/application.yml"
 
 #spring.cache.cache-names: customers,customersSearch
+spring.cache.type: hazelcast
 #spring:
 #  cache:
 #    type: CAFFEINE # can set to NONE for testing dev
@@ -72,7 +73,7 @@ management:
   endpoints:
     enabled-by-default: true
     web:
-      base-path: /actuator
+      # base-path: /actuator
       exposure:
         include: '*'
 #        include: health,info,liveness,metrics,caches

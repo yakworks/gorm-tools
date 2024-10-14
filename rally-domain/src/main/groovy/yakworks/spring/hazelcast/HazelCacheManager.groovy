@@ -2,7 +2,7 @@
 * Copyright 2008-2023 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.hazelcast
+package yakworks.spring.hazelcast
 
 
 import java.util.concurrent.ConcurrentMap
@@ -34,8 +34,7 @@ public class HazelCacheManager extends HazelcastCacheManager {
      */
     Map<String, Long> lockTimeoutMap = new HashMap<String, Long>();
 
-    public HazelCacheManager() {
-    }
+    public HazelCacheManager() {}
 
     public HazelCacheManager(HazelcastInstance hazelcastInstance) {
         super(hazelcastInstance);
@@ -49,10 +48,13 @@ public class HazelCacheManager extends HazelcastCacheManager {
         if (cache == null) {
             IMap<Object, Object> map = hazelcastInstance.getMap(name);
             cache = new HazelCache(map);
+
             long cacheTimeout = calculateCacheReadTimeout(name);
             cache.setReadTimeout(cacheTimeout);
+
             long cacheLockTimeout = calculateCacheLockTimeout(name);
             cache.setLockTimeout(cacheLockTimeout);
+
             Cache currentCache = getCaches().putIfAbsent(name, cache);
             if (currentCache != null) {
                 cache = currentCache;
@@ -63,6 +65,7 @@ public class HazelCacheManager extends HazelcastCacheManager {
 
     //@CompileDynamic
     ConcurrentMap<String, Cache> getCaches(){
+        //groovy not abel to access even with CompileDynamic
         (ConcurrentMap<String, Cache>) ReflectionUtils.getPrivateFieldValue(HazelcastCacheManager, "caches", this)
         //return super.@caches
     }
@@ -76,5 +79,9 @@ public class HazelCacheManager extends HazelcastCacheManager {
     private long calculateCacheReadTimeout(String name) {
         Long timeout = getReadTimeoutMap().get(name);
         return timeout == null ? defaultReadTimeout : timeout;
+    }
+
+    Cache create(String name) {
+        return null;
     }
 }

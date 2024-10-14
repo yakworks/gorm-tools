@@ -157,7 +157,7 @@ class OrgControllerTests extends RestIntTest {
 
     void "list fail no q"() {
         when:
-        controller.params << [max:20, sort:'contact.flex.num1', order:'desc']
+        controller.params << [max:20]
         controller.list()
         Map body = response.bodyToMap()
 

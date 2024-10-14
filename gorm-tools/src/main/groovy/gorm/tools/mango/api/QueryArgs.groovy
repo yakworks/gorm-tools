@@ -222,7 +222,7 @@ class QueryArgs {
         if(!pager) pager = Pager.of(pagerMap)
 
         //sorts and orderBy
-        String orderBy = params.remove('order') ?: 'asc'
+        String orderBy = params.remove('order') ?: 'asc' //FIXME this is legacy concept
         def sortField = params.remove('sort')
         if(sortField) sort = buildSort(sortField, orderBy)
 
@@ -288,12 +288,16 @@ class QueryArgs {
      */
     Map<String, Object> buildCriteriaMap(){
         ensureBuilt()
-        Map<String, Object> criterium = criteriaMap
+        //OLD kept for ref for now
+        // Map<String, Object> criterium = criteriaMap
         // if sort was populated, add it to the criteria with the $sort if its doesn't exist
         // if(sort && !qCriteria.containsKey(SORT) ) {
         //     criterium = qCriteria + ([(SORT): sort] as Map<String, Object>)
         // }
-        return criterium
+
+        //FIXME make a shallow copy for now to keep it like how it was,
+        // not sure if this is really needed but if changes are made to it after this call it wont mess with the criteriaMap
+        return criteriaMap + ([:] as Map<String, Object>)
     }
     /**
      * Throws IllegalArgumentException if qRequired is true.

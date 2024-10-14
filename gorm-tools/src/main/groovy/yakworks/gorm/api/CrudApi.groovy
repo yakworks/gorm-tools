@@ -4,7 +4,6 @@
 */
 package yakworks.gorm.api
 
-import java.net.http.HttpRequest
 
 import groovy.transform.CompileStatic
 

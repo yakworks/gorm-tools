@@ -4,15 +4,13 @@
 */
 package gorm.tools.mango.api
 
-import groovy.json.JsonException
+
 import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 import groovy.util.logging.Slf4j
-
-import org.hibernate.QueryException
 
 import gorm.tools.beans.Pager
 import yakworks.api.HttpStatus

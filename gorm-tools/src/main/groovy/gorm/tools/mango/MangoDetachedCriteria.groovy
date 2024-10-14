@@ -185,6 +185,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      * @param alias The alias
      * @return This create
      */
+    @SuppressWarnings('InvertedIfElse') //not our code so dont want to change it
     @Override //Overriden copy paste in just do we can do instance of this instead
     Criteria createAlias(String associationPath, String zalias) {
         initialiseIfNecessary(targetClass)
@@ -308,10 +309,10 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         }
     }
 
-    ThrowableProblem toDataProblem(Throwable ex){
+    static ThrowableProblem toDataProblem(Throwable ex){
         var dp = DataProblem.of(ex).msg('error.query.invalid')
         //SECURITY, shorten the desc, gives to much info about query and
-        dp.detail(dp.detail.take(50))
+        dp.detail(dp.detail.take(100))
         return dp.toException()
     }
 

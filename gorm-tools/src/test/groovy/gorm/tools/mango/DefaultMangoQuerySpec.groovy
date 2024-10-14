@@ -167,8 +167,9 @@ class DefaultMangoQuerySpec extends Specification implements GormHibernateTest {
 
         then:
         DataProblemException ex = thrown()
-        ex.code == 'error.data.problem'
-        ex.detail.contains 'Invalid query string - Cannot cast object'
+        ex.code == 'error.query.invalid'
+        //ex.message == "Invalid query"
+        ex.detail.contains "Cannot cast object '1' with class 'java.lang.Integer' to class 'java.util.UUID"
     }
 
     void "test non existent association field"() {
@@ -177,7 +178,8 @@ class DefaultMangoQuerySpec extends Specification implements GormHibernateTest {
 
         then:
         DataProblemException ex = thrown()
-        ex.message.contains("Invalid query string - Invalid criteria for field:foo")
+        ex.code == 'error.query.invalid'
+        ex.detail.contains("Invalid criteria for field:foo")
     }
 
     void "test invalid date"() {
@@ -186,7 +188,8 @@ class DefaultMangoQuerySpec extends Specification implements GormHibernateTest {
 
         then:
         DataProblemException ex = thrown()
-        ex.message.contains("Invalid query string - Text 'xxx' could not be parsed")
+        ex.code == 'error.query.invalid'
+        ex.detail.contains("Text 'xxx' could not be parsed")
     }
 
 }

@@ -53,6 +53,7 @@ dependencies {
   runtimeOnly "com.hazelcast:hazelcast-hibernate53:$vHazelcastHib"
   implementation "com.hazelcast:hazelcast:$vHazelcast"
   implementation "com.hazelcast:hazelcast-spring:$vHazelcast"
+  implementation "com.github.ben-manes.caffeine:caffeine:$vCaffeine"
 
   runtimeOnly "com.h2database:h2:$vH2"
   runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"

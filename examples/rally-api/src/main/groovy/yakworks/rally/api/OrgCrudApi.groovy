@@ -13,8 +13,11 @@ import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Component
 
 import gorm.tools.beans.Pager
+import gorm.tools.mango.api.QueryArgs
 import yakworks.commons.map.Maps
 import yakworks.gorm.api.DefaultCrudApi
+import yakworks.gorm.api.IncludesConfig
+import yakworks.gorm.api.IncludesKey
 import yakworks.gorm.api.IncludesProps
 import yakworks.meta.MetaMapList
 import yakworks.rally.orgs.model.Org
@@ -38,21 +41,40 @@ class OrgCrudApi extends DefaultCrudApi<Org> {
      2.
      */
     //, cacheManager = "hazelCacheManager"
+    String cacheName = 'WTF'
 
     @Cacheable(
-        cacheNames="orgApiList",
+        value='crudApi:list',
         cacheManager = "hazelCacheManager",
-        key="{@currentUser.getUserId(), #qParams.toString()}",
+        key="{@currentUser.getUserId(), #qParams.toString(), #root.target.entityClass.simpleName}",
         sync=true
     )
     //" + #includesKeys.toString()")
     @Override
     Pager list(Map qParams){
-        assert self
-        log.debug("no cache hit")
-        println "*********************NO HIT****************************"
+        log.debug("********************* list no cache hit")
+        //println "*********************NO HIT****************************"
         if(qParams.sleep) sleep(60000)
         super.list(qParams)
+    }
+
+    @Cacheable(
+        value='crudApi:list',
+        cacheManager = "hazelCacheManager",
+        key="{@currentUser.getUserId(), #qParams.toString(), #root.target.entityClass.simpleName}",
+        sync=true
+    )
+    @Override
+    Pager pickList(Map qParams){
+        //log.debug("********************* pickList no cache hit")
+        //super.pickList(qParams)
+        Pager pager = Pager.of(qParams)
+        QueryArgs qargs = createQueryArgs(pager, qParams)
+        Map incMap = includesConfig.getIncludesMap(entityClass)
+        List pickSelect = IncludesConfig.getFieldIncludes(incMap, ['picklist', IncludesKey.stamp.name()])
+        qargs.select(pickSelect)
+        List dlist = getApiCrudRepo().query(qargs, null).pagedList(qargs.pager)
+        return createPagerResult(pager, qParams, dlist, [])
     }
 
     @Override

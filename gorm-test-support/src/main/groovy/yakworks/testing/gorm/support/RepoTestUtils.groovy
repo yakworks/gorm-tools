@@ -17,6 +17,7 @@ import gorm.tools.async.ParallelStreamTools
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.mango.MangoBuilder
+import gorm.tools.mango.QuickSearchSupport
 import gorm.tools.metamap.services.MetaEntityService
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
@@ -92,6 +93,7 @@ class RepoTestUtils {
         repoExceptionSupport(RepoExceptionSupport, lazy())
         // mangoQuery(DefaultQueryService, lazy())
         mangoBuilder(MangoBuilder, lazy())
+        quickSearchSupport(QuickSearchSupport, lazy())
         trxService(TrxService, lazy())
         jdbcIdGenerator(MockJdbcIdGenerator, lazy())
         idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"), lazy())

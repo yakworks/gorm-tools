@@ -37,16 +37,23 @@ public class HazelCache extends HazelcastCache {
     }
 
     @Override
+    void put(Object key, Object value) {
+        log.debug("************ Cache[${getName()}] PUT for Key: ${key}, value: ${value}")
+        super.put(key, value)
+    }
+
+    @Override
     public <T> T get(Object key, Callable<T> valueLoader) {
-        log.debug("get ${key}")
         Object value = lookup(key);
         if (value != null) {
+            log.debug("************ Cache[${getName()}] HIT for Key: ${key}")
             return (T) fromStoreValue(value);
         } else {
             doLock(key)
             try {
                 value = lookup(key);
                 if (value != null) {
+                    log.debug("************ Cache[${getName()}] HIT for Key: ${key}")
                     return (T) fromStoreValue(value);
                 } else {
                     return loadValue(key, valueLoader);

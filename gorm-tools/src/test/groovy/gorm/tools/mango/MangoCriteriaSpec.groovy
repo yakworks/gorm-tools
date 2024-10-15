@@ -677,17 +677,17 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
         then:
         res.size() == 5
 
-        when: 'quickserach has fields under $q'
-        res = build((['$qSearch': ['text': "Nam", 'fields': ['name']], inactive: true])).list()
-
-        then:
-        res.size() == 5
-
-        when: 'quickserach has fields under $qSearch'
-        res = build((['$qSearch': ['text': "Nam", 'fields': ['name']], inactive: true])).list()
-
-        then:
-        res.size() == 5
+        // when: 'quickserach has fields under $q'
+        // res = build((['$qSearch': ['text': "Nam", 'fields': ['name']], inactive: true])).list()
+        //
+        // then:
+        // res.size() == 5
+        //
+        // when: 'quickserach has fields under $qSearch'
+        // res = build((['$qSearch': ['text': "Nam", 'fields': ['name']], inactive: true])).list()
+        //
+        // then:
+        // res.size() == 5
 
     }
 

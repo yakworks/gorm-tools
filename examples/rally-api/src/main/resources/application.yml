@@ -17,7 +17,7 @@ foo:
   message: "from rally-api/application.yml"
 
 #spring.cache.cache-names: customers,customersSearch
-spring.cache.type: hazelcast
+#spring.cache.type: hazelcast
 #spring:
 #  cache:
 #    type: CAFFEINE # can set to NONE for testing dev
@@ -33,7 +33,8 @@ logging:
     #org.springframework.boot.autoconfigure: DEBUG
     yakworks.rally.api.rally.OrgController: DEBUG
     yakworks.rally.api.OrgCrudApi: DEBUG
-    yakworks.hazelcast: DEBUG
+    yakworks.spring.hazelcast: DEBUG
+
     #gorm.tools.mango.MangoDetachedCriteria: DEBUG
 
 #    gorm.tools.mango.MangoBuilder: DEBUG
@@ -98,9 +99,10 @@ app:
     attachments.location: 'attachments'
 
 # enable multiple views resolvers by removing suffix and restricting viewNames so it flows through to hbs or mustache
-spring.thymeleaf.view-names: "*.html"
-spring.thymeleaf.suffix: ""
-spring.thymeleaf.template-resolver-order: 0
+#spring.thymeleaf.view-names: "*.html"
+#spring.thymeleaf.suffix: ""
+#spring.thymeleaf.template-resolver-order: 0
+
 # uncomment starter in build.gradle to activate handlebars
 # handlebars.enabled: true
 # handlebars.failOnMissingFile: false

@@ -12,6 +12,8 @@ import groovy.transform.CompileStatic
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.ObjectProvider
+import org.springframework.beans.factory.UnsatisfiedDependencyException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.http.HttpStatus
@@ -56,14 +58,14 @@ trait CrudApiController<D> extends RestApiController {
     Logger log = LoggerFactory.getLogger(this.class)
 
     /** Not required but if an CrudApi bean is setup then it will get get used */
-    @Autowired(required = false)
+    //@Autowired(required = false)
     CrudApi<D> crudApi
 
     @Autowired
     CsvToMapTransformer csvToMapTransformer
 
-    // @Autowired
-    // ObjectProvider<CrudApi<D>> crudApiProvider
+    @Autowired //(required = false)
+    ObjectProvider<CrudApi<D>> crudApiProvider
 
     /**
      * The java class for the Gorm domain (persistence entity). will generally get set in constructor or using the generic as
@@ -82,8 +84,15 @@ trait CrudApiController<D> extends RestApiController {
     }
 
     CrudApi<D> getCrudApi(){
-        if (!crudApi) this.crudApi = DefaultCrudApi.of(getEntityClass())
-        //crudApi.debugEnabled = log.isDebugEnabled()
+        if (!crudApi) {
+            try {
+                //check if concrete crudApi bean is setup, wont return nul since it will try the prototype
+                this.crudApi = crudApiProvider.getObject()
+            } catch(UnsatisfiedDependencyException ex){
+                //throws error if not as it tried to call the prototype defaultCrudApi() with no args, so call it now with args
+                this.crudApi = crudApiProvider.getObject(getEntityClass())
+            }
+        }
         return crudApi
     }
 

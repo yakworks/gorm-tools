@@ -35,9 +35,21 @@ class IndexController {
         "index"
     }
 
+    @GetMapping("/hbars")
+    String hbars() {
+        "hbars"
+    }
+
+    @GetMapping("/user")
+    String userInfo(ModelMap model, @CurrentSecurityContext SecurityContext secContext) {
+        model.addAttribute('user', secContext.authentication.details as UserInfo)
+        "userInfo"
+    }
+
     @GetMapping("/spring")
-    String spring() {
-        "spring/index.html"
+    String spring(ModelMap model) {
+        model.addAttribute('info', 'test info')
+        "spring/about"
     }
 
     @GetMapping("/about")
@@ -57,9 +69,4 @@ class IndexController {
         return secContext.authentication.details as UserInfo
     }
 
-    @GetMapping("/samlSuccess")
-    @ResponseBody String samlSuccess(ModelMap model) {
-        model.addAttribute('info', 'test info')
-        "samlSuccess"
-    }
 }

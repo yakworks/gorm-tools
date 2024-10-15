@@ -45,6 +45,9 @@ Authorization: {{Authorization}}
 GET {{base_url}}/rally/org?qSearch=org
 Authorization: {{Authorization}}
 
+### Org picklist
+GET {{base_url}}/rally/org/picklist?qSearch=org
+Authorization: {{Authorization}}
 
 ### Org
 GET {{base_url}}/rally/contact

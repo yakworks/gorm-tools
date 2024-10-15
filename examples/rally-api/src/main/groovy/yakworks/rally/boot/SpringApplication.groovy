@@ -2,7 +2,7 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.rally
+package yakworks.rally.boot
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Import
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
 import grails.util.BuildSettings
+import yakworks.rally.RallyConfiguration
 import yakworks.rest.gorm.RestApiFromConfig
 
 /**
@@ -48,7 +49,7 @@ class SpringApplication extends GrailsAutoConfiguration {
 
     // not sure if this is needed but grails adds it to the Application with the transformation
     static {
-        System.setProperty(BuildSettings.MAIN_CLASS_NAME, "yakworks.rally.api.SpringApplication")
+        System.setProperty(BuildSettings.MAIN_CLASS_NAME, "yakworks.rally.boot.SpringApplication")
     }
 
     /*

@@ -32,6 +32,11 @@ class KitchenSink implements NameNum, RepoEntity<KitchenSink> {
     static hasMany = [stringList: String]
     static toOneAssociations = [ 'ext' ]
 
+    static Map includes = [
+        qSearch: ['id', 'num', 'name'],
+        stamp: ['id', 'num', 'name']
+    ]
+
     //strings
     String name2
     String secret

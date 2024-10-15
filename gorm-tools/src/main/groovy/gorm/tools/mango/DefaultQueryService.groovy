@@ -4,12 +4,9 @@
 */
 package gorm.tools.mango
 
-import java.time.format.DateTimeParseException
 
 import groovy.transform.CompileStatic
 
-import org.codehaus.groovy.runtime.InvokerInvocationException
-import org.codehaus.groovy.runtime.typehandling.GroovyCastException
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.beans.Pager
@@ -17,7 +14,6 @@ import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.api.QueryService
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
-import yakworks.api.problem.data.DataProblem
 import yakworks.spring.AppCtx
 
 /**

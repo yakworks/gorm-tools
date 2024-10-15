@@ -17,6 +17,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
   // implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
   implementation 'org.springframework.boot:spring-boot-starter-mustache'
+  implementation('pl.allegro.tech.boot:handlebars-spring-boot-starter:0.4.1')
 
   // === Spring Sec ===
   implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -104,5 +105,5 @@ integrationTest.doFirst {
 }
 
 springBoot {
-  mainClass = 'yakworks.rally.api.SpringApplication'
+  mainClass = 'yakworks.rally.boot.SpringApplication'
 }

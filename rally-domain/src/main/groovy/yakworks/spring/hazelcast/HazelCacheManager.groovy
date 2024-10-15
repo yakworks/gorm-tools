@@ -8,6 +8,7 @@ package yakworks.spring.hazelcast
 import java.util.concurrent.ConcurrentMap
 
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 
 import org.springframework.cache.Cache
 import org.springframework.cache.CacheManager
@@ -20,6 +21,7 @@ import yakworks.util.ReflectionUtils
 /**
  * Spring-related {@link CacheManager} implementation for Hazelcast.
  */
+@Slf4j
 @SuppressWarnings(['WeakerAccess','ExplicitHashMapInstantiation'])
 @CompileStatic
 public class HazelCacheManager extends HazelcastCacheManager {
@@ -44,6 +46,7 @@ public class HazelCacheManager extends HazelcastCacheManager {
     //we add the lockTimeout
     @Override
     public Cache getCache(String name) {
+        log.debug "************** getCache name $name"
         Cache cache = getCaches().get(name);
         if (cache == null) {
             IMap<Object, Object> map = hazelcastInstance.getMap(name);

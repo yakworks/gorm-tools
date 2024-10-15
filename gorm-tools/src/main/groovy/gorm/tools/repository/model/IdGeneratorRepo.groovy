@@ -8,14 +8,8 @@ import javax.annotation.Resource
 
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.gorm.GormEntity
-import org.springframework.beans.factory.annotation.Autowired
-
 import gorm.tools.idgen.IdGenerator
 import gorm.tools.model.Persistable
-import gorm.tools.repository.GormRepo
-import gorm.tools.repository.PersistArgs
-import gorm.tools.repository.events.RepoEventPublisher
 
 /**
  * A trait that adds id generator to repo for manually generating ids during validation and for persist

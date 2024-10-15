@@ -4,8 +4,6 @@
 */
 package yakworks.gorm.api
 
-import java.net.http.HttpRequest
-
 import groovy.transform.CompileStatic
 
 import gorm.tools.beans.Pager
@@ -84,7 +82,7 @@ interface CrudApi<D> {
     /**
      * Mango Query that returns a paged list
      *
-     * @param params
+     * @param params the query params
      * @param uri the java 11 built in uri request so no libs are needed
      * @return the Pager with the data populated with the requested page
      */

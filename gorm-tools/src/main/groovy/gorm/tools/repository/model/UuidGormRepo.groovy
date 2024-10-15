@@ -4,16 +4,13 @@
 */
 package gorm.tools.repository.model
 
-
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.gorm.GormEntity
 import org.springframework.core.GenericTypeResolver
 
 import com.github.f4b6a3.uuid.UuidCreator
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
-import gorm.tools.repository.PersistArgs
 
 /**
  * Default implementation of repo that uses time ordered UUID for ids.

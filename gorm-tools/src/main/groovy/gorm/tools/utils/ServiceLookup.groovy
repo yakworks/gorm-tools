@@ -8,8 +8,6 @@ import groovy.transform.CompileStatic
 
 import org.springframework.core.ResolvableType
 
-import gorm.tools.mango.DefaultQueryService
-import gorm.tools.mango.api.QueryService
 import yakworks.spring.AppCtx
 
 @CompileStatic

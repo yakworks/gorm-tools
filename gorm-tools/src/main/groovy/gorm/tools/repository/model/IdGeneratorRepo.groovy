@@ -26,23 +26,19 @@ import gorm.tools.repository.events.RepoEventPublisher
  * @since 7.0.3
  */
 @CompileStatic
-trait IdGeneratorRepo<D> implements GenerateId<Long> {
+trait IdGeneratorRepo<D> { //implements GenerateId<Long> {
 
     @Resource(name="idGenerator")
     IdGenerator idGenerator
-
-    @Autowired RepoEventPublisher repoEventPublisher
 
     String idGeneratorKey
 
     // should be implemented by GormRepo
     abstract Class<D> getEntityClass()
-    abstract void doBeforePersistWithData(D entity, PersistArgs args)
 
     /**
      * calls the idGenerator.getNextId(getIdGeneratorKey())
      */
-    @Override
     Long generateId() {
         return idGenerator.getNextId(getIdGeneratorKey())
     }
@@ -63,17 +59,6 @@ trait IdGeneratorRepo<D> implements GenerateId<Long> {
     String getIdGeneratorKey() {
         if (!idGeneratorKey) this.idGeneratorKey = "${getEntityClass().simpleName}.id"
         return idGeneratorKey
-    }
-
-    /**
-     * replace the one in gormRepo
-     */
-    void doBeforePersist(D entity, PersistArgs args){
-        generateId((Persistable)entity)
-        if (args.bindAction && args.data){
-            doBeforePersistWithData(entity, args)
-        }
-        getRepoEventPublisher().doBeforePersist((GormRepo)this, (GormEntity)entity, args)
     }
 
 

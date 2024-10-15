@@ -51,7 +51,7 @@ import yakworks.commons.lang.ClassUtils
  */
 @SuppressWarnings(['EmptyMethod', 'MethodCount'])
 @CompileStatic
-trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProvider  {
+trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProvider {
 
     @Autowired EntityMapBinder entityMapBinder
 
@@ -59,7 +59,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
 
     @Autowired ProxyHandler proxyHandler
 
-    //@Autowired(required=false)  can't autowire, the DefaultGormRepo beans dont retain the D generic
+    //@Autowired(required=false)  //can't autowire, the DefaultGormRepo beans dont retain the D generic
     QueryService<D> queryService
 
     /** default to true. If false only method events are invoked on the implemented Repository. */
@@ -95,8 +95,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
 
     @Override
     ResolvableType getResolvableType() {
-        // return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forInstance(getEntity()))
-        return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forClass(getEntityClass()))
+        return ResolvableType.forClassWithGenerics(getClass(), getEntityClass())
     }
 
     /**
@@ -165,7 +164,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
      * NOTE
      */
     void doBeforePersist(D entity, PersistArgs args){
-        //NOTE: IdGeneratorRepo overrides this, make sure any changes here are cross checked with it.
+        generateId((Persistable)entity)
         if (args.bindAction && args.data){
             doBeforePersistWithData(entity, args)
         }
@@ -342,6 +341,14 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
      */
     D lookup(Map data) {
         return null
+    }
+
+    /**
+     * if entity.id is null then generates and assigns new id to id property on entity, if entity.id is already set then it just returns it
+     * does nothing by default, entities that have to generate an Id can override
+     */
+    Serializable generateId(Persistable entity){
+        return entity.id as Serializable
     }
 
     void bindAndUpdate(D entity, Map data, PersistArgs args) {

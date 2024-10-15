@@ -6,14 +6,13 @@ package yakworks.rest.gorm.controller
 
 import java.net.http.HttpRequest
 import java.nio.charset.StandardCharsets
+import java.util.function.Function
 import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.ObjectProvider
-import org.springframework.beans.factory.UnsatisfiedDependencyException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.http.HttpStatus
@@ -22,6 +21,7 @@ import org.springframework.web.util.UriUtils
 import gorm.tools.beans.Pager
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.model.DataOp
+import gorm.tools.utils.ServiceLookup
 import grails.web.Action
 import yakworks.api.problem.Problem
 import yakworks.etl.csv.CsvToMapTransformer
@@ -63,8 +63,13 @@ trait CrudApiController<D> extends RestApiController {
     @Autowired
     CsvToMapTransformer csvToMapTransformer
 
-    @Autowired //(required = false)
-    ObjectProvider<CrudApi<D>> crudApiProvider
+    // @Autowired //(required = false)
+    // ObjectProvider<CrudApi<D>> crudApiProvider
+    @Autowired
+    private Function<Class, CrudApi> crudApiFactory
+
+    // @Autowired
+    // Closure<CrudApi> crudApiClosure
 
     /**
      * The java class for the Gorm domain (persistence entity). will generally get set in constructor or using the generic as
@@ -84,13 +89,19 @@ trait CrudApiController<D> extends RestApiController {
 
     CrudApi<D> getCrudApi(){
         if (!crudApi) {
-            try {
-                //check if concrete crudApi bean is setup, wont return nul since it will try the prototype
-                this.crudApi = crudApiProvider.getObject()
-            } catch(UnsatisfiedDependencyException ex){
-                //throws error if not as it tried to call the prototype defaultCrudApi() with no args, so call it now with args
-                this.crudApi = crudApiProvider.getObject(getEntityClass())
-            }
+            this.crudApi = ServiceLookup.lookup(getEntityClass(), CrudApi<D>, "defaultCrudApi")
+            //this.crudApi = crudApiFactory.apply(getEntityClass())
+            //this.crudApi = crudApiClosure.call(getEntityClass()) as CrudApi<D>
+            // try {
+            //     // var rt = ResolvableType.forClassWithGenerics(CrudApi, getEntityClass())
+            //     // var ctx = AppCtx.ctx
+            //     // var names = ctx.getBeanNamesForType(rt)
+            //     //check if concrete crudApi bean is setup, wont return nul since it will try the prototype
+            //     this.crudApi = crudApiProvider.getObject()
+            // } catch(UnsatisfiedDependencyException ex){
+            //     //will throw error if not as it tried to call the prototype defaultCrudApi() with no args, so call it now with args
+            //     this.crudApi = crudApiProvider.getObject(getEntityClass())
+            // }
         }
         return crudApi
     }

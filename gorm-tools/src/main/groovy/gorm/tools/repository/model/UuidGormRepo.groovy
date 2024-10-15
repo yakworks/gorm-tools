@@ -22,7 +22,7 @@ import gorm.tools.repository.PersistArgs
  * @since 7.0.8
  */
 @CompileStatic
-class UuidGormRepo<D> implements GormRepo<D>, GenerateId<UUID>  {
+class UuidGormRepo<D> implements GormRepo<D> { //, GenerateId<UUID>  {
 
     UuidGormRepo() {
         this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormRepo)
@@ -32,7 +32,6 @@ class UuidGormRepo<D> implements GormRepo<D>, GenerateId<UUID>  {
         setEntityClass(clazz)
     }
 
-    @Override
     UUID generateId() {
         // return UUID.randomUUID()
         return UuidCreator.getTimeOrderedWithRandom()
@@ -44,15 +43,5 @@ class UuidGormRepo<D> implements GormRepo<D>, GenerateId<UUID>  {
             entity.setId(generateId())
         return entity.getId()
     }
-    /**
-     * replace the one in gormRepo
-     */
-    @Override
-    void doBeforePersist(D entity, PersistArgs args){
-        generateId((Persistable<UUID>)entity)
-        if (args.bindAction && args.data){
-            doBeforePersistWithData(entity, args)
-        }
-        getRepoEventPublisher().doBeforePersist((GormRepo)this, (GormEntity)entity, args)
-    }
+
 }

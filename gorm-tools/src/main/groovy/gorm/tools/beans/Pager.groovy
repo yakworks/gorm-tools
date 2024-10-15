@@ -175,7 +175,7 @@ class Pager implements Serializable{
      * @param metaMapList the list to use for the data
      * @return reference to this Pager
      */
-    Pager setDataList(List<Map> metaMapList) {
+    Pager dataList(List<Map> metaMapList) {
         if(metaMapList){
             if(metaMapList instanceof TotalCount) {
                 setRecordCount(((TotalCount) metaMapList).getTotalCount())
@@ -193,7 +193,7 @@ class Pager implements Serializable{
 
     @Deprecated
     Pager setMetaMapList(MetaMapList metaMapList) {
-        return setDataList(metaMapList as List<Map>)
+        return dataList(metaMapList as List<Map>)
     }
 
 

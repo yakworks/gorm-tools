@@ -69,7 +69,7 @@ class PagerSpec extends Specification implements GormHibernateTest{
         MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, ["*"])
 
         when:
-        pager.setDataList(entityMapList)
+        pager.dataList(entityMapList)
 
         then:
         pager.page == 1

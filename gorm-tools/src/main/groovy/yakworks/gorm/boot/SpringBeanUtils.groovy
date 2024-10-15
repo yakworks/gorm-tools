@@ -9,9 +9,11 @@ import groovy.transform.CompileStatic
 import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
+import org.springframework.beans.factory.support.RootBeanDefinition
 import org.springframework.core.ResolvableType
 
 import gorm.tools.repository.DefaultGormRepo
+import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.UuidGormRepo
 import gorm.tools.repository.model.UuidRepoEntity
@@ -63,17 +65,30 @@ class SpringBeanUtils {
             // look for Entities that dont have a Repo registered.
             if (!registry.containsBeanDefinition(repoName)) {
                 //if its not found then set a default one up.
+                RootBeanDefinition bdef
 
-                var repoClass = DefaultGormRepo as Class<DefaultGormRepo<D>>
+                //var repoClass = DefaultGormRepo as Class<DefaultGormRepo<D>>
                 if(UuidRepoEntity.isAssignableFrom(entityClass)) {
-                    repoClass = UuidGormRepo as Class<UuidGormRepo<D>>
+                    bdef = BeanDefinitionBuilder.rootBeanDefinition(UuidGormRepo<D>)
+                        .addConstructorArgValue(entityClass)
+                        .setLazyInit(true)
+                        .getBeanDefinition() as RootBeanDefinition
+                    bdef.setTargetType(ResolvableType.forClassWithGenerics(GormRepo, entityClass))
+                } else {
+                    bdef = BeanDefinitionBuilder.rootBeanDefinition(DefaultGormRepo<D>)
+                        .addConstructorArgValue(entityClass)
+                        .setLazyInit(true)
+                        .getBeanDefinition() as RootBeanDefinition
+                    bdef.setTargetType(ResolvableType.forClassWithGenerics(GormRepo, entityClass))
                 }
 
+                //FIXME seems not matter what we do above, we can get the generic on the DefaultGormRepo
+
                 // newRepoBeanMap[repoName] = [repoClass, entityClass]
-                var bdef = BeanDefinitionBuilder.rootBeanDefinition(repoClass)
-                    .addConstructorArgValue(entityClass)
-                    .setLazyInit(true)
-                    .getBeanDefinition()
+                // var bdef = BeanDefinitionBuilder.rootBeanDefinition(repoClass)
+                //     .addConstructorArgValue(entityClass)
+                //     .setLazyInit(true)
+                //     .getBeanDefinition()
 
                 // var rt = ResolvableType.forClassWithGenerics(DefaultGormRepo, entityClass)
                 // var bdefBuilder = BeanDefinitionBuilder.rootBeanDefinition(rt, () -> DefaultGormRepo.of(entityClass))

@@ -4,6 +4,7 @@
 */
 package yakworks.gorm.api
 
+import java.net.http.HttpRequest
 
 import groovy.transform.CompileStatic
 
@@ -79,21 +80,24 @@ interface CrudApi<D> {
      */
     boolean exists(Serializable id)
 
+
     /**
      * Mango Query that returns a paged list
      *
-     * @param params: the query params
+     * @param params
+     * @param uri the java 11 built in uri request so no libs are needed
      * @return the Pager with the data populated with the requested page
      */
-    Pager list(Map params)
+    Pager list(Map params, URI uri)
 
     /**
      * Mango Query that returns a paged list
      *
      * @param params: the query params
+     * @param uri the java 11 built in uri request so no libs are needed
      * @return the Pager with the data populated with the requested page
      */
-    Pager pickList(Map params)
+    Pager pickList(Map params, URI uri)
 
     /**
      * bulk operations on entity

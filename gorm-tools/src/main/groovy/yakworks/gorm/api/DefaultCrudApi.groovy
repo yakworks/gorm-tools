@@ -173,10 +173,12 @@ class DefaultCrudApi<D> implements CrudApi<D> {
      */
     @Transactional(readOnly = true)
     @Override
-    Pager list(Map qParams){
+    Pager list(Map qParams, URI uri){
         Pager pager = Pager.of(qParams)
-        List dlist = queryList(pager, qParams)
-        return createPagerResult(pager, qParams, dlist, [IncludesKey.list.name()])
+        QueryArgs qargs = createQueryArgs(pager, qParams, uri)
+        List dlist = queryList(qargs)
+        List<String> incs = getIncludes(qParams, [IncludesKey.list])
+        return createPagerResult(pager, qParams, dlist, incs)
     }
 
     /**
@@ -184,10 +186,12 @@ class DefaultCrudApi<D> implements CrudApi<D> {
      */
     @Transactional(readOnly = true)
     @Override
-    Pager pickList(Map qParams){
+    Pager pickList(Map qParams, URI uri){
         Pager pager = Pager.of(qParams)
-        List dlist = queryList(pager, qParams)
-        return createPagerResult(pager, qParams, dlist, ['picklist', IncludesKey.stamp.name()])
+        QueryArgs qargs = createQueryArgs(pager, qParams, uri)
+        List dlist = queryList(qargs)
+        List<String> incs = getIncludes(qParams, [IncludesKey.picklist, IncludesKey.stamp])
+        return createPagerResult(pager, qParams, dlist, incs)
     }
 
     @Override
@@ -197,22 +201,29 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         return job
     }
 
-    protected List<D> queryList(Pager pager, Map qParams) {
-        QueryArgs qargs = createQueryArgs(pager, qParams)
-        //if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.buildCriteria()}")
+    protected List<D> queryList(QueryArgs qargs) {
         return getApiCrudRepo().query(qargs, null).pagedList(qargs.pager)
     }
 
-    protected Pager createPagerResult(Pager pager, Map qParams, List dlist, List<String> fallbackIncludesKeys) {
-        List<String> incs = includesConfig.findIncludes(entityClass.name, IncludesProps.of(qParams), fallbackIncludesKeys)
+    protected Pager createPagerResult(Pager pager, Map qParams, List dlist, List<String> incs) {
         MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)
         pager.setDataList(entityMapList as List<Map>)
         return pager
     }
 
-    protected QueryArgs createQueryArgs(Pager pager, Map qParams) {
+    protected List<String> getIncludes(Map qParams, List fallbackIncludesKeys) {
+        List<String> incs = includesConfig.findIncludes(
+            entityClass.name,
+            IncludesProps.of(qParams),
+            fallbackIncludesKeys as List<String>
+        )
+        return incs
+    }
+
+    protected QueryArgs createQueryArgs(Pager pager, Map qParams, URI uri) {
         QueryArgs qargs = QueryArgs.withPager(pager)
             .strict(true) //only use criteria if its under the q query param
+            .uri(uri)
             .build(qParams)
             .defaultSortById() //add default id sort if none exists
             .validateQ(qRequired()) //if q is required then blows error if nothing was parsed out

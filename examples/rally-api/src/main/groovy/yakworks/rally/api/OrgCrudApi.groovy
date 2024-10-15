@@ -51,11 +51,11 @@ class OrgCrudApi extends DefaultCrudApi<Org> {
     )
     //" + #includesKeys.toString()")
     @Override
-    Pager list(Map qParams){
+    Pager list(Map qParams, URI uri){
         log.debug("********************* list no cache hit")
         //println "*********************NO HIT****************************"
         if(qParams.sleep) sleep(60000)
-        super.list(qParams)
+        super.list(qParams, uri)
     }
 
     @Cacheable(
@@ -65,11 +65,11 @@ class OrgCrudApi extends DefaultCrudApi<Org> {
         sync=true
     )
     @Override
-    Pager pickList(Map qParams){
+    Pager pickList(Map qParams, URI uri){
         //log.debug("********************* pickList no cache hit")
         //super.pickList(qParams)
         Pager pager = Pager.of(qParams)
-        QueryArgs qargs = createQueryArgs(pager, qParams)
+        QueryArgs qargs = createQueryArgs(pager, qParams, uri)
         Map incMap = includesConfig.getIncludesMap(entityClass)
         List pickSelect = IncludesConfig.getFieldIncludes(incMap, ['picklist', IncludesKey.stamp.name()])
         qargs.select(pickSelect)
@@ -78,8 +78,8 @@ class OrgCrudApi extends DefaultCrudApi<Org> {
     }
 
     @Override
-    Pager createPagerResult(Pager pager, Map qParams, List dlist, List<String> includesKeys) {
-        pager = super.createPagerResult(pager, qParams, dlist, includesKeys)
+    Pager createPagerResult(Pager pager, Map qParams, List dlist, List<String> includes) {
+        pager = super.createPagerResult(pager, qParams, dlist, includes)
         //we clone this here so it can be cached with all the associations initialized
         pager.data = Maps.clone(pager.data ) as List<Map>
         return pager

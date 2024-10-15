@@ -26,7 +26,6 @@ import grails.web.Action
 import yakworks.api.problem.Problem
 import yakworks.etl.csv.CsvToMapTransformer
 import yakworks.gorm.api.CrudApi
-import yakworks.gorm.api.DefaultCrudApi
 import yakworks.gorm.api.IncludesProps
 
 import static gorm.tools.problem.ProblemHandler.isBrokenPipe
@@ -185,9 +184,8 @@ trait CrudApiController<D> extends RestApiController {
     def list() {
         try {
             Map qParams = getParamsMap()
-            toHttpRequest()
             log.debug("list with gParams ${qParams}")
-            Pager pager = getCrudApi().list(qParams)
+            Pager pager = getCrudApi().list(qParams, toURI())
             //we pass in the params to args so it can get passed on to renderer, used in the excel renderer for example
             respondWith(pager, [params: qParams])
         } catch (Exception | AssertionError e) {
@@ -195,25 +193,12 @@ trait CrudApiController<D> extends RestApiController {
         }
     }
 
-    HttpRequest toHttpRequest(){
-        String requri = request.requestURI
-        String queryString = UriUtils.decode(request.queryString?:'', StandardCharsets.UTF_8)
-        println "requri: $requri - queryString: $queryString"
-        //String encodedQueryString = QueryParamsUtil.encode(queryString)
-        String encodedQueryString = UriUtils.encode(queryString, StandardCharsets.UTF_8)
-        URI newUri = URI.create("${request.requestURL}?${encodedQueryString}")
-        println "newUri: ${newUri}"
-        println "newUri query: ${newUri.query}"
-        HttpRequest v11Request = HttpRequest.newBuilder().uri(newUri).GET().build()
-        v11Request
-    }
-
     @Action
     def picklist() {
         try {
             Map qParams = getParamsMap()
             qParams.max = qParams.max ?: getPicklistMax() //default to 50 for picklists
-            Pager pager = getCrudApi().pickList(qParams)
+            Pager pager = getCrudApi().pickList(qParams, toURI())
             respondWith(pager, [params: qParams])
         } catch (Exception | AssertionError e) {
             handleThrowable(e)
@@ -296,6 +281,23 @@ trait CrudApiController<D> extends RestApiController {
     void respondWithMap(D instance, Map mParams, HttpStatus status = HttpStatus.OK){
         Map entityMap = getCrudApi().entityToMap(instance, IncludesProps.of(mParams))
         respondWith(entityMap, [status: status, params: mParams])
+    }
+
+    //Kept for reference, we might want to pass the HttpRequest instead of just the URI
+    URI toURI(){
+        String requri = request.requestURI
+        //decode and re-encode as the HttpServletReq doesn't escape the $, but URI needs it escaped
+        String queryString = UriUtils.decode(request.queryString?:'', StandardCharsets.UTF_8)
+        log.debug "requri: $requri - queryString: $queryString"
+        String encodedQueryString = UriUtils.encode(queryString, StandardCharsets.UTF_8)
+        URI newUri = URI.create("${request.requestURL}?${encodedQueryString}")
+        return newUri
+    }
+
+    //Kept for reference, we might want to pass the HttpRequest instead of just the URI
+    HttpRequest toHttpRequest(){
+        URI newUri = toURI()
+        return HttpRequest.newBuilder().uri(newUri).GET().build()
     }
 
     @Override

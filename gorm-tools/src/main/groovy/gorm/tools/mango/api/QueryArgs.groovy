@@ -4,6 +4,7 @@
 */
 package gorm.tools.mango.api
 
+import java.net.http.HttpRequest
 
 import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
@@ -37,7 +38,7 @@ import static gorm.tools.mango.MangoOps.QSEARCH
  */
 @Builder(
     builderStrategy=SimpleStrategy, prefix="",
-    includes=['strict', 'projections', 'select', 'timeout'],
+    includes=['strict', 'projections', 'select', 'timeout', 'uri'],
     useSetters=true
 )
 @Slf4j
@@ -60,9 +61,15 @@ class QueryArgs {
     // Closure closure
 
     /**
-     * The query string is useful for a cache key and for logging
+     * The HttpRequest if there is one. Can be used for logging and can use uri.query for cache key
+     * not required and wont be set for internal usage
      */
-    String queryString
+    URI uri
+
+    /**
+     * The source original params that were used to build this
+     */
+    Map originalParams
 
     /**
      * when true in build method, will only add params that are under q.
@@ -206,6 +213,8 @@ class QueryArgs {
      */
     QueryArgs build(Map<String, ?> paramsMap){
         if(isBuilt) throw new UnsupportedOperationException("build has already been called and cant be called again")
+        //keep ref to the orginalParams in case we need it later. can be used for debugging too
+        originalParams = paramsMap
         //copy it
         Map params = Maps.clone(paramsMap) as Map<String, Object>
 

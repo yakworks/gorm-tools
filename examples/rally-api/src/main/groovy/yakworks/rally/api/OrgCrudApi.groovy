@@ -54,7 +54,7 @@ class OrgCrudApi extends DefaultCrudApi<Org> {
     Pager list(Map qParams, URI uri){
         log.debug("********************* list no cache hit")
         //println "*********************NO HIT****************************"
-        if(qParams.sleep) sleep(60000)
+        if(qParams.sleep) sleep((qParams.sleep as Integer) * 1000)
         super.list(qParams, uri)
     }
 

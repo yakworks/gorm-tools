@@ -6,7 +6,9 @@ package yakworks.rest.gorm.controller
 
 import java.net.http.HttpRequest
 import java.nio.charset.StandardCharsets
+import java.util.concurrent.TimeoutException
 import java.util.function.Function
+import javax.persistence.LockTimeoutException
 import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
@@ -330,7 +332,16 @@ trait CrudApiController<D> extends RestApiController {
 
     @Override
     void handleThrowable(Throwable e) {
-        Problem apiError = problemHandler.handleException(e, getEntityClass()?.simpleName)
+        Problem apiError
+        if(e instanceof LockTimeoutException){
+            //thrown from locking in hazelcast cache
+            apiError = Problem.of('error.query.duplicate')
+                .detail("Timeout while waiting for 1 or more duplicate identical queries to finish for this user")
+                .status(HttpStatus.TOO_MANY_REQUESTS.value())
+        } else {
+            apiError = problemHandler.handleException(e, getEntityClass()?.simpleName)
+        }
+
         respondWith(apiError)
     }
 }

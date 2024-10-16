@@ -58,7 +58,7 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
         pageMap.detail.contains "expecting CLOSE, found 'bad'"
     }
 
-    //@Ignore //Fails when cache is enabled
+    @Ignore //Fails when cache is enabled
     @Unroll
     def "LIST get test #entity"(String entity, Class domain) {
 

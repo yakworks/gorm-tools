@@ -4,9 +4,10 @@
 */
 package yakworks.spring.hazelcast
 
-
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
@@ -22,10 +23,11 @@ import yakworks.util.ReflectionUtils
  * Spring-related {@link CacheManager} implementation for Hazelcast.
  */
 @Slf4j
-@SuppressWarnings(['WeakerAccess','ExplicitHashMapInstantiation'])
+@SuppressWarnings(['WeakerAccess', 'ExplicitHashMapInstantiation'])
 @CompileStatic
 public class HazelCacheManager extends HazelcastCacheManager {
 
+    private final ConcurrentMap<String, Cache> caches = new ConcurrentHashMap<String, Cache>();
     /**
      * Default cache tryLock wait timeout. Apply to all caches.
      */
@@ -47,7 +49,7 @@ public class HazelCacheManager extends HazelcastCacheManager {
     @Override
     public Cache getCache(String name) {
         log.debug "************** getCache name $name"
-        Cache cache = getCaches().get(name);
+        Cache cache = caches.get(name);
         if (cache == null) {
             IMap<Object, Object> map = hazelcastInstance.getMap(name);
             cache = new HazelCache(map);
@@ -58,7 +60,7 @@ public class HazelCacheManager extends HazelcastCacheManager {
             long cacheLockTimeout = calculateCacheLockTimeout(name);
             cache.setLockTimeout(cacheLockTimeout);
 
-            Cache currentCache = getCaches().putIfAbsent(name, cache);
+            Cache currentCache = caches.putIfAbsent(name, cache);
             if (currentCache != null) {
                 cache = currentCache;
             }
@@ -66,11 +68,10 @@ public class HazelCacheManager extends HazelcastCacheManager {
         return cache;
     }
 
-    //@CompileDynamic
     ConcurrentMap<String, Cache> getCaches(){
         //groovy not abel to access even with CompileDynamic
-        (ConcurrentMap<String, Cache>) ReflectionUtils.getPrivateFieldValue(HazelcastCacheManager, "caches", this)
-        //return super.@caches
+        //(ConcurrentMap<String, Cache>) ReflectionUtils.getPrivateFieldValue(HazelcastCacheManager, "caches", this)
+        return caches
     }
 
     //Override replace super since its private

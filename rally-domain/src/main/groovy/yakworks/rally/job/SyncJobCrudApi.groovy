@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component
 
 import gorm.tools.job.JobUtils
 import yakworks.gorm.api.DefaultCrudApi
-import yakworks.gorm.api.IncludesProps
 
 /**
  * Used by CrudApiController for rest api.

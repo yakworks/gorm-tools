@@ -21,8 +21,8 @@ class QuickSearchSupportSpec extends Specification implements DataRepoTest  {
 
     void 'sanity check qsearch includes'() {
         when:
-        List<String> qsFields =  includesConfig.getIncludes(KitchenSink, IncludesKey.qSearch.name())
-        List<String> stampFields =  includesConfig.getIncludes(KitchenSink, IncludesKey.stamp.name())
+        List<String> qsFields =  includesConfig.getByKey(KitchenSink, IncludesKey.qSearch)
+        List<String> stampFields =  includesConfig.getByKey(KitchenSink, IncludesKey.stamp)
         then:
         qsFields == ['id', 'num', 'name']
         stampFields == ['id', 'num', 'name']

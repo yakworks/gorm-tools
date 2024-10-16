@@ -65,18 +65,18 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     }
 
     class DefaultApiResult<D> implements CrudApiResult<D> {
-        IncludesProps includesProps
+        List<String> includes
         D entity
         int status
 
-        DefaultApiResult(D entity, IncludesProps includesProps){
+        DefaultApiResult(D entity, List<String> includes){
             this.entity = entity
-            this.includesProps = includesProps
+            this.includes = includes
         }
 
         @CompileDynamic //getting goofy error in intellij about casting entity to D
         Map asMap(){
-            entityToMap(this.entity, includesProps)
+            entityToMap(this.entity, includes)
         }
     }
 
@@ -102,11 +102,6 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         D instance = (D) getApiCrudRepo().read(id)
         RepoUtil.checkFound(instance, id, getEntityClass().simpleName)
         return createApiResult(instance, qParams)
-    }
-
-    @Override
-    CrudApiResult<D> createApiResult(D instance, Map params){
-        new DefaultApiResult(instance, IncludesProps.of(params))
     }
 
     /**
@@ -177,13 +172,10 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         Pager pager = Pager.of(qParams)
         QueryArgs qargs = createQueryArgs(pager, qParams, uri)
         List dlist = queryList(qargs)
-        List<String> incs = getIncludes(qParams, [IncludesKey.list])
+        List<String> incs = getIncludes(qParams, [IncludesKey.list, IncludesKey.get])
         return createPagerResult(pager, qParams, dlist, incs)
     }
 
-    /**
-     * Mango Query that returns a paged list
-     */
     @Transactional(readOnly = true)
     @Override
     Pager pickList(Map qParams, URI uri){
@@ -207,16 +199,38 @@ class DefaultCrudApi<D> implements CrudApi<D> {
 
     protected Pager createPagerResult(Pager pager, Map qParams, List dlist, List<String> incs) {
         MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)
-        pager.dataList(entityMapList as List<Map>)
+        var elist = entityMapList as List<Map>
+        pager.dataList(elist)
         return pager
     }
 
+
+    @Override
+    CrudApiResult<D> createApiResult(D instance, Map params){
+        List<String> incs = getIncludes(params, [IncludesKey.get])
+        new DefaultApiResult(instance, incs)
+    }
+
+    @Override
+    Map entityToMap(D instance, List<String> includes) {
+        flushIfSession() //in testing need to flush before generating MetaMap
+        MetaMap emap = metaMapService.createMetaMap(instance, includes)
+        return emap
+    }
+
+    /**
+     * Gets the includes/includesKey from the qParams or from the fallbackKeys
+     * @return the list of fields in our mango format.
+     */
     protected List<String> getIncludes(Map qParams, List fallbackIncludesKeys) {
-        List<String> incs = includesConfig.findIncludes(
-            entityClass.name,
-            IncludesProps.of(qParams),
-            fallbackIncludesKeys as List<String>
-        )
+        //parse the params into the IncludesProps
+        var incProps = IncludesProps.of(qParams).fallbackKeys(fallbackIncludesKeys)
+
+        //if includes was passed in, then it wins
+        if(incProps.includes) return incProps.includes
+
+        //otherwise search based on includesKey
+        List<String> incs = includesConfig.findIncludes(getEntityClass(), incProps)
         return incs
     }
 
@@ -233,15 +247,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         return qargs
     }
 
-    @Override
-    Map entityToMap(D instance, IncludesProps includesProps) {
-        flushIfSession() //in testing need to flush before generating MetaMap
-        List<String> incs = includesConfig.findIncludes(entityClass.name, includesProps, [])
-        MetaMap emap = metaMapService.createMetaMap(instance, incs)
-        return emap
-    }
-
-    void validateQueryArgs(QueryArgs args, Map params) {
+    protected void validateQueryArgs(QueryArgs args, Map params) {
         //FIXME, export to xlsx passes large number for max eg 10K at RNDC, below hack is to allow tht max for export
         boolean isExcelExport = params && params['format'] == FORMAT_XLSX
 
@@ -257,6 +263,9 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         }
     }
 
+    /**
+     * checks the apiconfig to see if we set it as reuiqred for the endpoint
+     */
     protected boolean qRequired(){
         PathItem pathItem = apiConfig.pathsByEntity[entityClass.name]
         return pathItem?.qRequired

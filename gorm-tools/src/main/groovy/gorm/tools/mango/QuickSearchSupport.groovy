@@ -96,7 +96,7 @@ class QuickSearchSupport {
      * @return the map
      */
     protected Map<String,Class> getQSearchFields(Class entityClazz) {
-        List<String> qsFields =  includesConfig.getIncludes(entityClazz, IncludesKey.qSearch.name())
+        List<String> qsFields =  includesConfig.getByKey(entityClazz, IncludesKey.qSearch)
         Map qsFieldMap = [:] as Map<String,Class>
         for(String field: qsFields){
             qsFieldMap[field] = getPropertyType(entityClazz, field)

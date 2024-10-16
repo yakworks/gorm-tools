@@ -15,6 +15,8 @@ class IncludesProps {
     List<String> includes
     /** the key name to find includes on the api config */
     String includesKey
+    /** The fallback keys */
+    List<String> fallbackKeys = []
 
     static IncludesProps of(Map params){
         var incProps = new IncludesProps()
@@ -24,6 +26,29 @@ class IncludesProps {
             incProps.includesKey = params['includesKey'] as String
         }
         return incProps
+    }
+
+    IncludesProps fallbackKey(String val){
+        this.fallbackKeys << val
+        return this
+    }
+
+    IncludesProps fallbackKeys(List val){
+        this.fallbackKeys = val*.toString()
+        return this
+    }
+
+    List<String> getIncludesKeys(){
+        List<String> keyList = []
+        if(includesKey){
+            keyList << includesKey
+        }
+        keyList.addAll(fallbackKeys)
+        keyList
+    }
+
+    List<String> findIncludes(Class clazz){
+        return IncludesConfig.bean().findIncludes(clazz, this)
     }
 
     /**

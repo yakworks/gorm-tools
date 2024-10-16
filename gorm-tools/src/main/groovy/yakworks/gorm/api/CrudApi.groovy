@@ -27,7 +27,7 @@ interface CrudApi<D> {
      */
     interface CrudApiResult<D> {
         /** The include properties to use for creating json map */
-        IncludesProps getIncludesProps()
+        List<String> getIncludes()
 
         /** The entity that was operated on (created or updated) */
         D getEntity()
@@ -112,10 +112,10 @@ interface CrudApi<D> {
      * Converts the instance to Map using the MetaMap wrapper with {@link gorm.tools.metamap.services.MetaMapService}.
      *
      * @param instance the entity instance
-     * @param includesProps the includes list or keys to use to generate the meta map
+     * @param includes the includes list
      * @return the MetaMap that can be converted to json
      */
-    Map entityToMap(D instance, IncludesProps incProps)
+    Map entityToMap(D instance, List<String> includes)
 
     /**
      * Creates the EntityResult.

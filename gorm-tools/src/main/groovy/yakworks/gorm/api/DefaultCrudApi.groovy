@@ -10,6 +10,7 @@ import groovy.transform.CompileStatic
 
 import org.grails.orm.hibernate.HibernateDatastore
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 
 import gorm.tools.beans.EntityResult
 import gorm.tools.beans.Pager
@@ -46,7 +47,10 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     @Autowired IncludesConfig includesConfig
     @Autowired ApiConfig apiConfig
     @Autowired MetaMapService metaMapService
+
+    @Qualifier("queryArgsValidator")
     @Autowired QueryArgsValidator queryArgsValidator
+
     @Autowired QueryConfig queryConfig
 
     /** Not required but if an BulkSupport bean is setup then it will get get used */

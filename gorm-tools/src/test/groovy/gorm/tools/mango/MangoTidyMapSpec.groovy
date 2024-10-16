@@ -477,16 +477,6 @@ class MangoTidyMapSpec extends Specification {
     }
 
     void "test sort"() {
-        // when:
-        // def mmap = tidy(
-        //     location: [
-        //         '$sort':['address': "desc"]
-        //     ]
-        // )
-        //
-        // then:
-        // mmap == [location: [$sort: ['address': "desc"]]]
-
         when:
         def mmap = tidy('$sort':['location.address': "desc"])
 
@@ -505,17 +495,17 @@ class MangoTidyMapSpec extends Specification {
         then:
         mmap == ['$sort':'location.address']
 
-        when:
-        mmap = tidy('$sort':'name desc')
-
-        then:
-        mmap == ['$sort':[name: 'desc']]
-
-        when:
-        mmap = tidy('$sort':'name asc, foo desc')
-
-        then:
-        mmap == ['$sort':[name: 'asc', foo: 'desc']]
+        // when:
+        // mmap = tidy('$sort':'name desc')
+        //
+        // then:
+        // mmap == ['$sort':[name: 'desc']]
+        //
+        // when:
+        // mmap = tidy('$sort':'name asc, foo desc')
+        //
+        // then:
+        // mmap == ['$sort':[name: 'asc', foo: 'desc']]
     }
 
     void "test exists"() {

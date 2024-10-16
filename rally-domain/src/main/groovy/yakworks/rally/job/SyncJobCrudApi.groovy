@@ -26,7 +26,7 @@ class SyncJobCrudApi extends DefaultCrudApi<SyncJob> {
     }
 
     @Override
-    Map entityToMap(SyncJob job, IncludesProps incProps){
+    Map entityToMap(SyncJob job, List<String> includes){
         Map response = JobUtils.convertToMap(job)
         return response
     }

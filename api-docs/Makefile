@@ -83,11 +83,11 @@ oapi.generate-api-yaml:
 oapi.generate-start: oapi.generate-api-yaml oapi.start
 
 # generates and builds the openapi, adds to rcm
-oapi.generate-build: oapi.generate-api-yaml oapi.build-bundle oapi.copy-to-rcm
+oapi.generate-build: oapi.generate-api-yaml oapi.build-bundle oapi.copy-to-rally-api
 
 # Coppies the final single file bundle to rcm-api
-oapi.copy-to-rcm:
-	cp api-docs/build/api.yaml rcm-api/src/main/resources/oapi.yaml
+oapi.copy-to-rally-api:
+	cp api-docs/build/api.yaml examples/rally-api/src/main/resources/oapi.yaml
 
 # run to get into builder shell
 # make oapi.generate-apy-yaml

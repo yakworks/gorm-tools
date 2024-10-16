@@ -1,10 +1,10 @@
 package yakworks
 
-import yakworks.testing.gorm.integration.DataIntegrationTest
-import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Org
+import yakworks.testing.gorm.integration.DataIntegrationTest
 
 @Integration
 @Rollback

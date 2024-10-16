@@ -23,10 +23,20 @@ class QueryServiceLookup {
      */
     static <D> QueryService<D> lookup(Class<D> entityClass){
         var rt = ResolvableType.forClassWithGenerics(QueryService, entityClass)
-        var ctx = AppCtx.ctx
-        var qsLookup = ctx.getBeanProvider(rt).getIfAvailable() as QueryService<D>
+        var qsLookup = AppCtx.ctx.getBeanProvider(rt).getIfAvailable() as QueryService<D>
         return qsLookup ?: DefaultQueryService.of(entityClass)
     }
+
+    // static <D,S> S<D> lookupService(Class<D> entityClass, Class<S<D>> serviceClass, String factoryMethod){
+    //     var rt = ResolvableType.forClassWithGenerics(serviceClass, entityClass)
+    //     var ctx = AppCtx.ctx
+    //     var qsLookup = ctx.getBeanProvider(rt).getIfAvailable() as S<D>
+    //     if(qsLookup){
+    //         return qsLookup
+    //     } else {
+    //         return ctx.getBean(factoryMethod, [entityClass] as Object[]) as S<D>
+    //     }
+    // }
 
     // ResolvableType resolvableType = ResolvableType.forClass(getEntityClass());
     // QueryService<?> myService = queryServiceProvider.getIfAvailable(

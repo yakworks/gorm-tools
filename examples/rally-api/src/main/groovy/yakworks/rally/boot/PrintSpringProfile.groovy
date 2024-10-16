@@ -1,4 +1,10 @@
-package yakworks.rally.api
+/*
+* Copyright 2024 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
+* You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+*/
+package yakworks.rally.boot
+
+import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -10,6 +16,7 @@ import org.springframework.stereotype.Component
  * Experiments with profiles
  */
 @Component
+@CompileStatic
 class PrintSpringProfile implements CommandLineRunner {
 
     @Autowired
@@ -22,6 +29,7 @@ class PrintSpringProfile implements CommandLineRunner {
     String pprop
 
     @Override
+    @SuppressWarnings(['Println'])
     public void run(String... args) throws Exception {
 
         println "info.app.name: ${environment.getProperty('info.app.name')}"

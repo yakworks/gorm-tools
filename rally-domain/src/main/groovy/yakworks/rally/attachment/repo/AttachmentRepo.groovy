@@ -139,12 +139,12 @@ class AttachmentRepo extends LongIdGormRepo<Attachment> {
     /**
      * Override query for custom search for Tags etc..
      */
-    @Override
-    MangoDetachedCriteria<Attachment> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
-        Map criteriaMap = queryArgs.qCriteria
-        //NOTE: tags are handled in the TagsMangoCriteriaEventListener
-        return getQueryService().query(queryArgs, closure)
-    }
+    // @Override
+    // MangoDetachedCriteria<Attachment> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
+    //     Map criteriaMap = queryArgs.criteriaMap
+    //     //NOTE: tags are handled in the TagsMangoCriteriaEventListener
+    //     return getQueryService().query(queryArgs, closure)
+    // }
 
     /**
      * removes the link for the entity and removes the attachment

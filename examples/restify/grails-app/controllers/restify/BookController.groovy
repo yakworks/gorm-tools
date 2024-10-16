@@ -22,7 +22,7 @@ class BookController implements CrudApiController<Book> {
             Map entityMap = getCrudApi().create(q, params).asMap()
             respondWith(entityMap, [status: CREATED])
             // respond instance, [status: CREATED] //201
-        } catch (RuntimeException e) {
+        } catch (e) {
             handleException(e)
         }
     }

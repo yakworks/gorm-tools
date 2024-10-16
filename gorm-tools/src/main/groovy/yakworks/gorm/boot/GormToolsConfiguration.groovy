@@ -30,7 +30,7 @@ import gorm.tools.idgen.JdbcIdGenerator
 import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.jdbc.DbDialectService
 import gorm.tools.mango.MangoBuilder
-import gorm.tools.mango.api.QueryService
+import gorm.tools.mango.QuickSearchSupport
 import gorm.tools.metamap.services.MetaEntityService
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
@@ -46,7 +46,7 @@ import yakworks.gorm.config.GormToolsPropertiesConfiguration
 
 @AutoConfiguration
 @Lazy
-@Import([GormToolsPropertiesConfiguration]) //Config Props AsyncConfig, GormConfig, IdGeneratorConfig, QueryConfig
+@Import([DefaultCrudApiConfiguration, GormToolsPropertiesConfiguration]) //Config Props AsyncConfig, GormConfig, IdGeneratorConfig, QueryConfig
 // @AutoConfigureBefore([HibernateJpaAutoConfiguration])
 // @AutoConfigureAfter(DataSourceAutoConfiguration)
 @CompileStatic
@@ -100,6 +100,10 @@ class GormToolsConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    QuickSearchSupport quickSearchSupport(){ new QuickSearchSupport()}
+
+    @Bean
+    @ConditionalOnMissingBean
     EntityMapBinder entityMapBinder(){ new EntityMapBinder()}
 
     @Bean
@@ -144,4 +148,5 @@ class GormToolsConfiguration {
     QueryArgsValidator queryArgsValidator(){
         new DefaultQueryArgsValidator()
     }
+
 }

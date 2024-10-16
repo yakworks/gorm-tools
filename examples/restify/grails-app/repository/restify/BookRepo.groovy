@@ -6,7 +6,6 @@ package restify
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import grails.gorm.transactions.Transactional
@@ -17,6 +16,6 @@ class BookRepo implements GormRepo<Book> {
 
     @Transactional(rollbackForClassName = "TestTransactionException")
     def foo(){
-        assert 1==1
+        assert '1'=="1"
     }
 }

@@ -11,5 +11,5 @@ import groovy.transform.CompileStatic
  */
 @CompileStatic
 enum IncludesKey {
-    qSearch, get, list, stamp, bulk, bulkError
+    qSearch, get, list, stamp, bulk, bulkError, picklist
 }

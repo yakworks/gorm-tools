@@ -5,6 +5,8 @@ import grails.gorm.transactions.Rollback
 import okhttp3.Request
 import okhttp3.RequestBody
 import org.springframework.http.HttpStatus
+
+
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.HttpUrl
@@ -116,9 +118,9 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
         then:
         resp.code == 400
         !body.ok
-        body.title == "Data Problem"
-        body.code == "error.data.problem"
-        body.detail.contains "Invalid query Json parsing expected"
+        body.title == "Invalid Query"
+        body.code == "error.query.invalid"
+        body.detail.contains "Invalid JSON"
     }
 
     void "test invalid q"() {
@@ -132,9 +134,9 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
         then:
         resp.code == 400
         !body.ok
-        body.title == "Data Problem"
-        body.code == "error.data.problem"
-        body.detail.contains "Invalid query Json parsing expected"
+        body.title == "Invalid Query"
+        body.code == "error.query.invalid"
+        body.detail.contains "Invalid JSON"
     }
 
 

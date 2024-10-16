@@ -13,97 +13,41 @@
   <cluster-name>dev</cluster-name>
   <instance-name>hz-member-1</instance-name>
 
-  <map name="default">
-    <!--
-       Data type that will be used for storing recordMap.
-       Possible values:
-       BINARY (default): keys and values will be stored as binary data
-       OBJECT : values will be stored in their object forms
-       NATIVE : values will be stored in non-heap region of JVM
-    -->
-    <in-memory-format>BINARY</in-memory-format>
+  <network>
+    <rest-api enabled="true">
+      <endpoint-group name="HEALTH_CHECK" enabled="true"/>
+      <endpoint-group name="DATA" enabled="true"/>
+    </rest-api>
+  </network>
 
-    <!--
-        Metadata creation policy for this map. Hazelcast may process objects of supported types ahead of time to
-        create additional metadata about them. This metadata then is used to make querying and indexing faster.
-        Metadata creation may decrease put throughput.
-        Valid values are:
-        CREATE_ON_UPDATE (default): Objects of supported types are pre-processed when they are created and updated.
-        OFF: No metadata is created.
-    -->
-    <metadata-policy>CREATE_ON_UPDATE</metadata-policy>
+  <properties>
+    <!--set to 80 (default it 70) to reduce somen noise
+      see https://docs.hazelcast.com/hazelcast/5.2/maintain-cluster/monitoring#health-check-and-monitoring-->
+    <property name="hazelcast.health.monitoring.threshold.memory.percentage">80</property>
+    <property name="hazelcast.health.monitoring.threshold.cpu.percentage">80</property>
+    <!--These 3 should not be needed. was trying to match whats in hazel tests for default timeout-->
+    <property name="hazelcast.wait.seconds.before.join">0</property>
+    <property name="hazelcast.graceful.shutdown.max.wait">120</property>
+    <property name="hazelcast.partition.backup.sync.interval">1</property>
+  </properties>
 
-    <!--
-        Number of backups. If 1 is set as the backup-count for example,
-        then all entries of the map will be copied to another JVM for
-        fail-safety. 0 means no backup.
-    -->
-    <backup-count>1</backup-count>
-    <!--
-        Number of async backups. 0 means no backup.
-    -->
-    <async-backup-count>0</async-backup-count>
+  <!--not sure if this is right, if test oks remove this comment-->
+  <map name="orgCrudApiList">
     <!--
         Maximum number of seconds for each entry to stay in the map. Entries that are
         older than <time-to-live-seconds> and not updated for <time-to-live-seconds>
         will get automatically evicted from the map.
         Any integer between 0 and Integer.MAX_VALUE. 0 means infinite. Default is 0
     -->
-    <time-to-live-seconds>0</time-to-live-seconds>
+    <time-to-live-seconds>1200</time-to-live-seconds>
     <!--
         Maximum number of seconds for each entry to stay idle in the map. Entries that are
         idle(not touched) for more than <max-idle-seconds> will get
         automatically evicted from the map. Entry is touched if get, put or containsKey is called.
         Any integer between 0 and Integer.MAX_VALUE. 0 means infinite. Default is 0.
     -->
-    <max-idle-seconds>0</max-idle-seconds>
+    <max-idle-seconds>1200</max-idle-seconds>
 
-    <eviction eviction-policy="NONE" max-size-policy="PER_NODE" size="0"/>
-    <!--
-        While recovering from split-brain (network partitioning),
-        map entries in the small cluster will merge into the bigger cluster
-        based on the policy set here. When an entry merge into the
-        cluster, there might an existing entry with the same key already.
-        Values of these entries might be different for that same key.
-        Which value should be set for the key? Conflict is resolved by
-        the policy set here. Default policy is PutIfAbsentMapMergePolicy
-
-        There are built-in merge policies such as
-        com.hazelcast.spi.merge.PassThroughMergePolicy; entry will be overwritten if merging entry exists for the key.
-        com.hazelcast.spi.merge.PutIfAbsentMergePolicy ; entry will be added if the merging entry doesn't exist in the cluster.
-        com.hazelcast.spi.merge.HigherHitsMergePolicy ; entry with the higher hits wins.
-        com.hazelcast.spi.merge.LatestUpdateMergePolicy ; entry with the latest update wins.
-    -->
-    <merge-policy batch-size="100">com.hazelcast.spi.merge.PutIfAbsentMergePolicy</merge-policy>
-
-    <!--
-       Control caching of de-serialized values. Caching makes query evaluation faster, but it cost memory.
-       Possible Values:
-                    NEVER: Never cache deserialized object
-                    INDEX-ONLY: Caches values only when they are inserted into an index.
-                    ALWAYS: Always cache deserialized values.
-    -->
-    <cache-deserialized-values>INDEX-ONLY</cache-deserialized-values>
-
-    <!--
-       Whether map level statistical information (total
-       hits, memory-cost etc.) should be gathered and stored.
-    -->
-    <statistics-enabled>true</statistics-enabled>
-
-    <!--
-        Whether statistical information (hits, creation
-        time, last access time etc.) should be gathered
-        and stored. You have to enable this if you plan to
-        implement a custom eviction policy, out-of-the-box
-        eviction policies work regardless of this setting.
-    -->
-    <per-entry-stats-enabled>false</per-entry-stats-enabled>
-
-  </map>
-
-  <!--not sure if this is right, if test oks remove this comment-->
-  <map name="default">
   </map>
 
 </hazelcast>

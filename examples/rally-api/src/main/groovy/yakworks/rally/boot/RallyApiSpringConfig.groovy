@@ -1,25 +1,15 @@
 /*
- * Copyright 2020 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package yakworks.rally.api
+* Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
+* You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+*/
+package yakworks.rally.boot
 
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
@@ -28,10 +18,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
 
 import yakworks.gorm.api.support.QueryArgsValidator
 import yakworks.openapi.gorm.OpenApiGenerator
 import yakworks.rally.RallyConfiguration
+import yakworks.rally.api.TestTimeoutQueryArgsValidator
 import yakworks.rest.grails.AppInfoBuilder
 import yakworks.security.spring.DefaultSecurityConfiguration
 import yakworks.security.spring.token.CookieAuthSuccessHandler
@@ -47,7 +40,7 @@ import static org.springframework.security.config.Customizer.withDefaults
  */
 // keep componentScan in Application.groovy for now so unit test work. see notes in the TestSpringApplication class in tests
 // @ComponentScan(['yakity.security', 'yakworks.security'])
-@Lazy
+//@Lazy
 @EnableWebSecurity //(debug = true)
 @CompileStatic
 @Configuration
@@ -78,7 +71,8 @@ class RallyApiSpringConfig {
             "/security-tests/**",
             "/login*",
             "/token",
-            "/about"
+            "/about",
+            "/rally/smoke/**"
         ]
 
         if(!securityEnabled){
@@ -144,5 +138,27 @@ class RallyApiSpringConfig {
     QueryArgsValidator queryArgsValidator() {
         return new TestTimeoutQueryArgsValidator()
     }
+
+    // @Bean @Lazy(false)
+    // WebMvcRegistrations webMvcRegistrations() {
+    //     return new WebMvcRegistrations() {
+    //
+    //         @Override
+    //         public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
+    //             RequestMappingHandlerMapping handlerMapping = new CustomRequestMappingHandlerMapping();
+    //             //handlerMapping.setUseTrailingSlashMatch(false);
+    //             return handlerMapping;
+    //         }
+    //
+    //         @Override
+    //         public RequestMappingHandlerAdapter getRequestMappingHandlerAdapter() {
+    //             RequestMappingHandlerAdapter handlerAdapter = new CustomRequestMappingHandlerAdapter();
+    //             //handlerMapping.setUseTrailingSlashMatch(false);
+    //             return handlerAdapter;
+    //         }
+    //
+    //     };
+    // }
+
 
 }

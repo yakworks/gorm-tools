@@ -9,22 +9,33 @@ spring.config.import: >-
   classpath:config/grails.yml,
   classpath:config/datasource.yml,
   classpath:config/foo.yml,
-  file://${app.resources.rootLocation}/application.yml
+  optional:file://${app.resources.rootLocation}/application.yml
 
 api.config.import: classpath:/restapi-config.yml,classpath*:/restapi/**/*.yml
 
 foo:
   message: "from rally-api/application.yml"
 
+#spring.cache.cache-names: customers,customersSearch
+#spring.cache.type: hazelcast
+#spring:
+#  cache:
+#    type: CAFFEINE # can set to NONE for testing dev
+#    caffeine:
+#      spec: initialCapacity=10,maximumSize=100,expireAfterAccess=1h
+
 logging:
   level:
     root: INFO
     org.springframework: INFO
     org.hibernate.orm.deprecation: OFF # turns off deprecation notices
-    org.springframework.security: DEBUG
-
+    #org.springframework.security: DEBUG
+    #org.springframework.boot.autoconfigure: DEBUG
     yakworks.rally.api.rally.OrgController: DEBUG
-    gorm.tools.mango.MangoDetachedCriteria: DEBUG
+    yakworks.rally.api.OrgCrudApi: DEBUG
+    yakworks.spring.hazelcast: DEBUG
+
+    #gorm.tools.mango.MangoDetachedCriteria: DEBUG
 
 #    gorm.tools.mango.MangoBuilder: DEBUG
     org.hibernate: OFF # turns off all
@@ -35,10 +46,10 @@ logging:
     # org.hibernate: INFO
     # for stats and sql logging
     # org.hibernate.stat: DEBUG
-    org.hibernate.SQL: ERROR
+    #org.hibernate.SQL: DEBUG
     # this one is very noisy but if neede will show the values passed to sql statements
     # org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    yakity.security: TRACE
+    #yakity.security: TRACE
 
 ---
 
@@ -63,7 +74,7 @@ management:
   endpoints:
     enabled-by-default: true
     web:
-      base-path: /actuator
+      # base-path: /actuator
       exposure:
         include: '*'
 #        include: health,info,liveness,metrics,caches
@@ -88,9 +99,10 @@ app:
     attachments.location: 'attachments'
 
 # enable multiple views resolvers by removing suffix and restricting viewNames so it flows through to hbs or mustache
-spring.thymeleaf.view-names: "*.html"
-spring.thymeleaf.suffix: ""
-spring.thymeleaf.template-resolver-order: 0
+#spring.thymeleaf.view-names: "*.html"
+#spring.thymeleaf.suffix: ""
+#spring.thymeleaf.template-resolver-order: 0
+
 # uncomment starter in build.gradle to activate handlebars
 # handlebars.enabled: true
 # handlebars.failOnMissingFile: false

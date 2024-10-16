@@ -256,7 +256,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         boolean isExcelExport = params && params['format'] == FORMAT_XLSX
 
         try {
-            queryArgsValidator.validate(args)
+            getQueryArgsValidator().validate(args)
         } catch(DataProblemException ex) {
             //For excel export, ui can send max=10,000 : if thts the case dont fail, catch and move on to override max to exportMax
             if(isExcelExport && ex.code == "error.query.max") {

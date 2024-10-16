@@ -6,18 +6,16 @@ package yakworks.spring.hazelcast
 
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
+import javax.persistence.LockTimeoutException
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.springframework.cache.Cache
-import org.springframework.lang.Nullable
 
 import com.hazelcast.map.IMap
 import com.hazelcast.spring.cache.HazelcastCache
-import yakworks.api.HttpStatus
-import yakworks.api.problem.Problem
 
 /**
  * Spring related {@link Cache} implementation for Hazelcast.
@@ -67,11 +65,11 @@ public class HazelCache extends HazelcastCache {
     void doLock(Object key){
         if(lockTimeout){
             boolean gotLock = getNativeCache().tryLock(key, lockTimeout, TimeUnit.MILLISECONDS);
-            if(!gotLock)
+            if(!gotLock) {
+                log.debug("Lock timeout on key $key")
                 //TODO fire the LockTimoutException
-                throw Problem.of('error.query.duplicate')
-                    .detail("Timeout waiting for identical query to finish")
-                    .status(HttpStatus.TOO_MANY_REQUESTS).toException()
+                throw new LockTimeoutException("Lock timeout on key $key, waited ${lockTimeout / 1000}s")
+            }
         } else {
             //does normal lock like it did before
             getNativeCache().lock(key);
@@ -96,15 +94,15 @@ public class HazelCache extends HazelcastCache {
     @SuppressWarnings("serial")
     class LockTimoutException extends RuntimeException {
 
-        @Nullable
         private final Object key;
+        private final long lockTimeoutSeconds
 
-        public LockTimoutException(@Nullable Object key, Throwable ex) {
-            super(String.format("Value for key '%s' could not be loaded using '%s'", key), ex);
-            this.key = key;
+        public LockTimoutException(Object key, long lockTimeoutSeconds) {
+            super("Lock timeout on key $key, waited ${lockTimeoutSeconds/1000}s")
+            this.key = key
+            this.lockTimeoutSeconds = lockTimeoutSeconds
         }
 
-        @Nullable
         public Object getKey() {
             return this.key;
         }

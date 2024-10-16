@@ -36,7 +36,7 @@ class CacheMgrConfig {
     // }
 
     @Configuration
-    @Profile("!test")
+    //@Profile("!test")
     static class MainCacheBeans {
 
         @Bean
@@ -64,29 +64,30 @@ class CacheMgrConfig {
             //var hcm = new HazelcastCacheManager(instance)
             var hcm = new HazelCacheManager(instance)
             //can be set from app.yml too, see https://docs.hazelcast.com/hazelcast/5.5/spring/add-caching
-            hcm.lockTimeoutMap['orgApiList'] = 10_000L //in millis
+            hcm.defaultLockTimeout = 5_000L //in millis
+            //hcm.lockTimeoutMap['orgApiList'] = 10_000L //in millis
             //setup a defdault cache, not really needed, just testing
-            hcm.getCache('orgApiList')
+            //hcm.getCache('orgApiList')
             return hcm
         }
 
     }
 
-    @Configuration
-    @Profile("test")
-    static class TestCacheBeans {
-
-        @Bean
-        @Primary
-        CacheManager cacheManager() {
-            return new NoOpCacheManager();
-        }
-
-        @Bean
-        CacheManager hazelCacheManager() {
-            return new NoOpCacheManager();
-        }
-
-
-    }
+    //@Configuration
+    //@Profile("test")
+    // static class TestCacheBeans {
+    //
+    //     @Bean
+    //     @Primary
+    //     CacheManager cacheManager() {
+    //         return new NoOpCacheManager();
+    //     }
+    //
+    //     @Bean
+    //     CacheManager hazelCacheManager() {
+    //         return new NoOpCacheManager();
+    //     }
+    //
+    //
+    // }
 }

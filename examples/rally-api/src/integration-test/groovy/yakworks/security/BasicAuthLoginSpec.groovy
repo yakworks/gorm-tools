@@ -7,6 +7,7 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.Response
 import spock.lang.Specification
+
 import yakworks.rest.client.OkHttpRestTrait
 
 /**

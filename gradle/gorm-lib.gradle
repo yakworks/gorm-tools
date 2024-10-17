@@ -9,6 +9,8 @@ dependencies {
   // implementation "com.fasterxml.jackson.core:jackson-core:$vJackson"
   // implementation "com.fasterxml.jackson.core:jackson-databind:$vJackson"
 
+  implementation 'org.springframework.data:spring-data-jpa:2.7.18'
+
   // implementation "org.grails:grails-datastore-gorm:${vGorm}"
   implementation "org.grails:grails-datastore-gorm-hibernate5:$vGormHibernate"
   implementation "org.grails.plugins:hibernate5:$vGormHibernate"

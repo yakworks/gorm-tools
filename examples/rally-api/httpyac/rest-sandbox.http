@@ -37,6 +37,17 @@ Authorization: {{Authorization}}
 GET {{base_url}}/rally/org?format=xlsx
 Authorization: {{Authorization}}
 
+### Org list sleep
+GET {{base_url}}/rally/org?qSearch=org&sleep=true
+Authorization: {{Authorization}}
+
+### Org list
+GET {{base_url}}/rally/org?qSearch=org
+Authorization: {{Authorization}}
+
+### Org picklist
+GET {{base_url}}/rally/org/picklist?qSearch=org
+Authorization: {{Authorization}}
 
 ### Org
 GET {{base_url}}/rally/contact
@@ -75,13 +86,23 @@ GET http://localhost:8080/info/urlMappings
 
 GET http://localhost:8080/info/urlMappings
 
-### Contact list
-# @ref login
-GET {{host}}/api/hazel
+### hazel
+GET {{base_url}}/hazel-hibernate
 Authorization: {{Authorization}}
 
 ### Health
 GET {{host}}/api/actuator/health
+
+### actuator
+GET {{host}}/api/actuator
+
+### metrics
+GET {{host}}/api/actuator/metrics
+
+
+### caches
+GET {{host}}/api/actuator/caches/
+
 
 ### readiness
 GET {{base_url}}/actuator/health/readiness

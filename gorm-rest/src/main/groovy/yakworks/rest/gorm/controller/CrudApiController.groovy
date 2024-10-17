@@ -4,6 +4,11 @@
 */
 package yakworks.rest.gorm.controller
 
+import java.net.http.HttpRequest
+import java.nio.charset.StandardCharsets
+import java.util.concurrent.TimeoutException
+import java.util.function.Function
+import javax.persistence.LockTimeoutException
 import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
@@ -13,18 +18,16 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.http.HttpStatus
+import org.springframework.web.util.UriUtils
 
 import gorm.tools.beans.Pager
-import gorm.tools.job.JobUtils
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.model.DataOp
+import gorm.tools.utils.ServiceLookup
 import grails.web.Action
 import yakworks.api.problem.Problem
 import yakworks.etl.csv.CsvToMapTransformer
 import yakworks.gorm.api.CrudApi
-import yakworks.gorm.api.DefaultCrudApi
-import yakworks.gorm.api.IncludesConfig
-import yakworks.gorm.api.IncludesKey
 import yakworks.gorm.api.IncludesProps
 
 import static gorm.tools.problem.ProblemHandler.isBrokenPipe
@@ -41,7 +44,7 @@ import static org.springframework.http.HttpStatus.OK
  * @since 6.1
  */
 @CompileStatic
-@SuppressWarnings(['CatchRuntimeException'])
+@SuppressWarnings(['CatchRuntimeException','Println'])
 trait CrudApiController<D> extends RestApiController {
 
     static picklistMax = 50
@@ -56,11 +59,19 @@ trait CrudApiController<D> extends RestApiController {
     Logger log = LoggerFactory.getLogger(this.class)
 
     /** Not required but if an CrudApi bean is setup then it will get get used */
-    @Autowired(required = false)
+    //@Autowired(required = false)
     CrudApi<D> crudApi
 
     @Autowired
     CsvToMapTransformer csvToMapTransformer
+
+    // @Autowired //(required = false)
+    // ObjectProvider<CrudApi<D>> crudApiProvider
+    @Autowired
+    private Function<Class, CrudApi> crudApiFactory
+
+    // @Autowired
+    // Closure<CrudApi> crudApiClosure
 
     /**
      * The java class for the Gorm domain (persistence entity). will generally get set in constructor or using the generic as
@@ -79,8 +90,21 @@ trait CrudApiController<D> extends RestApiController {
     }
 
     CrudApi<D> getCrudApi(){
-        if (!crudApi) this.crudApi = DefaultCrudApi.of(getEntityClass())
-        //crudApi.debugEnabled = log.isDebugEnabled()
+        if (!crudApi) {
+            this.crudApi = ServiceLookup.lookup(getEntityClass(), CrudApi<D>, "defaultCrudApi")
+            //this.crudApi = crudApiFactory.apply(getEntityClass())
+            //this.crudApi = crudApiClosure.call(getEntityClass()) as CrudApi<D>
+            // try {
+            //     // var rt = ResolvableType.forClassWithGenerics(CrudApi, getEntityClass())
+            //     // var ctx = AppCtx.ctx
+            //     // var names = ctx.getBeanNamesForType(rt)
+            //     //check if concrete crudApi bean is setup, wont return nul since it will try the prototype
+            //     this.crudApi = crudApiProvider.getObject()
+            // } catch(UnsatisfiedDependencyException ex){
+            //     //will throw error if not as it tried to call the prototype defaultCrudApi() with no args, so call it now with args
+            //     this.crudApi = crudApiProvider.getObject(getEntityClass())
+            // }
+        }
         return crudApi
     }
 
@@ -174,7 +198,7 @@ trait CrudApiController<D> extends RestApiController {
         try {
             Map qParams = getParamsMap()
             log.debug("list with gParams ${qParams}")
-            Pager pager = getCrudApi().list(qParams, [IncludesKey.list.name()])
+            Pager pager = getCrudApi().list(qParams, toURI())
             //we pass in the params to args so it can get passed on to renderer, used in the excel renderer for example
             respondWith(pager, [params: qParams])
         } catch (Exception | AssertionError e) {
@@ -187,7 +211,7 @@ trait CrudApiController<D> extends RestApiController {
         try {
             Map qParams = getParamsMap()
             qParams.max = qParams.max ?: getPicklistMax() //default to 50 for picklists
-            Pager pager = getCrudApi().list(qParams, ['picklist', IncludesKey.stamp.name()])
+            Pager pager = getCrudApi().pickList(qParams, toURI())
             respondWith(pager, [params: qParams])
         } catch (Exception | AssertionError e) {
             handleThrowable(e)
@@ -268,8 +292,26 @@ trait CrudApiController<D> extends RestApiController {
      * Helper method to convert entity instance to map and respond
      */
     void respondWithMap(D instance, Map mParams, HttpStatus status = HttpStatus.OK){
-        Map entityMap = getCrudApi().entityToMap(instance, IncludesProps.of(mParams))
+        List includes = IncludesProps.of(mParams).fallbackKey('get').findIncludes(getEntityClass())
+        Map entityMap = getCrudApi().entityToMap(instance, includes)
         respondWith(entityMap, [status: status, params: mParams])
+    }
+
+    //Kept for reference, we might want to pass the HttpRequest instead of just the URI
+    URI toURI(){
+        String requri = request.requestURI
+        //decode and re-encode as the HttpServletReq doesn't escape the $, but URI needs it escaped
+        String queryString = UriUtils.decode(request.queryString?:'', StandardCharsets.UTF_8)
+        log.debug "requri: $requri - queryString: $queryString"
+        String encodedQueryString = UriUtils.encode(queryString, StandardCharsets.UTF_8)
+        URI newUri = URI.create("${request.requestURL}?${encodedQueryString}")
+        return newUri
+    }
+
+    //Kept for reference, we might want to pass the HttpRequest instead of just the URI
+    HttpRequest toHttpRequest(){
+        URI newUri = toURI()
+        return HttpRequest.newBuilder().uri(newUri).GET().build()
     }
 
     @Override
@@ -288,8 +330,18 @@ trait CrudApiController<D> extends RestApiController {
         }
     }
 
+    @Override
     void handleThrowable(Throwable e) {
-        Problem apiError = problemHandler.handleException(e, getEntityClass()?.simpleName)
+        Problem apiError
+        if(e instanceof LockTimeoutException){
+            //thrown from locking in hazelcast cache
+            apiError = Problem.of('error.query.duplicate')
+                .detail("Timeout while waiting for 1 or more duplicate identical queries to finish for this user")
+                .status(HttpStatus.TOO_MANY_REQUESTS.value())
+        } else {
+            apiError = problemHandler.handleException(e, getEntityClass()?.simpleName)
+        }
+
         respondWith(apiError)
     }
 }

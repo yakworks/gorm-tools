@@ -16,9 +16,12 @@ error:
     emptyPayload: Expected payload is null or empty, No operation performed.
 
   query:
+    invalid: Invalid Query
     max: 'Max parameter value is larger then allowed value {max}'
     timeout: 'Query timeout has occurred'
+    duplicate: Duplicate Query
     qRequired: q or qSearch parameter restriction is required
+    # FIXME use invalid
     qInvalid: q or qSearch parameters are invalid
 
   # Delete Errors

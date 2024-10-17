@@ -64,9 +64,9 @@ class BulkApiSupport<D> {
      * sets up the SyncJobArgs from whats passed in from params
      */
     SyncJobArgs setupSyncJobArgs(DataOp dataOp, Map params, String sourceId){
-        Map includesMap = includesConfig.getIncludesMap(getEntityClass())
-        List bulkIncludes = IncludesConfig.getFieldIncludes(includesMap, [IncludesKey.bulk.name()])
-        List bulkErrorIncludes = includesMap['bulkError'] as List<String>
+        List bulkIncludes = includesConfig.findByKeys(getEntityClass(), [IncludesKey.bulk, IncludesKey.get])
+        //want the error includes to be blank if its not there
+        List bulkErrorIncludes = includesConfig.getByKey(getEntityClass(), 'bulkError') as List<String>
 
         SyncJobArgs syncJobArgs = SyncJobArgs.withParams(params)
         syncJobArgs.op = dataOp

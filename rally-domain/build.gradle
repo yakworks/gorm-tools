@@ -22,6 +22,12 @@ dependencies {
   api "org.grails.plugins:hibernate5:$vGormHibernate"
   api "org.hibernate:hibernate-core:$vHibernate"
 
+  //Hazelcast and Caffeine
+  //runtimeOnly "com.hazelcast:hazelcast-hibernate53:$vHazelcastHib"
+  implementation "com.hazelcast:hazelcast:$vHazelcast"
+  implementation "com.hazelcast:hazelcast-spring:$vHazelcast"
+  implementation "com.github.ben-manes.caffeine:caffeine:$vCaffeine"
+
   //mailgun
   api 'com.mailgun:mailgun-java:1.0.7'
   //to use the InternetAddress for validating emails

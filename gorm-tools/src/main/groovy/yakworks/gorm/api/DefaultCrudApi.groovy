@@ -4,14 +4,13 @@
 */
 package yakworks.gorm.api
 
-import groovy.json.JsonException
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.orm.hibernate.HibernateDatastore
-import org.hibernate.QueryException
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.dao.DataAccessException
+import org.springframework.beans.factory.annotation.Qualifier
 
 import gorm.tools.beans.EntityResult
 import gorm.tools.beans.Pager
@@ -26,7 +25,6 @@ import gorm.tools.repository.model.ApiCrudRepo
 import gorm.tools.repository.model.DataOp
 import gorm.tools.transaction.TrxUtils
 import grails.gorm.transactions.Transactional
-import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemException
 import yakworks.gorm.api.support.BulkApiSupport
 import yakworks.gorm.api.support.QueryArgsValidator
@@ -49,7 +47,10 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     @Autowired IncludesConfig includesConfig
     @Autowired ApiConfig apiConfig
     @Autowired MetaMapService metaMapService
+
+    @Qualifier("queryArgsValidator")
     @Autowired QueryArgsValidator queryArgsValidator
+
     @Autowired QueryConfig queryConfig
 
     /** Not required but if an BulkSupport bean is setup then it will get get used */
@@ -68,18 +69,18 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     }
 
     class DefaultApiResult<D> implements CrudApiResult<D> {
-        IncludesProps includesProps
+        List<String> includes
         D entity
         int status
 
-        DefaultApiResult(D entity, IncludesProps includesProps){
+        DefaultApiResult(D entity, List<String> includes){
             this.entity = entity
-            this.includesProps = includesProps
+            this.includes = includes
         }
 
-        @CompileDynamic //getting goody error in intellij about casting entity to D
+        @CompileDynamic //getting goofy error in intellij about casting entity to D
         Map asMap(){
-            entityToMap(this.entity, includesProps)
+            entityToMap(this.entity, includes)
         }
     }
 
@@ -105,11 +106,6 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         D instance = (D) getApiCrudRepo().read(id)
         RepoUtil.checkFound(instance, id, getEntityClass().simpleName)
         return createApiResult(instance, qParams)
-    }
-
-    @Override
-    CrudApiResult<D> createApiResult(D instance, Map params){
-        new DefaultApiResult(instance, IncludesProps.of(params))
     }
 
     /**
@@ -176,19 +172,22 @@ class DefaultCrudApi<D> implements CrudApi<D> {
      */
     @Transactional(readOnly = true)
     @Override
-    Pager list(Map qParams, List<String> includesKeys){
-        try {
-            Pager pager = Pager.of(qParams)
-            List dlist = queryList(pager, qParams)
-            return createPagerResult(pager, includesKeys, qParams, dlist)
-        } catch (JsonException | IllegalArgumentException | QueryException ex) {
-            //See #1925 - Catch bad query in 'q' parameter and report back. So we dont pollute logs, and can differentiate that its not us.
-            //Hibernate throws IllegalArgumentException when Antlr fails to parse query
-            //and throws QueryException when hibernate fails to execute query
-            throw DataProblem.ex("Invalid query $ex.message")
-        } catch (DataAccessException ex) {
-            throw DataProblem.of(ex).toException()
-        }
+    Pager list(Map qParams, URI uri){
+        Pager pager = Pager.of(qParams)
+        QueryArgs qargs = createQueryArgs(pager, qParams, uri)
+        List dlist = queryList(qargs)
+        List<String> incs = getIncludes(qParams, [IncludesKey.list, IncludesKey.get])
+        return createPagerResult(pager, qParams, dlist, incs)
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    Pager pickList(Map qParams, URI uri){
+        Pager pager = Pager.of(qParams)
+        QueryArgs qargs = createQueryArgs(pager, qParams, uri)
+        List dlist = queryList(qargs)
+        List<String> incs = getIncludes(qParams, [IncludesKey.picklist, IncludesKey.stamp])
+        return createPagerResult(pager, qParams, dlist, incs)
     }
 
     @Override
@@ -198,22 +197,51 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         return job
     }
 
-    protected List<D> queryList(Pager pager, Map qParams) {
-        QueryArgs qargs = createQueryArgs(pager, qParams)
-        //if (debugEnabled) log.debug("QUERY ${entityClass.name} queryArgs.criteria: ${qargs.buildCriteria()}")
+    protected List<D> queryList(QueryArgs qargs) {
         return getApiCrudRepo().query(qargs, null).pagedList(qargs.pager)
     }
 
-    protected Pager createPagerResult(Pager pager, List<String> includesKeys, Map qParams, List dlist) {
-        List<String> incs = includesConfig.findIncludes(entityClass.name, IncludesProps.of(qParams), includesKeys)
+    protected Pager createPagerResult(Pager pager, Map qParams, List dlist, List<String> incs) {
         MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)
-        pager.setMetaMapList(entityMapList)
+        var elist = entityMapList as List<Map>
+        pager.dataList(elist)
         return pager
     }
 
-    protected QueryArgs createQueryArgs(Pager pager, Map qParams) {
+
+    @Override
+    CrudApiResult<D> createApiResult(D instance, Map params){
+        List<String> incs = getIncludes(params, [IncludesKey.get])
+        new DefaultApiResult(instance, incs)
+    }
+
+    @Override
+    Map entityToMap(D instance, List<String> includes) {
+        flushIfSession() //in testing need to flush before generating MetaMap
+        MetaMap emap = metaMapService.createMetaMap(instance, includes)
+        return emap
+    }
+
+    /**
+     * Gets the includes/includesKey from the qParams or from the fallbackKeys
+     * @return the list of fields in our mango format.
+     */
+    protected List<String> getIncludes(Map qParams, List fallbackIncludesKeys) {
+        //parse the params into the IncludesProps
+        var incProps = IncludesProps.of(qParams).fallbackKeys(fallbackIncludesKeys)
+
+        //if includes was passed in, then it wins
+        if(incProps.includes) return incProps.includes
+
+        //otherwise search based on includesKey
+        List<String> incs = includesConfig.findIncludes(getEntityClass(), incProps)
+        return incs
+    }
+
+    protected QueryArgs createQueryArgs(Pager pager, Map qParams, URI uri) {
         QueryArgs qargs = QueryArgs.withPager(pager)
             .strict(true) //only use criteria if its under the q query param
+            .uri(uri)
             .build(qParams)
             .defaultSortById() //add default id sort if none exists
             .validateQ(qRequired()) //if q is required then blows error if nothing was parsed out
@@ -223,21 +251,12 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         return qargs
     }
 
-    @Override
-    Map entityToMap(D instance, IncludesProps includesProps) {
-        flushIfSession() //in testing need to flush before generating MetaMap
-        List<String> incs = includesConfig.findIncludes(entityClass.name, includesProps, [])
-        MetaMap emap = metaMapService.createMetaMap(instance, incs)
-        return emap
-    }
-
-    void validateQueryArgs(QueryArgs args, Map params) {
+    protected void validateQueryArgs(QueryArgs args, Map params) {
         //FIXME, export to xlsx passes large number for max eg 10K at RNDC, below hack is to allow tht max for export
-
         boolean isExcelExport = params && params['format'] == FORMAT_XLSX
 
         try {
-            queryArgsValidator.validate(args)
+            getQueryArgsValidator().validate(args)
         } catch(DataProblemException ex) {
             //For excel export, ui can send max=10,000 : if thts the case dont fail, catch and move on to override max to exportMax
             if(isExcelExport && ex.code == "error.query.max") {
@@ -248,6 +267,9 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         }
     }
 
+    /**
+     * checks the apiconfig to see if we set it as reuiqred for the endpoint
+     */
     protected boolean qRequired(){
         PathItem pathItem = apiConfig.pathsByEntity[entityClass.name]
         return pathItem?.qRequired

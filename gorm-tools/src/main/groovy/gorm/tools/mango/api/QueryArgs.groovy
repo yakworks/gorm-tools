@@ -4,6 +4,8 @@
 */
 package gorm.tools.mango.api
 
+import java.net.http.HttpRequest
+
 import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
@@ -20,7 +22,6 @@ import yakworks.json.groovy.JsonEngine
 
 import static gorm.tools.mango.MangoOps.CRITERIA
 import static gorm.tools.mango.MangoOps.QSEARCH
-import static gorm.tools.mango.MangoOps.SORT
 
 /**
  * Builder arguments for a query to pass from controllers etc to the MangoQuery
@@ -37,7 +38,7 @@ import static gorm.tools.mango.MangoOps.SORT
  */
 @Builder(
     builderStrategy=SimpleStrategy, prefix="",
-    includes=['strict', 'projections', 'select', 'timeout'],
+    includes=['strict', 'projections', 'select', 'timeout', 'uri'],
     useSetters=true
 )
 @Slf4j
@@ -58,6 +59,17 @@ class QueryArgs {
      * future
      */
     // Closure closure
+
+    /**
+     * The HttpRequest if there is one. Can be used for logging and can use uri.query for cache key
+     * not required and wont be set for internal usage
+     */
+    URI uri
+
+    /**
+     * The source original params that were used to build this
+     */
+    Map originalParams
 
     /**
      * when true in build method, will only add params that are under q.
@@ -84,10 +96,23 @@ class QueryArgs {
      * Criteria map to pass to the MangoBuilder. when QueryArgs is built from query params, then this is the q=...
      * This is the one to modify if making changes in an override.
      */
-    private Map<String, Object> qCriteria = [:] as Map<String, Object>
-    Map<String, Object> getqCriteria() {
-        return this.qCriteria
+    private Map<String, Object> criteriaMap = [:] as Map<String, Object>
+
+    /**
+     * The Mango criteriaMap
+     */
+    Map<String, Object> getCriteriaMap() {
+        return this.criteriaMap
     }
+
+    /**
+     * alias to criteriaMap
+     */
+    @Deprecated
+    Map<String, Object> getqCriteria() {
+        return this.criteriaMap
+    }
+
     /**
      * The Pager instance for paged list queries
      */
@@ -172,11 +197,11 @@ class QueryArgs {
      *  - removes 'max', 'offset', 'page' and sets up pager object if not passed in
      *
      * Sort and Order
-     *  - sets up an '$sort' map if sort or order key are passed in
+     *  - sets up the sort map if sort or order key are passed in
      *
      * Translates q from json
      * example params= [q: "{foo: 'test*'}", sort:'foo', page: 2, offset: 10]
-     * criteria= [foo:'test*', $sort:'foo'] and pager will be setup
+     * criteria= [foo:'test*'], sort=[foo: 'asc'] and pager will be setup
      *
      * Transalates qSearch fields when q is a string
      * params= [q: "foo", qSearchFields:['name', 'num']]
@@ -188,6 +213,8 @@ class QueryArgs {
      */
     QueryArgs build(Map<String, ?> paramsMap){
         if(isBuilt) throw new UnsupportedOperationException("build has already been called and cant be called again")
+        //keep ref to the orginalParams in case we need it later. can be used for debugging too
+        originalParams = paramsMap
         //copy it
         Map params = Maps.clone(paramsMap) as Map<String, Object>
 
@@ -204,7 +231,7 @@ class QueryArgs {
         if(!pager) pager = Pager.of(pagerMap)
 
         //sorts and orderBy
-        String orderBy = params.remove('order') ?: 'asc'
+        String orderBy = params.remove('order') ?: 'asc' //FIXME this is legacy concept
         def sortField = params.remove('sort')
         if(sortField) sort = buildSort(sortField, orderBy)
 
@@ -229,37 +256,32 @@ class QueryArgs {
                 //if q=* just put it as QSEARCH, it will get removed whn building criteria
                 //Its used by Rest tests, otherwise because of qRequired, rests tests cant query without passing any criterias
                 if(qString.trim() == "*") {
-                    qCriteria[QSEARCH] = qString
+                    criteriaMap[QSEARCH] = qString
                 } else {
                     //if the q param start with { then assume its json and parse it
                     //the parsed map will be set to the criteria.
-                    qCriteria = parseJson(qString, Map)
+                    criteriaMap = parseJson(qString, Map)
 
                     //clone so it can me modified later
-                    qCriteria = Maps.clone(qCriteria)
+                    criteriaMap = Maps.clone(criteriaMap)
                 }
             }
             //as is, mostly for testing and programtic stuff
             else if(qParam instanceof Map) {
-                qCriteria = qParam as Map<String, Object>
+                criteriaMap = qParam as Map<String, Object>
             }
         }
         //if no q was passed in then use whatever is left in the params as the criteria if strict is false
         else if(!strict){
             //FIXME should we not be making a copy of this?
-            qCriteria = params
+            criteriaMap = params
         }
 
         //now check if qSearch was passed as a separate param and its doesn't already exists in the criteria
         String qSearchParam = params.remove('qSearch')
-        if(qSearchParam && !qCriteria.containsKey(QSEARCH)){
-            qCriteria[QSEARCH] = qSearchParam
+        if(qSearchParam && !criteriaMap.containsKey(QSEARCH)){
+            criteriaMap[QSEARCH] = qSearchParam
         }
-
-        // if sort was populated, add it to the criteria with the $sort if its doesn't exist
-        // if(sort && !criteria.containsKey(MangoOps.SORT) ) {
-        //     criteria[MangoOps.SORT] = sort
-        // }
 
         //set that it was built
         isBuilt = true
@@ -273,21 +295,18 @@ class QueryArgs {
     /**
      * builds a COPY of qCrieria merged with sort if it exists and removes the $qSearch=* if it exists
      */
-    @Deprecated
-    Map<String, Object> buildCriteria(){
-        return buildCriteriaMap()
-    }
-
     Map<String, Object> buildCriteriaMap(){
         ensureBuilt()
-        Map<String, Object> criterium = qCriteria
+        //OLD kept for ref for now
+        // Map<String, Object> criterium = criteriaMap
         // if sort was populated, add it to the criteria with the $sort if its doesn't exist
-        if(sort && !qCriteria.containsKey(SORT) ) {
-            criterium = qCriteria + ([(SORT): sort] as Map<String, Object>)
-        }
-        //remove the qSearch=* if its been passed in.
-        if(criterium.containsKey(QSEARCH) && criterium[QSEARCH] == "*") criterium.remove(QSEARCH)
-        return criterium
+        // if(sort && !qCriteria.containsKey(SORT) ) {
+        //     criterium = qCriteria + ([(SORT): sort] as Map<String, Object>)
+        // }
+
+        //FIXME make a shallow copy for now to keep it like how it was,
+        // not sure if this is really needed but if changes are made to it after this call it wont mess with the criteriaMap
+        return criteriaMap + ([:] as Map<String, Object>)
     }
     /**
      * Throws IllegalArgumentException if qRequired is true.
@@ -298,7 +317,7 @@ class QueryArgs {
     QueryArgs validateQ(boolean qRequired){
         ensureBuilt()
         //put in initially because we loose params query parsing / lost params issue is fixed - See #1924
-        if(qRequired && !qCriteria){
+        if(qRequired && !criteriaMap){
             throw DataProblem.of('error.query.qRequired')
                 .status(HttpStatus.I_AM_A_TEAPOT) //TODO 418 error for now so its easy to add to retry as it gets droppped sometimes
                 .title("q or qSearch parameter restriction is required").toException()
@@ -309,7 +328,7 @@ class QueryArgs {
     /**
      * Applies Default sort by id:asc if no sort is provided in params
      * Does not apply default sort if
-     * - $sort is provided in `q` criteria
+     * - if $sort is provided in `q` criteria, then during the build it will use that and ignore the sort property
      * - If params has projections - because then there's no id column.
      *   In this case, if required, params should explicitely pass sort
      *
@@ -327,11 +346,19 @@ class QueryArgs {
      * if the string is known to be json then parse the json and returns the map
      */
     static <T> T parseJson(String text, Class<T> clazz) {
-        //jsonSlurper LAX allows fields to not be quoted
-        JsonSlurper jsonSlurper = new JsonSlurper().setType(JsonParserType.LAX)
-        Object parsedObj = jsonSlurper.parseText(text)
-        JsonEngine.validateExpectedClass(clazz, parsedObj)
-        return (T)parsedObj
+        try {
+            //jsonSlurper LAX allows fields to not be quoted
+            JsonSlurper jsonSlurper = new JsonSlurper().setType(JsonParserType.LAX)
+            Object parsedObj = jsonSlurper.parseText(text)
+            JsonEngine.validateExpectedClass(clazz, parsedObj)
+            return (T)parsedObj
+        } catch (ex) {
+            //JsonException
+            throw DataProblem.of('error.query.invalid')
+                .detail("Invalid JSON. Error parsing query - $ex.message")
+                .toException()
+        }
+
     }
 
     /**
@@ -362,10 +389,15 @@ class QueryArgs {
             //will only be one item in list if no ',' token
             List sortList = sortText.tokenize(',')*.trim() as List<String>
             for (String sortEntry : sortList) {
-                if (sortText.contains(':')) {
+                if (sortEntry.contains(':')) {
                     List sortTokens = sortEntry.tokenize(':')*.trim() as List<String>
                     sortMap[sortTokens[0]] = sortTokens[1]
-                } else {
+                } else if (sortEntry.contains(' ')){
+                    //could be in format sort:"foo desc,bar asc"
+                    String[] sorting = sortEntry.trim().split(" ")
+                    sortMap[(sorting[0])] = sorting[1] ?: orderBy
+                }
+                else {
                     //its should just a field name
                     sortMap[sortEntry] = orderBy
                 }

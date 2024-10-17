@@ -21,7 +21,7 @@ class DefaultGormRepo<D> implements GormRepo<D> {
     // QueryService<D> queryService
 
     DefaultGormRepo() {
-        this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormRepo)
+        //this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormRepo)
     }
 
     DefaultGormRepo(Class<D> clazz) {

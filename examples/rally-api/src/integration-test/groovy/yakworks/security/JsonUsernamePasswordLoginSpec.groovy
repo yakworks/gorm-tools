@@ -4,6 +4,7 @@ import grails.testing.mixin.integration.Integration
 import okhttp3.Request
 import okhttp3.Response
 import spock.lang.Specification
+
 import yakworks.rest.client.OkHttpRestTrait
 
 /**

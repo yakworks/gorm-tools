@@ -44,6 +44,7 @@ class ProblemHandler {
     @Autowired ICUMessageSource messageSource
 
     static {
+        //setup default class filtering for making stack trace less noisy
         stackTraceUtilsDefaultFilters()
     }
 
@@ -113,7 +114,7 @@ class ProblemHandler {
     }
 
     GenericProblem handleUnexpected(Throwable e){
-        log.error("UNEXPECTED Internal Server Error\n${e.message}", StackTraceUtils.deepSanitize(e))
+        log.error("UNEXPECTED Internal Server Error\n${e.message}", deepSanitize(e))
         if (e instanceof GenericProblem) {
             return (GenericProblem) e
         }
@@ -122,8 +123,9 @@ class ProblemHandler {
         }
         else if (e instanceof NullPointerException) {
             //deal with the dreaded null pointer
-            String stackLine1 = e.stackTrace[0].toString()
-            return new UnexpectedProblem().cause(e).detail("NullPointerException at ${stackLine1}")
+            //Check if there's stacktrace, in certain cases stacktrace is coming up empty, which is causing Arrayoutofbound ex - see #2712
+            String stackLine1 = e.stackTrace ? "at ${e.stackTrace[0].toString()}" : ""
+            return new UnexpectedProblem().cause(e).detail("NullPointerException $stackLine1")
         }
         else {
             return new UnexpectedProblem().cause(e).detail(e.message)
@@ -147,7 +149,7 @@ class ProblemHandler {
             String rootMessage = e.rootCause?.getMessage()
             String msgInfo = "===  message: ${e.message} \n === rootMessage: ${rootMessage} "
 
-            log.error("MAYBE UNEXPECTED? Data Access Exception ${msgInfo}", StackTraceUtils.deepSanitize(e))
+            log.error("MAYBE UNEXPECTED? Data Access Exception ${msgInfo}", deepSanitize(e))
             return DataProblem.of(e)
         }
     }
@@ -231,6 +233,11 @@ class ProblemHandler {
         return b.toString();
     }
 
+    public static Throwable deepSanitize(Throwable t) {
+        StackTraceUtils.deepSanitize(t)
+    }
+
+    //setup default class filtering for making stack trace less noisy
     @SuppressWarnings(['BooleanMethodReturnsNull'])
     static void stackTraceUtilsDefaultFilters(){
         StackTraceUtils.addClassTest { String className ->

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity
 
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+
 import yakworks.rest.client.WebClientTrait
 
 @Integration

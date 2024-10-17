@@ -19,7 +19,7 @@ import grails.gorm.DetachedCriteria
 /**
  * override to elminate the asBoolean
  */
-@SuppressWarnings(['ParameterName','VariableName','InvertedIfElse'])
+@SuppressWarnings(['ParameterName', 'VariableName', 'InvertedIfElse'])
 @CompileStatic
 class MangoDetachedAssociationCriteria<T> extends DetachedAssociationCriteria<T> {
 

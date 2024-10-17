@@ -2,6 +2,7 @@ package yakworks.rest
 
 import org.springframework.http.HttpStatus
 
+
 import yakworks.rally.orgs.model.ContactFlex
 import yakworks.rally.orgs.model.OrgFlex
 import yakworks.rest.gorm.controller.CrudApiController
@@ -156,7 +157,7 @@ class OrgControllerTests extends RestIntTest {
 
     void "list fail no q"() {
         when:
-        controller.params << [max:20, sort:'contact.flex.num1', order:'desc']
+        controller.params << [max:20]
         controller.list()
         Map body = response.bodyToMap()
 

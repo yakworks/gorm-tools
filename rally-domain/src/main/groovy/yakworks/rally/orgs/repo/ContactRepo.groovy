@@ -227,7 +227,7 @@ class ContactRepo extends LongIdGormRepo<Contact> {
         if (from == null) return null
 
         //generate id if not already done, ContactSource etc will need it
-        if(!toContat.id) toContat.id = Contact.repo.generateId()
+        if(!toContat.id) toContat.id = generateId()
         GormUtils.copyDomain(toContat, from)
         toContat.flex = GormUtils.copyDomain(ContactFlex, ContactFlex.get(from.flexId as Long), [contact: toContat])
 

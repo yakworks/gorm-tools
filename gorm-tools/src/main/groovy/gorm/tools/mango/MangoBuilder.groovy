@@ -21,8 +21,6 @@ import grails.gorm.DetachedCriteria
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.EnumUtils
 import yakworks.commons.model.IdEnum
-import yakworks.gorm.api.IncludesConfig
-import yakworks.gorm.api.IncludesKey
 
 import static gorm.tools.mango.MangoOps.CompareOp
 import static gorm.tools.mango.MangoOps.ExistOp
@@ -44,7 +42,7 @@ import static gorm.tools.mango.MangoOps.SubQueryOp
 @Slf4j
 class MangoBuilder {
 
-    @Autowired IncludesConfig includesConfig
+    @Autowired QuickSearchSupport quickSearchSupport
 
     @CompileDynamic //dynamic so it can access the protected criteria.clone
     static <D> MangoDetachedCriteria<D> cloneCriteria(DetachedCriteria<D> criteria) {
@@ -79,11 +77,11 @@ class MangoBuilder {
     <D> MangoDetachedCriteria<D> applyCriteria(MangoDetachedCriteria<D> mangoCriteria){
         QueryArgs qargs = mangoCriteria.queryArgs
         //will be copy if sort exists
-        Map tidyMap = mangoCriteria.criteriaMap
+        Map criteriaMap = mangoCriteria.criteriaMap
         Closure applyClosure = mangoCriteria.criteriaClosure
 
         //apply the map
-        applyMapOrList(mangoCriteria, tidyMap)
+        applyMapOrList(mangoCriteria, criteriaMap)
 
         //apply the closure
         if (applyClosure) {
@@ -91,9 +89,9 @@ class MangoBuilder {
             clonedClosure.setResolveStrategy(Closure.DELEGATE_FIRST)
             mangoCriteria.with(clonedClosure)
         }
-        //
-        //$sort was probably on the criteria as its added in QueryArgs?? but if not then use the property
-        if(qargs.sort && !tidyMap.containsKey(SORT)){
+
+        //do the queryArgs but only if $sort not in criteria map
+        if(qargs.sort && !criteriaMap.containsKey(SORT)){
             order(mangoCriteria, qargs.sort)
         }
 
@@ -344,27 +342,24 @@ class MangoBuilder {
         criteria.createAlias(associationPath, alias) as DetachedCriteria
     }
 
-    DetachedCriteria qSearch(DetachedCriteria criteria, Object val) {
-        List<String> qSearchFields
-        String qText
-        // if its a map then assume its already setup with text and fields to search on
-        if(val instanceof Map){
-            qText = val['text'] as String
-            qSearchFields = val['fields'] as List<String>
-        }
-        //otherwise we assume its a string and find the QSearchFields
-        else if (val instanceof String){
-            qText = val as String
-            qSearchFields = getQSearchFields(criteria)
-        }
+    void qSearch(DetachedCriteria criteria, Object val) {
+        //List<String> qSearchFields
+        String qText = val.toString()
+        //FIXME hack for testing when qRequired=true
+        // continue if qSearch=* if its been passed in.
+        if(qText == "*") return
 
-        if(qSearchFields) {
-            Map<String, String> orMap = qSearchFields.collectEntries {
-                [(it.toString()): (criteria.persistentEntity.getPropertyByName(it).type == String ? qText + '%' : qText)]
-            }
-            def criteriaMap = ['$or': orMap] as Map<String, Object>
-            // println "criteriaMap $criteriaMap"
-            return applyMap(criteria, MangoTidyMap.tidy(criteriaMap))
+        // if its a map then assume its already setup with text and fields to search on
+        //FIXME I dont think we should support this. Not neccesary to complicate it like this.
+        // if(val instanceof Map){
+        //     qText = val['text'] as String
+        //     qSearchFields = val['fields'] as List<String>
+        // }
+
+        Map qsMap = quickSearchSupport.buildSearchMap(getTargetClass(criteria), qText)
+
+        if(qsMap) {
+            applyMap(criteria, qsMap)
         }
     }
 
@@ -373,10 +368,10 @@ class MangoBuilder {
         criteria.targetClass
     }
 
-    List<String> getQSearchFields(DetachedCriteria criteria) {
-        Class entityClazz = getTargetClass(criteria)
-        return includesConfig.getIncludes(entityClazz, IncludesKey.qSearch.name())
-    }
+    // List<String> getQSearchFields(DetachedCriteria criteria) {
+    //     Class entityClazz = getTargetClass(criteria)
+    //     return includesConfig.getIncludes(entityClazz, IncludesKey.qSearch.name())
+    // }
 
     @CompileDynamic
     DetachedCriteria notIn(DetachedCriteria criteria, String propertyName, List params) {

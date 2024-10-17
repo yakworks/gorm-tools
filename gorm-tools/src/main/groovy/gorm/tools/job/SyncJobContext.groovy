@@ -40,7 +40,7 @@ import static gorm.tools.job.SyncJobArgs.DataFormat
 @SuppressWarnings('Println')
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @MapConstructor
-@ToString
+@ToString(includeNames = true, includes = ['ok', 'startTime', 'jobId'])
 @Slf4j
 @CompileStatic
 class SyncJobContext {
@@ -190,7 +190,7 @@ class SyncJobContext {
      * @return the finalized SyncJobEntity
      */
     SyncJobEntity finishJob() {
-        Map data = [id: jobId, state: SyncJobState.Finished] as Map<String, Object>
+        Map data = [id: jobId] as Map<String, Object>
         if(args.saveDataAsFile){
             // if saveDataAsFile then it will have been writing out the data results as it goes
             //close out the file
@@ -202,7 +202,6 @@ class SyncJobContext {
             // if NOT saveDataAsFile then we need to write out the results to dataBytes since results have not been written out yet.
             List<Map> renderResults = transformResults(results)
             data.dataBytes = JsonEngine.toJson(renderResults).bytes
-            data.ok = ok.get()
         }
         //if dataFormat is payload then we need to save the problems.
         if(args.dataFormat == DataFormat.Payload && problems.size() > 0) {
@@ -210,7 +209,12 @@ class SyncJobContext {
             data.problems = problems*.asMap()
         }
 
-        SyncJobEntity entity = syncJobService.updateJob(data)
+        //first just update the data/databytes on syncjob to ensure that data is always available if syncjob = finished
+        syncJobService.updateJob(data)
+
+        //update "ok" and status after data is updated
+        SyncJobEntity entity = syncJobService.updateJob([id:jobId, ok:ok.get(), state: SyncJobState.Finished])
+
         AppCtx.publishEvent(SyncJobFinishedEvent.of(this))
         return entity
     }

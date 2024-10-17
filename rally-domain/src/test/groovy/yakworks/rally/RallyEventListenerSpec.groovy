@@ -1,19 +1,16 @@
 package yakworks.rally
 
+import spock.lang.Specification
+import yakworks.rally.listeners.RallyEventListener
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRoleUser
-import yakworks.testing.gorm.TestDataJson
-import yakworks.testing.gorm.unit.DataRepoTest
-import spock.lang.Specification
-import yakworks.commons.map.Maps
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
-import yakworks.rally.listeners.RallyEventListener
 
 class RallyEventListenerSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List<Class> entityClasses = [AppUser, SecRole, SecRoleUser]
-    static springBeans = [rallyEventListener: RallyEventListener]
+    static List springBeans = [RallyEventListener]
 
     void "test orgid assignment"() {
         setup:

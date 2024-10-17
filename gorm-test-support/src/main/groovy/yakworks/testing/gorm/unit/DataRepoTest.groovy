@@ -12,6 +12,7 @@ import yakworks.commons.beans.PropertyTools
 import yakworks.spring.AppCtx
 import yakworks.testing.gorm.support.BaseRepoEntityUnitTest
 import yakworks.testing.gorm.support.RepoBuildDataTest
+import yakworks.testing.gorm.support.RepoTestDataBuilder
 import yakworks.testing.grails.GrailsAppUnitTest
 
 /**
@@ -23,8 +24,13 @@ import yakworks.testing.grails.GrailsAppUnitTest
  * @since 6.1
  */
 @CompileStatic
-trait DataRepoTest implements RepoBuildDataTest, GrailsAppUnitTest, BaseRepoEntityUnitTest { //, ExternalConfigAwareSpec  {
+trait DataRepoTest
+    //implements RepoBuildDataTest, BaseRepoEntityUnitTest, GrailsAppUnitTest {
+    implements RepoBuildDataTest, GrailsAppUnitTest, BaseRepoEntityUnitTest {
     //trait order above is important, GormToolsSpecHelper should come last as it overrides methods in GrailsAppUnitTest
+
+    @Override //hack, see explanation on isDataRepoTest in GrailsAppBuilder. has to do with context.'annotation-config'()
+    boolean getDataRepoTest(){true}
 
     void mockDomains(Class<?>... domainClassesToMock) {
         mockDomainsBuildDataTest(domainClassesToMock)

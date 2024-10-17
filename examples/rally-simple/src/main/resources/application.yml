@@ -17,7 +17,6 @@ logging:
     org.springframework.security: DEBUG
 
     yakworks.rally.api.rally.OrgController: DEBUG
-    yakworks.rest.gorm.controller.EntityResponder: DEBUG
     gorm.tools.mango.MangoDetachedCriteria: DEBUG
 
 #    gorm.tools.mango.MangoBuilder: DEBUG

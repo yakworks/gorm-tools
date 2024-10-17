@@ -8,42 +8,44 @@ import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
-import gorm.tools.model.SourceType
 import spock.lang.Specification
 import yakworks.api.problem.ThrowableProblem
-import yakworks.json.groovy.JsonEngine
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
-import yakworks.testing.gorm.unit.DataRepoTest
+import yakworks.rally.config.JobProps
+import yakworks.rally.config.MaintenanceProps
+import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
-class DefaultSyncJobServiceSpec extends Specification implements DataRepoTest, SecurityTest {
+class DefaultSyncJobServiceSpec extends Specification implements GormHibernateTest, SecurityTest {
     static entityClasses = [SyncJob, Attachment]
     static springBeans = [
-        attachmentSupport: AttachmentSupport,
-        syncJobService   : DefaultSyncJobService,
-        jobProps         : JobProps
+        AttachmentSupport,
+        MaintenanceProps,
+        JobProps,
+        DefaultSyncJobService
     ]
 
     @Autowired DefaultSyncJobService syncJobService
-    @Autowired JobProps jobProps
+    // @Autowired JobProps jobProps
+    @Autowired MaintenanceProps maintenanceProps
 
     void "smoke test jobProps"() {
         expect:
-        syncJobService.jobProps.maintenanceWindow.size() == 2
+        syncJobService.maintenanceProps.crons.size() == 2
     }
 
     void "test createJob"() {
         when:
-        jobProps.maintenanceWindow = []
+        maintenanceProps.crons = []
         SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source')
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, [])
         then:
         noExceptionThrown()
 
         when:
-        //force error with catch all cron expresions
-        jobProps.maintenanceWindow = ['* * 0-23 * * MON-SUN']
+        //force error with catch all cron expresions that makes ever hour of every day the window
+        maintenanceProps.crons = ['* * 0-23 * * MON-SUN']
         jobContext = syncJobService.createJob(syncJobArgs, [])
         then:
         var e = thrown(ThrowableProblem)

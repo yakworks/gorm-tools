@@ -1,3 +1,217 @@
+### v7.3.76
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.74...v7.3.76)
+- release [link](https://github.com/yakworks/gorm-tools/commit/c81500897a6573b9551e8f2a4fd789a15a50de27)
+- Merge pull request #837 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/226285812f15b3234f8fa30890653e359f705f42)
+- basejump [link](https://github.com/yakworks/gorm-tools/commit/b0798f5fe58b13b16a117dd2608177d776a697cc)
+- version 7.3.76 sync [link](https://github.com/yakworks/gorm-tools/commit/7fac4ab51a60856c3ae9b9f1733486fd4c123dbc)
+- stop excluding id in mango tiday (#835) [link](https://github.com/yakworks/gorm-tools/commit/8fc504d43e31493356f3a358ddfee33f41cdc398)
+- Mango jpql list (#834) [link](https://github.com/yakworks/gorm-tools/commit/ef538d9c394e976d3bf85c39d5a83ff4900d333a)
+- Fix static exists on entity (#832) [link](https://github.com/yakworks/gorm-tools/commit/a8222091e6ace6de8de5b5b3edcecc1508ac0968)
+- Q search validation (#830) [link](https://github.com/yakworks/gorm-tools/commit/21e80d9c6ce0508f5f1543d851ecfb741f781964)
+- Mango alias (#829) [link](https://github.com/yakworks/gorm-tools/commit/f8c0be2cd447a52199762f5c6fabb09abe7df8fa)
+- Support exportMax for xlsx export (#828) [link](https://github.com/yakworks/gorm-tools/commit/5b117f7a0eeed32fae44b51c681f92dc6f35270c)
+- remove ConditionalOnMissingBean from JdbcIdGenerator [link](https://github.com/yakworks/gorm-tools/commit/73a6be33ccfee18e93b29fdd7064a0860e5f3cd1)
+- App config (#826) [link](https://github.com/yakworks/gorm-tools/commit/a156a5b3a27be6e081a2b8a8cb584a21203795bc)
+- Jpql testing cleanup and QueryArgs has tighter restrictions on how to use it (#824) [link](https://github.com/yakworks/gorm-tools/commit/d4c2fca4482897f6f8e332aacdd329c45150ce64)
+- basejump [link](https://github.com/yakworks/gorm-tools/commit/4ff7e79fd9ca359d276e2ac428610802b0a14138)
+- jpql and exists (#823) [link](https://github.com/yakworks/gorm-tools/commit/c3ea2def2bcd067ae6ff990b66899fa1cfa91459)
+- add where clause to make it easier to parse out (#822) [link](https://github.com/yakworks/gorm-tools/commit/41f9e1c3b68bacc88a6a545cc24b809800f946b9)
+- Upsert functionality (#821) [link](https://github.com/yakworks/gorm-tools/commit/3ad089f662c0b12447e2fee9aef24999dca188f9)
+- Crud api repo fixes (#820) [link](https://github.com/yakworks/gorm-tools/commit/b3add351e882d97648d61ec2f65ae82e69f3c0a3)
+- CrudApiRepo (#818) [link](https://github.com/yakworks/gorm-tools/commit/53de92d3e932744229cc5816105f0f1d17147e34)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/441987e7e7a38ca2262c607951c193228ceee885)
+- 1791 query timeout  (#793) [link](https://github.com/yakworks/gorm-tools/commit/d8dbdb32389561e96b8e36b185abb74a157156ef)
+- Mail validation (#813) [link](https://github.com/yakworks/gorm-tools/commit/26f0bf428f7ea6172c55b46ef1c15db727d0b4c5)
+
+### v7.3.74
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.73...v7.3.74)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/b2d44519ac186e84f019c419bff534c9910deaf1)
+- Merge pull request #810 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/dca49067d030fbb986ad38cbb07895608444a7b9)
+- Csv Fix : convert "null" string to null (#809) [link](https://github.com/yakworks/gorm-tools/commit/56612783f2c27e478e4b407051762ce468f5554b)
+
+### v7.3.73
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.72...v7.3.73)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/163b9003fbd89906b661e1f920bbd8909eaa00fe)
+- Merge pull request #805 from yakworks/mailgun-logs [link](https://github.com/yakworks/gorm-tools/commit/0bbea97e7728b41e5f437ba176c0ff4e01fbe8ea)
+- add log.error [link](https://github.com/yakworks/gorm-tools/commit/291ce37e59dbc6c9810342643bfac82efde16400)
+-  Mail gun error log [link](https://github.com/yakworks/gorm-tools/commit/594695e73fcdd852f9729ce7e39c6a01499c006f)
+
+### v7.3.72
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.71...v7.3.72)
+- release [link](https://github.com/yakworks/gorm-tools/commit/1f37c34f8446d900c64f7c908240f93b28640e2e)
+- Merge pull request #801 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/b0d190f582e817edb50b38ada8afc8eeb58d75d3)
+-  Code as String ID (#799) [link](https://github.com/yakworks/gorm-tools/commit/60482ebb885b3b85dd30a2a5bdd32a0830f39fc7)
+- Merge pull request #798 from yakworks/797-unit-test-autowired-required-false [link](https://github.com/yakworks/gorm-tools/commit/4df69ea5a0fec858076e2fb311f297ac9d002dfc)
+- remove contraints from Company [link](https://github.com/yakworks/gorm-tools/commit/e5bfb8240c291f128ecd78e22ef895f87345cf41)
+- Sync the core items from ArSeed [link](https://github.com/yakworks/gorm-tools/commit/49488e64d109d2f4e2cd6eb7e0c292230bf01745)
+- remove the @nullable [link](https://github.com/yakworks/gorm-tools/commit/d4fbe0639223e66c915557a20423c1c16da59f7a)
+- add feature to be able to List the springBeans to create. [link](https://github.com/yakworks/gorm-tools/commit/fbe263905b62fc01a7adf42f7b3ea12ff22b3961)
+- fix up tests now that we always use the SpringBeanIdGenerator for unit tests [link](https://github.com/yakworks/gorm-tools/commit/a03c7109d8de1518bf5d9e8a86fa41b65c4650ac)
+- Merge branch 'dev' into 797-unit-test-autowired-required-false [link](https://github.com/yakworks/gorm-tools/commit/582c5cf6e3a07f40ed1ac1e0fee24240dcc0dbbb)
+- Autowired default to required = false for unit tests only works for GormHibernateTests right now https://github.com/yakworks/gorm-tools/issues/797 [link](https://github.com/yakworks/gorm-tools/commit/ed68a34a5c242a81b4a662065c223f8142cc3ec3)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/735fe4354841afab99e540e8ebd29eaebec1ac18)
+- oapi comments [link](https://github.com/yakworks/gorm-tools/commit/f242bf459fdc9392a8967f8012b55c8cae58df2a)
+
+### v7.3.71
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.70...v7.3.71)
+- release [link](https://github.com/yakworks/gorm-tools/commit/0b45bb81b654538ec2bb8728b348b977fc11b83a)
+- Merge pull request #795 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/da3ad04120ed5d09449200edf6439455a72ce32c)
+- Tests for blankout values (#794) [link](https://github.com/yakworks/gorm-tools/commit/abf7668e49e1ddf9427521e4c25e8235da918056)
+-  Default query timeout (#790) [link](https://github.com/yakworks/gorm-tools/commit/0b04845978586a01b118ee6614809b9fbfcd7d85)
+- InvalidApiCallEvent cleanup (#789) [link](https://github.com/yakworks/gorm-tools/commit/acbd73258e9341cf83f4a678e4208c4cd9a5681d)
+- Api results renderer title fix (#788) [link](https://github.com/yakworks/gorm-tools/commit/22a334029ecec6c59c751864a0bc4e2d0d3aee9e)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/dfdb469da6db5a5ac123c464049918c4632b45b4)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/511e0e8464c2e723d65e7b062a590d1f1276028e)
+- Do not log stacktraces for invalid json payloads  (#771) [link](https://github.com/yakworks/gorm-tools/commit/d127d29f9dd44582328d6791f3781bb1b134bec9)
+- Phase 1 : Handle assertion errors in controllers (#781) [link](https://github.com/yakworks/gorm-tools/commit/93499a01d0bc8befa1c263c3fbe1cc3358b13aba)
+- Api results renderer (#784) [link](https://github.com/yakworks/gorm-tools/commit/323cf91802085d954ac9636d11621d849dea22e1)
+- use grid config and uiList for export to excel (#785) [link](https://github.com/yakworks/gorm-tools/commit/5bbf1eb2cdf5569eb7cf2ce22b84f20313416a3f)
+- remove logging that was in place for the SyncJob stuff [link](https://github.com/yakworks/gorm-tools/commit/8b147f5fb307cf57c3c0f14ec2695048cc9c7a35)
+-  Mango query : Throw error for invalid/missing prop (#783) [link](https://github.com/yakworks/gorm-tools/commit/d34e254890af9c945d02d7ae672ac1d205cd8f89)
+
+### v7.3.70
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.69...v7.3.70)
+- use check for syncJob (#787) [link](https://github.com/yakworks/gorm-tools/commit/f5ec384f9146112adcd8ff6d22769214ca374f6a)
+
+### v7.3.69
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.68...v7.3.69)
+- Main util fix (#786) [link](https://github.com/yakworks/gorm-tools/commit/bcbf5b89201f3a065854e991a7b4bda781600049)
+
+### v7.3.68
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.67...v7.3.68)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/46d21bb973ee143f4345d8e47cc9f36d743357e0)
+- Merge pull request #782 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/77ec7e895a3c9733552dd603cf91638f38f8e131)
+- Support html emails for paymailer (#779) [link](https://github.com/yakworks/gorm-tools/commit/76c86df558edf363d31f6aba259791dd7f89909b)
+
+### v7.3.67
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.66...v7.3.67)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/2ed59ef0faf53d26718bacb29acac261c2ff7f54)
+- Merge pull request #777 from yakworks/syncjob-hotfix [link](https://github.com/yakworks/gorm-tools/commit/d5a25951ff6eb43facad321c8884f95a92651b48)
+- Log Syncjob with empty data [link](https://github.com/yakworks/gorm-tools/commit/e49fd4854697b70d249e0dd65eb7a41669cbf39b)
+
+### v7.3.66
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.65...v7.3.66)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/cce28b88c5a00860cffc23ae4049037756895b10)
+- Merge pull request #776 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/b9340955e8de5c4b48f0920469848b043e7d6f34)
+- Contact controller tests 9ci/domain9#550 (#773) [link](https://github.com/yakworks/gorm-tools/commit/a054853b6b6cac28dbdee8d4e26006e6a4ce5841)
+- Fix syncjob data update issue (#775) [link](https://github.com/yakworks/gorm-tools/commit/2736eef03c39fe965d1e55d02a73bb8c2236d93c)
+
+### v7.3.65
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.64...v7.3.65)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/239ff53e551ef651616883289f507fc79b5f726d)
+- Merge pull request #774 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/b976cfe0460890c6825c8e50240f04499a22cb0b)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/8f076a7ff948a6898c511a00217514f0ad8e6b08)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/fe362116afe0640df3dbe3a5641fc81bf03a7ce1)
+- Fix default sort by id for projections (#772) [link](https://github.com/yakworks/gorm-tools/commit/48b41889708a7e2b86e8e0a51ae4c72348e32b7b)
+- ignore test [link](https://github.com/yakworks/gorm-tools/commit/d645d9f95e8e1bc5631f15ac8e1614bb96c15b41)
+- hot fix for default sort id [link](https://github.com/yakworks/gorm-tools/commit/930ca9d423cb84b0134d155b28b0cf25a45b478c)
+- Merge pull request #766 from yakworks/list-default-sort [link](https://github.com/yakworks/gorm-tools/commit/52374fad7d113a6f8624f77d447a254957bb6162)
+- cleanup [link](https://github.com/yakworks/gorm-tools/commit/d5d32a6b42a5bd4cf54e280fa0e096e7b0cc755e)
+- remove pager from method args [link](https://github.com/yakworks/gorm-tools/commit/2696d6bff4cc5310267951e347de6a64c906cf1e)
+- Merge branch 'dev' into list-default-sort [link](https://github.com/yakworks/gorm-tools/commit/d90c75b950a5709899c25f12dd2702ae1f4706b4)
+- Merge pull request #769 from yakworks/cust-tags-search [link](https://github.com/yakworks/gorm-tools/commit/1d2b725307ecf751bde53c5ac4e7ce3a0854b25e)
+- remove tagIds support [link](https://github.com/yakworks/gorm-tools/commit/05ed4a231d09acbcb9746fde645ea3e5b3b3236e)
+- comments / add tests [link](https://github.com/yakworks/gorm-tools/commit/cde7f2c7c72f92beceee822e0a33f00a0d4fbb33)
+- Merge branch 'dev' into list-default-sort [link](https://github.com/yakworks/gorm-tools/commit/46736cbb1ff9ad96dbdd1a125d2fee8dec387bcb)
+- small fix [link](https://github.com/yakworks/gorm-tools/commit/8115311a55b7d5f0a32135782bd6bb43151d4697)
+- Support searching customer / account by tags [link](https://github.com/yakworks/gorm-tools/commit/350af3827e6ebd77b81ce573eb1bae7b32a18c4b)
+- Merge branch 'dev' into list-default-sort [link](https://github.com/yakworks/gorm-tools/commit/9f8a30612890aabbf0357a88b343dc74321c970e)
+- Merge branch 'dev' into list-default-sort [link](https://github.com/yakworks/gorm-tools/commit/449824c2dcdb67b7fb20d151a2ac79c4d0fb284e)
+- Merge branch 'dev' into list-default-sort [link](https://github.com/yakworks/gorm-tools/commit/6f279f86e778b937b573992f1227a0a22903c14f)
+- Add test [link](https://github.com/yakworks/gorm-tools/commit/285e928c05b109d4b8f350aaca1f1f6b80a4b114)
+- default sort by id [link](https://github.com/yakworks/gorm-tools/commit/fb45b1416268fb1d134537560c9510ff65588e11)
+
+### v7.3.64
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.63...v7.3.64)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/ff08f37e738a021371eb8ddf6999a006d63275d6)
+
+### v7.3.63
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.62...v7.3.63)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/bd28f356ec85dbfc433d51ec45f92144a29487af)
+
+### v7.3.62
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.61...v7.3.62)
+- release 7.3.62 [link](https://github.com/yakworks/gorm-tools/commit/ff1933b7a660c2df5ca357dc1261cc71b630ab3b)
+- Merge pull request #768 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/a03c6a87b4533e18d420f092f30cc9236730d372)
+- get org from q criteria (#765) [link](https://github.com/yakworks/gorm-tools/commit/945a2bb22469549f096978ae673c772b6f0de821)
+- Repo exception handling (#749) [link](https://github.com/yakworks/gorm-tools/commit/403e6402c48bcc043a3759bede702e414f590cf2)
+- Support querying by uuid string (#767) [link](https://github.com/yakworks/gorm-tools/commit/2a5ae8694ab31fa534716502a436246dd0e1e592)
+- #2162 Add InvalidApiCallEvent (#763) [link](https://github.com/yakworks/gorm-tools/commit/029be08cc172f21985bad8655dcdc866a2bfffe6)
+- 9ci/domain9#2440 , 9ci/cust-rndc-ext#325 (#764) [link](https://github.com/yakworks/gorm-tools/commit/746922701dad691657632f7734922396d72a4d19)
+-  Fix tidy map to use id for inquery if key exist in map list (#762) [link](https://github.com/yakworks/gorm-tools/commit/2774f07214b015ec37899c2e2a2d72a6b107f0e2)
+- Stack helper (#760) [link](https://github.com/yakworks/gorm-tools/commit/9d165043c25044271394aae4528bb69df3466be7)
+
+### v7.3.61
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.60...v7.3.61)
+- Merge branch 'master' of https://github.com/yakworks/gorm-tools [link](https://github.com/yakworks/gorm-tools/commit/170d44d184aee73d6618ab42fe698cca5ada423c)
+- release [link](https://github.com/yakworks/gorm-tools/commit/9425056a0b19190532a0dec320be9928718956d0)
+- dev merge for 7.3.61 release [link](https://github.com/yakworks/gorm-tools/commit/25f4d49e4134d4ab68003d9c851887fc35716619)
+- ignoreUnknownFields=false on OrgProps [link](https://github.com/yakworks/gorm-tools/commit/ae91bcb2243fa9b7db4236a278e9ebc9f355009b)
+- cronJobProps (#757) [link](https://github.com/yakworks/gorm-tools/commit/5b251a0999a872129fa3ebf02e804926404d469a)
+- App time zone (#756) [link](https://github.com/yakworks/gorm-tools/commit/8fa86aaf68ebeab142402a5e47792d4c312f748b)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/9682fec5401b6b4545934fc7c3f3a59c2c88f00b)
+- bump version to 61 [link](https://github.com/yakworks/gorm-tools/commit/74d64a8a49b3206f155f15e36ee2fa204ec407bc)
+- merge master [link](https://github.com/yakworks/gorm-tools/commit/9f0135d612061466cf97844085be9e74dd98059e)
+- Merge pull request #752 from yakworks/release/dev-next [link](https://github.com/yakworks/gorm-tools/commit/6c4b8b7903da88c2e32a28840bd7e1ac5288329e)
+- add getter for partitionOrg members to centralize common logic in OrgService [link](https://github.com/yakworks/gorm-tools/commit/10e023dfca327d4af93ec1af0f10b586ae8a927a)
+- rename OrgMemberService to OrgService to prep for it doing more. [link](https://github.com/yakworks/gorm-tools/commit/ba0e88c063d8bf25bfde6be40b8c6dc7132a2529)
+- Cleanup (#750) [link](https://github.com/yakworks/gorm-tools/commit/9e576f9a76d291c9751b2f6abd2103f1d26f7907)
+- setup OrgConfig and refactor OrgDimensions (#737) [link](https://github.com/yakworks/gorm-tools/commit/2367bba6796eeaad37cbff9a9539233197471ae8)
+
+### v7.3.60
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.59...v7.3.60)
+- release [link](https://github.com/yakworks/gorm-tools/commit/3f527e38b647e09f4b3781e1dca6098e74785517)
+- SyncJobArgs Default async=true (#754) [link](https://github.com/yakworks/gorm-tools/commit/2da5f643bcc5a89c67c22a73fbaae4256a16b06f)
+
+### v7.3.59
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.58...v7.3.59)
+- release 7.3.59 [link](https://github.com/yakworks/gorm-tools/commit/6ec5ae870861a33fb02b1be10b5a8fdb66fb2851)
+- Merge pull request #753 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/acc59b7a4956b85178859766132c9a5b0f96ff76)
+- Catch exception (#751) [link](https://github.com/yakworks/gorm-tools/commit/e14e5bcf8e3c205ecee6bcac06229fe776692937)
+- Merge pull request #748 from yakworks/hypersistence-upgrade [link](https://github.com/yakworks/gorm-tools/commit/aaaf1a37da309e6116341b94160e33f42363899d)
+- move to io.hypersistence.hypersistence-utils-hibernate-55 3.5.2 [link](https://github.com/yakworks/gorm-tools/commit/36c4ac8d4a4391ed4d3493acd3422d55a76d0bfa)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/514255d5ecc9b7d56788e75fce840a2b6b828be8)
+- Merge pull request #736 from yakworks/2127-activity-date [link](https://github.com/yakworks/gorm-tools/commit/0558e8b2f7e3ff49becddb890174d6e339d14abe)
+- Merge branch 'dev' into 2127-activity-date [link](https://github.com/yakworks/gorm-tools/commit/5ea3a323058490da615d283faf589758709edfe5)
+- update constraint [link](https://github.com/yakworks/gorm-tools/commit/f3ab3f25b05e65498ba540b1c0788cef2545e68f)
+- cleanup, add tests [link](https://github.com/yakworks/gorm-tools/commit/d66b04bd0e73e4e7048372bc0ffead30d31055a8)
+- 9ci/domain9#2127 Add actDate field to activity [link](https://github.com/yakworks/gorm-tools/commit/6eb1febd0a075316c4abff9f0c84a3adf519cca2)
+
+### v7.3.58
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.57...v7.3.58)
+- release [link](https://github.com/yakworks/gorm-tools/commit/f96be053f0f954bd11facc6370c065718fa45aa3)
+- Merge dev for release 7.3.58 [link](https://github.com/yakworks/gorm-tools/commit/f1753f8aa0800223e79c1fbc3ca03b23a4aa0b8a)
+- vGroovyCommons=3.13 [link](https://github.com/yakworks/gorm-tools/commit/bf57694cec2b76ebac6b01cab52673e8a3004167)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/84e0e0adc7c1aa090fd7070f67625d6541659b13)
+- remove the flush and clears from RepoUtils (#744) [link](https://github.com/yakworks/gorm-tools/commit/66cbd970e2d294b0f6c1a235d15c683fb239f822)
+- Hibernate session cache and query gotchas (#742) [link](https://github.com/yakworks/gorm-tools/commit/4d896411648b876f8e3f69843b14ea0ea3b95403)
+- Merge pull request #743 from yakworks/2292-bindid [link](https://github.com/yakworks/gorm-tools/commit/896c4c56e1be7f07edecb3fbc46ff46f9749857e)
+- support bindId during post [link](https://github.com/yakworks/gorm-tools/commit/a7df89714843d47356bebe41017589d570306bf0)
+
+### v7.3.57
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.56...v7.3.57)
+- try cache bust [link](https://github.com/yakworks/gorm-tools/commit/cbaa88d8519bb9596597a90084fa4966549d2aae)
+- fix so tags gets copied from MailMessage and sent through mailgun (#745) [link](https://github.com/yakworks/gorm-tools/commit/278a45338e4724a720d7b8b332c2653550e73980)
+
 ### v7.3.56
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.55...v7.3.56)

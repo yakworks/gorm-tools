@@ -4,17 +4,17 @@ import spock.lang.Specification
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
+import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
-import yakworks.testing.gorm.unit.DataRepoTest
 
-class TagLinkSpec extends Specification implements DataRepoTest, SecurityTest {
+class TagLinkSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [TagLink, Tag, Attachment]
 
     List createSomeTags(){
-        def tag1 = Tag.create(name: 'tag1', code: 'tag1')
-        def tag2 = Tag.create(name: 'tag2', code: 'tag2', entityName: 'Foo, Attachment')
-        def tag3 = Tag.create(name: 'tag3', code: 'tag3', entityName: 'Attachment')
-        def tag4 = Tag.create(name: 'tag4 wont work', code: 'tag4', entityName: 'SomethingElse')
+        def tag1 = Tag.repo.create([id: 1, name: 'tag1', code: 'tag1'], [bindId: true])
+        def tag2 = Tag.repo.create([id: 2, name: 'tag2', code: 'tag2', entityName: 'Foo, Attachment'], [bindId: true])
+        def tag3 = Tag.repo.create([id: 3, name: 'tag3', code: 'tag3', entityName: 'Attachment'], [bindId: true])
+        def tag4 = Tag.repo.create([id: 4, name: 'tag4 wont work', code: 'tag4', entityName: 'SomethingElse'], [bindId: true])
         return [tag1, tag2, tag3, tag4]
     }
 
@@ -27,7 +27,9 @@ class TagLinkSpec extends Specification implements DataRepoTest, SecurityTest {
             name: 'foo.txt',
             tags: [[id: 1], [id: 2], [id: 3]]
         ]
-        return Attachment.create(attachData)
+        def achm = Attachment.create(attachData)
+        flushAndClear()
+        return achm
     }
 
     void "sanity check"() {
@@ -50,7 +52,7 @@ class TagLinkSpec extends Specification implements DataRepoTest, SecurityTest {
         def tl2 = TagLink.create(att, tag2)
         assert tl.tag == tag1
         assert tl.linkedId == att.id
-        //flushAndClear()
+        flushAndClear()
 
         then:
         TagLink.exists(att, tag1)
@@ -107,6 +109,7 @@ class TagLinkSpec extends Specification implements DataRepoTest, SecurityTest {
 
         when: "add t1 t2"
         TagLink.addOrRemoveTags(att, [[id:t1.id], [id:t2.id]])
+        flushAndClear()
 
         then:
         TagLink.exists(att, t1)
@@ -156,6 +159,7 @@ class TagLinkSpec extends Specification implements DataRepoTest, SecurityTest {
 
         when: "add t1 t2"
         TagLink.addOrRemoveTags(att, [[id:t1.id], [id:t2.id]])
+        flushAndClear()
 
         then:
         TagLink.count() == 2
@@ -164,14 +168,14 @@ class TagLinkSpec extends Specification implements DataRepoTest, SecurityTest {
 
         when: "Add one more"
         TagLink.addOrRemoveTags(att, [op:"update", data:[[id:t3.id]]])
-
+        flushAndClear()
         then:
         TagLink.count() == 3
         TagLink.exists(att, t3)
 
         when: "update - keep t2,t3, remove t1"
         TagLink.addOrRemoveTags(att, [op:"update", data:[[op:"remove", id:t1.id]]])
-        flushAndClear()
+        flush()
 
         then:
         TagLink.count() == 2
@@ -182,6 +186,7 @@ class TagLinkSpec extends Specification implements DataRepoTest, SecurityTest {
 
         when: "no change - same as existing"
         TagLink.addOrRemoveTags(att, [op:"update", data:[[id:t1.id],[id:t2.id],[id:t3.id]]])
+        flush()
 
         then: "should keep em all"
         TagLink.count() == 3
@@ -191,6 +196,7 @@ class TagLinkSpec extends Specification implements DataRepoTest, SecurityTest {
 
         when: "update - empty"
         TagLink.addOrRemoveTags(att, [op:"update", data:[]])
+        flush()
 
         then: "Should do nothing"
         TagLink.count() == 3
@@ -205,9 +211,12 @@ class TagLinkSpec extends Specification implements DataRepoTest, SecurityTest {
         Tag t1 = Tag.create(name: 't1', code:'t1', entityName: 'Attachment')
         Tag t2 = Tag.create(name: 't2', code:'t2', entityName: 'Attachment')
         Tag t3 = Tag.create(name: 't3', code:'t3', entityName: 'Attachment')
+        flush()
 
         when: "add 1,2"
-        TagLink.addOrRemoveTags(att, '[{id:1}, {id:2}]')
+        String jstring = "[{id:${t1.id}}, {id:${t2.id}}]"
+        TagLink.addOrRemoveTags(att, jstring)
+        flush()
 
         then:
         TagLink.exists(att, t1)
@@ -215,8 +224,9 @@ class TagLinkSpec extends Specification implements DataRepoTest, SecurityTest {
         !TagLink.exists(att, t3)
 
         when: "add 2,3 remove 1"
-        TagLink.addOrRemoveTags(att, '[{id:2}, {id:3}]')
-        flushAndClear()
+        String jstring2 = "[{id:${t2.id}}, {id:${t3.id}}]"
+        TagLink.addOrRemoveTags(att, jstring2)
+        flush()
 
         then:
         TagLink.count() == 2

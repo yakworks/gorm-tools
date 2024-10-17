@@ -92,6 +92,7 @@ class ContactRepoSpec extends Specification implements GormHibernateTest, Securi
         when:
         Org org = Org.of("foo", "bar", OrgType.Customer).persist()
         Contact contact = Contact.create( firstName: 'foo', num: 'foo', orgId:org.id)
+        flush()
         Contact c = contactRepo.lookup(num:'foo')
 
         then:

@@ -32,14 +32,9 @@ import yakworks.rally.tag.model.TagLink
 @CompileStatic
 class ActivityCopier {
 
-    @Autowired(required = false)
-    ActivityLinkRepo activityLinkRepo
-
-    @Autowired(required = false)
-    AttachmentRepo attachmentRepo
-
-    @Autowired
-    ProblemHandler problemHandler
+    @Autowired ActivityLinkRepo activityLinkRepo
+    @Autowired AttachmentRepo attachmentRepo
+    @Autowired ProblemHandler problemHandler
 
     @Transactional
     Activity copy(Activity fromAct, Activity toAct) {

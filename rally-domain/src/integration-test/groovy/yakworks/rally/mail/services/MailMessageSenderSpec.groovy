@@ -6,6 +6,7 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.api.Result
+import yakworks.api.problem.data.DataProblemException
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.mail.EmailService
 import yakworks.rally.mail.EmailService.MailTo
@@ -36,6 +37,26 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
         return mailMsg
     }
 
+    void "validate mail to"() {
+        setup:
+        MailTo mailTo = new MailTo(
+            from: "test@9ci.com",
+            replyTo: "test@9ci.com",
+            to: ["one@9ci.com", "two@9ci.com"],
+            cc: ["valid@9ci.com", "invalid.9ci"], //2nd invalid
+            subject: "test",
+            text: "test"
+        )
+
+        when:
+        mailMessageSender.validateMailMessage(mailTo)
+
+        then:
+        DataProblemException ex = thrown()
+        ex.payload == "invalid.9ci"
+        ex.detail == "Invalid email address [invalid.9ci], Missing final '@domain'"
+    }
+
     void "smoke test mail message"() {
         when:
         //assert emailService instanceof MailgunService
@@ -56,8 +77,13 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
         MailTo mailTo = mailMessageSender.convertMailMessage(mailMsg)
 
         then:
-        mailTo
-        mailTo
+        mailTo.to[0] == mailMsg.sendTo
+        mailTo.from == mailMsg.sendFrom
+        mailTo.replyTo == mailMsg.replyTo
+        mailTo.subject == mailMsg.subject
+        mailTo.getText() == mailMsg.body
+        mailTo.tags == mailMsg.tags
+
     }
 
     void "convertMailMessage with attachment"() {
@@ -94,6 +120,19 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
         mailMsg.state == MailMessage.MsgState.Sent
         mailMsg.messageId
         emailService.sentMail.size() == 1
+    }
+
+    void "send : bad email fails validation"() {
+        when:
+        MailMessage mailMsg = MockData.mailMessage()
+        mailMsg.sendTo = mailMsg.sendTo +  ', "jon Doe" <john@doe.com>,jimjoe.com'
+        flush()
+        mailMessageSender.send(mailMsg)
+
+        then:
+        mailMsg.state == MailMessage.MsgState.Error
+        mailMsg.msgResponse.contains("Invalid email address [jimjoe.com], Missing final '@domain'")
+        emailService.sentMail.size() == 0
     }
 
     void "send with attachment"() {

@@ -1,0 +1,16 @@
+# testing external config
+
+# import another, these get added at the end of the documents so will override whatever is here
+spring.config.import: >-
+  file://${app.resources.rootLocation}/foo.yml
+
+# this will be overriden by whatver is imported from the above spring.config.import files
+foo:
+  message: "should not see this"
+
+---
+
+# the dashes above make this a new document,
+# the spring.config.import file above will override this too even though its a different yamnl doc
+foo:
+  message: "should not see this"

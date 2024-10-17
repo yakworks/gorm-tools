@@ -2,23 +2,30 @@ package yakworks.rally.orgs
 
 import org.apache.commons.lang3.RandomStringUtils
 
-import yakworks.testing.gorm.unit.GormHibernateTest
-import yakworks.testing.gorm.unit.SecurityTest
-import yakworks.testing.gorm.TestDataJson
 import spock.lang.Specification
+import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgCalc
 import yakworks.rally.orgs.model.OrgFlex
 import yakworks.rally.orgs.model.OrgInfo
+import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
+import yakworks.testing.gorm.TestDataJson
+import yakworks.testing.gorm.unit.GormHibernateTest
+import yakworks.testing.gorm.unit.SecurityTest
 
 class OrgSpec extends Specification implements GormHibernateTest, SecurityTest {
 
-    static entityClasses = [Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo]
+    static entityClasses = [Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo, OrgMember]
+
+    Closure doWithGormBeans(){ { ->
+        orgDimensionService(OrgDimensionService)
+        orgProps(OrgProps)
+    }}
 
     void "sanity check build"() {
         when:
@@ -29,13 +36,15 @@ class OrgSpec extends Specification implements GormHibernateTest, SecurityTest {
 
     }
 
-    // void "CRUD tests"() {
-    //     expect:
-    //     createEntity().id
-    //     persistEntity().id
-    //     updateEntity().version > 0
-    //     removeEntity()
-    // }
+    void "test create with of"() {
+        when:
+        Org org = Org.of('foo1', "foo", OrgType.Division)
+        org.persist(flush: true)
+
+        then:
+        org.companyId == 2
+    }
+
 
     void "test org errors, no type"() {
         when:
@@ -111,7 +120,7 @@ class OrgSpec extends Specification implements GormHibernateTest, SecurityTest {
         Map params = TestDataJson.buildMap(Org) << [id: orgId, flex: flex, info: info, type: 'Customer']
 
         when: "create"
-        def org = Org.create(params, bindId: true)
+        def org = Org.repo.create(params, [bindId: true])
 
         then:
 
@@ -126,7 +135,9 @@ class OrgSpec extends Specification implements GormHibernateTest, SecurityTest {
         org.info.website
 
         when: "update"
-        org = Org.update([id: org.id, flex: [text1: 'yyy'], info: [phone: '555-1234', fax: '555-1234', website: 'www.test.com']])
+        org = Org.repo.update(
+            [id: org.id, flex: [text1: 'yyy'], info: [phone: '555-1234', fax: '555-1234', website: 'www.test.com']]
+        )
 
         then:
         org.flex.text1 == 'yyy'

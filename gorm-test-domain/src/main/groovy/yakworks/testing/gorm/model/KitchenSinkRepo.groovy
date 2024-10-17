@@ -7,14 +7,12 @@ package yakworks.testing.gorm.model
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.events.AfterBindEvent
-import gorm.tools.repository.events.AfterBulkSaveEntityEvent
 import gorm.tools.repository.events.BeforeBulkSaveEntityEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.RepoListener
@@ -129,7 +127,8 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
             thing: [id: id],
             sinkItems: [[name: "red"], [name: "blue"]]
         ])
-        def ks = KitchenSink.create(data, bindId: true)
+
+        def ks = create(data, [bindId: true])
         if(flushIt) flush()
         return ks
     }
@@ -150,7 +149,7 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
             // actDate: LocalDateTime.now().plusDays(id).toDate(),
             localDate: IsoDateUtil.format(LocalDate.now().plusDays(id)),
             localDateTime: IsoDateUtil.format(LocalDateTime.now().plusDays(id)),
-            ext:[ name: "SinkExt$id", totalDue: id * 10.25],
+            ext:[ name: "SinkExt$id", totalDue: id * 10.25, thing: [id: id]],
             bazMap: [foo: 'bar']
             // thing: [id: id]
         ]

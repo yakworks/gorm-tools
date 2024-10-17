@@ -16,8 +16,11 @@ import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.model.TaskType
+import yakworks.rally.activity.repo.ActivityQuery
+import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.OrgDimensionService
-import yakworks.rally.orgs.OrgMemberService
+import yakworks.rally.orgs.OrgService
+import yakworks.rally.orgs.model.Company
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
@@ -58,10 +61,7 @@ class RallySeed {
     }
 
     //extra spring beans when orgMember and orgDimensionService is being used.
-    static springBeans = [
-        orgDimensionService: OrgDimensionService,
-        orgMemberService: OrgMemberService
-    ]
+    static List springBeanList = [OrgProps, OrgDimensionService, OrgService, ActivityQuery ]
 
     // see good explanation of thread safe static instance stratgey https://stackoverflow.com/a/16106598/6500859
     @SuppressWarnings('UnusedPrivateField')
@@ -83,7 +83,9 @@ class RallySeed {
         rallySeed.buildAppUsers()
         rallySeed.createOrgTypeSetups()
         rallySeed.buildClientOrg()
-        rallySeed.buildOrgs(count, true)
+        rallySeed.buildCompanies()
+        rallySeed.buildBranchDiv(count, true)
+        rallySeed.buildCusts(count)
         rallySeed.buildTags()
         rallySeed.createIndexes()
     }
@@ -96,33 +98,82 @@ class RallySeed {
         }
     }
 
+    @Transactional
+    void buildCompanies(){
+        def company = createOrg([id: Company.DEFAULT_COMPANY_ID, name: 'Main Company', type: OrgType.Company], true)
+        company.location.kind = Location.Kind.remittance
+        company.location.persist()
+        //createOrg([id: 4 , name: 'Canadian Company', type: OrgType.Company], true)
+        //We have the darn
+        def company2 = createOrg([id: 3 , name: 'Canadian Company', type: OrgType.Company], true)
+        company2.location.kind = Location.Kind.remittance
+        company2.location.persist()
+
+        Org.repo.flush()
+    }
+
     /**
      * build the Organizations up to count.
-     * Will create 2 company accounts, 2 brnaches and 2 divisions first.
+     * Will create 4 branches and 2 divisions first.
      * the rest will be customers.
      * @param count the count to make
      * @param createContact if true will generate a default contact for each org as well.
      */
     @Transactional
-    void buildOrgs(int count, boolean createContact = false){
+    void buildBranchDiv(int count, boolean createContact = false){
         Org.withTransaction {
             //createOrgTypeSetups()
-            (2..3).each{ id ->
-                def company = createOrg([id: id , type: OrgType.Company], createContact)
-                company.location.kind = Location.Kind.remittance
-                company.location.persist()
-            }
+            // (2..3).each{ id ->
+            //     def company = createOrg([id: id , name: "Company$id", type: OrgType.Company], createContact)
+            //     company.location.kind = Location.Kind.remittance
+            //     company.location.persist()
+            // }
+            Org.repo.flush()
             (4..5).each{ id ->
-                def branch = createOrg([id: id , type: OrgType.Branch] , createContact)
-                branch.persist()
-            }
-            (6..7).each{ id ->
-                def division = createOrg([id: id , type: OrgType.Division] , createContact)
+                def division = createOrg([
+                    id: id , name: "Division$id", type: OrgType.Division,
+                    member: [company: [id: 2]]
+                ] , createContact)
                 division.persist()
             }
-            if(count < 7) return
-            (8..count).each { id ->
-                def org = createOrg([id: id , type: OrgType.Customer], createContact)
+            Org.repo.flush()
+            //4 branches, 2 for division 4 and 2 for division 5
+            (6..7).each{ id ->
+                def branch = createOrg([
+                    id: id , name: "Branch$id", type: OrgType.Branch,
+                    member: [division: [id: 4], company: [id: 2]]
+                ] , createContact)
+                branch.persist()
+                Org.repo.flush()
+                //assert branch.member
+            }
+
+            (8..9).each{ id ->
+                def branch = createOrg([
+                    id: id , name: "Branch$id", type: OrgType.Branch,
+                    member: [division: [id: 5], company: [id: 2]]
+                ] , createContact)
+                branch.persist()
+                Org.repo.flush()
+                //assert branch.member
+            }
+        }
+
+    }
+
+    /**
+     * build custs, starts at 10 as buildMembers will have done 2-9
+     */
+    @Transactional
+    void buildCusts(int count){
+        Org.withTransaction {
+            if(count < 10) return
+            (10..count).each { id ->
+                Long brId = (id % 2) ? 6 : 8
+                def org = createOrg([
+                    id: id , name: "Org$id", type: OrgType.Customer,
+                    //member: [branch: [id: brId ]]
+                ], true)
             }
         }
 
@@ -186,11 +237,12 @@ class RallySeed {
         Org.repo.flush()
 
         if(createContact){
-            Contact contact = makeContact(org, [id: org.id])
+            Contact contact = makeContact(org, [id: org.id]) //cant have same id as Org, to complicated with secondary.
+            //Contact contact = makeContact(org)
             org.contact = contact
             org.persist()
         }
-        Activity act = Activity.create([kind: Activity.Kind.Log, orgId: id, name: "created Org ${id}"])
+        Activity act = Activity.repo.create([kind: Activity.Kind.Log, orgId: id, name: "created Org ${id}"])
         //add link to test
         act.link(org)
         return org
@@ -242,7 +294,7 @@ class RallySeed {
 
     @Transactional
     Activity makeNote(Org org, String note = 'Test note') {
-        return Activity.create(org: org, note: [body: note])
+        return Activity.repo.create(org: org, note: [body: note])
     }
 
     @Transactional

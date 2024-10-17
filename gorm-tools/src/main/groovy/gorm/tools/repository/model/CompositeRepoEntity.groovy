@@ -6,13 +6,12 @@ package gorm.tools.repository.model
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.mango.api.QueryMangoEntity
 import gorm.tools.repository.GormRepo
 
 /**
  * A trait for an entity that has a composite id.
  */
 @CompileStatic
-trait CompositeRepoEntity<D> implements PersistableRepoEntity<D, GormRepo<D>, Serializable>, QueryMangoEntity<D> {
+trait CompositeRepoEntity<D> implements PersistableRepoEntity<D, GormRepo<D>, Serializable> {
 
 }

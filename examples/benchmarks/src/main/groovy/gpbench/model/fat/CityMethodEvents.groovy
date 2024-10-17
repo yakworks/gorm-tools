@@ -1,11 +1,11 @@
 package gpbench.model.fat
 
-import gorm.tools.repository.model.GormRepoEntity
+
+import gorm.tools.repository.model.RepoEntity
 import gpbench.model.Country
 import gpbench.model.Region
 import gpbench.model.traits.AuditStamp
 import gpbench.model.traits.CityTraitFatWithAssoc
-import gpbench.repo.CityMethodEventsRepo
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
@@ -14,7 +14,7 @@ import grails.persistence.Entity
  */
 @Entity
 @GrailsCompileStatic
-class CityMethodEvents implements CityTraitFatWithAssoc, AuditStamp, GormRepoEntity<CityMethodEvents, CityMethodEventsRepo> {
+class CityMethodEvents implements CityTraitFatWithAssoc, AuditStamp, RepoEntity<CityMethodEvents> {
 
     // static belongsTo = [region : Region, country: Country,
     //                     region2: Region, country2: Country,

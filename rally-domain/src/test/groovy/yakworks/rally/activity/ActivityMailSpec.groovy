@@ -9,19 +9,19 @@ import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
-import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.model.TaskType
+import yakworks.rally.activity.repo.ActivityQuery
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
 import yakworks.rally.testing.MockData
-import yakworks.spring.AppResourceLoader
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
@@ -32,10 +32,7 @@ class ActivityMailSpec extends Specification implements GormHibernateTest, Secur
         AttachmentLink, ActivityLink, MailMessage, Activity, TaskType, Org, OrgTag,
         Tag, TagLink, Attachment, ActivityNote, Contact, ActivityContact
     ]
-    static springBeans = [
-        appResourceLoader: AppResourceLoader,
-        attachmentSupport: AttachmentSupport
-    ]
+    static springBeans = [AttachmentSupport, ActivityQuery]
 
     @Shared Long orgId
 
@@ -106,7 +103,7 @@ class ActivityMailSpec extends Specification implements GormHibernateTest, Secur
         // add another activity
         Activity.create(params)
         flush()
-        def linkedActs = Activity.repo.queryList([linkedId: 1, linkedEntity:'Contact'])
+        def linkedActs = Activity.repo.query([linkedId: 1, linkedEntity:'Contact']).list()
 
         then:
         linkedActs.size() == 2
@@ -134,7 +131,7 @@ class ActivityMailSpec extends Specification implements GormHibernateTest, Secur
         def params = [kind:"Note", id:activity.id]
         flushAndClear()
         params.name = RandomStringUtils.randomAlphabetic(300)
-        Activity updatedActivity = Activity.update(params)
+        Activity updatedActivity = Activity.repo.update(params)
 
         then:
         updatedActivity.note != null

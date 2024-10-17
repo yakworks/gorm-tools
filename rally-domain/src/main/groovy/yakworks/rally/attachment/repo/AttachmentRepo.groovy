@@ -11,6 +11,7 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.PathResource
 import org.springframework.core.io.Resource
 import org.springframework.web.multipart.MultipartFile
 
@@ -26,7 +27,6 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.validation.Rejector
-import grails.gorm.DetachedCriteria
 import yakworks.commons.io.PathTools
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
@@ -41,11 +41,8 @@ import yakworks.rally.tag.model.TagLink
 class AttachmentRepo extends LongIdGormRepo<Attachment> {
     public static final String ATTACHMENT_LOCATION_KEY = "attachments.location"
 
-    @Autowired(required = false)
-    AttachmentSupport attachmentSupport
-
-    @Autowired(required = false)
-    AttachmentLinkRepo attachmentLinkRepo
+    @Autowired AttachmentSupport attachmentSupport
+    @Autowired AttachmentLinkRepo attachmentLinkRepo
 
     /**
      * wraps super.bindAndCreate in try catch so that on any exception
@@ -142,19 +139,12 @@ class AttachmentRepo extends LongIdGormRepo<Attachment> {
     /**
      * Override query for custom search for Tags etc..
      */
-    @Override
-    MangoDetachedCriteria<Attachment> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
-        Map criteriaMap = queryArgs.qCriteria
-        //if its has tags keys then this returns something to add to exists, REMOVES the keys as well so work off qCriteria
-        DetachedCriteria tagExistsCrit = TagLink.getExistsCriteria(criteriaMap, Attachment, 'attachment_.id')
-
-        MangoDetachedCriteria<Attachment> detCrit = getMangoQuery().query(Attachment, queryArgs, closure)
-        //if it has tags key
-        if(tagExistsCrit != null) {
-            detCrit.exists(tagExistsCrit.id())
-        }
-        return detCrit
-    }
+    // @Override
+    // MangoDetachedCriteria<Attachment> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
+    //     Map criteriaMap = queryArgs.criteriaMap
+    //     //NOTE: tags are handled in the TagsMangoCriteriaEventListener
+    //     return getQueryService().query(queryArgs, closure)
+    // }
 
     /**
      * removes the link for the entity and removes the attachment
@@ -167,7 +157,7 @@ class AttachmentRepo extends LongIdGormRepo<Attachment> {
     /**
      * 4 ways a file can be set via params
      *   1. with tempFileName key, where its a name of a file that has been uploaded
-     *      to the tempDir location key for appResourceLoader
+     *      to the tempDir location key
      *   2. with sourcePath, this should be a absolute path object or string
      *   3. with MultipartFile
      *   4. with bytes, similiar to MultiPartFile. if this is the case then name should have the info for the file
@@ -219,11 +209,13 @@ class AttachmentRepo extends LongIdGormRepo<Attachment> {
 
 
     Resource getResource(Attachment attachment){
-        attachmentSupport.getResource(attachment)
+        //attachmentSupport.getResource(attachment)
+        Path path = getFile(attachment)
+        return new PathResource(path)
     }
 
     Path getFile(Attachment attachment){
-        attachmentSupport.getFile(attachment.location, attachment.locationKey)
+        attachmentSupport.getPath(attachment.location, attachment.locationKey)
     }
 
     String getDownloadUrl(Attachment attachment) {

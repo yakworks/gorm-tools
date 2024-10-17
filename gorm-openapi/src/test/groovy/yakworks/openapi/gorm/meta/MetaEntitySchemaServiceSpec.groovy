@@ -15,11 +15,12 @@ import yakworks.meta.MetaEntity
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgFlex
+import yakworks.testing.gorm.unit.GormHibernateTest
 
 /**
  * sanity check test for service, which is just a wrapper so cacheable works
  */
-class MetaEntitySchemaServiceSpec extends Specification implements DataRepoTest {
+class MetaEntitySchemaServiceSpec extends Specification implements GormHibernateTest {
     static entityClasses = [Org, OrgFlex, Location]
 
     @Shared

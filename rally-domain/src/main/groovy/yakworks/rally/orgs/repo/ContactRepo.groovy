@@ -4,15 +4,12 @@
 */
 package yakworks.rally.orgs.repo
 
-import javax.inject.Inject
-
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataRetrievalFailureException
 
 import gorm.tools.databinding.BindAction
-import gorm.tools.mango.MangoDetachedCriteria
-import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.events.AfterBindEvent
@@ -21,9 +18,7 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.utils.GormUtils
-import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
-import jakarta.annotation.Nullable
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.commons.map.Maps
 import yakworks.rally.activity.model.ActivityContact
@@ -42,12 +37,8 @@ import yakworks.security.gorm.model.AppUser
 class ContactRepo extends LongIdGormRepo<Contact> {
     private static final String IS_PRIMARY = "isPrimary"
 
-    //Making this nullable makes it easier to wire up for tests.
-    @Inject @Nullable
-    LocationRepo locationRepo
-
-    @Inject @Nullable
-    ContactSourceRepo contactSourceRepo
+    @Autowired LocationRepo locationRepo
+    @Autowired ContactSourceRepo contactSourceRepo
 
     @RepoListener
     void beforeValidate(Contact contact) {
@@ -103,30 +94,34 @@ class ContactRepo extends LongIdGormRepo<Contact> {
         contact.source = ContactSource.repo.createSource(contact, data)
     }
 
-    /** lookup by num or ContactSource */
+    /**
+     * lookup by num or ContactSource
+     * This is called from findWithData and is used to locate contact for updates and associtaions
+     */
     @Override
     Contact lookup(Map data) {
         Contact contact
         if (data == null) data = [:] //if null then make it empty map so it can cycle down and blow error
 
-        String sourceId = Maps.value(data, 'sourceId')
+        String sourceId = data.sourceId
 
         //For convience, it allows specifying sourceId directly at top level along with other contact fields.
         if(data.source == null && sourceId) data.source = [sourceId: sourceId]
+
         if (data.source && data.source['sourceId']) {
             Long cid = contactSourceRepo.findContactIdBySourceId(Maps.value(data, "source.sourceId") as String)
             if(cid) return get(cid)
         }
         else if (data.num) {
-            String num = Maps.value(data, 'num')
-            List contactForNum = Contact.findAllWhere(num:num)
+            String num = data.num
+            List contactForNum = Contact.findAllWhere(num: num)
             if(contactForNum?.size() == 1) {
                 contact = contactForNum[0]
             } else if (contactForNum.size() > 1){
                 throw new DataRetrievalFailureException("Multiple Contacts found for num: ${data.num}, lookup key must return a unique Contact")
             }
         }
-        return load(contact?.getId())
+        return contact
     }
 
     @RepoListener
@@ -157,20 +152,6 @@ class ContactRepo extends LongIdGormRepo<Contact> {
         if(data.phones) super.persistToManyData(contact, ContactPhone.repo, data.phones as List<Map>, "contact")
         if(data.emails) super.persistToManyData(contact, ContactEmail.repo, data.emails as List<Map>, "contact")
         if(data.tags != null) TagLink.addOrRemoveTags(contact, data.tags)
-    }
-
-    @Override
-    MangoDetachedCriteria<Contact> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
-        Map criteriaMap = queryArgs.qCriteria
-        //if its has tags keys then this returns something to add to exists, will remove the keys as well
-        DetachedCriteria tagExistsCrit = TagLink.getExistsCriteria(criteriaMap, Contact, 'contact_.id')
-
-        MangoDetachedCriteria<Contact> detCrit = getMangoQuery().query(Contact, queryArgs, closure)
-        //if it has tags key
-        if(tagExistsCrit != null) {
-            detCrit.exists(tagExistsCrit.id())
-        }
-        return detCrit
     }
 
     void removeAll(Org org) {
@@ -223,7 +204,7 @@ class ContactRepo extends LongIdGormRepo<Contact> {
         data.orgId = contact.orgId
         data.contact = contact
         // if it had an op of remove then will return null and this set primary location to null
-        contact.location = locationRepo.createOrUpdateItem(data)
+        contact.location = locationRepo.upsert(data).entity
         return contact.location
     }
     /*
@@ -246,7 +227,7 @@ class ContactRepo extends LongIdGormRepo<Contact> {
         if (from == null) return null
 
         //generate id if not already done, ContactSource etc will need it
-        if(!toContat.id) toContat.id = Contact.repo.generateId()
+        if(!toContat.id) toContat.id = generateId()
         GormUtils.copyDomain(toContat, from)
         toContat.flex = GormUtils.copyDomain(ContactFlex, ContactFlex.get(from.flexId as Long), [contact: toContat])
 

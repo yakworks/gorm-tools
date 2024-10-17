@@ -27,7 +27,6 @@ class MailProps {
         boolean enabled = false
         /** the private api key for sdk */
         String privateApiKey
-
     }
 
     //boxes are general setups that can be used for sending emails.

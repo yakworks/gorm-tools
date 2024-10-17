@@ -1,6 +1,5 @@
 package gorm.tools.mango.jpql
 
-
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
 import spock.lang.Ignore
@@ -8,6 +7,9 @@ import spock.lang.Specification
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.unit.GormHibernateTest
+
+//import static gorm.tools.mango.jpql.JpqlCompareUtils.compareQuery
+import static gorm.tools.mango.jpql.JpqlCompareUtils.formatAndStrip
 
 
 /**
@@ -17,8 +19,9 @@ class JpqlQueryBuilderProjectionsMapSpec extends Specification implements GormHi
 
     static List entityClasses = [KitchenSink, SinkItem]
 
-    String strip(String val){
-        val.stripIndent().replace('\n',' ').trim()
+    boolean compareQuery(String hql, String expected){
+        assert formatAndStrip(hql) == formatAndStrip(expected)
+        return true
     }
 
     void setupSpec(){
@@ -55,15 +58,9 @@ class JpqlQueryBuilderProjectionsMapSpec extends Specification implements GormHi
         JpqlQueryInfo queryInfo = builder.buildSelect()
         def query = queryInfo.query
 
-        String expectSql = """
-            SELECT SUM(kitchenSink.amount) as amount_sum, kitchenSink.kind as kind, kitchenSink.thing.country as thing_country
-            FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-            GROUP BY kitchenSink.kind,kitchenSink.thing.country
-        """
-
         then:"The query is valid"
         query != null
-        query == strip("""\
+        compareQuery(queryInfo.query, """\
         SELECT SUM(kitchenSink.amount) as amount_sum, kitchenSink.kind as kind, kitchenSink.thing.country as thing_country
         FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
         GROUP BY kitchenSink.kind,kitchenSink.thing.country
@@ -102,7 +99,7 @@ class JpqlQueryBuilderProjectionsMapSpec extends Specification implements GormHi
         def query = queryInfo.query
 
         then: "The query is valid"
-        queryInfo.query.trim() == strip('''
+        compareQuery(queryInfo.query, '''
             SELECT SUM(kitchenSink.ext.totalDue) as ext_totalDue_sum, kitchenSink.kind as kind
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
             GROUP BY kitchenSink.kind
@@ -142,7 +139,7 @@ class JpqlQueryBuilderProjectionsMapSpec extends Specification implements GormHi
         def query = queryInfo.query
 
         then: "The query is valid"
-        queryInfo.query.trim() == strip('''
+        compareQuery(queryInfo.query, '''
             SELECT SUM(kitchenSink.ext.totalDue) as ext_totalDue_sum, kitchenSink.kind as kind
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
             GROUP BY kitchenSink.kind
@@ -170,10 +167,10 @@ class JpqlQueryBuilderProjectionsMapSpec extends Specification implements GormHi
 
         then:
         query
-        query.trim() == strip('''
+        compareQuery(queryInfo.query, '''
             SELECT SUM(kitchenSink.amount) as amount_sum
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-            WHERE (kitchenSink.amount >= :p1)
+            WHERE kitchenSink.amount >= :p1
         ''')
 
         List<Map> list = criteria.mapList()
@@ -181,7 +178,7 @@ class JpqlQueryBuilderProjectionsMapSpec extends Specification implements GormHi
         list[0].amount == 21.25
     }
 
-    void "projections having with in"() {
+    void "projections with WHERE criteria, not HAVING"() {
         when: "having with in"
         MangoDetachedCriteria criteria = KitchenSink.repo.query(
             projections: [kind:'group', amount:'sum'],
@@ -196,10 +193,10 @@ class JpqlQueryBuilderProjectionsMapSpec extends Specification implements GormHi
 
         then:
         query
-        query.trim() == strip('''
+        compareQuery(queryInfo.query, '''
             SELECT kitchenSink.kind as kind, SUM(kitchenSink.amount) as amount_sum
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-            WHERE (kitchenSink.kind IN (:p1,:p2) AND kitchenSink.amount >= :p3)
+            WHERE kitchenSink.kind IN (:p1,:p2) AND kitchenSink.amount >= :p3
             GROUP BY kitchenSink.kind
         ''')
 
@@ -226,10 +223,10 @@ class JpqlQueryBuilderProjectionsMapSpec extends Specification implements GormHi
 
         then:
         query
-        query.trim() == strip('''
+        compareQuery(queryInfo.query, '''
             SELECT kitchenSink.kind as kind, SUM(kitchenSink.amount) as amount_sum
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-            WHERE (kitchenSink.kind IS NOT NULL  AND kitchenSink.amount IS NOT NULL )
+            WHERE kitchenSink.kind IS NOT NULL AND kitchenSink.amount IS NOT NULL
             GROUP BY kitchenSink.kind
         ''')
 
@@ -252,11 +249,11 @@ class JpqlQueryBuilderProjectionsMapSpec extends Specification implements GormHi
 
         then:
         query
-        query.trim() == strip('''
+        compareQuery(queryInfo.query, '''
             SELECT kitchenSink.localDate as localDate, SUM(kitchenSink.amount) as amount_sum
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-            WHERE ((kitchenSink.localDate >= :p1 AND kitchenSink.localDate <= :p2)
-            AND (kitchenSink.localDateTime >= :p3 AND kitchenSink.localDateTime <= :p4))
+            WHERE (kitchenSink.localDate >= :p1 AND kitchenSink.localDate <= :p2)
+            AND (kitchenSink.localDateTime >= :p3 AND kitchenSink.localDateTime <= :p4)
             GROUP BY kitchenSink.localDate
         ''')
 
@@ -286,10 +283,10 @@ class JpqlQueryBuilderProjectionsMapSpec extends Specification implements GormHi
 
         then: "The query is valid"
         query != null
-        query.trim() == strip('''
+        compareQuery(queryInfo.query, '''
             SELECT SUM(kitchenSink.ext.totalDue) as totalDue, kitchenSink.kind as kind
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-            WHERE (kitchenSink.ext.id=:p1 AND kitchenSink.thing.id=:p2 AND kitchenSink.inactive=:p3)
+            WHERE kitchenSink.ext.id=:p1 AND kitchenSink.thing.id=:p2 AND kitchenSink.inactive=:p3
             GROUP BY kitchenSink.kind
             HAVING (SUM(kitchenSink.ext.totalDue) < :p4)
             ORDER BY totalDue ASC
@@ -320,7 +317,7 @@ class JpqlQueryBuilderProjectionsMapSpec extends Specification implements GormHi
 
         then: "The query is valid"
         query != null
-        query.trim() == strip('''
+        compareQuery(queryInfo.query, '''
             SELECT SUM(kitchenSink.ext.totalDue) as amount, kitchenSink.kind as kind
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
             GROUP BY kitchenSink.kind
@@ -353,7 +350,7 @@ class JpqlQueryBuilderProjectionsMapSpec extends Specification implements GormHi
 
         then:"The query is valid"
         query != null
-        query == strip("""
+        compareQuery(queryInfo.query, """
         SELECT SUM(kitchenSink.amount) as x, kitchenSink.kind as y, kitchenSink.ext.name as name
         FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
         GROUP BY kitchenSink.kind,kitchenSink.ext.name
@@ -379,7 +376,7 @@ class JpqlQueryBuilderProjectionsMapSpec extends Specification implements GormHi
 
         then:"The query is valid"
         query != null
-        query == strip("""
+        compareQuery(queryInfo.query, """
             SELECT COUNT(DISTINCT kitchenSink.id) as cnt, MAX(kitchenSink.amount) as maxam, MIN(kitchenSink.amount) as minam,
             AVG(kitchenSink.amount) as avgam, kitchenSink.kind as kindGroup
             FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
@@ -424,10 +421,10 @@ class JpqlQueryBuilderProjectionsMapSpec extends Specification implements GormHi
 
         then:"The query is valid"
         query != null
-        query == strip("""\
+        compareQuery(queryInfo.query, """\
         SELECT new map( MAX(kitchenSink.sinkLink.amount) as maxam, kitchenSink.ext.name as name )
         FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-        WHERE (kitchenSink.sinkLink.amount > :p1 AND kitchenSink.sinkLink.kind=:p2)
+        WHERE kitchenSink.sinkLink.amount > :p1 AND kitchenSink.sinkLink.kind=:p2
         GROUP BY kitchenSink.ext.name
         """)
     }

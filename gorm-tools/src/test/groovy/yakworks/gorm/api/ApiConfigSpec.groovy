@@ -11,7 +11,7 @@ import yakworks.testing.grails.GrailsAppUnitTest
  */
 class ApiConfigSpec extends Specification implements GrailsAppUnitTest {
 
-    static springBeans = [apiConfig: ApiConfig]
+    static springBeans = [ApiConfig]
 
     @Autowired ApiConfig apiConfig
 

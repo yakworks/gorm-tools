@@ -1,5 +1,8 @@
 package yakworks.rally.activity
 
+import gorm.tools.problem.ValidationProblem
+import grails.validation.ValidationException
+
 import java.nio.file.Files
 
 import grails.gorm.transactions.Rollback
@@ -16,6 +19,8 @@ import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
+
+import java.time.LocalDateTime
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKind
 import static yakworks.rally.activity.model.Activity.VisibleTo
@@ -37,6 +42,24 @@ class ActivityTests extends Specification implements DomainIntTest {
         return [tag1, tag2]
     }
 
+    void "test actDate"() {
+        when: "create"
+        Activity act = Activity.create([org: Org.load(10), note: [body: 'Test note']])
+
+        then:
+        noExceptionThrown()
+        act.actDate
+        act.id
+
+        when: "update actDate"
+        act = Activity.repo.update(id:act.id, actDate: LocalDateTime.now())
+
+        then:
+        ValidationProblem.Exception ex = thrown()
+        ex.errors.hasFieldErrors('actDate')
+        ex.errors.getFieldError('actDate').code == "error.notupdateable"
+    }
+
     void "create note"() {
         setup:
         Org org = Org.first()
@@ -50,6 +73,7 @@ class ActivityTests extends Specification implements DomainIntTest {
         result != null
         result.name == "test-note"
         result.kind == ActKind.Note
+        result.actDate
 
         when: "update"
         result = activityRepo.update([id: result.id, name: "test-updated", kind: "Note", visibleTo: 'Owner'])
@@ -64,7 +88,7 @@ class ActivityTests extends Specification implements DomainIntTest {
         setup:
         //possible another note added one so only do if nothing there.
         if(!Activity.get(10)){
-            Activity.create([id: 10, org: Org.load(10), note: [body: 'Test note']], bindId: true)
+            Activity.repo.create([id: 10, org: Org.load(10), note: [body: 'Test note']], [bindId: true])
             flushAndClear()
         }
 
@@ -97,7 +121,7 @@ class ActivityTests extends Specification implements DomainIntTest {
         then:
         activity.attachments.size() == 1
 
-        Files.exists(attachmentSupport.getFile(attachmentLocation))
+        Files.exists(attachmentSupport.getPath(attachmentLocation))
 
         when: "we flag it for delete"
         flushAndClear()
@@ -112,7 +136,7 @@ class ActivityTests extends Specification implements DomainIntTest {
         then:
         updateAct
         updateAct.attachments.size() == 0
-        Files.notExists(attachmentSupport.getFile(attachmentLocation))
+        Files.notExists(attachmentSupport.getPath(attachmentLocation))
 
         when:
         flushAndClear()

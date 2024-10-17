@@ -2,13 +2,7 @@ package yakworks.rally.activity
 
 import org.springframework.beans.factory.annotation.Autowired
 
-import yakworks.rally.mail.model.MailMessage
-import yakworks.security.gorm.model.AppUser
-import yakworks.testing.gorm.unit.DataRepoTest
-import yakworks.testing.gorm.RepoTestData
-import yakworks.spring.AppResourceLoader
 import spock.lang.Specification
-import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
@@ -19,11 +13,16 @@ import yakworks.rally.activity.model.TaskType
 import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.testing.MockData
+import yakworks.security.gorm.model.AppUser
+import yakworks.testing.gorm.RepoTestData
+import yakworks.testing.gorm.unit.GormHibernateTest
+import yakworks.testing.gorm.unit.SecurityTest
 
-class TaskSpec extends Specification implements DataRepoTest, SecurityTest { //implements SecuritySpecUnitTestHelper{
+class TaskSpec extends Specification implements GormHibernateTest, SecurityTest { //implements SecuritySpecUnitTestHelper{
     static List<Class> entityClasses = [
         MailMessage, AttachmentLink, ActivityLink, Activity, Task, TaskType, TaskStatus,
         Org, AppUser, ActivityNote, Contact, ActivityContact
@@ -32,7 +31,6 @@ class TaskSpec extends Specification implements DataRepoTest, SecurityTest { //i
     @Autowired ActivityRepo activityRepo
 
     Closure doWithGormBeans() { { ->
-        appResourceLoader(AppResourceLoader)
         attachmentSupport(AttachmentSupport)
     }}
 

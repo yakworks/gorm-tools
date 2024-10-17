@@ -59,6 +59,7 @@ import static org.grails.compiler.injection.GrailsASTUtils.ZERO_PARAMETERS
  * @author Joshua Burnett
  * @author Graeme Rocher
  *
+ * NOTE: THIS IS NOT USED ANYWHERE RIGHT NOW. KEPT FOR REFERENCE
  */
 @SuppressWarnings(['ThrowRuntimeException'])
 @CompileStatic

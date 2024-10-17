@@ -8,10 +8,8 @@ import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.context.annotation.Configuration
 
-@Configuration(proxyBeanMethods = false)
-@ConfigurationProperties(prefix="gorm.tools")
+@ConfigurationProperties(prefix="yakworks.gorm")
 @CompileStatic
 class GormConfig {
 

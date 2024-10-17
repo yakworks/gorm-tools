@@ -4,18 +4,20 @@
 */
 package yakworks.rally.activity.model
 
+import java.time.LocalDateTime
+
 import groovy.transform.CompileDynamic
 
 import gorm.tools.model.NamedEntity
 import gorm.tools.model.Persistable
 import gorm.tools.model.SourceTrait
-import gorm.tools.repository.model.GormRepoEntity
+import gorm.tools.repository.RepoLookup
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.model.Attachable
-import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
@@ -25,7 +27,7 @@ import yakworks.security.audit.AuditStampTrait
 @Entity
 @IdEqualsHashCode
 @GrailsCompileStatic
-class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEntity<Activity, ActivityRepo>, Attachable, Taggable, Serializable {
+class Activity implements NamedEntity, AuditStampTrait, SourceTrait, RepoEntity<Activity>, Attachable, Taggable, Serializable {
     static List<String> toOneAssociations = ['note', 'task']
 
     Kind kind = Kind.Note
@@ -61,6 +63,10 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
 
     /** The priority level generally for an Alert or Log, but can be used for other Activity Kinds */
     AlertLevel level = AlertLevel.Info
+
+    LocalDateTime actDate
+
+    static ActivityRepo getRepo() { return RepoLookup.findRepo(this) as ActivityRepo}
 
     //
     @CompileDynamic
@@ -146,7 +152,8 @@ class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEnt
             d: 'Who can see this activity. Defaults to Everyone',
             default: 'Everyone',
             nullable: false
-        ]
+        ],
+        actDate: [d: 'Activity date', nullable: false, oapi:'CR']
     ]
 
     /** creates an ActivityLink for the entity */

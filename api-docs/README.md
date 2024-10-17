@@ -23,5 +23,9 @@ to generate the files into build. Then `cd api-docs`
 - `npm run openapi:bundle` merges the files in a single openapi/dist/api.yaml openapi file
 
 
-### notes, possible libs removed from pacakage
+### notes, possible libs removed from package
 "json-schema-merge-allof": "^0.8.1",
+
+### Used this much for inspiration
+https://github.com/Rebilly/api-definitions
+https://www.rebilly.com/docs/dev-docs/api/customers/getcustomercollection

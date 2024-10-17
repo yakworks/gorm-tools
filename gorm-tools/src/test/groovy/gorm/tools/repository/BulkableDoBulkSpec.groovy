@@ -6,6 +6,7 @@ import gorm.tools.job.SyncJobArgs
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.model.DataOp
 import spock.lang.Specification
+import testing.Cust
 import testing.TestSyncJob
 import yakworks.api.ApiResults
 import yakworks.api.HttpStatus
@@ -17,7 +18,8 @@ import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 /**
- * Tests for doBulk
+ * Tests for doBulk without the async and parallel stuff.
+ * easier to test core logic
  */
 class BulkableDoBulkSpec extends Specification implements GormHibernateTest {
     static entityClasses = [KitchenSink, SinkItem, SinkExt, TestSyncJob]
@@ -26,8 +28,7 @@ class BulkableDoBulkSpec extends Specification implements GormHibernateTest {
     @Autowired KitchenSinkRepo kitchenSinkRepo
 
     SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
-        return new SyncJobArgs(parallel: false, op: op, source: "test", sourceId: "test",
-            includes: ["id", "name", "ext.name"])
+        return new SyncJobArgs(parallel: false, async:false, op: op, source: "test", sourceId: "test", includes: ["id", "name", "ext.name"])
     }
 
     void "success doBulk add"() {
@@ -122,4 +123,47 @@ class BulkableDoBulkSpec extends Specification implements GormHibernateTest {
         problem.violations[0].code == 'NotNull'
     }
 
+
+    void "test bulk UPSERT"() {
+        given:
+        KitchenSink.createKitchenSinks(10)
+        assert KitchenSink.count() == 10
+
+        //change the existing ones
+        List upsertList = KitchenSink.list().collect {
+            [id: it.id, name: "updated${it.id}"]
+        }
+        //add in some news ones
+        (901..910).each {
+            upsertList.add(
+                [id: it, num: it, name: "inserted${it}"]
+            )
+        }
+
+        def syncArgs = setupSyncJobArgs(DataOp.upsert)
+        //set bindId so it will work with ids in the find which normally throws error, just like insert
+        syncArgs.persistArgs(bindId: true)
+
+        when: "doBulk UPSERT records"
+        ApiResults res = kitchenSinkRepo.doBulk(upsertList, syncArgs)
+
+        then:
+        res.ok
+        res.success.size() == 20
+
+        and: "spot check ok result"
+        OkResult res1 = res.success[1]
+        res1 instanceof OkResult
+        res1.status == HttpStatus.OK //should be 200
+
+        and: "verify data"
+        assert KitchenSink.count() == 20
+        KitchenSink.list().each {
+            if(it.id > 900){
+                assert it.name == "inserted${it.id}"
+            } else {
+                assert it.name == "updated${it.id}"
+            }
+        }
+    }
 }

@@ -1,0 +1,5929 @@
+openapi: 3.0.3
+servers:
+  - url: 'https://demo.9ci.io/api'
+    description: Default server
+  - url: 'https://sanbox.9ci.io/api'
+    description: Sandbox server
+info:
+  version: 1.0.0
+  title: 9ci Rest Api
+  termsOfService: 'http://9ci.com/terms/'
+  contact:
+    name: 9ci Inc
+    url: 'https://9ci.com'
+    email: connect@9ci.com
+  x-logo:
+    url: 'https://www.9ci.com/assets/img/logo.svg'
+    altText: 9ci logo
+  license:
+    name: 9ci Proprietary and Confidential
+    url: 'http://www.9ci.com/licenses/LICENSE-2.0.html'
+  description: "\nThe 9ci API specification for interoperable cloud-based processing of Accounts Receivable datasets.\n\n# Intro\n\nWelcome to the 9ci RESTful API reference documentation.\n\nRepresentational State Transfer (REST) APIs are service endpoints that support sets of HTTP operations (methods), which provide create, retrieve, update, or delete access to 9ci's application resources. It returns HTTP response codes to indicate errors. It also accepts and returns JSON in the HTTP body. You can use your preferred\nHTTP/REST library for your programming language. This document contains the most commonly\nintegrated resources.\n\nThe api.yaml file is available [here](api.yaml).\n\n# API Principles\n\n## Language\n\nIn the specification the key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [RFC 2119](http://tools.ietf.org/html/rfc2119) and [RFC 8174](http://tools.ietf.org/html/rfc8174).\n\n## Casing\n\nUnless otherwise stated the API is **case sensitive**.\n\nAll names SHOULD be written in camel case, i.e. words are separated by a capital letter and no spaces, with all endpoints and property names starting with a lower case. Example: `helloWorld`. All names MAY also be written in snake_case or kebab-case, i.e. words are separated with one underscore character (_) or one dash character (-) and no spaces, with all letters lower-cased BUT they should not be combined, the follwing would be invalid `foo_bar-baz`. Example: `hello_world`. HTTP header fields follow their respective casing conventions, e.g. `Content-Type` or `9ci-Costs`, despite being case-insensitive according to [RFC 7230](https://tools.ietf.org/html/rfc7230#section-3.2).\n\n## HTTP REST\n\nThis uses [HTTP REST](https://en.wikipedia.org/wiki/Representational_state_transfer) [Level 2](https://martinfowler.com/articles/richardsonMaturityModel.html#level2) for communication between client and back-end server.\n\nPublic APIs are available via HTTPS only. \n\nEndpoints are made use meaningful HTTP verbs (e.g. GET, POST, PUT, PATCH, DELETE) whenever technically possible. If there is a need to transfer big chunks of data for a GET requests to the back-end, POST requests MAY be used as a replacement as they support to send data via request body. \n\nNOTE: Unless otherwise stated, PATCH requests are only defined to work on direct (first-level) children of the full JSON object. Therefore, changing a property on a deeper level of the full JSON object always requires to send the whole JSON object defined by the first-level property.\n\nNaming of endpoints follow the REST principles. Therefore, endpoints are centered around a resource. Resource identifiers SHALL be named with a noun in singular form except for plural actions that can not be modelled with the regular HTTP verbs. Single actions MUST be single endpoints with a single HTTP verb (POST is RECOMMENDED) and no other endpoints beneath it.\n\n## JSON\n\nThe API uses JSON for request and response bodies whenever feasible. Services use JSON as the default encoding. Other encodings can be requested using [Content Negotiation](https://www.w3.org/Protocols/rfc2616/rfc2616-sec12.html). Clients and servers MUST NOT rely on the order in which properties appears in JSON. Collections usually don't include nested JSON objects if those information can be requested from the individual resources.\n\n### Temporal date-time data\n\nDate, time, intervals and durations are formatted based on ISO 8601 or its profile [RFC 3339](https://www.ietf.org/rfc/rfc3339) whenever there is an appropriate encoding available in the standard. All temporal data are specified based on the Gregorian calendar.\n\n# Status codes\n\nThe 9ci API usually uses the following HTTP status codes for successful requests: \n\n- **200 OK**:\n  Indicates a successful request **with** a response body being sent.\n- **201 Created**\n  Indicates a successful request that successfully created a new resource. Sends a `Location` header to the newly created resource **without** a response body.\n- **202 Accepted**\n  Indicates a successful request that successfully queued the creation of a new resource, but it has not been created yet. The response is sent **without** a response body.\n- **204 No Content**:\n  Indicates a successful request **without** a response body being sent.\n\nThe 9ci API has some commonly used HTTP status codes for failed requests: \n\n- **400 Bad Request**:\n  The back-end responds with this error code whenever the error has its origin on client side and no other HTTP status code in the 400 range is suitable.\n\n- **401 Unauthorized**:\n  The client did not provide any authentication details for a resource requiring authentication or the provided authentication details are not correct.\n\n- **403 Forbidden**:\n  The client did provided correct authentication details, but the privileges/permissions of the provided credentials do not allow to request the resource.\n\n- **404 Not Found**:\n  The resource specified by the path does not exist, i.e. one of the resources belonging to the specified identifiers are not available at the back-end.\n  *Note:* Unsupported endpoints MUST use HTTP status code 501.\n\n- **409 CONFLICT**:\n  OptimisticLockingFailureException, version did not match for an edited item and someone or something else \n  changed the data since it was last retrieved\n\n- **422 UNPROCESSABLE_ENTITY**:\n  The server had validation errors on a post or put\n\n- **500 Internal Server Error**:\n  The error has its origin on server side and no other status code in the 500 range is suitable.\n\n## Errors\n\n9ci follows and extends Problem Details for HTTP APIs [RFC 7807](https://tools.ietf.org/html/rfc7807). It defines a Problem JSON object using the media type\n`application/problem+json` to provide an extensible human and machine readable\nfailure information beyond the HTTP response status code to transports the\nfailure kind (`type` / `title`) and the failure cause and location (`instant` /\n`detail`). To make best use of this additional failure information, every\nendpoint must be capable of returning a Problem JSON on client usage errors\n({4xx} status codes) as well as server side processing errors ({5xx} status\ncodes).\n\n*Hint:* The media type `application/problem+json` is often not implemented as\na subset of `application/json` by libraries and services! Thus clients need to\ninclude `application/problem+json` in the {Accept}-Header to trigger delivery\nof the extended failure information.\n\nThe OpenAPI schema definition of the Problem JSON object can be found\nhttps://opensource.zalando.com/restful-api-guidelines/models/problem-1.0.1.yaml[on\nGitHub].\n\n### Error Handling\n\nThe success of requests will be indicated using [HTTP status codes](https://tools.ietf.org/html/rfc7231#section-6) according to [RFC 7231](https://tools.ietf.org/html/rfc7231).\n\nIf the API responds with a status code between 100 and 399 the back-end indicates that the request has been handled successfully.\n\nIf a HTTP status code in the 400 range is returned, the client SHOULD NOT repeat the request without modifications. For HTTP status code in the 500 range, the client MAY repeat the same request later.\n\nAll HTTP status codes defined in RFC 7231 in the 400 and 500 ranges can be used as 9ci error code in addition to the most used status codes mentioned here. Responding with 9ci error codes 400 and 500 SHOULD be avoided in favor of any more specific standardized or proprietary 9ci error code.\n\nIn general an error is communicated with a status code between 400 and 599. Client errors are defined as a client passing invalid data to the service and the service *correctly* rejecting that data. Examples include invalid credentials, incorrect parameters, unknown versions, or similar. These are generally \"4xx\" HTTP error codes and are the result of a client passing incorrect or invalid data. \n\nServer errors are defined as the server failing to correctly return in response to a valid client request. These are generally \"5xx\" HTTP error codes. \n\n###  Problem JSON object\n\nA JSON Problem object will be sent with all responses that have a status code between 400 and 599.\n\n```\n   HTTP/1.1 422 UNPROCESSABLE_ENTITY\n   Content-Type: application/problem+json\n   Content-Language: en\n\n{\n  \"status\": 422,\n  \"code\": \"arTran.post.error\",\n  \"title\": \"ArTran Validation Error\",\n  \"detail\": \"Lines dont balance and must sum to ArTran.origAmount\",\n  \"fieldErrors\": [...]\n}\n```\n\n``` json\n{\n  \"id\": \"123\",\n  \"code\": \"SampleError\",\n  \"message\": \"A sample error message.\",\n  \"url\": \"https://example.9ci.org/docs/errors/SampleError\"\n}\n```\n\n# CORS\n\n> Cross-origin resource sharing (CORS) is a mechanism that allows restricted resources [...] on a web page to be requested from another domain outside the domain from which the first resource was served. [...]\n\n> CORS defines a way in which a browser and server can interact to determine whether or not it is safe to allow the cross-origin request. It allows for more freedom and functionality than purely same-origin requests, but is more secure than simply allowing all cross-origin requests.\n\nSource: [https://en.wikipedia.org/wiki/Cross-origin_resource_sharing](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)\n\n9ci-based back-ends are usually hosted on a different domain / host than the client that is requesting data from the back-end. Therefore most requests to the back-end are blocked by all modern browsers. This leads to the problem that the JavaScript library and any browser-based application can't access back-ends. Therefore, all back-end providers SHOULD support CORS to enable browser-based applications to access back-ends. [CORS is a recommendation of the W3C organization](https://www.w3.org/TR/cors/). The following chapters will explain how back-end providers can implement CORS support.\n\n> **Tip**: Most servers can send the required headers and the responses to the OPTIONS requests automatically for all endpoints. Otherwise you may also use a proxy server to add the headers and OPTIONS responses.\n\n# API Queries\n\n## URL Parameters overview\n\n| Param       | Description                                                                     | Examples                                                                |\n|-------------|---------------------------------------------------------------------------------|-------------------------------------------------------------------------|\n| q           | Fuzzy search when alone and string                                              | `https://rcm-api.9ci.io/api/ar/customer?q=walm`                         |\n|             | Mango query                                                                     | `https://rcm-api.9ci.io/api/ar/customer?q={name:\"walm*\"}`               |\n| qSearch     | Fuzzy search when also specifying a q object                                    | `https://rcm-api.9ci.io/api/ar/customer?qSearch=walm&q={type:\"PARENT\"}` |\n| max         | max item in data                                                                | `..customer?q=wal&max=100`                                              |\n| sort        | sorts fields                                                                    | `..customer?sort=name` or `..customer?sort={type:\"asc\",name:\"desc}`     |\n| page        | the page number to return, when max is small enough to create mutiple pages     | `..customer?page=2`                                                     |\n| format      | csv it the currently supported format, more may be added in future              | `..customer?format=csv`                                                 |\n| totals      | returns sum totals for the resource in addition to , varies depending on entity | `..customer?totals=true`                                                |\n| projections | the aggregates (sum, count, min, max) and groupbys for projection queries       | `..customer?projections=[type, {org.calc.totalDue:sum}]`                |\n\n## Mango Q Query Language\n\n9ci has an easy and dynamic way to query via a rest api using a simple map object.\nIt allows to get paged collection of entities restricted by\nthe properties in the `q` param. The object passed to q should be passed as JSON. \n\n### Logical\n\n|  Op  |      Description      |                                              Examples                                              |\n| ---- | --------------------- | -------------------------------------------------------------------------------------------------- |\n| $and | default               | `$and: [ {\"name\": \"Belak\"}, {\"status\": \"D\"} ]` <br> equivalent to `\"name\": \"Belak\", \"status\": \"D\"` |\n| $or  | \"ors\" them all        | `$or: [ {\"name\": \"Belak\"}, {\"fork\": true} ]` <br> `$or: {\"name\": \"Belak\", \"fork\": true }`          |\n| $not | ALL not equal, !=, <> | `$not:{ \"status\": \"Destroyed\", \"dateStatus\": \"2371\" }`                                             |\n| $nor | ANY one is not equal  | `$nor:{ \"name\": \"Romulan\", \"fork\": 12`}                                                               |\n\n### Comparison\n\n|     Op     |           Description            |                   Example                    |\n| ---------- | -------------------------------- | -------------------------------------------- |\n| $gt        | >  greater than                  | `\"cargo\": {\"$gt\": 10000}`                    |\n| $gte       | >= greater than or equal         | `\"cargo\": {\"$gte\": 10000}`                   |\n| $lt        | <  less than                     | `\"cargo\": {\"$lt\": 10000}`                    |\n| $lte       | <= less than or equal            | `\"cargo\": {\"$lte\": 10000}`                   |\n| $between   | between two distinct values      | `\"dateStatus\": {\"$between\": [2300, 2400]}`   |\n| $like      | like expression                  | `\"name\": {\"$like\": \"Rom%\"}`                  |\n| $ilike     | like auto-append %               | `\"name\": {\"$ilike\": \"rom\"}`                  |\n| $eq        | = equal, concieince for builders | `\"salary\": {\"$eq\": 10}` \\| `\"salary\": 10`    |\n| $ne        | not equal, !=, <>                | `\"age\" : {\"$ne\" : 12}}`                      |\n| $in        | Match any value in array         | `\"field\" : {\"$in\" : [value1, value2, ...]`   |\n| $nin       | Not match any value in array     | `\"field\" : {\"$nin\" : [value1, value2, ...]}` |\n| $isNull    | Value is null                    | `\"name\": \"$isNull\" \\|  `\"name\": null         |\n| $isNotNull | Value is not null                | `\"name\": \"$isNotNull\" \\| `\"name\":{$ne: null} |\n\n### Fields\n\n|  Op   |    Description    |                Example                 |\n| ----- | ----------------- | -------------------------------------- |\n| $gtf  | >  another field  | `\"cargo\": {\"$gtf\": \"maxCargo\"}`        |\n| $gtef | >= field          | `\"cargo\": {\"$gtef\": \"maxCargo\"}`       |\n| $ltf  | <  field          | `\"cargo\": {\"$ltf\": \"maxCargo\"}`        |\n| $ltef | <= field          | `\"cargo\": {\"$ltef\": \"maxCargo\"}`       |\n| $eqf  | = field           | `\"cargo\": {\"$eqf\": \"controlTotal\"}`    |\n| $nef  | not equal, !=, <> | `\"cargo\" : {\"$nef\" : \"controlTotal\"}}` |\n\n## Examples\n\nBelow will be a list of supported syntax for parameters in json format, which is supported:\nAssume we are running these on Contacts.\n\n``` js\n{\n  \"firstName\": \"Kar%\", /* if it ends with % then it will use an ilike */\n  \"lastName\": \"Johnson\", //no % so its straight up\n  \"num\": {\"$ilike\": \"a1497%\"}, /* a case-insensitive 'like' expression appends the % */\n  \"isPrimary\": true, /* boolean */\n  \"createdDate\": \"2019-05-16\", // dates\n  \"birthday\": \"1957-07-26\" // dates\n  \"jobTitle\": {\"$eqf\": \"$comments\"} //equals another field in set\n  \"$sort\":\"name\" // asc by default\n}\n```\n\nFor those familiar with sql, this would produce something akin to\n\n```sql\n  .. firstName ilike \"Kar%\" \n  AND lastName=\"Johnson\" \n  AND num ilike \"a1497%\" \n  AND isPrimary = true\n  AND createdDate = '2019-05-16'\n  AND birthday = '1957-07-26'\n  AND jobTitle = comments\n  ORDER BY name ASC;\n```\n\n# Patching Association Collections\n\nWhen working with collection assoctiaions, such as Tags, there is some special logic using the `op` field.\nvalid values for op are `update`, `remove`, `replace` and `add`\n\nOn a put or post `replace` is the default\n\n```js\n# On a put or post `replace` is the default\n# thie example would add or replace the array\n{\n  \"id\": 123,\n  tags: [\n    {\"id\": 1}, {\"id\": 2}\n  ]\n}\n```\n\n```js\n# op:update with empty array to remove all\n{\n  \"id\": 123,\n  tags: {\n    \"op\": \"update\", data: []\n  }\n}\n```\n\n```js\n# op:remove one or more existing\n{\n  \"id\": 123,\n  \"tags\": {\n    {\"op\":\"remove\": \"ids\": [1,2]}\n  }\n}\n```\n\n```js\n# op:update will append to existing. \n# this example will add tag.id=3 to the \n# list of existing tags\n\n{\n  \"id\": 123,\n  \"tags\": {\n    \"op\": \"update\", data: [\n      {\"id\": 3}\n    ]\n  }\n}\n```\n\n# Authentication\n\n9ci supports Bearer based token authentication.\n\nUsing `curl`\n```bash\n# using curl\ncurl -H 'Content-Type: application/json' -X POST \\\n\t\t-d '{\\\"username\\\":\\\"someUser\\\",\\\"password\\\":\\\"secret_knock\\\"}' \\\n\t\thttps://rcm-api.9ci.io/api/login\n\n# using httpie\nhttp -b POST admin:123@localhost:8080/api/oauth/token\n#would return something like\n{\n    \"username\": \"someUser\",\n    \"roles\": [\n        \"Administrator\"\n    ],\n    \"token_type\": \"Bearer\",\n    \"access_token\": \"4g2134lkjlkj1324.....\"\n}\n\n# copy the access_token token into future requests\ncurl -G -H 'Authorization: Bearer 4g2134lkjlkj1324.....' https://rcm-api.9ci.io/api/ar/customer/1\n\n```\n"
+externalDocs:
+  description: 9ci Documentation
+  url: 'https://9ci.com/documentation/2.0/'
+tags:
+  - name: org
+    description: >
+      This domain represents all organizational units within the system. 
+      Customers and CustAccounts are special cases, each having their own
+      domain, but each also have corresponding Org records.  In addition, all
+      other system client organizational information is stored here.  This
+      includes company, business units, ops regions, client stores, sales
+      regions, etc.  This domain is configurable to accommodate the hierarchical
+      and overlay organizational structure of a client for reporting, access and
+      data management purposes.
+  - name: appParam
+    description: Provides company-specific configuration of application parameters
+  - name: activity
+    description: This domain records activity performed on an ArTran
+  - name: attachment
+    description: >
+      This domain links (Activity, Collection, Invoice, Report) to documents on
+      the filesystem, like check images or PDFs.
+  - name: attachment upload
+    description: Upload files and attachments.
+  - name: company
+    description: >
+      This domain represents your organization as a financial entity. There
+      could be multiple companies representing different branches of your
+      company.
+  - name: contact
+    description: >
+      This is a person with information by which he/she can be contacted. Email,
+      phone number, which organization> they're associated with, etc.
+  - name: org
+    description: >
+      This domain represents all organizational units within the system. 
+      Customers and CustAccounts are special cases, each having their own
+      domain, but each also have corresponding Org records.  In addition, all
+      other system client organizational information is stored here.  This
+      includes company, business units, ops regions, client stores, sales
+      regions, etc.  This domain is configurable to accommodate the hierarchical
+      and overlay organizational structure of a client for reporting, access and
+      data management purposes.
+  - name: tag
+    description: >
+      This domain is a list of labels that can be applied to various other
+      domains, like Customer, CustAccount, etc. The tags can be used in process
+      flow and/or as informational categories.
+  - name: user
+    description: >-
+      This domain contains information about users who can login and operate
+      this application.
+  - name: role
+    description: >-
+      This is a list of permission groups to allow access to features of this
+      application.
+  - name: roleUser
+    description: >-
+      This domain maps users to roles, essentially giving a select group of
+      features to the user.
+  - name: syncJob
+    description: An instance created right away when "any job" in 9ci is called
+  - name: kitchen
+  - name: activityNote
+  - name: orgTypeSetup
+x-tagGroups:
+  - name: root
+    tags:
+      - kitchen
+  - name: Core / Rally
+    tags:
+      - activity
+      - activityNote
+      - attachment
+      - company
+      - contact
+      - org
+      - orgTypeSetup
+      - role
+      - roleUser
+      - syncJob
+      - tag
+      - user
+paths:
+  /upload:
+    post:
+      tags:
+        - attachment
+      summary: Upload a attachment
+      description: Upload an attachment file
+      operationId: uploadAttachment
+      parameters:
+        - name: name
+          in: query
+          description: the file name for attachment such a 'invoice.pdf'
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Attachment Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attachment'
+        '400':
+          $ref: '#/components/responses/400_Problem'
+      x-codeSamples:
+        - label: Curl
+          lang: bash
+          source: |
+            # upload file
+            curl -X POST "https://sandbox.9ci.io/api/upload?name=big_file.zip" \
+              -H "Content-Type: application/octet-stream" \
+              -H 'Authorization: Bearer {access-token}' \
+              --data-binary "@big_file_12345.zip"
+  '/download/{id}/{name}':
+    get:
+      tags:
+        - attachment
+      summary: Download an attachment
+      description: 'Download an attachment using id, filename is optional'
+      operationId: downloadAttachment
+      parameters:
+        - name: id
+          in: path
+          description: the attachment id
+          schema:
+            type: integer
+            format: int64
+        - name: name
+          in: path
+          description: the optional filename (attachment.name field) of the attachment
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The file stream
+        '400':
+          $ref: '#/components/responses/400_Problem'
+      x-codeSamples:
+        - label: Curl
+          lang: bash
+          source: >
+            # download a file, the 'some_file.zip' after the attachment id is
+            optional here
+
+            # but useful for browser links as it gives a default name for saving
+
+            curl "https://sandbox.9ci.io/api/download/1234/some_file.zip" \
+              -H 'Authorization: Bearer {access-token}' \
+              --output some_file.zip
+  /kitchen:
+    get:
+      tags:
+        - kitchen
+      summary: Kitchen list
+      description: Query and retrieve a Kitchen list
+      operationId: getKitchenList
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/max'
+        - $ref: '#/components/parameters/q'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/order'
+      responses:
+        '200':
+          description: Kitchen Pager Resource
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Pager'
+                  - properties:
+                      data:
+                        description: Kitchen list
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/KitchenSink'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+    post:
+      tags:
+        - kitchen
+      summary: Create a Kitchen
+      description: Create a new Kitchen
+      operationId: createKitchen
+      requestBody:
+        description: Kitchen resource
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KitchenSink_Create'
+      responses:
+        '201':
+          description: Kitchen Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KitchenSink'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+  '/kitchen/{id}':
+    get:
+      tags:
+        - kitchen
+      summary: Get a Kitchen
+      description: Retrieve a Kitchen
+      operationId: getKitchenById
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Kitchen Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KitchenSink'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+    put:
+      tags:
+        - kitchen
+      summary: Update a Kitchen
+      description: ''
+      operationId: updateKitchen
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        description: Kitchen resource
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KitchenSink_Update'
+      responses:
+        '200':
+          description: Kitchen Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KitchenSink'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+    delete:
+      tags:
+        - kitchen
+      summary: Delete a Kitchen
+      description: Deletes a Batch and any associated Payments
+      operationId: deleteKitchen
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          $ref: '#/components/responses/204_NoContent'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+  /rally/activity:
+    get:
+      tags:
+        - activity
+      summary: Activity list
+      description: Query and retrieve a Activity list
+      operationId: getActivityList
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/max'
+        - $ref: '#/components/parameters/q'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/order'
+      responses:
+        '200':
+          description: Activity Pager Resource
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Pager'
+                  - properties:
+                      data:
+                        description: Activity list
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Activity'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+    post:
+      tags:
+        - activity
+      summary: Create a Activity
+      description: Create a new Activity
+      operationId: createActivity
+      requestBody:
+        description: Activity resource
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Activity_Create'
+      responses:
+        '201':
+          description: Activity Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+  '/rally/activity/{id}':
+    get:
+      tags:
+        - activity
+      summary: Get a Activity
+      description: Retrieve a Activity
+      operationId: getActivityById
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Activity Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+    put:
+      tags:
+        - activity
+      summary: Update a Activity
+      description: ''
+      operationId: updateActivity
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        description: Activity resource
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Activity_Update'
+      responses:
+        '200':
+          description: Activity Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+    delete:
+      tags:
+        - activity
+      summary: Delete a Activity
+      description: Deletes a Batch and any associated Payments
+      operationId: deleteActivity
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          $ref: '#/components/responses/204_NoContent'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+  /rally/activity/bulk:
+    post:
+      tags:
+        - activity
+      summary: Bulk Ops
+      description: Bulk Create or Update Activity
+      operationId: bulkActivity
+      requestBody:
+        description: Bulk object with change info for Activity
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                op:
+                  description: Operation type
+                  type: string
+                  enum:
+                    - Create
+                    - Update
+                ids:
+                  description: If update this will be the array of ids to update
+                  type: array
+                  items:
+                    type: number
+                data:
+                  description: >-
+                    Activity list of fields to update or create. if ids is not
+                    used on update then id should be included
+                  type: array
+                  items:
+                    title: Activity
+                    type: object
+      responses:
+        '200':
+          description: OK status - processing was completed successfully
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+  /rally/activityNote:
+    get:
+      tags:
+        - activityNote
+      summary: ActivityNote list
+      description: Query and retrieve a ActivityNote list
+      operationId: getActivityNoteList
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/max'
+        - $ref: '#/components/parameters/q'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/order'
+      responses:
+        '200':
+          description: ActivityNote Pager Resource
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Pager'
+                  - properties:
+                      data:
+                        description: ActivityNote list
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ActivityNote'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+    post:
+      tags:
+        - activityNote
+      summary: Create a ActivityNote
+      description: Create a new ActivityNote
+      operationId: createActivityNote
+      requestBody:
+        description: ActivityNote resource
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivityNote_Create'
+      responses:
+        '201':
+          description: ActivityNote Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityNote'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+  '/rally/activityNote/{id}':
+    get:
+      tags:
+        - activityNote
+      summary: Get a ActivityNote
+      description: Retrieve a ActivityNote
+      operationId: getActivityNoteById
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: ActivityNote Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityNote'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+    put:
+      tags:
+        - activityNote
+      summary: Update a ActivityNote
+      description: ''
+      operationId: updateActivityNote
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        description: ActivityNote resource
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivityNote_Update'
+      responses:
+        '200':
+          description: ActivityNote Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityNote'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+    delete:
+      tags:
+        - activityNote
+      summary: Delete a ActivityNote
+      description: Deletes a Batch and any associated Payments
+      operationId: deleteActivityNote
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          $ref: '#/components/responses/204_NoContent'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+  /rally/attachment:
+    get:
+      tags:
+        - attachment
+      summary: Attachment list
+      description: Query and retrieve a Attachment list
+      operationId: getAttachmentList
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/max'
+        - $ref: '#/components/parameters/q'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/order'
+      responses:
+        '200':
+          description: Attachment Pager Resource
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Pager'
+                  - properties:
+                      data:
+                        description: Attachment list
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Attachment'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+  '/rally/attachment/{id}':
+    get:
+      tags:
+        - attachment
+      summary: Get a Attachment
+      description: Retrieve a Attachment
+      operationId: getAttachmentById
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Attachment Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attachment'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+    put:
+      tags:
+        - attachment
+      summary: Update a Attachment
+      description: ''
+      operationId: updateAttachment
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        description: Attachment resource
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Attachment_Update'
+      responses:
+        '200':
+          description: Attachment Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attachment'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+    delete:
+      tags:
+        - attachment
+      summary: Delete a Attachment
+      description: Deletes a Batch and any associated Payments
+      operationId: deleteAttachment
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          $ref: '#/components/responses/204_NoContent'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+  /rally/company:
+    get:
+      tags:
+        - company
+      summary: Company list
+      description: Query and retrieve a Company list
+      operationId: getCompanyList
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/max'
+        - $ref: '#/components/parameters/q'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/order'
+      responses:
+        '200':
+          description: Company Pager Resource
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Pager'
+                  - properties:
+                      data:
+                        description: Company list
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Company'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+    post:
+      tags:
+        - company
+      summary: Create a Company
+      description: Create a new Company
+      operationId: createCompany
+      requestBody:
+        description: Company resource
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Company_Create'
+      responses:
+        '201':
+          description: Company Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+  '/rally/company/{id}':
+    get:
+      tags:
+        - company
+      summary: Get a Company
+      description: Retrieve a Company
+      operationId: getCompanyById
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Company Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+    put:
+      tags:
+        - company
+      summary: Update a Company
+      description: ''
+      operationId: updateCompany
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        description: Company resource
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Company_Update'
+      responses:
+        '200':
+          description: Company Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+    delete:
+      tags:
+        - company
+      summary: Delete a Company
+      description: Deletes a Batch and any associated Payments
+      operationId: deleteCompany
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          $ref: '#/components/responses/204_NoContent'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+  /rally/contact:
+    get:
+      tags:
+        - contact
+      summary: Contact list
+      description: Query and retrieve a Contact list
+      operationId: getContactList
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/max'
+        - $ref: '#/components/parameters/q'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/order'
+      responses:
+        '200':
+          description: Contact Pager Resource
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Pager'
+                  - properties:
+                      data:
+                        description: Contact list
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Contact'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+    post:
+      tags:
+        - contact
+      summary: Create a Contact
+      description: Create a new Contact
+      operationId: createContact
+      requestBody:
+        description: Contact resource
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contact_Create'
+      responses:
+        '201':
+          description: Contact Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+  '/rally/contact/{id}':
+    get:
+      tags:
+        - contact
+      summary: Get a Contact
+      description: Retrieve a Contact
+      operationId: getContactById
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Contact Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+    put:
+      tags:
+        - contact
+      summary: Update a Contact
+      description: ''
+      operationId: updateContact
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        description: Contact resource
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contact_Update'
+      responses:
+        '200':
+          description: Contact Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+    delete:
+      tags:
+        - contact
+      summary: Delete a Contact
+      description: Deletes a Batch and any associated Payments
+      operationId: deleteContact
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          $ref: '#/components/responses/204_NoContent'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+  /rally/contact/bulk:
+    post:
+      tags:
+        - contact
+      summary: Bulk Ops
+      description: Bulk Create or Update Contact
+      operationId: bulkContact
+      requestBody:
+        description: Bulk object with change info for Contact
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                op:
+                  description: Operation type
+                  type: string
+                  enum:
+                    - Create
+                    - Update
+                ids:
+                  description: If update this will be the array of ids to update
+                  type: array
+                  items:
+                    type: number
+                data:
+                  description: >-
+                    Contact list of fields to update or create. if ids is not
+                    used on update then id should be included
+                  type: array
+                  items:
+                    title: Contact
+                    type: object
+      responses:
+        '200':
+          description: OK status - processing was completed successfully
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+  /rally/org:
+    get:
+      tags:
+        - org
+      summary: Org list
+      description: Query and retrieve a Org list
+      operationId: getOrgList
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/max'
+        - $ref: '#/components/parameters/q'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/order'
+      responses:
+        '200':
+          description: Org Pager Resource
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Pager'
+                  - properties:
+                      data:
+                        description: Org list
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Org'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+    post:
+      tags:
+        - org
+      summary: Create a Org
+      description: Create a new Org
+      operationId: createOrg
+      requestBody:
+        description: Org resource
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Org_Create'
+      responses:
+        '201':
+          description: Org Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Org'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+  '/rally/org/{id}':
+    get:
+      tags:
+        - org
+      summary: Get a Org
+      description: Retrieve a Org
+      operationId: getOrgById
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Org Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Org'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+    put:
+      tags:
+        - org
+      summary: Update a Org
+      description: ''
+      operationId: updateOrg
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        description: Org resource
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Org_Update'
+      responses:
+        '200':
+          description: Org Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Org'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+    delete:
+      tags:
+        - org
+      summary: Delete a Org
+      description: Deletes a Batch and any associated Payments
+      operationId: deleteOrg
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          $ref: '#/components/responses/204_NoContent'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+  /rally/org/bulk:
+    post:
+      tags:
+        - org
+      summary: Bulk Ops
+      description: Bulk Create or Update Org
+      operationId: bulkOrg
+      requestBody:
+        description: Bulk object with change info for Org
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                op:
+                  description: Operation type
+                  type: string
+                  enum:
+                    - Create
+                    - Update
+                ids:
+                  description: If update this will be the array of ids to update
+                  type: array
+                  items:
+                    type: number
+                data:
+                  description: >-
+                    Org list of fields to update or create. if ids is not used
+                    on update then id should be included
+                  type: array
+                  items:
+                    title: Org
+                    type: object
+      responses:
+        '200':
+          description: OK status - processing was completed successfully
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+  /rally/orgTypeSetup:
+    get:
+      tags:
+        - orgTypeSetup
+      summary: OrgTypeSetup list
+      description: Query and retrieve a OrgTypeSetup list
+      operationId: getOrgTypeSetupList
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/max'
+        - $ref: '#/components/parameters/q'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/order'
+      responses:
+        '200':
+          description: OrgTypeSetup Pager Resource
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Pager'
+                  - properties:
+                      data:
+                        description: OrgTypeSetup list
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/OrgTypeSetup'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+  '/rally/orgTypeSetup/{id}':
+    get:
+      tags:
+        - orgTypeSetup
+      summary: Get a OrgTypeSetup
+      description: Retrieve a OrgTypeSetup
+      operationId: getOrgTypeSetupById
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: OrgTypeSetup Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgTypeSetup'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+    put:
+      tags:
+        - orgTypeSetup
+      summary: Update a OrgTypeSetup
+      description: ''
+      operationId: updateOrgTypeSetup
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        description: OrgTypeSetup resource
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrgTypeSetup_Update'
+      responses:
+        '200':
+          description: OrgTypeSetup Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgTypeSetup'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+  /rally/role:
+    get:
+      tags:
+        - role
+      summary: Role list
+      description: Query and retrieve a Role list
+      operationId: getRoleList
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/max'
+        - $ref: '#/components/parameters/q'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/order'
+      responses:
+        '200':
+          description: Role Pager Resource
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Pager'
+                  - properties:
+                      data:
+                        description: Role list
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SecRole'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+  '/rally/role/{id}':
+    get:
+      tags:
+        - role
+      summary: Get a Role
+      description: Retrieve a Role
+      operationId: getRoleById
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Role Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecRole'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+  /rally/roleUser:
+    get:
+      tags:
+        - roleUser
+      summary: RoleUser list
+      description: Query and retrieve a RoleUser list
+      operationId: getRoleUserList
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/max'
+        - $ref: '#/components/parameters/q'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/order'
+      responses:
+        '200':
+          description: RoleUser Pager Resource
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Pager'
+                  - properties:
+                      data:
+                        description: RoleUser list
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SecRoleUser'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+    post:
+      tags:
+        - roleUser
+      summary: Create a RoleUser
+      description: Create a new RoleUser
+      operationId: createRoleUser
+      requestBody:
+        description: RoleUser resource
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecRoleUser_Create'
+      responses:
+        '201':
+          description: RoleUser Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecRoleUser'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+  '/rally/roleUser/{id}':
+    get:
+      tags:
+        - roleUser
+      summary: Get a RoleUser
+      description: Retrieve a RoleUser
+      operationId: getRoleUserById
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: RoleUser Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecRoleUser'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+    delete:
+      tags:
+        - roleUser
+      summary: Delete a RoleUser
+      description: Deletes a Batch and any associated Payments
+      operationId: deleteRoleUser
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          $ref: '#/components/responses/204_NoContent'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+  /rally/syncJob:
+    get:
+      tags:
+        - syncJob
+      summary: SyncJob list
+      description: Query and retrieve a SyncJob list
+      operationId: getSyncJobList
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/max'
+        - $ref: '#/components/parameters/q'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/order'
+      responses:
+        '200':
+          description: SyncJob Pager Resource
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Pager'
+                  - properties:
+                      data:
+                        description: SyncJob list
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SyncJob'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+  '/rally/syncJob/{id}':
+    get:
+      tags:
+        - syncJob
+      summary: Get a SyncJob
+      description: Retrieve a SyncJob
+      operationId: getSyncJobById
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: SyncJob Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncJob'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+  /rally/tag:
+    get:
+      tags:
+        - tag
+      summary: Tag list
+      description: Query and retrieve a Tag list
+      operationId: getTagList
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/max'
+        - $ref: '#/components/parameters/q'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/order'
+      responses:
+        '200':
+          description: Tag Pager Resource
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Pager'
+                  - properties:
+                      data:
+                        description: Tag list
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Tag'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+    post:
+      tags:
+        - tag
+      summary: Create a Tag
+      description: Create a new Tag
+      operationId: createTag
+      requestBody:
+        description: Tag resource
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tag_Create'
+      responses:
+        '201':
+          description: Tag Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+  '/rally/tag/{id}':
+    get:
+      tags:
+        - tag
+      summary: Get a Tag
+      description: Retrieve a Tag
+      operationId: getTagById
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Tag Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+    put:
+      tags:
+        - tag
+      summary: Update a Tag
+      description: ''
+      operationId: updateTag
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        description: Tag resource
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tag_Update'
+      responses:
+        '200':
+          description: Tag Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+    delete:
+      tags:
+        - tag
+      summary: Delete a Tag
+      description: Deletes a Batch and any associated Payments
+      operationId: deleteTag
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          $ref: '#/components/responses/204_NoContent'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+  /rally/user:
+    get:
+      tags:
+        - user
+      summary: User list
+      description: Query and retrieve a User list
+      operationId: getUserList
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/max'
+        - $ref: '#/components/parameters/q'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/order'
+      responses:
+        '200':
+          description: User Pager Resource
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Pager'
+                  - properties:
+                      data:
+                        description: User list
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AppUser'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+    post:
+      tags:
+        - user
+      summary: Create a User
+      description: Create a new User
+      operationId: createUser
+      requestBody:
+        description: User resource
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppUser_Create'
+      responses:
+        '201':
+          description: User Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppUser'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+  '/rally/user/{id}':
+    get:
+      tags:
+        - user
+      summary: Get a User
+      description: Retrieve a User
+      operationId: getUserById
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: User Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppUser'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+    put:
+      tags:
+        - user
+      summary: Update a User
+      description: ''
+      operationId: updateUser
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        description: User resource
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppUser_Update'
+      responses:
+        '200':
+          description: User Resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppUser'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+        '422':
+          $ref: '#/components/responses/422_ValidationError'
+    delete:
+      tags:
+        - user
+      summary: Delete a User
+      description: Deletes a Batch and any associated Payments
+      operationId: deleteUser
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          $ref: '#/components/responses/204_NoContent'
+        '403':
+          $ref: '#/components/responses/403_Forbidden'
+        '404':
+          $ref: '#/components/responses/404_NotFound'
+components:
+  schemas:
+    Tag:
+      title: Tag
+      x-entity: Tag
+      type: object
+      required:
+        - code
+        - name
+      properties:
+        code:
+          description: >-
+            Short code, alphanumeric with no special characters except dash (for
+            space) and underscore
+          maxLength: 10
+          type: string
+        description:
+          description: The description for this tag
+          maxLength: 255
+          type: string
+        entityName:
+          description: >-
+            The entity this tag can be applied to. May be a comma sep list of
+            entity names
+          maxLength: 255
+          type: string
+        name:
+          description: The name of tag
+          maxLength: 50
+          type: string
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    Attachment:
+      title: Attachment
+      x-entity: Attachment
+      type: object
+      required:
+        - name
+      properties:
+        contentLength:
+          description: The file size/contentLength in bytes. Populated on save
+          example: '7896'
+          readOnly: true
+          type: integer
+          format: int64
+        description:
+          description: The description for this entity
+          maxLength: 255
+          type: string
+        extension:
+          description: >-
+            The extension the file should have. Pulled from the name if not set.
+            Helps dictate the mime-type
+          example: pdf
+          maxLength: 255
+          type: string
+        kind:
+          description: The kind of attachment
+          example: Activity
+          type: string
+          enum:
+            - Activity
+            - Collection
+            - Invoice
+            - Report
+        locationKey:
+          description: >-
+            Defaults to attachments.location but can be changed to another key
+            such as creditFiles.location
+          example: attachments.location
+          maxLength: 255
+          type: string
+        mimeType:
+          description: The mime type of the file. Will be pulled from the names extension
+          example: application/pdf
+          maxLength: 255
+          type: string
+        name:
+          description: >-
+            This should be the file display name without dir; foo.txt, bar.pdf,
+            etc.
+
+            Populated from originalFileName when using a multiPart upload.
+
+            Location has the relative path and unique name on system. Use
+            description for any other useful info
+          maxLength: 100
+          type: string
+        source:
+          description: A source description if this is synced from another system
+          maxLength: 50
+          type: string
+        subject:
+          description: >-
+            Optional value for a email template or collectionStep this is the
+            generally the subject of an email or fax cover page.
+          example: Customer
+          maxLength: 255
+          type: string
+        tags:
+          description: the tags for this item
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    Problem:
+      description: >-
+        The Problem Details JSON Object
+        [[RFC7807](https://tools.ietf.org/html/rfc7807)].
+      type: object
+      minProperties: 1
+      additionalProperties: true
+      properties:
+        ok:
+          type: boolean
+          description: ok will always be false for a problem
+        status:
+          type: integer
+          description: The HTTP status code.
+          minimum: 400
+          maximum: 599
+        title:
+          type: string
+          description: >-
+            A short, human-readable summary of the problem type. It SHOULD NOT
+            change from occurrence to occurrence of the problem, except for
+            purposes of localization.
+        detail:
+          type: string
+          description: >-
+            A human-readable explanation specific to this occurrence of the
+            problem.
+        code:
+          type: string
+          description: a unique message key. Can be used to build the message title
+          format: uri
+        type:
+          type: string
+          description: >-
+            A URI reference [[RFC3986](https://tools.ietf.org/html/rfc3986)]
+            that identifies the problem type. It should provide human-readable
+            documentation for the problem type. When this member is not present,
+            its value is assumed to be "about:blank".
+        data:
+          type: object
+          description: Data that caused the error. Optional and not always returned
+    Pager:
+      type: object
+      properties:
+        page:
+          description: the page number of the data
+          type: integer
+          example: 1
+        total:
+          description: the total number of pages
+          type: integer
+          example: 20
+        records:
+          description: the total count of items for the query result
+          type: integer
+          example: 100
+        data:
+          type: array
+    KitchenSink:
+      title: KitchenSink
+      x-entity: KitchenSink
+      type: object
+      required:
+        - name
+        - kind
+        - num
+        - items
+      properties:
+        actDate:
+          type: string
+          format: date-time
+        amount:
+          type: number
+          format: money
+        bazMap:
+          type: string
+        beforeValidateCheck:
+          type: string
+        comments:
+          type: string
+        createdByJobId:
+          type: integer
+          format: int64
+        event:
+          type: string
+        ext:
+          $ref: '#/components/schemas/SinkExt'
+        inactive:
+          type: boolean
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SinkItem'
+        kind:
+          type: string
+          enum:
+            - CLIENT
+            - VENDOR
+            - PARENT
+        localDate:
+          type: string
+          format: date
+        localDateTime:
+          type: string
+          format: date-time
+        name:
+          description: Full name for this entity
+          maxLength: 50
+          type: string
+        name2:
+          type: string
+        num:
+          description: Unique alpha-numeric identifier for this entity
+          maxLength: 50
+          type: string
+        sinkLink:
+          $ref: '#/components/schemas/KitchenSink'
+        stampEvent:
+          type: string
+        status:
+          type: string
+          enum:
+            - Active
+            - Inactive
+            - Void
+        stringList:
+          type: string
+        thing:
+          $ref: '#/components/schemas/Thing'
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    Thing:
+      title: Thing
+      x-entity: Thing
+      type: object
+      required:
+        - name
+      properties:
+        country:
+          maxLength: 2
+          type: string
+        name:
+          description: The name for this entity
+          maxLength: 50
+          type: string
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    SinkExt:
+      title: SinkExt
+      x-entity: SinkExt
+      type: object
+      required:
+        - name
+      properties:
+        kitchenParent:
+          $ref: '#/components/schemas/KitchenSink'
+        name:
+          type: string
+        textMax:
+          maxLength: 2
+          type: string
+        thing:
+          $ref: '#/components/schemas/Thing'
+        totalDue:
+          type: number
+          format: money
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    SinkItem:
+      title: SinkItem
+      x-entity: SinkItem
+      type: object
+      required:
+        - name
+        - kitchenSink
+      properties:
+        kitchenSink:
+          $ref: '#/components/schemas/KitchenSink'
+        name:
+          description: The name for this entity
+          maxLength: 50
+          type: string
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    BlankProblem:
+      description: >-
+        The Problem Details JSON Object
+        [[RFC7807](https://tools.ietf.org/html/rfc7807)].
+      type: object
+      minProperties: 1
+      additionalProperties: true
+      properties:
+        status:
+          type: integer
+          description: The HTTP status code.
+          minimum: 400
+          maximum: 599
+        title:
+          type: string
+          description: >-
+            A short, human-readable summary of the problem type. It SHOULD NOT
+            change from occurrence to occurrence of the problem, except for
+            purposes of localization.
+    DocumentedProblem:
+      type: object
+      allOf:
+        - properties:
+            type:
+              type: string
+              description: >-
+                A URI reference [[RFC3986](https://tools.ietf.org/html/rfc3986)]
+                that identifies the problem type. It should provide
+                human-readable documentation for the problem type. When this
+                member is not present, its value is assumed to be "about:blank".
+              format: uri
+        - $ref: '#/components/schemas/BlankProblem'
+    DetailedProblem:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BlankProblem'
+        - properties:
+            detail:
+              type: string
+              description: >-
+                A human-readable explanation specific to this occurrence of the
+                problem.
+    Error:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/DocumentedProblem'
+        - $ref: '#/components/schemas/DetailedProblem'
+    SinkExt_Create:
+      title: SinkExt
+      x-entity: SinkExt
+      type: object
+      required:
+        - name
+      properties:
+        kitchenParent:
+          title: KitchenSink
+          type: object
+          properties:
+            id:
+              description: KitchenSink id
+              example: 954
+              type: integer
+              format: int64
+        name:
+          type: string
+        textMax:
+          maxLength: 2
+          type: string
+        thing:
+          title: Thing
+          type: object
+          properties:
+            id:
+              description: Thing id
+              example: 954
+              type: integer
+              format: int64
+        totalDue:
+          type: number
+          format: money
+    KitchenSink_Create:
+      title: KitchenSink
+      x-entity: KitchenSink
+      type: object
+      required:
+        - name
+        - kind
+        - num
+        - items
+      properties:
+        actDate:
+          type: string
+          format: date-time
+        amount:
+          type: number
+          format: money
+        bazMap:
+          type: string
+        beforeValidateCheck:
+          type: string
+        comments:
+          type: string
+        createdByJobId:
+          type: integer
+          format: int64
+        event:
+          type: string
+        ext:
+          $ref: '#/components/schemas/SinkExt_Create'
+        inactive:
+          type: boolean
+        items:
+          type: array
+          items:
+            title: SinkItem
+            type: object
+            properties:
+              id:
+                description: SinkItem id
+                example: 954
+                type: integer
+                format: int64
+        kind:
+          type: string
+          enum:
+            - CLIENT
+            - VENDOR
+            - PARENT
+        localDate:
+          type: string
+          format: date
+        localDateTime:
+          type: string
+          format: date-time
+        name:
+          description: Full name for this entity
+          maxLength: 50
+          type: string
+        name2:
+          type: string
+        num:
+          description: Unique alpha-numeric identifier for this entity
+          maxLength: 50
+          type: string
+        sinkLink:
+          $ref: '#/components/schemas/KitchenSink_Create'
+        stampEvent:
+          type: string
+        status:
+          type: string
+          enum:
+            - Active
+            - Inactive
+            - Void
+        stringList:
+          type: string
+        thing:
+          title: Thing
+          type: object
+          properties:
+            id:
+              description: Thing id
+              example: 954
+              type: integer
+              format: int64
+    ValidationErrorExtensions:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                description: >-
+                  The field name. Dot notation is used for nested object field
+                  names.
+              message:
+                type: string
+          example:
+            - field: field1
+              message: field1 is invalid
+            - field: subObject.field2
+              message: field2 is invalid
+            - field: subObject.field2
+              message: another error in the field2
+    ValidationError:
+      description: Invalid data was sent.
+      allOf:
+        - $ref: '#/components/schemas/Problem'
+        - $ref: '#/components/schemas/ValidationErrorExtensions'
+    SinkExt_Update:
+      title: SinkExt
+      x-entity: SinkExt
+      type: object
+      required:
+        - name
+      properties:
+        kitchenParent:
+          title: KitchenSink
+          type: object
+          properties:
+            id:
+              description: KitchenSink id
+              example: 954
+              type: integer
+              format: int64
+        name:
+          type: string
+        textMax:
+          maxLength: 2
+          type: string
+        thing:
+          title: Thing
+          type: object
+          properties:
+            id:
+              description: Thing id
+              example: 954
+              type: integer
+              format: int64
+        totalDue:
+          type: number
+          format: money
+    KitchenSink_Update:
+      title: KitchenSink
+      x-entity: KitchenSink
+      type: object
+      required:
+        - name
+        - kind
+        - num
+        - items
+      properties:
+        actDate:
+          type: string
+          format: date-time
+        amount:
+          type: number
+          format: money
+        bazMap:
+          type: string
+        beforeValidateCheck:
+          type: string
+        comments:
+          type: string
+        createdByJobId:
+          type: integer
+          format: int64
+        event:
+          type: string
+        ext:
+          $ref: '#/components/schemas/SinkExt_Update'
+        inactive:
+          type: boolean
+        items:
+          type: array
+          items:
+            title: SinkItem
+            type: object
+            properties:
+              id:
+                description: SinkItem id
+                example: 954
+                type: integer
+                format: int64
+        kind:
+          type: string
+          enum:
+            - CLIENT
+            - VENDOR
+            - PARENT
+        localDate:
+          type: string
+          format: date
+        localDateTime:
+          type: string
+          format: date-time
+        name:
+          description: Full name for this entity
+          maxLength: 50
+          type: string
+        name2:
+          type: string
+        num:
+          description: Unique alpha-numeric identifier for this entity
+          maxLength: 50
+          type: string
+        sinkLink:
+          $ref: '#/components/schemas/KitchenSink_Update'
+        stampEvent:
+          type: string
+        status:
+          type: string
+          enum:
+            - Active
+            - Inactive
+            - Void
+        stringList:
+          type: string
+        thing:
+          title: Thing
+          type: object
+          properties:
+            id:
+              description: Thing id
+              example: 954
+              type: integer
+              format: int64
+    Contact:
+      title: Contact
+      x-entity: Contact
+      type: object
+      required:
+        - firstName
+        - name
+        - orgId
+      properties:
+        altName:
+          description: 'Alternate name, nickname or job name'
+          maxLength: 255
+          type: string
+        comments:
+          description: Notes about the contact
+          maxLength: 255
+          type: string
+        email:
+          description: Default email
+          maxLength: 255
+          format: email
+          type: string
+        emails:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactEmail'
+        firstName:
+          description: First name
+          maxLength: 50
+          type: string
+        flex:
+          description: Custom user fields for this contact
+          $ref: '#/components/schemas/ContactFlex'
+        inactive:
+          description: True when not active
+          type: boolean
+        jobTitle:
+          description: Job title
+          maxLength: 50
+          type: string
+        lastName:
+          description: Last name
+          maxLength: 50
+          type: string
+        location:
+          description: Default location
+          $ref: '#/components/schemas/Location'
+        name:
+          description: 'Name of Contact, joined using firstName + lastName'
+          maxLength: 50
+          type: string
+        num:
+          description: 'num, used for job or organization type contacts'
+          maxLength: 50
+          type: string
+        org:
+          description: The organization this contact belongs to
+          $ref: '#/components/schemas/Org'
+        orgId:
+          description: The org id for the contact
+          type: integer
+          format: int64
+        phone:
+          description: Default phone
+          maxLength: 255
+          type: string
+        phones:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactPhone'
+        source:
+          description: Originator source info
+          $ref: '#/components/schemas/ContactSource'
+        tagForReminders:
+          description: If this contact should get correspondence
+          type: boolean
+        tags:
+          description: the tags for this item
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        user:
+          description: The user if this contact is able to login
+          $ref: '#/components/schemas/AppUser'
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    ContactEmail:
+      title: ContactEmail
+      x-entity: ContactEmail
+      type: object
+      required:
+        - address
+      properties:
+        address:
+          description: The email addy
+          maxLength: 255
+          type: string
+        contact:
+          $ref: '#/components/schemas/Contact'
+        isPrimary:
+          description: If this is the contacts primary email
+          type: boolean
+        kind:
+          description: future use
+          maxLength: 50
+          type: string
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    ContactFlex:
+      title: ContactFlex
+      x-entity: ContactFlex
+      type: object
+      properties:
+        date1:
+          description: Flexible date field
+          type: string
+          format: date-time
+        date2:
+          description: Flexible date field
+          type: string
+          format: date-time
+        date3:
+          description: Flexible date field
+          type: string
+          format: date-time
+        date4:
+          description: Flexible date field
+          type: string
+          format: date-time
+        num1:
+          description: Flexible numeric field 1
+          type: number
+          format: money
+        num2:
+          description: Flexible numeric field 2
+          type: number
+          format: money
+        num3:
+          description: Flexible numeric field 3
+          type: number
+          format: money
+        num4:
+          description: Flexible numeric field 4
+          type: number
+          format: money
+        num5:
+          description: Flexible numeric field 5
+          type: number
+          format: money
+        num6:
+          description: Flexible numeric field 6
+          type: number
+          format: money
+        text1:
+          description: Flexible text field 1
+          maxLength: 255
+          type: string
+        text10:
+          description: Flexible text field 10
+          maxLength: 255
+          type: string
+        text2:
+          description: Flexible text field 2
+          maxLength: 255
+          type: string
+        text3:
+          description: Flexible text field 3
+          maxLength: 255
+          type: string
+        text4:
+          description: Flexible text field 4
+          maxLength: 255
+          type: string
+        text5:
+          description: Flexible text field 5
+          maxLength: 255
+          type: string
+        text6:
+          description: Flexible text field 6
+          maxLength: 255
+          type: string
+        text7:
+          description: Flexible text field 7
+          maxLength: 255
+          type: string
+        text8:
+          description: Flexible text field 8
+          maxLength: 255
+          type: string
+        text9:
+          description: Flexible text field 9
+          maxLength: 255
+          type: string
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    OrgCalc:
+      title: OrgCalc
+      x-entity: OrgCalc
+      type: object
+      properties:
+        adjustedTotal:
+          type: number
+          format: money
+        adjusterAmt:
+          type: number
+          format: money
+        adp:
+          description: avg days to pay
+          type: number
+          format: 'decimal(9,1)'
+        adpWtd:
+          description: weighted average days to pay
+          type: number
+          format: 'decimal(9,1)'
+        aging1:
+          description: Aging bucket 1
+          type: number
+          format: money
+        aging10:
+          description: Aging bucket 10
+          type: number
+          format: money
+        aging2:
+          description: Aging bucket 2
+          type: number
+          format: money
+        aging3:
+          description: Aging bucket 3
+          type: number
+          format: money
+        aging4:
+          description: Aging bucket 4
+          type: number
+          format: money
+        aging5:
+          description: Aging bucket 5
+          type: number
+          format: money
+        aging6:
+          description: Aging bucket 6
+          type: number
+          format: money
+        aging7:
+          description: Aging bucket 7
+          type: number
+          format: money
+        aging8:
+          description: Aging bucket 8
+          type: number
+          format: money
+        aging9:
+          description: Aging bucket 9
+          type: number
+          format: money
+        avgDaysBt:
+          description: avg days paid late / avg days beyond terms
+          type: number
+          format: 'decimal(9,1)'
+        beginBal:
+          type: number
+          format: money
+        cei:
+          description: collection effectiveness index
+          type: number
+          format: 'decimal(9,1)'
+        curBal:
+          description: whats not due yet
+          type: number
+          format: money
+        ddo:
+          description: days deductions and disputes outstanding
+          type: number
+          format: 'decimal(9,1)'
+        dso:
+          description: day sales outstanding
+          type: number
+          format: 'decimal(9,1)'
+        dso12:
+          description: DSO using the last 12 month average
+          type: number
+          format: 'decimal(9,1)'
+        dsoad:
+          description: DSO add back
+          type: number
+          format: 'decimal(9,1)'
+        dsobp:
+          description: DSO best possible
+          type: number
+          format: 'decimal(9,1)'
+        glPostPeriod:
+          type: string
+        grossProfit:
+          type: number
+          format: money
+        grossProfitPct:
+          type: number
+          format: money
+        maxDue:
+          description: max totalDue in this month and last 12 months
+          type: number
+          format: money
+        maxDuePer:
+          description: period the highest balance occured in the last 12 months
+          maxLength: 255
+          type: string
+        newCM:
+          type: number
+          format: money
+        newDD:
+          type: number
+          format: money
+        newDM:
+          type: number
+          format: money
+        newIN:
+          type: number
+          format: money
+        newPA:
+          type: number
+          format: money
+        newTotal:
+          type: number
+          format: money
+        num1:
+          type: number
+          format: money
+        num2:
+          type: number
+          format: money
+        num3:
+          type: number
+          format: money
+        num4:
+          type: number
+          format: money
+        num5:
+          type: number
+          format: money
+        num6:
+          type: number
+          format: money
+        openCM:
+          type: number
+          format: money
+        openDD:
+          type: number
+          format: money
+        openDM:
+          type: number
+          format: money
+        openIN:
+          type: number
+          format: money
+        openPA:
+          type: number
+          format: money
+        pastDue:
+          description: balance past due
+          type: number
+          format: money
+        salesRolling12:
+          type: number
+          format: money
+        salesYtd:
+          type: number
+          format: money
+        totalDue:
+          description: >-
+            total due, sum of all open items. will be the ending balance when
+            month is closed
+          type: number
+          format: money
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+    OrgFlex:
+      title: OrgFlex
+      x-entity: OrgFlex
+      type: object
+      properties:
+        date1:
+          description: Flexible date field
+          type: string
+          format: date-time
+        date2:
+          description: Flexible date field
+          type: string
+          format: date-time
+        date3:
+          description: Flexible date field
+          type: string
+          format: date-time
+        date4:
+          description: Flexible date field
+          type: string
+          format: date-time
+        num1:
+          description: Flexible numeric field 1
+          type: number
+          format: money
+        num2:
+          description: Flexible numeric field 2
+          type: number
+          format: money
+        num3:
+          description: Flexible numeric field 3
+          type: number
+          format: money
+        num4:
+          description: Flexible numeric field 4
+          type: number
+          format: money
+        num5:
+          description: Flexible numeric field 5
+          type: number
+          format: money
+        num6:
+          description: Flexible numeric field 6
+          type: number
+          format: money
+        text1:
+          description: Flexible text field 1
+          maxLength: 255
+          type: string
+        text10:
+          description: Flexible text field 10
+          maxLength: 255
+          type: string
+        text2:
+          description: Flexible text field 2
+          maxLength: 255
+          type: string
+        text3:
+          description: Flexible text field 3
+          maxLength: 255
+          type: string
+        text4:
+          description: Flexible text field 4
+          maxLength: 255
+          type: string
+        text5:
+          description: Flexible text field 5
+          maxLength: 255
+          type: string
+        text6:
+          description: Flexible text field 6
+          maxLength: 255
+          type: string
+        text7:
+          description: Flexible text field 7
+          maxLength: 255
+          type: string
+        text8:
+          description: Flexible text field 8
+          maxLength: 255
+          type: string
+        text9:
+          description: Flexible text field 9
+          maxLength: 255
+          type: string
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    OrgInfo:
+      title: OrgInfo
+      x-entity: OrgInfo
+      type: object
+      properties:
+        fax:
+          description: primary fax
+          maxLength: 255
+          type: string
+        phone:
+          description: 'primary hq number, switchboard'
+          maxLength: 255
+          type: string
+        website:
+          description: website home page
+          maxLength: 255
+          type: string
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    Location:
+      title: Location
+      x-entity: Location
+      type: object
+      required:
+        - orgId
+      properties:
+        address3:
+          maxLength: 100
+          type: string
+        address4:
+          maxLength: 100
+          type: string
+        city:
+          maxLength: 100
+          type: string
+        contact:
+          description: The contact this belongs to
+          $ref: '#/components/schemas/Contact'
+        country:
+          maxLength: 3
+          type: string
+        county:
+          maxLength: 50
+          type: string
+        kind:
+          description: The address type
+          type: string
+          enum:
+            - work
+            - home
+            - other
+            - mailing
+            - remittance
+            - physical
+        name:
+          description: 'A descriptive name, can be used for reports an letters'
+          maxLength: 255
+          type: string
+        org:
+          description: The organization this belongs to
+          $ref: '#/components/schemas/Org'
+        orgId:
+          description: The org id for this
+          type: integer
+          format: int64
+        state:
+          maxLength: 25
+          type: string
+        street1:
+          maxLength: 100
+          type: string
+        street2:
+          maxLength: 100
+          type: string
+        zipCode:
+          maxLength: 50
+          type: string
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    Org:
+      title: Org
+      x-entity: Org
+      type: object
+      required:
+        - name
+        - type
+        - num
+      properties:
+        calc:
+          description: Calculated fields
+          readOnly: true
+          $ref: '#/components/schemas/OrgCalc'
+        comments:
+          description: A user visible comment
+          example: Lorem ipsum
+          maxLength: 255
+          type: string
+        companyId:
+          description: Company id this org belongs to
+          example: '2'
+          type: integer
+          format: int64
+        contact:
+          description: The default or key Contact for this organization
+          $ref: '#/components/schemas/Contact'
+        flex:
+          description: User flex fields
+          $ref: '#/components/schemas/OrgFlex'
+        inactive:
+          description: indicator for an Org that is no longer active
+          type: boolean
+        info:
+          description: Info such as phone and website for an organization
+          $ref: '#/components/schemas/OrgInfo'
+        location:
+          description: The primary organization address info
+          $ref: '#/components/schemas/Location'
+        locations:
+          description: List of locations
+          type: array
+          items:
+            $ref: '#/components/schemas/Location'
+        member:
+          description: Dimension hierarchy fields
+          $ref: '#/components/schemas/OrgMember'
+        name:
+          description: The full name for this organization
+          example: SpaceX Corp.
+          maxLength: 255
+          type: string
+        num:
+          description: Unique alpha-numeric identifier for this organization
+          example: SPX-321
+          maxLength: 50
+          type: string
+        orgTypeId:
+          type: integer
+          format: int64
+        source:
+          description: 'Originator source info, used when this is sourced externally'
+          $ref: '#/components/schemas/OrgSource'
+        tags:
+          description: the tags for this item
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        type:
+          description: The type of org
+          example: Customer
+          type: string
+          enum:
+            - Customer
+            - CustAccount
+            - Branch
+            - Division
+            - Business
+            - Company
+            - Prospect
+            - Sales
+            - Client
+            - Factory
+            - Region
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    OrgMember:
+      title: OrgMember
+      x-entity: OrgMember
+      type: object
+      properties:
+        branch:
+          description: The branch for the Org
+          $ref: '#/components/schemas/Org'
+        business:
+          description: The business for the Org
+          $ref: '#/components/schemas/Org'
+        company:
+          $ref: '#/components/schemas/Org'
+        division:
+          description: The division for the Org
+          $ref: '#/components/schemas/Org'
+        factory:
+          description: The factory for the Org
+          $ref: '#/components/schemas/Org'
+        region:
+          description: The region for the Org
+          $ref: '#/components/schemas/Org'
+        sales:
+          description: The sales for the Org
+          $ref: '#/components/schemas/Org'
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    OrgSource:
+      title: OrgSource
+      x-entity: OrgSource
+      type: object
+      required:
+        - sourceId
+        - orgId
+      properties:
+        orgId:
+          description: The id of the org this is for
+          example: '954'
+          type: integer
+          format: int64
+        orgType:
+          description: >-
+            denormalized orgType so we can have unique index within org type
+            (sourceType, sourceId and orgType)
+          example: Customer
+          readOnly: true
+          type: string
+          enum:
+            - Customer
+            - CustAccount
+            - Branch
+            - Division
+            - Business
+            - Company
+            - Prospect
+            - Sales
+            - Client
+            - Factory
+            - Region
+        originator:
+          description: >-
+            indicates this source was the creator of this org, should only be 1
+            per Org
+          type: boolean
+        source:
+          description: A description of where this came from
+          example: 'Oracle, BankOfAmerica, Lockbox'
+          maxLength: 255
+          type: string
+        sourceId:
+          description: the unique id from the outside source or name of the scheduled job
+          example: AR-123-A64
+          maxLength: 255
+          type: string
+        sourceType:
+          description: 'Enum, defaults to SourceType.App'
+          example: App
+          default: App
+          type: string
+          enum:
+            - App
+            - Scheduler
+            - ERP
+            - RestApi
+            - PayGateway
+        sourceVersion:
+          description: the version of the last edit in source system
+          example: '912'
+          maxLength: 255
+          type: string
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    ContactPhone:
+      title: ContactPhone
+      x-entity: ContactPhone
+      type: object
+      properties:
+        contact:
+          $ref: '#/components/schemas/Contact'
+        isPrimary:
+          description: if this is the contacts primary number
+          type: boolean
+        kind:
+          description: future use
+          maxLength: 50
+          type: string
+        num:
+          description: future use
+          maxLength: 255
+          type: string
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    ContactSource:
+      title: ContactSource
+      x-entity: ContactSource
+      type: object
+      required:
+        - contactId
+        - sourceId
+      properties:
+        contactId:
+          description: The id of the contact this is for
+          type: integer
+          format: int64
+        source:
+          description: A description of where this came from
+          example: 'Oracle, BankOfAmerica, Lockbox'
+          maxLength: 255
+          type: string
+        sourceId:
+          description: the unique id from the outside source or name of the scheduled job
+          example: AR-123-A64
+          maxLength: 255
+          type: string
+        sourceType:
+          description: 'Enum, defaults to SourceType.App'
+          example: App
+          default: App
+          type: string
+          enum:
+            - App
+            - Scheduler
+            - ERP
+            - RestApi
+            - PayGateway
+        sourceVersion:
+          maxLength: 255
+          type: string
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    SecRole:
+      title: SecRole
+      x-entity: SecRole
+      type: object
+      required:
+        - code
+        - name
+      properties:
+        code:
+          description: Upper case role key
+          maxLength: 25
+          type: string
+        description:
+          description: A longer description
+          maxLength: 255
+          type: string
+        name:
+          description: The name of the role
+          maxLength: 50
+          type: string
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    AppUser:
+      title: AppUser
+      x-entity: AppUser
+      type: object
+      required:
+        - username
+        - email
+        - secRoles
+      properties:
+        email:
+          description: The email
+          maxLength: 255
+          format: email
+          type: string
+        inactive:
+          description: >-
+            True if user is inactive which means they cannot login but are still
+            here for history
+          readOnly: true
+          type: boolean
+        name:
+          description: >-
+            The full name, may come from contact, will default to username if
+            not populated
+          maxLength: 50
+          type: string
+        orgId:
+          description: The org to which this user belongs to
+          readOnly: true
+          type: integer
+          format: int64
+        passwordChangedDate:
+          description: The date password was changed
+          type: string
+          format: date-time
+        passwordExpired:
+          description: The password expired
+          readOnly: true
+          type: boolean
+        roles:
+          description: The string list of roles assigned to this user
+          readOnly: true
+          type: array
+          items:
+            type: string
+        secRoles:
+          description: The roles assigned to this user
+          type: array
+          items:
+            $ref: '#/components/schemas/SecRole'
+        username:
+          description: >
+            The unique user name, also known as your handle –– what you put
+            after the “@” symbol ala github or twitter
+
+            to mention others in comments or notes. appears in your profile URL.
+            username is used to log in to your account,
+
+            and is visible when sending and receiving. All lowercase and no
+            spaces or special characters.
+          maxLength: 50
+          type: string
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    ActivityLink:
+      title: ActivityLink
+      x-entity: ActivityLink
+      type: object
+      required:
+        - linkedId
+        - linkedEntity
+      properties:
+        linkedEntity:
+          description: The simple class name of the linked entity
+          example: ArTran
+          maxLength: 255
+          type: string
+        linkedId:
+          description: the id of the entity this tag is linked to
+          example: '954'
+          type: integer
+          format: int64
+    MailMessage:
+      title: MailMessage
+      x-entity: MailMessage
+      type: object
+      required:
+        - sendTo
+        - state
+      properties:
+        attachmentIds:
+          description: ids list of attachments
+          default: plain
+          type: string
+        bcc:
+          description: bcc addys
+          maxLength: 1000
+          type: string
+        body:
+          description: body of message
+          maxLength: 65535
+          type: string
+        cc:
+          description: 'cc addys, see `sendTo` for format'
+          maxLength: 1000
+          type: string
+        contentType:
+          type: string
+          enum:
+            - plain
+            - html
+            - markdown
+        inlineIds:
+          description: 'plain, html or markdown for whats in body'
+          default: plain
+          type: string
+        messageId:
+          description: >-
+            When using something like mailgun this is the id returned from the
+            send submit
+          maxLength: 255
+          type: string
+        msgResponse:
+          description: >-
+            The last response or error message from the mail processor when
+            availiable.
+          maxLength: 255
+          type: string
+        replyTo:
+          description: what to show for replyTo in email
+          maxLength: 255
+          type: string
+        sendDate:
+          description: >-
+            The last response or error message from the mail processor when
+            availiable.
+          type: string
+          format: date-time
+        sendFrom:
+          description: who its from
+          maxLength: 255
+          type: string
+        sendTo:
+          description: >
+
+            Email address of the recipient(s). RFC standard email format comma
+            seperated with name in quotes and email in < .. >.
+
+            example: "Blow, Joe" <joe@joes.com>, john@galt.com
+          maxLength: 1000
+          type: string
+        source:
+          description: any special source indicator
+          maxLength: 255
+          type: string
+        state:
+          description: the state of the message
+          type: string
+          enum:
+            - Queued
+            - Sent
+            - Error
+            - Delivered
+            - Opened
+            - Complained
+        subject:
+          description: email message subject
+          maxLength: 1000
+          type: string
+        tags:
+          type: string
+        id:
+          type: string
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    ActivityNote:
+      title: ActivityNote
+      x-entity: ActivityNote
+      type: object
+      required:
+        - body
+      properties:
+        body:
+          description: The note body
+          maxLength: 65535
+          type: string
+        contentType:
+          description: 'plain, html, markdown'
+          default: plain
+          maxLength: 255
+          type: string
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    TaskStatus:
+      title: TaskStatus
+      x-entity: TaskStatus
+      type: object
+      required:
+        - name
+        - code
+      properties:
+        code:
+          description: >-
+            Short code, alphanumeric with no special characters except dash (for
+            space) and underscore
+          maxLength: 10
+          type: string
+        description:
+          description: The description for this entity
+          maxLength: 255
+          type: string
+        name:
+          description: The name for this entity
+          maxLength: 50
+          type: string
+        state:
+          description: The task state this status assigns
+          default: Open
+          type: string
+          enum:
+            - Open
+            - Complete
+            - Draft
+            - Void
+        validForAr:
+          type: boolean
+        validForCall:
+          type: boolean
+        validForEmail:
+          type: boolean
+        validForFax:
+          type: boolean
+        validForMeeting:
+          type: boolean
+        validForParcel:
+          type: boolean
+        validForSales:
+          type: boolean
+        validForTask:
+          type: boolean
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    TaskType:
+      title: TaskType
+      x-entity: TaskType
+      type: object
+      required:
+        - name
+        - code
+        - kind
+      properties:
+        code:
+          description: >-
+            Short code, alphanumeric with no special characters except dash (for
+            space) and underscore
+          maxLength: 10
+          type: string
+        description:
+          description: The description for this entity
+          maxLength: 255
+          type: string
+        kind:
+          type: string
+          enum:
+            - Note
+            - Alert
+            - Log
+            - Email
+            - Todo
+            - Call
+            - Meeting
+        name:
+          description: The name for this entity
+          maxLength: 50
+          type: string
+        validForAr:
+          type: boolean
+        validForSales:
+          type: boolean
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    Task:
+      title: Task
+      x-entity: Task
+      type: object
+      required:
+        - dueDate
+        - taskType
+      properties:
+        completedBy:
+          description: The user who completed
+          type: integer
+          format: int64
+        completedDate:
+          description: The date it was completed
+          type: string
+          format: date-time
+        docTag:
+          description: descriptor
+          maxLength: 255
+          type: string
+        dueDate:
+          description: The relative path to the locationKey
+          type: string
+          format: date-time
+        priority:
+          description: '10 is Critical, 20 High, 30 Medium, 40 Low'
+          type: integer
+        state:
+          description: Defaults to Open
+          type: string
+          enum:
+            - Open
+            - Complete
+            - Draft
+            - Void
+        status:
+          description: Defaults to TaskStatus.OPEN
+          $ref: '#/components/schemas/TaskStatus'
+        taskType:
+          description: The type of the task
+          $ref: '#/components/schemas/TaskType'
+        userId:
+          description: >-
+            User id who is responsible for making sure this thing is done. null
+            means anyone.
+          type: integer
+          format: int64
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    Activity:
+      title: Activity
+      x-entity: Activity
+      type: object
+      required:
+        - name
+        - actDate
+        - org
+        - attachments
+        - contacts
+        - links
+      properties:
+        actDate:
+          description: Activity date
+          type: string
+          format: date-time
+        attachments:
+          description: the attachments for this item
+          type: array
+          items:
+            $ref: '#/components/schemas/Attachment'
+        contacts:
+          description: The contacts associated with this activity.
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+        kind:
+          description: 'The type of the activity, certain kinds are only valid for a Task.'
+          default: Note
+          type: string
+          enum:
+            - Note
+            - Alert
+            - Log
+            - Email
+            - Todo
+            - Call
+            - Meeting
+        level:
+          description: >-
+            The priority level generally for an Alert or Log, but can be used
+            for other Activity Kinds
+          default: Info
+          type: string
+          enum:
+            - Info
+            - Urgent
+            - Error
+            - Warn
+            - Resolved
+        links:
+          description: The entities this is linked to.
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivityLink'
+        mailMessage:
+          $ref: '#/components/schemas/MailMessage'
+        name:
+          description: >-
+            The short name or a 255 char string summary of the activity, if note
+            it will ends with ... if there is more to the note.
+          maxLength: 255
+          type: string
+        note:
+          description: A note for this activity. Name will be built from this
+          $ref: '#/components/schemas/ActivityNote'
+        org:
+          description: The Org this activity belongs to
+          $ref: '#/components/schemas/Org'
+        source:
+          description: |-
+            The source description for where this activity came from.
+                           The gorm domain name of the record that generated this such as CollectionStep, Promise
+          example: 'Oracle, BankOfAmerica, Lockbox'
+          maxLength: 50
+          type: string
+        sourceId:
+          description: >-
+            The id from the outside source or of the collection step, promise or
+            some future workflow template record that generated this
+          example: AR-123-A64
+          maxLength: 50
+          type: string
+        sourceType:
+          description: 'Enum, defaults to SourceType.App'
+          example: App
+          default: App
+          type: string
+          enum:
+            - App
+            - Scheduler
+            - ERP
+            - RestApi
+            - PayGateway
+        tags:
+          description: the tags for this item
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        task:
+          description: The task info if this is a task kind
+          $ref: '#/components/schemas/Task'
+        visibleId:
+          description: The id fo the role or group this is visible to if set to role
+          type: integer
+          format: int64
+        visibleTo:
+          description: Who can see this activity. Defaults to Everyone
+          default: Everyone
+          type: string
+          enum:
+            - Company
+            - Everyone
+            - Owner
+            - Role
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    ActivityNote_Create:
+      title: ActivityNote
+      x-entity: ActivityNote
+      type: object
+      required:
+        - body
+      properties:
+        body:
+          description: The note body
+          maxLength: 65535
+          type: string
+        contentType:
+          description: 'plain, html, markdown'
+          default: plain
+          maxLength: 255
+          type: string
+    Task_Create:
+      title: Task
+      x-entity: Task
+      type: object
+      required:
+        - dueDate
+        - taskType
+      properties:
+        completedBy:
+          description: The user who completed
+          type: integer
+          format: int64
+        completedDate:
+          description: The date it was completed
+          type: string
+          format: date-time
+        docTag:
+          description: descriptor
+          maxLength: 255
+          type: string
+        dueDate:
+          description: The relative path to the locationKey
+          type: string
+          format: date-time
+        priority:
+          description: '10 is Critical, 20 High, 30 Medium, 40 Low'
+          type: integer
+        state:
+          description: Defaults to Open
+          type: string
+          enum:
+            - Open
+            - Complete
+            - Draft
+            - Void
+        status:
+          description: Defaults to TaskStatus.OPEN
+          title: TaskStatus
+          type: object
+          properties:
+            id:
+              description: TaskStatus id
+              example: 954
+              type: integer
+              format: int64
+        taskType:
+          description: The type of the task
+          title: TaskType
+          type: object
+          properties:
+            id:
+              description: TaskType id
+              example: 954
+              type: integer
+              format: int64
+        userId:
+          description: >-
+            User id who is responsible for making sure this thing is done. null
+            means anyone.
+          type: integer
+          format: int64
+    Activity_Create:
+      title: Activity
+      x-entity: Activity
+      type: object
+      required:
+        - name
+        - actDate
+        - org
+        - attachments
+        - contacts
+        - links
+      properties:
+        actDate:
+          description: Activity date
+          type: string
+          format: date-time
+        attachments:
+          description: the attachments for this item
+          type: array
+          items:
+            title: Attachment
+            type: object
+            properties:
+              id:
+                description: Attachment id
+                example: 954
+                type: integer
+                format: int64
+        contacts:
+          description: The contacts associated with this activity.
+          type: array
+          items:
+            title: Contact
+            type: object
+            properties:
+              id:
+                description: Contact id
+                example: 954
+                type: integer
+                format: int64
+        kind:
+          description: 'The type of the activity, certain kinds are only valid for a Task.'
+          default: Note
+          type: string
+          enum:
+            - Note
+            - Alert
+            - Log
+            - Email
+            - Todo
+            - Call
+            - Meeting
+        level:
+          description: >-
+            The priority level generally for an Alert or Log, but can be used
+            for other Activity Kinds
+          default: Info
+          type: string
+          enum:
+            - Info
+            - Urgent
+            - Error
+            - Warn
+            - Resolved
+        links:
+          description: The entities this is linked to.
+          type: array
+          items:
+            title: ActivityLink
+            type: object
+            properties:
+              id:
+                description: ActivityLink id
+                example: 954
+                type: integer
+                format: int64
+        mailMessage:
+          title: MailMessage
+          type: object
+          properties:
+            id:
+              description: MailMessage id
+              example: 954
+              type: integer
+              format: int64
+        name:
+          description: >-
+            The short name or a 255 char string summary of the activity, if note
+            it will ends with ... if there is more to the note.
+          maxLength: 255
+          type: string
+        note:
+          description: A note for this activity. Name will be built from this
+          $ref: '#/components/schemas/ActivityNote_Create'
+        org:
+          description: The Org this activity belongs to
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+        source:
+          description: |-
+            The source description for where this activity came from.
+                           The gorm domain name of the record that generated this such as CollectionStep, Promise
+          example: 'Oracle, BankOfAmerica, Lockbox'
+          maxLength: 50
+          type: string
+        sourceId:
+          description: >-
+            The id from the outside source or of the collection step, promise or
+            some future workflow template record that generated this
+          example: AR-123-A64
+          maxLength: 50
+          type: string
+        sourceType:
+          description: 'Enum, defaults to SourceType.App'
+          example: App
+          default: App
+          type: string
+          enum:
+            - App
+            - Scheduler
+            - ERP
+            - RestApi
+            - PayGateway
+        tags:
+          description: the tags for this item
+          type: array
+          items:
+            title: Tag
+            type: object
+            properties:
+              id:
+                description: Tag id
+                example: 954
+                type: integer
+                format: int64
+        task:
+          description: The task info if this is a task kind
+          $ref: '#/components/schemas/Task_Create'
+        visibleId:
+          description: The id fo the role or group this is visible to if set to role
+          type: integer
+          format: int64
+        visibleTo:
+          description: Who can see this activity. Defaults to Everyone
+          default: Everyone
+          type: string
+          enum:
+            - Company
+            - Everyone
+            - Owner
+            - Role
+    ActivityNote_Update:
+      title: ActivityNote
+      x-entity: ActivityNote
+      type: object
+      required:
+        - body
+      properties:
+        body:
+          description: The note body
+          maxLength: 65535
+          type: string
+        contentType:
+          description: 'plain, html, markdown'
+          default: plain
+          maxLength: 255
+          type: string
+    Task_Update:
+      title: Task
+      x-entity: Task
+      type: object
+      required:
+        - dueDate
+        - taskType
+      properties:
+        completedBy:
+          description: The user who completed
+          type: integer
+          format: int64
+        completedDate:
+          description: The date it was completed
+          type: string
+          format: date-time
+        docTag:
+          description: descriptor
+          maxLength: 255
+          type: string
+        dueDate:
+          description: The relative path to the locationKey
+          type: string
+          format: date-time
+        priority:
+          description: '10 is Critical, 20 High, 30 Medium, 40 Low'
+          type: integer
+        state:
+          description: Defaults to Open
+          type: string
+          enum:
+            - Open
+            - Complete
+            - Draft
+            - Void
+        status:
+          description: Defaults to TaskStatus.OPEN
+          title: TaskStatus
+          type: object
+          properties:
+            id:
+              description: TaskStatus id
+              example: 954
+              type: integer
+              format: int64
+        taskType:
+          description: The type of the task
+          title: TaskType
+          type: object
+          properties:
+            id:
+              description: TaskType id
+              example: 954
+              type: integer
+              format: int64
+        userId:
+          description: >-
+            User id who is responsible for making sure this thing is done. null
+            means anyone.
+          type: integer
+          format: int64
+    Activity_Update:
+      title: Activity
+      x-entity: Activity
+      type: object
+      required:
+        - name
+        - org
+        - attachments
+        - contacts
+        - links
+      properties:
+        attachments:
+          description: the attachments for this item
+          type: array
+          items:
+            title: Attachment
+            type: object
+            properties:
+              id:
+                description: Attachment id
+                example: 954
+                type: integer
+                format: int64
+        contacts:
+          description: The contacts associated with this activity.
+          type: array
+          items:
+            title: Contact
+            type: object
+            properties:
+              id:
+                description: Contact id
+                example: 954
+                type: integer
+                format: int64
+        kind:
+          description: 'The type of the activity, certain kinds are only valid for a Task.'
+          default: Note
+          type: string
+          enum:
+            - Note
+            - Alert
+            - Log
+            - Email
+            - Todo
+            - Call
+            - Meeting
+        level:
+          description: >-
+            The priority level generally for an Alert or Log, but can be used
+            for other Activity Kinds
+          default: Info
+          type: string
+          enum:
+            - Info
+            - Urgent
+            - Error
+            - Warn
+            - Resolved
+        links:
+          description: The entities this is linked to.
+          type: array
+          items:
+            title: ActivityLink
+            type: object
+            properties:
+              id:
+                description: ActivityLink id
+                example: 954
+                type: integer
+                format: int64
+        mailMessage:
+          title: MailMessage
+          type: object
+          properties:
+            id:
+              description: MailMessage id
+              example: 954
+              type: integer
+              format: int64
+        name:
+          description: >-
+            The short name or a 255 char string summary of the activity, if note
+            it will ends with ... if there is more to the note.
+          maxLength: 255
+          type: string
+        note:
+          description: A note for this activity. Name will be built from this
+          $ref: '#/components/schemas/ActivityNote_Update'
+        org:
+          description: The Org this activity belongs to
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+        source:
+          description: |-
+            The source description for where this activity came from.
+                           The gorm domain name of the record that generated this such as CollectionStep, Promise
+          example: 'Oracle, BankOfAmerica, Lockbox'
+          maxLength: 50
+          type: string
+        sourceId:
+          description: >-
+            The id from the outside source or of the collection step, promise or
+            some future workflow template record that generated this
+          example: AR-123-A64
+          maxLength: 50
+          type: string
+        sourceType:
+          description: 'Enum, defaults to SourceType.App'
+          example: App
+          default: App
+          type: string
+          enum:
+            - App
+            - Scheduler
+            - ERP
+            - RestApi
+            - PayGateway
+        tags:
+          description: the tags for this item
+          type: array
+          items:
+            title: Tag
+            type: object
+            properties:
+              id:
+                description: Tag id
+                example: 954
+                type: integer
+                format: int64
+        task:
+          description: The task info if this is a task kind
+          $ref: '#/components/schemas/Task_Update'
+        visibleId:
+          description: The id fo the role or group this is visible to if set to role
+          type: integer
+          format: int64
+        visibleTo:
+          description: Who can see this activity. Defaults to Everyone
+          default: Everyone
+          type: string
+          enum:
+            - Company
+            - Everyone
+            - Owner
+            - Role
+    Attachment_Update:
+      title: Attachment
+      x-entity: Attachment
+      type: object
+      required:
+        - name
+      properties:
+        description:
+          description: The description for this entity
+          maxLength: 255
+          type: string
+        extension:
+          description: >-
+            The extension the file should have. Pulled from the name if not set.
+            Helps dictate the mime-type
+          example: pdf
+          maxLength: 255
+          type: string
+        kind:
+          description: The kind of attachment
+          example: Activity
+          type: string
+          enum:
+            - Activity
+            - Collection
+            - Invoice
+            - Report
+        locationKey:
+          description: >-
+            Defaults to attachments.location but can be changed to another key
+            such as creditFiles.location
+          example: attachments.location
+          maxLength: 255
+          type: string
+        mimeType:
+          description: The mime type of the file. Will be pulled from the names extension
+          example: application/pdf
+          maxLength: 255
+          type: string
+        name:
+          description: >-
+            This should be the file display name without dir; foo.txt, bar.pdf,
+            etc.
+
+            Populated from originalFileName when using a multiPart upload.
+
+            Location has the relative path and unique name on system. Use
+            description for any other useful info
+          maxLength: 100
+          type: string
+        source:
+          description: A source description if this is synced from another system
+          maxLength: 50
+          type: string
+        subject:
+          description: >-
+            Optional value for a email template or collectionStep this is the
+            generally the subject of an email or fax cover page.
+          example: Customer
+          maxLength: 255
+          type: string
+        tags:
+          description: the tags for this item
+          type: array
+          items:
+            title: Tag
+            type: object
+            properties:
+              id:
+                description: Tag id
+                example: 954
+                type: integer
+                format: int64
+    Company:
+      title: Company
+      x-entity: Company
+      type: object
+      required:
+        - name
+        - num
+      properties:
+        name:
+          description: Full name for this company
+          maxLength: 255
+          type: string
+        num:
+          description: Unique alpha-numeric identifier for this entity
+          maxLength: 50
+          type: string
+        org:
+          $ref: '#/components/schemas/Org'
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    Company_Create:
+      title: Company
+      x-entity: Company
+      type: object
+      required:
+        - name
+        - num
+      properties:
+        name:
+          description: Full name for this company
+          maxLength: 255
+          type: string
+        num:
+          description: Unique alpha-numeric identifier for this entity
+          maxLength: 50
+          type: string
+        org:
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+    Company_Update:
+      title: Company
+      x-entity: Company
+      type: object
+      required:
+        - name
+        - num
+      properties:
+        name:
+          description: Full name for this company
+          maxLength: 255
+          type: string
+        num:
+          description: Unique alpha-numeric identifier for this entity
+          maxLength: 50
+          type: string
+        org:
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+    ContactEmail_Create:
+      title: ContactEmail
+      x-entity: ContactEmail
+      type: object
+      required:
+        - address
+      properties:
+        address:
+          description: The email addy
+          maxLength: 255
+          type: string
+        contact:
+          title: Contact
+          type: object
+          properties:
+            id:
+              description: Contact id
+              example: 954
+              type: integer
+              format: int64
+        isPrimary:
+          description: If this is the contacts primary email
+          type: boolean
+        kind:
+          description: future use
+          maxLength: 50
+          type: string
+    ContactFlex_Create:
+      title: ContactFlex
+      x-entity: ContactFlex
+      type: object
+      properties:
+        date1:
+          description: Flexible date field
+          type: string
+          format: date-time
+        date2:
+          description: Flexible date field
+          type: string
+          format: date-time
+        date3:
+          description: Flexible date field
+          type: string
+          format: date-time
+        date4:
+          description: Flexible date field
+          type: string
+          format: date-time
+        num1:
+          description: Flexible numeric field 1
+          type: number
+          format: money
+        num2:
+          description: Flexible numeric field 2
+          type: number
+          format: money
+        num3:
+          description: Flexible numeric field 3
+          type: number
+          format: money
+        num4:
+          description: Flexible numeric field 4
+          type: number
+          format: money
+        num5:
+          description: Flexible numeric field 5
+          type: number
+          format: money
+        num6:
+          description: Flexible numeric field 6
+          type: number
+          format: money
+        text1:
+          description: Flexible text field 1
+          maxLength: 255
+          type: string
+        text10:
+          description: Flexible text field 10
+          maxLength: 255
+          type: string
+        text2:
+          description: Flexible text field 2
+          maxLength: 255
+          type: string
+        text3:
+          description: Flexible text field 3
+          maxLength: 255
+          type: string
+        text4:
+          description: Flexible text field 4
+          maxLength: 255
+          type: string
+        text5:
+          description: Flexible text field 5
+          maxLength: 255
+          type: string
+        text6:
+          description: Flexible text field 6
+          maxLength: 255
+          type: string
+        text7:
+          description: Flexible text field 7
+          maxLength: 255
+          type: string
+        text8:
+          description: Flexible text field 8
+          maxLength: 255
+          type: string
+        text9:
+          description: Flexible text field 9
+          maxLength: 255
+          type: string
+    ContactPhone_Create:
+      title: ContactPhone
+      x-entity: ContactPhone
+      type: object
+      properties:
+        contact:
+          title: Contact
+          type: object
+          properties:
+            id:
+              description: Contact id
+              example: 954
+              type: integer
+              format: int64
+        isPrimary:
+          description: if this is the contacts primary number
+          type: boolean
+        kind:
+          description: future use
+          maxLength: 50
+          type: string
+        num:
+          description: future use
+          maxLength: 255
+          type: string
+    Contact_Create:
+      title: Contact
+      x-entity: Contact
+      type: object
+      required:
+        - firstName
+        - name
+        - orgId
+      properties:
+        altName:
+          description: 'Alternate name, nickname or job name'
+          maxLength: 255
+          type: string
+        comments:
+          description: Notes about the contact
+          maxLength: 255
+          type: string
+        email:
+          description: Default email
+          maxLength: 255
+          format: email
+          type: string
+        emails:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactEmail_Create'
+        firstName:
+          description: First name
+          maxLength: 50
+          type: string
+        flex:
+          description: Custom user fields for this contact
+          $ref: '#/components/schemas/ContactFlex_Create'
+        inactive:
+          description: True when not active
+          type: boolean
+        isPrimary:
+          description: >
+            Set to true is this should this be set as the primary contact for
+            the Org.
+
+            Not persisted to the data store, this only serves as an instruction
+            command when creating or updating a contact.
+
+            If the Org already has a primary contact set then this contact will
+            be set as the new primary leaving the old primary contact as
+
+            a normal contact.
+          type: boolean
+        jobTitle:
+          description: Job title
+          maxLength: 50
+          type: string
+        lastName:
+          description: Last name
+          maxLength: 50
+          type: string
+        location:
+          description: Default location
+          title: Location
+          type: object
+          properties:
+            id:
+              description: Location id
+              example: 954
+              type: integer
+              format: int64
+        name:
+          description: 'Name of Contact, joined using firstName + lastName'
+          maxLength: 50
+          type: string
+        num:
+          description: 'num, used for job or organization type contacts'
+          maxLength: 50
+          type: string
+        org:
+          description: The organization this contact belongs to
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+        orgId:
+          description: The org id for the contact
+          type: integer
+          format: int64
+        phone:
+          description: Default phone
+          maxLength: 255
+          type: string
+        phones:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactPhone_Create'
+        source:
+          description: Originator source info
+          title: ContactSource
+          type: object
+          properties:
+            source:
+              type: string
+            sourceType:
+              type: string
+            sourceId:
+              type: string
+        tagForReminders:
+          description: If this contact should get correspondence
+          type: boolean
+        tags:
+          description: the tags for this item
+          type: array
+          items:
+            title: Tag
+            type: object
+            properties:
+              id:
+                description: Tag id
+                example: 954
+                type: integer
+                format: int64
+        user:
+          description: The user if this contact is able to login
+          title: AppUser
+          type: object
+          properties:
+            id:
+              description: AppUser id
+              example: 954
+              type: integer
+              format: int64
+    ContactEmail_Update:
+      title: ContactEmail
+      x-entity: ContactEmail
+      type: object
+      required:
+        - address
+      properties:
+        address:
+          description: The email addy
+          maxLength: 255
+          type: string
+        contact:
+          title: Contact
+          type: object
+          properties:
+            id:
+              description: Contact id
+              example: 954
+              type: integer
+              format: int64
+        isPrimary:
+          description: If this is the contacts primary email
+          type: boolean
+        kind:
+          description: future use
+          maxLength: 50
+          type: string
+    ContactFlex_Update:
+      title: ContactFlex
+      x-entity: ContactFlex
+      type: object
+      properties:
+        date1:
+          description: Flexible date field
+          type: string
+          format: date-time
+        date2:
+          description: Flexible date field
+          type: string
+          format: date-time
+        date3:
+          description: Flexible date field
+          type: string
+          format: date-time
+        date4:
+          description: Flexible date field
+          type: string
+          format: date-time
+        num1:
+          description: Flexible numeric field 1
+          type: number
+          format: money
+        num2:
+          description: Flexible numeric field 2
+          type: number
+          format: money
+        num3:
+          description: Flexible numeric field 3
+          type: number
+          format: money
+        num4:
+          description: Flexible numeric field 4
+          type: number
+          format: money
+        num5:
+          description: Flexible numeric field 5
+          type: number
+          format: money
+        num6:
+          description: Flexible numeric field 6
+          type: number
+          format: money
+        text1:
+          description: Flexible text field 1
+          maxLength: 255
+          type: string
+        text10:
+          description: Flexible text field 10
+          maxLength: 255
+          type: string
+        text2:
+          description: Flexible text field 2
+          maxLength: 255
+          type: string
+        text3:
+          description: Flexible text field 3
+          maxLength: 255
+          type: string
+        text4:
+          description: Flexible text field 4
+          maxLength: 255
+          type: string
+        text5:
+          description: Flexible text field 5
+          maxLength: 255
+          type: string
+        text6:
+          description: Flexible text field 6
+          maxLength: 255
+          type: string
+        text7:
+          description: Flexible text field 7
+          maxLength: 255
+          type: string
+        text8:
+          description: Flexible text field 8
+          maxLength: 255
+          type: string
+        text9:
+          description: Flexible text field 9
+          maxLength: 255
+          type: string
+    ContactPhone_Update:
+      title: ContactPhone
+      x-entity: ContactPhone
+      type: object
+      properties:
+        contact:
+          title: Contact
+          type: object
+          properties:
+            id:
+              description: Contact id
+              example: 954
+              type: integer
+              format: int64
+        isPrimary:
+          description: if this is the contacts primary number
+          type: boolean
+        kind:
+          description: future use
+          maxLength: 50
+          type: string
+        num:
+          description: future use
+          maxLength: 255
+          type: string
+    Contact_Update:
+      title: Contact
+      x-entity: Contact
+      type: object
+      required:
+        - firstName
+        - name
+        - orgId
+      properties:
+        altName:
+          description: 'Alternate name, nickname or job name'
+          maxLength: 255
+          type: string
+        comments:
+          description: Notes about the contact
+          maxLength: 255
+          type: string
+        email:
+          description: Default email
+          maxLength: 255
+          format: email
+          type: string
+        emails:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactEmail_Update'
+        firstName:
+          description: First name
+          maxLength: 50
+          type: string
+        flex:
+          description: Custom user fields for this contact
+          $ref: '#/components/schemas/ContactFlex_Update'
+        inactive:
+          description: True when not active
+          type: boolean
+        isPrimary:
+          description: >
+            Set to true is this should this be set as the primary contact for
+            the Org.
+
+            Not persisted to the data store, this only serves as an instruction
+            command when creating or updating a contact.
+
+            If the Org already has a primary contact set then this contact will
+            be set as the new primary leaving the old primary contact as
+
+            a normal contact.
+          type: boolean
+        jobTitle:
+          description: Job title
+          maxLength: 50
+          type: string
+        lastName:
+          description: Last name
+          maxLength: 50
+          type: string
+        location:
+          description: Default location
+          title: Location
+          type: object
+          properties:
+            id:
+              description: Location id
+              example: 954
+              type: integer
+              format: int64
+        name:
+          description: 'Name of Contact, joined using firstName + lastName'
+          maxLength: 50
+          type: string
+        num:
+          description: 'num, used for job or organization type contacts'
+          maxLength: 50
+          type: string
+        org:
+          description: The organization this contact belongs to
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+        orgId:
+          description: The org id for the contact
+          type: integer
+          format: int64
+        phone:
+          description: Default phone
+          maxLength: 255
+          type: string
+        phones:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactPhone_Update'
+        source:
+          description: Originator source info
+          title: ContactSource
+          type: object
+          properties:
+            id:
+              description: ContactSource id
+              example: 954
+              type: integer
+              format: int64
+        tagForReminders:
+          description: If this contact should get correspondence
+          type: boolean
+        tags:
+          description: the tags for this item
+          type: array
+          items:
+            title: Tag
+            type: object
+            properties:
+              id:
+                description: Tag id
+                example: 954
+                type: integer
+                format: int64
+        user:
+          description: The user if this contact is able to login
+          title: AppUser
+          type: object
+          properties:
+            id:
+              description: AppUser id
+              example: 954
+              type: integer
+              format: int64
+    OrgFlex_Create:
+      title: OrgFlex
+      x-entity: OrgFlex
+      type: object
+      properties:
+        date1:
+          description: Flexible date field
+          type: string
+          format: date-time
+        date2:
+          description: Flexible date field
+          type: string
+          format: date-time
+        date3:
+          description: Flexible date field
+          type: string
+          format: date-time
+        date4:
+          description: Flexible date field
+          type: string
+          format: date-time
+        num1:
+          description: Flexible numeric field 1
+          type: number
+          format: money
+        num2:
+          description: Flexible numeric field 2
+          type: number
+          format: money
+        num3:
+          description: Flexible numeric field 3
+          type: number
+          format: money
+        num4:
+          description: Flexible numeric field 4
+          type: number
+          format: money
+        num5:
+          description: Flexible numeric field 5
+          type: number
+          format: money
+        num6:
+          description: Flexible numeric field 6
+          type: number
+          format: money
+        text1:
+          description: Flexible text field 1
+          maxLength: 255
+          type: string
+        text10:
+          description: Flexible text field 10
+          maxLength: 255
+          type: string
+        text2:
+          description: Flexible text field 2
+          maxLength: 255
+          type: string
+        text3:
+          description: Flexible text field 3
+          maxLength: 255
+          type: string
+        text4:
+          description: Flexible text field 4
+          maxLength: 255
+          type: string
+        text5:
+          description: Flexible text field 5
+          maxLength: 255
+          type: string
+        text6:
+          description: Flexible text field 6
+          maxLength: 255
+          type: string
+        text7:
+          description: Flexible text field 7
+          maxLength: 255
+          type: string
+        text8:
+          description: Flexible text field 8
+          maxLength: 255
+          type: string
+        text9:
+          description: Flexible text field 9
+          maxLength: 255
+          type: string
+    OrgInfo_Create:
+      title: OrgInfo
+      x-entity: OrgInfo
+      type: object
+      properties:
+        fax:
+          description: primary fax
+          maxLength: 255
+          type: string
+        phone:
+          description: 'primary hq number, switchboard'
+          maxLength: 255
+          type: string
+        website:
+          description: website home page
+          maxLength: 255
+          type: string
+    Location_Create:
+      title: Location
+      x-entity: Location
+      type: object
+      required:
+        - orgId
+      properties:
+        address3:
+          maxLength: 100
+          type: string
+        address4:
+          maxLength: 100
+          type: string
+        city:
+          maxLength: 100
+          type: string
+        contact:
+          description: The contact this belongs to
+          title: Contact
+          type: object
+          properties:
+            id:
+              description: Contact id
+              example: 954
+              type: integer
+              format: int64
+        country:
+          maxLength: 3
+          type: string
+        county:
+          maxLength: 50
+          type: string
+        kind:
+          description: The address type
+          type: string
+          enum:
+            - work
+            - home
+            - other
+            - mailing
+            - remittance
+            - physical
+        name:
+          description: 'A descriptive name, can be used for reports an letters'
+          maxLength: 255
+          type: string
+        org:
+          description: The organization this belongs to
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+        orgId:
+          description: The org id for this
+          type: integer
+          format: int64
+        state:
+          maxLength: 25
+          type: string
+        street1:
+          maxLength: 100
+          type: string
+        street2:
+          maxLength: 100
+          type: string
+        zipCode:
+          maxLength: 50
+          type: string
+    OrgMember_Create:
+      title: OrgMember
+      x-entity: OrgMember
+      type: object
+      properties:
+        branch:
+          description: The branch for the Org
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+            num:
+              type: string
+        business:
+          description: The business for the Org
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+            num:
+              type: string
+        company:
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+        division:
+          description: The division for the Org
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+            num:
+              type: string
+        factory:
+          description: The factory for the Org
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+            num:
+              type: string
+        region:
+          description: The region for the Org
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+            num:
+              type: string
+        sales:
+          description: The sales for the Org
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+            num:
+              type: string
+    Org_Create:
+      title: Org
+      x-entity: Org
+      type: object
+      required:
+        - name
+        - type
+        - num
+      properties:
+        comments:
+          description: A user visible comment
+          example: Lorem ipsum
+          maxLength: 255
+          type: string
+        companyId:
+          description: Company id this org belongs to
+          example: '2'
+          type: integer
+          format: int64
+        contact:
+          description: The default or key Contact for this organization
+          $ref: '#/components/schemas/Contact_Create'
+        flex:
+          description: User flex fields
+          $ref: '#/components/schemas/OrgFlex_Create'
+        inactive:
+          description: indicator for an Org that is no longer active
+          type: boolean
+        info:
+          description: Info such as phone and website for an organization
+          $ref: '#/components/schemas/OrgInfo_Create'
+        location:
+          description: The primary organization address info
+          $ref: '#/components/schemas/Location_Create'
+        locations:
+          description: List of locations
+          type: array
+          items:
+            title: Location
+            type: object
+            properties:
+              id:
+                description: Location id
+                example: 954
+                type: integer
+                format: int64
+        member:
+          description: Dimension hierarchy fields
+          $ref: '#/components/schemas/OrgMember_Create'
+        name:
+          description: The full name for this organization
+          example: SpaceX Corp.
+          maxLength: 255
+          type: string
+        num:
+          description: Unique alpha-numeric identifier for this organization
+          example: SPX-321
+          maxLength: 50
+          type: string
+        orgTypeId:
+          type: integer
+          format: int64
+        source:
+          description: 'Originator source info, used when this is sourced externally'
+          title: OrgSource
+          type: object
+          properties:
+            source:
+              type: string
+            sourceType:
+              type: string
+            sourceId:
+              type: string
+        tags:
+          description: the tags for this item
+          type: array
+          items:
+            title: Tag
+            type: object
+            properties:
+              id:
+                description: Tag id
+                example: 954
+                type: integer
+                format: int64
+        type:
+          description: The type of org
+          example: Customer
+          type: string
+          enum:
+            - Customer
+            - CustAccount
+            - Branch
+            - Division
+            - Business
+            - Company
+            - Prospect
+            - Sales
+            - Client
+            - Factory
+            - Region
+    OrgFlex_Update:
+      title: OrgFlex
+      x-entity: OrgFlex
+      type: object
+      properties:
+        date1:
+          description: Flexible date field
+          type: string
+          format: date-time
+        date2:
+          description: Flexible date field
+          type: string
+          format: date-time
+        date3:
+          description: Flexible date field
+          type: string
+          format: date-time
+        date4:
+          description: Flexible date field
+          type: string
+          format: date-time
+        num1:
+          description: Flexible numeric field 1
+          type: number
+          format: money
+        num2:
+          description: Flexible numeric field 2
+          type: number
+          format: money
+        num3:
+          description: Flexible numeric field 3
+          type: number
+          format: money
+        num4:
+          description: Flexible numeric field 4
+          type: number
+          format: money
+        num5:
+          description: Flexible numeric field 5
+          type: number
+          format: money
+        num6:
+          description: Flexible numeric field 6
+          type: number
+          format: money
+        text1:
+          description: Flexible text field 1
+          maxLength: 255
+          type: string
+        text10:
+          description: Flexible text field 10
+          maxLength: 255
+          type: string
+        text2:
+          description: Flexible text field 2
+          maxLength: 255
+          type: string
+        text3:
+          description: Flexible text field 3
+          maxLength: 255
+          type: string
+        text4:
+          description: Flexible text field 4
+          maxLength: 255
+          type: string
+        text5:
+          description: Flexible text field 5
+          maxLength: 255
+          type: string
+        text6:
+          description: Flexible text field 6
+          maxLength: 255
+          type: string
+        text7:
+          description: Flexible text field 7
+          maxLength: 255
+          type: string
+        text8:
+          description: Flexible text field 8
+          maxLength: 255
+          type: string
+        text9:
+          description: Flexible text field 9
+          maxLength: 255
+          type: string
+    OrgInfo_Update:
+      title: OrgInfo
+      x-entity: OrgInfo
+      type: object
+      properties:
+        fax:
+          description: primary fax
+          maxLength: 255
+          type: string
+        phone:
+          description: 'primary hq number, switchboard'
+          maxLength: 255
+          type: string
+        website:
+          description: website home page
+          maxLength: 255
+          type: string
+    Location_Update:
+      title: Location
+      x-entity: Location
+      type: object
+      required:
+        - orgId
+      properties:
+        address3:
+          maxLength: 100
+          type: string
+        address4:
+          maxLength: 100
+          type: string
+        city:
+          maxLength: 100
+          type: string
+        contact:
+          description: The contact this belongs to
+          title: Contact
+          type: object
+          properties:
+            id:
+              description: Contact id
+              example: 954
+              type: integer
+              format: int64
+        country:
+          maxLength: 3
+          type: string
+        county:
+          maxLength: 50
+          type: string
+        kind:
+          description: The address type
+          type: string
+          enum:
+            - work
+            - home
+            - other
+            - mailing
+            - remittance
+            - physical
+        name:
+          description: 'A descriptive name, can be used for reports an letters'
+          maxLength: 255
+          type: string
+        org:
+          description: The organization this belongs to
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+        orgId:
+          description: The org id for this
+          type: integer
+          format: int64
+        state:
+          maxLength: 25
+          type: string
+        street1:
+          maxLength: 100
+          type: string
+        street2:
+          maxLength: 100
+          type: string
+        zipCode:
+          maxLength: 50
+          type: string
+    OrgMember_Update:
+      title: OrgMember
+      x-entity: OrgMember
+      type: object
+      properties:
+        branch:
+          description: The branch for the Org
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+        business:
+          description: The business for the Org
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+        company:
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+        division:
+          description: The division for the Org
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+        factory:
+          description: The factory for the Org
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+        region:
+          description: The region for the Org
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+        sales:
+          description: The sales for the Org
+          title: Org
+          type: object
+          properties:
+            id:
+              description: Org id
+              example: 954
+              type: integer
+              format: int64
+    Org_Update:
+      title: Org
+      x-entity: Org
+      type: object
+      required:
+        - name
+        - type
+        - num
+      properties:
+        comments:
+          description: A user visible comment
+          example: Lorem ipsum
+          maxLength: 255
+          type: string
+        companyId:
+          description: Company id this org belongs to
+          example: '2'
+          type: integer
+          format: int64
+        contact:
+          description: The default or key Contact for this organization
+          title: Contact
+          type: object
+          properties:
+            id:
+              description: Contact id
+              example: 954
+              type: integer
+              format: int64
+        flex:
+          description: User flex fields
+          $ref: '#/components/schemas/OrgFlex_Update'
+        inactive:
+          description: indicator for an Org that is no longer active
+          type: boolean
+        info:
+          description: Info such as phone and website for an organization
+          $ref: '#/components/schemas/OrgInfo_Update'
+        location:
+          description: The primary organization address info
+          $ref: '#/components/schemas/Location_Update'
+        locations:
+          description: List of locations
+          type: array
+          items:
+            title: Location
+            type: object
+            properties:
+              id:
+                description: Location id
+                example: 954
+                type: integer
+                format: int64
+        member:
+          description: Dimension hierarchy fields
+          $ref: '#/components/schemas/OrgMember_Update'
+        name:
+          description: The full name for this organization
+          example: SpaceX Corp.
+          maxLength: 255
+          type: string
+        num:
+          description: Unique alpha-numeric identifier for this organization
+          example: SPX-321
+          maxLength: 50
+          type: string
+        orgTypeId:
+          type: integer
+          format: int64
+        source:
+          description: 'Originator source info, used when this is sourced externally'
+          title: OrgSource
+          type: object
+          properties:
+            id:
+              description: OrgSource id
+              example: 954
+              type: integer
+              format: int64
+        tags:
+          description: the tags for this item
+          type: array
+          items:
+            title: Tag
+            type: object
+            properties:
+              id:
+                description: Tag id
+                example: 954
+                type: integer
+                format: int64
+        type:
+          description: The type of org
+          example: Customer
+          type: string
+          enum:
+            - Customer
+            - CustAccount
+            - Branch
+            - Division
+            - Business
+            - Company
+            - Prospect
+            - Sales
+            - Client
+            - Factory
+            - Region
+    OrgTypeSetup:
+      title: OrgTypeSetup
+      x-entity: OrgTypeSetup
+      type: object
+      required:
+        - code
+        - name
+      properties:
+        code:
+          description: >-
+            Short code, alphanumeric with no special characters except dash (for
+            space) and underscore
+          maxLength: 10
+          type: string
+        description:
+          description: The description for this entity
+          maxLength: 255
+          type: string
+        inactive:
+          type: boolean
+        name:
+          description: The name for this entity
+          maxLength: 50
+          type: string
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    OrgTypeSetup_Update:
+      title: OrgTypeSetup
+      x-entity: OrgTypeSetup
+      type: object
+      required:
+        - code
+        - name
+      properties:
+        code:
+          description: >-
+            Short code, alphanumeric with no special characters except dash (for
+            space) and underscore
+          maxLength: 10
+          type: string
+        description:
+          description: The description for this entity
+          maxLength: 255
+          type: string
+        inactive:
+          type: boolean
+        name:
+          description: The name for this entity
+          maxLength: 50
+          type: string
+    SecRoleUser:
+      title: SecRoleUser
+      x-entity: SecRoleUser
+      type: object
+      properties:
+        role:
+          description: The role for the user
+          $ref: '#/components/schemas/SecRole'
+        roleId:
+          description: The role id
+          type: string
+        user:
+          description: The user for the role
+          $ref: '#/components/schemas/AppUser'
+        userId:
+          description: The user id to assign the role
+          type: string
+    SecRoleUser_Create:
+      title: SecRoleUser
+      x-entity: SecRoleUser
+      type: object
+      properties:
+        role:
+          description: The role for the user
+          title: SecRole
+          type: object
+          properties:
+            id:
+              description: SecRole id
+              example: 954
+              type: integer
+              format: int64
+        roleId:
+          description: The role id
+          type: string
+        user:
+          description: The user for the role
+          title: AppUser
+          type: object
+          properties:
+            id:
+              description: AppUser id
+              example: 954
+              type: integer
+              format: int64
+        userId:
+          description: The user id to assign the role
+          type: string
+    SyncJob:
+      title: SyncJob
+      x-entity: SyncJob
+      type: object
+      required:
+        - state
+      properties:
+        data:
+          description: >-
+            The result data json, will normally be an array with items for
+            errors.
+          type: string
+        message:
+          description: Status message or log
+          maxLength: 500
+          type: string
+        ok:
+          type: boolean
+        payload:
+          description: The payload this job was sent to process
+          type: string
+        problems:
+          type: string
+        source:
+          description: A description of where this came from
+          example: 'Oracle, BankOfAmerica, Lockbox'
+          maxLength: 255
+          type: string
+        sourceId:
+          description: the unique id from the outside source for the scheduled job
+          example: AR-123-A64
+          maxLength: 255
+          type: string
+        sourceType:
+          description: 'Enum, defaults to SourceType.App'
+          example: App
+          default: App
+          type: string
+          enum:
+            - App
+            - Scheduler
+            - ERP
+            - RestApi
+            - PayGateway
+        state:
+          description: State of the job
+          type: string
+          enum:
+            - Queued
+            - Running
+            - Finished
+            - Cancelled
+            - WTF
+        id:
+          type: integer
+          format: int64
+          description: unique id
+          example: 954
+          readOnly: true
+        version:
+          type: integer
+          description: 'version of the edit, incremented on each change'
+          example: 0
+          readOnly: true
+    Tag_Create:
+      title: Tag
+      x-entity: Tag
+      type: object
+      required:
+        - code
+        - name
+      properties:
+        code:
+          description: >-
+            Short code, alphanumeric with no special characters except dash (for
+            space) and underscore
+          maxLength: 10
+          type: string
+        description:
+          description: The description for this tag
+          maxLength: 255
+          type: string
+        entityName:
+          description: >-
+            The entity this tag can be applied to. May be a comma sep list of
+            entity names
+          maxLength: 255
+          type: string
+        name:
+          description: The name of tag
+          maxLength: 50
+          type: string
+    Tag_Update:
+      title: Tag
+      x-entity: Tag
+      type: object
+      required:
+        - code
+        - name
+      properties:
+        code:
+          description: >-
+            Short code, alphanumeric with no special characters except dash (for
+            space) and underscore
+          maxLength: 10
+          type: string
+        description:
+          description: The description for this tag
+          maxLength: 255
+          type: string
+        entityName:
+          description: >-
+            The entity this tag can be applied to. May be a comma sep list of
+            entity names
+          maxLength: 255
+          type: string
+        name:
+          description: The name of tag
+          maxLength: 50
+          type: string
+    AppUser_Create:
+      title: AppUser
+      x-entity: AppUser
+      type: object
+      required:
+        - username
+        - email
+        - secRoles
+      properties:
+        email:
+          description: The email
+          maxLength: 255
+          format: email
+          type: string
+        name:
+          description: >-
+            The full name, may come from contact, will default to username if
+            not populated
+          maxLength: 50
+          type: string
+        password:
+          description: The pwd
+          maxLength: 255
+          type: string
+        secRoles:
+          description: The roles assigned to this user
+          type: array
+          items:
+            title: SecRole
+            type: object
+            properties:
+              id:
+                description: SecRole id
+                example: 954
+                type: integer
+                format: int64
+        username:
+          description: >
+            The unique user name, also known as your handle –– what you put
+            after the “@” symbol ala github or twitter
+
+            to mention others in comments or notes. appears in your profile URL.
+            username is used to log in to your account,
+
+            and is visible when sending and receiving. All lowercase and no
+            spaces or special characters.
+          maxLength: 50
+          type: string
+    AppUser_Update:
+      title: AppUser
+      x-entity: AppUser
+      type: object
+      required:
+        - username
+        - email
+        - secRoles
+      properties:
+        email:
+          description: The email
+          maxLength: 255
+          format: email
+          type: string
+        name:
+          description: >-
+            The full name, may come from contact, will default to username if
+            not populated
+          maxLength: 50
+          type: string
+        password:
+          description: The pwd
+          maxLength: 255
+          type: string
+        secRoles:
+          description: The roles assigned to this user
+          type: array
+          items:
+            title: SecRole
+            type: object
+            properties:
+              id:
+                description: SecRole id
+                example: 954
+                type: integer
+                format: int64
+        username:
+          description: >
+            The unique user name, also known as your handle –– what you put
+            after the “@” symbol ala github or twitter
+
+            to mention others in comments or notes. appears in your profile URL.
+            username is used to log in to your account,
+
+            and is visible when sending and receiving. All lowercase and no
+            spaces or special characters.
+          maxLength: 50
+          type: string
+  securitySchemes:
+    main_auth:
+      description: |
+        Get access to data while protecting your account credentials.
+        OAuth2 is also a safer and more secure way to give you access.
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: 'http://9ci.io/api/oauth/dialog'
+          scopes:
+            'write:pets': modify pets in your account
+            'read:pets': read your pets
+    api_key:
+      description: >
+        For this sample, you can use the api key `special-key` to test the
+        authorization filters.
+      type: apiKey
+      name: api_key
+      in: header
+  responses:
+    400_Problem:
+      description: Invalid data was sent. Problem response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    403_Forbidden:
+      description: Access forbidden. Permission denied.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    422_ValidationError:
+      description: Invalid data was sent. Validation Error(s)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationError'
+    404_NotFound:
+      description: Resource was not found.
+    204_NoContent:
+      description: 'Request was accepted, but no response body is returned.'
+  parameters:
+    page:
+      name: page
+      in: query
+      description: page number of list to retrieve
+      schema:
+        type: integer
+    max:
+      name: max
+      in: query
+      description: 'number of items to show per page, defaults to 20'
+      schema:
+        type: integer
+    q:
+      name: q
+      in: query
+      description: >-
+        the string to search for or mango query json, see docs for details on
+        mango format
+      schema:
+        anyOf:
+          - type: string
+          - type: object
+    sort:
+      name: sort
+      in: query
+      description: 'the field name to sort on, use the **q** param for multi sorts'
+      schema:
+        type: string
+    order:
+      name: order
+      in: query
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+      description: |
+        Sort order:
+          * `asc` - Ascending, from A to Z
+          * `desc` - Descending, from Z to A
+    id:
+      name: id
+      in: path
+      description: id for entity
+      required: true
+      schema:
+        type: integer
+        format: int64

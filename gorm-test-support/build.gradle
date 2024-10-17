@@ -11,6 +11,8 @@ dependencies {
 
   compileOnly "org.springframework.security:spring-security-config"
 
+  api ("org.yakworks:grails-kit:$vSpringGrailsKit")
+
   //used for bundled Test traits
   api("org.grails:grails-gorm-testing-support:$vGrailsTesting"){
     // transitive = false

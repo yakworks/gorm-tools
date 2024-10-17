@@ -8,7 +8,6 @@ import groovy.transform.CompileStatic
 
 import org.springframework.dao.OptimisticLockingFailureException
 
-import gorm.tools.transaction.TrxService
 import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.api.problem.data.NotFoundProblem
@@ -23,15 +22,9 @@ import yakworks.api.problem.data.NotFoundProblem
 @CompileStatic
 @SuppressWarnings(["FieldName"])
 class RepoUtil {
-    public static final String SUFFIX = "Repo"
 
     // static List<Class> getRepoClasses(){
     //     GrailsHolder.grailsApplication.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz
-    // }
-
-    // Deprecated, moved to RepoLookup
-    // static String getRepoBeanName(Class domainClass) {
-    //     return "${NameUtils.getPropertyName(domainClass.name)}$SUFFIX"
     // }
 
     /**
@@ -87,30 +80,4 @@ class RepoUtil {
             throw DataProblem.of('error.data.bindId', [name: entityClass.simpleName])
                 .title("set bindId:true when manually assigning id in create data").toException()
     }
-
-    /**
-     * flushes the session and clears the session cache and the DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
-     */
-    @Deprecated
-    static void flushAndClear() {
-        flush()
-        clear()
-    }
-
-    /**
-     * flushes the session
-     */
-    @Deprecated
-    static void flush() {
-        TrxService.bean().flush()
-    }
-
-    /**
-     * clears the session cache
-     */
-    @Deprecated
-    static void clear() {
-        TrxService.bean().clear()
-    }
-
 }

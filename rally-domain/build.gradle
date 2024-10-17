@@ -14,7 +14,7 @@ dependencies {
   api project(":boot-security-gorm")
   api project(":gorm-etl")
 
-  api "org.yakworks:grails-external-config:$vSpringGrailsKit"
+  //api "org.yakworks:grails-external-config:$vSpringGrailsKit"
   api 'jakarta.annotation:jakarta.annotation-api:2.1.0'
 
   //lock the compatible hibernate version here
@@ -22,11 +22,23 @@ dependencies {
   api "org.grails.plugins:hibernate5:$vGormHibernate"
   api "org.hibernate:hibernate-core:$vHibernate"
 
+  //Hazelcast and Caffeine
+  //runtimeOnly "com.hazelcast:hazelcast-hibernate53:$vHazelcastHib"
+  implementation "com.hazelcast:hazelcast:$vHazelcast"
+  implementation "com.hazelcast:hazelcast-spring:$vHazelcast"
+  implementation "com.github.ben-manes.caffeine:caffeine:$vCaffeine"
+
   //mailgun
   api 'com.mailgun:mailgun-java:1.0.7'
   //to use the InternetAddress for validating emails
   api "javax.mail:javax.mail-api:1.6.2"
   api "com.sun.mail:javax.mail:1.6.2"
+
+  //WIP for s3 paths
+  compileOnly platform('software.amazon.awssdk:bom:2.20.56')
+  compileOnly 'software.amazon.awssdk:s3:'
+  compileOnly 'software.amazon.nio.s3:aws-java-nio-spi-for-s3:1.2.4'
+  // compileOnly 'org.carlspring.cloud.aws:s3fs-nio:1.0.2'
 
   compileOnly "org.grails:grails-core"
 

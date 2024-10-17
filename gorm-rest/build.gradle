@@ -14,6 +14,9 @@ dependencies {
   api project(":gorm-etl")
   api project(":gorm-openapi")
 
+  //FIXME this shoudl not be needed anymore now that the EntityReponder is gone and move to CrudApi
+  api project(":boot-security-gorm")
+
   //FIXME remove this when we upgrade to spring 6 as its built in.
   // this uses the HttpClient thats built into java 11 for WebClient.
   // compileOnly 'com.integralblue:java-httpclient-webclient-spring-boot-starter:1.0.0'

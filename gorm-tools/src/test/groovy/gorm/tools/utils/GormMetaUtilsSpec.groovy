@@ -15,7 +15,7 @@ class GormMetaUtilsSpec extends Specification implements GormHibernateTest {
     static List entityClasses = [Cust, CustType, UuidSample]
 
     void setupSpec(){
-        new CustType(name: 'foo').persist(flush: true)
+        new CustType(id: 1, name: 'foo').persist(flush: true)
     }
 
     def "GetPersistentEntity name string"() {

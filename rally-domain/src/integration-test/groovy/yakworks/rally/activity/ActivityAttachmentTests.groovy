@@ -24,7 +24,7 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
     @OnceBefore
     void setupData(){
         Org.list().each { Org org ->
-            def act = Activity.create([id: org.id, org: org, note: [body: 'Test note']], bindId: true)
+            def act = Activity.repo.create([id: org.id, org: org, note: [body: 'Test note']], [bindId: true])
         }
         flushAndClear()
     }

@@ -1,24 +1,26 @@
 package yakworks.rest
 
-import gorm.tools.repository.RepoUtil
-import yakworks.rest.gorm.controller.RestRepoApiController
+
+import java.nio.file.Path
+
+import gorm.tools.transaction.TrxUtils
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import yakworks.commons.io.ZipUtils
 import yakworks.commons.util.BuildSupport
-import yakworks.testing.rest.RestIntTest
-import yakworks.spring.AppResourceLoader
+
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Contact
+import yakworks.rest.gorm.controller.CrudApiController
+import yakworks.testing.rest.RestIntTest
 
 @Rollback
 @Integration
 class BulkCsvSpec  extends RestIntTest {
 
-    RestRepoApiController<Contact> controller
-    AppResourceLoader appResourceLoader
+    CrudApiController<Contact> controller
     AttachmentRepo attachmentRepo
 
     void setup() {
@@ -28,11 +30,11 @@ class BulkCsvSpec  extends RestIntTest {
     void "test upload zip file for bulk process"() {
         setup: "Create zip"
         //Org.create(num:"bulk1", name:"bulk1", companyId: Company.DEFAULT_COMPANY_ID).persist()
-
-        File contactCsv =  new File(BuildSupport.rootProjectDir, "examples/resources/csv/contact.csv")
+        Path resDir = BuildSupport.rootProjectPath.resolve('examples/resources')
+        Path contactCsv =  resDir.resolve("csv/contact.csv")
         assert contactCsv.exists()
 
-        File zip = ZipUtils.zip("test.zip", appResourceLoader.rootPath.toFile(), contactCsv)
+        File zip = ZipUtils.zip("test.zip", resDir.toFile(), contactCsv.toFile())
 
         expect:
         zip.exists()
@@ -43,7 +45,7 @@ class BulkCsvSpec  extends RestIntTest {
         Attachment.withNewTransaction {
             attachment = Attachment.create(params)
         }
-        RepoUtil.flush()
+        TrxUtils.flush()
 
         then:
         noExceptionThrown()
@@ -91,7 +93,7 @@ class BulkCsvSpec  extends RestIntTest {
         attachmentRepo.removeById(syncJob.dataId as Long)
         Attachment.withNewTransaction {
             if(attachment) attachment.remove()
-            if(body.id) SyncJob.removeById(body.id as Long) //syncjob is created in new transaction
+            if(body.id) SyncJob.repo.removeById(body.id as Long) //syncjob is created in new transaction
             Contact.findAllByNumLike("bulk_").each {
                 it.remove()
             }
@@ -108,7 +110,7 @@ class BulkCsvSpec  extends RestIntTest {
         Attachment.withNewTransaction {
             attachment = Attachment.create(params)
         }
-        RepoUtil.flush()
+        TrxUtils.flush()
 
         then: "make sure attachment is good"
         noExceptionThrown()
@@ -155,10 +157,60 @@ class BulkCsvSpec  extends RestIntTest {
         attachmentRepo.removeById(syncJob.dataId as Long)
         Attachment.withNewTransaction {
             if(attachment) attachment.remove()
-            if(body.id) SyncJob.removeById(body.id as Long) //syncjob is created in new transaction
+            if(body.id) SyncJob.repo.removeById(body.id as Long) //syncjob is created in new transaction
             Contact.findAllByNumLike("bulk_").each {
                 it.remove()
             }
+        }
+    }
+
+
+    void "test bulk update with csv"() {
+
+        expect:
+        Contact.repo.lookup(num:"secondary11").lastName
+
+        when: "create attachment"
+        def csvFile = BuildSupport.rootProjectPath.resolve("examples/resources/csv/contact-update.csv")
+        Map params = [name: csvFile.fileName.toString(), sourcePath: csvFile]
+        Attachment attachment
+        Attachment.withNewTransaction {
+            attachment = Attachment.create(params)
+        }
+        TrxUtils.flush()
+
+        then: "make sure attachment is good"
+        noExceptionThrown()
+        attachment != null
+        attachment.id != null
+        attachment.resource.getFile().exists()
+
+        when:
+        controller.params.attachmentId = attachment.id
+        controller.params['async'] = false //disable promise for test
+
+        controller.bulkUpdate()
+        Map body = response.bodyToMap()
+        flushAndClear()
+
+        then:
+        body != null
+        body.state == "Finished"
+        body.ok == true
+        body.id != null
+
+        when: "Verify db records"
+        Contact c10 = Contact.repo.lookup(num:"secondary10")
+        Contact c11 = Contact.repo.lookup(num:"secondary11")
+
+        then:
+        c10.lastName == null //should have been nulled out.... rally seed data has org with comments
+        c11.lastName == "test" //should have been updated
+
+        cleanup: "cleanup db"
+        Attachment.withNewTransaction {
+            if(attachment) attachment.remove()
+            if(body.id) SyncJob.repo.removeById(body.id as Long) //syncjob is created in new transaction
         }
     }
 }

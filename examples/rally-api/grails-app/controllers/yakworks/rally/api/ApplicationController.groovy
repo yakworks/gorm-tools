@@ -24,10 +24,14 @@ class ApplicationController implements PluginManagerAware {
         [grailsApplication: grailsApplication, pluginManager: pluginManager]
     }
 
-    def hazel() {
+    def hazelHibernate() {
         Map reqionStats = [:]
         for(String s :sessionFactory.getStatistics().getSecondLevelCacheRegionNames()) {
-            reqionStats[s] = sessionFactory.getStatistics().getDomainDataRegionStatistics(s)
+            try {
+                reqionStats[s] = sessionFactory.getStatistics().getDomainDataRegionStatistics(s)
+            } catch(e){
+                //swallow error
+            }
             // println("[H-STATS] For region: \n"+ s + ":{"
             //     + "\n\tHit count: "+sessionFactory.getStatistics().getDomainDataRegionStatistics(s).getHitCount()
             //     + "\n\tMiss count: "+sessionFactory.getStatistics().getSecondLevelCacheStatistics(s).getMissCount()

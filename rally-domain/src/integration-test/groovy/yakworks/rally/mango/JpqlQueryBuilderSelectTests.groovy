@@ -87,7 +87,7 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         query.trim() == strip('''
             SELECT new map( SUM(org.calc.totalDue) as calc_totalDue_sum, org.type as type )
             FROM yakworks.rally.orgs.model.Org AS org
-            WHERE (org.inactive=:p1)
+            WHERE org.inactive=:p1
             GROUP BY org.type
             HAVING (SUM(org.calc.totalDue) < :p2)
             ORDER BY calc_totalDue_sum ASC
@@ -98,7 +98,7 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         List res = Org.executeQuery(query, queryInfo.paramMap)
 
         then:
-        res.size() == 4
+        res.size() == 3
         res[0]['type'] == OrgType.Client
         res[0]['calc_totalDue_sum'] < res[1]['calc_totalDue_sum']
         res[1]['calc_totalDue_sum'] < res[2]['calc_totalDue_sum']
@@ -125,7 +125,7 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         query.trim() == strip('''
             SELECT new map( SUM(org.calc.totalDue) as calc_totalDue_sum, org.type as type )
             FROM yakworks.rally.orgs.model.Org AS org
-            WHERE (org.member.division.id=:p1 AND org.contact.id=:p2)
+            WHERE org.member.division.id=:p1 AND org.contact.id=:p2
             GROUP BY org.type
         ''')
 
@@ -161,7 +161,7 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         query.trim() == strip('''
             SELECT new map( SUM(org.calc.totalDue) as calc_totalDue_sum, org.type as type )
             FROM yakworks.rally.orgs.model.Org AS org
-            WHERE (org.member.division.num=:p1 AND org.contact.id=:p2)
+            WHERE org.member.division.num=:p1 AND org.contact.id=:p2
             GROUP BY org.type
         ''')
     }
@@ -192,11 +192,10 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         then: "The query is valid"
         query.trim() == strip('''
             SELECT DISTINCT org FROM yakworks.rally.orgs.model.Org AS org
-            WHERE (lower(org.name) like lower(:p1) AND
+            WHERE lower(org.name) like lower(:p1) AND
             EXISTS (
             SELECT contact1.id FROM yakworks.rally.orgs.model.Contact contact1
             WHERE lower(contact1.location.city) like lower(:p2) AND contact1.org.id = org.id
-            )
             )
         ''')
     }

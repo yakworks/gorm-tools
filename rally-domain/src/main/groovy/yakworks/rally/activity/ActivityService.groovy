@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service
 
 import gorm.tools.repository.RepoUtil
 import grails.gorm.transactions.Transactional
-import jakarta.annotation.Nullable
 import yakworks.api.Result
 import yakworks.api.problem.Problem
 import yakworks.commons.lang.Validate
@@ -38,7 +37,7 @@ import yakworks.spring.AppCtx
 @CompileStatic
 class ActivityService {
 
-    @Inject @Nullable MailMessageSender mailMessageSender
+    @Inject MailMessageSender mailMessageSender
 
     /** static helper for ActivityUtils */
     static ActivityService bean(){
@@ -51,7 +50,7 @@ class ActivityService {
     @Transactional
     Activity createLog(Long orgId, String message){
         def params = [kind: Activity.Kind.Log, orgId: orgId, name: message]
-        Activity activity = Activity.create(params)
+        Activity activity = Activity.repo.create(params)
         return activity
     }
 
@@ -61,7 +60,7 @@ class ActivityService {
     @Transactional
     Activity createNote(Long orgId, String note){
         def params = [orgId: orgId, note:[body: 'foo'], linkedId: 1, linkedEntity:'Contact']
-        Activity activity = Activity.create(params)
+        Activity activity = Activity.repo.create(params)
         return activity
     }
 

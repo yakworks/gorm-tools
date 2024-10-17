@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
 
 import spock.lang.Specification
-import yakworks.rally.activity.ActivityService
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.testing.gorm.unit.GormHibernateTest
@@ -13,11 +12,7 @@ import yakworks.testing.gorm.unit.SecurityTest
 //@Ignore //see FIXME line 99 in GormHibernateTest
 class RallySeedSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = RallySeed.entityClasses
-
-    //RallySeedData.entityClasses
-    // static springBeans = [
-    //     activityService: ActivityService
-    // ]
+    static List springBeans = RallySeed.springBeanList
 
     @Autowired JdbcTemplate jdbcTemplate
 

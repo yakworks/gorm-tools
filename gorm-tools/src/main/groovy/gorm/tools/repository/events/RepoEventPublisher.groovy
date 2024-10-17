@@ -39,7 +39,7 @@ class RepoEventPublisher {
 
     private final Map<String, Map<String, Method>> repoEventMethodCache = new ConcurrentHashMap<>()
 
-    @Autowired(required = false)
+    @Autowired(required = false) //not required for testing when there are no repo beans
     List<GormRepo> repoBeans
 
     @PostConstruct

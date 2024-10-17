@@ -19,6 +19,7 @@ check: lint
 	# $(gradlew) check --max-workers=3
 	$(gradlew) check
 
+## clean and remove the .build-cache/
 clean.all:
 	rm -rf .build-cache/
 	$(MAKE) clean
@@ -157,11 +158,11 @@ test.benchmarks:
 #		-XX:+ScavengeBeforeFullGC -XX:+CMSScavengeBeforeRemark \
 #		-XX:SurvivorRatio=8 \
 
-# start the restify example jar
+# start the rally-api example jar
 start.rally-api: # start.db
-	${gradlew} restify:assemble
-	cd examples/restify
-	java -server -Xmx2g -jar build/libs/restify.jar
+	${gradlew} rally-api:assemble
+	cd examples/rally-api
+	java -server -Xmx2g -jar build/libs/rally-api.jar
 
 
 # clones the api-docs branch or this project where we will publish/push
@@ -221,7 +222,7 @@ test.token-exchange:
 	# http localhost:8080/api -A bearer -a "$$TOKEN"
 
 test.token.cookie:
-	RESP=`http -b POST admin:123@localhost:8080/api/oauth/token`
+	RESP=`https -b POST admin:123@localhost:8080/api/oauth/token`
 	# use awk to parse out the access_token
 	TOKEN=`echo $$RESP | awk -F'"' -v RS="," '/access_token/{ print $$4 }'`
 	echo "$$TOKEN"

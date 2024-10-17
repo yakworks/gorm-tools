@@ -1,6 +1,8 @@
 ---
 api:
   defaultPackage: yakworks.rally.api
+  # default is CrudApiController
+  defaultControllerTrait: yakworks.rest.gorm.controller.RestRepoApiController
   namespaces: {'': 'Root', rally: 'Core / Rally'}
   paths:
     /kitchen:

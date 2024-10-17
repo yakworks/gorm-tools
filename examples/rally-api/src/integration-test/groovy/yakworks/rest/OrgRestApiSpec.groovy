@@ -1,7 +1,11 @@
 package yakworks.rest
 
+import gorm.tools.transaction.WithTrx
 import grails.gorm.transactions.Rollback
+import okhttp3.Request
+import okhttp3.RequestBody
 import org.springframework.http.HttpStatus
+
 
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
@@ -13,7 +17,7 @@ import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
 
 @Integration
-class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
+class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
 
     String path = "/api/rally/org"
     String contactApiPath = "/api/rally/contact"
@@ -61,22 +65,22 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
 
     void "test qSearch"() {
         when:
-        Response resp = get("$path?q=org2")
+        Response resp = get("$path?qSearch=org2")
         Map body = bodyToMap(resp)
 
         then:
         resp.code() == HttpStatus.OK.value()
-        body.data.size() == 11
+        body.data.size() == 10
 
         when:
-        resp = get("$path?q=flubber")
+        resp = get("$path?qSearch=flubber")
         body = bodyToMap(resp)
 
         then:
         body.data.size() == 0
 
         when: 'num search'
-        resp = get("$path?q=11")
+        resp = get("$path?qSearch=11")
         body = bodyToMap(resp)
 
         then:
@@ -84,7 +88,7 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         body.data[0].num == '11'
 
         when: 'picklist search'
-        resp = get("$path/picklist?q=org12")
+        resp = get("$path/picklist?qSearch=org12")
         body = bodyToMap(resp)
 
         then:
@@ -106,7 +110,83 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         body.data[0].name == "Org20"
     }
 
-    void "test sorting"() {
+    void "test q used like qSearch"() {
+        when:
+        def resp = get("$path/picklist?q=foo")
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code == 400
+        !body.ok
+        body.title == "Invalid Query"
+        body.code == "error.query.invalid"
+        body.detail.contains "Invalid JSON"
+    }
+
+    void "test invalid q"() {
+        when:
+        String q = '({name: "Org20"})'
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(getUrl(path)).newBuilder()
+        urlBuilder.addQueryParameter("q", q)
+        def resp = get(urlBuilder.build().toString())
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code == 400
+        !body.ok
+        body.title == "Invalid Query"
+        body.code == "error.query.invalid"
+        body.detail.contains "Invalid JSON"
+    }
+
+
+    void "default sort by id"() {
+
+        when: "default sort by id asc"
+        def resp = get("${path}?q=*")
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code() == HttpStatus.OK.value()
+        body
+        body.data
+        body.data.eachWithIndex{ def entry, int i ->
+            if(i > 0) {
+                assert entry['id'] > body.data[i - 1]['id']
+            }
+        }
+
+        when: 'default sort should not apply if $sort is in q'
+        String q = '{inactive: true, $sort: {id:"desc"}}' //This should apply sort id:desc, instead of default id:asc
+        resp = get("${path}?q=$q")
+        body = bodyToMap(resp)
+
+        then: 'sorted as per $sort from q'
+        resp.code() == HttpStatus.OK.value()
+        body
+        body.data
+        body.data.eachWithIndex{ def entry, int i ->
+            if(i > 0) {
+                assert entry['id'] < body.data[i - 1]['id']
+            }
+        }
+    }
+
+    void "default sort by id should not apply with projections"() {
+        when: "there's a projection without id column"
+        def resp = get("${path}?q=*&projections="+'flex.num1:"sum",type:"group"')
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code() == HttpStatus.OK.value()
+        body
+        body.records == 5 //RallySeed creates orgs with 5 different org types, so one record for each group
+        body.data.size() == 5
+        body.data[0].type.name != null
+        body.data[0].flex.num1 != null
+    }
+
+    void "test explicit sort"() {
         when: "sort asc"
         def resp = get("${path}?q=*&sort=id&order=asc")
         Map body = bodyToMap(resp)
@@ -150,6 +230,34 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
 
         cleanup:
         delete(path, body.id)
+    }
+
+    void "testing UPSERT insert"() {
+        when:
+        Response resp = post("$path/upsert", [num: "upsert1", name: "upsert1", type: "Customer"])
+
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code() == HttpStatus.CREATED.value()
+        body.id
+        body.name == 'upsert1'
+
+        cleanup:
+        delete(path, body.id)
+    }
+
+    void "testing UPSERT update"() {
+        when:
+        Response resp = post("$path/upsert", [id: 89, name: "upsert2", type: "Customer"])
+
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code() == HttpStatus.OK.value()
+        body.id
+        body.name == 'upsert2'
+
     }
 
     @Rollback
@@ -292,7 +400,26 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         body.tags[0].id == tag1.id
 
         cleanup:
-        Org.removeById(body.id as Long)
+        withTrx {
+            Org.repo.removeById(body.id as Long)
+        }
+    }
 
+    void "malformed json in request"() {
+        setup:
+        Request request = getRequestBuilder(path)
+            .method("POST", RequestBody.create('{"num":"C1", name:"C1"}', null))
+            .build()
+
+        when:
+        Response resp = getHttpClient().newCall(request).execute()
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code() == 400
+        body.status == 400
+        !body.ok
+        body.code == "error.data.problem"
+        body.detail.contains "expecting '}'"
     }
 }

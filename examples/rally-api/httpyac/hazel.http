@@ -1,0 +1,16 @@
+# Use Httyak plugin https://github.com/AnWeber/vscode-httpyac
+@host = http://localhost:5701
+@base_url = {{host}}/hazelcast
+@contentType = application/json
+
+### See https://docs.hazelcast.com/hazelcast/5.3/maintain-cluster/rest-api
+### cluster state
+GET {{base_url}}/health/cluster-state
+
+GET {{base_url}}/health/cluster-size
+
+GET {{base_url}}/health/node-state
+
+GET {{base_url}}/rest/cluster
+
+GET {{base_url}}/rest/maps/

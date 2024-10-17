@@ -14,7 +14,7 @@ import yakworks.commons.lang.EnumUtils
  */
 @CompileStatic
 enum DataOp {
-    add, update, remove, replace, copy, move
+    add, update, upsert, remove, replace, copy, move
 
     /**
      * case insensitive find

@@ -12,7 +12,6 @@ import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.query.api.Criteria
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 
 import grails.gorm.transactions.Transactional
 import yakworks.security.gorm.model.AppUser
@@ -30,30 +29,15 @@ import yakworks.security.user.CurrentUser
 @Transactional
 class AppUserService {
 
-    @Value('${yakworks.security.password.historyEnabled:false}')
-    boolean passwordHistoryEnabled
-
-    @Value('${yakworks.security.password.expireDays:90}')
-    int passwordExpireDays
-
-    @Value('${yakworks.security.password.expireEnabled:false}')
-    boolean passwordExpiryEnabled
-
-    @Value('${yakworks.security.password.warnDays:30}')
-    int passwordWarnDays
-
-    @Autowired
-    CurrentUser currentUser
-
-    @Autowired(required = false) //required = false so in case spring sec is not working
-    PasswordValidator passwordValidator
+    @Autowired CurrentUser currentUser
+    @Autowired PasswordValidator passwordValidator
 
     /**
      * Create new record in secLoginHistory with logged in user and date
      */
     void trackUserLogin() {
         Long userId = currentUser.userId as Long
-        SecLoginHistory secLoginHistory = SecLoginHistory.create([userId: userId, loginDate: new Date()])
+        SecLoginHistory secLoginHistory = SecLoginHistory.repo.create([userId: userId, loginDate: new Date()])
     }
 
     @CompileDynamic //doesn't pick up maxResults with GrCompStatic
@@ -69,13 +53,13 @@ class AppUserService {
         } as List
         if (secLoginHistoryList) {
             SecLoginHistory secLoginHistory = secLoginHistoryList[0]
-            secLoginHistory.logoutDate = new Date()
+            secLoginHistory.logoutDate = LocalDateTime.now()
             secLoginHistory.save()
         }
     }
 
     Integer remainingDaysForPasswordExpiry(AppUser u) {
-        LocalDateTime pExpire = u.passwordChangedDate.plusDays(passwordExpireDays)
+        LocalDateTime pExpire = u.passwordChangedDate.plusDays(passwordValidator.passwordExpireDays)
         return Duration.between(LocalDateTime.now(), pExpire).toDays().toInteger()
     }
 
@@ -88,7 +72,7 @@ class AppUserService {
         user.passwordChangedDate = LocalDateTime.now()
         user.save()
 
-        if (passwordHistoryEnabled) {
+        if (passwordValidator.passwordHistoryEnabled) {
             SecPasswordHistory.create(user, newPwd)
         }
     }

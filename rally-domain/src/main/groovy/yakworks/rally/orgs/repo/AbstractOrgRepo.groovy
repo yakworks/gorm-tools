@@ -24,8 +24,7 @@ import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.utils.GormMetaUtils
 import gorm.tools.validation.Rejector
-import jakarta.annotation.Nullable
-import yakworks.rally.orgs.OrgMemberService
+import yakworks.rally.orgs.OrgService
 import yakworks.rally.orgs.model.Company
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
@@ -38,21 +37,15 @@ import yakworks.rally.orgs.model.OrgType
  */
 @CompileStatic
 abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
-    //Making these nullable makes it easier to wire up for tests.
-    @Inject @Nullable
-    LocationRepo locationRepo
+    @Inject LocationRepo locationRepo
 
-    @Inject @Nullable
-    ContactRepo contactRepo
+    @Inject ContactRepo contactRepo
 
-    @Inject @Nullable
-    OrgTagRepo orgTagRepo
+    @Inject OrgTagRepo orgTagRepo
 
-    @Inject @Nullable
-    OrgSourceRepo orgSourceRepo
+    @Inject OrgSourceRepo orgSourceRepo
 
-    @Inject @Nullable
-    OrgMemberService orgMemberService
+    @Inject OrgService orgService
 
     @RepoListener
     void beforeValidate(Org org, Errors errors) {
@@ -64,7 +57,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
     /**
      * makes sure org has a company on it, and sets it self if its a company
      */
-    void verifyCompany(Org org){
+    void ensureCompany(Org org){
         if (org.companyId == null) {
             if (org.type == OrgType.Company){
                 org.companyId = org.id
@@ -78,7 +71,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
     @RepoListener
     void beforeBind(Org org, Map data, BeforeBindEvent be) {
         if (be.isBindCreate()) {
-            verifyCompany(org)
+            ensureCompany(org)
             org.type = getOrgTypeFromData(data)
             //bind id early or generate one as we use it in afterBind
             if(data.id) {
@@ -95,8 +88,9 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         Map data = args.data
         if (args.bindAction == BindAction.Create) {
             verifyNumAndOrgSource(org, data)
-            //orgMemberService is nullable so its easier to mock for testing
-            if(orgMemberService?.isOrgMemberEnabled()) orgMemberService.setupMember(org, data.remove('member') as Map)
+            //if no orgType then let it fall through and fail validation, orgService is nullable so its easier to mock for testing
+            if(org.type && orgService?.isOrgMemberEnabled())
+                orgService.setupMember(org, data.remove('member') as Map)
         }
         // we do primary location and contact here before persist so we persist org only once with contactId it is created
         if(data.location) createOrUpdatePrimaryLocation(org, data.location as Map)
@@ -194,7 +188,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         data.remove('isPrimary')
 
         data.orgId = org.getId()
-        org.contact = contactRepo.createOrUpdateItem(data)
+        org.contact = contactRepo.upsert(data).entity
         return org.contact
     }
 
@@ -203,7 +197,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         //make sure params has org key
         data.orgId = org.getId()
         // if it had an op of remove then will return null and this set primary location to null
-        org.location = locationRepo.createOrUpdateItem(data)
+        org.location = locationRepo.upsert(data).entity
         return org.location
     }
 
@@ -246,7 +240,13 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
     /**
      * Lookup Org by num or sourceId. Search by num is usually used for other orgs like division or num (non customer or custAccount)
      * where we have unique num. Search by sourceId is used when there is no org or org.id; for example to assign org on contact
+     * NOTE: This is called from findWithData and is used to locate for updates and associations
+     * SHOULD NOT NORMALLY BE CALLED DIRECTLY, findWithDatais used most of the time
      * @param data (num or source with sourceId and orgType)
+     */
+    /**
+     * lookup by num or ContactSource
+     * This is called from findWithData and is used to locate contact for updates and associtaions
      */
     @Override
     Org lookup(Map data) {
@@ -256,10 +256,12 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         OrgType orgType = coerceOrgType(data.type)
         // special case for customer lookup when it comes with org.source; for example [org:[source:[sourceId:K14700]]
         if(data.org) {
-            data.source =data.org['source']
-            data.sourceId =data.org['sourceId']
+            data.source = data.org['source']
+            data.sourceId = data.org['sourceId']
         }
+        //nest sourceId under source if pecified up one level.
         if(data.source == null && data.sourceId) data.source = [sourceId: data.sourceId]
+
         if (data.source && data.source['sourceId']) {
             Map source = data.source as Map
             if(!orgType && source.orgType) {

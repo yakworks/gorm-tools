@@ -2,6 +2,7 @@
 package gorm.tools.repository;
 
 import org.codehaus.groovy.transform.GroovyASTTransformationClass;
+import org.springframework.stereotype.Component;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -9,15 +10,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation to marks a Repository artifact when not under grails-app/repo
- * AST tranform will also add the Spring @Component annotation so that it gets picked up on a scan
- * as well as the @Artefact that grails uses and needs for artifacts.
+ * Custom Service annotation to make a GormRepo.
+ * Just adds the @Component
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@GroovyASTTransformationClass("gorm.tools.repository.ast.GormRepositoryArtefactTypeTransformation")
+@Component
+//@GroovyASTTransformationClass("gorm.tools.repository.ast.GormRepositoryArtefactTypeTransformation")
 public @interface GormRepository {
 }

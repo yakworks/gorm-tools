@@ -12,6 +12,7 @@ import gorm.tools.repository.GormRepository
 import gorm.tools.repository.model.AbstractLinkedEntityRepo
 import grails.gorm.DetachedCriteria
 import yakworks.commons.beans.Transform
+import yakworks.commons.map.Maps
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
 
@@ -67,17 +68,29 @@ class TagLinkRepo extends AbstractLinkedEntityRepo<TagLink, Tag> {
      * Add exists criteria to a DetachedCriteria if its has tags
      * in the criteriaMap
      */
-    DetachedCriteria getExistsCriteria(Map criteriaMap, Class linkedEntityClazz, String linkedIdJoinProperty){
-        DetachedCriteria existsCrit
-        if(criteriaMap.tags){
-            //convert to id long list
-            List<Long> tagIds = Transform.objectToLongList((List)criteriaMap.remove('tags'), 'id')
-            existsCrit = buildExistsCriteria(tagIds, linkedEntityClazz, linkedIdJoinProperty)
-        } else if(criteriaMap.tagIds) {
-            //should be list of id if this key is present
-            existsCrit = buildExistsCriteria((List)criteriaMap.remove('tagIds'),  linkedEntityClazz, linkedIdJoinProperty)
+    void doExistsCriteria(Map criteriaMap, Class linkedEntityClazz, String linkedIdJoinProperty){
+        Map mapWithTags = criteriaMap
+        //convert to id long list, this assumes its in this format - {"tags": [{"id":1}, ..]}
+        if (criteriaMap.containsKey('$not')) {
+            Object notData = criteriaMap['$not']
+            if (notData instanceof List){
+                (notData as List<Map>).each {
+                    if (it.containsKey('tags')) mapWithTags = it
+                }
+            } else if(notData instanceof Map){
+                if (notData['tags']) mapWithTags = (Map)notData
+            }
         }
-        return existsCrit
+        //if it has nothing then exit
+        if(!mapWithTags.containsKey('tags')) return
+
+        List tagIds = Maps.value(mapWithTags, 'tags.id.$in') as List
+        tagIds = Transform.toLongList(tagIds) //make it long list
+        mapWithTags.remove('tags') //remove it so its not picked up
+
+        if(tagIds){
+            mapWithTags['$exists'] = buildExistsCriteria(tagIds, linkedEntityClazz, linkedIdJoinProperty)
+        }
     }
 
 }

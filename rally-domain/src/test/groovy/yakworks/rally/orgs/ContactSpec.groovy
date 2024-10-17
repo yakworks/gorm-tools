@@ -15,7 +15,6 @@ import yakworks.security.gorm.model.AppUser
 import yakworks.testing.gorm.RepoTestData
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
-import yakworks.testing.gorm.unit.DataRepoTest
 
 class ContactSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List<Class> entityClasses = [ Contact, AppUser, Org, OrgSource, OrgTypeSetup, Location, ContactPhone, ContactSource, ContactEmail]
@@ -87,7 +86,7 @@ class ContactSpec extends Specification implements GormHibernateTest, SecurityTe
 
         when:
         Map params = [id:contact.id, firstName:'Peter', email:'abc@walmart.com', tagForReminders:'on']
-        Contact.update(params)
+        Contact.repo.update(params)
 
         Contact updatedContact = Contact.get(contact.id)
 

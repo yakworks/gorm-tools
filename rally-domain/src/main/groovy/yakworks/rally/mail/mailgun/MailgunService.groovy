@@ -45,7 +45,7 @@ class MailgunService extends EmailService {
         if(mailMsg.bcc) bldr.bcc(mailMsg.bcc)
         if(mailMsg.tags) bldr.tag(mailMsg.tags)
         if(mailMsg.text) bldr.text(mailMsg.text)
-        if(mailMsg.html) bldr.html(mailMsg.html)
+        if(mailMsg.html) bldr.html(mailMsg.html) //html will be present, when contentType=html
         if(mailMsg.attachments) bldr.attachment(mailMsg.attachments as List<File>)
 
         return bldr.build()
@@ -55,21 +55,24 @@ class MailgunService extends EmailService {
      * calls mailgunMessagesApi.sendMessage
      * The return Result has a payload Map with id and message
      * @param domain the mailgun domain name
-     * @param mailMsg the MailTo message to send.
+     * @param mailTo the MailTo message to send.
      * @return The result with payload
      */
     @Override
-    Result send(String domain, MailTo mailMsg){
+    Result send(String domain, MailTo mailTo){
         try{
-            Message message = mailMsgToMessage(mailMsg)
+            Message message = mailMsgToMessage(mailTo)
             MessageResponse resp = sendMessage(domain, message)
+            log.debug("Mail gun response : domain:$domain, id:${resp.id}, message:${resp.message}")
             return Result.OK().payload([id: resp.id, message: resp.message])
         } catch(FeignException e){
+            log.error("Mailgun failed to send email : ${mailTo}", e)
             if(e.status() == 401) return new DataProblem().title("Unauthorized or bad domain").status(e.status())
             Map msgData =  ObjectMapperUtil.getObjectMapper().readValue(e.contentUTF8(), Map)
             return new DataProblem().title("Mailgun Send Failure").detail(msgData['message'] as String).status(e.status())
         } catch(ex){
             //return Problem.of('error.illegalArgument').status(status400).detail(e.message)
+            log.error("Mailgun Send Failure", ex)
             return Problem.of(ex)
         }
 

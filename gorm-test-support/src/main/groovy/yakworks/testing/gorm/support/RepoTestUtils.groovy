@@ -16,8 +16,8 @@ import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelStreamTools
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.PooledIdGenerator
-import gorm.tools.mango.DefaultMangoQuery
 import gorm.tools.mango.MangoBuilder
+import gorm.tools.mango.QuickSearchSupport
 import gorm.tools.metamap.services.MetaEntityService
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
@@ -91,8 +91,9 @@ class RepoTestUtils {
         repoEventPublisher(RepoEventPublisher, lazy())
         //repoUtilBean(RepoUtil)
         repoExceptionSupport(RepoExceptionSupport, lazy())
-        mangoQuery(DefaultMangoQuery, lazy())
+        // mangoQuery(DefaultQueryService, lazy())
         mangoBuilder(MangoBuilder, lazy())
+        quickSearchSupport(QuickSearchSupport, lazy())
         trxService(TrxService, lazy())
         jdbcIdGenerator(MockJdbcIdGenerator, lazy())
         idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"), lazy())
@@ -105,7 +106,7 @@ class RepoTestUtils {
         metaMapService(MetaMapService, lazy())
         problemHandler(ProblemHandler, lazy())
         messageSource(GrailsICUMessageSource, lazy())
-        externalConfigLoader(ExternalConfigLoader, lazy())
+        //externalConfigLoader(ExternalConfigLoader, lazy())
     }}
 
     @CompileDynamic

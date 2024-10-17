@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus
 
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+
 import yakworks.rest.client.OkAuth
 import yakworks.rest.client.OkHttpRestTrait
 

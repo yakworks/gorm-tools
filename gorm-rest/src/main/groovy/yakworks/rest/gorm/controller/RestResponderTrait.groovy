@@ -11,15 +11,16 @@ import org.codehaus.groovy.runtime.InvokerHelper
 import org.springframework.beans.factory.annotation.Autowired
 
 import grails.web.servlet.mvc.GrailsParameterMap
+import yakworks.rest.gorm.responder.RestResponderService
 
 /**
- * Copy of Grails RestResponder but without the magic stuff that keeps having errors picked up
- *
+ * Copy of Grails RestResponder but uses the RestResponderService
+ * and main method is "respondWith"
  */
 @CompileStatic
 trait RestResponderTrait {
 
-    @Autowired(required = false) RestResponderService restResponderService
+    @Autowired RestResponderService restResponderService
 
     //will get implemented by normal controller and WebAttributes
     //FIXME change to what we end up with with our override for getParamsMap()

@@ -75,6 +75,8 @@ class RepoTestData {
             }
             propValues = ((args?.data) ? args.remove('data') : args) as Map<String, Object>
         }
+        //defaults to flush if save is true and flush wasn't passed in
+        if (!newArgs.containsKey('flush')) newArgs['flush'] = true
         return build(newArgs, entityClass, propValues)
     }
 

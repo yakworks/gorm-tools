@@ -1,3 +1,17 @@
+### v7.3.77
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.76...v7.3.77)
+- release [link](https://github.com/yakworks/gorm-tools/commit/8a6c4fd16cb5a09b7941da75300a6bb16a5d23d4)
+- 7.3.77 release Merge pull request #844 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/4683db8f362fab34cd5c134e7e3ec251c075c6c6)
+- use getQueryArgsValidator [link](https://github.com/yakworks/gorm-tools/commit/8da1c28bd7df0c7ed8a84eb94ba6ec994a30834c)
+- add Qualifier on the queryArgsValidator so can have multiple beans and keep that as default [link](https://github.com/yakworks/gorm-tools/commit/395d2c9c967bf1131f80ed69244deb3243f687a5)
+- fix fubar(#842) [link](https://github.com/yakworks/gorm-tools/commit/54765ac54cfc424b3e52b13b7f76ef97bee6af49)
+- Spring application, hazelcast cache (#836) [link](https://github.com/yakworks/gorm-tools/commit/2e9c5341fe79f276325d46e4e285436512d9ee4d)
+- mango query : Handle cast exceptions when building mango queries (#833) [link](https://github.com/yakworks/gorm-tools/commit/93dbf20484c253ae9e47f721b96ba0ddecb930cb)
+- Add exception handler for throwable (#840) [link](https://github.com/yakworks/gorm-tools/commit/8d8a80ecf4bd880b2c8f3e3fc7ad504250eb8585)
+- basejump [link](https://github.com/yakworks/gorm-tools/commit/f6c2b4db63fe4fe987accc1c8d70ae32c5d6d63f)
+- merge master [link](https://github.com/yakworks/gorm-tools/commit/5c91061e48e7eb7834c5fb4483ef328c967998ed)
+
 ### v7.3.76
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.74...v7.3.76)

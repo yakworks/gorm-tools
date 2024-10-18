@@ -84,7 +84,8 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
     }
 
     @Override
-    void doBeforePersistWithData(Org org, PersistArgs args) {
+    void doBeforePersist(Org org, PersistArgs args) {
+        if(!args.bindAction || !args.data) return //exit fast if nothing
         Map data = args.data
         if (args.bindAction == BindAction.Create) {
             verifyNumAndOrgSource(org, data)

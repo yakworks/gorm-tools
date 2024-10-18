@@ -76,7 +76,8 @@ class ContactRepo extends LongIdGormRepo<Contact> {
 
 
     @Override
-    void doBeforePersistWithData(Contact contact, PersistArgs args) {
+    void doBeforePersist(Contact contact, PersistArgs args) {
+        if(!args.bindAction || !args.data) return //exit fast if nothing
         Map data = args.data
         if (args.bindAction == BindAction.Create) {
             setupSource(contact, data)

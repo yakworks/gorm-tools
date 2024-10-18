@@ -129,9 +129,16 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
      */
     D doPersist(D entity, PersistArgs args) {
         try {
+            generateId((Persistable)entity) //should only set id if its empty, does nothing here by default
+
             doBeforePersist(entity, args)
+            getRepoEventPublisher().doBeforePersist(this, (GormEntity)entity, args)
+
             validateAndSave(entity, args)
+
             doAfterPersist(entity, args)
+            getRepoEventPublisher().doAfterPersist(this, (GormEntity)entity, args )
+
             return entity
         }
         catch (ValidationException | DataAccessException ex) {
@@ -164,11 +171,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
      * NOTE
      */
     void doBeforePersist(D entity, PersistArgs args){
-        generateId((Persistable)entity)
-        if (args.bindAction && args.data){
-            doBeforePersistWithData(entity, args)
-        }
-        getRepoEventPublisher().doBeforePersist(this, (GormEntity)entity, args)
+        //empty, implement in concrete repo if needed
     }
 
     /**
@@ -187,7 +190,6 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
         if (args.bindAction && args.data){
             doAfterPersistWithData(entity, args)
         }
-        getRepoEventPublisher().doAfterPersist(this, (GormEntity)entity, args )
     }
 
     /**
@@ -348,7 +350,8 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
      * does nothing by default, entities that have to generate an Id can override
      */
     Serializable generateId(Persistable entity){
-        return entity.id as Serializable
+        //override in impl that needs this.
+        return null as Serializable
     }
 
     void bindAndUpdate(D entity, Map data, PersistArgs args) {
@@ -553,16 +556,6 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
      * @param data passed from unpdate or create
      */
     void doAfterPersistWithData(D entity, PersistArgs args) {
-        //empty, implement in concrete repo if needed
-    }
-
-    /**
-     * Called from doBeforePersist and before validate and beforePersist event if its a bindAction (create/update) and it has data.
-     *
-     * @param entity the main entity for this repo
-     * @param data passed from unpdate or create
-     */
-    void doBeforePersistWithData(D entity, PersistArgs args) {
         //empty, implement in concrete repo if needed
     }
 

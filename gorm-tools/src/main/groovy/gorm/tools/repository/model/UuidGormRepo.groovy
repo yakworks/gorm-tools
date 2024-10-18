@@ -35,10 +35,10 @@ class UuidGormRepo<D> implements GormRepo<D> { //, GenerateId<UUID>  {
     }
 
     @Override
-    UUID generateId(Persistable<UUID> entity){
+    Serializable generateId(Persistable entity){
         if (entity.getId() == null)
             entity.setId(generateId())
-        return entity.getId()
+        return entity.getId() as Serializable
     }
 
 }

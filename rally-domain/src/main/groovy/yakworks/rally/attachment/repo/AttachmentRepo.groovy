@@ -62,14 +62,16 @@ class AttachmentRepo extends LongIdGormRepo<Attachment> {
     }
 
     /**
-     * Called from doAfterPersist and before afterPersist event
+     * Called after persist and right before afterPersist event
      * if its had a bind action (create or update) and it has data
      * creates or updates One-to-Many associations for this entity.
      */
     @Override
-    void doAfterPersistWithData(Attachment attachment, PersistArgs args) {
-        Map data = args.data
-        if(data.tags != null) TagLink.addOrRemoveTags(attachment, data.tags)
+    void doAfterPersist(Attachment attachment, PersistArgs args) {
+        if (args.bindAction && args.data) {
+            Map data = args.data
+            if (data.tags != null) TagLink.addOrRemoveTags(attachment, data.tags)
+        }
     }
 
     /**

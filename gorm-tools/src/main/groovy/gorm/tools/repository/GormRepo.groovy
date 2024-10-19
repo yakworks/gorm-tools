@@ -187,9 +187,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
      * just be sure to fire event if overidden.
      */
     void doAfterPersist(D entity, PersistArgs args){
-        if (args.bindAction && args.data){
-            doAfterPersistWithData(entity, args)
-        }
+        //empty, implement in concrete repo if needed
     }
 
     /**
@@ -548,20 +546,8 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
     }
 
     /**
-     * Called from doAfterPersist and before afterPersist event
-     * when its a bindAction (create/update) and it has data.
-     * Can be used to creates or update One-to-Many associations for this entity with persistToManyData
-     *
-     * @param entity the main entity for this repo
-     * @param data passed from unpdate or create
-     */
-    void doAfterPersistWithData(D entity, PersistArgs args) {
-        //empty, implement in concrete repo if needed
-    }
-
-    /**
      * helper for createOrUpdate with One-to-Many association on the entity.
-     * Will most often be called from an overriden doAfterPersistWithData.
+     * Will most often be called from an overriden doAfterPersist with data.
      * 1. iterates over the List of Maps and assigns the childrens belongs to key to the entity intance
      * 2. uses the passed in repo to call the createOrUpdate or the List
      *

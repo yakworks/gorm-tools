@@ -6,6 +6,7 @@ apply from: "${rootDir}/gradle/test-integration.gradle"
 dependencies {
 
   compileOnly "org.springframework.boot:spring-boot-starter-web"
+
   //transitive spring security
   //compileOnly "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
 

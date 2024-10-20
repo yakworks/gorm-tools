@@ -58,6 +58,9 @@ configurations.all {
     if (details.requested.group.startsWith('org.junit.platform')) {
       details.useVersion project['vJunitPlatform']
     }
+    if (details.requested.group.startsWith('com.github.ben-manes.caffeine')) {
+      details.useVersion project['vCaffeine']
+    }
   }
 }
 

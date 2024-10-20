@@ -168,7 +168,6 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
     /**
      * called right BEFORE validateAndSave to fire events but can be overridden too.
      * just be sure to fire event if overidden.
-     * NOTE
      */
     void doBeforePersist(D entity, PersistArgs args){
         //empty, implement in concrete repo if needed
@@ -381,9 +380,6 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
      * Or even better implement the beforeBind|afterBind event methods
      */
     void bind(D entity, Map data, BindAction bindAction, PersistArgs args = new PersistArgs()) {
-        //if its a PathKeyMap then init it
-        // if(data instanceof PathKeyMap) data.init()
-
         getRepoEventPublisher().doBeforeBind(this, (GormEntity)entity, data, bindAction, args)
         doBind(entity, data, bindAction, args)
         getRepoEventPublisher().doAfterBind(this, (GormEntity)entity, data, bindAction, args)

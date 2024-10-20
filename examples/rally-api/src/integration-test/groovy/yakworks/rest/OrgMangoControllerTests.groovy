@@ -2,7 +2,8 @@ package yakworks.rest
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import yakworks.rest.gorm.controller.RestRepoApiController
+
+import yakworks.rest.gorm.controller.CrudApiController
 import yakworks.rally.orgs.model.Org
 import yakworks.testing.rest.RestIntTest
 
@@ -10,7 +11,7 @@ import yakworks.testing.rest.RestIntTest
 @Integration
 class OrgMangoControllerTests extends RestIntTest {
 
-    RestRepoApiController<Org> controller
+    CrudApiController<Org> controller
 
     void setup() {
         controllerName = 'OrgController'

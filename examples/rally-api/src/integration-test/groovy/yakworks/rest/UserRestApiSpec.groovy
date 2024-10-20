@@ -1,11 +1,12 @@
 package yakworks.rest
 
-import org.springframework.boot.test.context.SpringBootTest
+
 import org.springframework.http.HttpStatus
 
-import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+
+import yakworks.rest.client.OkHttpRestTrait
 
 @Integration
 class UserRestApiSpec extends Specification implements OkHttpRestTrait {

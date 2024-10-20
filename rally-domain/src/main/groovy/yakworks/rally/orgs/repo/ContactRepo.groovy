@@ -4,15 +4,12 @@
 */
 package yakworks.rally.orgs.repo
 
-
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataRetrievalFailureException
 
 import gorm.tools.databinding.BindAction
-import gorm.tools.mango.MangoDetachedCriteria
-import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.events.AfterBindEvent
@@ -21,7 +18,6 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.utils.GormUtils
-import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.commons.map.Maps
@@ -80,13 +76,15 @@ class ContactRepo extends LongIdGormRepo<Contact> {
 
 
     @Override
-    void doBeforePersistWithData(Contact contact, PersistArgs args) {
-        Map data = args.data
-        if (args.bindAction == BindAction.Create) {
-            setupSource(contact, data)
+    void doBeforePersist(Contact contact, PersistArgs args) {
+        if(args.bindAction && args.data) {
+            Map data = args.data
+            if (args.bindAction == BindAction.Create) {
+                setupSource(contact, data)
+            }
+            // we do primary location and contact here before persist so we persist org only once with contactId it is created
+            if (data.location) createOrUpdateLocation(contact, data.location as Map)
         }
-        // we do primary location and contact here before persist so we persist org only once with contactId it is created
-        if(data.location) createOrUpdateLocation(contact, data.location as Map)
     }
 
     /**
@@ -140,36 +138,24 @@ class ContactRepo extends LongIdGormRepo<Contact> {
     }
 
     /**
-     * Called from doAfterPersist and before afterPersist event
+     * Called from doPersist and right before afterPersist event
      * if its had a bind action (create or update) and it has data
      * creates or updates One-to-Many associations for this entity.
      */
     @Override
-    void doAfterPersistWithData(Contact contact, PersistArgs args) {
-        Map data = args.data
-        if(data.getBoolean(IS_PRIMARY)) {
-            Org org = Org.get(contact.orgId)
-            org.contact = contact
-            org.persist()
+    void doAfterPersist(Contact contact, PersistArgs args) {
+        if (args.bindAction && args.data) {
+            Map data = args.data
+            if (data.getBoolean(IS_PRIMARY)) {
+                Org org = Org.get(contact.orgId)
+                org.contact = contact
+                org.persist()
+            }
+            if (data.locations) super.persistToManyData(contact, Location.repo, data.locations as List<Map>, "contact")
+            if (data.phones) super.persistToManyData(contact, ContactPhone.repo, data.phones as List<Map>, "contact")
+            if (data.emails) super.persistToManyData(contact, ContactEmail.repo, data.emails as List<Map>, "contact")
+            if (data.tags != null) TagLink.addOrRemoveTags(contact, data.tags)
         }
-        if(data.locations) super.persistToManyData(contact, Location.repo, data.locations as List<Map>, "contact")
-        if(data.phones) super.persistToManyData(contact, ContactPhone.repo, data.phones as List<Map>, "contact")
-        if(data.emails) super.persistToManyData(contact, ContactEmail.repo, data.emails as List<Map>, "contact")
-        if(data.tags != null) TagLink.addOrRemoveTags(contact, data.tags)
-    }
-
-    @Override
-    MangoDetachedCriteria<Contact> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
-        Map criteriaMap = queryArgs.qCriteria
-        //if its has tags keys then this returns something to add to exists, will remove the keys as well
-        DetachedCriteria tagExistsCrit = TagLink.getExistsCriteria(criteriaMap, Contact, 'contact_.id')
-
-        MangoDetachedCriteria<Contact> detCrit = getMangoQuery().query(Contact, queryArgs, closure)
-        //if it has tags key
-        if(tagExistsCrit != null) {
-            detCrit.exists(tagExistsCrit.id())
-        }
-        return detCrit
     }
 
     void removeAll(Org org) {
@@ -222,7 +208,7 @@ class ContactRepo extends LongIdGormRepo<Contact> {
         data.orgId = contact.orgId
         data.contact = contact
         // if it had an op of remove then will return null and this set primary location to null
-        contact.location = locationRepo.createOrUpdateItem(data)
+        contact.location = locationRepo.upsert(data).entity
         return contact.location
     }
     /*
@@ -245,7 +231,7 @@ class ContactRepo extends LongIdGormRepo<Contact> {
         if (from == null) return null
 
         //generate id if not already done, ContactSource etc will need it
-        if(!toContat.id) toContat.id = Contact.repo.generateId()
+        if(!toContat.id) toContat.id = generateId()
         GormUtils.copyDomain(toContat, from)
         toContat.flex = GormUtils.copyDomain(ContactFlex, ContactFlex.get(from.flexId as Long), [contact: toContat])
 

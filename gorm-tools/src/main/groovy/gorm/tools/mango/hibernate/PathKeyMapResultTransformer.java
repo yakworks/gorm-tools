@@ -28,15 +28,9 @@ public class PathKeyMapResultTransformer implements ResultTransformer {
 
     //public static final PathKeyMapResultTransformer INSTANCE = new PathKeyMapResultTransformer();
 
-    /**
-     * Disallow instantiation of AliasToEntityMapResultTransformer.
-     */
     public PathKeyMapResultTransformer() {
     }
 
-    /**
-     * Disallow instantiation of AliasToEntityMapResultTransformer.
-     */
     public PathKeyMapResultTransformer(List<String> aliasesToTrimSuffix) {
         this.aliasesToTrimSuffix = aliasesToTrimSuffix;
     }

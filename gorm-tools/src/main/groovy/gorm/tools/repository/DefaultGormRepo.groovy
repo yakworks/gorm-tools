@@ -17,11 +17,18 @@ import org.springframework.core.GenericTypeResolver
 @CompileStatic
 class DefaultGormRepo<D> implements GormRepo<D> {
 
+    // @Autowired(required=false) // @Qualifier("mangoQuery")
+    // QueryService<D> queryService
+
     DefaultGormRepo() {
-        this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormRepo)
+        //this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormRepo)
     }
 
     DefaultGormRepo(Class<D> clazz) {
         this.entityClass = clazz
+    }
+
+    public static <D> DefaultGormRepo<D> of(Class<D> entityClass){
+        return new DefaultGormRepo(entityClass)
     }
 }

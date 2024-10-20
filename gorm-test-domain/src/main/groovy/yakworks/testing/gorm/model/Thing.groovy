@@ -5,7 +5,7 @@
 package yakworks.testing.gorm.model
 
 import gorm.tools.model.NamedEntity
-import gorm.tools.repository.model.GormRepoEntity
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
@@ -14,7 +14,7 @@ import yakworks.commons.transform.IdEqualsHashCode
 @IdEqualsHashCode
 @GrailsCompileStatic
 // @ManagedEntity
-class Thing implements NamedEntity, GormRepoEntity<Thing, ThingRepo> {
+class Thing implements NamedEntity, RepoEntity<Thing>, Serializable {
 
     // address fields
     String name

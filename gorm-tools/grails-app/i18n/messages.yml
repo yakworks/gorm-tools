@@ -14,11 +14,15 @@ error:
     empty: Empty Data
     bindId: Id was passed in the data but bindId argument was false. Set bindId=true or remove the id property
     emptyPayload: Expected payload is null or empty, No operation performed.
-    qRequired: q or qSearch parameter restriction is required
 
   query:
+    invalid: Invalid Query
     max: 'Max parameter value is larger then allowed value {max}'
     timeout: 'Query timeout has occurred'
+    duplicate: Duplicate Query
+    qRequired: q or qSearch parameter restriction is required
+    # FIXME use invalid
+    qInvalid: q or qSearch parameters are invalid
 
   # Delete Errors
   delete:

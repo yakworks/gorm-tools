@@ -9,8 +9,11 @@ import java.util.concurrent.TimeUnit
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
+import org.jetbrains.annotations.NotNull
 import org.springframework.beans.factory.annotation.Value
 
+import okhttp3.Call
+import okhttp3.Callback
 import okhttp3.Credentials
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
@@ -50,6 +53,24 @@ trait OkHttpRestTrait {
         return getHttpClient().newCall(request).execute()
     }
 
+    void enqueue(String method, String uriPath, Object body = null){
+        Request request = getRequestBuilder(uriPath)
+            .method(method, getRequestBody(method, body))
+            .build()
+
+        getHttpClient().newCall(request).enqueue(
+            new EmptyCallBack()
+        );
+    }
+
+    static class EmptyCallBack implements Callback{
+        @Override
+        void onFailure(@NotNull Call call, @NotNull IOException e) {
+        }
+        @Override
+        void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+        }
+    }
     /**
      * build and OkHttpClient with higher time out of 120
      */

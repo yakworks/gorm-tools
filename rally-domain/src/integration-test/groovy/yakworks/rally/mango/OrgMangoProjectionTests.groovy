@@ -30,11 +30,15 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
                 groupProperty('type')
             }
         }
-        def sumbObj = qry.list()
+        def list = qry.list()
+        def listJpql = qry.mapList()
 
         then:
-        sumbObj.size() == 5
-        sumbObj[0]['type'] == OrgType.Customer
+        list.size() == 5
+        listJpql.size() == 5
+        //same key sets here
+        (list[0] as Map).keySet() == ['id', 'type'] as Set
+        (listJpql[0] as Map).keySet() == ['id', 'type'] as Set
     }
 
     def "sum simple mango projection"() {
@@ -197,8 +201,8 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
 
     def "sum with QueryArgs"() {
         when:
-        def args = QueryArgs.withProjections('calc.totalDue':'sum', 'type':'group')
-        def qry = Org.query(args)
+        def args = QueryArgs.of().projections('calc.totalDue':'sum', 'type':'group')
+        def qry = Org.repo.query(args)
         def sumbObj = qry.list()
 
         then:

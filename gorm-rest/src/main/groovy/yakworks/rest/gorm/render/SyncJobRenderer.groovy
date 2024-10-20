@@ -4,11 +4,12 @@
 */
 package yakworks.rest.gorm.render
 
-import groovy.json.JsonOutput
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import gorm.tools.job.JobUtils
 import gorm.tools.job.SyncJobEntity
 import grails.rest.render.RenderContext
 
@@ -22,27 +23,13 @@ import grails.rest.render.RenderContext
 @CompileStatic
 class SyncJobRenderer implements JsonRendererTrait<SyncJobEntity> {
 
+    //this is also done in
     @Override
     @CompileDynamic
     void render(SyncJobEntity job, RenderContext context) {
         setContentType(context)
 
-        // gets the raw json string and use the unescaped to it just dumps it to writer without any round robin conversion
-        String jobData = job.dataToString()
-        JsonOutput.JsonUnescaped rawDataJson = JsonOutput.unescaped(jobData)
-
-        Map response = [
-            id: job.id,
-            ok: job.ok,
-            state: job.state.name(),
-            source: job.source,
-            sourceId: job.sourceId,
-            data: rawDataJson
-        ]
-
-        if(job.problems) {
-            response['problems'] = job.problems
-        }
+        Map response = JobUtils.convertToMap(job)
 
         jsonBuilder(context).call(response)
     }

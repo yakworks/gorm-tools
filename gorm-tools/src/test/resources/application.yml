@@ -15,10 +15,10 @@ hibernate:
 logging:
   level:
     root: WARN
-    # For unit test need to setup in the logback-test.xml
+    # NOTE: For unit test need to setup logging in the logback-test.xml for SQL debugging
 #    org.springframework: WARN
 #    org.hibernate.orm.deprecation: OFF # turns off deprecation notices
-    org.hibernate.SQL: DEBUG
+#    org.hibernate.SQL: DEBUG
 
 
 yakworks:

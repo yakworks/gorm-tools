@@ -5,7 +5,6 @@
 package gorm.tools.utils
 
 import grails.gorm.annotation.Entity
-import grails.testing.gorm.DataTest
 import spock.lang.Specification
 import yakworks.commons.beans.PropertyTools
 import yakworks.testing.gorm.unit.DataRepoTest

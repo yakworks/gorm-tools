@@ -1,6 +1,7 @@
 package yakworks.rest
 
-import yakworks.rest.gorm.controller.RestRepoApiController
+
+import yakworks.rest.gorm.controller.CrudApiController
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import yakworks.commons.map.Maps
@@ -11,7 +12,7 @@ import yakworks.rally.orgs.model.Contact
 @Integration
 class ContactControllerTests extends RestIntTest {
 
-    RestRepoApiController<Contact> controller
+    CrudApiController<Contact> controller
     // String controllerName = 'ContactController'
 
     void setup() {
@@ -63,7 +64,7 @@ class ContactControllerTests extends RestIntTest {
     }
 
     void "pick list"() {
-        controller.params << [q:"John100", max:20]
+        controller.params << [qSearch:"John100", max:20]
 
         when:
         controller.picklist()

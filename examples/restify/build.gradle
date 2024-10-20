@@ -1,6 +1,4 @@
-apply plugin:"war"
-apply plugin:"org.grails.grails-web"
-// apply plugin:"org.grails.plugins.views-json"
+apply plugin:'yakworks.grails-web'
 
 apply from: "${rootDir}/gradle/compile.gradle"
 apply from: "${rootDir}/gradle/hibernate.gradle"
@@ -59,5 +57,8 @@ bootRun {
   systemProperty "project.projectDir", project.projectDir.absolutePath
 }
 
-bootJar.enabled = true
-bootJar.archiveFileName = 'restify.jar'
+bootJar {
+  enabled = true
+  archiveFileName = 'rcm-jobs.jar'
+  duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+}

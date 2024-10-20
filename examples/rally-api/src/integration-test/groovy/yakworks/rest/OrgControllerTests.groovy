@@ -1,8 +1,11 @@
 package yakworks.rest
 
+import org.springframework.http.HttpStatus
+
+
 import yakworks.rally.orgs.model.ContactFlex
 import yakworks.rally.orgs.model.OrgFlex
-import yakworks.rest.gorm.controller.RestRepoApiController
+import yakworks.rest.gorm.controller.CrudApiController
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import yakworks.commons.map.Maps
@@ -14,7 +17,7 @@ import yakworks.rally.tag.model.Tag
 @Integration
 class OrgControllerTests extends RestIntTest {
 
-    RestRepoApiController<Org> controller
+    CrudApiController<Org> controller
 
     void setup() {
         controllerName = 'OrgController'
@@ -36,6 +39,17 @@ class OrgControllerTests extends RestIntTest {
         then:
         response.status == 200
         Maps.containsAll(body, [id:9, num: '9', name: 'Branch9'])
+    }
+
+    void "test post"() {
+        when:
+        request.json = [num:"test1", name:"test1", type: 'Customer']
+        controller.post()
+        Map body = response.bodyToMap()
+
+        then:
+        response.status == 201
+        body.num == 'test1'
     }
 
     void "post with empty data"() {
@@ -81,6 +95,28 @@ class OrgControllerTests extends RestIntTest {
         body.tags[0].id == tag1.id
     }
 
+    void "test UPSERT insert"() {
+        when:
+        request.json = [num:"test1", name:"test1", type: 'Customer']
+        controller.upsert()
+        Map body = response.bodyToMap()
+
+        then:
+        response.status == HttpStatus.CREATED.value()
+        body.num == 'test1'
+    }
+
+    void "test UPSERT update"() {
+        when:
+        request.json = [id:1, name:"updated"]
+        controller.upsert()
+        Map body = response.bodyToMap()
+
+        then:
+        response.status == HttpStatus.OK.value()
+        body.name == 'updated'
+    }
+
     void "list sort 3rd level nested object"() {
         setup:
         Org.list().each { Org org ->
@@ -121,14 +157,14 @@ class OrgControllerTests extends RestIntTest {
 
     void "list fail no q"() {
         when:
-        controller.params << [max:20, sort:'contact.flex.num1', order:'desc']
+        controller.params << [max:20]
         controller.list()
         Map body = response.bodyToMap()
 
         then:
         response.status == 418
         !body.ok
-        body.code == "error.data.qRequired"
+        body.code == "error.query.qRequired"
 
         //data[0].name == 'Org10'
     }

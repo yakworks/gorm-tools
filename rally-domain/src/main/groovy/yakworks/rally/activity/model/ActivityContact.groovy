@@ -7,7 +7,8 @@ package yakworks.rally.activity.model
 import org.codehaus.groovy.util.HashCodeHelper
 
 import gorm.tools.model.Persistable
-import gorm.tools.repository.model.GormRepoEntity
+import gorm.tools.repository.RepoLookup
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.rally.activity.repo.ActivityContactRepo
@@ -15,7 +16,7 @@ import yakworks.rally.orgs.model.Contact
 
 @Entity
 @GrailsCompileStatic
-class ActivityContact implements GormRepoEntity<ActivityContact, ActivityContactRepo>, Serializable {
+class ActivityContact implements RepoEntity<ActivityContact>, Serializable {
     Activity activity
     Contact contact
 
@@ -25,6 +26,8 @@ class ActivityContact implements GormRepoEntity<ActivityContact, ActivityContact
         activity column: 'activityId'
         contact column: 'personId'
     }
+
+    static ActivityContactRepo getRepo() { return (ActivityContactRepo) RepoLookup.findRepo(this) }
 
     static ActivityContact create( Activity act, Contact con, Map args = [:]) {
         getRepo().create(act, con, args)

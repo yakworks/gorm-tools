@@ -77,7 +77,7 @@ class RallyUserService {
             // setAlias 'secRoleUser'
             // createAlias('role', 'role')
             eqProperty("user.id", "appUser_.id")
-            inList('role.name', [Roles.AR_MANAGER, Roles.MANAGER])
+            "in"('role.name', [Roles.AR_MANAGER, Roles.MANAGER])
         }
         DetachedCriteria conSubQuery = Contact.query {
             // setAlias 'contact'

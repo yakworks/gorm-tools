@@ -37,7 +37,7 @@ class AppUserService {
      */
     void trackUserLogin() {
         Long userId = currentUser.userId as Long
-        SecLoginHistory secLoginHistory = SecLoginHistory.create([userId: userId, loginDate: new Date()])
+        SecLoginHistory secLoginHistory = SecLoginHistory.repo.create([userId: userId, loginDate: new Date()])
     }
 
     @CompileDynamic //doesn't pick up maxResults with GrCompStatic

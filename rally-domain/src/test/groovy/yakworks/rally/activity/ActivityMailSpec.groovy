@@ -11,6 +11,7 @@ import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.model.TaskType
+import yakworks.rally.activity.repo.ActivityQuery
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
@@ -31,7 +32,7 @@ class ActivityMailSpec extends Specification implements GormHibernateTest, Secur
         AttachmentLink, ActivityLink, MailMessage, Activity, TaskType, Org, OrgTag,
         Tag, TagLink, Attachment, ActivityNote, Contact, ActivityContact
     ]
-    static springBeans = [AttachmentSupport]
+    static springBeans = [AttachmentSupport, ActivityQuery]
 
     @Shared Long orgId
 
@@ -102,7 +103,7 @@ class ActivityMailSpec extends Specification implements GormHibernateTest, Secur
         // add another activity
         Activity.create(params)
         flush()
-        def linkedActs = Activity.repo.queryList([linkedId: 1, linkedEntity:'Contact'])
+        def linkedActs = Activity.repo.query([linkedId: 1, linkedEntity:'Contact']).list()
 
         then:
         linkedActs.size() == 2
@@ -130,7 +131,7 @@ class ActivityMailSpec extends Specification implements GormHibernateTest, Secur
         def params = [kind:"Note", id:activity.id]
         flushAndClear()
         params.name = RandomStringUtils.randomAlphabetic(300)
-        Activity updatedActivity = Activity.update(params)
+        Activity updatedActivity = Activity.repo.update(params)
 
         then:
         updatedActivity.note != null

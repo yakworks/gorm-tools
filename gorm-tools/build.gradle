@@ -8,9 +8,9 @@ dependencies {
 
   compileOnly "org.springframework.boot:spring-boot-autoconfigure"
   //here only for the HttpServletRequest, grail compile AST tries to add the EnableWebMvc to the Application if the servlet-api is found
-  compileOnly "org.springframework:spring-webmvc"
-  compileOnly "javax.servlet:javax.servlet-api:4.0.1"
-  // api 'org.springframework.data:spring-data-commons'
+  // compileOnly "org.springframework:spring-webmvc"
+  // compileOnly "javax.servlet:javax.servlet-api:4.0.1"
+  //api 'org.springframework.data:spring-data-commons'
 
   // api project(":commons")
   // TODO use this standard for json converters
@@ -24,7 +24,8 @@ dependencies {
     exclude group:"com.vladmihalcea", module: "hibernate-types-55"
   }
 
-  api ("org.yakworks:grails-kit:$vSpringGrailsKit")
+  //api ("org.yakworks:grails-kit:$vSpringGrailsKit")
+  api ("org.yakworks:spring-kit:$vSpringGrailsKit")
   api "org.yakworks:grails-icu4j:$vYakICU4J"
   api "org.yakworks:groovy-commons:$vGroovyCommons"
 

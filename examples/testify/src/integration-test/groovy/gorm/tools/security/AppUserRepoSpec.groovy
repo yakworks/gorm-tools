@@ -111,7 +111,7 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
             roles: [[id: 2], [id: 3]]
         ]
         //update it to 2 and 3.
-        AppUser.update(updateParams)
+        AppUser.repo.update(updateParams)
         flushAndClear()
 
         AppUser user = AppUser.get(1)
@@ -128,7 +128,7 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
             id: 1,
             roles: ["ADMIN"]
         ]
-        AppUser.update(params2)
+        AppUser.repo.update(params2)
         flush()
 
         then:

@@ -10,14 +10,15 @@ import java.time.LocalDateTime
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import yakworks.commons.model.IdEnum
-import gorm.tools.repository.model.GormRepoEntity
+import gorm.tools.repository.RepoLookup
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import yakworks.commons.model.IdEnum
 
 @Entity
 @GrailsCompileStatic
-class Cust implements GormRepoEntity<Cust, CustRepo> {
+class Cust implements RepoEntity<Cust> {
     String name
     UUID uid //an UUID field for testing
     Integer descId // inverted order for test
@@ -81,6 +82,8 @@ class Cust implements GormRepoEntity<Cust, CustRepo> {
         location:[  nullable: true],
         ext:[       nullable: true],
     ]
+
+    static CustRepo getRepo() { return (CustRepo) RepoLookup.findRepo(this) }
 
     @CompileDynamic //bug in grailsCompileStatic requires this on internal enums
     enum Kind {CLIENT, COMPANY}

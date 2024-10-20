@@ -18,7 +18,7 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 
 @Entity
 @GrailsCompileStatic
-class JsonSample implements UuidRepoEntity<JsonSample, UuidGormRepo<JsonSample>> {
+class JsonSample implements UuidRepoEntity<JsonSample> {
     UUID id
     String name
 

@@ -8,18 +8,19 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import yakworks.commons.io.ZipUtils
 import yakworks.commons.util.BuildSupport
+
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Contact
-import yakworks.rest.gorm.controller.RestRepoApiController
+import yakworks.rest.gorm.controller.CrudApiController
 import yakworks.testing.rest.RestIntTest
 
 @Rollback
 @Integration
 class BulkCsvSpec  extends RestIntTest {
 
-    RestRepoApiController<Contact> controller
+    CrudApiController<Contact> controller
     AttachmentRepo attachmentRepo
 
     void setup() {
@@ -92,7 +93,7 @@ class BulkCsvSpec  extends RestIntTest {
         attachmentRepo.removeById(syncJob.dataId as Long)
         Attachment.withNewTransaction {
             if(attachment) attachment.remove()
-            if(body.id) SyncJob.removeById(body.id as Long) //syncjob is created in new transaction
+            if(body.id) SyncJob.repo.removeById(body.id as Long) //syncjob is created in new transaction
             Contact.findAllByNumLike("bulk_").each {
                 it.remove()
             }
@@ -156,7 +157,7 @@ class BulkCsvSpec  extends RestIntTest {
         attachmentRepo.removeById(syncJob.dataId as Long)
         Attachment.withNewTransaction {
             if(attachment) attachment.remove()
-            if(body.id) SyncJob.removeById(body.id as Long) //syncjob is created in new transaction
+            if(body.id) SyncJob.repo.removeById(body.id as Long) //syncjob is created in new transaction
             Contact.findAllByNumLike("bulk_").each {
                 it.remove()
             }
@@ -209,7 +210,7 @@ class BulkCsvSpec  extends RestIntTest {
         cleanup: "cleanup db"
         Attachment.withNewTransaction {
             if(attachment) attachment.remove()
-            if(body.id) SyncJob.removeById(body.id as Long) //syncjob is created in new transaction
+            if(body.id) SyncJob.repo.removeById(body.id as Long) //syncjob is created in new transaction
         }
     }
 }

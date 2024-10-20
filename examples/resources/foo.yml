@@ -1,0 +1,11 @@
+# testing external config
+
+foo:
+  message: "from EXTERNAL examples/resource/foo.yml"
+  bar:
+    testMessage: should not see this
+
+---
+
+foo.bar:
+  testMessage: got it

@@ -4,16 +4,20 @@
 */
 package yakworks.gorm.boot
 
+import javax.annotation.PostConstruct
 import javax.sql.DataSource
 
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.model.AbstractMappingContext
+import org.grails.orm.hibernate.HibernateDatastore
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
-import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.context.MessageSource
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.DependsOn
+import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Lazy
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -21,46 +25,59 @@ import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelStreamTools
 import gorm.tools.async.ParallelTools
 import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.hibernate.QueryConfig
 import gorm.tools.idgen.IdGenerator
 import gorm.tools.idgen.JdbcIdGenerator
 import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.jdbc.DbDialectService
-import gorm.tools.mango.DefaultMangoQuery
 import gorm.tools.mango.MangoBuilder
-import gorm.tools.mango.api.MangoQuery
+import gorm.tools.mango.QuickSearchSupport
 import gorm.tools.metamap.services.MetaEntityService
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.transaction.TrxService
+import gorm.tools.validation.RepoValidatorRegistry
 import yakworks.gorm.api.ApiConfig
 import yakworks.gorm.api.IncludesConfig
-import yakworks.gorm.config.AsyncConfig
-import yakworks.gorm.config.GormConfig
-import yakworks.gorm.config.IdGeneratorConfig
+import yakworks.gorm.api.support.DefaultQueryArgsValidator
+import yakworks.gorm.api.support.QueryArgsValidator
+import yakworks.gorm.config.GormToolsPropertiesConfiguration
 
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @Lazy
-@EnableConfigurationProperties([AsyncConfig, GormConfig, IdGeneratorConfig, QueryConfig])
+@Import([DefaultCrudApiConfiguration, GormToolsPropertiesConfiguration]) //Config Props AsyncConfig, GormConfig, IdGeneratorConfig, QueryConfig
+// @AutoConfigureBefore([HibernateJpaAutoConfiguration])
+// @AutoConfigureAfter(DataSourceAutoConfiguration)
 @CompileStatic
 class GormToolsConfiguration {
+
+    @Autowired HibernateDatastore hibernateDatastore
+    @Autowired MessageSource messageSource
 
     // see https://zetcode.com/spring/beanfactorypostprocessor/ for lambda BeanFactoryPostProcessor
     @Bean
     //important here, if we dont do DependsOn then it eagerly instantiates the DataSource before its ready.
+    //@ConditionalOnBean(HibernateDatastore)
     @DependsOn(["grailsDomainClassMappingContext", "appCtx"])
     static GormRepoBeanFactoryPostProcessor gormRepoBeanFactoryPostProcessor(AbstractMappingContext grailsDomainClassMappingContext) {
         return new GormRepoBeanFactoryPostProcessor(grailsDomainClassMappingContext)
     }
 
+    @PostConstruct
+    void init(){
+        //register the gorm validators
+        RepoValidatorRegistry.init(hibernateDatastore, messageSource)
+    }
+
     @Bean
+    @ConditionalOnMissingBean
     ApiConfig apiConfig(){
         new ApiConfig()
     }
 
     @Bean
+    @ConditionalOnMissingBean
     IncludesConfig includesConfig(){ new IncludesConfig()}
 
     @Bean
@@ -74,28 +91,39 @@ class GormToolsConfiguration {
     @Bean
     IdGenerator idGenerator(JdbcIdGenerator jdbcIdGenerator){ new PooledIdGenerator(jdbcIdGenerator)}
 
-    @Bean
-    MangoQuery mangoQuery(){ new DefaultMangoQuery()}
+    // @Bean
+    // QueryService mangoQuery(){ new DefaultQueryService()}
 
     @Bean
+    @ConditionalOnMissingBean
     MangoBuilder mangoBuilder(){ new MangoBuilder()}
 
     @Bean
+    @ConditionalOnMissingBean
+    QuickSearchSupport quickSearchSupport(){ new QuickSearchSupport()}
+
+    @Bean
+    @ConditionalOnMissingBean
     EntityMapBinder entityMapBinder(){ new EntityMapBinder()}
 
     @Bean
+    @ConditionalOnMissingBean
     MetaEntityService metaEntityService(){ new MetaEntityService()}
 
     @Bean
+    @ConditionalOnMissingBean
     MetaMapService metaMapService(){ new MetaMapService()}
 
     @Bean
+    @ConditionalOnMissingBean
     RepoEventPublisher repoEventPublisher(){ new RepoEventPublisher()}
 
     @Bean
+    @ConditionalOnMissingBean
     RepoExceptionSupport repoExceptionSupport(){ new RepoExceptionSupport()}
 
     @Bean
+    @ConditionalOnMissingBean
     ParallelTools parallelTools(){ new ParallelStreamTools()}
 
     @Bean
@@ -106,11 +134,19 @@ class GormToolsConfiguration {
     DbDialectService dbDialectService(){ new DbDialectService()}
 
     @Bean
+    @ConditionalOnMissingBean
     TrxService trxService(){ new TrxService()}
 
     @Bean @Lazy(false)
+    @ConditionalOnMissingBean
     ProblemHandler problemHandler(){
         new ProblemHandler()
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    QueryArgsValidator queryArgsValidator(){
+        new DefaultQueryArgsValidator()
     }
 
 }

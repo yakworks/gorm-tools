@@ -9,13 +9,19 @@ import spock.lang.Specification
 import testing.Address
 import testing.AddyNested
 import testing.Cust
+import testing.CustRepo
 import testing.TestSeedData
+import yakworks.api.problem.data.DataProblemException
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class DefaultMangoQuerySpec extends Specification implements GormHibernateTest {
     static List entityClasses = [Cust, Address, AddyNested]
 
-    @Autowired DefaultMangoQuery mangoQuery
+    @Autowired CustRepo custRepo
+
+    DefaultQueryService getMangoQuery(){
+        custRepo.queryService
+    }
 
     void setupSpec() {
         Cust.withTransaction {
@@ -23,15 +29,16 @@ class DefaultMangoQuerySpec extends Specification implements GormHibernateTest {
         }
     }
 
+
     def "count"() {
         when:
-        int count = mangoQuery.query(Cust, [name: 'Name1']).count() as Integer
+        int count = mangoQuery.query( [name: 'Name1']).count() as Integer
 
         then:
         count
 
         when:
-        count = mangoQuery.query(Cust, [name: 'FOOBAR']).count() as Integer
+        count = mangoQuery.query([name: 'FOOBAR']).count() as Integer
 
         then:
         !count
@@ -39,13 +46,13 @@ class DefaultMangoQuerySpec extends Specification implements GormHibernateTest {
 
     def "exists"() {
         when:
-        boolean hasIt = mangoQuery.query(Cust, [name: 'Name1']).exists()
+        boolean hasIt = mangoQuery.query([name: 'Name1']).exists()
 
         then:
         hasIt
 
         when:
-        hasIt = mangoQuery.query(Cust, [name: 'FOOBAR']).exists()
+        hasIt = mangoQuery.query([name: 'FOOBAR']).exists()
 
         then:
         !hasIt
@@ -53,13 +60,13 @@ class DefaultMangoQuerySpec extends Specification implements GormHibernateTest {
 
     def "sort check"() {
         when: "Check if \$sort will cause NullPointerException"
-        def list = mangoQuery.query(Cust, [name: 'joe', '$sort': 'id'])
+        def list = mangoQuery.query([name: 'joe', '$sort': 'id'])
         then:
         noExceptionThrown()
         list != null
 
         when: "Check if sort will cause NullPointerException"
-        list = mangoQuery.query(Cust, [name: 'joe', 'sort': 'id'])
+        list = mangoQuery.query([name: 'joe', 'sort': 'id'])
         then:
         noExceptionThrown()
         list != null
@@ -152,6 +159,37 @@ class DefaultMangoQuerySpec extends Specification implements GormHibernateTest {
         o.id == 2
         o.location.address == 'City2'
 
+    }
+
+    void "invalid type"() {
+        when:
+        Cust.query(uid:['$eq': 1])
+
+        then:
+        DataProblemException ex = thrown()
+        ex.code == 'error.query.invalid'
+        //ex.message == "Invalid query"
+        ex.detail.contains "Cannot cast object '1' with class 'java.lang.Integer' to class 'java.util.UUID"
+    }
+
+    void "test non existent association field"() {
+        when:
+        Cust.query("foo.name":"test")
+
+        then:
+        DataProblemException ex = thrown()
+        ex.code == 'error.query.invalid'
+        ex.detail.contains("Invalid criteria for field:foo")
+    }
+
+    void "test invalid date"() {
+        when:
+        Cust.query("locDate":"xxx")
+
+        then:
+        DataProblemException ex = thrown()
+        ex.code == 'error.query.invalid'
+        ex.detail.contains("Text 'xxx' could not be parsed")
     }
 
 }

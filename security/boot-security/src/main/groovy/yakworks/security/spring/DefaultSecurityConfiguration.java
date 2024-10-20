@@ -89,6 +89,7 @@ public class DefaultSecurityConfiguration {
 
     /**
      * Legacy, Helper to setup a Filter to pick up POST to /api/login to it can be a REST call instead of just form post.
+     * adds JsonUsernamePasswordLoginFilter under /api/login and forwards it to api/tokenLegacy
      */
     public static void addJsonAuthenticationFilter(HttpSecurity http, TokenStore tokenStore) throws Exception {
         //get the 2 beans needed

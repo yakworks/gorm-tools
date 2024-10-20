@@ -42,7 +42,7 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
         //make sure one is there
         City city1 = City.create(name: 'Denver')
         Map tdata = [id: city1.id, name: "test update"]
-        City city = City.update(tdata)
+        City city = City.repo.update(tdata)
 
         then:
         city.name == "test update"
@@ -75,28 +75,28 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
         Map params = [name: "test"]
 
         when:
-        BeforeBindEvent bbe = new BeforeBindEvent(City.repo, city, params, BindAction.Create, PersistArgs.new())
+        BeforeBindEvent bbe = new BeforeBindEvent(City.repo, city, params, BindAction.Create, PersistArgs.defaults())
         repoEventPublisher.publishEvents(City.repo, bbe, [city, params, bbe] as Object[])
 
         then:
         city.event == "beforeBind Create"
 
         when:
-        AfterBindEvent abe = new AfterBindEvent(City.repo, city, params, BindAction.Update, PersistArgs.new())
+        AfterBindEvent abe = new AfterBindEvent(City.repo, city, params, BindAction.Update, PersistArgs.defaults())
         repoEventPublisher.invokeEventMethod(City.repo, RepositoryEventType.AfterBind.eventKey, city, params, abe)
 
         then:
         city.eventAfter == "afterBind Update"
 
         when:
-        BeforeRemoveEvent bre = new BeforeRemoveEvent(City.repo, city, PersistArgs.new())
+        BeforeRemoveEvent bre = new BeforeRemoveEvent(City.repo, city, PersistArgs.defaults())
         repoEventPublisher.invokeEventMethod(City.repo, RepositoryEventType.BeforeRemove.eventKey, city, bre)
 
         then:
         city.event == "beforeRemove"
 
         when:
-        AfterRemoveEvent are = new AfterRemoveEvent(City.repo, city, PersistArgs.new())
+        AfterRemoveEvent are = new AfterRemoveEvent(City.repo, city, PersistArgs.defaults())
         repoEventPublisher.invokeEventMethod(City.repo, RepositoryEventType.AfterRemove.eventKey, city, are)
 
         then:
@@ -152,7 +152,7 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
         City city = City.create(name: 'Denver') //City.create(params)
         City city2 = City.create(name: 'Chicago') //City.create(params)
         city.remove()
-        City.removeById(city2.id)
+        City.repo.removeById(city2.id)
 
         then:
         sleep(100)
@@ -168,7 +168,7 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
         city.events = [:]
 
         when:
-        City.update([id: city.id, name: "test1"])
+        City.repo.update([id: city.id, name: "test1"])
 
         then:
         sleep(100)
@@ -180,7 +180,7 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
 
         when:
         city.events = [:]
-        City.update([id: city.id, name: "test2"])
+        City.repo.update([id: city.id, name: "test2"])
 
         then:
         City.get(city.id).name == "test2"

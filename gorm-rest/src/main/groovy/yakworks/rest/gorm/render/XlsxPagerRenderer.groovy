@@ -42,7 +42,7 @@ class XlsxPagerRenderer implements XlsRendererTrait<Pager> {
             //look in config and match whats there if not specified
             ExcelBuilderSupport.useIncludesConfig(eb, apiConfig, dataList)
         }
-        eb.writeData(dataList)
+        eb.writeData(dataList as List<Map>)
         eb.writeOut()
         context.setStatus(HttpStatus.OK)
     }

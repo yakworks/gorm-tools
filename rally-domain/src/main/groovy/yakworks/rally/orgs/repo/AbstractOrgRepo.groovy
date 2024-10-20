@@ -84,31 +84,36 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
     }
 
     @Override
-    void doBeforePersistWithData(Org org, PersistArgs args) {
-        Map data = args.data
-        if (args.bindAction == BindAction.Create) {
-            verifyNumAndOrgSource(org, data)
-            //if no orgType then let it fall through and fail validation, orgService is nullable so its easier to mock for testing
-            if(org.type && orgService?.isOrgMemberEnabled())
-                orgService.setupMember(org, data.remove('member') as Map)
+    void doBeforePersist(Org org, PersistArgs args) {
+        if(args.bindAction && args.data) {
+            Map data = args.data
+            if (args.bindAction == BindAction.Create) {
+                verifyNumAndOrgSource(org, data)
+                //if no orgType then let it fall through and fail validation, orgService is nullable so its easier to mock for testing
+                if (org.type && orgService?.isOrgMemberEnabled())
+                    orgService.setupMember(org, data.remove('member') as Map)
+            }
+            // we do primary location and contact here before persist so we persist org only once with contactId it is created
+            if (data.location) createOrUpdatePrimaryLocation(org, data.location as Map)
+            // do contact, support keyContact for legacy and Customers
+            def contactData = data.contact ?: data.keyContact
+            if (contactData) createOrUpdatePrimaryContact(org, contactData as Map)
         }
-        // we do primary location and contact here before persist so we persist org only once with contactId it is created
-        if(data.location) createOrUpdatePrimaryLocation(org, data.location as Map)
-        // do contact, support keyContact for legacy and Customers
-        def contactData = data.contact ?: data.keyContact
-        if(contactData) createOrUpdatePrimaryContact(org, contactData as Map)
     }
 
     /**
-     * Called after persist if its had a bind action (create or update) and it has data
+     * Called after persist
+     * if its had a bind action (create or update) and it has data
      * creates or updates One-to-Many associations for this entity.
      */
     @Override
-    void doAfterPersistWithData(Org org, PersistArgs args) {
-        Map data = args.data
-        if(data.locations) persistToManyWithOrgId(org, Location.repo, data.locations as List<Map>)
-        if(data.contacts) persistToManyWithOrgId(org, Contact.repo, data.contacts as List<Map>)
-        if(data.tags != null) orgTagRepo.addOrRemove((Persistable)org, data.tags)
+    void doAfterPersist(Org org, PersistArgs args) {
+        if (args.bindAction && args.data) {
+            Map data = args.data
+            if (data.locations) persistToManyWithOrgId(org, Location.repo, data.locations as List<Map>)
+            if (data.contacts) persistToManyWithOrgId(org, Contact.repo, data.contacts as List<Map>)
+            if (data.tags != null) orgTagRepo.addOrRemove((Persistable) org, data.tags)
+        }
     }
 
     @Override
@@ -188,7 +193,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         data.remove('isPrimary')
 
         data.orgId = org.getId()
-        org.contact = contactRepo.createOrUpdateItem(data)
+        org.contact = contactRepo.upsert(data).entity
         return org.contact
     }
 
@@ -197,7 +202,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         //make sure params has org key
         data.orgId = org.getId()
         // if it had an op of remove then will return null and this set primary location to null
-        org.location = locationRepo.createOrUpdateItem(data)
+        org.location = locationRepo.upsert(data).entity
         return org.location
     }
 

@@ -20,7 +20,6 @@ import org.springframework.core.ResolvableTypeProvider
 import org.springframework.dao.DataAccessException
 import org.springframework.transaction.TransactionDefinition
 
-import gorm.tools.beans.EntityResult
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryService
@@ -33,6 +32,7 @@ import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.ApiCrudRepo
+import gorm.tools.repository.model.EntityResult
 import gorm.tools.repository.model.PersistableRepoEntity
 import gorm.tools.transaction.TrxUtils
 import gorm.tools.utils.GormMetaUtils
@@ -174,19 +174,19 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
     }
 
     /**
-     * called right AFTER validate and BEFORE save. calls associations persists but can be overridden too.
-     * No events fired for this
-     */
-    void doAfterValidateBeforeSave(D entity, PersistArgs args){
-        persistToOneAssociations(entity, getToOneAssociations())
-    }
-
-    /**
      * called right after save to fire events and call associations persists but can be overridden too.
      * just be sure to fire event if overidden.
      */
     void doAfterPersist(D entity, PersistArgs args){
         //empty, implement in concrete repo if needed
+    }
+
+    /**
+     * called right AFTER validate and BEFORE save. calls associations persists but can be overridden too.
+     * No events fired for this
+     */
+    void doAfterValidateBeforeSave(D entity, PersistArgs args){
+        persistToOneAssociations(entity, getToOneAssociations())
     }
 
     /**
@@ -230,16 +230,9 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
     D doCreate(Map data, PersistArgs args) {
         D entity = (D) getEntityClass().newInstance()
         args.insert(true)
+        args.bindAction = BindAction.Create
         bindAndCreate(entity, data, args)
         return entity
-    }
-
-    /**
-     * just calls bindAndSave with the right BindAction
-     * This is the best method to overrride if needed
-     */
-    void bindAndCreate(D entity, Map data, PersistArgs args) {
-        bindAndSave(entity, data, BindAction.Create, args)
     }
 
     /**
@@ -264,8 +257,21 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
      */
     D doUpdate(Map data, PersistArgs args) {
         D entity = findWithData(data)
+        args.bindAction = BindAction.Update
         bindAndUpdate(entity, data, args)
         return entity
+    }
+
+    /**
+     * just calls bindAndSave with the right BindAction
+     * This is the best method to overrride if needed
+     */
+    void bindAndCreate(D entity, Map data, PersistArgs args) {
+        bindAndSave(entity, data, BindAction.Create, args)
+    }
+
+    void bindAndUpdate(D entity, Map data, PersistArgs args) {
+        bindAndSave(entity, data, BindAction.Update, args)
     }
 
     /**
@@ -349,10 +355,6 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
     Serializable generateId(Persistable entity){
         //override in impl that needs this.
         return null as Serializable
-    }
-
-    void bindAndUpdate(D entity, Map data, PersistArgs args) {
-        bindAndSave(entity, data, BindAction.Update, args)
     }
 
     /** short cut to call {@link #bind}, setup args for events then calls {@link #doPersist} */

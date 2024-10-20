@@ -15,6 +15,6 @@ import gorm.tools.repository.GormRepo
  * @since 6.1
  */
 @CompileStatic
-trait UuidRepoEntity<D, R extends GormRepo<D>> implements PersistableRepoEntity<D, R, UUID> {
+trait UuidRepoEntity<D> implements PersistableRepoEntity<D, GormRepo<D>, UUID> {
 
 }

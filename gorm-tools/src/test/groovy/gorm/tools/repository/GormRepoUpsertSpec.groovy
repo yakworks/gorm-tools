@@ -4,26 +4,9 @@
 */
 package gorm.tools.repository
 
-import gorm.tools.beans.EntityResult
-import gorm.tools.databinding.BindAction
-import gorm.tools.problem.ValidationProblem
-import gorm.tools.repository.model.RepoEntity
-import grails.artefact.Artefact
-import grails.compiler.GrailsCompileStatic
-import grails.persistence.Entity
+import gorm.tools.repository.model.EntityResult
 import spock.lang.Specification
-import testing.Address
-import testing.AddyNested
-import testing.Cust
-import testing.CustExt
-import testing.CustRepo
-import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
-import yakworks.api.problem.data.DataProblem
-import yakworks.api.problem.data.DataProblemCodes
-import yakworks.api.problem.data.DataProblemException
-import yakworks.api.problem.data.NotFoundProblem
-import yakworks.testing.gorm.RepoTestData
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.SinkExt
 import yakworks.testing.gorm.model.SinkItem

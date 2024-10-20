@@ -12,7 +12,6 @@ import org.grails.orm.hibernate.HibernateDatastore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
-import gorm.tools.beans.EntityResult
 import gorm.tools.beans.Pager
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
@@ -23,6 +22,7 @@ import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.ApiCrudRepo
 import gorm.tools.repository.model.DataOp
+import gorm.tools.repository.model.EntityResult
 import gorm.tools.transaction.TrxUtils
 import grails.gorm.transactions.Transactional
 import yakworks.api.problem.data.DataProblemException

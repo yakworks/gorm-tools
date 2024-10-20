@@ -96,13 +96,14 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
     }
 
     /**
-     * Called after persist if its had a bind action (create or update) and it has data
-     * creates or updates One-to-Many associations for this entity.
+     * Called after persist
      */
     @Override
-    void doAfterPersistWithData(KitchenSink kitchenSink, PersistArgs args) {
-        Map data = args.data
-        if(data.sinkItems) super.persistToManyData(kitchenSink, SinkItem.repo, data.sinkItems as List<Map>, "kitchenSink")
+    void doAfterPersist(KitchenSink kitchenSink, PersistArgs args) {
+        if (args.bindAction && args.data) {
+            Map data = args.data
+            if (data.sinkItems) super.persistToManyData(kitchenSink, SinkItem.repo, data.sinkItems as List<Map>, "kitchenSink")
+        }
     }
 
     //USED FOR UNIT TESTS

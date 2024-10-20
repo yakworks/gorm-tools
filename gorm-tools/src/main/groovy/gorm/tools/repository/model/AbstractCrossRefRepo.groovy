@@ -11,7 +11,6 @@ import groovy.util.logging.Slf4j
 
 import org.codehaus.groovy.runtime.InvokerHelper
 
-import gorm.tools.beans.EntityResult
 import gorm.tools.databinding.BindAction
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.model.Persistable

@@ -117,22 +117,25 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
     }
 
     /**
-     * Called after persist if its had a bind action (create or update) and it has data
+     * Called after persist .
+     * if its had a bind action (create or update) and it has data
      * creates or updates One-to-Many associations for this entity.
      */
     @Override
-    void doAfterPersistWithData(Activity activity, PersistArgs args) {
-        Map data = args.data
-        if(data.attachments) doAttachments(activity, data.attachments)
-        if(data.contacts != null) ActivityContact.addOrRemove(activity, data.contacts)
-        if(data.tags != null) TagLink.addOrRemoveTags(activity, data.tags)
+    void doAfterPersist(Activity activity, PersistArgs args) {
+        if (args.bindAction && args.data) {
+            Map data = args.data
+            if (data.attachments) doAttachments(activity, data.attachments)
+            if (data.contacts != null) ActivityContact.addOrRemove(activity, data.contacts)
+            if (data.tags != null) TagLink.addOrRemoveTags(activity, data.tags)
 
-        if(args.bindAction?.isCreate()){
-            if(data.linkedId && data.linkedEntity) {
-                activityLinkRepo.create(data.linkedId as Long, data.linkedEntity as String, activity)
-            } else if(data.links) {
-                assert data.links instanceof List<Map>
-                doLinks(activity, data.links as List<Map>)
+            if (args.bindAction?.isCreate()) {
+                if (data.linkedId && data.linkedEntity) {
+                    activityLinkRepo.create(data.linkedId as Long, data.linkedEntity as String, activity)
+                } else if (data.links) {
+                    assert data.links instanceof List<Map>
+                    doLinks(activity, data.links as List<Map>)
+                }
             }
         }
     }

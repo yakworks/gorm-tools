@@ -9,7 +9,6 @@ import java.time.LocalDateTime
 import groovy.transform.CompileDynamic
 
 import gorm.tools.hibernate.type.JsonType
-import gorm.tools.repository.model.UuidGormRepo
 import gorm.tools.repository.model.UuidRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -21,7 +20,7 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 @Entity
 @IdEqualsHashCode
 @GrailsCompileStatic
-class MailMessage implements UuidRepoEntity<MailMessage, UuidGormRepo<MailMessage>>, AuditCreatedTrait, Serializable {
+class MailMessage implements UuidRepoEntity<MailMessage>, AuditCreatedTrait, Serializable {
     // static belongsTo = [Activity]
     UUID id
     /** the state of the Mail */

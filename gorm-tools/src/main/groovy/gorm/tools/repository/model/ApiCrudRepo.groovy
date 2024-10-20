@@ -6,7 +6,6 @@ package gorm.tools.repository.model
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.beans.EntityResult
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs

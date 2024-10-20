@@ -26,11 +26,11 @@ import gorm.tools.validation.ApiConstraints
  * @since 6.1
  */
 @CompileStatic
-trait PersistableRepoEntity<D, R extends GormRepo<D>, ID> extends GormEntity<D> implements Persistable<ID> {
+trait PersistableRepoEntity<D, ID> extends GormEntity<D> implements Persistable<ID> {
 
-    static R getRepo() { return (R) RepoLookup.findRepo(this) }
+    static GormRepo<D> getRepo() { return (GormRepo<D>) RepoLookup.findRepo(this) }
 
-    R findRepo() { return (R) RepoLookup.findRepo(getClass()) }
+    GormRepo<D> findRepo() { return (GormRepo<D>) RepoLookup.findRepo(getClass()) }
 
     D persist() {
         return findRepo().persist((D) this, [:])

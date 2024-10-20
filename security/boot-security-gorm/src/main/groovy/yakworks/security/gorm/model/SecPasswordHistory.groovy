@@ -6,13 +6,15 @@ package yakworks.security.gorm.model
 
 import java.time.LocalDateTime
 
+import groovy.transform.CompileDynamic
+
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
 import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 
 @Entity
-@GrailsCompileStatic
+@CompileDynamic
 class SecPasswordHistory {
     static belongsTo = [user: AppUser]
     String password

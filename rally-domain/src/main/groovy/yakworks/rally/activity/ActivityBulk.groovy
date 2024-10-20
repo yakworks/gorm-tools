@@ -97,7 +97,7 @@ class ActivityBulk {
     List<Activity> insertMassActivity(List targets, Map activityData, String source = null, boolean newAttachments = false) {
 
         Map<Long, Activity> createdActivities = [:]
-        List attachments = []
+        List attachments = [] as List<Attachment>
         List attachmentData = activityData?.attachments as List
         if (attachmentData) {
             attachments = attachmentRepo.createOrUpdate(attachmentData)

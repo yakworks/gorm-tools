@@ -98,7 +98,7 @@ class RepoEventPublisher {
         Method method = eventMethodMap?.get(eventKey)
         if (!method) return
         //tuncate the args to the number of params for the method
-        Object[] truncMethArgs = methodArgs[0..method.parameterCount-1]
+        Object[] truncMethArgs = methodArgs[0..method.parameterCount-1] as Object[]
         ReflectionUtils.invokeMethod(method, repo, truncMethArgs)
     }
 

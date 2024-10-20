@@ -76,7 +76,7 @@ class SecRolePermission implements RepoEntity<SecRolePermission>, Serializable  
     }
 
     static boolean remove(SecRole role, String perm, boolean flush = false) {
-        SecRolePermission instance = SecRolePermission.findByRoleAndPermission(role, perm)
+        SecRolePermission instance = SecRolePermission.findWhere(role: role, permission: perm)
         if (!instance) {
             return false
         }

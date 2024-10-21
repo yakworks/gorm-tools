@@ -51,7 +51,7 @@ class DefaultCrudApiConfiguration {
             return (CrudApi<D>) appCtx.getBeanProvider(rt).getIfAvailable(
                 () -> defaultCrudApi(clazz)
             );
-        } as Function<Class<D>, CrudApi<D>>
+        }
     }
 
     @Bean

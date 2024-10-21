@@ -58,7 +58,7 @@ class TestDataJson {
 
         // if(fieldsToBuild.contains('id') && !getIncludeList(builder, ctx).contains('id') ) fieldsToBuild.remove('id')
 
-        fieldsToBuild.addAll(data.keySet())
+        fieldsToBuild.addAll(data.keySet() as Set<String>)
 
         builder.persistentEntity.associations.each{ Association assc ->
             if(fieldsToBuild.contains(assc.name) && !(assc.associatedEntity instanceof EmbeddedPersistentEntity)){

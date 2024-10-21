@@ -1,5 +1,7 @@
 package yakworks.rally.mango
 
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 import gorm.tools.mango.MangoBuilder
 import gorm.tools.mango.MangoTidyMap
@@ -11,7 +13,7 @@ import yakworks.rally.orgs.model.Org
 /**
  * Shows the
  */
-@GrailsCompileStatic
+@CompileStatic
 class OrgMangoBench{
 
     MangoBuilder mangoBuilder
@@ -34,6 +36,7 @@ class OrgMangoBench{
         println BenchmarkHelper.endTimeMsg("For loop", start)
     }
 
+    @CompileDynamic
     static void findByName() {
         def start = BenchmarkHelper.startTime()
         for (int i = 0; i < cnt; i++) {

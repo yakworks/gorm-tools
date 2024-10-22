@@ -11,7 +11,7 @@ project:
   # this is needed for url in pom for jar lib, doesnt pick up defaults from git
   fullName: yakworks/gorm-tools
   # list of subproject dirs used to spin through, build the checksum and consolidate the test reports for circle
-  subprojects: gorm-tools gorm-audit gorm-etl gorm-openapi gorm-rest gorm-test-domain gorm-test-support rally-domain security/boot-security security/boot-security-gorm examples/testify examples/rally-api
+  subprojects: gorm-tools gorm-audit gorm-etl gorm-openapi gorm-rest gorm-test-domain gorm-test-support rally-domain security/security-core security/boot-security security/boot-security-gorm examples/testify examples/rally-api
 
 # app info, assumes that there is one main deployable app per project which is the best practice.
 # But you can always make more and create a .env or .sh and call 'make foo env=deploy/custom.env

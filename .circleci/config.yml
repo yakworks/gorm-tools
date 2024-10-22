@@ -74,7 +74,7 @@ jobs:
 
       - run:
           name: ✔︎ -- assemble
-          command: ./gradlew assemble -x testify:assemble -x benchmarks:assemble -x rally-api:assemble
+          command: ./gradlew assemble -x testify:assemble -x benchmarks:assemble -x rally-api:assemble -x hello-boot-security:check
 
       - save_gradle_cache
       - save_workspace
@@ -95,6 +95,8 @@ jobs:
 
       - run: make gradle.merge-test-results
       - store_test_results: { path: build/test-results/ }
+      - store_artifacts:
+          path: build/reports/
 
   rally:
     executor: builder-medium
@@ -122,14 +124,8 @@ jobs:
       - run: make gradle.merge-test-results
       - store_test_results: { path: build/test-results/ }
       - store_artifacts:
-          path: examples/rally-api/build/reports/
-          destination: reports/rally-api
-      - store_artifacts:
-          path: examples/testify/build/reports/
-          destination: reports/testify
-      - store_artifacts:
-          path: examples/hello-boot-security/build/reports/
-          destination: reports/hello-boot-security
+          path: build/reports/
+          destination: reports
 
   ship-gh-pages:
     docker:

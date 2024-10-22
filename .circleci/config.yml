@@ -74,7 +74,7 @@ jobs:
 
       - run:
           name: ✔︎ -- assemble
-          command: ./gradlew assemble -x restify:assemble -x testify:assemble -x benchmarks:assemble -x rally-api:assemble
+          command: ./gradlew assemble -x testify:assemble -x benchmarks:assemble -x rally-api:assemble
 
       - save_gradle_cache
       - save_workspace
@@ -90,8 +90,8 @@ jobs:
       - run:
           name: ✔︎ -- check
           command: |
-            ./gradlew check -x rally-domain:check \
-            -x restify:check -x testify:check -x benchmarks:check -x rally-api:check
+            ./gradlew check -x rally-domain:check -x hello-boot-security:check \
+            -x testify:check -x benchmarks:check -x rally-api:check
 
       - run: make gradle.merge-test-results
       - store_test_results: { path: build/test-results/ }
@@ -107,6 +107,9 @@ jobs:
       - run: ./gradlew rally-domain:check --parallel
       - run: make gradle.merge-test-results
       - store_test_results: { path: build/test-results/ }
+      - store_artifacts:
+          path: rally-domain/build/reports/
+          destination: reports/rally-domain
 
   examples:
     executor: builder-large
@@ -115,9 +118,18 @@ jobs:
       - restore_gradle_cache
       - attach_workspace:
           at: .
-      - run: ./gradlew rally-api:check testify:check restify:check -x benchmarks:check --parallel
+      - run: ./gradlew rally-api:check testify:check hello-boot-security:check --parallel
       - run: make gradle.merge-test-results
       - store_test_results: { path: build/test-results/ }
+      - store_artifacts:
+          path: examples/rally-api/build/reports/
+          destination: reports/rally-api
+      - store_artifacts:
+          path: examples/testify/build/reports/
+          destination: reports/testify
+      - store_artifacts:
+          path: examples/hello-boot-security/build/reports/
+          destination: reports/hello-boot-security
 
   ship-gh-pages:
     docker:

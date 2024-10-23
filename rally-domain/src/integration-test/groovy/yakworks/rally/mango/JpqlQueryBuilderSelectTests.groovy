@@ -192,11 +192,23 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         then: "The query is valid"
         query.trim() == strip('''
             SELECT DISTINCT org FROM yakworks.rally.orgs.model.Org AS org
-            WHERE lower(org.name) like lower(:p1) AND
+            WHERE fn_ilike(org.name, :p1 ) = true AND
             EXISTS (
             SELECT contact1.id FROM yakworks.rally.orgs.model.Contact contact1
-            WHERE lower(contact1.location.city) like lower(:p2) AND contact1.org.id = org.id
+            WHERE fn_ilike(contact1.location.city, :p2 ) = true AND contact1.org.id = org.id
             )
         ''')
+
+        when:
+        //NOTE: This runs the query as is. Without the .aliasToMap(true) it returns a
+        // list of arrays since its not going through the Transformer
+        List res = Org.executeQuery(query, queryInfo.paramMap)
+
+        then:
+        res.size() == 11
+        //see note above on why its arrays
+        // res[0][1] == OrgType.Client
+        // res[0][0] < res[1][0]
+        // res[1][0] < res[2][0]
     }
 }

@@ -62,6 +62,8 @@ class JpqlQueryBuilder {
     List<String> groupByList = []
     List<String> selectList = []
     boolean allowJoins = true
+    // if true then will use custom dialect functions such as fn_ilike
+    boolean enableExtendedFunctions = true
     ConversionService conversionService = ApplicationConversionService.getSharedInstance()
     //ConversionService conversionService = new GenericConversionService()
 
@@ -548,6 +550,7 @@ class JpqlQueryBuilder {
 
         // ILIKE SQL SERVER
         queryHandlers.put(Query.ILike, new QueryHandler() {
+
             public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
                               String logicalName, int position, List parameters) {
                 Query.ILike eq = (Query.ILike) criterion
@@ -555,17 +558,28 @@ class JpqlQueryBuilder {
                 PersistentProperty prop = validateProperty(entity, name, Query.ILike.simpleName)
                 Class propType = prop.getType()
 
-                whereClause.append("lower(")
-
                 String propName = buildPropName(name, logicalName)
 
-                whereClause
-                 .append(propName)
-                 .append(")")
-                 .append(" like lower(")
-                 .append(PARAMETER_PREFIX)
-                 .append(++position)
-                 .append(")")
+                if(enableExtendedFunctions){
+                    whereClause
+                        .append('fn_ilike(')
+                        .append(propName)
+                        .append(", ")
+                        .append(PARAMETER_PREFIX)
+                        .append(++position)
+                        //.append(" ) = true")
+                        .append(" ) = true")
+                } else {
+                    whereClause.append("lower(")
+                    whereClause
+                        .append(propName)
+                        .append(")")
+                        .append(" like lower(")
+                        .append(PARAMETER_PREFIX)
+                        .append(++position)
+                        .append(")")
+                }
+
                 parameters.add(conversionService.convert( eq.getValue(), propType ))
                 return position
             }

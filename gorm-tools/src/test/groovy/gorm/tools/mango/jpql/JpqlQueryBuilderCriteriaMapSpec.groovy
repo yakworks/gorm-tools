@@ -96,6 +96,36 @@ class JpqlQueryBuilderCriteriaMapSpec extends Specification implements GormHiber
         criteria.list().size() == 2
     }
 
+    void "Test build select with or and ilike"() {
+        given:"Some criteria"
+
+        def criteria = KitchenSink.query(
+            '$or': [
+                ['name2': 'org1%'],
+                ['num': '1%']
+            ]
+        )
+
+        when:"A jpa query is built"
+        def builder = JpqlQueryBuilder.of(criteria)
+        final queryInfo = builder.buildSelect()
+
+        then:"The query is valid"
+        queryInfo.query!= null
+        //NOTE TODO, see the same query using closure, this adds extra parens
+        compareQuery(queryInfo.query, """
+        SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
+        WHERE ( fn_ilike(kitchenSink.name2, :p1 ) = true OR fn_ilike(kitchenSink.num, :p2 ) = true )
+        """)
+        queryInfo.parameters == ['org1%', '1%']
+
+        when:
+        List<Map> list = criteria.mapList()
+
+        then:
+        list.size() == 2
+    }
+
     @Ignore //blowing up on unknown field, which is should bu we need a way to override
     void "Test eqf"() {
         given:

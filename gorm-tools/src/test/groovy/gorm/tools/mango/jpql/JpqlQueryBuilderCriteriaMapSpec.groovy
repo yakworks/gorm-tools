@@ -1,10 +1,12 @@
 package gorm.tools.mango.jpql
 
+import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
 import spock.lang.Ignore
 import spock.lang.Specification
+import yakworks.gorm.config.GormConfig
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.unit.GormHibernateTest
@@ -17,6 +19,9 @@ import static gorm.tools.mango.jpql.JpqlCompareUtils.formatAndStrip
 class JpqlQueryBuilderCriteriaMapSpec extends Specification implements GormHibernateTest  {
 
     static List entityClasses = [KitchenSink, SinkItem]
+
+    @Autowired
+    GormConfig gormConfig
 
     boolean compareQuery(String hql, String expected){
         assert formatAndStrip(hql) == formatAndStrip(expected)
@@ -98,6 +103,7 @@ class JpqlQueryBuilderCriteriaMapSpec extends Specification implements GormHiber
 
     void "Test build select with or and ilike"() {
         given:"Some criteria"
+        gormConfig.query.enableCustomFunctions = true
 
         def criteria = KitchenSink.query(
             '$or': [

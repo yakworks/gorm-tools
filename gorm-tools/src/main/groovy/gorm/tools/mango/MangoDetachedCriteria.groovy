@@ -37,6 +37,8 @@ import grails.gorm.PagedResultList
 import yakworks.api.problem.ThrowableProblem
 import yakworks.api.problem.data.DataProblem
 import yakworks.commons.lang.NameUtils
+import yakworks.gorm.config.GormConfig
+import yakworks.spring.AppCtx
 
 /**
  * This is here to make it easier to build criteria with domain bean paths
@@ -291,6 +293,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         if(args.aliasToMap){
             builder.aliasToMap(true)
         }
+
         JpqlQueryInfo queryInfo = builder.buildSelect()
         //use SimplePagedQuery so it can attach the totalCount
         PagedQuery hq = buildSimplePagedQuery()

@@ -17,15 +17,16 @@ import org.grails.datastore.mapping.query.AssociationQuery
 import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.api.AssociationCriteria
 import org.grails.datastore.mapping.query.api.QueryableCriteria
+import org.springframework.beans.factory.NoSuchBeanDefinitionException
 import org.springframework.boot.convert.ApplicationConversionService
 import org.springframework.core.convert.ConversionService
-import org.springframework.core.convert.support.GenericConversionService
 import org.springframework.dao.InvalidDataAccessResourceUsageException
 
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.utils.GormMetaUtils
-import grails.gorm.DetachedCriteria
 import yakworks.commons.map.Maps
+import yakworks.gorm.config.GormConfig
+import yakworks.spring.AppCtx
 
 /**
  * Builds JPQL String-based queries from the DetachedCriteria.
@@ -63,7 +64,7 @@ class JpqlQueryBuilder {
     List<String> selectList = []
     boolean allowJoins = true
     // if true then will use custom dialect functions such as fn_ilike
-    boolean enableExtendedFunctions = true
+    boolean enableCustomFunctions = false
     ConversionService conversionService = ApplicationConversionService.getSharedInstance()
     //ConversionService conversionService = new GenericConversionService()
 
@@ -120,6 +121,15 @@ class JpqlQueryBuilder {
 
         jqb.orders = crit.getOrders()
 
+        //XXX Hack so it can be turned on and off
+        try {
+            if (AppCtx.get(GormConfig).query.dialectFunctions.enabled) {
+                jqb.enableCustomFunctions(true)
+            }
+        } catch(NoSuchBeanDefinitionException ex){
+            //swallow the no bean found
+        }
+
         return jqb
     }
 
@@ -133,6 +143,14 @@ class JpqlQueryBuilder {
      */
     JpqlQueryBuilder aliasToMap(boolean val){
         this.aliasToMap = val
+        return this
+    }
+
+    /**
+     * wraps the SELECT in a new map( ...)
+     */
+    JpqlQueryBuilder enableCustomFunctions(boolean val){
+        this.enableCustomFunctions = val
         return this
     }
 
@@ -560,7 +578,7 @@ class JpqlQueryBuilder {
 
                 String propName = buildPropName(name, logicalName)
 
-                if(enableExtendedFunctions){
+                if(enableCustomFunctions){
                     whereClause
                         .append('fn_ilike(')
                         .append(propName)

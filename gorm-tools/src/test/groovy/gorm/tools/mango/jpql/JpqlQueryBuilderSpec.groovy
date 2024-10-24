@@ -1,10 +1,12 @@
 package gorm.tools.mango.jpql
 
 import org.hibernate.engine.jdbc.internal.BasicFormatterImpl
+import org.springframework.beans.factory.annotation.Autowired
 
 import grails.gorm.DetachedCriteria
 import org.springframework.dao.InvalidDataAccessResourceUsageException
 import spock.lang.Specification
+import yakworks.gorm.config.GormConfig
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.unit.GormHibernateTest
 
@@ -17,6 +19,9 @@ class JpqlQueryBuilderSpec extends Specification implements GormHibernateTest  {
 
     static List entityClasses = [KitchenSink]
 
+    @Autowired
+    GormConfig gormConfig
+
     static boolean compareQuery(String hql, String expected){
         assert formatAndStrip(hql) == formatAndStrip(expected)
         return true
@@ -24,6 +29,8 @@ class JpqlQueryBuilderSpec extends Specification implements GormHibernateTest  {
 
     void "Test update query with ilike criterion"() {
         given:"Some criteria"
+        gormConfig.query.enableCustomFunctions = true
+
         def criteria = KitchenSink.query {
             eq 'amount', 10.0
             ilike 'name', 'Sink1'

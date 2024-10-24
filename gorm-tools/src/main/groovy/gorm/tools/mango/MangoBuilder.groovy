@@ -113,16 +113,16 @@ class MangoBuilder {
      * calls list for the criteria, if criteria has projections then calls mapList
      * which uses JpqlQueryBuilder
      */
-    static List list(MangoDetachedCriteria criteria, Map args) {
-        List resList
-        if(criteria.projections){
-            resList =  criteria.mapList(args)
-        } else {
-            //return standard list
-            resList =  criteria.list(args)
-        }
-        return resList
-    }
+    // static List list(MangoDetachedCriteria criteria, Map args) {
+    //     List resList
+    //     if(criteria.projections){
+    //         resList =  criteria.mapList(args)
+    //     } else {
+    //         //return standard list
+    //         resList =  criteria.list(args)
+    //     }
+    //     return resList
+    // }
 
     /**
      * Apply projections from map in form [key:type] where type is sum, group, count, min, max or avg

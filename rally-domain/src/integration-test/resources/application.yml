@@ -15,6 +15,12 @@ logging:
     # shows the sql parameters
     # org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
+yakworks:
+  gorm:
+    query:
+      dialectFunctions:
+        enabled: true
+
 app:
   resources:
     rootLocation: "./build/rootLocation"

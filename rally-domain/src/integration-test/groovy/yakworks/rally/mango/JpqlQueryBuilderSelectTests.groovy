@@ -1,11 +1,14 @@
 package yakworks.rally.mango
 
+import org.springframework.beans.factory.annotation.Autowired
+
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.jpql.JpqlQueryBuilder
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
 import spock.lang.Specification
+import yakworks.gorm.config.GormConfig
 import yakworks.rally.orgs.model.Contact
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.orgs.model.Org
@@ -15,6 +18,9 @@ import yakworks.testing.gorm.model.KitchenSink
 @Integration
 @Rollback
 class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest {
+
+    @Autowired
+    GormConfig gormConfig
 
     void buildKitchen(){
         //KitchenSink.withTransaction {
@@ -169,6 +175,8 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
     //FIXME still need to work out alias
     def "exists on contact location"() {
         given:
+        assert gormConfig.query.dialectFunctions.enabled
+
         def qryContact = Contact.query(
             q: [
                 'location.city': "second City1*",

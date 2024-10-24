@@ -23,7 +23,6 @@ logging:
 
 yakworks:
   gorm:
-    hello: world
     async:
       pool-size: 2
     id-generator:

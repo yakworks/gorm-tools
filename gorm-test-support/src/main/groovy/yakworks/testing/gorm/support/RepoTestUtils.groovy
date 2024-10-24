@@ -36,6 +36,7 @@ import grails.persistence.support.NullPersistentContextInterceptor
 import grails.spring.BeanBuilder
 import yakworks.gorm.api.ApiConfig
 import yakworks.gorm.api.IncludesConfig
+import yakworks.gorm.config.GormConfig
 import yakworks.grails.GrailsHolder
 import yakworks.i18n.icu.GrailsICUMessageSource
 import yakworks.spring.AppCtx
@@ -93,6 +94,7 @@ class RepoTestUtils {
         repoExceptionSupport(RepoExceptionSupport, lazy())
         // mangoQuery(DefaultQueryService, lazy())
         mangoBuilder(MangoBuilder, lazy())
+        gormConfig(GormConfig)
         quickSearchSupport(QuickSearchSupport, lazy())
         trxService(TrxService, lazy())
         jdbcIdGenerator(MockJdbcIdGenerator, lazy())

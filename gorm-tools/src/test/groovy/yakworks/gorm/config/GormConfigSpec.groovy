@@ -24,8 +24,6 @@ class GormConfigSpec extends Specification implements GrailsAppUnitTest {
         gormConfig.async.poolSize == 2
         gormConfig.async.sliceSize == 50
 
-        gormConfig.hello == "world"
-
         idGeneratorConfig.startValue == 1
         gormConfig.idGenerator.startValue == 1
     }

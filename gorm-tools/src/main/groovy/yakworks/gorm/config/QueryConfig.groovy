@@ -8,6 +8,8 @@ import groovy.transform.CompileStatic
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 
+import yakworks.spring.config.Enabler
+
 @ConfigurationProperties(prefix="yakworks.gorm.query")
 @CompileStatic
 class QueryConfig {
@@ -18,8 +20,14 @@ class QueryConfig {
     /** Query timeout in seconds, default is 30 */
     Integer timeout = 30
 
-    /** Max value allowed for excel exports
+    /**
+     * Max value allowed for excel exports
      * Default to 1000, RNDC can have 10K
-     **/
+     */
     Integer exportMax = 1000
+
+    /**
+     * if true will use the custom fn_ilike in the JpqlQueryBuilder
+     */
+    Enabler dialectFunctions = new Enabler(enabled: false)
 }

@@ -14,15 +14,15 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 @CompileStatic
 class ExcelUtils {
 
-   static List<String> getHeader(XSSFWorkbook workbook) {
-       XSSFSheet firstSheet = workbook.getSheetAt(0)
-       XSSFRow row = firstSheet.getRow(0)
-       List<String> header = []
+    static List<String> getHeader(XSSFWorkbook workbook) {
+        XSSFSheet firstSheet = workbook.getSheetAt(0)
+        XSSFRow row = firstSheet.getRow(0)
+        List<String> header = []
 
-       for (Cell cell : row) {
-           header.add(cell.getStringCellValue())
-       }
+        for (Cell cell : row) {
+            header.add(cell.getStringCellValue())
+        }
 
-       return header
-   }
+        return header
+    }
 }

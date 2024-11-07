@@ -304,6 +304,7 @@ class ExcelBuilder {
     /**
      * userful for testing to write out and close stream
      */
+    @SuppressWarnings(['ThrowRuntimeException'])
     ExcelBuilder writeOutAndClose() {
         try {
             workbook.write(outputStream);

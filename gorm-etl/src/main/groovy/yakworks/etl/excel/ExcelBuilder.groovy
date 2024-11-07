@@ -177,7 +177,8 @@ class ExcelBuilder {
             Map<String, Object> firstRow = dataList[0] as Map<String, Object>
             Map flatRow = MapFlattener.of(firstRow).convertObjectToString(false).flatten()
             if(!includes) includes = flatRow.keySet().toList()
-            writeHeader(includes)
+            if(!headers) headers = includes
+            writeHeader(headers)
         }
         return this
     }

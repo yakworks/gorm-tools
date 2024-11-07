@@ -13,7 +13,6 @@ import gorm.tools.beans.Pager
 import grails.rest.render.RenderContext
 import yakworks.etl.excel.ExcelBuilder
 import yakworks.etl.excel.ExcelBuilderSupport
-import yakworks.meta.MetaMapList
 
 /**
  * Rederer for paged list data
@@ -38,9 +37,10 @@ class XlsxPagerRenderer implements XlsRendererTrait<Pager> {
         // String headers = params['headers']
         // String includesKey = params['includesKey']
         //if includes was passed then dont use whats in the grid config
-        if(dataList instanceof MetaMapList && !params['includes']){
+        if(!params['includes']){
+            String entityClassName = params['entityClassName']
             //look in config and match whats there if not specified
-            ExcelBuilderSupport.useIncludesConfig(eb, apiConfig, dataList)
+            ExcelBuilderSupport.useIncludesConfig(eb, apiConfig, dataList, entityClassName)
         }
         eb.writeData(dataList as List<Map>)
         eb.writeOut()

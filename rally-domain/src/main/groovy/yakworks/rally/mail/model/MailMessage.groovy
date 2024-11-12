@@ -85,10 +85,11 @@ class MailMessage implements UuidRepoEntity<MailMessage>, AuditCreatedTrait, Ser
     static enum MsgState {
         Queued, //Queued in the system, ready to be sent to mail processor
         Sent, //sent from here vai mailgun or smtp
-        Error, //an error occured and message failed
         Delivered, // if using something like mailgun and we interface, Mailgun sent the email and it was accepted by the recipient email server.
         Opened, // When using something like mailgun with Open tracking enabled
-        Complained //The email recipient clicked on the spam complaint button within their email client.
+        Complained, //The email recipient clicked on the spam complaint button within their email client.
+        Error, //an error occured and message failed, (eg when mailfun permanent failure)
+        TemporaryError //Mailgun temporary failure, Mailgun will retry and may be able to send it successfully
     }
 
 

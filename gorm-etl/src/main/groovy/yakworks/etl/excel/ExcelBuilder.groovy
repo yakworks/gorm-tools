@@ -177,7 +177,8 @@ class ExcelBuilder {
             Map<String, Object> firstRow = dataList[0] as Map<String, Object>
             Map flatRow = MapFlattener.of(firstRow).convertObjectToString(false).flatten()
             if(!includes) includes = flatRow.keySet().toList()
-            writeHeader(includes)
+            if(!headers) headers = includes
+            writeHeader(headers)
         }
         return this
     }
@@ -303,6 +304,7 @@ class ExcelBuilder {
     /**
      * userful for testing to write out and close stream
      */
+    @SuppressWarnings(['ThrowRuntimeException'])
     ExcelBuilder writeOutAndClose() {
         try {
             workbook.write(outputStream);

@@ -9,7 +9,7 @@ import yakworks.rest.gorm.mapping.RepoApiMappingsService
 class UrlMappings {
 
     static mappings = {
-        println "parsing restify UrlMappings"
+        println "parsing rally-api UrlMappings"
         "/"(controller: 'application', action:'index')
         "/hazel-hibernate"(controller: 'application', action:'hazelHibernate')
         "/hazel-caches"(controller: 'application', action:'hazel')

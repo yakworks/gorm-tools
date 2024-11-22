@@ -82,7 +82,7 @@ class MailMessageSender {
     @Transactional
     protected void updateMessageState(MailMessage mailMessage, Result result) {
         if (result instanceof Problem) {
-            mailMessage.state = MailMessage.MsgState.Failed
+            mailMessage.state = MailMessage.MsgState.Error
             mailMessage.msgResponse = result.detail
         } else {
             Map payload = (Map) result.payload

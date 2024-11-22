@@ -4,8 +4,8 @@ import gorm.tools.transaction.WithTrx
 import grails.gorm.transactions.Rollback
 import okhttp3.Request
 import okhttp3.RequestBody
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.http.HttpStatus
-
 
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
@@ -15,6 +15,7 @@ import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
+import static yakworks.etl.excel.ExcelUtils.getHeader
 
 @Integration
 class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
@@ -61,6 +62,13 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
         then:
         resp.code() == HttpStatus.OK.value()
 
+        when: "verify excel file"
+        XSSFWorkbook workbook = new XSSFWorkbook(resp.body().byteStream())
+        List<String> headers = getHeader(workbook)
+
+        then: "column name should have been resolved from grid col model"
+        headers
+        headers.containsAll(['Num', 'Name', 'Type', 'TotalDue'])
     }
 
     void "test qSearch"() {

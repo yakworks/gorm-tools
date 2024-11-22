@@ -200,6 +200,8 @@ trait CrudApiController<D> extends RestApiController {
             log.debug("list with gParams ${qParams}")
             Pager pager = getCrudApi().list(qParams, toURI())
             //we pass in the params to args so it can get passed on to renderer, used in the excel renderer for example
+            //pass entityClassName, if required renderers can use it. excel renders use it for getting column mapping from config
+            qParams['entityClassName'] = entityClass.name
             respondWith(pager, [params: qParams])
         } catch (Exception | AssertionError e) {
             handleThrowable(e)

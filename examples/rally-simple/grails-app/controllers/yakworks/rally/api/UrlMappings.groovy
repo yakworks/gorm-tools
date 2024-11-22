@@ -9,7 +9,7 @@ import yakworks.rest.gorm.mapping.RepoApiMappingsService
 class UrlMappings {
 
     static mappings = {
-        println "parsing restify UrlMappings"
+        println "parsing rally-simple UrlMappings"
         "/"(controller: 'application', action:'index')
         RepoApiMappingsService repoApiMappingsService = getApplicationContext().getBean('repoApiMappingsService', RepoApiMappingsService)
         repoApiMappingsService.createNestedMappings('rally', 'org', 'orgId', 'contact', delegate)

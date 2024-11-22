@@ -55,9 +55,6 @@ findProject(':security/security-core').name = 'security-core'
 include "examples/testify"
 findProject(':examples/testify').name = 'testify'
 
-include 'examples/restify'
-findProject(':examples/restify').name = 'restify'
-
 include 'examples/benchmarks'
 findProject(':examples/benchmarks').name = 'benchmarks'
 

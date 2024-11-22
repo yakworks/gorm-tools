@@ -124,8 +124,11 @@ class ZonedDateUtilSpec extends Specification {
 
         var ldNow = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
         var ldEt = LocalDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.MINUTES)
-        ChronoUnit.HOURS.between(ldEt, ldNow) == 4
-        //ldEt.toString() == ldNow.toString()
+
+        //need to handle daylight savings to get time diff between utc and nyc
+        ZonedDateTime nyc_time = ZonedDateTime.now( ZoneId.of( "America/New_York" ) )
+        int nyc_time_diff =  nyc_time.zone.rules.isDaylightSavings(nyc_time.toInstant()) ? 4 : 5
+        ChronoUnit.HOURS.between(ldEt, ldNow) == nyc_time_diff
     }
 
 }

@@ -130,7 +130,7 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
         mailMessageSender.send(mailMsg)
 
         then:
-        mailMsg.state == MailMessage.MsgState.Error
+        mailMsg.state == MailMessage.MsgState.Failed
         mailMsg.msgResponse.contains("Invalid email address [jimjoe.com], Missing final '@domain'")
         emailService.sentMail.size() == 0
     }
@@ -161,7 +161,7 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
         emailService.sentMail.size() == 0
         !res.ok
         !mailMsg.messageId
-        mailMsg.state == MailMessage.MsgState.Error
+        mailMsg.state == MailMessage.MsgState.Failed
         mailMsg.msgResponse == "bad mail"
     }
 
@@ -179,7 +179,7 @@ class MailMessageSenderSpec extends Specification implements DomainIntTest {
         emailService.sentMail.size() == 0
         !res.ok
         !mailMsg.messageId
-        mailMsg.state == MailMessage.MsgState.Error
+        mailMsg.state == MailMessage.MsgState.Failed
         mailMsg.msgResponse.contains("does not exist")
     }
 

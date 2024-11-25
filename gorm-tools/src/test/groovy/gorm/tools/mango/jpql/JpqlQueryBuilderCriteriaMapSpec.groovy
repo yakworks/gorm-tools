@@ -121,7 +121,7 @@ class JpqlQueryBuilderCriteriaMapSpec extends Specification implements GormHiber
         //NOTE TODO, see the same query using closure, this adds extra parens
         compareQuery(queryInfo.query, """
         SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
-        WHERE ( fn_ilike(kitchenSink.name2, :p1 ) = true OR fn_ilike(kitchenSink.num, :p2 ) = true )
+        WHERE ( flike(kitchenSink.name2, :p1 ) = true OR flike(kitchenSink.num, :p2 ) = true )
         """)
         queryInfo.parameters == ['org1%', '1%']
 

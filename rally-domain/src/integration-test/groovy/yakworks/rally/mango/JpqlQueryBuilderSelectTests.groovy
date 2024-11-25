@@ -200,10 +200,10 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         then: "The query is valid"
         query.trim() == strip('''
             SELECT DISTINCT org FROM yakworks.rally.orgs.model.Org AS org
-            WHERE fn_ilike(org.name, :p1 ) = true AND
+            WHERE flike(org.name, :p1 ) = true AND
             EXISTS (
             SELECT contact1.id FROM yakworks.rally.orgs.model.Contact contact1
-            WHERE fn_ilike(contact1.location.city, :p2 ) = true AND contact1.org.id = org.id
+            WHERE flike(contact1.location.city, :p2 ) = true AND contact1.org.id = org.id
             )
         ''')
 

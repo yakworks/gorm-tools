@@ -63,7 +63,7 @@ class JpqlQueryBuilder {
     List<String> groupByList = []
     List<String> selectList = []
     boolean allowJoins = true
-    // if true then will use custom dialect functions such as fn_ilike
+    // if true then will use custom dialect functions such as flike
     boolean enableCustomFunctions = false
     ConversionService conversionService = ApplicationConversionService.getSharedInstance()
     //ConversionService conversionService = new GenericConversionService()
@@ -580,7 +580,7 @@ class JpqlQueryBuilder {
 
                 if(enableCustomFunctions){
                     whereClause
-                        .append('fn_ilike(')
+                        .append('flike(')
                         .append(propName)
                         .append(", ")
                         .append(PARAMETER_PREFIX)

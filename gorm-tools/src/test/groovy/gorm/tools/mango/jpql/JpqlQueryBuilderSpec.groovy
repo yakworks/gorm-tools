@@ -44,7 +44,7 @@ class JpqlQueryBuilderSpec extends Specification implements GormHibernateTest  {
         compareQuery(queryInfo.query, '''\
             UPDATE yakworks.testing.gorm.model.KitchenSink kitchenSink
             SET kitchenSink.name=:p1
-            WHERE kitchenSink.amount=:p2 AND fn_ilike(kitchenSink.name, :p3 ) = true
+            WHERE kitchenSink.amount=:p2 AND flike(kitchenSink.name, :p3 ) = true
         ''')
     }
 

@@ -13,7 +13,7 @@ import org.hibernate.dialect.function.VarArgsSQLFunction;
 import org.hibernate.type.StandardBasicTypes;
 
 /**
- * adds json and custom fn_ilike function
+ * adds json and custom flike function
  */
 public class ExtendedMoreH2Dialect extends H2Dialect {
 
@@ -24,8 +24,8 @@ public class ExtendedMoreH2Dialect extends H2Dialect {
         super();
         registerColumnType(Types.OTHER, "json");
         registerColumnType( Types.VARBINARY, "BLOB" );
-        //registerFunction( "fn_ilike", new SQLFunctionTemplate(StandardBasicTypes.BOOLEAN, "?1 ilike ?2", false));
-        registerFunction( "fn_ilike", new VarArgsSQLFunction(StandardBasicTypes.BOOLEAN, "(", " ilike ", ")"));
+        //registerFunction( "flike", new SQLFunctionTemplate(StandardBasicTypes.BOOLEAN, "?1 ilike ?2", false));
+        registerFunction( "flike", new VarArgsSQLFunction(StandardBasicTypes.BOOLEAN, "(", " ilike ", ")"));
     }
 
 }

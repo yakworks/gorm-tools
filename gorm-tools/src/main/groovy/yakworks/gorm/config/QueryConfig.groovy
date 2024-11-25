@@ -27,7 +27,7 @@ class QueryConfig {
     Integer exportMax = 1000
 
     /**
-     * if true will use the custom fn_ilike in the JpqlQueryBuilder
+     * if true will use the custom flike in the JpqlQueryBuilder
      */
     Enabler dialectFunctions = new Enabler(enabled: false)
 }

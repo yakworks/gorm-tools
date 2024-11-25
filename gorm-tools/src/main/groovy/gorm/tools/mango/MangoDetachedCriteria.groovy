@@ -276,6 +276,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         return resList as List<T>
     }
 
+    @Deprecated //use the pagedList(Pager pager)
     List<T> pagedList() {
         Pager pager = queryArgs?.pager ? queryArgs.pager : Pager.of([:])
         return pagedList(pager)

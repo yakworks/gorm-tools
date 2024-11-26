@@ -25,11 +25,13 @@ class OrgController implements CrudApiController<Org> {
     }
 
     //here, to test exception handling
+    @SuppressWarnings(['DeadCode'])
     def exception() {
         throw DataProblem.ex("test")
         respondWith([ok:true], [status: OK])
     }
 
+    @SuppressWarnings(['ComparisonOfTwoConstants'])
     def throwable() {
         assert "foo" == "bar"
         respondWith([ok:true], [status: OK])

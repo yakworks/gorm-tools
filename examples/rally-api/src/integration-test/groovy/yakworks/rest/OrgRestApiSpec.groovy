@@ -6,7 +6,7 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.http.HttpStatus
-
+import spock.lang.IgnoreRest
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.HttpUrl
@@ -388,6 +388,8 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
 
     }
 
+
+
     void "test post with tags"() {
         when: "Create a test tag"
         Tag tag1 = Tag.create(code: 'T1', entityName: 'Customer')
@@ -429,5 +431,27 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
         !body.ok
         body.code == "error.data.problem"
         body.detail.contains "expecting '}'"
+    }
+
+    void "test exception handler - exception"() {
+        when:
+        Response resp = post(path+"/exception", [num:"C1", name:"C1", type: 'Customer'])
+        Map body = bodyToMap(resp)
+
+        then:
+        body
+        body.ok == false
+        body.code == "error.data.problem"
+        body.detail == "test"
+    }
+
+    void "test exception handler - throwable"() {
+        when:
+        Response resp = post(path+"/throwable", [num:"C1", name:"C1", type: 'Customer'])
+        Map body = bodyToMap(resp)
+
+        then:
+        !body.containsKey("ok")
+        !body.containsKey("code")
     }
 }

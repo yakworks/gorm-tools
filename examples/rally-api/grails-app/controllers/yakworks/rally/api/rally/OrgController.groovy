@@ -6,10 +6,12 @@ package yakworks.rally.api.rally
 
 import groovy.transform.CompileStatic
 
+import yakworks.api.problem.data.DataProblem
 import yakworks.rally.orgs.model.Org
 import yakworks.rest.gorm.controller.CrudApiController
 
 import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.OK
 
 @CompileStatic
 class OrgController implements CrudApiController<Org> {
@@ -20,5 +22,16 @@ class OrgController implements CrudApiController<Org> {
         Map qParams = getParamsMap()
         Map entityMap = getCrudApi().create(bodyAsMap(), qParams).asMap()
         respondWith(entityMap, [status: CREATED, params: qParams])
+    }
+
+    //here, to test exception handling
+    def exception() {
+        throw DataProblem.ex("test")
+        respondWith([ok:true], [status: OK])
+    }
+
+    def throwable() {
+        assert "foo" == "bar"
+        respondWith([ok:true], [status: OK])
     }
 }

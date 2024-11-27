@@ -104,5 +104,5 @@ app:
 #spring.thymeleaf.template-resolver-order: 0
 
 # uncomment starter in build.gradle to activate handlebars
-# handlebars.enabled: true
+handlebars.enabled: true
 # handlebars.failOnMissingFile: false

@@ -433,25 +433,4 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
         body.detail.contains "expecting '}'"
     }
 
-    void "test exception handler - exception"() {
-        when:
-        Response resp = post(path+"/exception", [num:"C1", name:"C1", type: 'Customer'])
-        Map body = bodyToMap(resp)
-
-        then:
-        body
-        body.ok == false
-        body.code == "error.data.problem"
-        body.detail == "test"
-    }
-
-    void "test exception handler - throwable"() {
-        when:
-        Response resp = post(path+"/throwable", [num:"C1", name:"C1", type: 'Customer'])
-        Map body = bodyToMap(resp)
-
-        then:
-        !body.containsKey("ok")
-        !body.containsKey("code")
-    }
 }

@@ -103,7 +103,7 @@ class JpqlQueryBuilderCriteriaMapSpec extends Specification implements GormHiber
 
     void "Test build select with or and ilike"() {
         given:"Some criteria"
-        gormConfig.query.enableCustomFunctions = true
+        gormConfig.query.dialectFunctions.enabled = true
 
         def criteria = KitchenSink.query(
             '$or': [

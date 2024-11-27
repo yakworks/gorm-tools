@@ -121,7 +121,7 @@ class JpqlQueryBuilder {
 
         jqb.orders = crit.getOrders()
 
-        //XXX Hack so it can be turned on and off
+        //XXX Hack so it can be turned on and off right now
         try {
             if (AppCtx.get(GormConfig).query.dialectFunctions.enabled) {
                 jqb.enableCustomFunctions(true)

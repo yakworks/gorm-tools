@@ -94,7 +94,7 @@ class RepoTestUtils {
         repoExceptionSupport(RepoExceptionSupport, lazy())
         // mangoQuery(DefaultQueryService, lazy())
         mangoBuilder(MangoBuilder, lazy())
-        gormConfig(GormConfig)
+        //gormConfig(GormConfig) //GrailsAppBuilder is doing a scan on yakworks.gorm.config
         quickSearchSupport(QuickSearchSupport, lazy())
         trxService(TrxService, lazy())
         jdbcIdGenerator(MockJdbcIdGenerator, lazy())

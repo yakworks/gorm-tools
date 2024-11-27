@@ -7,6 +7,7 @@ import grails.gorm.DetachedCriteria
 import org.springframework.dao.InvalidDataAccessResourceUsageException
 import spock.lang.Specification
 import yakworks.gorm.config.GormConfig
+import yakworks.spring.AppCtx
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.unit.GormHibernateTest
 
@@ -29,7 +30,7 @@ class JpqlQueryBuilderSpec extends Specification implements GormHibernateTest  {
 
     void "Test update query with ilike criterion"() {
         given:"Some criteria"
-        gormConfig.query.enableCustomFunctions = true
+        gormConfig.query.dialectFunctions.enabled = true
 
         def criteria = KitchenSink.query {
             eq 'amount', 10.0

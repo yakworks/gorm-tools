@@ -24,6 +24,7 @@ import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.utils.GormMetaUtils
 import gorm.tools.validation.Rejector
+import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.OrgService
 import yakworks.rally.orgs.model.Company
 import yakworks.rally.orgs.model.Contact
@@ -31,21 +32,20 @@ import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgType
+import yakworks.rally.orgs.model.PartitionOrg
 
 /**
  * base or OrgRepo. common functionality refactored out so can be overriden in application.
  */
 @CompileStatic
 abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
+
     @Inject LocationRepo locationRepo
-
     @Inject ContactRepo contactRepo
-
     @Inject OrgTagRepo orgTagRepo
-
     @Inject OrgSourceRepo orgSourceRepo
-
     @Inject OrgService orgService
+    @Inject OrgProps orgProps
 
     @RepoListener
     void beforeValidate(Org org, Errors errors) {
@@ -98,6 +98,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
             // do contact, support keyContact for legacy and Customers
             def contactData = data.contact ?: data.keyContact
             if (contactData) createOrUpdatePrimaryContact(org, contactData as Map)
+            createOrUpdatePartitionOrg(org, args.bindAction)
         }
     }
 
@@ -159,6 +160,16 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         Location.query(orgId: org.getId()).deleteAll()
         Contact.query(orgId: org.getId()).deleteAll()
         OrgSource.query(orgId: org.getId()).deleteAll()
+    }
+
+    protected void createOrUpdatePartitionOrg(Org org, BindAction bindAction) {
+        if(org.isOrgType(orgProps.partition.type)) {
+            if (bindAction == BindAction.Create) {
+                PartitionOrg.repo.create([id: org.id, num: org.num, name: org.name], [bindId: true])
+            } else if(org.hasChanged('num') || org.hasChanged('name')) {
+               PartitionOrg.update([id:org.id, num:org.num, name:org.name])
+            }
+        }
     }
 
     /**

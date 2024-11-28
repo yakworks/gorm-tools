@@ -64,13 +64,16 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     /** reference to QueryArgs used to build this if it exists */
     QueryArgs queryArgs
 
-    /** the root map to apply. Wont neccesarily be same as whats in the QueryArgs as it will have been run through the tidy operation*/
+    /**
+     * the root map to apply.
+     * Wont neccesarily be same as whats in the QueryArgs as it will have been run through the tidy operation
+     */
     Map criteriaMap
 
     /** the root criteriaClosure to apply */
     Closure criteriaClosure
 
-
+    /** the map of aliases, see the  parseAlias method */
     Map<String, String> propertyAliases = [:]
 
     /**
@@ -92,7 +95,12 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      * @param targetClass The target class
      * @param alias The root alias to be used in queries
      */
-    MangoDetachedCriteria(Class<T> targetClass, String zalias = null) {
+    MangoDetachedCriteria(Class<T> targetClass) {
+        super(targetClass, null)
+        this.@alias = "${NameUtils.getPropertyName(targetClass.simpleName)}_"
+    }
+
+    MangoDetachedCriteria(Class<T> targetClass, String zalias) {
         super(targetClass, zalias)
         if(!zalias) this.@alias = "${NameUtils.getPropertyName(targetClass.simpleName)}_"
     }
@@ -156,8 +164,6 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
         associationCriteriaMap[methodName] = associationCriteria
         add associationCriteria
-
-
 
         def lastArg = args[-1]
         if(lastArg instanceof Closure) {

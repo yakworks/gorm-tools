@@ -36,7 +36,7 @@ class ExceptionTestController implements CrudApiController<Org> {
 
     @SuppressWarnings(['ComparisonOfTwoConstants'])
     def throwable() {
-        //FIXME see notes in test, how do we intercept and generate problem without the try/catch wrap?
+        //this one will be handled by error.hbs
         assert "foo" == "bar"
         respondWith([ok:true], [status: OK])
     }

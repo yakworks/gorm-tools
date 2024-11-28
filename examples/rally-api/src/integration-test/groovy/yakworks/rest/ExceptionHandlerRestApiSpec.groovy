@@ -59,12 +59,6 @@ class ExceptionHandlerRestApiSpec extends Specification implements OkHttpRestTra
         Map body = bodyToMap(resp)
 
         then:
-        //TODO This is generating an object that is converetd to rest object, where and can we intercept it?
-        // [timestamp:1732731709097, status:500, error:Internal Server Error, path:/api/rally/exceptionTest/throwable]
-        // what do we need to do to intercept that?
-        //shows javax.servlet.ServletException: Could not resolve view with name '/error' in servlet with name 'grailsDispatcherServlet'
-        //I checked in a error.hbs, it looks like we can probably set that up, just not sure about the model.
-
         body.ok == false
         body.status == 500
         body.code == "error.unexpected"

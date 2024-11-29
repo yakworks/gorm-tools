@@ -24,6 +24,7 @@ class ApplicationController implements PluginManagerAware {
         [grailsApplication: grailsApplication, pluginManager: pluginManager]
     }
 
+    @SuppressWarnings(['EmptyCatchBlock'])
     def hazelHibernate() {
         Map reqionStats = [:]
         for(String s :sessionFactory.getStatistics().getSecondLevelCacheRegionNames()) {

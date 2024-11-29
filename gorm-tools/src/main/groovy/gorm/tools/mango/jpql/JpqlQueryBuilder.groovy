@@ -17,7 +17,6 @@ import org.grails.datastore.mapping.query.AssociationQuery
 import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.api.AssociationCriteria
 import org.grails.datastore.mapping.query.api.QueryableCriteria
-import org.springframework.beans.factory.NoSuchBeanDefinitionException
 import org.springframework.boot.convert.ApplicationConversionService
 import org.springframework.core.convert.ConversionService
 import org.springframework.dao.InvalidDataAccessResourceUsageException
@@ -25,8 +24,6 @@ import org.springframework.dao.InvalidDataAccessResourceUsageException
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.utils.GormMetaUtils
 import yakworks.commons.map.Maps
-import yakworks.gorm.config.GormConfig
-import yakworks.spring.AppCtx
 
 /**
  * Builds JPQL String-based queries from the DetachedCriteria.
@@ -36,7 +33,6 @@ import yakworks.spring.AppCtx
  * @author Joshua Burnett (@basejump)
  * @since 7.0.8
  */
-//FIXME refactor later
 @SuppressWarnings(['BuilderMethodWithSideEffects', 'AbcMetric', 'ParameterCount', 'ExplicitCallToEqualsMethod', 'ClassSize', 'MethodSize'])
 @CompileStatic
 class JpqlQueryBuilder {
@@ -53,36 +49,30 @@ class JpqlQueryBuilder {
     //the main root entity alias, will normall be just the decapitalized name
     private String entityAlias
 
-    PersistentEntity entity
-    boolean hibernateCompatible
+    // the root entity this is for
+    private PersistentEntity entity
+
+    //boolean hibernateCompatible
+
     //wraps the SELECT in a new map( ...) when true
-    boolean aliasToMap
-    Map<String, JoinType> joinTypes
-    Map<String, String> projectionAliases = [:]
-    Map<String, String> propertyAliases = [:]
-    List<String> groupByList = []
-    List<String> selectList = []
-    boolean allowJoins = true
+    private boolean aliasToMap
+    // deletes for example cant have joins
+    private boolean allowJoins = true
     // if true then will use custom dialect functions such as flike
-    boolean enableCustomFunctions = false
+    private boolean enableDialectFunctions = false
+
+    //map of join types from MangoDetachedCriteria
+    Map<String, JoinType> joinTypes
+    //aliases as they are built here
+    Map<String, String> projectionAliases = [:]
+    //map of propertyAliases from MangoDetachedCriteria
+    Map<String, String> propertyAliases = [:]
+    //as GroupPropertyProjection are proceses add them to this list so they can be skipped while building having clause
+    private List<String> groupByList = []
+    //as selects are proceses add them to this list so they can be skipped while building having clause
+    private List<String> selectList = []
+
     ConversionService conversionService = ApplicationConversionService.getSharedInstance()
-    //ConversionService conversionService = new GenericConversionService()
-
-    // JpqlQueryBuilder(QueryableCriteria criteria) {
-    //     this(criteria.getPersistentEntity(), criteria.getCriteria())
-    // }
-
-    // JpqlQueryBuilder(PersistentEntity entity, List<Query.Criterion> criteria) {
-    //     this(entity, new Query.Conjunction(criteria))
-    // }
-
-    // JpqlQueryBuilder(PersistentEntity entity, List<Query.Criterion> criteria, Query.ProjectionList projectionList) {
-    //     this(entity, new Query.Conjunction(criteria), projectionList)
-    // }
-
-    // JpqlQueryBuilder(PersistentEntity entity, List<Query.Criterion> criteria, Query.ProjectionList projectionList, List<Query.Order> orders) {
-    //     this(entity, new Query.Conjunction(criteria), projectionList, orders)
-    // }
 
     JpqlQueryBuilder(PersistentEntity entity, Query.Junction criteria) {
         this.entity = entity
@@ -94,16 +84,6 @@ class JpqlQueryBuilder {
         this.entity = entity
         this.entityAlias = entity.getDecapitalizedName()
     }
-
-    // JpqlQueryBuilder(PersistentEntity entity, Query.Junction criteria, Query.ProjectionList projectionList) {
-    //     this(entity, criteria)
-    //     this.projectionList = projectionList
-    // }
-
-    // JpqlQueryBuilder(PersistentEntity entity, Query.Junction criteria, Query.ProjectionList projectionList, List<Query.Order> orders) {
-    //     this(entity, criteria, projectionList)
-    //     this.orders = orders
-    // }
 
     static JpqlQueryBuilder of(MangoDetachedCriteria crit){
         var jqb = new JpqlQueryBuilder(crit.persistentEntity, new Query.Conjunction(crit.criteria) )
@@ -120,15 +100,6 @@ class JpqlQueryBuilder {
         }
 
         jqb.orders = crit.getOrders()
-
-        //XXX Hack so it can be turned on and off right now
-        try {
-            if (AppCtx.get(GormConfig).query.dialectFunctions.enabled) {
-                jqb.enableCustomFunctions(true)
-            }
-        } catch(NoSuchBeanDefinitionException ex){
-            //swallow the no bean found
-        }
 
         return jqb
     }
@@ -147,16 +118,16 @@ class JpqlQueryBuilder {
     }
 
     /**
-     * wraps the SELECT in a new map( ...)
+     * Enables custom dialect functions, such as flike
      */
-    JpqlQueryBuilder enableCustomFunctions(boolean val){
-        this.enableCustomFunctions = val
+    JpqlQueryBuilder enableDialectFunctions(boolean val){
+        this.enableDialectFunctions = val
         return this
     }
 
-    public void setHibernateCompatible(boolean hibernateCompatible) {
-        this.hibernateCompatible = hibernateCompatible
-    }
+    // public void setHibernateCompatible(boolean hibernateCompatible) {
+    //     this.hibernateCompatible = hibernateCompatible
+    // }
 
     /**
      * Builds an UPDATE statement.
@@ -578,7 +549,7 @@ class JpqlQueryBuilder {
 
                 String propName = buildPropName(name, logicalName)
 
-                if(enableCustomFunctions){
+                if(enableDialectFunctions){
                     whereClause
                         .append('flike(')
                         .append(propName)

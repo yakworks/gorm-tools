@@ -175,7 +175,7 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
     //FIXME still need to work out alias
     def "exists on contact location"() {
         given:
-        assert gormConfig.query.dialectFunctions.enabled
+        //assert gormConfig.query.dialectFunctions.enabled
 
         def qryContact = Contact.query(
             q: [
@@ -193,6 +193,7 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
 
         when: "A jpa query is built"
         def builder = JpqlQueryBuilder.of(qry as MangoDetachedCriteria)//.aliasToMap(true)
+        builder.enableDialectFunctions(true)
         //def builder = JpqlQueryBuilder.of(qryContact as MangoDetachedCriteria)//.aliasToMap(true)
         def queryInfo = builder.buildSelect()
         def query = queryInfo.query

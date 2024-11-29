@@ -103,8 +103,6 @@ class JpqlQueryBuilderCriteriaMapSpec extends Specification implements GormHiber
 
     void "Test build select with or and ilike"() {
         given:"Some criteria"
-        gormConfig.query.dialectFunctions.enabled = true
-
         def criteria = KitchenSink.query(
             '$or': [
                 ['name2': 'org1%'],
@@ -114,6 +112,7 @@ class JpqlQueryBuilderCriteriaMapSpec extends Specification implements GormHiber
 
         when:"A jpa query is built"
         def builder = JpqlQueryBuilder.of(criteria)
+        builder.enableDialectFunctions(true)
         final queryInfo = builder.buildSelect()
 
         then:"The query is valid"

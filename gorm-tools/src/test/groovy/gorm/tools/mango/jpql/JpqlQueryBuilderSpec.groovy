@@ -30,8 +30,6 @@ class JpqlQueryBuilderSpec extends Specification implements GormHibernateTest  {
 
     void "Test update query with ilike criterion"() {
         given:"Some criteria"
-        gormConfig.query.dialectFunctions.enabled = true
-
         def criteria = KitchenSink.query {
             eq 'amount', 10.0
             ilike 'name', 'Sink1'
@@ -39,6 +37,7 @@ class JpqlQueryBuilderSpec extends Specification implements GormHibernateTest  {
 
         when:"A jpa query is built"
         def builder = JpqlQueryBuilder.of(criteria)
+        builder.enableDialectFunctions(true)
         def queryInfo = builder.buildUpdate(name:"SinkUp")
 
         then:"The query is valid"
@@ -102,7 +101,7 @@ class JpqlQueryBuilderSpec extends Specification implements GormHibernateTest  {
 
         when:"A jpa query is built"
         def builder = JpqlQueryBuilder.of(criteria)
-        builder.hibernateCompatible = true
+        //builder.hibernateCompatible = true
         def queryInfo = builder.buildUpdate(name:"SinkUp", amount:30)
 
         then:"The query is valid"
@@ -169,7 +168,7 @@ class JpqlQueryBuilderSpec extends Specification implements GormHibernateTest  {
 
         when:"A jpa query is built"
         def builder = JpqlQueryBuilder.of(criteria)
-        builder.hibernateCompatible = true
+        //builder.hibernateCompatible = true
         def query = builder.buildSelect().query
 
         then:"The query is valid"

@@ -24,6 +24,7 @@ import org.grails.datastore.mapping.query.api.QueryArgumentsAware
 import org.grails.datastore.mapping.query.api.QueryableCriteria
 import org.grails.orm.hibernate.AbstractHibernateSession
 import org.hibernate.QueryException
+import org.springframework.beans.factory.NoSuchBeanDefinitionException
 
 import gorm.tools.beans.Pager
 import gorm.tools.mango.api.QueryArgs
@@ -88,6 +89,9 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      * Query timeout in seconds. If value is set, the timeout would be set on hibernate criteria instance.
      */
     Integer timeout = 0
+
+    /** The Gorm config properties for settings.*/
+    GormConfig gormConfig
 
     /**
      * Constructs a DetachedCriteria instance target the given class and alias for the name
@@ -295,10 +299,13 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      *
      * @return A list of matching instances
      */
-    List<Map> mapList(Map args = [:]) {
+    protected List<Map> mapList(Map args = [:]) {
         def builder = JpqlQueryBuilder.of(this) //.aliasToMap(true)
         if(args.aliasToMap){
             builder.aliasToMap(true)
+        }
+        if (gormConfig && gormConfig.query.dialectFunctions.enabled) {
+            builder.enableDialectFunctions(true)
         }
 
         JpqlQueryInfo queryInfo = builder.buildSelect()

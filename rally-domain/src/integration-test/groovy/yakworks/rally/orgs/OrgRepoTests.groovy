@@ -544,6 +544,13 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         then:
         porg.name == "updated"
         porg.name == "updated"
+
+        when "delete"
+        orgRepo.removeById(org.id)
+        flush()
+
+        then:
+        !PartitionOrg.get(org.id)
     }
 
 }

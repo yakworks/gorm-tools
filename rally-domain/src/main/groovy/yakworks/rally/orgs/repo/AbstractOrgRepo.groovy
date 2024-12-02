@@ -147,6 +147,9 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         }
         orgTagRepo.remove(org)
         contactRepo.removeAll(org)
+        if(org.isOrgType(orgProps.partition.type)) {
+            PartitionOrg.repo.removeById(org.id)
+        }
     }
 
     /**

@@ -545,7 +545,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         porg.name == "updated"
         porg.name == "updated"
 
-        when "delete"
+        when: "delete"
         orgRepo.removeById(org.id)
         flush()
 

@@ -14,10 +14,12 @@ import yakworks.rally.activity.model.TaskType
 import yakworks.rally.activity.repo.ActivityQuery
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.rally.config.OrgProps
 import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
+import yakworks.rally.orgs.model.PartitionOrg
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
 import yakworks.rally.testing.MockData
@@ -29,9 +31,9 @@ import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 class ActivitySpec extends Specification implements GormHibernateTest, SecurityTest {
     static entityClasses = [
         AttachmentLink, ActivityLink, Activity, MailMessage, TaskType, Attachment, ActivityNote, ActivityContact,
-        Org, OrgTag, Tag, TagLink, Contact
+        Org, OrgTag, Tag, TagLink, Contact, PartitionOrg
     ]
-    static springBeans = [ ActivityQuery ]
+    static springBeans = [ActivityQuery, OrgProps ]
 
     @Shared Long orgId
 

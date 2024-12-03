@@ -24,6 +24,7 @@ import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgTypeSetup
+import yakworks.rally.orgs.model.PartitionOrg
 import yakworks.rally.testing.OrgDimensionTesting
 import yakworks.testing.gorm.RepoTestData
 import yakworks.testing.gorm.unit.GormHibernateTest
@@ -32,7 +33,7 @@ import yakworks.testing.gorm.unit.SecurityTest
 class OrgCopierSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [
         Org, Contact, OrgFlex, OrgMember, OrgCalc, OrgSource, OrgTag, OrgInfo, OrgTypeSetup, Location, ContactPhone,
-        ContactEmail, ContactSource, ContactFlex, Activity, ActivityLink, AttachmentLink, MailMessage, Attachment
+        ContactEmail, ContactSource, ContactFlex, Activity, ActivityLink, AttachmentLink, MailMessage, Attachment, PartitionOrg
     ]
 
     static List springBeans = [ActivityCopier, OrgCopier, OrgProps, OrgDimensionService ]

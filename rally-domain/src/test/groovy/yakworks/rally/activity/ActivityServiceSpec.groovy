@@ -12,10 +12,12 @@ import yakworks.rally.activity.model.Task
 import yakworks.rally.activity.model.TaskStatus
 import yakworks.rally.activity.model.TaskType
 import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.rally.config.OrgProps
 import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.PartitionOrg
 import yakworks.rally.testing.MockData
 import yakworks.security.gorm.model.AppUser
 import yakworks.testing.gorm.unit.GormHibernateTest
@@ -24,8 +26,9 @@ import yakworks.testing.gorm.unit.SecurityTest
 class ActivityServiceSpec extends Specification implements GormHibernateTest, SecurityTest { //implements SecuritySpecUnitTestHelper{
     static List<Class> entityClasses = [
         MailMessage, AttachmentLink, ActivityLink, Activity, Task, TaskType, TaskStatus,
-        Org, AppUser, ActivityNote, Contact, ContactSource, ActivityContact
+        Org, AppUser, ActivityNote, Contact, ContactSource, ActivityContact, PartitionOrg
     ]
+    static List springBeans = [OrgProps]
 
     @Autowired ActivityService activityService
 

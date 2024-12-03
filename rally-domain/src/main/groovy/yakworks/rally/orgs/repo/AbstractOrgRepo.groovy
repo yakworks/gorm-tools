@@ -17,6 +17,7 @@ import gorm.tools.model.SourceType
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
+import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.events.AfterRemoveEvent
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
@@ -46,6 +47,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
     @Inject OrgSourceRepo orgSourceRepo
     @Inject OrgService orgService
     @Inject OrgProps orgProps
+    @Inject PartitionOrgRepo partitionOrgRepo
 
     @RepoListener
     void beforeValidate(Org org, Errors errors) {
@@ -98,8 +100,10 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
             // do contact, support keyContact for legacy and Customers
             def contactData = data.contact ?: data.keyContact
             if (contactData) createOrUpdatePrimaryContact(org, contactData as Map)
-            createOrUpdatePartitionOrg(org, args.bindAction)
         }
+        //do partitionOrg update here in beforePersist,
+        //because after persist, the dirty state gets reset and we can not check if name/num has changed
+        partitionOrgRepo.createOrUpdate(org)
     }
 
     /**
@@ -147,9 +151,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         }
         orgTagRepo.remove(org)
         contactRepo.removeAll(org)
-        if(org.isOrgType(orgProps.partition.type)) {
-            PartitionOrg.repo.removeById(org.id)
-        }
+        partitionOrgRepo.removeForOrg(org)
     }
 
     /**
@@ -163,16 +165,6 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         Location.query(orgId: org.getId()).deleteAll()
         Contact.query(orgId: org.getId()).deleteAll()
         OrgSource.query(orgId: org.getId()).deleteAll()
-    }
-
-    protected void createOrUpdatePartitionOrg(Org org, BindAction bindAction) {
-        if(org.isOrgType(orgProps.partition.type)) {
-            if (bindAction == BindAction.Create) {
-                PartitionOrg.repo.create([id: org.id, num: org.num, name: org.name], [bindId: true])
-            } else if(org.hasChanged('num') || org.hasChanged('name')) {
-               PartitionOrg.update([id:org.id, num:org.num, name:org.name])
-            }
-        }
     }
 
     /**

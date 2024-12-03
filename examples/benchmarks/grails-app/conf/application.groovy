@@ -24,7 +24,7 @@ benchmark {
 grails {
     gorm.failOnError = true
     gorm.default.mapping = {
-        id generator: 'gorm.tools.hibernate.SpringBeanIdGenerator'
+        id generator: 'yakworks.gorm.hibernate.SpringBeanIdGenerator'
         '*'(cascadeValidate: 'dirty')
         //cache usage: System.getProperty("cacheStrategy", "read-write").toString()
     }

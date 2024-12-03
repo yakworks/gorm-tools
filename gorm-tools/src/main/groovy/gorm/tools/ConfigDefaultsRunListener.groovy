@@ -24,7 +24,7 @@ import org.springframework.core.env.ConfigurableEnvironment
  *   //gorm.flushMode = 'AUTO'
  *   gorm.failOnError = true
  *   gorm.default.mapping = {
- *     // id generator: 'gorm.tools.hibernate.SpringBeanIdGenerator'
+ *     // id generator: 'yakworks.gorm.hibernate.SpringBeanIdGenerator'
  *     '*'(cascadeValidate: 'dirty')
  *   }
  *   gorm.default.constraints = {

@@ -24,6 +24,7 @@ import org.grails.datastore.mapping.query.api.QueryArgumentsAware
 import org.grails.datastore.mapping.query.api.QueryableCriteria
 import org.grails.orm.hibernate.AbstractHibernateSession
 import org.hibernate.QueryException
+import org.springframework.beans.factory.NoSuchBeanDefinitionException
 
 import gorm.tools.beans.Pager
 import gorm.tools.mango.api.QueryArgs
@@ -37,6 +38,8 @@ import grails.gorm.PagedResultList
 import yakworks.api.problem.ThrowableProblem
 import yakworks.api.problem.data.DataProblem
 import yakworks.commons.lang.NameUtils
+import yakworks.gorm.config.GormConfig
+import yakworks.spring.AppCtx
 
 /**
  * This is here to make it easier to build criteria with domain bean paths
@@ -62,13 +65,16 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     /** reference to QueryArgs used to build this if it exists */
     QueryArgs queryArgs
 
-    /** the root map to apply. Wont neccesarily be same as whats in the QueryArgs as it will have been run through the tidy operation*/
+    /**
+     * the root map to apply.
+     * Wont neccesarily be same as whats in the QueryArgs as it will have been run through the tidy operation
+     */
     Map criteriaMap
 
     /** the root criteriaClosure to apply */
     Closure criteriaClosure
 
-
+    /** the map of aliases, see the  parseAlias method */
     Map<String, String> propertyAliases = [:]
 
     /**
@@ -84,13 +90,21 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      */
     Integer timeout = 0
 
+    /** The Gorm config properties for settings.*/
+    GormConfig gormConfig
+
     /**
      * Constructs a DetachedCriteria instance target the given class and alias for the name
      * The default is to use the short domain name with "_" appended to it.
      * @param targetClass The target class
      * @param alias The root alias to be used in queries
      */
-    MangoDetachedCriteria(Class<T> targetClass, String zalias = null) {
+    MangoDetachedCriteria(Class<T> targetClass) {
+        super(targetClass, null)
+        this.@alias = "${NameUtils.getPropertyName(targetClass.simpleName)}_"
+    }
+
+    MangoDetachedCriteria(Class<T> targetClass, String zalias) {
         super(targetClass, zalias)
         if(!zalias) this.@alias = "${NameUtils.getPropertyName(targetClass.simpleName)}_"
     }
@@ -154,8 +168,6 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
         associationCriteriaMap[methodName] = associationCriteria
         add associationCriteria
-
-
 
         def lastArg = args[-1]
         if(lastArg instanceof Closure) {
@@ -274,6 +286,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         return resList as List<T>
     }
 
+    @Deprecated //use the pagedList(Pager pager)
     List<T> pagedList() {
         Pager pager = queryArgs?.pager ? queryArgs.pager : Pager.of([:])
         return pagedList(pager)
@@ -286,11 +299,15 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      *
      * @return A list of matching instances
      */
-    List<Map> mapList(Map args = [:]) {
+    protected List<Map> mapList(Map args = [:]) {
         def builder = JpqlQueryBuilder.of(this) //.aliasToMap(true)
         if(args.aliasToMap){
             builder.aliasToMap(true)
         }
+        if (gormConfig && gormConfig.query.dialectFunctions.enabled) {
+            builder.enableDialectFunctions(true)
+        }
+
         JpqlQueryInfo queryInfo = builder.buildSelect()
         //use SimplePagedQuery so it can attach the totalCount
         PagedQuery hq = buildSimplePagedQuery()
@@ -545,9 +562,15 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
     @Override
     protected MangoDetachedCriteria<T> clone() {
-        AbstractDetachedCriteria criteria = (MangoDetachedCriteria)super.clone()
-        criteria.propertyAliases = propertyAliases
-        return criteria
+        MangoDetachedCriteria clonedCriteria = (MangoDetachedCriteria)super.clone()
+        clonedCriteria.queryArgs = queryArgs
+        clonedCriteria.criteriaMap = criteriaMap
+        clonedCriteria.criteriaClosure = criteriaClosure
+        clonedCriteria.propertyAliases = propertyAliases
+        clonedCriteria.systemAliases = systemAliases
+        clonedCriteria.timeout = timeout
+        clonedCriteria.gormConfig = gormConfig
+        return clonedCriteria
     }
 
     /**

@@ -8,16 +8,15 @@ import groovy.transform.CompileDynamic
 
 import org.grails.datastore.mapping.config.MappingDefinition
 
-import gorm.tools.hibernate.type.JsonType
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.annotation.Entity
+import yakworks.gorm.hibernate.type.JsonType
 import yakworks.security.audit.AuditStampTrait
 
 import static grails.gorm.hibernate.mapping.MappingBuilder.orm
-
 
 /**
  * An instance created right away when "any job" in 9ci is called.

@@ -21,6 +21,7 @@ import grails.gorm.DetachedCriteria
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.EnumUtils
 import yakworks.commons.model.IdEnum
+import yakworks.gorm.config.GormConfig
 
 import static gorm.tools.mango.MangoOps.CompareOp
 import static gorm.tools.mango.MangoOps.ExistOp
@@ -43,6 +44,7 @@ import static gorm.tools.mango.MangoOps.SubQueryOp
 class MangoBuilder {
 
     @Autowired QuickSearchSupport quickSearchSupport
+    @Autowired GormConfig gormConfig
 
     @CompileDynamic //dynamic so it can access the protected criteria.clone
     static <D> MangoDetachedCriteria<D> cloneCriteria(DetachedCriteria<D> criteria) {
@@ -61,6 +63,7 @@ class MangoBuilder {
      */
     <D> MangoDetachedCriteria<D> createCriteria(Class<D> clazz, QueryArgs queryArgs, Closure applyClosure){
         MangoDetachedCriteria<D> mangoCriteria = new MangoDetachedCriteria<D>(clazz)
+        mangoCriteria.gormConfig = gormConfig
         //assign the queryArgs for use later if needed
         mangoCriteria.queryArgs = queryArgs
         //assign the the criteriaMap and run the tidy on it to normalize it.
@@ -113,16 +116,16 @@ class MangoBuilder {
      * calls list for the criteria, if criteria has projections then calls mapList
      * which uses JpqlQueryBuilder
      */
-    static List list(MangoDetachedCriteria criteria, Map args) {
-        List resList
-        if(criteria.projections){
-            resList =  criteria.mapList(args)
-        } else {
-            //return standard list
-            resList =  criteria.list(args)
-        }
-        return resList
-    }
+    // static List list(MangoDetachedCriteria criteria, Map args) {
+    //     List resList
+    //     if(criteria.projections){
+    //         resList =  criteria.mapList(args)
+    //     } else {
+    //         //return standard list
+    //         resList =  criteria.list(args)
+    //     }
+    //     return resList
+    // }
 
     /**
      * Apply projections from map in form [key:type] where type is sum, group, count, min, max or avg

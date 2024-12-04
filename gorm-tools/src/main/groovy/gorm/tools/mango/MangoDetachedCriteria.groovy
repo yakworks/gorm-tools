@@ -562,10 +562,15 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
     @Override
     protected MangoDetachedCriteria<T> clone() {
-        MangoDetachedCriteria criteria = (MangoDetachedCriteria)super.clone()
-        criteria.propertyAliases = propertyAliases
-        criteria.gormConfig = gormConfig
-        return criteria
+        MangoDetachedCriteria clonedCriteria = (MangoDetachedCriteria)super.clone()
+        clonedCriteria.queryArgs = queryArgs
+        clonedCriteria.criteriaMap = criteriaMap
+        clonedCriteria.criteriaClosure = criteriaClosure
+        clonedCriteria.propertyAliases = propertyAliases
+        clonedCriteria.systemAliases = systemAliases
+        clonedCriteria.timeout = timeout
+        clonedCriteria.gormConfig = gormConfig
+        return clonedCriteria
     }
 
     /**

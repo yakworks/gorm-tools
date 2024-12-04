@@ -299,7 +299,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      *
      * @return A list of matching instances
      */
-    protected List<Map> mapList(Map args = [:]) {
+    List<Map> mapList(Map args = [:]) {
         def builder = JpqlQueryBuilder.of(this) //.aliasToMap(true)
         if(args.aliasToMap){
             builder.aliasToMap(true)

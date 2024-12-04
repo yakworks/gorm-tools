@@ -562,8 +562,9 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
     @Override
     protected MangoDetachedCriteria<T> clone() {
-        AbstractDetachedCriteria criteria = (MangoDetachedCriteria)super.clone()
+        MangoDetachedCriteria criteria = (MangoDetachedCriteria)super.clone()
         criteria.propertyAliases = propertyAliases
+        criteria.gormConfig = gormConfig
         return criteria
     }
 

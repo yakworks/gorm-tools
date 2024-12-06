@@ -34,6 +34,8 @@ class JobUtils {
             state: job.state.name(),
             source: job.source,
             sourceId: job.sourceId,
+            createdDate: job['createdDate'], //does not have access to Auditstamp trait here
+            editedDate: job['editedDate'],
             data: rawDataJson
         ]
 

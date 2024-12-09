@@ -27,6 +27,8 @@ class MailProps {
         boolean enabled = false
         /** the private api key for sdk */
         String privateApiKey
+
+        /** Mailgun Http webhook signing key - used to verify webhook calls **/
         String webhookSigningKey
     }
 

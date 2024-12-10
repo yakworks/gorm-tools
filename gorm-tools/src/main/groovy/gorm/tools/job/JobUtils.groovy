@@ -22,11 +22,15 @@ class JobUtils {
         return sourceId
     }
 
-    //static helper as its used both here and also in the SyncJobRenderer
-    static Map convertToMap(SyncJobEntity job){
+    static JsonOutput.JsonUnescaped getRowJobData(SyncJobEntity job) {
         // gets the raw json string and use the unescaped to it just dumps it to writer without any round robin conversion
         String jobData = job.dataToString()
-        JsonOutput.JsonUnescaped rawDataJson = JsonOutput.unescaped(jobData)
+        return JsonOutput.unescaped(jobData)
+    }
+
+    //static helper as its used both here and also in the SyncJobRenderer
+    static Map convertToMap(SyncJobEntity job){
+        JsonOutput.JsonUnescaped rawDataJson = getRowJobData(job)
 
         Map map = [
             id: job['id'],
@@ -34,8 +38,6 @@ class JobUtils {
             state: job.state.name(),
             source: job.source,
             sourceId: job.sourceId,
-            createdDate: job['createdDate'], //does not have access to Auditstamp trait here
-            editedDate: job['editedDate'],
             data: rawDataJson
         ]
 

@@ -11,6 +11,7 @@ import groovy.transform.CompileStatic
 import org.springframework.stereotype.Component
 
 import gorm.tools.job.JobUtils
+import yakworks.commons.map.Maps
 import yakworks.gorm.api.DefaultCrudApi
 
 /**
@@ -26,7 +27,9 @@ class SyncJobCrudApi extends DefaultCrudApi<SyncJob> {
 
     @Override
     Map entityToMap(SyncJob job, List<String> includes){
-        Map response = JobUtils.convertToMap(job)
+        //clone metamap, SomeHow trying to put a new entry in MetaMap throws UnSupportedOperationException
+        Map response = Maps.clone(super.entityToMap(job, includes))
+        response.put("data", JobUtils.getRowJobData(job))
         return response
     }
 

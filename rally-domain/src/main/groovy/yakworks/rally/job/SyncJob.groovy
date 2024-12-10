@@ -59,7 +59,6 @@ class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity,  AuditStampTrait, S
     static MappingDefinition getMapping() {
         orm {
             columns(
-                state: property(enumType: 'identity'),
                 problems: property(type: JsonType, typeParams: [type: ArrayList])
             )
         }

@@ -1,5 +1,6 @@
 package yakworks.rest
 
+import gorm.tools.job.SyncJobState
 import gorm.tools.model.SourceType
 import grails.gorm.transactions.Transactional
 import grails.testing.mixin.integration.Integration
@@ -27,6 +28,7 @@ class SyncjobRestApiSpec extends Specification implements OkHttpRestTrait {
         body
         body.id
         body.ok
+        body.state == 'Finished'
         body.createdDate
         body.editedDate
         body.data
@@ -42,6 +44,7 @@ class SyncjobRestApiSpec extends Specification implements OkHttpRestTrait {
         Map data = [test:"value"]
         job.dataBytes = JsonEngine.toJson(data).bytes
         job.ok = true
+        job.state = SyncJobState.Finished
         return job.persist()
     }
 

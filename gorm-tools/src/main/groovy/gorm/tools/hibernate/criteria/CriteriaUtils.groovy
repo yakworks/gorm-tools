@@ -12,6 +12,7 @@ import org.hibernate.criterion.CriteriaSpecification
 /**
  * For consistently searching across data types.
  */
+@Deprecated
 @SuppressWarnings(["NestedBlockDepth"])
 @CompileStatic
 class CriteriaUtils {

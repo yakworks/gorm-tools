@@ -19,12 +19,10 @@ import org.grails.datastore.mapping.query.api.AssociationCriteria
 import org.grails.datastore.mapping.query.api.QueryableCriteria
 import org.springframework.boot.convert.ApplicationConversionService
 import org.springframework.core.convert.ConversionService
-import org.springframework.core.convert.support.GenericConversionService
 import org.springframework.dao.InvalidDataAccessResourceUsageException
 
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.utils.GormMetaUtils
-import grails.gorm.DetachedCriteria
 import yakworks.commons.map.Maps
 
 /**
@@ -35,7 +33,6 @@ import yakworks.commons.map.Maps
  * @author Joshua Burnett (@basejump)
  * @since 7.0.8
  */
-//FIXME refactor later
 @SuppressWarnings(['BuilderMethodWithSideEffects', 'AbcMetric', 'ParameterCount', 'ExplicitCallToEqualsMethod', 'ClassSize', 'MethodSize'])
 @CompileStatic
 class JpqlQueryBuilder {
@@ -52,34 +49,30 @@ class JpqlQueryBuilder {
     //the main root entity alias, will normall be just the decapitalized name
     private String entityAlias
 
-    PersistentEntity entity
-    boolean hibernateCompatible
+    // the root entity this is for
+    private PersistentEntity entity
+
+    //boolean hibernateCompatible
+
     //wraps the SELECT in a new map( ...) when true
-    boolean aliasToMap
+    private boolean aliasToMap
+    // deletes for example cant have joins
+    private boolean allowJoins = true
+    // if true then will use custom dialect functions such as flike
+    private boolean enableDialectFunctions = false
+
+    //map of join types from MangoDetachedCriteria
     Map<String, JoinType> joinTypes
+    //aliases as they are built here
     Map<String, String> projectionAliases = [:]
+    //map of propertyAliases from MangoDetachedCriteria
     Map<String, String> propertyAliases = [:]
-    List<String> groupByList = []
-    List<String> selectList = []
-    boolean allowJoins = true
+    //as GroupPropertyProjection are proceses add them to this list so they can be skipped while building having clause
+    private List<String> groupByList = []
+    //as selects are proceses add them to this list so they can be skipped while building having clause
+    private List<String> selectList = []
+
     ConversionService conversionService = ApplicationConversionService.getSharedInstance()
-    //ConversionService conversionService = new GenericConversionService()
-
-    // JpqlQueryBuilder(QueryableCriteria criteria) {
-    //     this(criteria.getPersistentEntity(), criteria.getCriteria())
-    // }
-
-    // JpqlQueryBuilder(PersistentEntity entity, List<Query.Criterion> criteria) {
-    //     this(entity, new Query.Conjunction(criteria))
-    // }
-
-    // JpqlQueryBuilder(PersistentEntity entity, List<Query.Criterion> criteria, Query.ProjectionList projectionList) {
-    //     this(entity, new Query.Conjunction(criteria), projectionList)
-    // }
-
-    // JpqlQueryBuilder(PersistentEntity entity, List<Query.Criterion> criteria, Query.ProjectionList projectionList, List<Query.Order> orders) {
-    //     this(entity, new Query.Conjunction(criteria), projectionList, orders)
-    // }
 
     JpqlQueryBuilder(PersistentEntity entity, Query.Junction criteria) {
         this.entity = entity
@@ -91,16 +84,6 @@ class JpqlQueryBuilder {
         this.entity = entity
         this.entityAlias = entity.getDecapitalizedName()
     }
-
-    // JpqlQueryBuilder(PersistentEntity entity, Query.Junction criteria, Query.ProjectionList projectionList) {
-    //     this(entity, criteria)
-    //     this.projectionList = projectionList
-    // }
-
-    // JpqlQueryBuilder(PersistentEntity entity, Query.Junction criteria, Query.ProjectionList projectionList, List<Query.Order> orders) {
-    //     this(entity, criteria, projectionList)
-    //     this.orders = orders
-    // }
 
     static JpqlQueryBuilder of(MangoDetachedCriteria crit){
         var jqb = new JpqlQueryBuilder(crit.persistentEntity, new Query.Conjunction(crit.criteria) )
@@ -134,9 +117,17 @@ class JpqlQueryBuilder {
         return this
     }
 
-    public void setHibernateCompatible(boolean hibernateCompatible) {
-        this.hibernateCompatible = hibernateCompatible
+    /**
+     * Enables custom dialect functions, such as flike
+     */
+    JpqlQueryBuilder enableDialectFunctions(boolean val){
+        this.enableDialectFunctions = val
+        return this
     }
+
+    // public void setHibernateCompatible(boolean hibernateCompatible) {
+    //     this.hibernateCompatible = hibernateCompatible
+    // }
 
     /**
      * Builds an UPDATE statement.
@@ -548,6 +539,7 @@ class JpqlQueryBuilder {
 
         // ILIKE SQL SERVER
         queryHandlers.put(Query.ILike, new QueryHandler() {
+
             public int handle(PersistentEntity entity, Query.Criterion criterion, StringBuilder q, StringBuilder whereClause,
                               String logicalName, int position, List parameters) {
                 Query.ILike eq = (Query.ILike) criterion
@@ -555,17 +547,28 @@ class JpqlQueryBuilder {
                 PersistentProperty prop = validateProperty(entity, name, Query.ILike.simpleName)
                 Class propType = prop.getType()
 
-                whereClause.append("lower(")
-
                 String propName = buildPropName(name, logicalName)
 
-                whereClause
-                 .append(propName)
-                 .append(")")
-                 .append(" like lower(")
-                 .append(PARAMETER_PREFIX)
-                 .append(++position)
-                 .append(")")
+                if(enableDialectFunctions){
+                    whereClause
+                        .append('flike(')
+                        .append(propName)
+                        .append(", ")
+                        .append(PARAMETER_PREFIX)
+                        .append(++position)
+                        //.append(" ) = true")
+                        .append(" ) = true")
+                } else {
+                    whereClause.append("lower(")
+                    whereClause
+                        .append(propName)
+                        .append(")")
+                        .append(" like lower(")
+                        .append(PARAMETER_PREFIX)
+                        .append(++position)
+                        .append(")")
+                }
+
                 parameters.add(conversionService.convert( eq.getValue(), propType ))
                 return position
             }

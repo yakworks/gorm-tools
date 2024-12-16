@@ -8,6 +8,7 @@ import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.hibernate.HibernateMangoQuery
 import spock.lang.Issue
 import testing.TestSource
+import yakworks.gorm.config.GormConfig
 
 import java.time.LocalDate
 
@@ -24,6 +25,7 @@ import yakworks.testing.gorm.unit.GormHibernateTest
 
 class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
     static List entityClasses = [Cust, Address, AddyNested, TestSource]
+    static List springBeans = [GormConfig]
 
     @Autowired MangoBuilder mangoBuilder
 
@@ -793,6 +795,39 @@ class MangoCriteriaSpec extends Specification implements GormHibernateTest  {
 
         then:
         query.getHibernateCriteria().timeout == 10
+    }
+
+    void "test clone"() {
+        setup:
+        MangoDetachedCriteria criteria = build('sort': 'inactive desc, id desc')
+        criteria.timeout = 100
+        criteria.propertyAliases = ["test":"test"]
+        criteria.systemAliases = ["test"]
+
+        expect:
+        criteria.gormConfig
+        criteria.timeout
+        criteria.queryArgs
+
+        when:
+        MangoDetachedCriteria cloned = criteria.clone()
+
+        then:
+        cloned.gormConfig == criteria.gormConfig
+        cloned.timeout == criteria.timeout
+        criteria.queryArgs == criteria.queryArgs
+        cloned.propertyAliases == criteria.propertyAliases
+        cloned.systemAliases == criteria.systemAliases
+
+        when:
+        MangoDetachedCriteria projectionCrit = criteria.id()
+
+        then:
+        projectionCrit.gormConfig == criteria.gormConfig
+        projectionCrit.timeout == criteria.timeout
+        projectionCrit.queryArgs == criteria.queryArgs
+        projectionCrit.propertyAliases == criteria.propertyAliases
+        projectionCrit.systemAliases == criteria.systemAliases
     }
 
 }

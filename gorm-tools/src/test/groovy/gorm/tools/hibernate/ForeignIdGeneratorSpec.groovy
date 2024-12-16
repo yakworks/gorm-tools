@@ -77,7 +77,7 @@ class FidMaster implements RepoEntity<FidMaster> {
     FidChild child
 
     static mapping = {
-        id generator:'gorm.tools.hibernate.SpringBeanIdGenerator', params:[foo:'bar']
+        id generator:'yakworks.gorm.hibernate.SpringBeanIdGenerator', params:[foo:'bar']
     }
 
     static constraints = {

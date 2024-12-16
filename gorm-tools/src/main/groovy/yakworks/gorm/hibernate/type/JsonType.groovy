@@ -2,7 +2,7 @@
 * Copyright 2022 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.hibernate.type
+package yakworks.gorm.hibernate.type
 
 import java.lang.reflect.Type
 
@@ -17,7 +17,6 @@ import io.hypersistence.utils.hibernate.type.json.internal.JsonTypeDescriptor
 /**
  * Overrides so we can access setParameterValues using the gorm mapping
  */
-@Deprecated //MOVED to yakworks.gorm.hibernate.type, use that one
 @SuppressWarnings(["ClassNameSameAsSuperclass"])
 @CompileStatic
 class JsonType extends io.hypersistence.utils.hibernate.type.json.JsonType {

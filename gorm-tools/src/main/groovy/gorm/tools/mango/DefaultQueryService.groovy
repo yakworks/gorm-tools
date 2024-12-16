@@ -103,15 +103,16 @@ class DefaultQueryService<D> implements QueryService<D> {
      */
     @Transactional(readOnly = true)
     public List pagedList(MangoDetachedCriteria criteria, Pager pager) {
-        Map args = [max: pager.max, offset: pager.offset]
-        List resList
-        if(criteria.projections){
-            resList =  criteria.mapList(args)
-        } else {
-            //return standard list
-            resList =  criteria.list(args)
-        }
-        return resList
+        //NOT USED RIGHT NOW
+        // Map args = [max: pager.max, offset: pager.offset]
+        // List resList
+        // if(criteria.projections){
+        //     resList =  criteria.mapList(args)
+        // } else {
+        //     //return standard list
+        //     resList =  criteria.list(args)
+        // }
+        return null
     }
 
     /**

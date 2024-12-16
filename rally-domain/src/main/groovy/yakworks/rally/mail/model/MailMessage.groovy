@@ -8,11 +8,11 @@ import java.time.LocalDateTime
 
 import groovy.transform.CompileDynamic
 
-import gorm.tools.hibernate.type.JsonType
 import gorm.tools.repository.model.UuidRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
+import yakworks.gorm.hibernate.type.JsonType
 import yakworks.security.audit.AuditCreatedTrait
 
 import static grails.gorm.hibernate.mapping.MappingBuilder.orm

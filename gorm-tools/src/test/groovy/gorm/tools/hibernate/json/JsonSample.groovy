@@ -4,15 +4,11 @@
 */
 package gorm.tools.hibernate.json
 
-import groovy.transform.CompileDynamic
 
-import org.grails.datastore.mapping.config.MappingDefinition
-
-import gorm.tools.hibernate.type.JsonType
-import gorm.tools.repository.model.UuidGormRepo
 import gorm.tools.repository.model.UuidRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import yakworks.gorm.hibernate.type.JsonType
 
 import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 

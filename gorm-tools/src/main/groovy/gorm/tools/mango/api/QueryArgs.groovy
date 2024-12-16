@@ -4,8 +4,6 @@
 */
 package gorm.tools.mango.api
 
-import java.net.http.HttpRequest
-
 import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic

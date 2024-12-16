@@ -25,7 +25,7 @@ The identity generator can be configured globally in application.groovy as shown
 grails {
 
 	gorm.default.mapping = {
-		id column: 'id', generator:'gorm.tools.hibernate.SpringBeanIdGenerator'
+		id column: 'id', generator:'yakworks.gorm.hibernate.SpringBeanIdGenerator'
 	}
 }
 

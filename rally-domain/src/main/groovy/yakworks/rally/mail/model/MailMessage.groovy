@@ -81,15 +81,23 @@ class MailMessage implements UuidRepoEntity<MailMessage>, AuditCreatedTrait, Ser
     /** The send date, always in Zulu to match server time */
     LocalDateTime sendDate
 
+    // see https://documentation.mailgun.com/docs/mailgun/user-manual/tracking-messages/#webhooks
     @CompileDynamic
     static enum MsgState {
-        Queued, //Queued in the system, ready to be sent to mail processor
-        Sent, //sent from here vai mailgun or smtp
-        Delivered, // if using something like mailgun and we interface, Mailgun sent the email and it was accepted by the recipient email server.
-        Opened, // When using something like mailgun with Open tracking enabled
-        Complained, //The email recipient clicked on the spam complaint button within their email client.
-        Error, //a permanent error occured and message failed, (could be mailgun permanent failure)
-        Failed //Mailgun temporary failure
+        //Queued in the system, ready to be sent to mail processor
+        Queued,
+        //sent from here vai mailgun or smtp
+        Sent,
+        // if using something like mailgun and we interface, Mailgun sent the email and it was accepted by the recipient email server.
+        Delivered,
+        // When using something like mailgun with Open tracking enabled
+        Opened,
+        //The email recipient clicked on the spam complaint button within their email client.
+        Complained,
+        //Hard Bounce, (permanent failures) a permanent error occured and message failed, (could be mailgun permanent failure)
+        Error,
+        //Soft Bounce, Mailgun Temporary Failure
+        Failed
     }
 
 

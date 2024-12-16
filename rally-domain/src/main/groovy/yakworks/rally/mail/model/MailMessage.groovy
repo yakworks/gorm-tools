@@ -21,7 +21,7 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 @IdEqualsHashCode
 @GrailsCompileStatic
 class MailMessage implements UuidRepoEntity<MailMessage>, AuditCreatedTrait, Serializable {
-    
+
     UUID id
 
     /** the state of the Mail */

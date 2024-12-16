@@ -44,7 +44,6 @@ class TestSyncJob implements RepoEntity<TestSyncJob>, SyncJobEntity {
     static mapping = orm {
         //id(generator: "assigned")
         columns(
-            state: property(enumType: 'identity'),
             payloadBytes: property(sqlType: 'BLOB'),
             dataBytes: property(sqlType: 'BLOB'),
             problems: property(type: JsonType, typeParams: [type: ArrayList])

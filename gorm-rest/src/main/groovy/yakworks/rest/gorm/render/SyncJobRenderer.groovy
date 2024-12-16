@@ -21,7 +21,6 @@ import grails.rest.render.RenderContext
  */
 @Slf4j
 @CompileStatic
-//XXX is this used now, since we have SyncjobCrudApi
 class SyncJobRenderer implements JsonRendererTrait<SyncJobEntity> {
 
     //this is also done in

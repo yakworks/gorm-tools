@@ -27,12 +27,15 @@ class SyncjobRestApiSpec extends Specification implements OkHttpRestTrait {
         then:
         body
         body.id
-        body.ok
+        !body.ok
         body.state == 'Finished'
         body.createdDate
         body.editedDate
         body.data
         body.data.test == "value"
+        body.problems
+        body.problems[0].ok == false
+        body.problems[0].title == "error"
 
         cleanup:
         if(body && body.id) removeJob(body.id as Long)
@@ -43,8 +46,9 @@ class SyncjobRestApiSpec extends Specification implements OkHttpRestTrait {
         SyncJob job = new SyncJob([sourceType: SourceType.ERP, sourceId: 'ar/org'])
         Map data = [test:"value"]
         job.dataBytes = JsonEngine.toJson(data).bytes
-        job.ok = true
+        job.ok = false
         job.state = SyncJobState.Finished
+        job.problems = [["ok":false,"title":"error"]]
         return job.persist()
     }
 

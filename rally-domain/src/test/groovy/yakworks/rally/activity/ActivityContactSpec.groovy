@@ -11,13 +11,14 @@ import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.PartitionOrg
+import yakworks.rally.seed.RallySeed
 import yakworks.rally.tag.model.Tag
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
 class ActivityContactSpec extends Specification implements GormHibernateTest, SecurityTest {
-    static List entityClasses = [Activity, ActivityContact, ActivityNote, Contact, ContactSource, Org, Tag, PartitionOrg]
-    static List springBeans = [OrgProps ]
+    static List entityClasses = RallySeed.entityClasses
+    static List springBeans = RallySeed.springBeanList
 
     @Shared
     ActivityContactRepo repo

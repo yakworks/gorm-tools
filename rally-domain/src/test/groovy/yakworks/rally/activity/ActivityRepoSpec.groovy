@@ -1,6 +1,7 @@
 package yakworks.rally.activity
 
 import org.springframework.beans.factory.annotation.Autowired
+
 import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.repo.ActivityRepo
@@ -9,12 +10,12 @@ import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.PartitionOrg
-import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.testing.gorm.unit.GormHibernateTest
+import yakworks.testing.gorm.unit.SecurityTest
 
 class ActivityRepoSpec extends Specification implements GormHibernateTest, SecurityTest {
-    static entityClasses = [Activity, Org, OrgSource, PartitionOrg]
-    static List springBeans = [OrgProps ]
+    static List entityClasses = [Activity, Org, OrgSource, PartitionOrg]
+    static List springBeans = [OrgProps]
 
     @Autowired ActivityRepo activityRepo
 

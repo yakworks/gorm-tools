@@ -13,7 +13,7 @@ import yakworks.testing.gorm.unit.SecurityTest
 
 class UserInfoExtSpec extends Specification implements GormHibernateTest, SecurityTest {
     static entityClasses = [Org, PartitionOrg]
-    static List springBeans = [OrgProps ]
+    static List springBeans = [OrgProps]
 
     @Autowired CurrentUser currentUser
 

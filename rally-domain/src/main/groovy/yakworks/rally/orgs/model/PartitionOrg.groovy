@@ -14,12 +14,18 @@ import yakworks.security.audit.AuditStamp
 
 /**
  * Represents an Org which has orgType=partitionOrgType
+ * See docs in OrgProps for partion.
+ * This holds copy of the partition Org since it joined so often.
+ * PartitionOrg is Division at CED and RNDC for example. There might be 20-50 of them but there are millions of Orgs since
+ * there are that many customers. PartitionOrg is frequently if not always joined to ArTran and Customer for filtering and validation.
+ * This way we are joining and filtering on a table with 20 rows instead 2 million.
  */
 @Entity
 @AuditStamp
 @GrailsCompileStatic
 class PartitionOrg implements NameNum, RepoEntity<PartitionOrg>, Serializable {
 
+    /** read only link to the Org using this id */
     Org org
 
     static mapping = {

@@ -38,15 +38,6 @@ class PartitionOrgRepo extends LongIdGormRepo<PartitionOrg> {
     }
 
     /**
-     * updates PartitionOrg if num or name has changed
-     */
-    protected void updateIfChanged(Org org) {
-        if (exists(org.id) && (org.hasChanged('num') || org.hasChanged('name'))) {
-            query(id: org.id).updateAll(num: org.num, name: org.name)
-        }
-    }
-
-    /**
      * Creates or updates partition org, if its new org, or if num/name has changed
      */
     void createOrUpdate(Org org) {
@@ -64,5 +55,14 @@ class PartitionOrgRepo extends LongIdGormRepo<PartitionOrg> {
         PartitionOrg porg = new PartitionOrg(num: org.num, name: org.name)
         porg.id = org.id
         porg.persist()
+    }
+
+    /**
+     * updates PartitionOrg if num or name has changed
+     */
+    protected void updateIfChanged(Org org) {
+        if (exists(org.id) && (org.hasChanged('num') || org.hasChanged('name'))) {
+            query(id: org.id).updateAll(num: org.num, name: org.name)
+        }
     }
 }

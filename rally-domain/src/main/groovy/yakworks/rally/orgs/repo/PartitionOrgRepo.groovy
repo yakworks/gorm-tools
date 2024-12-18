@@ -29,7 +29,7 @@ class PartitionOrgRepo extends LongIdGormRepo<PartitionOrg> {
 
     @Override
     PartitionOrg update(Map data, PersistArgs args) {
-        throw new UnsupportedOperationException("Creating PartitionOrg is not allowed")
+        throw new UnsupportedOperationException("Updating PartitionOrg is not allowed")
     }
 
     @Override

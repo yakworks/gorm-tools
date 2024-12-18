@@ -4,11 +4,11 @@
 */
 package yakworks.etl.excel
 
-
 import groovy.transform.CompileStatic
 
 import yakworks.commons.beans.PropertyTools
 import yakworks.commons.lang.LabelUtils
+import yakworks.commons.lang.Validate
 import yakworks.commons.map.MapFlattener
 import yakworks.gorm.api.ApiConfig
 import yakworks.meta.MetaMapList
@@ -62,7 +62,8 @@ class ExcelBuilderSupport {
                 if(!it.hidden) {
                     //colModel would need to atleast specify field name, but if label is provided it would be used for xls header
                     //name is the name of domain field, label is what gets displayed as xls header
-                    colMap[(it.name as String)] = (it.label ?: it.name) as String
+                    Validate.notEmpty(it.name, "name is required for columns in gridOptions.colMode")
+                    colMap[(it.name as String)] = it.label as String
                 }
             }
         }

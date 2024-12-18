@@ -32,6 +32,7 @@ import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
+import yakworks.rally.orgs.model.PartitionOrg
 import yakworks.rally.orgs.repo.ContactRepo
 import yakworks.rally.orgs.repo.OrgRepo
 import yakworks.rally.tag.model.Tag
@@ -53,7 +54,7 @@ class RallySeed {
     static List<Class<?>> getEntityClasses() {
         return [
             AppUser, SecRole, SecRoleUser, SecRolePermission,
-            Org, OrgSource, OrgTypeSetup, OrgTag, OrgMember, OrgFlex, OrgCalc, OrgInfo,
+            Org, OrgSource, OrgTypeSetup, OrgTag, OrgMember, PartitionOrg, OrgFlex, OrgCalc, OrgInfo,
             Location, Contact,
             ActivityLink, Activity, TaskType, ActivityNote, ActivityContact,
             Tag, TagLink

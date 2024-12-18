@@ -17,6 +17,7 @@ import gorm.tools.model.SourceType
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
+import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.events.AfterRemoveEvent
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
@@ -24,6 +25,7 @@ import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.utils.GormMetaUtils
 import gorm.tools.validation.Rejector
+import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.OrgService
 import yakworks.rally.orgs.model.Company
 import yakworks.rally.orgs.model.Contact
@@ -31,21 +33,21 @@ import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgType
+import yakworks.rally.orgs.model.PartitionOrg
 
 /**
  * base or OrgRepo. common functionality refactored out so can be overriden in application.
  */
 @CompileStatic
 abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
+
     @Inject LocationRepo locationRepo
-
     @Inject ContactRepo contactRepo
-
     @Inject OrgTagRepo orgTagRepo
-
     @Inject OrgSourceRepo orgSourceRepo
-
     @Inject OrgService orgService
+    @Inject OrgProps orgProps
+    @Inject PartitionOrgRepo partitionOrgRepo
 
     @RepoListener
     void beforeValidate(Org org, Errors errors) {
@@ -99,6 +101,11 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
             def contactData = data.contact ?: data.keyContact
             if (contactData) createOrUpdatePrimaryContact(org, contactData as Map)
         }
+        //do partitionOrg update here in beforePersist,
+        //because after persist, the dirty state gets reset and we can not check if name/num has changed
+        if (org.isOrgType(orgProps.partition.type)) {
+            partitionOrgRepo.createOrUpdate(org)
+        }
     }
 
     /**
@@ -146,6 +153,12 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         }
         orgTagRepo.remove(org)
         contactRepo.removeAll(org)
+
+        if (org.isOrgType(orgProps.partition.type)) {
+            //pass PersistArgs, because default removeById(long) is disabled in PartitionOrgRepo to prevent deletion from API
+            //As delete through api calls removeById(id)
+            partitionOrgRepo.removeById(org.id, PersistArgs.defaults())
+        }
     }
 
     /**

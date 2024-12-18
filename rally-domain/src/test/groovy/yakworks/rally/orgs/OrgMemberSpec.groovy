@@ -14,6 +14,8 @@ import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
+import yakworks.rally.orgs.model.PartitionOrg
+import yakworks.rally.seed.RallySeed
 import yakworks.rally.testing.OrgDimensionTesting
 import yakworks.spring.AppCtx
 import yakworks.testing.gorm.unit.GormHibernateTest
@@ -21,13 +23,8 @@ import yakworks.testing.gorm.unit.SecurityTest
 
 class OrgMemberSpec extends Specification implements GormHibernateTest, SecurityTest {
 
-    static entityClasses = [Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo, OrgMember]
-
-    Closure doWithGormBeans(){ { ->
-        orgDimensionService(OrgDimensionService)
-        orgService(OrgService)
-        orgProps(OrgProps)
-    }}
+    static List entityClasses = RallySeed.entityClasses
+    static List springBeans = RallySeed.springBeanList
 
     void "sanity check build"() {
         when:

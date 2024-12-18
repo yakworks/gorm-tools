@@ -103,7 +103,9 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         }
         //do partitionOrg update here in beforePersist,
         //because after persist, the dirty state gets reset and we can not check if name/num has changed
-        partitionOrgRepo.createOrUpdate(org)
+        if (org.isOrgType(orgProps.partition.type)) {
+            partitionOrgRepo.createOrUpdate(org)
+        }
     }
 
     /**
@@ -151,7 +153,12 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         }
         orgTagRepo.remove(org)
         contactRepo.removeAll(org)
-        partitionOrgRepo.removeForOrg(org)
+
+        if (org.isOrgType(orgProps.partition.type)) {
+            //pass PersistArgs, because default removeById(long) is disabled in PartitionOrgRepo to prevent deletion from API
+            //As delete through api calls removeById(id)
+            partitionOrgRepo.removeById(org.id, PersistArgs.defaults())
+        }
     }
 
     /**

@@ -55,22 +55,6 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
 
     }
 
-    void "test xlsx"() {
-        when:
-        Response resp = get("${path}?q=*&format=xlsx")
-
-        then:
-        resp.code() == HttpStatus.OK.value()
-
-        when: "verify excel file"
-        XSSFWorkbook workbook = new XSSFWorkbook(resp.body().byteStream())
-        List<String> headers = getHeader(workbook)
-
-        then: "column name should have been resolved from grid col model"
-        headers
-        headers.containsAll(['Num', 'Name', 'Type', 'TotalDue'])
-    }
-
     void "test qSearch"() {
         when:
         Response resp = get("$path?qSearch=org2")

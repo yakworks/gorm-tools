@@ -50,7 +50,7 @@ class PartitionOrgRestApiSpec  extends Specification implements OkHttpRestTrait,
 
         then:
         !body.ok
-        body.detail == 'Can not create Partition org'
+        body.detail == 'Creating new PartitionOrg is not allowed'
     }
 
     void "update is disabled"() {
@@ -60,7 +60,7 @@ class PartitionOrgRestApiSpec  extends Specification implements OkHttpRestTrait,
 
         then:
         !body.ok
-        body.detail == 'Can not update Partition org'
+        body.detail == 'Updating PartitionOrg is not allowed'
     }
 
     void "delete is disabled"() {
@@ -70,6 +70,6 @@ class PartitionOrgRestApiSpec  extends Specification implements OkHttpRestTrait,
 
         then:
         !body.ok
-        body.detail == 'Can not delete Partition org'
+        body.detail == 'Deleting PartitionOrg is not allowed'
     }
 }

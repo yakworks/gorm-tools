@@ -22,13 +22,6 @@ import yakworks.rally.orgs.model.Org
 @Slf4j
 class OrgRepo extends AbstractOrgRepo {
 
-    //@Autowired OrgQuery orgQuery
-
-    // @Override
-    // QueryService getQueryService(){
-    //     orgQuery
-    // }
-
     // add @Override
     @RepoListener
     void beforeValidate(Org org, Errors errors) {

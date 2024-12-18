@@ -3,6 +3,7 @@ package yakworks.rally.orgs
 import spock.lang.Specification
 import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.PartitionOrg
 import yakworks.rally.orgs.repo.PartitionOrgRepo
@@ -12,7 +13,7 @@ import yakworks.testing.gorm.unit.SecurityTest
 import javax.inject.Inject
 
 class PartitionOrgRepoSpec extends Specification implements GormHibernateTest, SecurityTest {
-    static List entityClasses = [Org, OrgType, PartitionOrg]
+    static List entityClasses = [Org, OrgTag, OrgType, PartitionOrg]
     static List springBeans = [OrgProps ]
 
     @Inject PartitionOrgRepo repo
@@ -29,10 +30,10 @@ class PartitionOrgRepoSpec extends Specification implements GormHibernateTest, S
         flush()
 
         then:
-        PartitionOrg.exists(org.id)
+        PartitionOrg.repo.exists(org.id)
 
         when: "removeForOrg"
-        repo.removeForOrg(org)
+        Org.repo.removeById(org.id)
         flush()
 
         then:

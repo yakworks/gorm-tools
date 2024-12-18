@@ -60,7 +60,9 @@ class ExcelBuilderSupport {
         if(colModel){
             colModel.each {
                 if(!it.hidden) {
-                    colMap[(it.name as String)] = it.label as String
+                    //colModel would need to atleast specify field name, but if label is provided it would be used for xls header
+                    //name is the name of domain field, label is what gets displayed as xls header
+                    colMap[(it.name as String)] = (it.label ?: it.name) as String
                 }
             }
         }

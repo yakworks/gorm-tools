@@ -32,7 +32,7 @@ class ExcelExportSpec extends Specification implements OkHttpRestTrait, WithTrx 
 
         then: "column name should have been resolved from grid col model"
         headers
-        //flex.text1 does not have a label
-        headers.containsAll(['Num', 'Name', 'Type', 'TotalDue', 'flex.text1'])
+        //flex.text1 does not have a label, so it would have used getNaturalTitle on name
+        headers.containsAll(['Num', 'Name', 'Type', 'TotalDue', 'Flex Text1'])
     }
 }

@@ -4,6 +4,7 @@ import org.apache.commons.lang3.RandomStringUtils
 
 import spock.lang.Specification
 import yakworks.rally.config.OrgProps
+import yakworks.rally.orgs.model.Company
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
@@ -178,6 +179,26 @@ class OrgSpec extends Specification implements GormHibernateTest, SecurityTest {
         OrgType.Branch   | [orgTypeId: '3']
         OrgType.Branch   | [type: OrgType.Branch]
         OrgType.Branch   | [type: [id: 3]]
+    }
+
+    void "ensure company"() {
+        when: "type is company"
+        Org one = Org.repo.create(num:"one", name:"one", type:OrgType.Company)
+
+        then:
+        one.companyId == one.id
+
+        when: "type is other thn company and companyId is provided in data"
+        Org two = Org.repo.create(num:"two", name:"two", type:OrgType.Customer, companyId:3)
+
+        then:
+        two.companyId == 3
+
+        when: "type is other thn company and companyId is not provided"
+        Org three = Org.repo.create(num:"three", name:"three", type:OrgType.Customer)
+
+        then:
+        three.companyId == Company.DEFAULT_COMPANY_ID
     }
 
 }

@@ -2,6 +2,7 @@ package yakworks.rally.orgs
 
 import gorm.tools.problem.ValidationProblem
 import spock.lang.Specification
+import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail
 import yakworks.rally.orgs.model.ContactPhone
@@ -10,6 +11,8 @@ import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTypeSetup
+import yakworks.rally.orgs.model.PartitionOrg
+import yakworks.rally.seed.RallySeed
 import yakworks.rally.testing.MockData
 import yakworks.security.gorm.model.AppUser
 import yakworks.testing.gorm.RepoTestData
@@ -17,7 +20,8 @@ import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
 class ContactSpec extends Specification implements GormHibernateTest, SecurityTest {
-    static List<Class> entityClasses = [ Contact, AppUser, Org, OrgSource, OrgTypeSetup, Location, ContactPhone, ContactSource, ContactEmail]
+    static List entityClasses = RallySeed.entityClasses
+    static List springBeans = RallySeed.springBeanList
 
     Contact createContactWithUser(){
         Contact contact = MockData.contact([firstName: "John", lastName: 'Galt',  email: "al@9ci.io"])

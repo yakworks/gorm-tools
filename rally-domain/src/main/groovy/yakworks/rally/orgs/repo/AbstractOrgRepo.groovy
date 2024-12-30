@@ -17,7 +17,7 @@ import gorm.tools.model.SourceType
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
-import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.AfterRemoveEvent
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
@@ -33,7 +33,6 @@ import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgType
-import yakworks.rally.orgs.model.PartitionOrg
 
 /**
  * base or OrgRepo. common functionality refactored out so can be overriden in application.
@@ -73,8 +72,8 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
     @RepoListener
     void beforeBind(Org org, Map data, BeforeBindEvent be) {
         if (be.isBindCreate()) {
-            ensureCompany(org)
             org.type = getOrgTypeFromData(data)
+
             //bind id early or generate one as we use it in afterBind
             if(data.id) {
                 //dont depend on the args.bindId setting and always do it
@@ -82,6 +81,14 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
             } else {
                 generateId(org)
             }
+        }
+    }
+
+    @RepoListener
+    void afterBind(Org org, Map data, AfterBindEvent e) {
+        if (e.isBindCreate()) {
+            //ensureCompany in afterBind, as it needs to check companyId and orgType and id, by now all of em would have been set
+            ensureCompany(org)
         }
     }
 

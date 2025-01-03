@@ -66,7 +66,7 @@ class CSVPathKeyMapReader extends CSVReaderHeaderAware {
      * @return the list of maps for entire file
      */
     List<Map<String, Object>> readAllRows() {
-        List result = []
+        List result = [] as List<Map<String, Object>>
         while (hasNext) {
             Map r = readMap()
             if(r) result << r
@@ -103,11 +103,11 @@ class CSVPathKeyMapReader extends CSVReaderHeaderAware {
     /**
      * Converts, string with value "null" constant, to null
      */
-     static <K, V> Map<K, V> convertNullStrings(Map<K, V> map) {
-        if(!map) return map
+    static <K, V> Map<K, V> convertNullStrings(Map<K, V> map) {
+        if (!map) return map
         return map.collectEntries { k, v ->
-            if(v instanceof String && v.trim() == "null") v = null
-            else if(v instanceof Map) v = convertNullStrings(v)
+            if (v instanceof String && v.trim() == "null") v = null
+            else if (v instanceof Map) v = convertNullStrings(v)
             return [k, v]
         } as Map<K, V>
     }

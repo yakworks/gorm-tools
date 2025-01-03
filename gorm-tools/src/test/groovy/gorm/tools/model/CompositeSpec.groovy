@@ -35,8 +35,8 @@ class CompositeSpec extends Specification implements GormHibernateTest {
         !ent2.isNew()
         ent2.linkedId == 99
         //gorm adds the id and version columns anyway but they are null
-        !ent.id
-        !ent.version
+        !ent2.id
+        !ent2.version
 
     }
 

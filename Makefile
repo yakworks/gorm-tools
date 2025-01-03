@@ -158,7 +158,7 @@ test.benchmarks:
 #		-XX:+ScavengeBeforeFullGC -XX:+CMSScavengeBeforeRemark \
 #		-XX:SurvivorRatio=8 \
 
-# start the rally-api example jar
+## start the rally-api example jar
 start.rally-api: # start.db
 	${gradlew} rally-api:assemble
 	cd examples/rally-api

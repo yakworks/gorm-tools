@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Qualifier
 
 import gorm.tools.async.AsyncArgs
 import gorm.tools.async.ParallelTools
-import gorm.tools.beans.EntityResult
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobService
@@ -27,6 +26,7 @@ import gorm.tools.repository.events.AfterBulkSaveEntityEvent
 import gorm.tools.repository.events.BeforeBulkSaveEntityEvent
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.DataOp
+import gorm.tools.repository.model.EntityResult
 import yakworks.api.ApiResults
 import yakworks.api.HttpStatus
 import yakworks.api.Result

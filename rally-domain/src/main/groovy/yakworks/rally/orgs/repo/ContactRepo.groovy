@@ -76,13 +76,15 @@ class ContactRepo extends LongIdGormRepo<Contact> {
 
 
     @Override
-    void doBeforePersistWithData(Contact contact, PersistArgs args) {
-        Map data = args.data
-        if (args.bindAction == BindAction.Create) {
-            setupSource(contact, data)
+    void doBeforePersist(Contact contact, PersistArgs args) {
+        if(args.bindAction && args.data) {
+            Map data = args.data
+            if (args.bindAction == BindAction.Create) {
+                setupSource(contact, data)
+            }
+            // we do primary location and contact here before persist so we persist org only once with contactId it is created
+            if (data.location) createOrUpdateLocation(contact, data.location as Map)
         }
-        // we do primary location and contact here before persist so we persist org only once with contactId it is created
-        if(data.location) createOrUpdateLocation(contact, data.location as Map)
     }
 
     /**
@@ -136,22 +138,24 @@ class ContactRepo extends LongIdGormRepo<Contact> {
     }
 
     /**
-     * Called from doAfterPersist and before afterPersist event
+     * Called from doPersist and right before afterPersist event
      * if its had a bind action (create or update) and it has data
      * creates or updates One-to-Many associations for this entity.
      */
     @Override
-    void doAfterPersistWithData(Contact contact, PersistArgs args) {
-        Map data = args.data
-        if(data.getBoolean(IS_PRIMARY)) {
-            Org org = Org.get(contact.orgId)
-            org.contact = contact
-            org.persist()
+    void doAfterPersist(Contact contact, PersistArgs args) {
+        if (args.bindAction && args.data) {
+            Map data = args.data
+            if (data.getBoolean(IS_PRIMARY)) {
+                Org org = Org.get(contact.orgId)
+                org.contact = contact
+                org.persist()
+            }
+            if (data.locations) super.persistToManyData(contact, Location.repo, data.locations as List<Map>, "contact")
+            if (data.phones) super.persistToManyData(contact, ContactPhone.repo, data.phones as List<Map>, "contact")
+            if (data.emails) super.persistToManyData(contact, ContactEmail.repo, data.emails as List<Map>, "contact")
+            if (data.tags != null) TagLink.addOrRemoveTags(contact, data.tags)
         }
-        if(data.locations) super.persistToManyData(contact, Location.repo, data.locations as List<Map>, "contact")
-        if(data.phones) super.persistToManyData(contact, ContactPhone.repo, data.phones as List<Map>, "contact")
-        if(data.emails) super.persistToManyData(contact, ContactEmail.repo, data.emails as List<Map>, "contact")
-        if(data.tags != null) TagLink.addOrRemoveTags(contact, data.tags)
     }
 
     void removeAll(Org org) {

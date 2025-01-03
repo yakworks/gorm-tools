@@ -5,37 +5,19 @@ import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
-import yakworks.rally.activity.model.ActivityContact
-import yakworks.rally.activity.model.ActivityLink
-import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.model.Task
 import yakworks.rally.activity.model.TaskStatus
 import yakworks.rally.activity.model.TaskType
-import yakworks.rally.attachment.model.AttachmentLink
-import yakworks.rally.mail.model.MailMessage
-import yakworks.rally.orgs.model.Contact
-import yakworks.rally.orgs.model.ContactSource
-import yakworks.rally.orgs.model.Org
+import yakworks.rally.seed.RallySeed
 import yakworks.rally.testing.MockData
-import yakworks.security.gorm.model.AppUser
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
 class ActivityServiceSpec extends Specification implements GormHibernateTest, SecurityTest { //implements SecuritySpecUnitTestHelper{
-    static List<Class> entityClasses = [
-        MailMessage, AttachmentLink, ActivityLink, Activity, Task, TaskType, TaskStatus,
-        Org, AppUser, ActivityNote, Contact, ContactSource, ActivityContact
-    ]
+    static List entityClasses = RallySeed.entityClasses
+    static List springBeans = RallySeed.springBeanList + [ActivityService]
 
     @Autowired ActivityService activityService
-
-    Closure doWithGormBeans() { { ->
-        activityService(ActivityService)
-        // attachmentSupport(AttachmentSupport)
-        // mailMessageSender(MailMessageSender)
-        // emailService(TestMailService)
-        // mailProps(MailProps)
-    }}
 
     @Shared Long orgId
 

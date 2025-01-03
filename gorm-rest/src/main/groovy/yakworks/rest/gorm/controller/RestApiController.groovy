@@ -71,7 +71,12 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRespon
         ClassUtils.getStaticPropertyValue(this.class.metaClass, 'namespace') as String
     }
 
+    //This is the normal Grails exception handler that is automaticaly wrap in actions by the AST
     def handleException(Exception e) {
+        handleThrowable(e)
+    }
+
+    void handleThrowable(Throwable e) {
         /*
          * Broken pipe exception occurs when connection is closed before server has finished writing response.
          * Once that happens, trying to write any response to output stream will result in broken pipe.
@@ -80,13 +85,6 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRespon
         if(isBrokenPipe(e)) {
             return
         }
-        else {
-            Problem apiError = problemHandler.handleException(e)
-            respondWith(apiError)
-        }
-    }
-
-    void handleThrowable(Throwable e) {
         Problem apiError = problemHandler.handleException(e)
         respondWith(apiError)
     }

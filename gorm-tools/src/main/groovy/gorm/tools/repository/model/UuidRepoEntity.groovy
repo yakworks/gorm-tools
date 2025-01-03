@@ -6,8 +6,6 @@ package gorm.tools.repository.model
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.repository.GormRepo
-
 /**
  * Default trait for a domain that has a concrete implemented repo and mango query methods.
  *
@@ -15,6 +13,6 @@ import gorm.tools.repository.GormRepo
  * @since 6.1
  */
 @CompileStatic
-trait UuidRepoEntity<D, R extends GormRepo<D>> implements PersistableRepoEntity<D, R, UUID> {
+trait UuidRepoEntity<D> implements PersistableRepoEntity<D, UUID> {
 
 }

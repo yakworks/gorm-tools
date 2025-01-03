@@ -39,12 +39,12 @@ trait IdGeneratorRepo<D> { //implements GenerateId<Long> {
 
     /**
      * if entity.id is null then generates and assigns new id to id property on entity,
-     * if entity.id is already set then it just returns it
+     * if entity.id is already set then it just returns
      */
     @Override
-    Long generateId(Persistable<Long> entity){
+    Serializable generateId(Persistable entity){
         if (entity.id == null) entity.id = generateId()
-        return entity.id
+        return entity.id as Serializable
     }
 
     /**

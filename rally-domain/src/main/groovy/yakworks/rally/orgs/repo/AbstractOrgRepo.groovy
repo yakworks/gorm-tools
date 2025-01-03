@@ -17,6 +17,7 @@ import gorm.tools.model.SourceType
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
+import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.AfterRemoveEvent
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
@@ -24,6 +25,7 @@ import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.utils.GormMetaUtils
 import gorm.tools.validation.Rejector
+import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.OrgService
 import yakworks.rally.orgs.model.Company
 import yakworks.rally.orgs.model.Contact
@@ -37,15 +39,14 @@ import yakworks.rally.orgs.model.OrgType
  */
 @CompileStatic
 abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
+
     @Inject LocationRepo locationRepo
-
     @Inject ContactRepo contactRepo
-
     @Inject OrgTagRepo orgTagRepo
-
     @Inject OrgSourceRepo orgSourceRepo
-
     @Inject OrgService orgService
+    @Inject OrgProps orgProps
+    @Inject PartitionOrgRepo partitionOrgRepo
 
     @RepoListener
     void beforeValidate(Org org, Errors errors) {
@@ -71,8 +72,8 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
     @RepoListener
     void beforeBind(Org org, Map data, BeforeBindEvent be) {
         if (be.isBindCreate()) {
-            ensureCompany(org)
             org.type = getOrgTypeFromData(data)
+
             //bind id early or generate one as we use it in afterBind
             if(data.id) {
                 //dont depend on the args.bindId setting and always do it
@@ -83,32 +84,57 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         }
     }
 
-    @Override
-    void doBeforePersistWithData(Org org, PersistArgs args) {
-        Map data = args.data
-        if (args.bindAction == BindAction.Create) {
-            verifyNumAndOrgSource(org, data)
-            //if no orgType then let it fall through and fail validation, orgService is nullable so its easier to mock for testing
-            if(org.type && orgService?.isOrgMemberEnabled())
-                orgService.setupMember(org, data.remove('member') as Map)
+    @RepoListener
+    void afterBind(Org org, Map data, AfterBindEvent e) {
+        if (e.isBindCreate()) {
+            //ensureCompany in afterBind, as it needs to check companyId and orgType and id, by now all of em would have been set
+            ensureCompany(org)
         }
-        // we do primary location and contact here before persist so we persist org only once with contactId it is created
-        if(data.location) createOrUpdatePrimaryLocation(org, data.location as Map)
-        // do contact, support keyContact for legacy and Customers
-        def contactData = data.contact ?: data.keyContact
-        if(contactData) createOrUpdatePrimaryContact(org, contactData as Map)
+    }
+
+    @Override
+    void doBeforePersist(Org org, PersistArgs args) {
+        if(args.bindAction && args.data) {
+            Map data = args.data
+            if (args.bindAction == BindAction.Create) {
+                verifyNumAndOrgSource(org, data)
+                //if no orgType then let it fall through and fail validation, orgService is nullable so its easier to mock for testing
+                if (org.type && orgService?.isOrgMemberEnabled())
+                    orgService.setupMember(org, data.remove('member') as Map)
+            }
+            // we do primary location and contact here before persist so we persist org only once with contactId it is created
+            if (data.location) createOrUpdatePrimaryLocation(org, data.location as Map)
+            // do contact, support keyContact for legacy and Customers
+            def contactData = data.contact ?: data.keyContact
+            if (contactData) createOrUpdatePrimaryContact(org, contactData as Map)
+        }
+        partitionOrgCreateOrUpdate(org)
     }
 
     /**
-     * Called after persist if its had a bind action (create or update) and it has data
+     * do partitionOrg update here in beforePersist because after persist, the dirty state gets reset
+     * and we can not check if name/num has changed
+     */
+    void partitionOrgCreateOrUpdate(Org org){
+        //orgProps can't be null unless its unit testing, so allowing null makes it easier to mock up test data
+        if (orgProps && org.isOrgType(orgProps.partition.type)) {
+            partitionOrgRepo.createOrUpdate(org)
+        }
+    }
+
+    /**
+     * Called after persist
+     * if its had a bind action (create or update) and it has data
      * creates or updates One-to-Many associations for this entity.
      */
     @Override
-    void doAfterPersistWithData(Org org, PersistArgs args) {
-        Map data = args.data
-        if(data.locations) persistToManyWithOrgId(org, Location.repo, data.locations as List<Map>)
-        if(data.contacts) persistToManyWithOrgId(org, Contact.repo, data.contacts as List<Map>)
-        if(data.tags != null) orgTagRepo.addOrRemove((Persistable)org, data.tags)
+    void doAfterPersist(Org org, PersistArgs args) {
+        if (args.bindAction && args.data) {
+            Map data = args.data
+            if (data.locations) persistToManyWithOrgId(org, Location.repo, data.locations as List<Map>)
+            if (data.contacts) persistToManyWithOrgId(org, Contact.repo, data.contacts as List<Map>)
+            if (data.tags != null) orgTagRepo.addOrRemove((Persistable) org, data.tags)
+        }
     }
 
     @Override
@@ -141,6 +167,12 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         }
         orgTagRepo.remove(org)
         contactRepo.removeAll(org)
+
+        if (org.isOrgType(orgProps.partition.type)) {
+            //pass PersistArgs, because default removeById(long) is disabled in PartitionOrgRepo to prevent deletion from API
+            //As delete through api calls removeById(id)
+            partitionOrgRepo.removeById(org.id, PersistArgs.defaults())
+        }
     }
 
     /**

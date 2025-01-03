@@ -12,6 +12,7 @@ import spock.lang.Ignore
 import spock.lang.IgnoreRest
 import yakworks.commons.lang.IsoDateUtil
 import gorm.tools.repository.model.RepoEntity
+import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.unit.DataRepoTest
 import yakworks.commons.model.IdEnum
 import grails.databinding.converters.ValueConverter
@@ -26,15 +27,14 @@ import yakworks.testing.gorm.model.KitchenSink
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
+import yakworks.testing.gorm.unit.GormHibernateTest
+
+class EntityMapBinderUnitSpec extends Specification implements GormHibernateTest {
+    static List<Class> entityClasses = [TestDomain, Nest, AnotherDomain, BindableNested, KitchenSink]
     EntityMapBinder binder
 
     void setup() {
         binder = new EntityMapBinder()
-    }
-
-    Class[] getDomainClassesToMock() {
-        [TestDomain, Nest, AnotherDomain, BindableNested, KitchenSink]
     }
 
     void "should bind numbers without going through converters"() {
@@ -485,6 +485,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         //association
         testDomain.notBindableNested == null
     }
+
 
     void "binder shouldn't initialize proxy when checks association's id"() {
         BindableNested nested = new BindableNested(name: 'proxy').save(failOnError: true)

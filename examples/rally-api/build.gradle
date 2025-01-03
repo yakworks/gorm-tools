@@ -16,8 +16,13 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
   // implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-  implementation 'org.springframework.boot:spring-boot-starter-mustache'
+  //implementation 'org.springframework.boot:spring-boot-starter-mustache'
+
   implementation('pl.allegro.tech.boot:handlebars-spring-boot-starter:0.4.1')
+
+  // implementation "com.github.jknack:handlebars:$vHandlebars"
+  // implementation "com.github.jknack:handlebars-springmvc:$vHandlebars"
+  // implementation "com.github.jknack:handlebars-guava-cache:$vHandlebars"
 
   // === Spring Sec ===
   implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -105,5 +110,5 @@ integrationTest.doFirst {
 }
 
 springBoot {
-  mainClass = 'yakworks.rally.boot.SpringApplication'
+  mainClass = 'yakworks.rally.SpringApplication'
 }

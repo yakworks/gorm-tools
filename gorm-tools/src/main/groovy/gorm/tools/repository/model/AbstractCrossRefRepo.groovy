@@ -11,7 +11,6 @@ import groovy.util.logging.Slf4j
 
 import org.codehaus.groovy.runtime.InvokerHelper
 
-import gorm.tools.beans.EntityResult
 import gorm.tools.databinding.BindAction
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.model.Persistable
@@ -267,10 +266,10 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
 
         //default is to replace the tags with whats in tagParams
         if (itemParams instanceof Map) {
-            DataOp op = DataOp.get(itemParams.op)
-            List dataList = (List)itemParams.data
+            DataOp op = DataOp.get(itemParams['op'])
+            List dataList = (List)itemParams['data']
 
-            Validate.isTrue(itemParams.data instanceof List)
+            Validate.isTrue(itemParams['data'] instanceof List)
             if(op == DataOp.update) {
                 xlist =  addOrRemoveList(main, dataList as List)
             }

@@ -53,7 +53,7 @@ class RestResponderService {
         final HttpServletResponse response = webRequest.getCurrentResponse()
         MimeType[] mimeTypes = getResponseFormat(response)
 
-        Renderer renderer = null
+        Renderer renderer
 
         for(MimeType mimeType in mimeTypes) {
             if (mimeType == MimeType.ALL && formats) {
@@ -90,7 +90,7 @@ class RestResponderService {
         final ServletRenderContext context = new ServletRenderContext(webRequest, args)
         if(statusCode != null) context.status = HttpStatus.valueOf(statusCode)
 
-        renderer.render(value, context)
+        ((Renderer<Object>)renderer).render(value, context)
 
         // BenchmarkHelper.printEndTimeMsg("${renderer.class} render")
 

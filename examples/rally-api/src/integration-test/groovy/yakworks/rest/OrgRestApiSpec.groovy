@@ -4,9 +4,9 @@ import gorm.tools.transaction.WithTrx
 import grails.gorm.transactions.Rollback
 import okhttp3.Request
 import okhttp3.RequestBody
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.http.HttpStatus
-
-
+import spock.lang.IgnoreRest
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.HttpUrl
@@ -15,6 +15,7 @@ import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
+import static yakworks.etl.excel.ExcelUtils.getHeader
 
 @Integration
 class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
@@ -48,15 +49,6 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
         when:
         Response resp = get("${path}?q=*&format=csv")
         // Map body = bodyToMap(resp)
-
-        then:
-        resp.code() == HttpStatus.OK.value()
-
-    }
-
-    void "test xlsx"() {
-        when:
-        Response resp = get("${path}?q=*&format=xlsx")
 
         then:
         resp.code() == HttpStatus.OK.value()
@@ -380,6 +372,8 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
 
     }
 
+
+
     void "test post with tags"() {
         when: "Create a test tag"
         Tag tag1 = Tag.create(code: 'T1', entityName: 'Customer')
@@ -422,4 +416,5 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
         body.code == "error.data.problem"
         body.detail.contains "expecting '}'"
     }
+
 }

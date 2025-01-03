@@ -9,7 +9,7 @@ import yakworks.rest.gorm.mapping.RepoApiMappingsService
 class UrlMappings {
 
     static mappings = {
-        println "parsing restify UrlMappings"
+        println "parsing rally-api UrlMappings"
         "/"(controller: 'application', action:'index')
         "/hazel-hibernate"(controller: 'application', action:'hazelHibernate')
         "/hazel-caches"(controller: 'application', action:'hazel')
@@ -44,7 +44,9 @@ class UrlMappings {
         "/forbidden"(controller: "forbidden")
         // "404"(controller: "errorProblem", action: 'notFound404')
 
-
+        //to test errors and error handlers
+        post "/api/rally/exceptionTest/runtimeException"(controller: 'exceptionTest', action:'runtimeException', namespace:'rally')
+        post "/api/rally/exceptionTest/throwable"(controller: 'exceptionTest', action:'throwable', namespace:'rally')
     }
 
     static void runClosure(Closure mappingClosure, Object delegate) {

@@ -200,6 +200,8 @@ trait CrudApiController<D> extends RestApiController {
             log.debug("list with gParams ${qParams}")
             Pager pager = getCrudApi().list(qParams, toURI())
             //we pass in the params to args so it can get passed on to renderer, used in the excel renderer for example
+            //pass entityClassName, if required renderers can use it. excel renders use it for getting column mapping from config
+            qParams['entityClassName'] = entityClass.name
             respondWith(pager, [params: qParams])
         } catch (Exception | AssertionError e) {
             handleThrowable(e)
@@ -314,8 +316,13 @@ trait CrudApiController<D> extends RestApiController {
         return HttpRequest.newBuilder().uri(newUri).GET().build()
     }
 
+    // @Override
+    // def handleException(Exception e) {
+    //     handleThrowable(e)
+    // }
+
     @Override
-    def handleException(Exception e) {
+    void handleThrowable(Throwable e) {
         /*
          * Broken pipe exception occurs when connection is closed before server has finished writing response.
          * Once that happens, trying to write any response to output stream will result in broken pipe.
@@ -324,14 +331,8 @@ trait CrudApiController<D> extends RestApiController {
         if (isBrokenPipe(e)) {
             return
         }
-        else {
-            Problem apiError = problemHandler.handleException(e, getEntityClass()?.simpleName)
-            respondWith(apiError)
-        }
-    }
 
-    @Override
-    void handleThrowable(Throwable e) {
+        //do the rest
         Problem apiError
         if(e instanceof LockTimeoutException){
             //thrown from locking in hazelcast cache

@@ -71,14 +71,14 @@ class OrgProps {
          */
         List<OrgType> dimension = [OrgType.Customer, OrgType.Company]
 
-        void setDimension(List<OrgType> v){
+        void setDimension(List v){
             //Spring binding doesnt convert list strings to OrgTypes for some reason here, do it manually
             dimension = v.collect { it as OrgType}
         }
 
         List<OrgType> dimension2
 
-        void setDimension2(List<OrgType> v){
+        void setDimension2(List v){
             dimension2 = v.collect { it as OrgType}
         }
     }

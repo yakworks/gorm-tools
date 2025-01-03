@@ -65,6 +65,7 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
 
     HibernateAliasProjectionList hibernateAliasProjectionList
 
+    //hack so private hasJoins is accesible.
     Field hasJoinsField
 
     HibernateMangoQuery(Criteria criteria, AbstractHibernateSession session, PersistentEntity entity) {
@@ -284,7 +285,7 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
      */
     @Override
     List list() {
-        def criteria = getHibernateCriteria()
+        Criteria criteria = getHibernateCriteria()
         if(criteria == null) throw new IllegalStateException("Cannot execute query using a detached criteria instance");
 
         int projectionLength = initProjections()
@@ -358,19 +359,19 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
     /**
      * List but uses the CriteriaSpecification.ALIAS_TO_ENTITY_MAP for projection queries
      */
-    List mapList() {
-        def crit = getHibernateCriteria()
-        if(crit == null) throw new IllegalStateException("Cannot execute query using a detached criteria instance");
-
-        int projectionLength = initProjections()
-        crit.setResultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP);
-
-        // applyDefaultSortOrderAndCaching()
-        // applyFetchStrategies()
-
-        // return listForCriteria()
-        return crit.list()
-    }
+    // List mapList() {
+    //     def crit = getHibernateCriteria()
+    //     if(crit == null) throw new IllegalStateException("Cannot execute query using a detached criteria instance");
+    //
+    //     int projectionLength = initProjections()
+    //     crit.setResultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP);
+    //
+    //     // applyDefaultSortOrderAndCaching()
+    //     // applyFetchStrategies()
+    //
+    //     // return listForCriteria()
+    //     return crit.list()
+    // }
 
     /**
      * get the hibernate ProjectionList for when customer query access is needed

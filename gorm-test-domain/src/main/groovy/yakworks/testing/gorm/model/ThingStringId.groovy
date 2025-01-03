@@ -5,12 +5,11 @@
 package yakworks.testing.gorm.model
 
 import gorm.tools.model.NameCode
-import gorm.tools.repository.GormRepo
-import gorm.tools.repository.model.StringIdRepoEntity
+import gorm.tools.repository.model.PersistableRepoEntity
 import grails.persistence.Entity
 
 @Entity
-class ThingStringId implements NameCode<ThingStringId>, StringIdRepoEntity<ThingStringId, GormRepo> {
+class ThingStringId implements NameCode<ThingStringId>, PersistableRepoEntity<ThingStringId, String> {
 
     //Need to have explicit String id field for class to compile.
     //Otherwise, grails AST will add Long field by default, Persistable also requires getId() to match the generic type for ID

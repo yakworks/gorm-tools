@@ -75,10 +75,11 @@ class OrgService {
         if(immediateParents && !org.member) org.member = OrgMember.make(org)
 
         //if company is in parent, but not explicitely provided, take it from org.companyId
-        if(immediateParents.contains(OrgType.Company) && (!params || !params.containsKey(OrgType.Company.propertyName))) {
-            if(!params) params = [:]
-            params[OrgType.Company.propertyName] = [id:org.companyId]
-        }
+        //XXX blowing up tests in domain9
+        // if(immediateParents.contains(OrgType.Company) && (!params || !params.containsKey(OrgType.Company.propertyName))) {
+        //     if(!params) params = [:]
+        //     params[OrgType.Company.propertyName] = [id:org.companyId]
+        // }
 
         if(!params) return
 

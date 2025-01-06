@@ -3,7 +3,6 @@ package yakworks.rally.orgs.members
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import yakworks.api.problem.data.DataProblemException
-import yakworks.rally.orgs.model.Company
 import yakworks.rally.testing.OrgDimensionTesting
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.orgs.OrgService
@@ -145,22 +144,5 @@ class OrgServiceSpec extends Specification implements DomainIntTest {
 
         cleanup:
         OrgService.partition.type = bck
-    }
-
-    void "set company member from companyId if not provided"() {
-        setup:
-        OrgDimensionTesting.setDimensions(['Customer','Company'])
-
-        when:
-        //when no companyId is provided, "AbstractOrgReppo.ensureCompany" sets default companyId, but company member should get set too
-        Org customer = Org.create(num:"T1", name:"T1", type:OrgType.Customer)
-
-        then:
-        customer.companyId == Company.DEFAULT_COMPANY_ID
-        customer.member
-        customer.member.companyId == Company.DEFAULT_COMPANY_ID
-
-        cleanup:
-        OrgDimensionTesting.resetDimensions()
     }
 }

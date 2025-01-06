@@ -101,16 +101,9 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
             def contactData = data.contact ?: data.keyContact
             if (contactData) createOrUpdatePrimaryContact(org, contactData as Map)
         }
-        partitionOrgCreateOrUpdate(org)
-    }
-
-    /**
-     * do partitionOrg update here in beforePersist because after persist, the dirty state gets reset
-     * and we can not check if name/num has changed
-     */
-    void partitionOrgCreateOrUpdate(Org org){
-        //orgProps can't be null unless its unit testing, so allowing null makes it easier to mock up test data
-        if (orgProps && org.isOrgType(orgProps.partition.type)) {
+        //do partitionOrg update here in beforePersist,
+        //because after persist, the dirty state gets reset and we can not check if name/num has changed
+        if (org.isOrgType(orgProps.partition.type)) {
             partitionOrgRepo.createOrUpdate(org)
         }
     }

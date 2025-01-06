@@ -7,15 +7,20 @@ import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
+import yakworks.rally.activity.model.ActivityContact
+import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
+import yakworks.rally.activity.model.TaskType
+import yakworks.rally.activity.repo.ActivityQuery
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
-import yakworks.rally.seed.RallySeed
+import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.tag.model.Tag
+import yakworks.rally.tag.model.TagLink
 import yakworks.rally.testing.MockData
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
@@ -23,9 +28,11 @@ import yakworks.testing.gorm.unit.SecurityTest
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 
 class ActivityMailSpec extends Specification implements GormHibernateTest, SecurityTest {
-
-    static List entityClasses = RallySeed.entityClasses + [MailMessage, AttachmentLink]
-    static List springBeans = RallySeed.springBeanList + [AttachmentSupport]
+    static entityClasses = [
+        AttachmentLink, ActivityLink, MailMessage, Activity, TaskType, Org, OrgTag,
+        Tag, TagLink, Attachment, ActivityNote, Contact, ActivityContact
+    ]
+    static springBeans = [AttachmentSupport, ActivityQuery]
 
     @Shared Long orgId
 

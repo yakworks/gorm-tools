@@ -11,14 +11,12 @@ import yakworks.rally.orgs.model.OrgFlex
 import yakworks.rally.orgs.model.OrgInfo
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
-import yakworks.rally.orgs.model.PartitionOrg
-import yakworks.rally.seed.RallySeed
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
 class OrgConstraintsSpec extends Specification implements GormHibernateTest, SecurityTest {
-    static List entityClasses = RallySeed.entityClasses
-    static List springBeans = RallySeed.springBeanList
+    static List entityClasses = [Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo]
+    static List springBeans = [OrgProps, OrgDimensionService ]
 
     void "sanity check build"() {
         when:

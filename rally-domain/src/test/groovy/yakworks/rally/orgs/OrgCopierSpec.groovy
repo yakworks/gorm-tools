@@ -4,27 +4,49 @@ import org.springframework.beans.factory.annotation.Autowired
 
 import spock.lang.Specification
 import yakworks.rally.activity.ActivityCopier
+import yakworks.rally.activity.model.Activity
+import yakworks.rally.activity.model.ActivityLink
+import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.rally.config.OrgProps
+import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail
+import yakworks.rally.orgs.model.ContactFlex
 import yakworks.rally.orgs.model.ContactPhone
+import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgCalc
 import yakworks.rally.orgs.model.OrgFlex
 import yakworks.rally.orgs.model.OrgInfo
 import yakworks.rally.orgs.model.OrgMember
-import yakworks.rally.seed.RallySeed
+import yakworks.rally.orgs.model.OrgSource
+import yakworks.rally.orgs.model.OrgTag
+import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.rally.testing.OrgDimensionTesting
 import yakworks.testing.gorm.RepoTestData
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
 class OrgCopierSpec extends Specification implements GormHibernateTest, SecurityTest {
-    static List entityClasses = RallySeed.entityClasses + [AttachmentLink]
-    static List springBeans = RallySeed.springBeanList +  [ActivityCopier, OrgCopier]
+    static List entityClasses = [
+        Org, Contact, OrgFlex, OrgMember, OrgCalc, OrgSource, OrgTag, OrgInfo, OrgTypeSetup, Location, ContactPhone,
+        ContactEmail, ContactSource, ContactFlex, Activity, ActivityLink, AttachmentLink, MailMessage, Attachment
+    ]
+
+    static List springBeans = [ActivityCopier, OrgCopier, OrgProps, OrgDimensionService ]
 
     @Autowired OrgCopier orgCopier
+
+    // Closure doWithGormBeans(){ { ->
+    //     orgDimensionService(OrgDimensionService)
+    //     orgCopier(OrgCopier)
+    //     activityCopier(ActivityCopier)
+    //     orgProps(OrgProps)
+    //     cacheManager(SimpleCacheManager)
+    //     attachmentSupport(AttachmentSupport)
+    // }}
 
     def "test copy"() {
         setup:

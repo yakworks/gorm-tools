@@ -14,14 +14,13 @@ import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
-import yakworks.rally.orgs.model.PartitionOrg
 import yakworks.testing.gorm.TestDataJson
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
 class OrgSpec extends Specification implements GormHibernateTest, SecurityTest {
 
-    static entityClasses = [Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo, OrgMember, PartitionOrg]
+    static entityClasses = [Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo, OrgMember]
 
     Closure doWithGormBeans(){ { ->
         orgDimensionService(OrgDimensionService)

@@ -1,12 +1,10 @@
 package yakworks.rally.orgs
 
 import spock.lang.Specification
-import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
-import yakworks.rally.orgs.model.PartitionOrg
 import yakworks.rally.orgs.repo.ContactSourceRepo
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
@@ -14,8 +12,7 @@ import yakworks.testing.gorm.unit.SecurityTest
 import javax.inject.Inject
 
 class ContactSourceRepoSpec extends Specification implements GormHibernateTest, SecurityTest {
-    static List entityClasses = [Contact, Org, ContactSource, PartitionOrg]
-    static List springBeans = [OrgProps]
+    static List entityClasses = [Contact, Org, ContactSource]
 
     @Inject ContactSourceRepo contactSourceRepo
 

@@ -329,7 +329,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     static ThrowableProblem toDataProblem(Throwable ex){
         var dp = DataProblem.of(ex).msg('error.query.invalid')
         //SECURITY, shorten the desc, gives to much info about query and
-        dp.detail(dp.detail.take(100))
+        if(dp.detail) dp.detail(dp.detail.take(100))
         return dp.toException()
     }
 

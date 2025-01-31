@@ -372,8 +372,6 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
 
     }
 
-
-
     void "test post with tags"() {
         when: "Create a test tag"
         Tag tag1 = Tag.create(code: 'T1', entityName: 'Customer')

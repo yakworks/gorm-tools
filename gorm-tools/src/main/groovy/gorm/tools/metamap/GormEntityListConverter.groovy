@@ -16,7 +16,7 @@ import yakworks.meta.MetaMapList
  * MetaMap.Converter for List to just show id for the gormEntity if nothing is specified.
  */
 @CompileStatic
-class GormEntityListConverter implements MetaMap.Converter {
+class GormEntityListConverter implements MetaMap.Converter, Serializable {
 
     @Override
     boolean handles(Object value) {

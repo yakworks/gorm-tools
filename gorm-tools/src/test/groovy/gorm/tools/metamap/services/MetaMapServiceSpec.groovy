@@ -4,7 +4,6 @@
 */
 package gorm.tools.metamap.services
 
-import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.api.problem.data.DataProblemException
 import yakworks.meta.MetaMap
@@ -77,7 +76,7 @@ class MetaMapServiceSpec extends Specification implements GormHibernateTest  {
         result == [num: '1', kind: 'PARENT', status:[id:2, name:'Inactive'], thing: [name: 'Thing1']]
     }
 
-    void "works with space in field and its null"() {
+    void "works with space  field and its null"() {
         when: 'a field has spaces'
         def ks = KitchenSink.get(1)
         def result = metaMapService.createMetaMap(ks, ['num', '  simplePogo.foo'])
@@ -223,7 +222,27 @@ class MetaMapServiceSpec extends Specification implements GormHibernateTest  {
 
         then:
         emap == [id: 1, ext: [id:1, name:'SinkExt1', thing: [id: 99, name: 'Thing99']]]
+    }
 
+    void "test serialize"() {
+        when: 'sanity check'
+        KitchenSink.get(1)
+        MetaMap emap = metaMapService.createMetaMap(KitchenSink.get(1), ['id', 'num', 'ext.id'])
+
+        ByteArrayOutputStream bout = new ByteArrayOutputStream()
+        ObjectOutputStream out = new ObjectOutputStream(bout)
+        out.writeObject(emap)
+        out.flush()
+
+        ObjectInputStream input = new ObjectInputStream(new ByteArrayInputStream(bout.toByteArray()))
+        MetaMap serialized = input.readObject()
+
+        then:
+        noExceptionThrown()
+
+        and:
+        3 == serialized.size()
+        serialized.getIncludes() == ['id', 'num', 'ext'] as Set
     }
 
 }

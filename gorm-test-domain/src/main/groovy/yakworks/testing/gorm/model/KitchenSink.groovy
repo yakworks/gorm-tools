@@ -24,7 +24,7 @@ import yakworks.security.audit.AuditStamp
 @Entity
 // @ManagedEntity //see ManagedEntitySinkSpec
 @GrailsCompileStatic
-class KitchenSink implements NameNum, RepoEntity<KitchenSink> {
+class KitchenSink implements NameNum, RepoEntity<KitchenSink>, Serializable {
     //<- ext belong to KitchenSink
     // since ext also has an KitchenSink property (kitchenParent) it will confused
     // example of how to explcitly force the "belongsTo"  with the mappedBy

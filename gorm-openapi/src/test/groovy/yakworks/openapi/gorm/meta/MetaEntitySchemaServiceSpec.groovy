@@ -4,7 +4,6 @@
 */
 package yakworks.openapi.gorm.meta
 
-import yakworks.testing.gorm.unit.DataRepoTest
 import io.swagger.v3.oas.models.media.DateTimeSchema
 import io.swagger.v3.oas.models.media.IntegerSchema
 import io.swagger.v3.oas.models.media.NumberSchema
@@ -117,5 +116,34 @@ class MetaEntitySchemaServiceSpec extends Specification implements GormHibernate
         date1Schema.format == "date-time"
     }
 
+    void "test serialize"() {
+        when: 'sanity check'
+        MetaEntity ment = metaEntitySchemaService.getMetaEntity(Org.name, ['id', 'name', 'flex.date1', 'flex.text1', 'flex.num1'], [])
+
+        ByteArrayOutputStream bout = new ByteArrayOutputStream()
+        ObjectOutputStream out = new ObjectOutputStream(bout)
+        out.writeObject(ment)
+        out.flush()
+
+        ObjectInputStream input = new ObjectInputStream(new ByteArrayInputStream(bout.toByteArray()))
+        MetaEntity serialized = input.readObject()
+
+        then:
+        noExceptionThrown()
+
+        when:
+        Map flatMap = ment.flattenSchema()
+
+        then:
+        ment.metaProps.keySet() == ['id', 'name', 'flex'] as Set
+        Map idSchema = flatMap['id']
+        idSchema.type == 'integer'
+        idSchema.format == 'int64'
+        idSchema.readOnly
+
+        Map nameSchema = flatMap['name']
+        nameSchema.type == 'string'
+        nameSchema.maxLength == 100
+    }
 
 }

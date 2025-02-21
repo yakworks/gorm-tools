@@ -4,6 +4,8 @@
 */
 package gorm.tools.metamap.services
 
+import org.springframework.util.SerializationUtils
+
 import spock.lang.Specification
 import yakworks.api.problem.data.DataProblemException
 import yakworks.meta.MetaMap
@@ -227,22 +229,20 @@ class MetaMapServiceSpec extends Specification implements GormHibernateTest  {
     void "test serialize"() {
         when: 'sanity check'
         KitchenSink.get(1)
-        MetaMap emap = metaMapService.createMetaMap(KitchenSink.get(1), ['id', 'num', 'ext.id'])
+        MetaMap metamap = metaMapService.createMetaMap(KitchenSink.get(1), ['id', 'num', 'ext.id'])
 
-        ByteArrayOutputStream bout = new ByteArrayOutputStream()
-        ObjectOutputStream out = new ObjectOutputStream(bout)
-        out.writeObject(emap)
-        out.flush()
-
-        ObjectInputStream input = new ObjectInputStream(new ByteArrayInputStream(bout.toByteArray()))
-        MetaMap serialized = input.readObject()
+        def serialMetamap = SerializationUtils.serialize(metamap)
+        MetaMap deserialMetamap = SerializationUtils.deserialize(serialMetamap) as MetaMap
 
         then:
         noExceptionThrown()
+        new MetaMapTester().testEquals(deserialMetamap, metamap)
+        deserialMetamap == metamap
+        metamap.getEntityClass() == deserialMetamap.getEntityClass()
 
         and:
-        3 == serialized.size()
-        serialized.getIncludes() == ['id', 'num', 'ext'] as Set
+        3 == deserialMetamap.size()
+        deserialMetamap.getIncludes() == ['id', 'num', 'ext'] as Set
     }
 
 }

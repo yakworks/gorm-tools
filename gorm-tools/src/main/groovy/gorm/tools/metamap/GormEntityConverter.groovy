@@ -16,7 +16,7 @@ import yakworks.meta.MetaMap
  *
  */
 @CompileStatic
-class GormEntityConverter implements MetaMap.Converter, Serializable {
+class GormEntityConverter implements MetaMap.Converter {
 
     @Override
     boolean handles(Object value) {

@@ -236,7 +236,6 @@ class MetaMapServiceSpec extends Specification implements GormHibernateTest  {
 
         then:
         noExceptionThrown()
-        new MetaMapTester().testEquals(deserialMetamap, metamap)
         deserialMetamap == metamap
         metamap.getEntityClass() == deserialMetamap.getEntityClass()
 

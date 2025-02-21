@@ -4,14 +4,17 @@
 */
 package yakworks.openapi.gorm.meta
 
-import yakworks.testing.gorm.unit.DataRepoTest
+import org.springframework.util.SerializationUtils
+
 import io.swagger.v3.oas.models.media.DateTimeSchema
 import io.swagger.v3.oas.models.media.IntegerSchema
 import io.swagger.v3.oas.models.media.NumberSchema
 import io.swagger.v3.oas.models.media.StringSchema
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.meta.MetaEntity
+import yakworks.meta.MetaMap
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgFlex
@@ -117,5 +120,30 @@ class MetaEntitySchemaServiceSpec extends Specification implements GormHibernate
         date1Schema.format == "date-time"
     }
 
+    @Ignore
+    void "test serialize"() {
+        when: 'sanity check'
+        MetaEntity ment = metaEntitySchemaService.getMetaEntity(Org.name, ['id', 'name', 'flex.date1', 'flex.text1', 'flex.num1'], [])
+
+        def serialMent = SerializationUtils.serialize(ment)
+        MetaEntity deserialMent = SerializationUtils.deserialize(serialMent) as MetaEntity
+
+        then:
+        noExceptionThrown()
+
+        when:
+        Map flatMap = deserialMent.flattenSchema()
+
+        then:
+        deserialMent.metaProps.keySet() == ['id', 'name', 'flex'] as Set
+        Map idSchema = flatMap['id']
+        idSchema.type == 'integer'
+        idSchema.format == 'int64'
+        idSchema.readOnly
+
+        Map nameSchema = flatMap['name']
+        nameSchema.type == 'string'
+        nameSchema.maxLength == 100
+    }
 
 }

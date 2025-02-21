@@ -13,6 +13,8 @@ dependencies {
 
   api ("org.yakworks:grails-kit:$vSpringGrailsKit")
 
+  implementation("org.yakworks:groovy-commons:$vGroovyCommons")
+
   //used for bundled Test traits
   api("org.grails:grails-gorm-testing-support:$vGrailsTesting"){
     // transitive = false

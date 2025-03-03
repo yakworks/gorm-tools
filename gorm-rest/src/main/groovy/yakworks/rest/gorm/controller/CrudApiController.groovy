@@ -91,7 +91,7 @@ trait CrudApiController<D> extends RestApiController {
 
     CrudApi<D> getCrudApi(){
         if (!crudApi) {
-            this.crudApi = ServiceLookup.lookup(getEntityClass(), CrudApi<D>, "defaultCrudApi")
+            this.crudApi = ServiceLookup.lookup(getEntityClass(), CrudApi<D>, "secureCrudApi")
             //this.crudApi = crudApiFactory.apply(getEntityClass())
             //this.crudApi = crudApiClosure.call(getEntityClass()) as CrudApi<D>
             // try {

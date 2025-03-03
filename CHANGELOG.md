@@ -1,3 +1,11 @@
+### v7.3.81
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.80...v7.3.81)
+- release 7.3.81 [link](https://github.com/yakworks/gorm-tools/commit/0980605b7498ee443a1cf572f10f817f2317dfc9)
+- Merge pull request #874 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/d4dc89acd43a3dbd8c091a85eadba2439c5a2a8f)
+- vGroovyCommons=3.15 [link](https://github.com/yakworks/gorm-tools/commit/3e035294a52848a2341b6789bad71d15053ccccb)
+- MetaMap serialize (#871) [link](https://github.com/yakworks/gorm-tools/commit/b5f7c9eda462f71c40f45cf47b9e4fcb9d736f9c)
+
 ### v7.3.80
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.79...v7.3.80)

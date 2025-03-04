@@ -433,5 +433,8 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
         body.code == "error.unauthorized"
         body.title == 'Unauthorized'
         body.detail == 'Access Denied'
+
+        cleanup:
+        OkAuth.TOKEN = null
     }
 }

@@ -10,51 +10,47 @@ import org.springframework.security.access.prepost.PreAuthorize
 
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.model.DataOp
-import yakworks.gorm.api.CrudApi
+import yakworks.gorm.api.DefaultCrudApi
 
 @CompileStatic
-class SecureCrudApi<D> implements CrudApi<D> {
+class SecureCrudApi<D> extends DefaultCrudApi<D> {
 
-    @Delegate
-    private CrudApi<D> crudApi
-
-    SecureCrudApi(CrudApi<D> d) {
-        this.crudApi = d
+    SecureCrudApi(Class<D> entityClass) {
+        super(entityClass)
     }
 
     @Override
-    @PreAuthorize("!hasRole('READ_ONLY')")
     CrudApiResult<D> get(Serializable id, Map params) {
-        return crudApi.get(id, params)
+        return super.get(id, params)
     }
 
     @Override
-    @PreAuthorize("!hasRole('READ_ONLY')")
+    @PreAuthorize("!hasRole('ROLE_READ_ONLY')")
     CrudApiResult<D> create(Map data, Map params) {
-        return crudApi.create(data, params)
+        return super.create(data, params)
     }
 
     @Override
-    @PreAuthorize("!hasRole('READ_ONLY')")
+    @PreAuthorize("!hasRole('ROLE_READ_ONLY')")
     CrudApiResult<D> update(Map data, Map params) {
-        return crudApi.update(data, params)
+        return super.update(data, params)
     }
 
     @Override
-    @PreAuthorize("!hasRole('READ_ONLY')")
+    @PreAuthorize("!hasRole('ROLE_READ_ONLY')")
     CrudApiResult<D> upsert(Map data, Map params) {
-        return crudApi.update(data, params)
+        return super.update(data, params)
     }
 
     @Override
     void removeById(Serializable id, Map params) {
-        crudApi.removeById(id, params)
+        super.removeById(id, params)
     }
 
     @Override
-    @PreAuthorize("!hasRole('READ_ONLY')")
+    @PreAuthorize("!hasRole('ROLE_READ_ONLY')")
     SyncJobEntity bulk(DataOp dataOp, List<Map> dataList, Map params, String sourceId) {
-        return crudApi.bulk(dataOp, dataList, params, sourceId)
+        return super.bulk(dataOp, dataList, params, sourceId)
     }
 
 }

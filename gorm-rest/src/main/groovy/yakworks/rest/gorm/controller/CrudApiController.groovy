@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.util.UriUtils
 
 import gorm.tools.beans.Pager
@@ -334,7 +335,10 @@ trait CrudApiController<D> extends RestApiController {
 
         //do the rest
         Problem apiError
-        if(e instanceof LockTimeoutException){
+        if(e instanceof AccessDeniedException) {
+            apiError = Problem.of('error.unauthorized').status(HttpStatus.UNAUTHORIZED.value()).detail(e.message)
+        }
+        else if(e instanceof LockTimeoutException){
             //thrown from locking in hazelcast cache
             apiError = Problem.of('error.query.duplicate')
                 .detail("Timeout while waiting for 1 or more duplicate identical queries to finish for this user")

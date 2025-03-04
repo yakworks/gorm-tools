@@ -18,12 +18,13 @@ import yakworks.commons.map.Maps
 import yakworks.gorm.api.DefaultCrudApi
 import yakworks.gorm.api.IncludesKey
 import yakworks.rally.orgs.model.Org
+import yakworks.rest.gorm.SecureCrudApi
 import yakworks.security.user.CurrentUser
 
 @Slf4j
 @Component
 @CompileStatic
-class OrgCrudApi extends DefaultCrudApi<Org> {
+class OrgCrudApi extends SecureCrudApi<Org> {
 
     @Inject CurrentUser currentUser
     @Inject OrgCrudApi self
@@ -46,7 +47,6 @@ class OrgCrudApi extends DefaultCrudApi<Org> {
         key="{@currentUser.getUserId(), #qParams.toString(), #root.target.entityClass.simpleName}",
         sync=true
     )
-    //" + #includesKeys.toString()")
     @Override
     Pager list(Map qParams, URI uri){
         log.debug("********************* list no cache hit")

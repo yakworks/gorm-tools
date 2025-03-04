@@ -4,19 +4,11 @@
 */
 package yakworks.rest.gorm
 
-import java.util.function.Function
-
 import groovy.transform.CompileStatic
 
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Scope
-import org.springframework.core.ResolvableType
-
-import yakworks.gorm.api.CrudApi
-import yakworks.gorm.api.DefaultCrudApi
 
 @CompileStatic
 @Configuration
@@ -24,8 +16,8 @@ class SecuredCrudApiConfiguration {
 
     @Bean
     @Scope("prototype")
-    public <D> SecureCrudApi<D> secureCrudApi(Class<D> entityClass) {
-        return new SecureCrudApi<D>(new DefaultCrudApi(entityClass))
+    <D> SecureCrudApi<D> secureCrudApi(Class<D> entityClass) {
+        return new SecureCrudApi<D>(entityClass)
     }
 
 }

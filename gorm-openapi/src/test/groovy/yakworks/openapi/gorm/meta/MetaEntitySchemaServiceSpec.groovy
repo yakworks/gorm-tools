@@ -120,7 +120,7 @@ class MetaEntitySchemaServiceSpec extends Specification implements GormHibernate
         date1Schema.format == "date-time"
     }
 
-    @Ignore
+    @Ignore //XXX @SUD need to work out how to fix this.
     void "test serialize"() {
         when: 'sanity check'
         MetaEntity ment = metaEntitySchemaService.getMetaEntity(Org.name, ['id', 'name', 'flex.date1', 'flex.text1', 'flex.num1'], [])

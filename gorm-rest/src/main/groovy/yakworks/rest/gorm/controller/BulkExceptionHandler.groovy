@@ -9,6 +9,9 @@ import javax.servlet.http.HttpServletRequest
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.springframework.http.HttpStatus
+import org.springframework.security.access.AccessDeniedException
+
 import gorm.tools.problem.ProblemHandler
 import yakworks.api.problem.Problem
 
@@ -38,7 +41,13 @@ class BulkExceptionHandler {
      * Its here, because we cant have more thn one exception handler for "Exception" in controller
      */
     Problem handleBulkOperationException(HttpServletRequest req, Throwable e) {
-        Problem apiError = problemHandler.handleException(getEntityClass(), e)
+        Problem apiError
+        if(e instanceof AccessDeniedException) {
+            apiError = Problem.of('error.unauthorized').status(HttpStatus.UNAUTHORIZED.value()).detail(e.message)
+        }
+        else {
+            apiError = problemHandler.handleException(getEntityClass(), e)
+        }
         if (apiError.status.code == 500) {
             String requestInfo = "requestURI=[${req.requestURI}], method=[${req.method}], queryString=[${req.queryString}]"
             log.warn("⛔️ 👉 Bulk operation exception ⛔️ \n $requestInfo \n $apiError.cause?.message")

@@ -335,6 +335,8 @@ trait CrudApiController<D> extends RestApiController {
 
         //do the rest
         Problem apiError
+        //XXX @JOSH, this should be in ProblemHandler, so its common, and would get used for BulkExceptionHandler too
+        //but AccessDeniedException is not accessible in gorm-tools/ProblemHandler as gorm-tools doesnt have dependency on spring sec
         if(e instanceof AccessDeniedException) {
             apiError = Problem.of('error.unauthorized').status(HttpStatus.UNAUTHORIZED.value()).detail(e.message)
         }

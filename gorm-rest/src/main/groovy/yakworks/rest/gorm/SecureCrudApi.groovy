@@ -20,11 +20,6 @@ class SecureCrudApi<D> extends DefaultCrudApi<D> {
     }
 
     @Override
-    CrudApiResult<D> get(Serializable id, Map params) {
-        return super.get(id, params)
-    }
-
-    @Override
     @PreAuthorize("!hasRole('ROLE_READ_ONLY')")
     CrudApiResult<D> create(Map data, Map params) {
         return super.create(data, params)
@@ -43,6 +38,7 @@ class SecureCrudApi<D> extends DefaultCrudApi<D> {
     }
 
     @Override
+    @PreAuthorize("!hasRole('ROLE_READ_ONLY')")
     void removeById(Serializable id, Map params) {
         super.removeById(id, params)
     }

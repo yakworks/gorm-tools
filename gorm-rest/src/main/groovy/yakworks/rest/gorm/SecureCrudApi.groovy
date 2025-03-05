@@ -39,7 +39,7 @@ class SecureCrudApi<D> extends DefaultCrudApi<D> {
     @Override
     @PreAuthorize("!hasRole('ROLE_READ_ONLY')")
     CrudApiResult<D> upsert(Map data, Map params) {
-        return super.update(data, params)
+        return super.upsert(data, params)
     }
 
     @Override

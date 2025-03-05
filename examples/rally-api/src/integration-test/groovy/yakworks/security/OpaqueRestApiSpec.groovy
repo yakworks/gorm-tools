@@ -46,7 +46,7 @@ class OpaqueRestApiSpec extends Specification implements OkHttpRestTrait {
         //add token to the store.
         LocalDateTime now = LocalDateTime.now()
         Instant nowInstant = now.atZone(ZoneId.of("UTC")).toInstant()
-        def oat = createOAuthToken("opq_123", nowInstant, nowInstant.plusSeconds(60))
+        def oat = createOAuthToken("opq_123", nowInstant, nowInstant.plusSeconds(20))
         tokenStore.storeToken('admin', oat)
 
         when:

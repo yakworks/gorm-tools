@@ -120,6 +120,15 @@ class ApiSchemaEntity {
         //println "-- PersistentProperties --"
         for (PersistentProperty prop : persistentProperties) {
             String propName = prop.name
+            try{
+                if((prop.mapping.mappedForm['type']['name'] as String).endsWith('JsonType')){
+                    //skip JsonTypes so the iteration over constrained props can pick them up and do them.
+                    continue
+                }
+            } catch(e){
+
+            }
+
             def constrainedProperty = (DefaultConstrainedProperty) constrainedProperties[propName]
             //remove from constraint name list so we can spin through the remaining later that are not persistentProperties
             //and set them up to for transients and set them up too.

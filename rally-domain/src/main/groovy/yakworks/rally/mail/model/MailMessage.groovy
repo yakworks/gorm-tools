@@ -131,9 +131,9 @@ class MailMessage implements UuidRepoEntity<MailMessage>, AuditCreatedTrait, Ser
         state        : [d: 'the state of the message', nullable: false],
         subject      : [d: 'email message subject', maxSize: 1000],
         body         : [d: 'body of message', maxSize: 65535],
-        attachmentIds: [d: 'ids list of attachments', default: 'plain'],
-        inlineIds    : [d: 'plain, html or markdown for whats in body', default: 'plain'],
-        sendDate     : [d: 'The last response or error message from the mail processor when availiable.'],
+        attachmentIds: [d: 'ids list of attachments'],
+        inlineIds    : [d: 'Attachment ids with inline disposition.'],
+        sendDate     : [d: 'The send datetime, always in Zulu to match server time'],
         msgResponse  : [d: 'The last response or error message from the mail processor when availiable.', maxSize: 2000],
         messageId    : [d: 'When using something like mailgun this is the id returned from the send submit']
     ]

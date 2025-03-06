@@ -120,6 +120,15 @@ class ApiSchemaEntity {
         //println "-- PersistentProperties --"
         for (PersistentProperty prop : persistentProperties) {
             String propName = prop.name
+            try{
+                if((prop.mapping.mappedForm['type']['name'] as String).endsWith('JsonType')){
+                    //skip JsonTypes so the iteration over constrained props can pick them up and do them.
+                    continue
+                }
+            } catch(e){
+
+            }
+
             def constrainedProperty = (DefaultConstrainedProperty) constrainedProperties[propName]
             //remove from constraint name list so we can spin through the remaining later that are not persistentProperties
             //and set them up to for transients and set them up too.
@@ -149,9 +158,13 @@ class ApiSchemaEntity {
         //println "-- Contrained Non-PersistentProperties --"
         for(String propName : constrainedPropsNames){
             def constrainedProp = (DefaultConstrainedProperty) constrainedProperties[propName]
-
+            // if(propName == 'tags'){
+            //     println "tags"
+            // }
             Map apiProp = getOapiProps(propName, constrainedProp)
             if(!isAllowed(type, apiProp)) continue
+            //keep copy of orig for overrides
+            Map oapiProps = Maps.clone(apiProp)
 
             Class returnType = constrainedProp.propertyType
             if(Collection.isAssignableFrom(returnType)){
@@ -175,6 +188,12 @@ class ApiSchemaEntity {
             }
             apiProp.remove('allowed') //remove allowed so it doesn't get added to the json output
             if(apiProp.remove('required')) required.add(propName)
+
+            //if its specified in the constraints then use it verbatim
+            if(oapiProps['type']) apiProp.type = oapiProps['type']
+            if(oapiProps['format']) apiProp.format = oapiProps['format']
+            if(oapiProps['items']) apiProp.items = oapiProps['items']
+
             propsMap[propName] = apiProp
         }
         if(required) propsMap.required = required

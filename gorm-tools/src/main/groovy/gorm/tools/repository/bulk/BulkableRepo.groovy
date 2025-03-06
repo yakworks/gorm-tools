@@ -263,4 +263,28 @@ trait BulkableRepo<D> {
         def event = new AfterBulkSaveEntityEvent<D>(self, entity, data, syncJobArgs)
         getRepoEventPublisher().publishEvents(self, event, [event] as Object[])
     }
+
+    Long bulkExport(SyncJobArgs syncJobArgs) {
+        if(syncJobArgs.queryArgs == null) throw DataProblem.of('error.query.qRequired').detail("q criteria required").toException()
+        syncJobArgs.entityClass = getEntityClass()
+
+        //resulting data should be saved as a file
+        syncJobArgs.saveDataAsFile = true
+        SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, syncJobArgs.queryArgs.criteriaMap)
+        return syncJobService.runJob(syncJobArgs.asyncArgs, jobContext, () -> doBulkExport(jobContext))
+    }
+
+    void doBulkExport(SyncJobContext jobContext) {
+        try {
+            //fetch data list
+            //List resultList = query(jobContext.args.queryArgs, null).list()
+            //transform result using includes
+            //MetaMapList entityMapList = metaMapService.createMetaMapList(dlist, incs)
+            //Result r = Result.ok().payload(entityMapList)
+            //jobContext.updateJobResults(result, false)
+        } catch (Exception ex) {
+            log.error("BulkableRepo unexpected exception", ex)
+            jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
+        }
+    }
 }

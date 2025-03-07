@@ -2,6 +2,7 @@ package yakworks.rally.mail.model
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Specification
 import yakworks.rally.testing.MockData
 import yakworks.testing.gorm.integration.DomainIntTest
@@ -26,14 +27,19 @@ class MailMessageSpec extends Specification implements DomainIntTest {
         when:
         def msg = MockData.mailMessage()
         msg.attachmentIds = [1,2,3]
+        msg.msgResponse = RandomStringUtils.random(2000, "abcde")
         msg.persist()
-        flushAndClear()
+        flush()
+
         def msg2 = MailMessage.get(msg.id)
         msg2.source = "foo"
-        msg2.persist(flush: true)
+        msg2.persist()
+        flushAndClear()
 
         then:
+        noExceptionThrown()
         msg
+        msg.msgResponse.length() == 2000
         msg2.createdBy
         msg2.createdDate
         msg2.sendTo

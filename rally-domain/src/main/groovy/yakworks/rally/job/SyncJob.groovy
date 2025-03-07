@@ -65,8 +65,8 @@ class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity,  AuditStampTrait, S
     }
 
     static constraintsMap = [
-        payload:[ d: 'The payload this job was sent to process'],
-        data: [d: 'The result data json, will normally be an array with items for errors.']
+        payload:[ d: 'The payload this job was sent to process', oapi: [type: 'object']],
+        data: [d: 'The result data json, will normally be an array with items for errors.', oapi: [type: 'object']]
     ]
 
 }

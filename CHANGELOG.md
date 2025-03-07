@@ -1,3 +1,9 @@
+### v7.3.82
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.81...v7.3.82)
+- release [link](https://github.com/yakworks/gorm-tools/commit/ec89818dbc1c4859d595aadb59af225e5553fe1a)
+- bump vGroovyCommons=3.16-SNAPSHOT (#875) [link](https://github.com/yakworks/gorm-tools/commit/e795a35cb218bb9a26ed78d93b9b071f8cc67bd7)
+
 ### v7.3.81
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.80...v7.3.81)

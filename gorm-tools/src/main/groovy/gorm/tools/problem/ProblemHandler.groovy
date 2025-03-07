@@ -30,7 +30,6 @@ import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.i18n.icu.ICUMessageSource
 import yakworks.message.MsgServiceRegistry
-
 /**
  * Service to prepare ApiError / ApiValidationError for given a given exception
  *

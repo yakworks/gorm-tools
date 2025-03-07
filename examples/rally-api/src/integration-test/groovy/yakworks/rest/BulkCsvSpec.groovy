@@ -1,5 +1,6 @@
 package yakworks.rest
 
+import yakworks.testing.gorm.integration.SecuritySpecHelper
 
 import java.nio.file.Path
 
@@ -18,7 +19,7 @@ import yakworks.testing.rest.RestIntTest
 
 @Rollback
 @Integration
-class BulkCsvSpec  extends RestIntTest {
+class BulkCsvSpec  extends RestIntTest implements SecuritySpecHelper {
 
     CrudApiController<Contact> controller
     AttachmentRepo attachmentRepo

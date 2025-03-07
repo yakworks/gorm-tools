@@ -22,14 +22,14 @@ class SecuritySeedData {
     static void createAppUsers(){
 
         AppUser admin = new AppUser([
-            id: (Long)1, username: "admin", email: "admin@yak.com", password:"123", orgId: 2
+            id: 1L, username: "admin", email: "admin@yak.com", password:"123", orgId: 2
         ]).persist()
 
         admin.addRole(Roles.ADMIN, true)
         admin.addRole(Roles.MANAGER, true)
 
         AppUser custUser = new AppUser([
-            id: (Long)2, username: "cust", email: "cust@yak.com", password:"123", orgId: 2
+            id: 2L, username: "cust", email: "cust@yak.com", password:"123", orgId: 2
         ]).persist()
         assert custUser.id == 2
 
@@ -40,15 +40,23 @@ class SecuritySeedData {
             [bindId: true]
         )
         assert noRoleUser.id == 3
+
+        AppUser readonlyUser = new AppUser([
+            id: 4L, username: "readonly", email: "readonly@yak.com", password:"123", orgId: 2
+        ]).persist()
+        assert readonlyUser.id == 4
+        readonlyUser.addRole(Roles.READ_ONLY, true)
+
         SecRole.repo.flush()
     }
 
     static void createRoles(){
 
-        SecRole admin = new SecRole(id: (Long)1, code: Roles.ADMIN).persist()
-        SecRole power = new SecRole(id: (Long)2, code: Roles.POWER_USER).persist()
-        SecRole mgr = new SecRole(id: (Long)3, code: Roles.MANAGER).persist()
-        SecRole custRole = new SecRole(id: (Long)5, code: Roles.CUSTOMER).persist()
+        SecRole admin = new SecRole(id: 1L, code: Roles.ADMIN).persist()
+        SecRole power = new SecRole(id: 2L, code: Roles.POWER_USER).persist()
+        SecRole mgr = new SecRole(id: 3L, code: Roles.MANAGER).persist()
+        SecRole custRole = new SecRole(id: 5L, code: Roles.CUSTOMER).persist()
+        SecRole readonly = new SecRole(id: 6L, code: Roles.READ_ONLY).persist()
         // SecRole foo = new SecRole(id: (Long)6, code: "FOO").persist()
 
         //add permissions

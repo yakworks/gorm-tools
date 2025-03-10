@@ -9,6 +9,7 @@ import spock.lang.Specification
 import yakworks.gorm.config.GormConfig
 import yakworks.spring.AppCtx
 import yakworks.testing.gorm.model.KitchenSink
+import yakworks.testing.gorm.model.SinkExt
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 import static gorm.tools.mango.jpql.JpqlCompareUtils.formatAndStrip
@@ -72,6 +73,24 @@ class JpqlQueryBuilderSpec extends Specification implements GormHibernateTest  {
             ''')
         queryInfo.parameters == ["SinkUp", "Simpson"]
 
+    }
+
+    void "Test update query with exists"() {
+        given:
+        def existsQuery = SinkExt.query {
+            eqProperty("kitchenParent.id", "kitchenSink_.id")
+        }.id()
+
+        def criteria = KitchenSink.query {
+           exists existsQuery
+        }
+
+        when:
+        def builder = JpqlQueryBuilder.of(criteria)
+        def queryInfo = builder.buildUpdate(name:"SinkUp")
+
+        then:
+        noExceptionThrown()
     }
 
     void "Test exception is thrown in join with delete"() {

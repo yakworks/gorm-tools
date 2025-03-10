@@ -33,6 +33,7 @@ app:
   resources:
     rootLocation: "${project.rootProjectDir}/examples/resources"
     tempDir: "./build/rootLocation/tempDir"
+    attachments.location: 'attachments'
 
 yakworks:
   gorm:

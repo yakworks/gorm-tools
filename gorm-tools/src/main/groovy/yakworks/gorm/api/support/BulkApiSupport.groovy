@@ -81,6 +81,16 @@ class BulkApiSupport<D> {
         return syncJobArgs
     }
 
+    SyncJobArgs setupBulkExportArgs(Map params, String sourceId){
+        List bulkIncludes = includesConfig.findByKeys(getEntityClass(), [IncludesKey.list, IncludesKey.get])
+        SyncJobArgs syncJobArgs = SyncJobArgs.withParams(params)
+        //syncJobArgs.op = DataOp.update.export
+        syncJobArgs.includes = bulkIncludes
+        syncJobArgs.sourceId = sourceId
+        return syncJobArgs
+    }
+
+
     GormRepo<D> getRepo() {
         RepoLookup.findRepo(getEntityClass())
     }

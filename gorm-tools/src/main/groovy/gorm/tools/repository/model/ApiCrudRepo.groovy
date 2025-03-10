@@ -120,7 +120,7 @@ interface ApiCrudRepo<D> {
      * @return Job id
      */
     Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs)
-
+    Long bulkExport(SyncJobArgs syncJobArgs)
     //--------------------Mango Query -------------------
 
     /**

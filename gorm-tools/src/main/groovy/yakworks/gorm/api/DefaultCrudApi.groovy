@@ -201,8 +201,9 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         return job
     }
 
-    Long bulkExport(Map params) {
-        return getApiCrudRepo().bulkExport(params)
+    Long bulkExport(Map params, String sourceId) {
+        SyncJobArgs syncJobArgs = getBulkApiSupport().setupBulkExportArgs(params, sourceId)
+        return getApiCrudRepo().bulkExport(syncJobArgs)
     }
 
     protected List<D> queryList(QueryArgs qargs) {

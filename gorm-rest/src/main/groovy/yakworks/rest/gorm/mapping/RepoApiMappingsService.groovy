@@ -53,6 +53,12 @@ class RepoApiMappingsService {
                     .httpMethod('POST').action('upsert').suffix('/upsert')
                     .urlMappingBuilder(builderDelegate).build()
 
+                //bulk export FIXME @SUD, not working, doesnt get picked up
+                SimpleUrlMappingBuilder.of(contextPath, nspace, ctrlName)
+                    .httpMethod('GET').action('bulkExport').suffix('/bulkExport')
+                    .urlMappingBuilder(builderDelegate).build()
+
+
                 // bulks ops at /bulk
                 SimpleUrlMappingBuilder.of(contextPath, nspace, ctrlName)
                     .httpMethod('POST').action('bulkCreate').suffix('/bulk')

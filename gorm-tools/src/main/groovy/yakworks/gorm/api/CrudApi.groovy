@@ -108,7 +108,7 @@ interface CrudApi<D> {
      */
     SyncJobEntity bulk(DataOp dataOp, List<Map> dataList, Map params, String sourceId)
 
-    Long bulkExport(Map params)
+    Long bulkExport(Map params, String sourceId)
 
     /**
      * Converts the instance to Map using the MetaMap wrapper with {@link gorm.tools.metamap.services.MetaMapService}.

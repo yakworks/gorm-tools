@@ -10,43 +10,46 @@ import org.springframework.security.access.prepost.PreAuthorize
 
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.model.DataOp
-import yakworks.gorm.api.DefaultCrudApi
+import yakworks.gorm.api.CrudApi
 
 @CompileStatic
-class SecureCrudApi<D> extends DefaultCrudApi<D> {
+class SecureCrudApi<D> implements CrudApi<D> {
 
-    SecureCrudApi(Class<D> entityClass) {
-        super(entityClass)
+    @Delegate
+    CrudApi<D> defaultCrudApi
+
+    SecureCrudApi(CrudApi<D> defaultCrudApi) {
+        this.defaultCrudApi = defaultCrudApi
     }
 
     @Override
     @PreAuthorize("!hasRole('ROLE_READ_ONLY')")
     CrudApiResult<D> create(Map data, Map params) {
-        return super.create(data, params)
+        return defaultCrudApi.create(data, params)
     }
 
     @Override
     @PreAuthorize("!hasRole('ROLE_READ_ONLY')")
     CrudApiResult<D> update(Map data, Map params) {
-        return super.update(data, params)
+        return defaultCrudApi.update(data, params)
     }
 
     @Override
     @PreAuthorize("!hasRole('ROLE_READ_ONLY')")
     CrudApiResult<D> upsert(Map data, Map params) {
-        return super.upsert(data, params)
+        return defaultCrudApi.upsert(data, params)
     }
 
     @Override
     @PreAuthorize("!hasRole('ROLE_READ_ONLY')")
     void removeById(Serializable id, Map params) {
-        super.removeById(id, params)
+        defaultCrudApi.removeById(id, params)
     }
 
     @Override
     @PreAuthorize("!hasRole('ROLE_READ_ONLY')")
     SyncJobEntity bulk(DataOp dataOp, List<Map> dataList, Map params, String sourceId) {
-        return super.bulk(dataOp, dataList, params, sourceId)
+        return defaultCrudApi.bulk(dataOp, dataList, params, sourceId)
     }
 
 }

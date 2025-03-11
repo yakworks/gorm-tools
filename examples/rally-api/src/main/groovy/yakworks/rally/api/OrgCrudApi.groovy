@@ -24,7 +24,7 @@ import yakworks.security.user.CurrentUser
 @Slf4j
 @Component
 @CompileStatic
-class OrgCrudApi extends SecureCrudApi<Org> {
+class OrgCrudApi extends DefaultCrudApi<Org> {
 
     @Inject CurrentUser currentUser
     @Inject OrgCrudApi self

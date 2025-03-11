@@ -10,6 +10,9 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Scope
 
+import gorm.tools.utils.ServiceLookup
+import yakworks.gorm.api.CrudApi
+
 @CompileStatic
 @Configuration
 class SecuredCrudApiConfiguration {
@@ -17,7 +20,8 @@ class SecuredCrudApiConfiguration {
     @Bean
     @Scope("prototype")
     <D> SecureCrudApi<D> secureCrudApi(Class<D> entityClass) {
-        return new SecureCrudApi<D>(entityClass)
+        CrudApi<D> defaultCrudApi = ServiceLookup.lookup(entityClass, CrudApi<D>, "defaultCrudApi")
+        return new SecureCrudApi<D>(defaultCrudApi)
     }
 
 }

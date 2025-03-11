@@ -30,6 +30,7 @@ import yakworks.api.problem.Problem
 import yakworks.etl.csv.CsvToMapTransformer
 import yakworks.gorm.api.CrudApi
 import yakworks.gorm.api.IncludesProps
+import yakworks.spring.AppCtx
 
 import static gorm.tools.problem.ProblemHandler.isBrokenPipe
 import static org.springframework.http.HttpStatus.CREATED
@@ -92,7 +93,10 @@ trait CrudApiController<D> extends RestApiController {
 
     CrudApi<D> getCrudApi(){
         if (!crudApi) {
-            this.crudApi = ServiceLookup.lookup(getEntityClass(), CrudApi<D>, "secureCrudApi")
+            //can not use ServiceLookup.lookup with delegate pattern in SecureCrudApi. As, even if OrgCrudApi is registered, we still
+            //want to inject secureCrudApi which would have wrapped OrgCrudApi, instead of OrgCrudApi
+            this.crudApi = (CrudApi<D>)AppCtx.ctx.getBean("secureCrudApi", [getEntityClass()] as Object[])
+            //this.crudApi = ServiceLookup.lookup(getEntityClass(), CrudApi<D>, "secureCrudApi")
             //this.crudApi = crudApiFactory.apply(getEntityClass())
             //this.crudApi = crudApiClosure.call(getEntityClass()) as CrudApi<D>
             // try {

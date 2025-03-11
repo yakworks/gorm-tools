@@ -1,13 +1,18 @@
 package yakworks.security
 
 import gorm.tools.repository.model.DataOp
+import gorm.tools.utils.ServiceLookup
 import grails.testing.mixin.integration.Integration
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.AuthenticationException
 import spock.lang.Specification
+import yakworks.gorm.api.DefaultCrudApi
 import yakworks.rally.api.OrgCrudApi
+import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rest.gorm.SecureCrudApi
+import yakworks.gorm.api.CrudApi
+import yakworks.spring.AppCtx
 
 import javax.inject.Inject
 
@@ -17,39 +22,47 @@ class SecureCrudApiSpec extends Specification {
     @Inject OrgCrudApi orgCrudApi
     @Inject SecService service
 
+    SecureCrudApi<Org> orgSecureCrudApi
+
+    void setup() {
+        orgSecureCrudApi = AppCtx.ctx.getBean("secureCrudApi", [Org] as Object[])
+    }
+
     void "sanity check"() {
         expect:
         orgCrudApi
-        orgCrudApi instanceof SecureCrudApi
+        orgCrudApi instanceof DefaultCrudApi
+        orgSecureCrudApi
+        orgSecureCrudApi instanceof SecureCrudApi
     }
 
     void "not logged in"() {
         when:
-        orgCrudApi.create(orgData, [:])
+        orgSecureCrudApi.create(orgData, [:])
 
         then:
         AuthenticationException ex = thrown()
 
         when:
-        orgCrudApi.update(orgData, [:])
+        orgSecureCrudApi.update(orgData, [:])
 
         then:
         ex = thrown()
 
         when:
-        orgCrudApi.upsert(orgData, [:])
+        orgSecureCrudApi.upsert(orgData, [:])
 
         then:
         ex = thrown()
 
         when:
-        orgCrudApi.removeById(1L, [:])
+        orgSecureCrudApi.removeById(1L, [:])
 
         then:
         ex = thrown()
 
         when:
-        orgCrudApi.bulk(DataOp.update, [orgData], [:], "Test")
+        orgSecureCrudApi.bulk(DataOp.update, [orgData], [:], "Test")
 
         then:
         ex = thrown()
@@ -60,35 +73,35 @@ class SecureCrudApiSpec extends Specification {
         service.login("readonly", "123")
 
         when:
-        orgCrudApi.create(orgData, [:])
+        orgSecureCrudApi.create(orgData, [:])
 
         then:
         AccessDeniedException ex = thrown()
         ex.message == 'Access Denied'
 
         when:
-        orgCrudApi.update(orgData, [:])
+        orgSecureCrudApi.update(orgData, [:])
 
         then:
         ex = thrown()
         ex.message == 'Access Denied'
 
         when:
-        orgCrudApi.upsert(orgData, [:])
+        orgSecureCrudApi.upsert(orgData, [:])
 
         then:
         ex = thrown()
         ex.message == 'Access Denied'
 
         when:
-        orgCrudApi.removeById(1L, [:])
+        orgSecureCrudApi.removeById(1L, [:])
 
         then:
         ex = thrown()
         ex.message == 'Access Denied'
 
         when:
-        orgCrudApi.bulk(DataOp.update, [orgData], [:], "Test")
+        orgSecureCrudApi.bulk(DataOp.update, [orgData], [:], "Test")
 
         then:
         ex = thrown()

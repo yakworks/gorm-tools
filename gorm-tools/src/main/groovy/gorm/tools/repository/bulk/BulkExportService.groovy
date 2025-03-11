@@ -35,10 +35,14 @@ class BulkExportService {
     @Inject MetaMapService metaMapService
     @Inject ProblemHandler problemHandler
 
+    /**
+     * Creates a new bulk export job with status : "Queued" and QueryArgs stored in job payload
+     */
     Long scheduleBulkExportJob(SyncJobArgs syncJobArgs) {
         if(syncJobArgs.queryArgs == null) throw DataProblem.of('error.query.qRequired').detail("q criteria required").toException()
         //resulting data should be saved as a file
         syncJobArgs.saveDataAsFile = true
+        syncJobArgs.jobState = SyncJobState.Queued
 
         //Store QueryArgs and includes list as payload, these are the two things we need when running export
         //so that we can construct it back when syncjob runs
@@ -51,6 +55,9 @@ class BulkExportService {
         return jobContext.jobId
     }
 
+    /**
+     * Loads queued bulkexport job, recreates JobArgs and context from payload and runs the job
+     */
     Long runBulkExportJob(Long jobId) {
         //build job context and syncjobargs from previously saved syncjob's payload
         SyncJobContext context = buildJobContext(jobId)
@@ -64,6 +71,26 @@ class BulkExportService {
 
         //run job
         return syncJobService.runJob(context.args.asyncArgs, context, () -> doBulkExport(context, repo))
+    }
+
+    /**
+     * Run bulk export job
+     */
+    void doBulkExport(SyncJobContext jobContext, GormRepo repo) {
+        try {
+            //fetch data list
+            List resultList = repo.query(jobContext.args.queryArgs).list()
+
+            //create metamap list with includes
+            MetaMapList entityMapList = metaMapService.createMetaMapList(resultList, jobContext.args.includes)
+
+            //update job with result
+            Result result = Result.OK().payload(entityMapList)
+            jobContext.updateJobResults(result, false)
+        } catch (Exception ex) {
+            log.error("BulkExport unexpected exception", ex)
+            jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
+        }
     }
 
 
@@ -90,6 +117,9 @@ class BulkExportService {
         return syncJobArgs
     }
 
+    /**
+     * Recreate jobcontext and jobargs from saved job
+     */
     SyncJobContext buildJobContext(Long jobId) {
         SyncJobEntity job = syncJobService.getJob(jobId)
 
@@ -107,22 +137,6 @@ class BulkExportService {
         syncJobService.updateJob([id:jobId, state: SyncJobState.Running])
     }
 
-    void doBulkExport(SyncJobContext jobContext, GormRepo repo) {
-        try {
-            //fetch data list
-            List resultList = repo.query(jobContext.args.queryArgs).list()
-
-            //create metamap list with includes
-            MetaMapList entityMapList = metaMapService.createMetaMapList(resultList, jobContext.args.includes)
-
-            //update job with result
-            Result result = Result.OK().payload(entityMapList)
-            jobContext.updateJobResults(result, false)
-        } catch (Exception ex) {
-            log.error("BulkExport unexpected exception", ex)
-            jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
-        }
-    }
 
     GormRepo loadRepo(String domainName) {
         return AppCtx.get("${NameUtils.getPropertyName(domainName)}Repo") as GormRepo

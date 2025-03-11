@@ -6,7 +6,6 @@ package yakworks.rest.gorm.controller
 
 import java.net.http.HttpRequest
 import java.nio.charset.StandardCharsets
-import java.util.concurrent.TimeoutException
 import java.util.function.Function
 import javax.persistence.LockTimeoutException
 import javax.servlet.http.HttpServletRequest
@@ -18,17 +17,19 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.util.UriUtils
 
 import gorm.tools.beans.Pager
 import gorm.tools.job.SyncJobEntity
+import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.model.DataOp
-import gorm.tools.utils.ServiceLookup
 import grails.web.Action
 import yakworks.api.problem.Problem
 import yakworks.etl.csv.CsvToMapTransformer
 import yakworks.gorm.api.CrudApi
 import yakworks.gorm.api.IncludesProps
+import yakworks.spring.AppCtx
 
 import static gorm.tools.problem.ProblemHandler.isBrokenPipe
 import static org.springframework.http.HttpStatus.CREATED
@@ -91,7 +92,10 @@ trait CrudApiController<D> extends RestApiController {
 
     CrudApi<D> getCrudApi(){
         if (!crudApi) {
-            this.crudApi = ServiceLookup.lookup(getEntityClass(), CrudApi<D>, "defaultCrudApi")
+            //not using ServiceLookup.lookup as we dont want to inject OrgCrudApi, even if its available,
+            //Always inject SecureCrudApi, which wraps and delegates to configured custom CrudApi or DefaultCrudApi.
+            this.crudApi = (CrudApi<D>)AppCtx.ctx.getBean("secureCrudApi", [getEntityClass()] as Object[])
+            //this.crudApi = ServiceLookup.lookup(getEntityClass(), CrudApi<D>, "secureCrudApi")
             //this.crudApi = crudApiFactory.apply(getEntityClass())
             //this.crudApi = crudApiClosure.call(getEntityClass()) as CrudApi<D>
             // try {
@@ -334,7 +338,10 @@ trait CrudApiController<D> extends RestApiController {
 
         //do the rest
         Problem apiError
-        if(e instanceof LockTimeoutException){
+        if(e instanceof AccessDeniedException) {
+            apiError = ProblemHandler.handleAccessDenied(e)
+        }
+        else if(e instanceof LockTimeoutException){
             //thrown from locking in hazelcast cache
             apiError = Problem.of('error.query.duplicate')
                 .detail("Timeout while waiting for 1 or more duplicate identical queries to finish for this user")

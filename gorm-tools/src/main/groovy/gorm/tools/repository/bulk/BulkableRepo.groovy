@@ -4,8 +4,6 @@
 */
 package gorm.tools.repository.bulk
 
-import gorm.tools.mango.MangoDetachedCriteria
-import gorm.tools.mango.api.QueryArgs
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.core.Datastore
@@ -19,6 +17,8 @@ import gorm.tools.async.ParallelTools
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobService
+import gorm.tools.mango.MangoDetachedCriteria
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo

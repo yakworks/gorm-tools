@@ -1,4 +1,13 @@
+/*
+* Copyright 2025 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
+* You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+*/
 package gorm.tools.repository.bulk
+
+import javax.inject.Inject
+
+import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
@@ -9,8 +18,6 @@ import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import grails.core.GrailsApplication
-import groovy.transform.CompileStatic
-import groovy.util.logging.Slf4j
 import yakworks.api.Result
 import yakworks.api.problem.data.DataProblem
 import yakworks.commons.lang.NameUtils
@@ -18,8 +25,6 @@ import yakworks.commons.lang.Validate
 import yakworks.json.groovy.JsonEngine
 import yakworks.meta.MetaMapList
 import yakworks.spring.AppCtx
-
-import javax.inject.Inject
 
 @CompileStatic
 @Slf4j

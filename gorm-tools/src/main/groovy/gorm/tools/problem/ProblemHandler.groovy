@@ -219,7 +219,7 @@ class ProblemHandler {
     /**
      * Handles Access denied exception, which is thrown when user doesnt have required roles/authority to access a method
      */
-    static Problem handleAccessDenied(Exception ex) {
+    static GenericProblem handleAccessDenied(Exception ex) {
         return Problem.of('error.unauthorized').status(HttpStatus.UNAUTHORIZED).detail(ex.message)
     }
 

@@ -53,12 +53,6 @@ class RepoApiMappingsService {
                     .httpMethod('POST').action('upsert').suffix('/upsert')
                     .urlMappingBuilder(builderDelegate).build()
 
-                //bulk export FIXME @SUD, not working, doesnt get picked up
-                SimpleUrlMappingBuilder.of(contextPath, nspace, ctrlName)
-                    .httpMethod('GET').action('bulkExport').suffix('/bulkExport')
-                    .urlMappingBuilder(builderDelegate).build()
-
-
                 // bulks ops at /bulk
                 SimpleUrlMappingBuilder.of(contextPath, nspace, ctrlName)
                     .httpMethod('POST').action('bulkCreate').suffix('/bulk')
@@ -67,12 +61,19 @@ class RepoApiMappingsService {
                     .httpMethod('PUT').action('bulkUpdate').suffix('/bulk')
                     .urlMappingBuilder(builderDelegate).build()
 
+                //bulk export FIXME @SUD, not working, doesnt get picked up
+                SimpleUrlMappingBuilder.of(contextPath, nspace, ctrlName)
+                    .httpMethod('GET').action('bulkExport').suffix('/bulk')
+                    .urlMappingBuilder(builderDelegate).build()
+
+
                 //allow POST any action added to the controller
                 // /api/nspace/controller/$action
                 // post "/$action(.$format)?"(controller: cName)
                 SimpleUrlMappingBuilder.of(contextPath, nspace, ctrlName)
                     .httpMethod('POST').suffix('/(*)').matchParams(['action'])
                     .urlMappingBuilder(builderDelegate).build()
+
             }
         }
     }

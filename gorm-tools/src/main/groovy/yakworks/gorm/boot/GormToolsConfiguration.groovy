@@ -4,6 +4,8 @@
 */
 package yakworks.gorm.boot
 
+import gorm.tools.repository.bulk.BulkExportService
+
 import javax.annotation.PostConstruct
 import javax.sql.DataSource
 
@@ -147,6 +149,12 @@ class GormToolsConfiguration {
     @ConditionalOnMissingBean
     QueryArgsValidator queryArgsValidator(){
         new DefaultQueryArgsValidator()
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    BulkExportService bulkExportService() {
+        return new BulkExportService()
     }
 
 }

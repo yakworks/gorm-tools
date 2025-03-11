@@ -201,6 +201,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         return job
     }
 
+    //FIXME @SUD change to use BulkExportService
     Long bulkExport(Map params, String sourceId) {
         SyncJobArgs syncJobArgs = getBulkApiSupport().setupBulkExportArgs(params, sourceId)
         return getApiCrudRepo().bulkExport(syncJobArgs)

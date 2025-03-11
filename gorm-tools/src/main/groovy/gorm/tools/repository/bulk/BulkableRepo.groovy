@@ -271,6 +271,7 @@ trait BulkableRepo<D> {
         getRepoEventPublisher().publishEvents(self, event, [event] as Object[])
     }
 
+    //FIXME @SUD remove
     Long bulkExport(SyncJobArgs syncJobArgs) {
         if(syncJobArgs.queryArgs == null) throw DataProblem.of('error.query.qRequired').detail("q criteria required").toException()
         syncJobArgs.entityClass = getEntityClass()
@@ -281,6 +282,7 @@ trait BulkableRepo<D> {
         return syncJobService.runJob(syncJobArgs.asyncArgs, jobContext, () -> doBulkExport(jobContext))
     }
 
+    //FIXME @SUD remove
     void doBulkExport(SyncJobContext jobContext) {
         try {
             //fetch data list

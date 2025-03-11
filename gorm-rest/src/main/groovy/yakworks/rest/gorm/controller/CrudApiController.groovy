@@ -6,7 +6,6 @@ package yakworks.rest.gorm.controller
 
 import java.net.http.HttpRequest
 import java.nio.charset.StandardCharsets
-import java.util.concurrent.TimeoutException
 import java.util.function.Function
 import javax.persistence.LockTimeoutException
 import javax.servlet.http.HttpServletRequest
@@ -23,8 +22,8 @@ import org.springframework.web.util.UriUtils
 
 import gorm.tools.beans.Pager
 import gorm.tools.job.SyncJobEntity
+import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.model.DataOp
-import gorm.tools.utils.ServiceLookup
 import grails.web.Action
 import yakworks.api.problem.Problem
 import yakworks.etl.csv.CsvToMapTransformer
@@ -339,10 +338,8 @@ trait CrudApiController<D> extends RestApiController {
 
         //do the rest
         Problem apiError
-        //XXX @JOSH, this should be in ProblemHandler, so its common, and would get used for BulkExceptionHandler too
-        //but AccessDeniedException is not accessible in gorm-tools/ProblemHandler as gorm-tools doesnt have dependency on spring sec
         if(e instanceof AccessDeniedException) {
-            apiError = Problem.of('error.unauthorized').status(HttpStatus.UNAUTHORIZED.value()).detail(e.message)
+            apiError = ProblemHandler.handleAccessDenied(e)
         }
         else if(e instanceof LockTimeoutException){
             //thrown from locking in hazelcast cache

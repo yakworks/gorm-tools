@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.springframework.http.HttpStatus
 import org.springframework.security.access.AccessDeniedException
 
 import gorm.tools.problem.ProblemHandler
@@ -30,7 +29,7 @@ class BulkExceptionHandler {
         this.entityClass = entityClass
     }
 
-    public static BulkExceptionHandler of(Class entityClass, ProblemHandler problemHandler){
+    static BulkExceptionHandler of(Class entityClass, ProblemHandler problemHandler){
         def bcs = new BulkExceptionHandler(entityClass)
         bcs.problemHandler = problemHandler
         return bcs
@@ -43,7 +42,7 @@ class BulkExceptionHandler {
     Problem handleBulkOperationException(HttpServletRequest req, Throwable e) {
         Problem apiError
         if(e instanceof AccessDeniedException) {
-            apiError = Problem.of('error.unauthorized').status(HttpStatus.UNAUTHORIZED.value()).detail(e.message)
+            apiError = ProblemHandler.handleAccessDenied(e)
         }
         else {
             apiError = problemHandler.handleException(getEntityClass(), e)

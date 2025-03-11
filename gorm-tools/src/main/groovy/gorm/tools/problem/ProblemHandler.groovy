@@ -67,6 +67,7 @@ class ProblemHandler {
         ApiStatus status400 = HttpStatus.BAD_REQUEST
         ApiStatus status404 = HttpStatus.NOT_FOUND
         ApiStatus status422 = HttpStatus.UNPROCESSABLE_ENTITY
+        ApiStatus status401 = HttpStatus.UNAUTHORIZED
 
         if (e instanceof ValidationProblem.Exception) {
             def valProblem = e.getValidationProblem()
@@ -213,6 +214,13 @@ class ProblemHandler {
      */
     static boolean isBrokenPipe(Throwable ex) {
         return ex.message && ex.message.toLowerCase().contains("broken pipe")
+    }
+
+    /**
+     * Handles Access denied exception, which is thrown when user doesnt have required roles/authority to access a method
+     */
+    static handleAccessDenied(Exception ex) {
+        return Problem.of('error.unauthorized').status(HttpStatus.UNAUTHORIZED).detail(ex.message)
     }
 
     //Legacy from ValidationException

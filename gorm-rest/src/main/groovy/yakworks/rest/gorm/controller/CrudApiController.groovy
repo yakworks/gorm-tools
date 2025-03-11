@@ -92,8 +92,8 @@ trait CrudApiController<D> extends RestApiController {
 
     CrudApi<D> getCrudApi(){
         if (!crudApi) {
-            //can not use ServiceLookup.lookup with delegate pattern in SecureCrudApi. As, even if OrgCrudApi is registered, we still
-            //want to inject secureCrudApi which would have wrapped OrgCrudApi, instead of OrgCrudApi
+            //not using ServiceLookup.lookup as we dont want to inject OrgCrudApi, even if its available,
+            //Always inject SecureCrudApi, which wraps and delegates to configured custom CrudApi or DefaultCrudApi.
             this.crudApi = (CrudApi<D>)AppCtx.ctx.getBean("secureCrudApi", [getEntityClass()] as Object[])
             //this.crudApi = ServiceLookup.lookup(getEntityClass(), CrudApi<D>, "secureCrudApi")
             //this.crudApi = crudApiFactory.apply(getEntityClass())

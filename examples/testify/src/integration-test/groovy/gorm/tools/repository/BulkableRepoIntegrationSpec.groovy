@@ -2,6 +2,7 @@ package gorm.tools.repository
 
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobState
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.model.DataOp
 import grails.gorm.transactions.NotTransactional
 import org.apache.commons.lang3.StringUtils
@@ -11,6 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+import yakworks.rally.attachment.model.Attachment
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.rally.job.SyncJob
@@ -352,6 +354,59 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         cleanup:
         Org.withNewTransaction {
             jdbcTemplate.execute("DROP index org_num_unique")
+        }
+    }
+
+    void "bulk export"() {
+        setup:
+        SyncJobArgs args = setupSyncJobArgs()
+        args.includes= ["id", "name", "num"]
+        //args.dataFormat = SyncJobArgs.DataFormat.Payload
+        args.queryArgs = QueryArgs.of("type": "Company")
+
+        when:
+        Long jobId = orgRepo.bulkExport(args)
+        flush()
+
+        then:
+        noExceptionThrown()
+        jobId
+
+        when:
+        SyncJob job = SyncJob.repo.getWithTrx(jobId)
+
+        then:
+        job
+        job.ok
+        job.dataId //should have attachment
+        Attachment.repo.exists(job.dataId)
+
+        when:
+        String jsonStr = job.dataToString()
+        def json = parseJson(jsonStr)
+
+        then:
+        json
+        json instanceof List
+        json[0].ok
+        json[0].data instanceof List
+
+        when:
+        List data = json[0].data
+
+        then:
+        data.size() == 2 //two records for two company orgs
+        data[0].id == 2
+        data[0].num
+        data[0].name
+
+        data[1].id == 3
+        data[1].num
+        data[1].name
+
+        cleanup:
+        if(job && job.dataId) {
+            Attachment.repo.removeById(job.dataId)
         }
     }
 

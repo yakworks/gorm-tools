@@ -57,15 +57,18 @@ class BulkExportService {
 
     /**
      * Loads queued bulkexport job, recreates JobArgs and context from payload and runs the job
+     *
+     * @param async, default=true, can be passed false for tests to keep tests clean
      */
-    Long runBulkExportJob(Long jobId) {
+    Long runBulkExportJob(Long jobId, boolean async = true) {
         //build job context and syncjobargs from previously saved syncjob's payload
         SyncJobContext context = buildJobContext(jobId)
+        context.args.async = async
 
         //change job state to running
         changeJobStatusToRunning(jobId)
 
-        //load repo for the domain
+        //load repo for the domain class name stored in payload
         GormRepo repo = loadRepo(context.payload['domain'] as String)
         context.args.entityClass = repo.entityClass
 
@@ -85,7 +88,7 @@ class BulkExportService {
             MetaMapList entityMapList = metaMapService.createMetaMapList(resultList, jobContext.args.includes)
 
             //update job with result
-            Result result = Result.OK().payload(entityMapList)
+            Result result = Result.OK().payload([data:entityMapList])
             jobContext.updateJobResults(result, false)
         } catch (Exception ex) {
             log.error("BulkExport unexpected exception", ex)
@@ -113,7 +116,7 @@ class BulkExportService {
 
         //bulkexport always saves data in a file
         syncJobArgs.saveDataAsFile = true
-
+        syncJobArgs.dataFormat = SyncJobArgs.DataFormat.Payload
         return syncJobArgs
     }
 
@@ -127,7 +130,9 @@ class BulkExportService {
         Validate.notEmpty(payloadStr, "job payload is empty")
         Map payload =  JsonEngine.parseJson(payloadStr) as Map
 
-        return SyncJobContext.of(buildSyncJobArgs(payload)).syncJobService(syncJobService).payload(payload)
+        SyncJobContext context = SyncJobContext.of(buildSyncJobArgs(payload)).syncJobService(syncJobService).payload(payload)
+        context.args.jobId = jobId
+        return context
     }
 
     /**

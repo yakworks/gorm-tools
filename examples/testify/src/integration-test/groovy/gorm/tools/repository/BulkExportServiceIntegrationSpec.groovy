@@ -7,6 +7,7 @@ import gorm.tools.repository.bulk.BulkExportService
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Org
 import yakworks.testing.gorm.integration.DomainIntTest
@@ -75,6 +76,55 @@ class BulkExportServiceIntegrationSpec  extends Specification implements DomainI
         args.parallel
     }
 
+    void "run export"() {
+        setup:
+        Long jobId = bulkExportService.scheduleBulkExportJob(setupJobArgs("type": "Company"))
+
+        when:
+        bulkExportService.runBulkExportJob(jobId, false)
+        flushAndClear()
+
+        then:
+        noExceptionThrown()
+
+        when:
+        SyncJob job = SyncJob.repo.getWithTrx(jobId)
+
+
+        then:
+        job
+        job.ok
+        job.dataId //should have attachment
+        Attachment.repo.exists(job.dataId)
+
+        when:
+        String jsonStr = job.dataToString()
+        def json = parseJson(jsonStr)
+
+        then:
+        json
+        json instanceof List
+        json[0].data instanceof List
+
+        when:
+        List data = json[0].data
+
+        then:
+        data.size() == 2 //two records for two company orgs
+        data[0].id == 2
+        data[0].num
+        data[0].name
+
+        data[1].id == 3
+        data[1].num
+        data[1].name
+
+        cleanup:
+        if(job && job.dataId) {
+            Attachment.repo.removeById(job.dataId)
+        }
+    }
+
     SyncJobArgs setupJobArgs(Map q) {
         SyncJobArgs syncJobArgs = SyncJobArgs.withParams(q:q)
         syncJobArgs.includes = ["id", "num", "name"]
@@ -82,6 +132,5 @@ class BulkExportServiceIntegrationSpec  extends Specification implements DomainI
         syncJobArgs.entityClass = Org
         return syncJobArgs
     }
-
 
 }

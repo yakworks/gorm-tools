@@ -1,3 +1,30 @@
+### v7.3.82
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.81...v7.3.82)
+- release [link](https://github.com/yakworks/gorm-tools/commit/ec89818dbc1c4859d595aadb59af225e5553fe1a)
+- bump vGroovyCommons=3.16-SNAPSHOT (#875) [link](https://github.com/yakworks/gorm-tools/commit/e795a35cb218bb9a26ed78d93b9b071f8cc67bd7)
+
+### v7.3.81
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.80...v7.3.81)
+- release 7.3.81 [link](https://github.com/yakworks/gorm-tools/commit/0980605b7498ee443a1cf572f10f817f2317dfc9)
+- Merge pull request #874 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/d4dc89acd43a3dbd8c091a85eadba2439c5a2a8f)
+- vGroovyCommons=3.15 [link](https://github.com/yakworks/gorm-tools/commit/3e035294a52848a2341b6789bad71d15053ccccb)
+- MetaMap serialize (#871) [link](https://github.com/yakworks/gorm-tools/commit/b5f7c9eda462f71c40f45cf47b9e4fcb9d736f9c)
+
+### v7.3.80
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.79...v7.3.80)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/3249c60cd1d56326451e476cd10ec84d58b8923a)
+- Merge pull request #872 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/4584a122c6de38acd439e1ed48d5a5724a1fb3d5)
+- fix null pointer. https://github.com/9ci/domain9/issues/2967 (#869) [link](https://github.com/yakworks/gorm-tools/commit/bb4ff1597f0e6998bf3d03af1e57f34d13cf49da)
+- Revert "remove company change for setupMember" (#868) [link](https://github.com/yakworks/gorm-tools/commit/1e0b2ff2d7d227faaf130c2b30231eacffc00b3f)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/541d512c9054f1db3f5dd7a9840081667eb4f4d9)
+- Merge pull request #866 from yakworks/revert_orgService-changes [link](https://github.com/yakworks/gorm-tools/commit/9cc080fcc7e3bc06dd166345db983803a87ff3a7)
+- remove company change for setupMember [link](https://github.com/yakworks/gorm-tools/commit/b82173aca43bc8b376934efd7f86bf70cef670a1)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/01c1dba0913bfae83ffbf0e731da406dcc3eabba)
+- Mailgun logs cleanup (#864) [link](https://github.com/yakworks/gorm-tools/commit/2599f8378571a22b50372c9e15e623133c4e218a)
+
 ### v7.3.79
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.78...v7.3.79)

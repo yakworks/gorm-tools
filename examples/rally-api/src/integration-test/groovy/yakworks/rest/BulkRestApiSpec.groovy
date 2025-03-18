@@ -212,13 +212,15 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         updated == 3
     }
 
-    @Ignore //FIXME @SUD
     void "bulk export"() {
         when:
-        Response resp = get("/api/rally/org/bulkExport?q=*&parallel=false&async=false")
+        Response resp = get("/api/rally/org/bulk?q=*&parallel=false&async=false")
         Map body = bodyToMap(resp)
 
         then:
-        !body
+        body
+        body.id
+        body.state == SyncJobState.Queued.name()
+        body.sourceId
     }
 }

@@ -90,6 +90,7 @@ class BulkApiSupport<D> {
         //syncJobArgs.op = DataOp.update.export
         syncJobArgs.includes = bulkIncludes
         syncJobArgs.sourceId = sourceId
+        syncJobArgs.entityClass = getEntityClass()
         return syncJobArgs
     }
 

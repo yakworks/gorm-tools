@@ -110,6 +110,15 @@ class BulkExportServiceIntegrationSpec  extends Specification implements DomainI
         List data = json[0].data
 
         then:
+        //syncjob data format
+        /*
+         * {
+         *   data [
+         *      {id:1, name:"x", num:"y"},
+         *      {id:2, name:"x", num:"y"},
+         *   ]
+         * }
+         */
         data.size() == 2 //two records for two company orgs
         data[0].id == 2
         data[0].num

@@ -4,7 +4,6 @@
 */
 package yakworks.gorm.api.support
 
-
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
@@ -16,6 +15,7 @@ import gorm.tools.job.SyncJobService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
+import gorm.tools.repository.bulk.BulkExportService
 import gorm.tools.repository.model.DataOp
 import yakworks.commons.lang.EnumUtils
 import yakworks.gorm.api.IncludesConfig
@@ -39,6 +39,9 @@ class BulkApiSupport<D> {
 
     @Autowired
     ProblemHandler problemHandler
+
+    @Autowired
+    BulkExportService bulkExportService
 
     Class<D> entityClass // the domain class this is for
 
@@ -88,6 +91,12 @@ class BulkApiSupport<D> {
         syncJobArgs.includes = bulkIncludes
         syncJobArgs.sourceId = sourceId
         return syncJobArgs
+    }
+
+    SyncJobEntity processBulkExport(Map params, String sourceId) {
+        SyncJobArgs args = setupBulkExportArgs(params, sourceId)
+        Long jobId = bulkExportService.scheduleBulkExportJob(args)
+        return syncJobService.getJob(jobId)
     }
 
 

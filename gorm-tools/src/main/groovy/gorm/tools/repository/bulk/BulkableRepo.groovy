@@ -17,8 +17,6 @@ import gorm.tools.async.ParallelTools
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobService
-import gorm.tools.mango.MangoDetachedCriteria
-import gorm.tools.mango.api.QueryArgs
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
@@ -34,10 +32,7 @@ import yakworks.api.Result
 import yakworks.api.problem.data.DataProblem
 import yakworks.commons.map.LazyPathKeyMap
 import yakworks.commons.map.Maps
-import yakworks.gorm.api.IncludesConfig
-import yakworks.gorm.api.IncludesProps
 import yakworks.meta.MetaMap
-import yakworks.meta.MetaMapList
 
 /**
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>
@@ -61,8 +56,6 @@ trait BulkableRepo<D> {
     @Autowired
     ProblemHandler problemHandler
 
-    @Autowired IncludesConfig includesConfig
-
     //Here for @CompileStatic - GormRepo implements these
     abstract D doCreate(Map data, PersistArgs args)
     abstract D doUpdate(Map data, PersistArgs args)
@@ -74,7 +67,6 @@ trait BulkableRepo<D> {
     abstract RepoEventPublisher getRepoEventPublisher()
     abstract <T> T withTrx(Closure<T> callable)
     abstract <T> T withNewTrx(Closure<T> callable)
-    abstract MangoDetachedCriteria<D> query(QueryArgs queryArgs)
 
     /**
      * creates a supplier to wrap doBulkParallel and calls bulk
@@ -271,47 +263,4 @@ trait BulkableRepo<D> {
         getRepoEventPublisher().publishEvents(self, event, [event] as Object[])
     }
 
-    //FIXME @SUD remove
-    Long bulkExport(SyncJobArgs syncJobArgs) {
-        if(syncJobArgs.queryArgs == null) throw DataProblem.of('error.query.qRequired').detail("q criteria required").toException()
-        syncJobArgs.entityClass = getEntityClass()
-
-        //resulting data should be saved as a file
-        syncJobArgs.saveDataAsFile = true
-        SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, syncJobArgs.queryArgs.criteriaMap)
-        return syncJobService.runJob(syncJobArgs.asyncArgs, jobContext, () -> doBulkExport(jobContext))
-    }
-
-    //FIXME @SUD remove
-    void doBulkExport(SyncJobContext jobContext) {
-        try {
-            //fetch data list
-            List resultList = query(jobContext.args.queryArgs).list()
-            //todo, transform result using includes
-
-            MetaMapList entityMapList = metaMapService.createMetaMapList(resultList, jobContext.args.includes)
-            Result result = Result.OK().payload(entityMapList)
-            jobContext.updateJobResults(result, false)
-        } catch (Exception ex) {
-            log.error("BulkExport unexpected exception", ex)
-            jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
-        }
-    }
-
-
-    /**
-     * Gets the includes/includesKey from the qParams or from the fallbackKeys
-     * @return the list of fields in our mango format.
-     */
-    List<String> getIncludes(Map qParams, List fallbackIncludesKeys) {
-        //parse the params into the IncludesProps
-        var incProps = IncludesProps.of(qParams).fallbackKeys(fallbackIncludesKeys)
-
-        //if includes was passed in, then it wins
-        if(incProps.includes) return incProps.includes
-
-        //otherwise search based on includesKey
-        List<String> incs = includesConfig.findIncludes(getEntityClass(), incProps)
-        return incs
-    }
 }

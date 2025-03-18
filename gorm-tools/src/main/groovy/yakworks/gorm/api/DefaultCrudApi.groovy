@@ -176,9 +176,6 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         Pager pager = Pager.of(qParams)
         QueryArgs qargs = createQueryArgs(pager, qParams, uri)
 
-        //TODO check here, if this should be a bulk export
-        //TODO need to fix method return type, if its a bulk export, it will return a syncjob, not a pager, how ?
-
         List dlist = queryList(qargs)
         List<String> incs = getIncludes(qParams, [IncludesKey.list, IncludesKey.get])
         return createPagerResult(pager, qParams, dlist, incs)
@@ -201,10 +198,8 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         return job
     }
 
-    //FIXME @SUD change to use BulkExportService
-    Long bulkExport(Map params, String sourceId) {
-        SyncJobArgs syncJobArgs = getBulkApiSupport().setupBulkExportArgs(params, sourceId)
-        return getApiCrudRepo().bulkExport(syncJobArgs)
+    SyncJobEntity bulkExport(Map params, String sourceId) {
+        return getBulkApiSupport().processBulkExport(params, sourceId)
     }
 
     protected List<D> queryList(QueryArgs qargs) {

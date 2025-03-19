@@ -4,6 +4,9 @@
 */
 package gorm.tools.repository.bulk
 
+import gorm.tools.beans.Pager
+import gorm.tools.mango.api.QueryArgs
+
 import javax.inject.Inject
 
 import groovy.transform.CompileStatic
@@ -81,15 +84,14 @@ class BulkExportService {
      */
     void doBulkExport(SyncJobContext jobContext, GormRepo repo) {
         try {
-            //fetch data list
-            List resultList = repo.query(jobContext.args.queryArgs).list()
-
-            //create metamap list with includes
-            MetaMapList entityMapList = metaMapService.createMetaMapList(resultList, jobContext.args.includes)
-
-            //update job with result
-            Result result = Result.OK().payload([data:entityMapList])
-            jobContext.updateJobResults(result, false)
+            //paginate and fetch data list, update job results for each page of data.
+            eachPage(repo, jobContext.args.queryArgs) { List pageData ->
+                //create metamap list with includes
+                MetaMapList entityMapList = metaMapService.createMetaMapList(pageData, jobContext.args.includes)
+                Result result = Result.OK().payload([data:entityMapList])
+                //update job with page data
+                jobContext.updateJobResults(result, false)
+            }
         } catch (Exception ex) {
             log.error("BulkExport unexpected exception", ex)
             jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
@@ -145,6 +147,21 @@ class BulkExportService {
 
     GormRepo loadRepo(String domainName) {
         return AppCtx.get("${NameUtils.getPropertyName(domainName)}Repo") as GormRepo
+    }
+
+    /**
+     * Instead of loading all the data for bulkexport, it paginates and loads one page at a time
+     */
+    void eachPage(GormRepo repo, QueryArgs queryArgs, Closure cl) {
+        //count total records based on query args and build a paginator
+        Integer totalRecords = repo.query(queryArgs).count() as Integer
+        Pager paginator = Pager.of(max:10)
+        paginator.recordCount = totalRecords
+
+        paginator.eachPage { def max, def offset ->
+            List pageData = repo.query(queryArgs).pagedList(Pager.of(max:max, offset:offset))
+            cl.call(pageData)
+        }
     }
 
 }

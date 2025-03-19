@@ -78,7 +78,7 @@ class BulkExportServiceIntegrationSpec  extends Specification implements DomainI
 
     void "run export"() {
         setup:
-        Long jobId = bulkExportService.scheduleBulkExportJob(setupJobArgs("type": "Company"))
+        Long jobId = bulkExportService.scheduleBulkExportJob(setupJobArgs("inactive": false))
 
         when:
         bulkExportService.runBulkExportJob(jobId, false)
@@ -104,6 +104,7 @@ class BulkExportServiceIntegrationSpec  extends Specification implements DomainI
         then:
         json
         json instanceof List
+        json.size() == Org.where(inactive:false).count() / 10
         json[0].data instanceof List
 
         when:
@@ -113,20 +114,17 @@ class BulkExportServiceIntegrationSpec  extends Specification implements DomainI
         //syncjob data format
         /*
          * {
-         *   data [
+         *   data: [
          *      {id:1, name:"x", num:"y"},
          *      {id:2, name:"x", num:"y"},
          *   ]
          * }
          */
-        data.size() == 2 //two records for two company orgs
-        data[0].id == 2
+        data.size() == 10 //
+        data[0].id == 1
         data[0].num
         data[0].name
 
-        data[1].id == 3
-        data[1].num
-        data[1].name
 
         cleanup:
         if(job && job.dataId) {

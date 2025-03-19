@@ -6,7 +6,6 @@ package yakworks.rest.gorm.controller
 
 import java.net.http.HttpRequest
 import java.nio.charset.StandardCharsets
-import java.util.concurrent.TimeoutException
 import java.util.function.Function
 import javax.persistence.LockTimeoutException
 import javax.servlet.http.HttpServletRequest
@@ -69,6 +68,7 @@ trait CrudApiController<D> extends RestApiController {
     // ObjectProvider<CrudApi<D>> crudApiProvider
     @Autowired
     private Function<Class, CrudApi> crudApiFactory
+
 
     // @Autowired
     // Closure<CrudApi> crudApiClosure
@@ -237,6 +237,19 @@ trait CrudApiController<D> extends RestApiController {
     def bulkUpdate() {
         try {
             bulkProcess(DataOp.update)
+        } catch (Exception | AssertionError e) {
+            respondWith(
+                BulkExceptionHandler.of(getEntityClass(), problemHandler).handleBulkOperationException(request, e)
+            )
+        }
+    }
+
+    @Action
+    def bulkExport() {
+        try {
+            Map qParams = getParamsMap()
+            SyncJobEntity job = getCrudApi().bulkExport(qParams,  requestToSourceId(request))
+            respondWith(job, [status: MULTI_STATUS])
         } catch (Exception | AssertionError e) {
             respondWith(
                 BulkExceptionHandler.of(getEntityClass(), problemHandler).handleBulkOperationException(request, e)

@@ -1,7 +1,6 @@
 package yakworks.rally.activity
 
 import gorm.tools.problem.ValidationProblem
-import grails.validation.ValidationException
 
 import java.nio.file.Files
 
@@ -82,6 +81,20 @@ class ActivityTests extends Specification implements DomainIntTest {
         result != null
         result.name == "test-updated"
         result.visibleTo == VisibleTo.Owner
+    }
+
+    void "create note empty body"() {
+        setup:
+        Org org = Org.first()
+        Map params = ["orgId":org.id,"note":["body":"\n"]]
+
+        when:
+        Activity result = activityRepo.create(params)
+        flush()
+
+        then:
+        ValidationProblem.Exception ex = thrown()
+        ex.errors.getFieldError('name').code == "NotNull"
     }
 
     void "update note"() {

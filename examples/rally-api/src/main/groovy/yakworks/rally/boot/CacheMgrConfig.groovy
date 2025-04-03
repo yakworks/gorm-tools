@@ -4,6 +4,9 @@
 */
 package yakworks.rally.boot
 
+import com.hazelcast.collection.IQueue
+import yakworks.rally.api.HazelQueueListener
+
 import java.util.concurrent.TimeUnit
 
 import groovy.transform.CompileStatic
@@ -71,6 +74,18 @@ class CacheMgrConfig {
             return hcm
         }
 
+    }
+
+    @Bean
+    HazelQueueListener hazelQueueListener() {
+        return new HazelQueueListener()
+    }
+
+    @Bean
+    IQueue<Long> hazelQueue(HazelcastInstance instance, HazelQueueListener listener) {
+        IQueue<Long> queue = instance.getQueue( "bulkExport" )
+        queue.addItemListener(listener, true)
+        return queue
     }
 
     //@Configuration

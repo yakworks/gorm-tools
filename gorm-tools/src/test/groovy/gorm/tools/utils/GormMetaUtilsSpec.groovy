@@ -4,15 +4,17 @@
 */
 package gorm.tools.utils
 
+import org.grails.datastore.mapping.model.PersistentProperty
 import spock.lang.Specification
 import testing.Cust
 import testing.CustType
 import testing.UuidSample
+import yakworks.security.gorm.model.SecRoleUser
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class GormMetaUtilsSpec extends Specification implements GormHibernateTest {
 
-    static List entityClasses = [Cust, CustType, UuidSample]
+    static List entityClasses = [Cust, CustType, UuidSample, SecRoleUser]
 
     void setupSpec(){
         new CustType(id: 1, name: 'foo').persist(flush: true)
@@ -40,10 +42,18 @@ class GormMetaUtilsSpec extends Specification implements GormHibernateTest {
         GormMetaUtils.findPersistentEntity("testing.Cust")
     }
 
-    def "getPersistentProperties"(){
+    void "getPersistentProperties"(){
         expect:
         GormMetaUtils.getPersistentProperties("testing.Cust").size()
         GormMetaUtils.getPersistentProperties("testing.Cust").find{it.name == "id"} != null
+
+        when: "when domain has composite identity"
+        List<PersistentProperty> pprops = GormMetaUtils.getPersistentProperties("yakworks.security.gorm.model.SecRoleUser")
+
+        then:
+        pprops.find { it == null} == null //there should be no null prop in persistent props list
+        pprops.find { it.name == 'user'}
+        pprops.find { it.name == 'role'}
     }
 
     void "test getMetaProperties"() {
@@ -118,7 +128,6 @@ class GormMetaUtilsSpec extends Specification implements GormHibernateTest {
 
         then:
         clazz.name == "testing.CustType"
-
     }
 
 }

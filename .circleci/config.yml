@@ -8,14 +8,14 @@ executors:
       # JAVA_OPTIONS: "-Xmx1792m"
       GRADLE_OPTS: "-Dorg.gradle.caching=true -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=4 -Dorg.gradle.console=plain"
     docker:
-      - image: yakworks/builder:jdk11
+      - image: yakworks/bullseye:jdk11
   builder-medium: # 2cpus 4gb ram
     resource_class: 'medium'
     environment:
       # JAVA_OPTIONS: "-Xmx1792m"
       GRADLE_OPTS: "-Dorg.gradle.caching=true -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dorg.gradle.console=plain"
     docker:
-      - image: yakworks/builder:jdk11
+      - image: yakworks/bullseye:jdk11
 
 commands:
   restore_gradle_cache:

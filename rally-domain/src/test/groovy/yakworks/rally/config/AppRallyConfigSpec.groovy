@@ -29,6 +29,7 @@ class AppRallyConfigSpec extends Specification implements GrailsAppUnitTest {
     def "sanity Check"() {
         expect:
         rootDir == "./build/rootLocation"
+        appResourcesDir == 'foo'
         appResourcesDir == rootDir
         rallyConfig.resourcesDir == "./build/rootLocation"
         rallyConfig.hello == "world"

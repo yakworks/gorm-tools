@@ -50,6 +50,14 @@ class PartitionOrgRepo extends LongIdGormRepo<PartitionOrg> {
     }
 
     /**
+     * Looks up PartionOrg from Org
+     */
+    @ReadOnly
+    PartitionOrg getByOrg(Org org) {
+        PartitionOrg.get(org.id)
+    }
+
+    /**
      * Creates a PartitionOrg for the given org. If org.type is partition org type
      */
     protected PartitionOrg createFromOrg(Org org) {
@@ -58,13 +66,6 @@ class PartitionOrgRepo extends LongIdGormRepo<PartitionOrg> {
         porg.persist()
     }
 
-    /**
-     * Looks up PartionOrg from Org
-     */
-    @ReadOnly
-    PartitionOrg getByOrg(Org org) {
-        PartitionOrg.findWhere(org: org)
-    }
 
     /**
      * updates PartitionOrg if num or name has changed

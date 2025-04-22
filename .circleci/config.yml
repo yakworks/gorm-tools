@@ -74,7 +74,7 @@ jobs:
 
       - run:
           name: ✔︎ -- assemble
-          command: ./gradlew assemble -x testify:assemble -x benchmarks:assemble -x rally-api:assemble -x hello-boot-security:check --stacktrace
+          command: ./gradlew assemble -x testify:assemble -x benchmarks:assemble -x rally-api:assemble -x hello-boot-security:check
 
       - save_gradle_cache
       - save_workspace

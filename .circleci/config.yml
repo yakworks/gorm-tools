@@ -75,6 +75,10 @@ jobs:
       - restore_build_cache
 
       - run:
+          name: ✔︎ -- compile
+          command: ./gradlew gorm-tools:classes
+
+      - run:
           name: ✔︎ -- assemble
           command: ./gradlew assemble -x testify:assemble -x benchmarks:assemble -x rally-api:assemble -x hello-boot-security:check
 

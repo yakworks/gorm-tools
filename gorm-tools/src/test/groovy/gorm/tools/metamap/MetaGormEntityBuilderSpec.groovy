@@ -4,7 +4,7 @@
 */
 package gorm.tools.metamap
 
-
+import yakworks.security.gorm.model.SecRoleUser
 import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.testing.gorm.model.Enummy
@@ -15,7 +15,7 @@ import yakworks.testing.gorm.model.Thing
 import yakworks.meta.MetaEntity
 
 class MetaGormEntityBuilderSpec extends Specification implements DataRepoTest {
-    static entityClasses = [KitchenSink, SinkExt, SinkItem, Thing, Enummy]
+    static entityClasses = [KitchenSink, SinkExt, SinkItem, Thing, Enummy, SecRoleUser]
 
     void "KitchenSink *"(){
         when:
@@ -172,6 +172,14 @@ class MetaGormEntityBuilderSpec extends Specification implements DataRepoTest {
 
         def thingLevel = extIncs.metaEntityProps['thing']
         thingLevel.metaProps.keySet() == ['id', 'name'] as Set
+    }
+
+    void "build for roleUser with composite id"() {
+        when:
+        MetaGormEntityBuilder.build(SecRoleUser, ["user.id", "user.username", "role.id", "role.name"])
+
+        then:
+        noExceptionThrown()
     }
 
 }

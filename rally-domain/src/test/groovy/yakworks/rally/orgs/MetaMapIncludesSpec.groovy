@@ -20,7 +20,7 @@ import yakworks.security.gorm.model.SecRoleUser
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
-class MetaMaptIncludesSpec extends Specification implements GormHibernateTest, SecurityTest {
+class MetaMapIncludesSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [Org, Contact, ContactSource, ContactPhone, ContactEmail, SecRoleUser]
 
     @Autowired MetaMapService metaMapService

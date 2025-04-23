@@ -249,8 +249,13 @@ class GormMetaUtils {
      */
     static List<PersistentProperty> getPersistentProperties(PersistentEntity domain){
         List<PersistentProperty> result = domain.persistentProperties.collect() // collect copies it
-        if(domain.compositeIdentity) result.addAll(domain.compositeIdentity)
-        result.add(0, domain.getIdentity())
+        if(domain.compositeIdentity) {
+            result.addAll(domain.compositeIdentity)
+        }
+        else {
+            //domain.getIdentity() would be null if domain has compositeIdentity, so dont add a null prop
+            result.add(0, domain.getIdentity())
+        }
         result.unique()
     }
 

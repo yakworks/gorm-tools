@@ -1,3 +1,15 @@
+### v7.3.83
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.82...v7.3.83)
+- release trigger [link](https://github.com/yakworks/gorm-tools/commit/380b0f0da8b25a6a778484bde886a3aad7265a1c)
+- dev merge for release [link](https://github.com/yakworks/gorm-tools/commit/18677b210dc2be2c151ac2bf3b738b92f68b1c32)
+- Fix NPE - MetaGormEntityBuilder (#883) [link](https://github.com/yakworks/gorm-tools/commit/8de11983b058c2f4fc1a6ae931110d13df148489)
+- Get by org (#884) [link](https://github.com/yakworks/gorm-tools/commit/3a0db24baa95269dc613e9fc72ddff54b8c886e6)
+- change to bullseye [link](https://github.com/yakworks/gorm-tools/commit/ba3df0d0cdcfccc2d11630b8d2aa7f266659ff51)
+- Activity create : NPE fix (#879) [link](https://github.com/yakworks/gorm-tools/commit/13d2b65f6f9ef8c903cb05a83fef42421b829516)
+- Api docs (#878) [link](https://github.com/yakworks/gorm-tools/commit/de3dcd270ccdd081ac208a545e3d20737f936a6a)
+- MailMessage.msgResponse increase maxSize constrait (#876) [link](https://github.com/yakworks/gorm-tools/commit/be240818685d6430a9559d7be761f20c814b11f1)
+
 ### v7.3.82
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.81...v7.3.82)

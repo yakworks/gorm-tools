@@ -16,11 +16,12 @@ import yakworks.rally.orgs.model.ContactPhone
 import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.testing.MockData
+import yakworks.security.gorm.model.SecRoleUser
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
-class ContactIncludesSpec extends Specification implements GormHibernateTest, SecurityTest {
-    static List entityClasses = [Org, Contact, ContactSource, ContactPhone, ContactEmail]
+class MetaMapIncludesSpec extends Specification implements GormHibernateTest, SecurityTest {
+    static List entityClasses = [Org, Contact, ContactSource, ContactPhone, ContactEmail, SecRoleUser]
 
     @Autowired MetaMapService metaMapService
 
@@ -45,5 +46,17 @@ class ContactIncludesSpec extends Specification implements GormHibernateTest, Se
 
         then:
         result == [id:1, emails:[[id:1, address:'test@9ci.com', kind:'work']]]
+    }
+
+    void "build for roleUser"() {
+        when:
+        def incs = MetaGormEntityBuilder.build(SecRoleUser, ["user.id", "user.username", "role.id", "role.name"])
+
+        then:
+        noExceptionThrown()
+        incs
+        incs.metaProps.size() == 2
+        incs.metaProps['user']
+        incs.metaProps['role']
     }
 }

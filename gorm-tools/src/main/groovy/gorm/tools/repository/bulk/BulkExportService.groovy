@@ -4,19 +4,18 @@
 */
 package gorm.tools.repository.bulk
 
-import gorm.tools.beans.Pager
-import gorm.tools.mango.api.QueryArgs
-
 import javax.inject.Inject
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import gorm.tools.beans.Pager
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
 import gorm.tools.job.SyncJobState
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo

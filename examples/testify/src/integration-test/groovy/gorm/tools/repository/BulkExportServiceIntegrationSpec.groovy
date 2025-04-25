@@ -104,7 +104,7 @@ class BulkExportServiceIntegrationSpec  extends Specification implements DomainI
         then:
         json
         json instanceof List
-        json.size() == Org.where(inactive:false).count() / 10
+        json.size() == Org.query(inactive:false).count() / 10
         json[0].data instanceof List
 
         when:

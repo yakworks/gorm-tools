@@ -8,18 +8,17 @@ import java.util.concurrent.TimeUnit
 
 import groovy.transform.CompileStatic
 
-import org.springframework.cache.CacheManager
 import org.springframework.cache.caffeine.CaffeineCacheManager
-import org.springframework.cache.support.NoOpCacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
 import org.springframework.context.annotation.Primary
-import org.springframework.context.annotation.Profile
 
 import com.github.benmanes.caffeine.cache.Caffeine
+import com.hazelcast.collection.IQueue
 import com.hazelcast.core.HazelcastInstance
 import com.hazelcast.spring.cache.HazelcastCacheManager
+import yakworks.rally.api.HazelQueueListener
 import yakworks.spring.hazelcast.HazelCacheManager
 
 //@AutoConfiguration(after = org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration)
@@ -71,6 +70,23 @@ class CacheMgrConfig {
             return hcm
         }
 
+    }
+
+    @Bean
+    HazelQueueListener hazelQueueListener() {
+        return new HazelQueueListener()
+    }
+
+    /**
+     * Configure a queue for bulk export.
+     * Once the queue is configured, the queue would be distributed and can be shared among instances
+     */
+    @Bean
+    IQueue<Long> hazelQueue(HazelcastInstance instance, HazelQueueListener listener) {
+        //instance.getQueue would create or get existing distributed queue, which would be shared among instances
+        IQueue<Long> queue = instance.getQueue( "bulkExport" )
+        queue.addItemListener(listener, true)
+        return queue
     }
 
     //@Configuration

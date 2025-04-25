@@ -11,6 +11,7 @@ import groovy.transform.CompileStatic
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.LongIdGormRepo
+import grails.gorm.transactions.ReadOnly
 import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.PartitionOrg
@@ -49,6 +50,14 @@ class PartitionOrgRepo extends LongIdGormRepo<PartitionOrg> {
     }
 
     /**
+     * Looks up PartionOrg from Org
+     */
+    @ReadOnly
+    PartitionOrg getByOrg(Org org) {
+        PartitionOrg.get(org.id)
+    }
+
+    /**
      * Creates a PartitionOrg for the given org. If org.type is partition org type
      */
     protected PartitionOrg createFromOrg(Org org) {
@@ -56,6 +65,7 @@ class PartitionOrgRepo extends LongIdGormRepo<PartitionOrg> {
         porg.id = org.id
         porg.persist()
     }
+
 
     /**
      * updates PartitionOrg if num or name has changed

@@ -4,9 +4,6 @@
 */
 package yakworks.rally.boot
 
-import com.hazelcast.collection.IQueue
-import yakworks.rally.api.HazelQueueListener
-
 import java.util.concurrent.TimeUnit
 
 import groovy.transform.CompileStatic
@@ -18,8 +15,10 @@ import org.springframework.context.annotation.Lazy
 import org.springframework.context.annotation.Primary
 
 import com.github.benmanes.caffeine.cache.Caffeine
+import com.hazelcast.collection.IQueue
 import com.hazelcast.core.HazelcastInstance
 import com.hazelcast.spring.cache.HazelcastCacheManager
+import yakworks.rally.api.HazelQueueListener
 import yakworks.spring.hazelcast.HazelCacheManager
 
 //@AutoConfiguration(after = org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration)

@@ -77,8 +77,13 @@ class CacheMgrConfig {
         return new HazelQueueListener()
     }
 
+    /**
+     * Configure a queue for bulk export.
+     * Once the queue is configured, the queue would be distributed and can be shared among instances
+     */
     @Bean
     IQueue<Long> hazelQueue(HazelcastInstance instance, HazelQueueListener listener) {
+        //instance.getQueue would create or get existing distributed queue, which would be shared among instances
         IQueue<Long> queue = instance.getQueue( "bulkExport" )
         queue.addItemListener(listener, true)
         return queue

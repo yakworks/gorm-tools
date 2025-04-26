@@ -4,9 +4,12 @@
 */
 package yakworks.rally
 
+import java.sql.SQLException
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
+import org.h2.tools.Server
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
@@ -14,6 +17,8 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Import
+import org.springframework.context.annotation.Lazy
+import org.springframework.context.annotation.Profile
 
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
@@ -54,6 +59,20 @@ class SpringApplication extends GrailsAutoConfiguration {
         System.setProperty(BuildSettings.MAIN_CLASS_NAME, "yakworks.rally.boot.SpringApplication")
     }
 
+    /**
+     * Start internal H2 server so we can query the DB from IDE
+     *
+     * @return H2 Server instance
+     * @throws SQLException
+     */
+    @Profile("server")
+    @Lazy(false)
+    @Bean(initMethod = "start", destroyMethod = "stop")
+    public Server h2Server() throws SQLException {
+        println "***********************Starting H2 Server********************"
+        return Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "9090");
+    }
+
     /*
     grails HibernateDatastoreConnectionSourcesRegistrar.postProcessBeanDefinitionRegistry sets up the dataSource but checks for existing first.
     in order for other spring boot Autoconfigure (such as actuator metrics) to get picked up then datasource needs to be setup early.
@@ -62,7 +81,7 @@ class SpringApplication extends GrailsAutoConfiguration {
     and the Datasource early (which looks like it should be a factory based on dataSourceConnectionSourceFactory)
     this is a WIP example.
     */
-    @Bean // @Primary
+    //@Bean // @Primary
     // DataSource dataSource() {
     //     return DataSourceBuilder
     //         .create()

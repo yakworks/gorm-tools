@@ -61,7 +61,7 @@ dependencies {
   implementation "com.hazelcast:hazelcast-spring:$vHazelcast"
   implementation "com.github.ben-manes.caffeine:caffeine:$vCaffeine"
 
-  runtimeOnly "com.h2database:h2:$vH2"
+  implementation "com.h2database:h2:$vH2"
   runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"
   runtimeOnly "com.zaxxer:HikariCP:$vHikari"
 
@@ -98,6 +98,8 @@ bootRun {
   //set the sys properties so BuildSupport statics can see them. Should not really be used or needed in prod
   systemProperty "project.rootProjectDir", rootProject.projectDir.absolutePath
   systemProperty "project.projectDir", project.projectDir.absolutePath
+  //fixes the hazelcast when running offline
+  systemProperty "java.net.preferIPv4Stack", true
 }
 
 bootJar.enabled = true

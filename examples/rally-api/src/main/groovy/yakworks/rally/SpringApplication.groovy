@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Profile
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
 import grails.util.BuildSettings
+import yakworks.rally.boot.AsyncConfig
 import yakworks.rally.boot.CacheMgrConfig
 import yakworks.rally.boot.RallyApiSpringConfig
 import yakworks.rally.boot.WebMvcConfiguration
@@ -32,14 +33,14 @@ import yakworks.rest.gorm.RestApiFromConfig
  * Grails adds the @EnableWebMvc to the Application class. This annotation imports DelegatingWebMvcConfiguration and doesn't allow
  * us to import ours. See the WebMvcConfiguration which is needed to create our custom RequestMappingHandlerAdapter.
  */
-@ComponentScan(['yakworks.testing.gorm.model'])
+@ComponentScan(['yakworks.testing.gorm.model','yakworks.rally.hazel'])
 @RestApiFromConfig
 // caching will use hazelcast for spring caching too, look into how to use caffiene for spring stuff and hazel for hibernate.
 @EnableCaching
 @EnableAutoConfiguration(
     exclude = [DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class]
 )
-@Import([RallyApiSpringConfig, WebMvcConfiguration, CacheMgrConfig])
+@Import([RallyApiSpringConfig, WebMvcConfiguration, CacheMgrConfig, AsyncConfig])
 //@SpringBootApplication
 @CompileStatic
 class SpringApplication extends GrailsAutoConfiguration {

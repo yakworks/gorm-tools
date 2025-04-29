@@ -41,4 +41,8 @@ class PartitionOrg implements NameNum, RepoEntity<PartitionOrg>, Serializable {
     ]
 
     static PartitionOrgRepo getRepo() { return (PartitionOrgRepo) RepoLookup.findRepo(this) }
+
+    static PartitionOrg getByOrg(Org org) {
+        getRepo().getByOrg(org)
+    }
 }

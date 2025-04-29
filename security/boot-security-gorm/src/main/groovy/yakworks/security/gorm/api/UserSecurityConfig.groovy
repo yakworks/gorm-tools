@@ -14,7 +14,6 @@ import yakworks.security.user.CurrentUser
 
 
 @CompileStatic
-@Configuration(proxyBeanMethods = false)
 @ConfigurationProperties(prefix="app.security")
 class UserSecurityConfig {
 

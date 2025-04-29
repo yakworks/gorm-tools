@@ -19,8 +19,12 @@ class ApplicationProperySpec extends Specification {
     @Value('${foo.bar.test-message:}')
     String bazMsg
 
+    @Value('${app.resources.rootLocation}')
+    String appResourcesDir
+
     void "Check it gets set from the right place"() {
         expect:
+        appResourcesDir //== '.'
         message == "from EXTERNAL examples/resource/foo.yml"
         bazMsg == "got it"
     }

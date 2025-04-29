@@ -71,6 +71,7 @@ trait CrudApiController<D> extends RestApiController {
     @Autowired
     private Function<Class, CrudApi> crudApiFactory
 
+
     // @Autowired
     // Closure<CrudApi> crudApiClosure
 
@@ -241,6 +242,19 @@ trait CrudApiController<D> extends RestApiController {
     def bulkUpdate() {
         try {
             bulkProcess(DataOp.update)
+        } catch (Exception | AssertionError e) {
+            respondWith(
+                BulkExceptionHandler.of(getEntityClass(), problemHandler).handleBulkOperationException(request, e)
+            )
+        }
+    }
+
+    @Action
+    def bulkExport() {
+        try {
+            Map qParams = getParamsMap()
+            SyncJobEntity job = getCrudApi().bulkExport(qParams,  requestToSourceId(request))
+            respondWith(job, [status: MULTI_STATUS])
         } catch (Exception | AssertionError e) {
             respondWith(
                 BulkExceptionHandler.of(getEntityClass(), problemHandler).handleBulkOperationException(request, e)

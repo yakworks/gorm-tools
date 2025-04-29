@@ -159,6 +159,12 @@ class SyncJobArgs {
     //reference back to the SyncJobContext built from these args.
     SyncJobContext context
 
+    /**
+     * SyncJobState to use when creating new job.
+     * Default is Running. But Queued can be used for jobs which are scheduled to run later, eg BulkExport.
+     */
+    SyncJobState jobState = SyncJobState.Running
+
     /** helper to return true if op=DataOp.add */
     boolean isCreate(){
         op == DataOp.add

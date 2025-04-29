@@ -39,9 +39,6 @@ import static org.springframework.security.config.Customizer.withDefaults
 /**
  * An example of explicitly configuring Spring Security with the defaults.
  */
-// keep componentScan in Application.groovy for now so unit test work. see notes in the TestSpringApplication class in tests
-// @ComponentScan(['yakity.security', 'yakworks.security'])
-//@Lazy
 @EnableMethodSecurity
 @EnableWebSecurity //(debug = true)
 @CompileStatic

@@ -10,7 +10,7 @@ import java.time.ZonedDateTime
 
 import spock.lang.Specification
 import yakworks.api.problem.ThrowableProblem
-import yakworks.rally.common.ZonedDateUtil
+import yakworks.commons.lang.ZonedDateUtil
 import yakworks.rally.config.MaintenanceProps
 
 class MaintWindowUtilSpec extends Specification {

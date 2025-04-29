@@ -20,7 +20,7 @@ class BootStrap {
         AppUser.withTransaction {
             AppUser.repo.flush()
             AppUser admin = new AppUser([
-                id: (Long)6, username: "developers@9ci.com", email: "developers@9ci.com", orgId: 2
+                id: 6L, username: "developers@9ci.com", email: "developers@9ci.com", orgId: 2
             ]).persist()
             admin.addRole('ADMIN', true)
             admin.addRole('MANAGER', true)

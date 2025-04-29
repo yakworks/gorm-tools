@@ -2,11 +2,13 @@ package yakworks.rally.hazel
 
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.atomic.AtomicLong
+import javax.inject.Inject
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
@@ -21,9 +23,12 @@ import com.hazelcast.core.HazelcastInstance
 @Slf4j
 @CompileStatic
 @Component
-class DemoJob {
+class DemoSpringJobs {
 
     @Autowired HazelcastInstance hazelcastInstance
+    @Autowired DemoJobService demoJobService
+    @Autowired BlockingQueue<Long> demoJobQueue
+
     AtomicLong nextId = new AtomicLong(1)
 
     // @Scheduled(fixedDelay = 2000L)
@@ -33,11 +38,12 @@ class DemoJob {
     //     log.info("✅  Finished Job\n")
     // }
 
-    @Scheduled(fixedDelay = 5000L)
+    //@Scheduled(fixedDelay = 5000L)
     public void consumerJob() {
         log.info("🤡  Consumer Running \n")
         //Thread.sleep(5000);
-        var bque = getQueue()
+        //var bque = getQueue()
+        var bque = demoJobQueue
         while(true) {
             // take() - Retrieves and removes the head of this queue, waits until one becomes available.
             // poll() - Retrieves and removes the head of this queue, returns null if this queue is empty. Can add a timeout for how long to wait
@@ -45,7 +51,7 @@ class DemoJob {
             // process event
             if (qid != null) {
                 log.info("Found one consumerJob poller::: Processing {} ", qid);
-                //demoService.doWork(event);
+                demoJobService.runJob(qid);
             } else {
                 log.info("null poll, breaking")
                 break;
@@ -57,15 +63,18 @@ class DemoJob {
     /**
      * Sticks stuff in the queue every 2 seconds
      */
-    @Scheduled(fixedDelay = 1000L)
+    @Scheduled(fixedDelay = 10000L)
     public void producerJob() {
-        log.info("🌶  OFFER item on queue\n")
+        log.info("🌶  OFFER some items on queue\n")
         BlockingQueue<Long> bque = getQueue()
         // offer returns true or false, can also pass in timeout
         // add throws exception if not space
         // put will block until it can be added
-        bque.offer(nextId.getAndIncrement())
-        log.info("✅  OFFER Finished adding item to queue\n")
+        (1..3).each {
+            Long jobId = nextId.getAndIncrement()
+            bque.offer(jobId)
+            log.info("✅  OFFER Finished adding ${jobId} to queue\n")
+        }
     }
 
     IQueue<Long> getQueue(){

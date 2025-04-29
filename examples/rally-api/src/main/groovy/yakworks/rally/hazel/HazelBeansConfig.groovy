@@ -4,28 +4,15 @@
 */
 package yakworks.rally.hazel
 
-import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.BlockingQueue
 
 import groovy.transform.CompileStatic
 
-import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler
-import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
-import org.springframework.boot.task.TaskExecutorBuilder
-import org.springframework.boot.task.TaskSchedulerBuilder
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
-import org.springframework.scheduling.annotation.AsyncConfigurer
-import org.springframework.scheduling.annotation.EnableAsync
-import org.springframework.scheduling.annotation.EnableScheduling
-import org.springframework.scheduling.concurrent.CustomizableThreadFactory
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
-import org.springframework.scheduling.config.TaskManagementConfigUtils
-import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecutor
 
-import com.hazelcast.collection.IQueue
 import com.hazelcast.core.HazelcastInstance
 
 /**
@@ -36,12 +23,20 @@ import com.hazelcast.core.HazelcastInstance
 @CompileStatic
 class HazelBeansConfig {
 
-    public static String QUE_NAME = "demoQueue"
+    public static final String QUE_NAME = "demoJobQueue"
+
+    @Autowired HazelcastInstance hazelcastInstance
 
     @Bean
-    public IQueue<Long> demoQueue(HazelcastInstance hazelcastInstance) {
+    public BlockingQueue<Long> demoJobQueue() {
         return hazelcastInstance.getQueue(QUE_NAME);
     }
+
+    @Bean
+    public DemoConsumer demoConsumer(BlockingQueue<Long> demoJobQueue, DemoJobService demoJobService) {
+        new DemoConsumer(demoJobQueue, demoJobService);
+    }
+
 
 
 }

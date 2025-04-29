@@ -4,41 +4,50 @@
 */
 package yakworks.rally.api
 
-import javax.inject.Inject
+import java.util.concurrent.BlockingQueue
 
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.context.annotation.Lazy
+import org.springframework.stereotype.Component
 
-import com.hazelcast.collection.IQueue
+import com.hazelcast.collection.ICollection
 import com.hazelcast.collection.ItemEvent
 import com.hazelcast.collection.ItemListener
-import com.hazelcast.core.HazelcastInstance
-import grails.gorm.transactions.Transactional
-import yakworks.rally.orgs.model.Org
+import yakworks.rally.hazel.DemoJobService
 
 @Slf4j
+//@Component @Lazy(false)
+@CompileStatic
 class DemoQueueListener implements ItemListener<Long>{
 
-    @Inject HazelcastInstance hazelcastInstance
+    //@Inject HazelcastInstance hazelcastInstance
+    //@Autowired
+    DemoJobService demoJobService
+    //@Autowired
+    BlockingQueue<Long> demoJobQueue
 
-    @Inject
-    @Qualifier("hazelQueue")
-    IQueue<Long> hazelQueue
+    // @Inject
+    // @Qualifier("hazelQueue")
+    // IQueue<Long> hazelQueue
+
+    DemoQueueListener(@Qualifier("demoJobQueue") BlockingQueue<Long> demoJobQueue, DemoJobService demoJobService) {
+        log.info("🔥🔥🔥🔥               DemoQueueListener new")
+        this.demoJobQueue = demoJobQueue;
+        this.demoJobService = demoJobService;
+        (this.demoJobQueue as ICollection).addItemListener(this, true);
+    }
 
     @Override
     void itemAdded(ItemEvent<Long> event) {
-        updateOrg(event.item)
+        log.info("🔥  Queue item added")
     }
 
     @Override
     void itemRemoved(ItemEvent<Long> item) {
-        log.info("Queue item removed $item")
+        log.info("🔥  Queue item removed $item")
     }
 
-    @Transactional
-    void updateOrg(Long id) {
-        Org.update([id:id, comments: "updated-from-hazel-listener"])
-        hazelQueue.remove(id)
-    }
 }

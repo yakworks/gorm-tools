@@ -82,7 +82,7 @@ trait BulkableRepo<D> {
 
         syncJobArgs.entityClass = getEntityClass()
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
-        //FIXME why are we setting session: true here? explain. should it be default?
+        //XXX why are we setting session: true here? explain. should it be default?
         def asyncArgs = jobContext.args.asyncArgs.session(true)
         // This is the promise call. Will return immediately if syncJobArgs.async=true
         return syncJobService.runJob(asyncArgs, jobContext, () -> doBulkParallel(dataList, jobContext))

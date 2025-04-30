@@ -15,7 +15,6 @@ import gorm.tools.job.SyncJobService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
-import gorm.tools.repository.bulk.BulkExportService
 import gorm.tools.repository.model.DataOp
 import yakworks.commons.lang.EnumUtils
 import yakworks.gorm.api.IncludesConfig
@@ -43,6 +42,9 @@ class BulkApiSupport<D> {
     @Autowired
     BulkExportService bulkExportService
 
+    @Autowired
+    CsvToMapTransformer csvToMapTransformer
+
     Class<D> entityClass // the domain class this is for
 
     BulkApiSupport(Class<D> entityClass){
@@ -55,6 +57,31 @@ class BulkApiSupport<D> {
         // bcs.syncJobService = AppCtx.get('syncJobService', SyncJobService)
         // if(AppCtx.ctx.containsBean('csvToMapTransformer')) bcs.csvToMapTransformer = AppCtx.get('csvToMapTransformer', CsvToMapTransformer)
         return bcs
+    }
+
+    SyncJobEntity submitJob(DataOp dataOp, Map qParams, String sourceId, List<Map> dataList) {
+        SyncJobArgs args = setupSyncJobArgs(dataOp, qParams, sourceId)
+        Map data = [
+            id: args.jobId, source: args.source, sourceId: args.sourceId,
+            state: args.jobState
+        ] as Map<String,Object>
+            
+        //if attachmentId then assume its a csv
+        if(qParams.attachmentId) {
+            // We set savePayload to false by default for CSV since we already have the csv file as attachment
+            qParams.savePayload = false
+
+        }
+
+
+        // Map data = [
+        //     id: args.jobId, source: args.source, sourceId: args.sourceId,
+        //     state: args.jobState, payload: payload
+        // ] as Map<String,Object>
+        //
+        // def jobEntity = syncJobService.repo.create(data, [flush: true, bindId: true]) as SyncJobEntity
+
+        return null
     }
 
     SyncJobEntity process(List<Map> dataList, SyncJobArgs syncJobArgs) {
@@ -78,6 +105,8 @@ class BulkApiSupport<D> {
         syncJobArgs.sourceId = sourceId
 
         //for upsert they can pass in op=upsert to params.
+        // This is different than the dataOp arg in method here, which is going to either be add or update already
+        // as its set because it either a POST or PUT call.
         DataOp paramsOp = EnumUtils.getEnumIgnoreCase(DataOp, params.op as String)
         if(paramsOp == DataOp.upsert) syncJobArgs.op = paramsOp
 

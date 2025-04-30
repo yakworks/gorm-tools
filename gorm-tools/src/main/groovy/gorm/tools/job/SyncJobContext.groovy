@@ -87,40 +87,40 @@ class SyncJobContext {
     Long getJobId(){ return args.jobId }
 
     /** create a job using the syncJobService.repo.create */
-    SyncJobContext createJob(){
-        Validate.notNull(payload)
-        //get jobId early so it can be used, might not need this anymore
-        args.jobId = ((IdGeneratorRepo)syncJobService.repo).generateId()
-        setPayloadSize(payload)
-
-        Map data = [
-            id: args.jobId, source: args.source, sourceId: args.sourceId,
-            state: args.jobState, payload: payload
-        ] as Map<String,Object>
-
-        if(payload instanceof Collection && payload.size() > 1000) {
-            args.savePayloadAsFile = true
-            args.saveDataAsFile = true
-        }
-
-        if(args.savePayload){
-            if (payload && args.savePayloadAsFile) {
-                data.payloadId = writePayloadFile(payload as Collection)
-            }
-            else {
-                String res = JsonEngine.toJson(payload)
-                data.payloadBytes = res.bytes
-            }
-        }
-
-        //the call to this createJob method is already wrapped in a new trx
-        def jobEntity = syncJobService.repo.create(data, [flush: true, bindId: true]) as SyncJobEntity
-
-        //inititialize the ApiResults to be used in process
-        results = ApiResults.create()
-
-        return this
-    }
+    // SyncJobContext createJob(){
+    //     Validate.notNull(payload)
+    //     //get jobId early so it can be used, might not need this anymore
+    //     args.jobId = ((IdGeneratorRepo)syncJobService.repo).generateId()
+    //     setPayloadSize(payload)
+    //
+    //     Map data = [
+    //         id: args.jobId, source: args.source, sourceId: args.sourceId,
+    //         state: args.jobState, payload: payload
+    //     ] as Map<String,Object>
+    //
+    //     if(payload instanceof Collection && payload.size() > 1000) {
+    //         args.savePayloadAsFile = true
+    //         args.saveDataAsFile = true
+    //     }
+    //
+    //     if(args.savePayload){
+    //         if (payload && args.savePayloadAsFile) {
+    //             data.payloadId = writePayloadFile(payload as Collection)
+    //         }
+    //         else {
+    //             String res = JsonEngine.toJson(payload)
+    //             data.payloadBytes = res.bytes
+    //         }
+    //     }
+    //
+    //     //the call to this createJob method is already wrapped in a new trx
+    //     def jobEntity = syncJobService.repo.create(data, [flush: true, bindId: true]) as SyncJobEntity
+    //
+    //     //inititialize the ApiResults to be used in process
+    //     results = ApiResults.create()
+    //
+    //     return this
+    // }
 
     /**
      * Update the job results with the current progress info

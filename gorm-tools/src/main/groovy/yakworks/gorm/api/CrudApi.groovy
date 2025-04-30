@@ -108,6 +108,8 @@ interface CrudApi<D> {
      */
     SyncJobEntity bulk(DataOp dataOp, List<Map> dataList, Map params, String sourceId)
 
+    SyncJobEntity bulkImport(DataOp dataOp, List<Map> dataList, Map params, String sourceId)
+
     SyncJobEntity bulkExport(Map params, String sourceId)
 
     /**

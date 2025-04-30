@@ -97,6 +97,16 @@ trait SyncJobEntity implements SourceTrait {
     List problems
 
     /**
+     * Job request params
+     */
+    Map<String, String> params
+
+    /**
+     * Job request body
+     */
+    Map<String, Object> body
+
+    /**
      * The data is a response of resources that were successfully and unsuccessfully updated or created after processing.
      * gets the data as byte array, either from attachment file or resultData byte array
      * If no data then returns string representation of json empty array which is '[]'
@@ -117,7 +127,7 @@ trait SyncJobEntity implements SourceTrait {
         state       : [d: 'State of the job', nullable: false],
         message     : [d: 'Status message or log', maxSize: 500],
         payloadId   : [d: 'If payload is stored as attahcment file this is the id', oapi: "NO"],
-        payloadBytes: [d      : 'Json payload data (stored as byte array) that is passed in, for example list of items to bulk create',
+        payloadBytes: [d: 'Json payload data (stored as byte array) that is passed in, for example list of items to bulk create',
                        maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
         dataId      : [d: 'If data is saved as attahchment file this is the id', oapi: "NO"],
         dataBytes   : [d: 'The result data stored as bytes', maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],

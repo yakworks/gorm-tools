@@ -34,13 +34,13 @@ import gorm.tools.mango.QuickSearchSupport
 import gorm.tools.metamap.services.MetaEntityService
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
-import gorm.tools.repository.bulk.BulkExportService
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.transaction.TrxService
 import gorm.tools.validation.RepoValidatorRegistry
 import yakworks.gorm.api.ApiConfig
 import yakworks.gorm.api.IncludesConfig
+import yakworks.gorm.api.support.BulkExportService
 import yakworks.gorm.api.support.DefaultQueryArgsValidator
 import yakworks.gorm.api.support.QueryArgsValidator
 import yakworks.gorm.config.GormToolsPropertiesConfiguration

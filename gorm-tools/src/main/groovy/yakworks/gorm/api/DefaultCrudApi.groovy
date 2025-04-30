@@ -198,6 +198,28 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         return job
     }
 
+    @Override
+    SyncJobEntity bulkImport(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
+        /*
+        1. create the Job
+        2. adds to the queue
+        3. if its async then loop until its marked as finished
+            a. sleep and check every 2 seconds for the first 5 iterations
+            b. then check every 5 seconds for the next iterations.
+            c. so we an intercept the timeout, if its going to exceed the 2 minute timeout then return job and error
+               error is that job is still running but request is going to timeout.
+        4. if its not async then just return the job.
+
+        for 3 above we can also make a hazelcast Job cache to check so we dont hit database every 2 seconds.
+         */
+
+        //submit the job
+
+        SyncJobArgs syncJobArgs = getBulkApiSupport().setupSyncJobArgs(dataOp, qParams, sourceId)
+        SyncJobEntity job = getBulkApiSupport().process(dataList, syncJobArgs)
+        return job
+    }
+
     SyncJobEntity bulkExport(Map params, String sourceId) {
         return getBulkApiSupport().processBulkExport(params, sourceId)
     }

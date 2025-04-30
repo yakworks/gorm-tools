@@ -17,8 +17,12 @@ import gorm.tools.async.AsyncArgs
 import gorm.tools.async.AsyncService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.transaction.TrxService
+import yakworks.api.ApiResults
+import yakworks.commons.lang.Validate
 import yakworks.i18n.icu.ICUMessageSource
+import yakworks.json.groovy.JsonEngine
 import yakworks.spring.AppCtx
 
 /** Trait for a conretete SyncJobService that provides standard functionality to create and update a jobs status */
@@ -51,11 +55,54 @@ abstract class SyncJobService<D> {
         //keep it in its own transaction so it doesn't depend on wrapping
         trxService.withNewTrx {
             jobContext = SyncJobContext.of(args).syncJobService(this).payload(payload)
-            jobContext.createJob()
+            //jobContext.createJob()
+            doCreateJob(jobContext)
+            jobContext.results = ApiResults.create()
             jobContext.startTime = System.currentTimeMillis()
         }
         AppCtx.publishEvent(SyncJobStartEvent.of(jobContext))
         return jobContext
+    }
+
+    /** create a job using the syncJobService.repo.create */
+    protected SyncJobEntity doCreateJob(SyncJobContext jobContext){
+        Object payload = jobContext.payload
+        Validate.notNull(jobContext.payload)
+        SyncJobArgs syncJobArgs = jobContext.args
+        //get jobId early so it can be used, might not need this anymore
+        syncJobArgs.jobId = ((IdGeneratorRepo)getRepo()).generateId()
+        jobContext.setPayloadSize(payload)
+
+        Map data = [
+            id: syncJobArgs.jobId,
+            source: syncJobArgs.source,
+            sourceId: syncJobArgs.sourceId,
+            state: syncJobArgs.jobState,
+            payload: payload
+        ] as Map<String,Object>
+
+        if(payload instanceof Collection && payload.size() > 1000) {
+            syncJobArgs.savePayloadAsFile = true
+            syncJobArgs.saveDataAsFile = true
+        }
+
+        if(syncJobArgs.savePayload){
+            if (payload && syncJobArgs.savePayloadAsFile) {
+                data.payloadId = jobContext.writePayloadFile(payload as Collection)
+            }
+            else {
+                String res = JsonEngine.toJson(payload)
+                data.payloadBytes = res.bytes
+            }
+        }
+
+        //the call to this createJob method is already wrapped in a new trx
+        SyncJobEntity jobEntity = getRepo().create(data, [flush: true, bindId: true]) as SyncJobEntity
+
+        //inititialize the ApiResults to be used in process
+        //results = ApiResults.create()
+
+        return jobEntity
     }
 
     /**

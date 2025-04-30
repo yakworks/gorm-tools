@@ -3,7 +3,7 @@ package gorm.tools.repository
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobState
-import gorm.tools.repository.bulk.BulkExportService
+import yakworks.gorm.api.support.BulkExportService
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification

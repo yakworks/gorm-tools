@@ -85,7 +85,7 @@ trait BulkableRepo<D> {
         //XXX why are we setting session: true here? explain. should it be default?
         //def asyncArgs = jobContext.args.asyncArgs.session(true)
         // This is the promise call. Will return immediately if syncJobArgs.async=true
-        return syncJobService.runJob(asyncArgs, jobContext, () -> doBulkParallel(dataList, jobContext))
+        return syncJobService.runJob( jobContext.args.asyncArgs, jobContext, () -> doBulkParallel(dataList, jobContext))
     }
 
     void doBulkParallel(List<Map> dataList, SyncJobContext jobContext){

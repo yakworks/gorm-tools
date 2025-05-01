@@ -43,7 +43,7 @@ class BulkExportService {
     Long scheduleBulkExportJob(SyncJobArgs syncJobArgs) {
         if(syncJobArgs.queryArgs == null) throw DataProblem.of('error.query.qRequired').detail("q criteria required").toException()
         //resulting data should be saved as a file
-        syncJobArgs.saveDataAsFile = true
+        syncJobArgs.saveDataAsFile = true //XXX Whats the point of setting this? doesnt get saved.
         syncJobArgs.jobState = SyncJobState.Queued
 
         //Store QueryArgs and includes list as payload, these are the two things we need when running export

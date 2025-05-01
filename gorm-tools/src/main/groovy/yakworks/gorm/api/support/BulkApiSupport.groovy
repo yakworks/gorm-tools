@@ -10,8 +10,10 @@ import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.job.SyncJobArgs
+import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
+import gorm.tools.job.SyncJobState
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
@@ -19,6 +21,7 @@ import gorm.tools.repository.model.DataOp
 import yakworks.commons.lang.EnumUtils
 import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.IncludesKey
+import yakworks.json.groovy.JsonEngine
 import yakworks.spring.AppCtx
 
 /**
@@ -59,29 +62,59 @@ class BulkApiSupport<D> {
         return bcs
     }
 
-    SyncJobEntity submitJob(DataOp dataOp, Map qParams, String sourceId, List<Map> dataList) {
+    SyncJobEntity submitJob(DataOp dataOp, Map qParams, String sourceId, List<Map> payloadBody) {
         SyncJobArgs args = setupSyncJobArgs(dataOp, qParams, sourceId)
+        //add dataOp to params
+        qParams['dataOp'] = dataOp.toString()
         Map data = [
-            id: args.jobId, source: args.source, sourceId: args.sourceId,
-            state: args.jobState
+            id: args.jobId,
+            source: args.source,
+            sourceId: args.sourceId,
+            state: SyncJobState.Queued,
+            params: qParams
         ] as Map<String,Object>
-            
+
         //if attachmentId then assume its a csv
         if(qParams.attachmentId) {
-            // We set savePayload to false by default for CSV since we already have the csv file as attachment
-            qParams.savePayload = false
-
+            data.payloadId = qParams.attachmentId
+        } else if(payloadBody){
+            data.payload = payloadBody
         }
 
+        SyncJobEntity jobEntity = syncJobService.repo.create(data, [flush: true, bindId: true]) as SyncJobEntity
 
-        // Map data = [
-        //     id: args.jobId, source: args.source, sourceId: args.sourceId,
-        //     state: args.jobState, payload: payload
-        // ] as Map<String,Object>
-        //
-        // def jobEntity = syncJobService.repo.create(data, [flush: true, bindId: true]) as SyncJobEntity
+        return jobEntity
+    }
 
-        return null
+    SyncJobEntity startJob(Long jobId) {
+        SyncJobEntity job = syncJobService.getJob(jobId)
+        List<Map> dataList
+        Map qParams = job.params
+        //1. check payloadId and see if its a zip and csv
+        //XXX right now we assume its csv in zip but we should have more info stored to say that.
+        if(qParams.attachmentId) {
+            //We set savePayload to false by default for CSV since we already have the csv file as attachment
+            qParams.savePayload = false
+            //sets the datalist from the csv instead of body
+            dataList = transformCsvToBulkList(qParams)
+        } else if(job.payloadId || job.payloadBytes) {
+            dataList = JsonEngine.parseJson(job.payloadToString(), List<Map>)
+        }
+        //2. get dataOp from params
+        DataOp dataOp = qParams['dataOp'] as DataOp
+        assert(dataOp)
+
+        SyncJobArgs syncJobArgs = setupSyncJobArgs(dataOp, qParams, job.sourceId)
+        SyncJobContext sctx = syncJobService.initContext(syncJobArgs, dataList)
+        //run it.
+        getRepo().bulkProcess(dataList, sctx)
+
+        return syncJobService.getJob(jobId)
+    }
+
+
+    List<Map> transformCsvToBulkList(Map gParams) {
+        return getCsvToMapTransformer().process(gParams)
     }
 
     SyncJobEntity process(List<Map> dataList, SyncJobArgs syncJobArgs) {

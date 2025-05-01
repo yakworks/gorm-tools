@@ -65,7 +65,7 @@ class BulkApiSupport<D> {
             id: args.jobId, source: args.source, sourceId: args.sourceId,
             state: args.jobState
         ] as Map<String,Object>
-            
+
         //if attachmentId then assume its a csv
         if(qParams.attachmentId) {
             // We set savePayload to false by default for CSV since we already have the csv file as attachment

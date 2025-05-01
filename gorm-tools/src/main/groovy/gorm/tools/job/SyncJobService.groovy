@@ -50,6 +50,18 @@ abstract class SyncJobService<D> {
     /**
      * creates and saves the Job and returns the SyncJobContext with the jobId
      */
+    SyncJobContext initContext(SyncJobArgs args, Object payload){
+        SyncJobContext jobContext = SyncJobContext.of(args).syncJobService(this).payload(payload)
+        jobContext.setPayloadSize(payload)
+
+        jobContext.results = ApiResults.create()
+        jobContext.startTime = System.currentTimeMillis()
+        return jobContext
+    }
+
+    /**
+     * creates and saves the Job and returns the SyncJobContext with the jobId
+     */
     SyncJobContext createJob(SyncJobArgs args, Object payload){
         SyncJobContext jobContext
         //keep it in its own transaction so it doesn't depend on wrapping
@@ -78,7 +90,7 @@ abstract class SyncJobService<D> {
             source: syncJobArgs.source,
             sourceId: syncJobArgs.sourceId,
             state: syncJobArgs.jobState,
-            payload: payload
+            payload: payload //XXX we add payload here despite the savePayload, what are the implications?
         ] as Map<String,Object>
 
         if(payload instanceof Collection && payload.size() > 1000) {
@@ -98,9 +110,6 @@ abstract class SyncJobService<D> {
 
         //the call to this createJob method is already wrapped in a new trx
         SyncJobEntity jobEntity = getRepo().create(data, [flush: true, bindId: true]) as SyncJobEntity
-
-        //inititialize the ApiResults to be used in process
-        //results = ApiResults.create()
 
         return jobEntity
     }

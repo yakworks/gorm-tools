@@ -76,6 +76,7 @@ trait BulkableRepo<D> {
      * @param syncJobArgs the args object to pass on to doBulk
      * @return Job id
      */
+    @Deprecated
     Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs) {
         //If dataList is empty then error right away.
         if(dataList == null || dataList.isEmpty()) throw DataProblem.of('error.data.emptyPayload').detail("Bulk Data is Empty").toException()
@@ -86,6 +87,31 @@ trait BulkableRepo<D> {
         //def asyncArgs = jobContext.args.asyncArgs.session(true)
         // This is the promise call. Will return immediately if syncJobArgs.async=true
         return syncJobService.runJob( jobContext.args.asyncArgs, jobContext, () -> doBulkParallel(dataList, jobContext))
+    }
+
+    /**
+     * wrap doBulkParallel and calls bulk
+     *
+     * @param dataList the list of data maps to create
+     * @param jobContext the jobContext for the job
+     * @return the id, just whats in jobContext
+     */
+    Long bulkProcess(List<Map> dataList, SyncJobContext jobContext) {
+        //If dataList is empty then error right away.
+        if(dataList == null || dataList.isEmpty()) throw DataProblem.of('error.data.emptyPayload').detail("Bulk Data is Empty").toException()
+
+        try {
+            jobContext.args.entityClass = getEntityClass()
+            doBulkParallel(dataList, jobContext)
+        } catch (ex){
+            //ideally should not happen as the pattern here is that all exceptions should be handled in doBulkParallel
+            jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
+        }
+        finally {
+            jobContext.finishJob()
+        }
+
+        return jobContext.jobId
     }
 
     void doBulkParallel(List<Map> dataList, SyncJobContext jobContext){

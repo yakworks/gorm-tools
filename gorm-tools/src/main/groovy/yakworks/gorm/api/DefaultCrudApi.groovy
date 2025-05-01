@@ -214,9 +214,13 @@ class DefaultCrudApi<D> implements CrudApi<D> {
          */
 
         //submit the job
+        SyncJobEntity job = getBulkApiSupport().submitJob(dataOp, qParams, sourceId, dataList)
+        //if not async then wait
+        if(!qParams.getBoolean('async', true)){
+            //XXX new process to wait
 
-        SyncJobArgs syncJobArgs = getBulkApiSupport().setupSyncJobArgs(dataOp, qParams, sourceId)
-        SyncJobEntity job = getBulkApiSupport().process(dataList, syncJobArgs)
+        }
+
         return job
     }
 

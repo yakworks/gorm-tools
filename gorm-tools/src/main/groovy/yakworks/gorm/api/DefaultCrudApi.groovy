@@ -206,7 +206,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         3. if its async then loop until its marked as finished
             a. sleep and check every 2 seconds for the first 5 iterations
             b. then check every 5 seconds for the next iterations.
-            c. so we an intercept the timeout, if its going to exceed the 2 minute timeout then return job and error
+            c. so we an intercept the timeout, if its going to exceed the 1 or 2 minute timeout then return job and error
                error is that job is still running but request is going to timeout.
         4. if its not async then just return the job.
 
@@ -217,7 +217,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         SyncJobEntity job = getBulkApiSupport().submitJob(dataOp, qParams, sourceId, dataList)
         //if not async then wait
         if(!qParams.getBoolean('async', true)){
-            //XXX new process to wait
+            //XXX new process loop and wait for job to finish
 
         }
 

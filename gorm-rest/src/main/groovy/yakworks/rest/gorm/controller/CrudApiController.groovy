@@ -24,6 +24,7 @@ import gorm.tools.beans.Pager
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.model.DataOp
+import gorm.tools.utils.ServiceLookup
 import grails.web.Action
 import yakworks.api.problem.Problem
 import yakworks.etl.csv.CsvToMapTransformer
@@ -93,10 +94,14 @@ trait CrudApiController<D> extends RestApiController {
 
     CrudApi<D> getCrudApi(){
         if (!crudApi) {
+
+            //XXX future secureCrudApi, should be able to be turned on and off with config
             //not using ServiceLookup.lookup as we dont want to inject OrgCrudApi, even if its available,
             //Always inject SecureCrudApi, which wraps and delegates to configured custom CrudApi or DefaultCrudApi.
-            this.crudApi = (CrudApi<D>)AppCtx.ctx.getBean("secureCrudApi", [getEntityClass()] as Object[])
-            //this.crudApi = ServiceLookup.lookup(getEntityClass(), CrudApi<D>, "secureCrudApi")
+            //this.crudApi = (CrudApi<D>)AppCtx.ctx.getBean("secureCrudApi", [getEntityClass()] as Object[])
+
+            this.crudApi = ServiceLookup.lookup(getEntityClass(), CrudApi<D>, "secureCrudApi")
+
             //this.crudApi = crudApiFactory.apply(getEntityClass())
             //this.crudApi = crudApiClosure.call(getEntityClass()) as CrudApi<D>
             // try {

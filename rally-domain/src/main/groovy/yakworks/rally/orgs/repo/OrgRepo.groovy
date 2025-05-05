@@ -12,18 +12,15 @@ import org.springframework.validation.Errors
 
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
+import gorm.tools.mango.api.QueryService
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
-import grails.gorm.DetachedCriteria
 import yakworks.rally.orgs.model.Org
 
 @GormRepository
 @CompileStatic
 @Slf4j
 class OrgRepo extends AbstractOrgRepo {
-
-    @Autowired OrgTagRepo orgTagRepo
-
 
     // add @Override
     @RepoListener
@@ -49,16 +46,13 @@ class OrgRepo extends AbstractOrgRepo {
      * special handling for tags
      */
     @Override
-    MangoDetachedCriteria<Org> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure = null) {
-
-        DetachedCriteria tagCriteria = orgTagRepo.getExistsCriteria(queryArgs.qCriteria)
-        DetachedCriteria<Org> detCrit = getMangoQuery().query(Org, queryArgs, closure)
-
-        //if it has tags key
-        if(tagCriteria != null) {
-            detCrit.exists(tagCriteria)
-        }
-
-        return detCrit
+    MangoDetachedCriteria<Org> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure applyClosure) {
+        MangoDetachedCriteria<Org> mangoCriteria = getQueryService().createCriteria(queryArgs, applyClosure)
+        //do the tags
+        orgTagRepo.doExistsCriteria(mangoCriteria.criteriaMap)
+        //apply as normal
+        getQueryService().applyCriteria(mangoCriteria)
+        return mangoCriteria
     }
+
 }

@@ -15,23 +15,30 @@ import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
+import org.springframework.core.ResolvableType
+import org.springframework.core.ResolvableTypeProvider
 import org.springframework.dao.DataAccessException
 import org.springframework.transaction.TransactionDefinition
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.mango.api.QueryMangoEntityApi
+import gorm.tools.mango.api.QueryService
+import gorm.tools.mango.api.QueryServiceLookup
+import gorm.tools.mango.jpql.KeyExistsQuery
 import gorm.tools.model.Lookupable
 import gorm.tools.model.Persistable
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
+import gorm.tools.repository.model.ApiCrudRepo
+import gorm.tools.repository.model.EntityResult
 import gorm.tools.repository.model.PersistableRepoEntity
 import gorm.tools.transaction.TrxUtils
 import gorm.tools.utils.GormMetaUtils
 import grails.core.support.proxy.ProxyHandler
 import grails.validation.ValidationException
+import yakworks.api.HttpStatus
 import yakworks.api.problem.ThrowableProblem
 import yakworks.api.problem.data.NotFoundProblem
 import yakworks.commons.lang.ClassUtils
@@ -42,15 +49,18 @@ import yakworks.commons.lang.ClassUtils
  * @author Joshua Burnett (@basejump)
  * @since 6.x
  */
-@SuppressWarnings(['EmptyMethod'])
+@SuppressWarnings(['EmptyMethod', 'MethodCount'])
 @CompileStatic
-trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
+trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProvider {
 
     @Autowired EntityMapBinder entityMapBinder
 
     @Autowired RepoEventPublisher repoEventPublisher
 
     @Autowired ProxyHandler proxyHandler
+
+    //@Autowired(required=false)  //can't autowire, the DefaultGormRepo beans dont retain the D generic
+    QueryService<D> queryService
 
     /** default to true. If false only method events are invoked on the implemented Repository. */
     Boolean enableEvents = true
@@ -63,6 +73,9 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      */
     Class<D> entityClass // the domain class this is for
 
+    //cached instance of the query for id to keep it fast
+    KeyExistsQuery idExistsQuery
+
     /**
      * The gorm domain class. uses the {@link org.springframework.core.GenericTypeResolver} is not set during contruction
      */
@@ -70,6 +83,19 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
     Class<D> getEntityClass() {
         if (!entityClass) this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormRepo)
         return entityClass
+    }
+
+    QueryService<D> getQueryService(){
+        if (!this.queryService) {
+            //creates a DefaultQueryService if one cant be found
+            this.queryService = QueryServiceLookup.lookup(getEntityClass())
+        }
+        return this.queryService
+    }
+
+    @Override
+    ResolvableType getResolvableType() {
+        return ResolvableType.forClassWithGenerics(getClass(), getEntityClass())
     }
 
     /**
@@ -80,7 +106,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * @param args the arguments to pass to save.
      * @throws DataAccessException if a validation or DataAccessException error happens
      */
-    D persist(D entity, PersistArgs args = PersistArgs.new()) {
+    D persist(D entity, PersistArgs args = PersistArgs.defaults()) {
         withTrx {
             return doPersist(entity, args)
         }
@@ -103,9 +129,16 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      */
     D doPersist(D entity, PersistArgs args) {
         try {
+            generateId((Persistable)entity) //should only set id if its empty, does nothing here by default
+
             doBeforePersist(entity, args)
+            getRepoEventPublisher().doBeforePersist(this, (GormEntity)entity, args)
+
             validateAndSave(entity, args)
+
             doAfterPersist(entity, args)
+            getRepoEventPublisher().doAfterPersist(this, (GormEntity)entity, args )
+
             return entity
         }
         catch (ValidationException | DataAccessException ex) {
@@ -128,21 +161,24 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * called from doPersist. calls validate and save, no try catch so Exceptions bubble out.
      * Can be
      */
-    D gormSave(D entity, PersistArgs args = PersistArgs.defaults()) {
+    D gormSave(D entity, PersistArgs args) {
         gormInstanceApi().save(entity, args as Map)
     }
 
     /**
      * called right BEFORE validateAndSave to fire events but can be overridden too.
      * just be sure to fire event if overidden.
-     * NOTE
      */
     void doBeforePersist(D entity, PersistArgs args){
-        //NOTE: IdGeneratorRepo overrides this, make sure any changes here are cross checked with it.
-        if (args.bindAction && args.data){
-            doBeforePersistWithData(entity, args)
-        }
-        getRepoEventPublisher().doBeforePersist(this, (GormEntity)entity, args)
+        //empty, implement in concrete repo if needed
+    }
+
+    /**
+     * called right after save to fire events and call associations persists but can be overridden too.
+     * just be sure to fire event if overidden.
+     */
+    void doAfterPersist(D entity, PersistArgs args){
+        //empty, implement in concrete repo if needed
     }
 
     /**
@@ -151,17 +187,6 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      */
     void doAfterValidateBeforeSave(D entity, PersistArgs args){
         persistToOneAssociations(entity, getToOneAssociations())
-    }
-
-    /**
-     * called right after save to fire events and call associations persists but can be overridden too.
-     * just be sure to fire event if overidden.
-     */
-    void doAfterPersist(D entity, PersistArgs args){
-        if (args.bindAction && args.data){
-            doAfterPersistWithData(entity, args)
-        }
-        getRepoEventPublisher().doAfterPersist(this, (GormEntity)entity, args )
     }
 
     /**
@@ -183,7 +208,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
     /**
      * Transactional wrap for {@link #doCreate}
      */
-    D create(Map data, PersistArgs args = PersistArgs.new()) {
+    D create(Map data, PersistArgs args = PersistArgs.defaults()) {
         withTrx {
             return doCreate(data, args)
         }
@@ -205,22 +230,15 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
     D doCreate(Map data, PersistArgs args) {
         D entity = (D) getEntityClass().newInstance()
         args.insert(true)
+        args.bindAction = BindAction.Create
         bindAndCreate(entity, data, args)
         return entity
     }
 
     /**
-     * just calls bindAndSave with the right BindAction
-     * This is the best method to overrride if needed
-     */
-    void bindAndCreate(D entity, Map data, PersistArgs args) {
-        bindAndSave(entity, data, BindAction.Create, args)
-    }
-
-    /**
      * Transactional wrap for {@link #doUpdate}
      */
-    D update(Map data, PersistArgs args = PersistArgs.new()) {
+    D update(Map data, PersistArgs args = PersistArgs.defaults()) {
         withTrx {
             return doUpdate(data, args)
         }
@@ -239,8 +257,56 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      */
     D doUpdate(Map data, PersistArgs args) {
         D entity = findWithData(data)
+        args.bindAction = BindAction.Update
         bindAndUpdate(entity, data, args)
         return entity
+    }
+
+    /**
+     * just calls bindAndSave with the right BindAction
+     * This is the best method to overrride if needed
+     */
+    void bindAndCreate(D entity, Map data, PersistArgs args) {
+        bindAndSave(entity, data, BindAction.Create, args)
+    }
+
+    void bindAndUpdate(D entity, Map data, PersistArgs args) {
+        bindAndSave(entity, data, BindAction.Update, args)
+    }
+
+    /**
+     * Update if it can find it with findWithData, otherwise it inserts it.
+     * Uses findWithData and if instance is found then considers it an update.
+     * NOT transactional so should be wrapped in a transaction.
+     *
+     * @param data what to update or insert
+     * @param pargs the PersistArgs
+     * @return The result with the entity
+     */
+    @Override
+    EntityResult<D> upsert(Map data, PersistArgs pargs = PersistArgs.of()) {
+        if (!data) return
+        D instance
+        try {
+            instance = findWithData(data, false)
+        } catch(NotFoundProblem.Exception nfe){
+            //we pass mustExist=false to findWithData but if data has an 'id' prop
+            // and it fails on the get then will throws a NotFoundProblem Ex.
+            //if we want them inserted then args.bindId must be true as well, just like on an insert.
+            // when bindId is not set then we throw the exception.
+            if(!pargs.bindId) throw nfe
+        }
+        HttpStatus status
+        if (instance) {
+            //dont call update or doUpdate as it will do findWithData again.
+            bindAndUpdate(instance, data, pargs)
+            status = HttpStatus.OK
+        } else {
+            instance = doCreate(data, pargs)
+            status = HttpStatus.CREATED
+        }
+        // Result.OK().status(status).payload(instance)
+        return EntityResult.of(instance).status(status)
     }
 
     /**
@@ -248,9 +314,9 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * If data has an id key the use that.
      * otherwise it will see if entity has lookupable or if the concrete repo has a lookup method
      *
-     * @param data - the map with the keys for lookup
-     * @param boolean mustExist - if the record must exist, default true
-     * @return the found entity
+     * @param data: the map with the keys for lookup
+     * @param mustExist: if the record must exist. If true then throws error if can't be found.
+     * @return the found entity. If mustExist=false then can return null
      * @throws NotFoundProblem.Exception if mustExist is true, and entity not found
      */
     D findWithData(Map data, boolean mustExist = true) {
@@ -258,7 +324,8 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
         def ident = data['id'] as Serializable
         //check by id first
         if(ident){
-            //return it fast if its good to go, will have blown and error if not found
+            //return it fast if its good to go, will blown an error if not found
+            //if this is an upsert though we want to create it with the id if bindId=true
             return get(ident, data['version'] as Long)
         }
         if(Lookupable.isAssignableFrom(getEntityClass())){
@@ -281,8 +348,13 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
         return null
     }
 
-    void bindAndUpdate(D entity, Map data, PersistArgs args) {
-        bindAndSave(entity, data, BindAction.Update, args)
+    /**
+     * if entity.id is null then generates and assigns new id to id property on entity, if entity.id is already set then it just returns it
+     * does nothing by default, entities that have to generate an Id can override
+     */
+    Serializable generateId(Persistable entity){
+        //override in impl that needs this.
+        return null as Serializable
     }
 
     /** short cut to call {@link #bind}, setup args for events then calls {@link #doPersist} */
@@ -310,9 +382,6 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * Or even better implement the beforeBind|afterBind event methods
      */
     void bind(D entity, Map data, BindAction bindAction, PersistArgs args = new PersistArgs()) {
-        //if its a PathKeyMap then init it
-        // if(data instanceof PathKeyMap) data.init()
-
         getRepoEventPublisher().doBeforeBind(this, (GormEntity)entity, data, bindAction, args)
         doBind(entity, data, bindAction, args)
         getRepoEventPublisher().doAfterBind(this, (GormEntity)entity, data, bindAction, args)
@@ -328,40 +397,39 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
     }
 
     /**
-     * Remove by ID
+     * Remove by ID, this does not wrap a trx
      *
      * @param id - the id to delete
      * @param args - the args to pass to delete. flush being the most common
      *
      * @throws NotFoundProblem.Exception if its not found or DataProblemException if a DataIntegrityViolationException is thrown
      */
-    void removeById(Serializable id, Map args = [:]) {
+    void removeById(Serializable id, PersistArgs args) {
         try {
-            withTrx {
-                D entity = get(id, null)
-                doRemove(entity, PersistArgs.of(args))
-            }
+            D entity = get(id)
+            RepoUtil.checkFound(entity, id, getEntityClass().name)
+            doRemove(entity, args)
         }
         catch (DataAccessException ex) {
+            // attempt to catch exception (eg fk violation), if occurs, but most of the time this wont if its wrapped in a Trx
+            // would occur during flush (either if passed in or at commit in end of transaction).
+            // So this removeById either needs to be wrapped in try/catch with problemHandler or flush should be passed in here
             throw RepoExceptionSupport.translateException(ex, id)
         }
     }
 
     /**
-     * Transactional, Calls delete always with flush = true so we can intercept any DataIntegrityViolationExceptions.
+     * Calls delete, if you want the error handling to pic up and translate fk error then pass in flush()
      *
      * @param entity the domain entity
      * @throws ThrowableProblem if a DataIntegrityViolationException is thrown
      */
-    void remove(D entity, Map args = [:]) {
+    void remove(D entity, PersistArgs args = PersistArgs.defaults()) {
         try {
-            //Wrap the withTrx in try/catch
-            //Because the exception (eg fk violation), if occurs, would occur in withTrx when transaction gets commited. not occur during doRemove.
-            withTrx {
-                doRemove(entity, PersistArgs.of(args))
-            }
+            doRemove(entity, args)
         }
         catch (DataAccessException ex) {
+            //see comments in removeById about when or if this ever gets picked up
             throw RepoExceptionSupport.translateException(ex, entity)
         }
     }
@@ -406,8 +474,8 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
     }
 
     /**
-     * wraps get in a trx. NOT a read only trx like read as that messes with dirty tracking
-     * @param id required, the id to get
+     * wraps get in a trx, usefull for testing. NOT a read only trx like read as that messes with dirty tracking
+     * @param id the id to get
      * @return the retrieved entity
      */
     D getWithTrx(Serializable id) {
@@ -424,14 +492,12 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * @return the retrieved entity
      */
     D read(Serializable id) {
-        withReadOnlyTrx {
-            (D) gormStaticApi().read(id)
-        }
+        (D) gormStaticApi().read(id)
     }
 
     /**
-     * a read wrapped in a read-only transaction.
-     *
+     * load without hydrating
+     *x
      * @param id required, the id to get
      * @return the retrieved entity
      */
@@ -463,10 +529,10 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
     void persistToOneAssociations(D entity, List<String> assoctiations){
         for(String assocName: assoctiations){
             def assoc = entity[assocName]
-            //use the getAssociationId as it deals with proxies and it doesn't hydrate the proxy
             if (assoc) {
                 //if its a proxy then its already setup and not new
                 //so check that its not a proxy and that it doesnt have an id for it already
+                //use the getAssociationId as it deals with proxies and it doesn't hydrate the proxy
                 if(!proxyHandler.isProxy(assoc) && !((GormEntity)entity).getAssociationId(assocName)){
                     PersistableRepoEntity assocEntity = assoc as PersistableRepoEntity
                     assocEntity.id = ((PersistableRepoEntity)entity).getId()
@@ -478,30 +544,8 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
     }
 
     /**
-     * Called from doAfterPersist and before afterPersist event
-     * when its a bindAction (create/update) and it has data.
-     * Can be used to creates or update One-to-Many associations for this entity with persistToManyData
-     *
-     * @param entity the main entity for this repo
-     * @param data passed from unpdate or create
-     */
-    void doAfterPersistWithData(D entity, PersistArgs args) {
-        //empty, implement in concrete repo if needed
-    }
-
-    /**
-     * Called from doBeforePersist and before validate and beforePersist event if its a bindAction (create/update) and it has data.
-     *
-     * @param entity the main entity for this repo
-     * @param data passed from unpdate or create
-     */
-    void doBeforePersistWithData(D entity, PersistArgs args) {
-        //empty, implement in concrete repo if needed
-    }
-
-    /**
      * helper for createOrUpdate with One-to-Many association on the entity.
-     * Will most often be called from an overriden doAfterPersistWithData.
+     * Will most often be called from an overriden doAfterPersist with data.
      * 1. iterates over the List of Maps and assigns the childrens belongs to key to the entity intance
      * 2. uses the passed in repo to call the createOrUpdate or the List
      *
@@ -519,7 +563,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
     }
 
     /**
-     * Creates or updates a list of items.
+     * Calls upsert on a list of items.
      * Use for small datasets, use bulk operations for larger datasets.
      * iterates and just calls createOrUpdateItem, no special handling for data.op
      * NOT Transactional, so should be wrapped in a trx to function properly.
@@ -528,33 +572,26 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
      * @param dataList the list of data maps to create/update
      * @return the list of created or updated entities
      */
-    List<D> createOrUpdate(List<Map> dataList){
+    List<D> createOrUpdate(List<Map> dataList, PersistArgs pargs = PersistArgs.of()){
         List resultList = [] as List<D>
 
         dataList.each { Map item ->
-            resultList << createOrUpdateItem(item)
+            resultList << upsert(item, pargs.clone()).entity
         }
 
         return resultList
     }
 
     /**
-     * Simple helper to updating from data.
-     * Uses findWithData and if instance is found then considers it an update.
-     * If not found then considers it a create.
-     * DOES NOT do anything with data.op operations.
-     * NOT transactional so should be wrapped in a transaction.
+     * Performant way to check if id exists in database.
+     * Wrapped in read-only trx so dont need to setup a @Transactional method to do a quick check in code
      */
-    D createOrUpdateItem(Map data, PersistArgs args = PersistArgs.defaults()) {
-        if (!data) return
-        D instance = findWithData(data, false)
-        if (instance) {
-            //dont call update or doUpdate as it will do findWithData again.
-            bindAndUpdate(instance, data, args)
-        } else {
-            instance = doCreate(data, args)
+    @Override
+    boolean exists(Serializable id) {
+        withReadOnlyTrx {
+            if (!idExistsQuery) idExistsQuery = KeyExistsQuery.of(getEntityClass())
+            return idExistsQuery.exists(id)
         }
-        return instance
     }
 
     /** gets the datastore for this Gorm domain instance */
@@ -649,5 +686,6 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
     GormValidationApi gormValidationApi() {
         GormEnhancer.findValidationApi(getEntityClass())
     }
+
 
 }

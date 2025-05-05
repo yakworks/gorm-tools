@@ -1,12 +1,9 @@
 package gorm.tools
 
-import spock.lang.IgnoreRest
-
 import java.time.LocalDate
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgFlex
@@ -17,7 +14,7 @@ class MangoSpec extends Specification {
 
     def "sanity Check list"() {
         expect:
-        Org.queryList().size() == 20
+        Org.repo.query([:]).pagedList().size() == 20
     }
 
     def "Filter by Name eq"() {
@@ -47,9 +44,9 @@ class MangoSpec extends Specification {
 
     void "Filter by xxxId for criteria as JSON"() {
         when:
-        Map params = [max: 150]
-        params.criteria = (["id": [9, 12]] as grails.converters.JSON).toString()
-        List list = Org.repo.queryList(params)
+        Map params = [:]
+        params.criteria = '{"id":[9, 12]}'
+        List list = Org.repo.query(params).list()
         then:
         list.size() == 2
         list[0].num == "9"
@@ -58,7 +55,7 @@ class MangoSpec extends Specification {
 
     def "Filter by Name ilike"() {
         when: "eq"
-        List list = Org.queryList([q: [name: "Org2%"], max: 150])
+        List list = Org.repo.query([q: [name: "Org2%"], max: 150]).pagedList()
         then:
         list.size() == 10
         list[0].name == "Org20"
@@ -67,7 +64,7 @@ class MangoSpec extends Specification {
 
     def "Filter by Name wildcard"() {
         when: "eq"
-        List list = Org.queryList(name: "Org2*", max: 20)
+        List list = Org.repo.query(name: "Org2*").list()
         then:
         list.size() == 10
         list[0].name == "Org20"
@@ -76,7 +73,7 @@ class MangoSpec extends Specification {
 
     def "Filter by nested id"() {
         when: "eq"
-        List list = Org.repo.queryList(q: [flex: [id: 2]])
+        List list = Org.repo.query(q: [flex: [id: 2]]).list()
         then:
         list.size() == 1
         list[0].num == "2"
@@ -85,7 +82,7 @@ class MangoSpec extends Specification {
 
     def "Filter by nested.id"() {
         when: "eq"
-        List list = Org.repo.queryList(q: ["flex.id": 2])
+        List list = Org.repo.query(q: ["flex.id": 2]).list()
         then:
         list.size() == 1
         list[0].num == "2"
@@ -94,7 +91,7 @@ class MangoSpec extends Specification {
 
     def "Filter by nested id inList"() {
         when:
-        List list = Org.repo.queryList([q: [flex: [id: [24, 25, 26]]]])
+        List list = Org.repo.query([q: [flex: [id: [24, 25, 26]]]]).list()
         then:
         list.size() == 3
         list[0].num == "24" //sanity check
@@ -109,7 +106,7 @@ class MangoSpec extends Specification {
 
     def "Filter by nested string on info"() {
         when: "eq"
-        List list = Org.queryList('info.phone': "1-800-4")
+        List list = Org.repo.query('info.phone': "1-800-4").list()
         then:
         list.size() == 1
         list[0].num == "4"
@@ -135,7 +132,7 @@ class MangoSpec extends Specification {
 
     def "Filter by boolean in list"() {
         when:
-        List list = Org.repo.queryList([inactive: [false], max: 100])
+        List list = Org.repo.query([inactive: [false]]).list()
         then:
         list.size() == 50
         list[0].inactive == false
@@ -175,7 +172,7 @@ class MangoSpec extends Specification {
 
     def "Filter by LocDate"() {
         when:
-        List list = Org.queryList(flex: [date1: LocalDate.now().plusDays(1).atStartOfDay()])
+        List list = Org.repo.query(flex: [date1: LocalDate.now().plusDays(1).atStartOfDay()]).list()
         then:
         list.size() == 1
         list[0].name == "Org1"
@@ -183,14 +180,14 @@ class MangoSpec extends Specification {
 
     def "Filter by Date le"() {
         when:
-        List list = Org.queryList(flex: ['date1.$lte': LocalDate.now().plusDays(3).atStartOfDay() ])
+        List list = Org.repo.query(flex: ['date1.$lte': LocalDate.now().plusDays(3).atStartOfDay() ]).list()
         then:
         list.size() == 3
     }
 
     def "Filter by xxxId 1"() {
         when: "xxxId in domain"
-        List list = Org.queryList(flexId: 2)
+        List list = Org.repo.query(flexId: 2).list()
         then:
         list.size() == 1
         list[0].flexId == 2
@@ -198,7 +195,7 @@ class MangoSpec extends Specification {
 
     def "Filter with `or`"() {
         when:
-        List list = Org.queryList('$or': ["num": "9", "flexId": 10])
+        List list = Org.repo.query('$or': ["num": "9", "flexId": 10]).list()
         then:
         list.size() == 2
         list[0].num == "9"
@@ -207,7 +204,7 @@ class MangoSpec extends Specification {
 
     def "Filter with `or` dot id"() {
         when:
-        List list = Org.queryList('$or': ["num": "9", "flex.id": 10])
+        List list = Org.repo.query('$or': ["num": "9", "flex.id": 10]).list()
         then:
         list.size() == 2
         list[0].num == "9"
@@ -252,7 +249,7 @@ class MangoSpec extends Specification {
 
     def "Filter with several `or` on same level as root using id"() {
         when:
-        List list = Org.queryList('$or': [["contact.id": 10], ["contact.id": 11], ["location.id": -999]])
+        List list = Org.query('$or': [["contact.id": 10], ["contact.id": 11], ["location.id": -999]]).list()
         then:
         //should only be 2, -999 does not exist
         list.size() == 2
@@ -260,91 +257,91 @@ class MangoSpec extends Specification {
 
     def "Filter with `or` with like"() {
         when:
-        List list = Org.queryList('$or': ["num": "2%", "location.city": "City4"])
+        List list = Org.query('$or': ["num": "2%", "location.city": "City4"]).list()
         then:
         list.size() == 12
     }
 
     def "Filter with `between()`"() {
         when:
-        List list = Org.queryList(id: ['$between': [2, 10]])
+        List list = Org.query(id: ['$between': [2, 10]]).list()
         then:
         list.size() == 9
     }
 
     def "Filter with `in()`"() {
         when:
-        List list = Org.queryList(id: ['$in': [24, 25]])
+        List list = Org.query(id: ['$in': [24, 25]]).list()
         then:
         list.size() == 2
     }
 
     def "Filter with `inList()`"() {
         when:
-        List list = Org.queryList(id: ['$inList': [24, 25]])
+        List list = Org.query(id: ['$inList': [24, 25]]).list()
         then:
         list.size() == 2
     }
 
     def "Filter by Name ilike explicit"() {
         when:
-        List list = Org.queryList(name: ['$ilike': "Org2%"])
+        List list = Org.query(name: ['$ilike': "Org2%"]).list()
         then:
         list.size() == 10
     }
 
     def "Filter with `gt()`"() {
         when:
-        List list = Org.queryList([q: [id: ['$gt': 95]]])
+        List list = Org.query([q: [id: ['$gt': 95]]]).list()
         then:
         list.size() == 5
     }
 
     def "Filter with `ge()`"() {
         when:
-        List list = Org.queryList([q: [id: ['$gte': 95]]])
+        List list = Org.query([q: [id: ['$gte': 95]]]).list()
         then:
         list.size() == 6
     }
 
     def "Filter with `ge()` for bigdecimal"() {
         when:
-        List list = Org.queryList(flex: [num1: ['$gte': 100.0]])
+        List list = Org.query(flex: [num1: ['$gte': 100.0]]).list()
         then:
         list.size() == Org.createCriteria().list() { flex { ge "num1", 100.0 } }.size()
     }
 
     def "Filter with `lte()` then another value"() {
         when:
-        List list = OrgFlex.queryList(q: ['num1': ['$ltef': "num2"]], max: 150)
+        List list = OrgFlex.repo.query(q: ['num1': ['$ltef': "num2"]]).list(max: 150)
         then:
         list.size() == OrgFlex.createCriteria().list() { leProperty "num1", "num2" }.size()
     }
 
     def "Filter with `gtef()` then another value"() {
         when:
-        List list = OrgFlex.queryList(q: [num1: ['$gtef': "num2"]], max: 150)
+        List list = OrgFlex.repo.query(q: [num1: ['$gtef': "num2"]]).list(max: 150)
         then:
         list.size() == OrgFlex.createCriteria().list() { geProperty "num1", "num2" }.size()
     }
 
     def "Filter with `gtf()` then another value"() {
         when:
-        List list = OrgFlex.queryList(q: ['num1': ['$gtf': "num2"]], max: 150)
+        List list = OrgFlex.repo.query(q: ['num1': ['$gtf': "num2"]]).list(max: 150)
         then:
         list.size() == Org.createCriteria().list() { flex { gtProperty "num1", "num2" } }.size()
     }
 
     def "Filter with `ltf()` then another value"() {
         when:
-        List list = OrgFlex.queryList(q: [num1: ['$ltf': "num2"]], max: 150)
+        List list = OrgFlex.repo.query(q: [num1: ['$ltf': "num2"]]).list(max: 150)
         then:
         list.size() == OrgFlex.createCriteria().list() { ltProperty "num1", "num2" }.size()
     }
 
     def "Filter with `lt()`"() {
         when:
-        List list = Org.repo.queryList([q: [id: ['$lt': 5]], max: 150]).sort { it.id }
+        List list = Org.repo.query([q: [id: ['$lt': 5]]]).list(max: 150).sort { it.id }
         then:
         list.size() == Org.createCriteria().list() { lt "id", 5L }.size()
         list[0].name == Org.createCriteria().list() { lt "id", 5L }[0].name
@@ -352,7 +349,7 @@ class MangoSpec extends Specification {
 
     def "Filter with `le()`"() {
         when:
-        List list = Org.repo.queryList([q: [id: ['$lte': 5]], max: 150]).sort { it.id }
+        List list = Org.repo.query([q: [id: ['$lte': 5]]]).list(max: 150).sort { it.id }
         then:
         list.size() == Org.createCriteria().list() { le "id", 5L }.size()
         list[0].name == Org.createCriteria().list() { le "id", 5L }[0].name
@@ -360,21 +357,21 @@ class MangoSpec extends Specification {
 
     def "Filter with `isNull` object"() {
         when:
-        List list = Org.queryList([q: [comments: ['$isNull': true]], max: 150]).sort { it.id }
+        List list = Org.repo.query([q: [comments: ['$isNull': true]]]).list(max: 150).sort { it.id }
         then:
         list.size() == Org.createCriteria().list() { isNull "comments" }.size()
     }
 
     def "Filter with `isNull` when val"() {
         when:
-        List list = Org.queryList(q: [comments: '$isNull'], max: 100)
+        List list = Org.repo.query(q: [comments: '$isNull']).list(max: 100)
         then:
         list.size() == 50
     }
 
     def "Filter with `isNull` when just null"() {
         when:
-        List list = Org.queryList([q: [comments: null], max: 100])
+        List list = Org.repo.query([q: [comments: null]]).list(max: 100)
         then:
         list.size() == Org.createCriteria().list() { isNull "comments" }.size()
     }
@@ -382,7 +379,7 @@ class MangoSpec extends Specification {
 
     def "Filter with `not in()`"() {
         when:
-        List list = Org.queryList([q: [id: ["\$nin": [2, 3, 4, 5]]], max: 150])
+        List list = Org.repo.query([q: [id: ["\$nin": [2, 3, 4, 5]]]]).list(max: 150)
         then:
         list.size() == Org.createCriteria().list() { not { inList "id", [2L, 3L, 4L, 5L] } }.size()
     }
@@ -390,60 +387,60 @@ class MangoSpec extends Specification {
 
     def "Filter with `not in()` with ids in array"() {
         when:
-        List list = Org.queryList([q: [id: ['$nin': [2, 3, 4, 5]]], max: 150])
+        List list = Org.repo.query([q: [id: ['$nin': [2, 3, 4, 5]]]]).list(max: 150)
         then:
-        list.size() == Org.createCriteria().list() { not { inList "id", [2L, 3L, 4L, 5L] } }.size()
+        list.size() == Org.executeQuery("from Org where id not in (2, 3, 4, 5)").size()
     }
 
     def "Filter on enums"() {
         when:
-        List list = Org.queryList(location: [
+        List list = Org.repo.query(location: [
             kind: [
                 '$in': ['remittance', 'other']
             ]
-        ])
+        ]).list()
         then:
         list.size() == 2
     }
 
     def "Filter on identity enum"() {
         when:
-        List list = Org.queryList(type: ['$in': [5, 6]])
+        List list = Org.repo.query(type: ['$in': [5, 6]]).list()
 
         then:
         list.size() == 2
     }
 
-    def "test paging, defaults"() {
+    def "test pagedList, defaults"() {
         when:
-        List list = Org.queryList()
+        List list = Org.repo.query([:]).pagedList()
         then:
         list.size() == 20
     }
 
-    def "test paging"() {
+    def "test pagedList"() {
         when:
-        List list = Org.queryList([max: 20])
+        List list = Org.repo.query([max: 30]).pagedList()
         then:
-        list.size() == 20
+        list.size() == 30
     }
 
     def "test closure"() {
         when:
-        List list = Org.queryList([max: 20]) {
+        List list = Org.repo.query([max: 20]) {
             or {
                 eq "id", 2L
             }
-        }
+        }.pagedList()
         then:
         list.size() == 1
     }
 
     def "test closure with params"() {
         when:
-        List list = Org.queryList(id: ['$in': [24, 25, 18, 19]]) {
+        List list = Org.repo.query(id: ['$in': [24, 25, 18, 19]]) {
             gt "id", 19L
-        }
+        }.pagedList()
 
         then:
         list.size() == 2
@@ -452,7 +449,7 @@ class MangoSpec extends Specification {
 
     def "test quick search"() {
         when:
-        List list = Org.queryList(q: "Org2")
+        List list = Org.repo.query(qSearch: "Org2").pagedList()
         then:
         list.size() == 10
 
@@ -460,7 +457,7 @@ class MangoSpec extends Specification {
 
     def "test quick search with q"() {
         when:
-        List list = Org.queryList(q: "Org2")
+        List list = Org.repo.query(qSearch: "Org2").list()
         then:
         list.size() == 10
 

@@ -1,11 +1,11 @@
 package yakworks.rally
 
+import org.springframework.util.ReflectionUtils
+
 import grails.artefact.DomainClass
 import grails.web.databinding.WebDataBinding
-import org.springframework.util.ReflectionUtils
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Org
-import yakworks.testing.gorm.unit.DataRepoTest
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 /**

@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import gorm.tools.async.AsyncArgs
 import gorm.tools.beans.Pager
 import gorm.tools.databinding.BindAction
-import gorm.tools.mango.DefaultMangoQuery
+import gorm.tools.mango.DefaultQueryService
 import gorm.tools.mango.MangoBuilder
 import gorm.tools.mango.MangoTidyMap
 import gorm.tools.mango.api.QueryArgs
@@ -28,7 +28,7 @@ abstract class BenchProcessData implements BenchConfig, WithTrx  {
 
     @Autowired
     @Qualifier("mangoQuery")
-    DefaultMangoQuery mangoQuery
+    DefaultQueryService mangoQuery
 
     //default for insert, override for updates
     Closure bindAndSaveClosure = { Class<?> domainClass, Map row ->
@@ -169,19 +169,21 @@ abstract class BenchProcessData implements BenchConfig, WithTrx  {
         newCriteria.list()
     }
 
-    void testQuery4(Map map){
-        Map<String, Object> p = QueryArgs.of(map).buildCriteria()
-        DetachedCriteria dcrit = mangoQuery.query(Region, p.criteria as Map, null)
-        mangoQuery.list(dcrit, p.pager as Pager)
-        //DetachedCriteria criteria = MangoBuilder.build(Region, map, null)
-        //criteria.list(max: 10, offset: 0)
-    }
+    // void testQuery4(Map map){
+    //     Map<String, Object> p = QueryArgs.of(map).buildCriteriaMap()
+    //     DetachedCriteria dcrit = Region.repo.query(p.criteria as Map, null)
+    //     dcrit.mapList()
+    //     //mangoQuery.pagedList(dcrit, p.pager as Pager)
+    //     //DetachedCriteria criteria = MangoBuilder.build(Region, map, null)
+    //     //criteria.list(max: 10, offset: 0)
+    // }
 
     //static DetachedCriteria dcrit = MangoBuilder.build(Region, [name: 'foo', 'country.name': 'bar'], null)
 
     void testQuery5(Map map){
         //Map<String, Map> p = mangoQuery.parseParams(map)
-        DetachedCriteria dcrit = mangoQuery.query(Region, map, null) //MangoBuilder.build(Region, map, null)
+        DetachedCriteria dcrit = Region.repo.query(map, null)
+            //mangoQuery.query(Region, map, null) //MangoBuilder.build(Region, map, null)
         dcrit.list()
         //mangoQuery.query(dcrit, map)
         //DetachedCriteria criteria = MangoBuilder.build(Region, map, null)

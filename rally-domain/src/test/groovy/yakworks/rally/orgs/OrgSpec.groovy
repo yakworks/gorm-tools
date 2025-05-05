@@ -4,6 +4,7 @@ import org.apache.commons.lang3.RandomStringUtils
 
 import spock.lang.Specification
 import yakworks.rally.config.OrgProps
+import yakworks.rally.orgs.model.Company
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
@@ -14,13 +15,14 @@ import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
+import yakworks.rally.orgs.model.PartitionOrg
 import yakworks.testing.gorm.TestDataJson
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
 class OrgSpec extends Specification implements GormHibernateTest, SecurityTest {
 
-    static entityClasses = [Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo, OrgMember]
+    static entityClasses = [Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo, OrgMember, PartitionOrg]
 
     Closure doWithGormBeans(){ { ->
         orgDimensionService(OrgDimensionService)
@@ -120,7 +122,7 @@ class OrgSpec extends Specification implements GormHibernateTest, SecurityTest {
         Map params = TestDataJson.buildMap(Org) << [id: orgId, flex: flex, info: info, type: 'Customer']
 
         when: "create"
-        def org = Org.create(params, bindId: true)
+        def org = Org.repo.create(params, [bindId: true])
 
         then:
 
@@ -135,7 +137,9 @@ class OrgSpec extends Specification implements GormHibernateTest, SecurityTest {
         org.info.website
 
         when: "update"
-        org = Org.update([id: org.id, flex: [text1: 'yyy'], info: [phone: '555-1234', fax: '555-1234', website: 'www.test.com']])
+        org = Org.repo.update(
+            [id: org.id, flex: [text1: 'yyy'], info: [phone: '555-1234', fax: '555-1234', website: 'www.test.com']]
+        )
 
         then:
         org.flex.text1 == 'yyy'
@@ -175,6 +179,26 @@ class OrgSpec extends Specification implements GormHibernateTest, SecurityTest {
         OrgType.Branch   | [orgTypeId: '3']
         OrgType.Branch   | [type: OrgType.Branch]
         OrgType.Branch   | [type: [id: 3]]
+    }
+
+    void "ensure company"() {
+        when: "type is company"
+        Org one = Org.repo.create(num:"one", name:"one", type:OrgType.Company)
+
+        then:
+        one.companyId == one.id
+
+        when: "type is other thn company and companyId is provided in data"
+        Org two = Org.repo.create(num:"two", name:"two", type:OrgType.Customer, companyId:3)
+
+        then:
+        two.companyId == 3
+
+        when: "type is other thn company and companyId is not provided"
+        Org three = Org.repo.create(num:"three", name:"three", type:OrgType.Customer)
+
+        then:
+        three.companyId == Company.DEFAULT_COMPANY_ID
     }
 
 }

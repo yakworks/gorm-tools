@@ -73,7 +73,7 @@ hibernate:
   show_sql: false
   schema_management_tool: 'yakworks.hibernate.schema.SimpleSchemaManagementTool'
   naming_strategy: 'org.hibernate.cfg.DefaultNamingStrategy'
-  dialect: 'yakworks.hibernate.h2.ExtendedH2Dialect'
+  dialect: 'yakworks.gorm.hibernate.dialect.ExtendedH2Dialect'
   cache:
     queries: false
     use_second_level_cache: false

@@ -7,17 +7,11 @@ package yakworks.gorm.json
 import groovy.json.JsonGenerator
 import groovy.transform.CompileStatic
 
-import org.springframework.validation.Errors
-import org.springframework.validation.FieldError
-import org.springframework.validation.ObjectError
-
 import gorm.tools.problem.ValidationProblem
 import yakworks.api.problem.Problem
-import yakworks.api.problem.Violation
-import yakworks.api.problem.ViolationFieldError
 
 /**
- * Stops stack overflow on ApiResults renderer.
+ * Groovy json converter for Problem
  */
 @CompileStatic
 class ProblemConverter implements JsonGenerator.Converter {
@@ -29,6 +23,7 @@ class ProblemConverter implements JsonGenerator.Converter {
 
     @Override
     Object convert(Object value, String key) {
+        //FIXME why is this not using the asMap?
         def p = (Problem)value
         Map props = [
             ok: p.ok,
@@ -41,23 +36,12 @@ class ProblemConverter implements JsonGenerator.Converter {
         ] as Map<String, Object>
 
         List violations = p.violations
-        if(!violations && p instanceof ValidationProblem && p.getErrors()){
-            violations = transformErrorsToViolations((p as ValidationProblem).getErrors())
+        //if its a ValidationProblem and has unstranslated errors then convert them
+        if(!violations && p instanceof ValidationProblem && p.getErrors().hasErrors()){
+            violations = ValidationProblem.transateErrorsToViolations((p as ValidationProblem).getErrors())
         }
         if(violations) props.errors = violations
         return props
     }
 
-    List<Violation> transformErrorsToViolations(Errors errs) {
-        List<ViolationFieldError> errors = []
-        if(!errs?.allErrors) return errors as List<Violation>
-
-        for (ObjectError err : errs.allErrors) {
-            //TODO get getMsg hooked up, using defaultMessage for message for now, should be ViolationFieldError.of(err.code, getMsg(err))
-            ViolationFieldError fieldError = ViolationFieldError.of(err.code, err.defaultMessage)
-            if (err instanceof FieldError) fieldError.field = err.field
-            errors << fieldError
-        }
-        return errors as List<Violation>
-    }
 }

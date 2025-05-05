@@ -69,7 +69,7 @@ bootRun {
 }
 
 bootJar.enabled = true
-bootJar.archiveFileName = 'restify.jar'
+bootJar.archiveFileName = 'rally-simple.jar'
 
 integrationTest.doFirst {
   //fix hazel cast Not supported: "http://javax.xml.XMLConstants/property/accessExternalDTD"

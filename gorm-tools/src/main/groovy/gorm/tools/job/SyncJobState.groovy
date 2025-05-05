@@ -6,21 +6,13 @@ package gorm.tools.job
 
 import groovy.transform.CompileStatic
 
-import yakworks.commons.model.IdEnum
-
 @CompileStatic
-enum SyncJobState implements IdEnum<SyncJobState, Integer> {
-    Queued(0),
-    Running(1),
-    Finished(2), // completed succesfully or with errors
-    Cancelled(3), // killed, stopped
-    WTF(4)  // WORK THAT FAILED -- was running or queued and we had to change state to something becasue it's not running
-
-    Integer id
-
-    SyncJobState(Integer id) {
-        this.id = id
-    }
+enum SyncJobState {
+    Queued,
+    Running,
+    Finished, // completed succesfully or with errors
+    Cancelled, // killed, stopped
+    WTF  // WORK THAT FAILED -- was running or queued and we had to change state to something becasue it's not running
 
     boolean isComplete(){
         this == Finished || this == Cancelled

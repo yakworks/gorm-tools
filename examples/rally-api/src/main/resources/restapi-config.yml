@@ -1,6 +1,8 @@
 ---
 api:
   defaultPackage: yakworks.rally.api
+  # default is CrudApiController
+  defaultControllerTrait: yakworks.rest.gorm.controller.RestRepoApiController
   namespaces: {'': 'Root', rally: 'Core / Rally'}
   paths:
     /kitchen:
@@ -23,6 +25,9 @@ api:
       entityClass: yakworks.rally.orgs.model.Org
       bulkOps: true
       qRequired: true
+    /rally/partitionOrg:
+      entityClass: yakworks.rally.orgs.model.PartitionOrg
+      allowedOps: [ read ]
     /rally/orgTypeSetup:
       entityClass: yakworks.rally.orgs.model.OrgTypeSetup
       allowedOps: [ update ]

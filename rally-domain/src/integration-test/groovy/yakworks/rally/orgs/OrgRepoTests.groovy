@@ -7,6 +7,7 @@ import yakworks.rally.orgs.model.OrgCalc
 import yakworks.rally.orgs.model.OrgFlex
 import yakworks.rally.orgs.model.OrgInfo
 import yakworks.rally.orgs.model.OrgMember
+import yakworks.rally.orgs.model.PartitionOrg
 
 import java.time.LocalDate
 
@@ -328,7 +329,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
         then:
         !Org.get(10)
-        !Contact.exists(10)
+        !Contact.exists(10L)
         !Contact.findWhere(num: 'secondary10')
         !Contact.findAllByOrg(org)
         !OrgFlex.get(org.id)
@@ -463,7 +464,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         Map params = TestDataJson.buildMap(Org) << [id: orgId, name: 'name', num: 'foo', type: 'Customer']
 
         when: "create"
-        def org = Org.create(params, bindId: true)
+        def org = Org.repo.create(params, [bindId: true])
         orgRepo.flush()
 
         then: "make sure source is assigned properly"
@@ -476,7 +477,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         res.size() == 1
 
         when: "update"
-        org = Org.update([source: [sourceId: 'foo', orgType: 'Customer'], name: 'new name'])
+        org = Org.repo.update([source: [sourceId: 'foo', orgType: 'Customer'], name: 'new name'])
 
         then:
         org.name == 'new name'
@@ -501,7 +502,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         Long orgId = 1111
 
         Map params = TestDataJson.buildMap(Org) << [id: orgId, name: 'name', num: 'foo', type: 'Customer', member: [branch: [id: branch.id ]]]
-        def org = Org.create(params, bindId: true)
+        def org = Org.repo.create(params, [bindId: true])
         orgRepo.flush()
 
         then: "make sure member is created with branch"
@@ -511,6 +512,45 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
         cleanup:
         OrgDimensionTesting.resetDimensions()
+    }
+
+    void "create and update partition org"() {
+        when: "orgtype is not partition type"
+        Org org = Org.create(num: '0011', name: 'testComp', type: 'Customer')
+        flush()
+
+        then:
+        org
+        !PartitionOrg.findWhere(num:"0011")
+
+        when: "type=partition type"
+        org = Org.create(num: '0012', name: 'testComp', type: 'Company')
+        flush()
+
+        PartitionOrg porg = PartitionOrg.findWhere(num:"0012")
+
+        then:
+        org
+        porg
+        org.id == porg.id
+        org.name == porg.name
+        org.num == porg.num
+
+        when:
+        Org.update(id:org.id, name:"updated", num:"updated")
+        flushAndClear()
+        porg = PartitionOrg.findWhere(num:"updated")
+
+        then:
+        porg.name == "updated"
+        porg.name == "updated"
+
+        when: "delete"
+        orgRepo.removeById(org.id)
+        flush()
+
+        then:
+        !PartitionOrg.get(org.id)
     }
 
 }

@@ -6,14 +6,14 @@ package testing
 
 import javax.persistence.Transient
 
-import gorm.tools.repository.model.CompositeRepoEntity
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import org.springframework.lang.Nullable
 
 @Entity
 @GrailsCompileStatic
-class CompositeNoVersion implements CompositeRepoEntity<CompositeNoVersion>, Serializable {
+class CompositeNoVersion implements RepoEntity<CompositeNoVersion>, Serializable {
 
     Long linkedId
     String name
@@ -29,9 +29,9 @@ class CompositeNoVersion implements CompositeRepoEntity<CompositeNoVersion>, Ser
     }
 
     // @Override
-    void setId(@Nullable Serializable serializable) {
-
-    }
+    // void setId(@Nullable Serializable serializable) {
+    //
+    // }
 
     @Transient
     boolean isNew(){

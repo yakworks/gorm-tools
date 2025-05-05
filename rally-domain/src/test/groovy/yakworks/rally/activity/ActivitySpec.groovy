@@ -7,18 +7,13 @@ import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
-import yakworks.rally.activity.model.ActivityContact
-import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
-import yakworks.rally.activity.model.TaskType
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
-import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
-import yakworks.rally.orgs.model.OrgTag
+import yakworks.rally.seed.RallySeed
 import yakworks.rally.tag.model.Tag
-import yakworks.rally.tag.model.TagLink
 import yakworks.rally.testing.MockData
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
@@ -26,13 +21,8 @@ import yakworks.testing.gorm.unit.SecurityTest
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 
 class ActivitySpec extends Specification implements GormHibernateTest, SecurityTest {
-    static entityClasses = [
-        AttachmentLink, ActivityLink, Activity, MailMessage, TaskType, Attachment, ActivityNote, ActivityContact,
-        Org, OrgTag, Tag, TagLink, Contact
-    ]
-    // static springBeans = [
-    //     attachmentSupport: AttachmentSupport
-    // ]
+    static List entityClasses = RallySeed.entityClasses + [AttachmentLink]
+    static List springBeans = RallySeed.springBeanList
 
     @Shared Long orgId
 
@@ -113,7 +103,7 @@ class ActivitySpec extends Specification implements GormHibernateTest, SecurityT
         // add another activity
         Activity.create(params)
         flush()
-        def linkedActs = Activity.repo.queryList([linkedId: 1, linkedEntity:'Contact'])
+        def linkedActs = Activity.repo.query([linkedId: 1, linkedEntity:'Contact']).list()
 
         then:
         linkedActs.size() == 2
@@ -141,7 +131,7 @@ class ActivitySpec extends Specification implements GormHibernateTest, SecurityT
         def params = [kind:"Note", id:activity.id]
         flushAndClear()
         params.name = RandomStringUtils.randomAlphabetic(300)
-        Activity updatedActivity = Activity.update(params)
+        Activity updatedActivity = Activity.repo.update(params)
 
         then:
         updatedActivity.note != null

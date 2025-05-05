@@ -5,11 +5,12 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 
 import gorm.tools.beans.Pager
+import gorm.tools.transaction.WithTrx
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import org.springframework.web.client.RestClientException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import spock.lang.Specification
+
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
@@ -21,7 +22,7 @@ import static yakworks.json.groovy.JsonEngine.parseJson
  * Requires
  */
 @Integration
-class OrgWebApiSpec extends Specification implements WebClientTrait {
+class OrgWebApiSpec extends Specification implements WebClientTrait, WithTrx {
 
     String path = "/api/rally/org"
     String contactApiPath = "/api/rally/contact"
@@ -82,26 +83,26 @@ class OrgWebApiSpec extends Specification implements WebClientTrait {
     void "test qSearch"() {
         when:
         //gets all that start with org 2
-        Map body  = getBody("$path?q=org2")
+        Map body  = getBody("$path?qSearch=org2")
 
         then: "should be 10 of them"
         body.data.size() == 10
 
         when:
-        body  = getBody("$path?q=flubber")
+        body  = getBody("$path?qSearch=flubber")
 
         then:
         body.data.size() == 0
 
         when: 'num search'
-        body  = getBody("$path?q=11")
+        body  = getBody("$path?qSearch=11")
 
         then:
         body.data.size() == 1
         body.data[0].num == '11'
 
         when: 'picklist search'
-        body  = getBody("$path/picklist?q=org12")
+        body  = getBody("$path/picklist?qSearch=org12")
 
         then:
         body.data.size() == 1
@@ -310,6 +311,8 @@ class OrgWebApiSpec extends Specification implements WebClientTrait {
         body.tags[0].id == tag1.id
 
         cleanup:
-        Org.removeById(body.id as Long)
+        withTrx {
+            Org.repo.removeById(body.id as Long)
+        }
     }
 }

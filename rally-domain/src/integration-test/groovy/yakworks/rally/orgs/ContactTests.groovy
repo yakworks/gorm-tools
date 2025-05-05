@@ -186,7 +186,7 @@ class ContactTests extends Specification implements DomainIntTest {
         when:"update contact"
         data.firstName = "name2"
         data.email = "dev@9ci.com"
-        contact = Contact.update(data)
+        contact = Contact.repo.update(data)
         flush()
 
         then:

@@ -4,11 +4,11 @@
 */
 package gorm.tools.mango
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
+
 import gorm.tools.beans.Pager
-
-import javax.inject.Inject
-
-import gorm.tools.mango.api.MangoQuery
+import gorm.tools.mango.api.QueryService
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
@@ -32,7 +32,7 @@ class MangoOverrideSpec extends Specification implements DataRepoTest {
         }
 
         when:
-        List list = MangoThing.repo.queryList()
+        List list = MangoThing.repo.query([:]).list()
         then:
         list.size() == 1
         list[0].id == 2
@@ -45,39 +45,29 @@ class MangoThing implements RepoEntity<MangoThing> {
     String name
 }
 
-class NewMangoQuery implements MangoQuery {
+class NewMangoQuery extends DefaultQueryService<MangoThing> {
 
-    @Override
-    MangoDetachedCriteria query(Class domainClass, Map params, Closure closure = null) {
-        new MangoDetachedCriteria(domainClass).build { eq "id", 2 }
+    NewMangoQuery() {
+        super(MangoThing)
     }
 
     @Override
-    MangoDetachedCriteria query(Class domainClass, QueryArgs qargs, Closure closure = null) {
-        new MangoDetachedCriteria(domainClass).build { eq "id", 2 }
+    MangoDetachedCriteria query(QueryArgs qargs, Closure closure = null) {
+        new MangoDetachedCriteria(MangoThing).build { eq "id", 2 }
     }
 
     @Override
-    List list(MangoDetachedCriteria criteria, Pager pager) {
+    List pagedList(MangoDetachedCriteria criteria, Pager pager) {
         criteria.list(max: pager.max, offset: pager.offset)
     }
 
-    // @Override
-    // List queryList(Class domainClass, Map params, Closure closure = null) {
-    //     query(domainClass, [:], null).list()
-    // }
-
-    // @Override
-    // List queryList(Class domainClass, QueryArgs qargs, Closure closure = null) {
-    //     query(domainClass, [:], null).list()
-    // }
 }
 
 @GormRepository
 class MangoThingRepo implements GormRepo<MangoThing> {
 
-    @Inject
-    NewMangoQuery newMangoQuery
+    // @Autowired
+    // QueryService queryService
 
-    MangoQuery getMangoQuery(){ newMangoQuery }
+    //MangoQuery getMangoQuery(){ newMangoQuery }
 }

@@ -95,7 +95,7 @@ class SyncJobContext {
 
         Map data = [
             id: args.jobId, source: args.source, sourceId: args.sourceId,
-            state: SyncJobState.Running, payload: payload
+            state: args.jobState, payload: payload
         ] as Map<String,Object>
 
         if(payload instanceof Collection && payload.size() > 1000) {

@@ -27,7 +27,7 @@ class RepoTestData {
 
     static InitialPropsResolver initialPropsResolver
 
-    static final Map BUILDERS = [: ] as Map<Class, DataBuilder>
+    static final Map BUILDERS = [:] as Map<Class, DataBuilder>
     static final List<DataBuilderFactory> FACTORIES = []
 
     //override the stock one to use persist
@@ -126,7 +126,7 @@ class RepoTestData {
         if(!BUILDERS.containsKey(clazz)){
             BUILDERS.put(clazz, createBuilder(clazz))
         }
-        BUILDERS.get(clazz)
+        return (DataBuilder)BUILDERS.get(clazz)
     }
 
     /**

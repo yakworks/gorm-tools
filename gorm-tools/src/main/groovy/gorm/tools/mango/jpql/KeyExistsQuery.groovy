@@ -21,7 +21,6 @@ import org.hibernate.query.Query
  *
  * The fastest way is NOT to do a count(*).
  * Note: The above could always end up being an Angry Monkey thing, so always confirm this as perhaps the DB
-
  * basically sets the limit to 1 with setMaxResults and checks if row count is at least 1
  */
 @Builder(builderStrategy= SimpleStrategy, prefix="")
@@ -47,7 +46,7 @@ class KeyExistsQuery<D> {
         return inst
     }
 
-    boolean exists(Object keyVal){
+    boolean exists(Serializable keyVal){
         String queryString = "select 1 from ${entityClass.name} where ${keyName} = :keyVal"
         //String query = "select ${idName} from ${entity.name} where id = :id"
         return (Boolean) staticApi.hibernateTemplate.execute { Session session ->
@@ -56,7 +55,7 @@ class KeyExistsQuery<D> {
                 .setMaxResults(1)
                 .setParameter('keyVal', keyVal)
 
-            return q.list().size() == 1
+            return !q.list().isEmpty()
         }
     }
 

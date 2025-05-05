@@ -25,6 +25,7 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 class AppUser implements UserInfo, AuditStampTrait, RepoEntity<AppUser>, Serializable {
 
     static Map includes = [
+        //get: [ 'id', 'version', 'username' , 'name', 'email', 'inactive', 'roles.$*'],
         qSearch: ['username', 'name', 'email'], // quick search includes
         stamp: ['id', 'username', 'name']  //picklist or minimal for joins
     ]

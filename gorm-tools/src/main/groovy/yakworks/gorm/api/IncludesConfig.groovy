@@ -25,23 +25,15 @@ import yakworks.spring.AppCtx
 class IncludesConfig {
 
     @Autowired ApiConfig apiConfig
+    @Autowired IncludesConfig self //inject self so can call methods and get caching
 
     //static cheater to get the bean, use sparingly if at all
     static IncludesConfig bean(){
         AppCtx.get('includesConfig', this)
     }
 
-    /**
-     * pulls the value for key from includes map.
-     * @return the list or empty if not found
-     */
-    List<String> getIncludes(Class entityClass, String key){
-        Map incsMap = getIncludes(entityClass)
-        return (incsMap ? incsMap[key] : []) as List<String>
-    }
-
-    @Cacheable('ApiConfig.includesByClass')
-    Map getIncludes(Class entityClass){
+    @Cacheable(cacheNames="includesConfig.includesByClass",key="{#entityClass}")
+    Map getIncludesMap(Class entityClass){
         Map includesMap = getClassStaticIncludes(entityClass)
         //if anything in yml config then they win
         Map includesConfigMap = apiConfig.getIncludesForEntity(entityClass.name)
@@ -50,48 +42,66 @@ class IncludesConfig {
     }
 
     /**
-     * Get the map of includes
-     * @param entityClassName fully qualified class name, not short name
-     * @return the include map
+     * pulls the value for key from includes map.
+     * Does NOT fallback to anything. If its not in the map then it returns empty list
+     * @return the list or empty if not found
      */
-    Map getIncludes(String entityClassName){
-        ClassLoader classLoader = getClass().getClassLoader()
-        Class entityClass = classLoader.loadClass(entityClassName)
-        return getIncludes(entityClass)
+    List<String> getByKey(Class entityClass, Object key){
+        Map incsMap = self.getIncludesMap(entityClass) ?: [:]
+        return (incsMap[key.toString()] ?: []) as List<String>
     }
 
     /**
-     * gets using getFieldIncludes which ensures it always has something as it falls back to the get [*] if not found
+     * Looks up the key on statics and api yml.
+     * get the fields includes with a list of keys to search in order, stopping at the first found.
+     * If nothing found will return ['*']
+     * @param entityClass the entity class to lookup
+     * @param includesKey the key to look for
+     * @return the includes for key, or the 'get' includes or ['*']
      */
-    List<String> getIncludesByKey(String entityClassName, String includesKey){
-        def incMap = getIncludes(entityClassName)
-        return getFieldIncludes(incMap, [includesKey])
+    List<String> findByKeys(Class entityClass, List includesKeys){
+        def incMap = self.getIncludesMap(entityClass)
+        List<String> incs = searchMapForKeys(incMap, includesKeys)
+        return incs ?: ['*']
     }
 
     /**
      * finds the right includes.
      *   - looks for includes param and uses that if passed in
-     *   - looks for includesKey param and uses that if set, falling back to the defaultIncludesKey
-     *   - falls back to the passed fallbackKeys if not set
+     *   - looks for includesKey param and uses that if set, falling back to the fallbackKeys
      *   - the fallbackKeys will itself unlimately fallback to the 'get' includes if it can't be found
      *
-     * @param params the request params
      * @return the List of includes field that can be passed to the MetaMap creation
      */
-    List<String> findIncludes(String entityClassName, Map params, List<String> fallbackKeys = []){
-        List<String> keyList = []
-        //if it has a includes then just parse that and pass it back
-        if(params.containsKey('includes')) {
-            return (params['includes'] as String).tokenize(',')*.trim()
-        } else if(params.containsKey('includesKey')){
-            keyList << (params['includesKey'] as String)
-        }
-        keyList.addAll(fallbackKeys)
-        def incMap = getIncludes(entityClassName)
-        return getFieldIncludes(incMap, keyList)
+    List<String> findIncludes(Class entityClass, IncludesProps incProps){
+        //if it has includes then that always wins, just return right away
+        if(incProps.includes) return incProps.includes
+        //use keys to search
+        return findByKeys(entityClass, incProps.includesKeys)
     }
 
-    Map getClassStaticIncludes( Class entityClass) {
+    /**
+     * get the fields includes with a list of keys to search in order, stopping at the first found
+     * @param includesMap the map to check
+     * @param includesKeys the key to check
+     * @return the first match or empty if nothing
+     */
+    List<String> searchMapForKeys(Map includesMap, List includesKeys){
+        for(Object key : includesKeys){
+            String skey = key.toString()
+            if(includesMap.containsKey(skey)) {
+                def incs = includesMap[skey]
+                return incs as List<String>
+            }
+        }
+        return []
+    }
+
+
+    /**
+     * Get the statics includes on the class
+     */
+    protected Map getClassStaticIncludes(Class entityClass) {
         // look for includes map on the domain first
         Map entityIncludes = ClassUtils.getStaticPropertyValue(entityClass, 'includes', Map)
         Map includesMap = (entityIncludes ? Maps.clone(entityIncludes) : [:]) as Map<String, Object>
@@ -99,24 +109,12 @@ class IncludesConfig {
     }
 
     /**
-     * get the fields includes with a list of keys to search in order, stopping at the first found
-     * and falling back to 'get' which should always exist
-     *
-     * @param includesKeys the List of keys to get in order of priority
-     * @return the includes list that can be passed into MetMap creation
+     * load class
      */
-    static List<String> getFieldIncludes(Map includesMap, List<String> includesKeys){
-        if(!includesKeys.contains('get')) includesKeys << 'get'
-
-        for(String key : includesKeys){
-            if(includesMap.containsKey(key)) {
-                def incs = includesMap[key]
-                //they get merged in as Maps when coming from external configs with the key being index, [0:id, 1:name, etc..], just need vals
-                return (incs instanceof Map ? incs.values() : incs ) as List<String>
-            }
-        }
-        //its should never get here but in case it does and config is messed then fall back *
-        return ['*']
+    static Class lookupClass(String entityClassName){
+        ClassLoader classLoader = IncludesConfig.getClassLoader()
+        Class entityClass = classLoader.loadClass(entityClassName)
+        return entityClass
     }
 
 }

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import yakworks.commons.lang.ClassUtils
+import yakworks.rest.gorm.controller.CrudApiController
 import yakworks.rest.gorm.controller.RestRepoApiController
 
 /**
@@ -41,10 +42,16 @@ class RepoApiMappingsService {
         for (controller in controllerClasses) {
             // println "controler $controller.fullName"
             String ctrlName = controller.logicalPropertyName
-            boolean isApi = RestRepoApiController.isAssignableFrom(controller.clazz)
-            if (isApi) {
+            boolean isRestRepoApi = RestRepoApiController.isAssignableFrom(controller.clazz)
+            boolean isCrudApi = CrudApiController.isAssignableFrom(controller.clazz)
+            if (isRestRepoApi || isCrudApi) {
                 String nspace = ClassUtils.getStaticPropertyValue(controller.clazz, 'namespace', String)
                 CrudUrlMappingsBuilder.of(contextPath, nspace, ctrlName).build(builderDelegate)
+
+                //UPSERT
+                SimpleUrlMappingBuilder.of(contextPath, nspace, ctrlName)
+                    .httpMethod('POST').action('upsert').suffix('/upsert')
+                    .urlMappingBuilder(builderDelegate).build()
 
                 // bulks ops at /bulk
                 SimpleUrlMappingBuilder.of(contextPath, nspace, ctrlName)
@@ -54,12 +61,20 @@ class RepoApiMappingsService {
                     .httpMethod('PUT').action('bulkUpdate').suffix('/bulk')
                     .urlMappingBuilder(builderDelegate).build()
 
+                //XXX @SUD, what this mean "not working, doesnt get picked up"?
+                //bulk export FIXME @SUD, not working, doesnt get picked up
+                SimpleUrlMappingBuilder.of(contextPath, nspace, ctrlName)
+                    .httpMethod('GET').action('bulkExport').suffix('/bulk')
+                    .urlMappingBuilder(builderDelegate).build()
+
+
                 //allow POST any action added to the controller
                 // /api/nspace/controller/$action
                 // post "/$action(.$format)?"(controller: cName)
                 SimpleUrlMappingBuilder.of(contextPath, nspace, ctrlName)
                     .httpMethod('POST').suffix('/(*)').matchParams(['action'])
                     .urlMappingBuilder(builderDelegate).build()
+
             }
         }
     }

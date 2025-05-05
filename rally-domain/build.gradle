@@ -6,6 +6,7 @@ apply from: "${rootDir}/gradle/test-integration.gradle"
 dependencies {
 
   compileOnly "org.springframework.boot:spring-boot-starter-web"
+
   //transitive spring security
   //compileOnly "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
 
@@ -14,13 +15,19 @@ dependencies {
   api project(":boot-security-gorm")
   api project(":gorm-etl")
 
-  api "org.yakworks:grails-external-config:$vSpringGrailsKit"
+  //api "org.yakworks:grails-external-config:$vSpringGrailsKit"
   api 'jakarta.annotation:jakarta.annotation-api:2.1.0'
 
   //lock the compatible hibernate version here
   api "org.grails:grails-datastore-gorm-hibernate5:$vGormHibernate"
   api "org.grails.plugins:hibernate5:$vGormHibernate"
   api "org.hibernate:hibernate-core:$vHibernate"
+
+  //Hazelcast and Caffeine
+  //runtimeOnly "com.hazelcast:hazelcast-hibernate53:$vHazelcastHib"
+  implementation "com.hazelcast:hazelcast:$vHazelcast"
+  implementation "com.hazelcast:hazelcast-spring:$vHazelcast"
+  implementation "com.github.ben-manes.caffeine:caffeine:$vCaffeine"
 
   //mailgun
   api 'com.mailgun:mailgun-java:1.0.7'

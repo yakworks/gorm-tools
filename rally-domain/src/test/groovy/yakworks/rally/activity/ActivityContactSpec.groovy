@@ -1,23 +1,24 @@
 package yakworks.rally.activity
 
-import gorm.tools.repository.model.CriteriaRemover
-import grails.gorm.DetachedCriteria
 import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.repo.ActivityContactRepo
+import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.PartitionOrg
+import yakworks.rally.seed.RallySeed
 import yakworks.rally.tag.model.Tag
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
-import yakworks.testing.gorm.unit.DataRepoTest
 
 class ActivityContactSpec extends Specification implements GormHibernateTest, SecurityTest {
-    static List entityClasses = [Activity, ActivityContact, ActivityNote, Contact, ContactSource, Org, Tag]
+    static List entityClasses = RallySeed.entityClasses
+    static List springBeans = RallySeed.springBeanList
 
     @Shared
     ActivityContactRepo repo
@@ -25,11 +26,11 @@ class ActivityContactSpec extends Specification implements GormHibernateTest, Se
     void setupSpec() {
         //setup remover
         repo = ActivityContact.repo
-        repo.criteriaRemover = new CriteriaRemover(){
-            void deleteAll(DetachedCriteria crit) {
-                crit.list()*.delete()
-            }
-        }
+        // repo.criteriaRemover = new CriteriaRemover(){
+        //     void deleteAll(DetachedCriteria crit) {
+        //         crit.list()*.delete()
+        //     }
+        // }
     }
 
     List createSomeContacts(Long orgId){

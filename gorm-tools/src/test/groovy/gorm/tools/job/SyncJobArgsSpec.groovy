@@ -1,7 +1,9 @@
 package gorm.tools.job
 
+import gorm.tools.repository.model.DataOp
 import spock.lang.Specification
 import testing.TestSyncJobService
+import yakworks.commons.lang.EnumUtils
 
 class SyncJobArgsSpec extends Specification  {
 
@@ -36,4 +38,12 @@ class SyncJobArgsSpec extends Specification  {
         args.dataFormat == SyncJobArgs.DataFormat.Payload
     }
 
+    void "test enum"() {
+        setup:
+        //def dfoo = ("foo" as DataOp)
+        def v = null
+        def dfoo = EnumUtils.getEnumIgnoreCase(DataOp, v as String)
+        expect:
+        dfoo == null
+    }
 }

@@ -8,7 +8,8 @@ import org.codehaus.groovy.util.HashCodeHelper
 
 import gorm.tools.model.LinkedEntity
 import gorm.tools.model.Persistable
-import gorm.tools.repository.model.GormRepoEntity
+import gorm.tools.repository.RepoLookup
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.rally.attachment.repo.AttachmentLinkRepo
@@ -18,7 +19,7 @@ import yakworks.rally.attachment.repo.AttachmentLinkRepo
  */
 @Entity
 @GrailsCompileStatic
-class AttachmentLink implements LinkedEntity, GormRepoEntity<AttachmentLink, AttachmentLinkRepo>, Serializable {
+class AttachmentLink implements LinkedEntity, RepoEntity<AttachmentLink>, Serializable {
     static belongsTo = [attachment: Attachment]
 
     static mapping = {
@@ -26,6 +27,8 @@ class AttachmentLink implements LinkedEntity, GormRepoEntity<AttachmentLink, Att
         version false
         attachment column: 'attachmentId', fetch: 'join'
     }
+
+    static AttachmentLinkRepo getRepo() { return (AttachmentLinkRepo) RepoLookup.findRepo(this) }
 
     static AttachmentLink create(Persistable linkedEntity, Attachment attach, Map args = [:]) {
         getRepo().create(linkedEntity, attach, args)

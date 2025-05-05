@@ -18,29 +18,6 @@ class JpqlQueryBuilderUpdateTests extends Specification implements DomainIntTest
         val.stripIndent().replace('\n',' ').trim()
     }
 
-    //update name where id is 1
-    def "simple select base line"(){
-        when:
-        def qry = Org.query(
-            projections: ['name': 'group'],
-            q: [
-                name: "Org1%"
-            ]
-        )
-        def list = qry.mapList()
-
-        then:
-        list
-
-        when:
-        def builder = JpqlQueryBuilder.of(qry) //.aliasToMap(true)
-        JpqlQueryInfo queryInfo = builder.buildSelect()
-
-        then:
-        queryInfo.query == "SELECT org.name as name FROM yakworks.rally.orgs.model.Org AS org WHERE (lower(org.name) like lower(:p1)) GROUP BY org.name"
-
-    }
-
     void "simple update query"() {
         given:"Some criteria"
 
@@ -58,7 +35,7 @@ class JpqlQueryBuilderUpdateTests extends Specification implements DomainIntTest
         then:"The query is valid"
         queryInfo.query == strip('''\
         UPDATE yakworks.rally.orgs.model.Org org SET org.name=:p1
-        WHERE (org.name=:p2)
+        WHERE org.name=:p2
         ''')
 
         // when:
@@ -86,7 +63,7 @@ class JpqlQueryBuilderUpdateTests extends Specification implements DomainIntTest
         then:"The query is valid"
         queryInfo.query == strip('''\
         UPDATE yakworks.rally.orgs.model.Org org SET org.name=:p1
-        WHERE (org.id=:p2)
+        WHERE org.id=:p2
         ''')
 
         // when:

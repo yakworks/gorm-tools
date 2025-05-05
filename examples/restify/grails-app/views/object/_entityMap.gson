@@ -1,8 +1,0 @@
-import yakworks.meta.MetaMap
-
-model {
-    MetaMap entityMap
-    // Map renderArgs = [:]
-}
-// System.out.println "Model in _object $binding.variables"
-json g.render(entityMap)

@@ -11,21 +11,21 @@ project:
   # this is needed for url in pom for jar lib, doesnt pick up defaults from git
   fullName: yakworks/gorm-tools
   # list of subproject dirs used to spin through, build the checksum and consolidate the test reports for circle
-  subprojects: gorm-tools security/boot-security gorm-audit gorm-etl gorm-rest rally-domain security/boot-security security/boot-security-gorm examples/restify examples/testify
+  subprojects: gorm-tools gorm-audit gorm-etl gorm-openapi gorm-rest gorm-test-domain gorm-test-support rally-domain security/security-core security/boot-security security/boot-security-gorm examples/testify examples/rally-api
 
 # app info, assumes that there is one main deployable app per project which is the best practice.
 # But you can always make more and create a .env or .sh and call 'make foo env=deploy/custom.env
 # versions snapshot, dev, stable
-# restify:current stable, restify-dev: latest dev release, restify-snapshot: most recent snapshot
+# testify:current stable, testify-dev: latest dev release, testify-snapshot: most recent snapshot
 # only when we have an old version will it have that appened.
 # app_key standard to <app name>-<env>-<short version>
-# so when app_name=restify, app_env=dev short_ver=10 then its restify-dev,
-# if VERSION_POSTFIX get set then it would be restify-snapshot
+# so when app_name=testify, app_env=dev short_ver=10 then its testify-dev,
+# if VERSION_POSTFIX get set then it would be testify-snapshot
 
 app:
-  name: restify
+  name: rally-api
   key: ${APP_NAME}${VERSION_POSTFIX}
-  jar: examples/restify/build/libs/${APP_NAME}-${BUILD_VERSION}.jar
+  jar: examples/rally-api/build/libs/${APP_NAME}-${BUILD_VERSION}.jar
   docker:
     src: ./deploy/docker
     url: yakworks/gorm-tools:${APP_KEY}

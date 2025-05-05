@@ -158,11 +158,11 @@ test.benchmarks:
 #		-XX:+ScavengeBeforeFullGC -XX:+CMSScavengeBeforeRemark \
 #		-XX:SurvivorRatio=8 \
 
-# start the restify example jar
+## start the rally-api example jar
 start.rally-api: # start.db
-	${gradlew} restify:assemble
-	cd examples/restify
-	java -server -Xmx2g -jar build/libs/restify.jar
+	${gradlew} rally-api:assemble
+	cd examples/rally-api
+	java -server -Xmx2g -jar build/libs/rally-api.jar
 
 
 # clones the api-docs branch or this project where we will publish/push

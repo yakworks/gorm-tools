@@ -131,8 +131,13 @@ class SyncJobArgs {
      */
     Map persistArgs
 
-    /** returns new PersistArgs instance on each call */
-    PersistArgs getPersistArgs() { return this.persistArgs ? PersistArgs.of(this.persistArgs) : new PersistArgs() }
+    /**
+     * returns new PersistArgs instance on each call.
+     * GormRepo make changes as it goes so we dont want the same one going through multiple cylces
+     */
+    PersistArgs getPersistArgs() {
+        return this.persistArgs ? PersistArgs.of(this.persistArgs) : new PersistArgs()
+    }
 
     /**
      * When params include a mango query this is the QueryArgs that are created from it. Used for the ExportSyncArgs.
@@ -153,6 +158,12 @@ class SyncJobArgs {
 
     //reference back to the SyncJobContext built from these args.
     SyncJobContext context
+
+    /**
+     * SyncJobState to use when creating new job.
+     * Default is Running. But Queued can be used for jobs which are scheduled to run later, eg BulkExport.
+     */
+    SyncJobState jobState = SyncJobState.Running
 
     /** helper to return true if op=DataOp.add */
     boolean isCreate(){

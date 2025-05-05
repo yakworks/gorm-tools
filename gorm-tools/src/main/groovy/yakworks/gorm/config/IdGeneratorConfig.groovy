@@ -7,9 +7,7 @@ package yakworks.gorm.config
 import groovy.transform.CompileStatic
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.context.annotation.Configuration
 
-@Configuration(proxyBeanMethods = false)
 @ConfigurationProperties(prefix="yakworks.gorm.id-generator")
 @CompileStatic
 class IdGeneratorConfig {

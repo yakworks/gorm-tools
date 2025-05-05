@@ -13,7 +13,7 @@ import java.time.LocalDateTime
 import groovy.transform.CompileDynamic
 
 import gorm.tools.model.NameNum
-import gorm.tools.repository.model.GormRepoEntity
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
@@ -28,13 +28,19 @@ import yakworks.security.audit.AuditStamp
 // @ManagedEntity //see ManagedEntitySinkSpec
 @GrailsCompileStatic
 @ToString(includeNames=true, includes = ["id", "num"])
-class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRepo>, Auditable  {
+class KitchenSink implements NameNum, RepoEntity<KitchenSink>, Serializable, Auditable  {
+
     //<- ext belong to KitchenSink
     // since ext also has an KitchenSink property (kitchenParent) it will confused
     // example of how to explcitly force the "belongsTo"  with the mappedBy
     static mappedBy = [ext: "kitchenSink"]
     static hasMany = [stringList: String]
     static toOneAssociations = [ 'ext' ]
+
+    static Map includes = [
+        qSearch: ['id', 'num', 'name'],
+        stamp: ['id', 'num', 'name']
+    ]
 
     //strings
     String name2

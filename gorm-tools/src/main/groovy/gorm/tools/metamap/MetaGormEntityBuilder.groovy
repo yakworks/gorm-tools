@@ -136,7 +136,7 @@ class MetaGormEntityBuilder {
                 //if it start with a $ then use it as includesKey
                 else if (field.startsWith('$')) {
                     String incKey = field.replace('$', '')
-                    Map incsMap = IncludesConfig.bean().getIncludes(entityClass)
+                    Map incsMap = IncludesConfig.bean().getIncludesMap(entityClass)
                     if(incsMap){
                         List props = ( incsMap[incKey] ?: ['id'] ) as List<String>
                         def toMerge = MetaGormEntityBuilder.build(entityClass.name, props)
@@ -186,7 +186,7 @@ class MetaGormEntityBuilder {
         //XXX WHY DO WE RETURN NULL?
         if (!metaEntity.metaProps)  return null //throw new IllegalArgumentException("includes must be bad, includes: ${includes}")
 
-        if(blacklist) metaEntity.addBlacklist(blacklist)
+        if(blacklist) metaEntity.addBlacklist(blacklist as Set<String>)
         //if it has nestedProps then go recursive
         if(nestedProps){
             buildNested(nestedProps)

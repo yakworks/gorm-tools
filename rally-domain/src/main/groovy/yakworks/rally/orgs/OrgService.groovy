@@ -21,7 +21,7 @@ import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.repo.OrgRepo
 
 /**
- * event listener for afterbind to setup org member
+ * Service helper for the Org partition
  */
 @Service @Lazy
 @Slf4j
@@ -43,6 +43,10 @@ class OrgService {
 
     String getPartitionPropName(){
         return orgProps.partition.type.propertyName
+    }
+
+    String getPartitionIdFieldName(){
+        return orgProps.partition.type.idFieldName
     }
 
     String getMemberPartitionPath(){
@@ -69,6 +73,13 @@ class OrgService {
         List<OrgType> immediateParents = orgDimensionService.getImmediateParents(org.type)
         //if it has parents so going to need to have a member too. kicks in validation in OrgMemberRepo
         if(immediateParents && !org.member) org.member = OrgMember.make(org)
+
+        //if company is in parent, but not explicitely provided, take it from org.companyId
+        if(immediateParents.contains(OrgType.Company) && (!params || !params.containsKey(OrgType.Company.propertyName))) {
+            if(!params) params = [:]
+            params[OrgType.Company.propertyName] = [id:org.companyId]
+        }
+
         if(!params) return
 
         //spin through orgTypes for immediate parents and update parents

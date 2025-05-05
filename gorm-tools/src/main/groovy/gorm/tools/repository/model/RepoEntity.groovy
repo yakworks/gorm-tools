@@ -6,9 +6,6 @@ package gorm.tools.repository.model
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.mango.api.QueryMangoEntity
-import gorm.tools.repository.GormRepo
-
 /**
  * Default trait for a domain that has a generated repo and mango query methods.
  *
@@ -16,6 +13,6 @@ import gorm.tools.repository.GormRepo
  * @since 6.1
  */
 @CompileStatic
-trait RepoEntity<D> implements PersistableRepoEntity<D, GormRepo<D>, Long>, QueryMangoEntity<D> {
+trait RepoEntity<D> implements PersistableRepoEntity<D, Long> {
 
 }

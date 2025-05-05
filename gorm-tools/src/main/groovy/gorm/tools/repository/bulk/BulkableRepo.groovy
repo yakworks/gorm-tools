@@ -4,7 +4,6 @@
 */
 package gorm.tools.repository.bulk
 
-
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.core.Datastore
@@ -25,7 +24,10 @@ import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.events.AfterBulkSaveEntityEvent
 import gorm.tools.repository.events.BeforeBulkSaveEntityEvent
 import gorm.tools.repository.events.RepoEventPublisher
+import gorm.tools.repository.model.DataOp
+import gorm.tools.repository.model.EntityResult
 import yakworks.api.ApiResults
+import yakworks.api.HttpStatus
 import yakworks.api.Result
 import yakworks.api.problem.data.DataProblem
 import yakworks.commons.map.LazyPathKeyMap
@@ -55,10 +57,9 @@ trait BulkableRepo<D> {
     ProblemHandler problemHandler
 
     //Here for @CompileStatic - GormRepo implements these
-    abstract D create(Map data, Map args)
-    abstract D update(Map data, Map args)
     abstract D doCreate(Map data, PersistArgs args)
     abstract D doUpdate(Map data, PersistArgs args)
+    abstract EntityResult<D> upsert(Map data, PersistArgs args)
     abstract  Class<D> getEntityClass()
     abstract void flushAndClear()
     abstract void clear()
@@ -144,8 +145,8 @@ trait BulkableRepo<D> {
         ApiResults results = ApiResults.create(false)
         for (Map item : dataList) {
             try {
-                Map entityMapData = bulkSaveEntity(item, syncJobArgs, transactionPerItem)
-                results << Result.OK().payload(entityMapData).status(syncJobArgs.isCreate() ? 201 : 200)
+                EntityResult<Map> entResult = bulkSaveEntity(item, syncJobArgs, transactionPerItem)
+                results << Result.OK().payload(entResult.entity).status(entResult.status)
             } catch(Exception e) {
                 // if trx by item then collect the exceptions, otherwise throw so it can rollback
                 if(transactionPerItem){
@@ -158,7 +159,7 @@ trait BulkableRepo<D> {
         }
         // flush and clear here so easier to debug problems and clear for memory to help garbage collection
         if(getDatastore().hasCurrentSession()) {
-            // if trx is at item then only clear
+            // if trx is per item then it already flushes at trx commit so only clear.
             transactionPerItem ? clear() : flushAndClear()
         }
 
@@ -172,9 +173,10 @@ trait BulkableRepo<D> {
      * @param data the item data
      * @param syncJobArgs - persistArgs and isCreate will be pulled from here
      * @param transactional true if should be wraped in withTrx
-     * @return the data map after bing run through buildSuccessMap using the includes in the syncJobArgs
+     * @return the EntityResult with the data map as entity after being run through buildSuccessMap
+     *         using the includes in the syncJobArgs
      */
-    Map bulkSaveEntity(Map data, SyncJobArgs syncJobArgs, boolean transactional) {
+    EntityResult<Map> bulkSaveEntity(Map data, SyncJobArgs syncJobArgs, boolean transactional) {
         //need to copy the incoming map, as during create(), repos may remove entries from the data map
         //or it can create circular references - eg org.contact.org - which would result in Stackoverflow when converting to json
         Map dataClone
@@ -188,10 +190,26 @@ trait BulkableRepo<D> {
         def closure = {
             doBeforeBulkSaveEntity(dataClone, syncJobArgs)
             PersistArgs pargs = syncJobArgs.persistArgs
-            D entityInstance = syncJobArgs.isCreate() ? doCreate(dataClone, pargs) : doUpdate(dataClone, pargs)
+            D entityInstance
+            DataOp op = syncJobArgs.op
+            int statusCode
+            if(op == DataOp.add) { // create
+                entityInstance = doCreate(dataClone, pargs)
+                statusCode = HttpStatus.CREATED.code
+            } else if (op == DataOp.update) { // update
+                entityInstance = doUpdate(dataClone, pargs)
+                statusCode = HttpStatus.OK.code
+            } else if (op == DataOp.upsert) { // upsert (insert or update)
+                EntityResult res = upsert(dataClone, pargs)
+                entityInstance = res.entity
+                statusCode = res.status.code
+            } else {
+                throw new UnsupportedOperationException("DataOp $op not supported")
+            }
             doAfterBulkSaveEntity(entityInstance, dataClone, syncJobArgs)
-            return buildSuccessMap(entityInstance, syncJobArgs.includes)
-        } as Closure<Map>
+            Map successMap = buildSuccessMap(entityInstance, syncJobArgs.includes)
+            return EntityResult.of(successMap).status(statusCode)
+        } as Closure<EntityResult<Map>>
 
         return transactional ? withTrx(closure) : closure()
     }
@@ -217,7 +235,8 @@ trait BulkableRepo<D> {
 
     /**
      * uses metaMapService to create the map for the includes in the jobContext.args
-     * Will return a clone to ensure that all properties are called and its a clean, unwrapped map
+     * Will return a clone to ensure that all properties are called
+     * and its a clean, unwrapped, no proxies, map
      */
     Map createMetaMap(D entityInstance, List<String> includes){
         MetaMap entityMapData = metaMapService.createMetaMap(entityInstance, includes)
@@ -243,4 +262,5 @@ trait BulkableRepo<D> {
         def event = new AfterBulkSaveEntityEvent<D>(self, entity, data, syncJobArgs)
         getRepoEventPublisher().publishEvents(self, event, [event] as Object[])
     }
+
 }

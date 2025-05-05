@@ -107,6 +107,7 @@ class TokenController {
      * Basically a url for grant_type=password and storing a user token in the table
      * TODO for legacy and possible in future.  JsonUsernamePasswordLogin forwards to this right now
      * we will sunset this once we move off of having stored tokens as the default when using the login.
+     * @see yakworks.security.spring.DefaultSecurityConfiguration#addJsonAuthenticationFilter
      */
     @Deprecated
     @PostMapping("/tokenLegacy")

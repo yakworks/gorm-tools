@@ -2,6 +2,7 @@ package yakworks.rally.activity
 
 import java.nio.file.Path
 
+import gorm.tools.databinding.BindAction
 import gorm.tools.repository.PersistArgs
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
@@ -24,7 +25,7 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
     @OnceBefore
     void setupData(){
         Org.list().each { Org org ->
-            def act = Activity.create([id: org.id, org: org, note: [body: 'Test note']], bindId: true)
+            def act = Activity.repo.create([id: org.id, org: org, note: [body: 'Test note']], [bindId: true])
         }
         flushAndClear()
     }
@@ -40,14 +41,14 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
         return [tempFileName: tempFileName, originalFileName: filename]
     }
 
-    void "doAfterPersistWithData attachments"() {
+    void "doAfterPersist attachments"() {
         when:
         def data = [:]
         data['attachments'] = [getTestAttachment('testing.txt')]
         Activity activity = Activity.get(9)
         assert !activity.attachments
 
-        activityRepo.doAfterPersistWithData(activity, PersistArgs.of(data:data))
+        activityRepo.doAfterPersist(activity, PersistArgs.of(data:data, bindAction: BindAction.Create))
         flush()
         Attachment attachment = activity.attachments[0]
 
@@ -65,7 +66,7 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
 
     }
 
-    void "doAfterPersistWithData Attachment In Params"() {
+    void "doAfterPersist Attachment In Params"() {
         when:
         def activity = Activity.get(9)
         Map data = [
@@ -74,7 +75,7 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
             ]
         ]
 
-        activityRepo.doAfterPersistWithData(activity, PersistArgs.of(data: data))
+        activityRepo.doAfterPersist(activity, PersistArgs.of(data: data, bindAction: BindAction.Create))
 
         flush()
 

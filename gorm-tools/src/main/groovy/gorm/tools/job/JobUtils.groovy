@@ -4,8 +4,9 @@
 */
 package gorm.tools.job
 
-import javax.servlet.http.HttpServletRequest
+//import javax.servlet.http.HttpServletRequest
 
+import groovy.json.JsonOutput
 import groovy.transform.CompileStatic
 
 /**
@@ -14,9 +15,35 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class JobUtils {
 
-    static String requestToSourceId(HttpServletRequest req){
-        String sourceId = "${req.method} ${req.requestURI}"
-        if(req.queryString) sourceId = "${sourceId}?${req.queryString}"
+    @Deprecated //removed the servlet api dependency
+    static String requestToSourceId(Object req){
+        String sourceId = "${req['method']} ${req['requestURI']}"
+        if(req['queryString']) sourceId = "${sourceId}?${req['queryString']}"
         return sourceId
+    }
+
+    static JsonOutput.JsonUnescaped getRowJobData(SyncJobEntity job) {
+        // gets the raw json string and use the unescaped to it just dumps it to writer without any round robin conversion
+        String jobData = job.dataToString()
+        return JsonOutput.unescaped(jobData)
+    }
+
+    //static helper as its used both here and also in the SyncJobRenderer
+    static Map convertToMap(SyncJobEntity job){
+        JsonOutput.JsonUnescaped rawDataJson = getRowJobData(job)
+
+        Map map = [
+            id: job['id'],
+            ok: job.ok,
+            state: job.state.name(),
+            source: job.source,
+            sourceId: job.sourceId,
+            data: rawDataJson
+        ]
+
+        if(job.problems) {
+            map['problems'] = job.problems
+        }
+        return map
     }
 }

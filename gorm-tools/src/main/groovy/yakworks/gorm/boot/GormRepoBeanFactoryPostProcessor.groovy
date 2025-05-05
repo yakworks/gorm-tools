@@ -7,15 +7,14 @@ package yakworks.gorm.boot
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.model.AbstractMappingContext
+import org.grails.orm.hibernate.HibernateDatastore
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
-import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
+import org.springframework.context.MessageSource
 
-import gorm.tools.repository.DefaultGormRepo
-import gorm.tools.repository.RepoLookup
-import gorm.tools.repository.model.UuidGormRepo
-import gorm.tools.repository.model.UuidRepoEntity
+import gorm.tools.validation.RepoValidatorRegistry
 
 /**
  * Sets up the spring beans for the GormRepos.
@@ -30,9 +29,12 @@ class GormRepoBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
     AbstractMappingContext grailsDomainClassMappingContext
 
-    GormRepoBeanFactoryPostProcessor(List<Class> entityClasses){
-        this.entityClasses = entityClasses
-    }
+    // @Autowired HibernateDatastore hibernateDatastore
+    // @Autowired MessageSource messageSource
+
+    // GormRepoBeanFactoryPostProcessor(List<Class> entityClasses){
+    //     this.entityClasses = entityClasses
+    // }
 
     GormRepoBeanFactoryPostProcessor(AbstractMappingContext grailsDomainClassMappingContext){
         this.grailsDomainClassMappingContext = grailsDomainClassMappingContext
@@ -53,25 +55,9 @@ class GormRepoBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
         // Map<String, Object> newRepoBeanMap = [:]
 
-        for(Class entityClass: entityClasses){
-            String repoName = RepoLookup.getRepoBeanName(entityClass)
-            // def hasRepo = repoClasses.find { NameUtils.getPropertyName(it.simpleName) == repoName }
-            // look for Entities that dont have a Repo registered.
-            if (!registry.containsBeanDefinition(repoName)) {
-                //if its not found then set a default one up.
-                Class repoClass = DefaultGormRepo
-                if(UuidRepoEntity.isAssignableFrom(entityClass)) {
-                    repoClass = UuidGormRepo
-                }
-                // newRepoBeanMap[repoName] = [repoClass, entityClass]
-                var bdef = BeanDefinitionBuilder.rootBeanDefinition(repoClass)
-                    .addConstructorArgValue(entityClass)
-                    .setLazyInit(true)
-                    .getBeanDefinition()
-                registry.registerBeanDefinition(repoName, bdef)
-            }
-        }
+        SpringBeanUtils.registerRepos(registry, entityClasses)
 
+        //RepoValidatorRegistry.init(hibernateDatastore, messageSource)
     }
 
 }

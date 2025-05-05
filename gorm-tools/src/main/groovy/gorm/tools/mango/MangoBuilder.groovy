@@ -4,8 +4,6 @@
 */
 package gorm.tools.mango
 
-import java.util.UUID
-
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -23,8 +21,7 @@ import grails.gorm.DetachedCriteria
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.EnumUtils
 import yakworks.commons.model.IdEnum
-import yakworks.gorm.api.IncludesConfig
-import yakworks.gorm.api.IncludesKey
+import yakworks.gorm.config.GormConfig
 
 import static gorm.tools.mango.MangoOps.CompareOp
 import static gorm.tools.mango.MangoOps.ExistOp
@@ -33,6 +30,7 @@ import static gorm.tools.mango.MangoOps.OverrideOp
 import static gorm.tools.mango.MangoOps.PropertyOp
 import static gorm.tools.mango.MangoOps.QSEARCH
 import static gorm.tools.mango.MangoOps.SORT
+import static gorm.tools.mango.MangoOps.SubQueryOp
 
 /**
  * the main builder to turn Mango QL Maps or json into DetachedCriteria for Gorm
@@ -45,51 +43,72 @@ import static gorm.tools.mango.MangoOps.SORT
 @Slf4j
 class MangoBuilder {
 
-    @Autowired IncludesConfig includesConfig
-
-    public <D> MangoDetachedCriteria<D> build(Class<D> clazz, Map map, @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
-        MangoDetachedCriteria<D> detachedCriteria = new MangoDetachedCriteria<D>(clazz)
-        return build(detachedCriteria, map, callable)
-    }
-
-    public <D> MangoDetachedCriteria<D> build(MangoDetachedCriteria<D> criteria, Map map,
-                                         @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
-        MangoDetachedCriteria newCriteria = cloneCriteria(criteria)
-        def tidyMap = MangoTidyMap.tidy(map)
-        applyMapOrList(newCriteria, tidyMap)
-        if (callable) {
-            final Closure clonedClosure = (Closure) callable.clone()
-            clonedClosure.setResolveStrategy(Closure.DELEGATE_FIRST)
-            newCriteria.with(clonedClosure)
-        }
-        return newCriteria
-    }
+    @Autowired QuickSearchSupport quickSearchSupport
+    @Autowired GormConfig gormConfig
 
     @CompileDynamic //dynamic so it can access the protected criteria.clone
     static <D> MangoDetachedCriteria<D> cloneCriteria(DetachedCriteria<D> criteria) {
         (MangoDetachedCriteria)criteria.clone()
     }
 
-    public <D> MangoDetachedCriteria<D> buildWithQueryArgs(Class<D> clazz, QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
-        MangoDetachedCriteria<D> mangoCriteria = new MangoDetachedCriteria<D>(clazz)
-        Map criteria = qargs.buildCriteria()
-        //will be copy if sort exists
-        def tidyMap = MangoTidyMap.tidy(criteria)
-        applyMapOrList(mangoCriteria, tidyMap)
+    public <D> MangoDetachedCriteria<D> build(Class<D> clazz, QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
+        MangoDetachedCriteria<D> mangoCriteria = createCriteria(clazz, qargs, callable)
+        applyCriteria(mangoCriteria)
+        return mangoCriteria
+    }
 
-        if (callable) {
-            final Closure clonedClosure = (Closure) callable.clone()
+    /**
+     * Creates the MangoDetachedCriteria object with the queryArgs.
+     * Does NOT apply or set it up yet.
+     */
+    <D> MangoDetachedCriteria<D> createCriteria(Class<D> clazz, QueryArgs queryArgs, Closure applyClosure){
+        MangoDetachedCriteria<D> mangoCriteria = new MangoDetachedCriteria<D>(clazz)
+        mangoCriteria.gormConfig = gormConfig
+        //assign the queryArgs for use later if needed
+        mangoCriteria.queryArgs = queryArgs
+        //assign the the criteriaMap and run the tidy on it to normalize it.
+        Map criteria = queryArgs.buildCriteriaMap()
+        //normalize the map and assign it
+        mangoCriteria.criteriaMap = MangoTidyMap.tidy(criteria)
+        mangoCriteria.criteriaClosure = applyClosure
+        return mangoCriteria
+    }
+
+    /**
+     * Applies the criteriaMap and criteriaClosure to setup the MangoDetachedCriteria
+     */
+    <D> MangoDetachedCriteria<D> applyCriteria(MangoDetachedCriteria<D> mangoCriteria){
+        QueryArgs qargs = mangoCriteria.queryArgs
+        //will be copy if sort exists
+        Map criteriaMap = mangoCriteria.criteriaMap
+        Closure applyClosure = mangoCriteria.criteriaClosure
+
+        //apply the map
+        applyMapOrList(mangoCriteria, criteriaMap)
+
+        //apply the closure
+        if (applyClosure) {
+            final Closure clonedClosure = (Closure) applyClosure.clone()
             clonedClosure.setResolveStrategy(Closure.DELEGATE_FIRST)
             mangoCriteria.with(clonedClosure)
         }
-        //$sort was probably on the criteria as its added in QueryArgs?? but if not then use the property
-        if(qargs.sort && !criteria.containsKey(SORT)){
+
+        //do the queryArgs but only if $sort not in criteria map
+        if(qargs.sort && !criteriaMap.containsKey(SORT)){
             order(mangoCriteria, qargs.sort)
         }
 
         if(qargs.projections){
             applyProjections(mangoCriteria, qargs.projections)
         }
+
+        //apply select properties, this should not
+        if(qargs.select){
+            applySelect(mangoCriteria, qargs.select)
+        }
+
+        if(qargs.timeout) mangoCriteria.setTimeout(qargs.timeout)
+
         return mangoCriteria
     }
 
@@ -97,16 +116,16 @@ class MangoBuilder {
      * calls list for the criteria, if criteria has projections then calls mapList
      * which uses JpqlQueryBuilder
      */
-    static List list(MangoDetachedCriteria criteria, Map args) {
-        List resList
-        if(criteria.projections){
-            resList =  criteria.mapList(args)
-        } else {
-            //return standard list
-            resList =  criteria.list(args)
-        }
-        return resList
-    }
+    // static List list(MangoDetachedCriteria criteria, Map args) {
+    //     List resList
+    //     if(criteria.projections){
+    //         resList =  criteria.mapList(args)
+    //     } else {
+    //         //return standard list
+    //         resList =  criteria.list(args)
+    //     }
+    //     return resList
+    // }
 
     /**
      * Apply projections from map in form [key:type] where type is sum, group, count, min, max or avg
@@ -130,6 +149,15 @@ class MangoBuilder {
             } else if (v == 'max'){
                 criteria.max(k)
             }
+        }
+    }
+
+    /**
+     * list of properties that will go in the select clause
+     */
+    void applySelect(MangoDetachedCriteria criteria, List<String> projs) {
+        for(String prop : projs){
+            criteria.property(prop)
         }
     }
 
@@ -166,7 +194,17 @@ class MangoBuilder {
             JunctionOp jop = EnumUtils.getEnum(JunctionOp, key)
             if (jop) {
                 //tidyMap should have ensured all ops have a List for a value
+                // or if its an instance of
                 invoke(jop.op, criteria, (List) val)
+                continue
+            }
+
+            //subquery, value should be preprocessed and be a QueryableCriteria
+            //exists is one example we are using here
+            SubQueryOp subOp = EnumUtils.getEnum(SubQueryOp, key)
+            if (subOp && val instanceof QueryableCriteria) {
+                //invoke(subOp.op, (QueryableCriteria) val)
+                InvokerHelper.invokeMethod(criteria, subOp.op, val)
                 continue
             }
 
@@ -201,7 +239,7 @@ class MangoBuilder {
                 return
             }
         }
-        // if field ends in Id then try removing the Id postfix and see if its a property
+        // ID Helper, if field ends in Id then try removing the Id postfix and see if its a property
         else if (!prop && field.matches(/.*[^.]Id/) && criteria.persistentEntity.getPropertyByName(field.replaceAll("Id\$", ""))) {
             applyFieldMap(criteria, field.replaceAll("Id\$", ".id"), fieldVal as Map)
             //applyField(criteria, field.replaceAll("Id\$", ".id"), fieldVal)
@@ -209,19 +247,22 @@ class MangoBuilder {
         else if (!(fieldVal instanceof Map) && !(fieldVal instanceof List && prop != null)) {
             criteria.eq(field, toType(criteria, field, fieldVal))
         }
+        //ENUMS
         else if (prop && IdEnum.isAssignableFrom(prop.type) && fieldVal instanceof Map && fieldVal.containsKey('id')) {
             //&& fieldVal instanceof Map && fieldVal.containsKey('id')
             applyField(criteria, field, fieldVal['id'])
         }
-        //just pass it on through, prop might be null but that might be because its a dot notation ending in id ex: "foo.id"
-        else if (fieldVal instanceof Map) { // && (prop || field.endsWith('.id'))) { field=name fieldVal=['$like': 'foo%']
+        //its common a MangoOp, for example fieldVal=['$eq': 'foo']
+        else if (fieldVal instanceof Map) {
             applyFieldMap(criteria, field, fieldVal)
         }
-        // else if (fieldVal instanceof Map && (prop || field.endsWith('.id'))) { // field=name fieldVal=['$like': 'foo%']
-        //     applyFieldMap(criteria, field, fieldVal)
-        // }
-        //I think we should not blow up an error if some field isnt in domain, just add message to log
-        log.debug "No match in applyField for [field:$field, entity:${getTargetClass(criteria).name}, fieldVal: $fieldVal, fieldVal.class: ${fieldVal?.class}"
+        else { //will get here if fieldVal is not a Map and prop is null. maybe only blow error if prop is null?
+            //fieldVal is bad somehow so blow an error
+            String msg = "No Match [field:$field, entity:${getTargetClass(criteria).name}, fieldVal: $fieldVal]"
+            //XXX log it out for now, remove this once we know its ok
+            log.error(msg)
+            throw new IllegalArgumentException(msg)
+        }
 
     }
 
@@ -268,7 +309,7 @@ class MangoBuilder {
                 continue
             } else {
                 //field is not an association, but value is a map and key doesnt match any of the operator ?
-                //It is invalid query eg ("Source.sourceId = "xx")
+                //It is invalid query example ("Source.sourceId = "xx"), case matters so wont find Source
                 throw new IllegalArgumentException("Invalid criteria for field:$field value:$fieldVal")
             }
 
@@ -304,27 +345,24 @@ class MangoBuilder {
         criteria.createAlias(associationPath, alias) as DetachedCriteria
     }
 
-    DetachedCriteria qSearch(DetachedCriteria criteria, Object val) {
-        List<String> qSearchFields
-        String qText
-        // if its a map then assume its already setup with text and fields to search on
-        if(val instanceof Map){
-            qText = val['text'] as String
-            qSearchFields = val['fields'] as List<String>
-        }
-        //otherwise we assume its a string and find the QSearchFields
-        else if (val instanceof String){
-            qText = val as String
-            qSearchFields = getQSearchFields(criteria)
-        }
+    void qSearch(DetachedCriteria criteria, Object val) {
+        //List<String> qSearchFields
+        String qText = val.toString()
+        //FIXME hack for testing when qRequired=true
+        // continue if qSearch=* if its been passed in.
+        if(qText == "*") return
 
-        if(qSearchFields) {
-            Map<String, String> orMap = qSearchFields.collectEntries {
-                [(it.toString()): (criteria.persistentEntity.getPropertyByName(it).type == String ? qText + '%' : qText)]
-            }
-            def criteriaMap = ['$or': orMap] as Map<String, Object>
-            // println "criteriaMap $criteriaMap"
-            return applyMap(criteria, MangoTidyMap.tidy(criteriaMap))
+        // if its a map then assume its already setup with text and fields to search on
+        //FIXME I dont think we should support this. Not neccesary to complicate it like this.
+        // if(val instanceof Map){
+        //     qText = val['text'] as String
+        //     qSearchFields = val['fields'] as List<String>
+        // }
+
+        Map qsMap = quickSearchSupport.buildSearchMap(getTargetClass(criteria), qText)
+
+        if(qsMap) {
+            applyMap(criteria, qsMap)
         }
     }
 
@@ -333,18 +371,19 @@ class MangoBuilder {
         criteria.targetClass
     }
 
-    List<String> getQSearchFields(DetachedCriteria criteria) {
-        Class entityClazz = getTargetClass(criteria)
-        return includesConfig.getIncludes(entityClazz, IncludesKey.qSearch.name())
-    }
+    // List<String> getQSearchFields(DetachedCriteria criteria) {
+    //     Class entityClazz = getTargetClass(criteria)
+    //     return includesConfig.getIncludes(entityClazz, IncludesKey.qSearch.name())
+    // }
 
-    //@CompileDynamic
+    @CompileDynamic
     DetachedCriteria notIn(DetachedCriteria criteria, String propertyName, List params) {
         Map val = [:]
         val.put(propertyName, ['$in': params])
-        DetachedCriteria builtCrit = build(getTargetClass(criteria), val)
-        def qryCrit = builtCrit[propertyName] as QueryableCriteria
-        return criteria.notIn(propertyName, qryCrit)
+        // DetachedCriteria builtCrit = build(getTargetClass(criteria), val)
+        // def qryCrit = builtCrit[propertyName] as QueryableCriteria
+        // return criteria.notIn(propertyName, qryCrit)
+        return not(criteria, [val])
     }
 
     /**
@@ -353,7 +392,7 @@ class MangoBuilder {
      * @return This criterion
      */
     DetachedCriteria and(DetachedCriteria criteria, List andList) {
-        criteria.junctions << new Query.Conjunction()
+        getJunctions(criteria) << new Query.Conjunction()
         handleJunction(criteria, andList)
         return criteria
     }
@@ -364,7 +403,7 @@ class MangoBuilder {
      * @return This criterion
      */
     DetachedCriteria or(DetachedCriteria criteria, List orList) {
-        criteria.junctions << new Query.Disjunction()
+        getJunctions(criteria) << new Query.Disjunction()
         handleJunction(criteria, orList)
         return criteria
     }
@@ -375,7 +414,7 @@ class MangoBuilder {
      * @return This criterion
      */
     DetachedCriteria not(DetachedCriteria criteria, List notList) {
-        criteria.junctions << new Query.Negation()
+        getJunctions(criteria) << new Query.Negation()
         handleJunction(criteria, notList)
         return criteria
     }
@@ -389,7 +428,8 @@ class MangoBuilder {
             applyMapOrList(criteria, list)
         }
         finally {
-            Query.Junction lastJunction = criteria.junctions.remove(criteria.junctions.size() - 1)
+            var junctions = getJunctions(criteria)
+            Query.Junction lastJunction = junctions.remove(junctions.size() - 1)
             criteria.add lastJunction
         }
     }
@@ -439,5 +479,10 @@ class MangoBuilder {
 
     static getEnumWithGet(Class<?> enumClass, Number id){
         return ClassUtils.callStaticMethod(enumClass, 'get', id)
+    }
+
+    @CompileDynamic
+    List<Query.Junction> getJunctions(DetachedCriteria criteria){
+        criteria.@junctions
     }
 }

@@ -27,7 +27,6 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.validation.Rejector
-import grails.gorm.DetachedCriteria
 import yakworks.commons.io.PathTools
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
@@ -63,14 +62,16 @@ class AttachmentRepo extends LongIdGormRepo<Attachment> {
     }
 
     /**
-     * Called from doAfterPersist and before afterPersist event
+     * Called after persist and right before afterPersist event
      * if its had a bind action (create or update) and it has data
      * creates or updates One-to-Many associations for this entity.
      */
     @Override
-    void doAfterPersistWithData(Attachment attachment, PersistArgs args) {
-        Map data = args.data
-        if(data.tags != null) TagLink.addOrRemoveTags(attachment, data.tags)
+    void doAfterPersist(Attachment attachment, PersistArgs args) {
+        if (args.bindAction && args.data) {
+            Map data = args.data
+            if (data.tags != null) TagLink.addOrRemoveTags(attachment, data.tags)
+        }
     }
 
     /**
@@ -140,19 +141,12 @@ class AttachmentRepo extends LongIdGormRepo<Attachment> {
     /**
      * Override query for custom search for Tags etc..
      */
-    @Override
-    MangoDetachedCriteria<Attachment> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
-        Map criteriaMap = queryArgs.qCriteria
-        //if its has tags keys then this returns something to add to exists, REMOVES the keys as well so work off qCriteria
-        DetachedCriteria tagExistsCrit = TagLink.getExistsCriteria(criteriaMap, Attachment, 'attachment_.id')
-
-        MangoDetachedCriteria<Attachment> detCrit = getMangoQuery().query(Attachment, queryArgs, closure)
-        //if it has tags key
-        if(tagExistsCrit != null) {
-            detCrit.exists(tagExistsCrit.id())
-        }
-        return detCrit
-    }
+    // @Override
+    // MangoDetachedCriteria<Attachment> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
+    //     Map criteriaMap = queryArgs.criteriaMap
+    //     //NOTE: tags are handled in the TagsMangoCriteriaEventListener
+    //     return getQueryService().query(queryArgs, closure)
+    // }
 
     /**
      * removes the link for the entity and removes the attachment

@@ -1,4 +1,4 @@
-package gorm.tools.repository
+package gorm.tools.api.support
 
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
@@ -18,7 +18,7 @@ import static yakworks.json.groovy.JsonEngine.parseJson
 
 @Integration
 @Rollback
-class BulkExportServiceIntegrationSpec  extends Specification implements DomainIntTest {
+class BulkExportServiceIntegrationSpec extends Specification implements DomainIntTest {
 
     @Inject BulkExportService bulkExportService
 

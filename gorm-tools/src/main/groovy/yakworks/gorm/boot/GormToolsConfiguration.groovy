@@ -34,6 +34,7 @@ import gorm.tools.mango.QuickSearchSupport
 import gorm.tools.metamap.services.MetaEntityService
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
+import gorm.tools.repository.bulk.BulkExportService
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.transaction.TrxService
@@ -147,6 +148,12 @@ class GormToolsConfiguration {
     @ConditionalOnMissingBean
     QueryArgsValidator queryArgsValidator(){
         new DefaultQueryArgsValidator()
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    BulkExportService bulkExportService() {
+        return new BulkExportService()
     }
 
 }

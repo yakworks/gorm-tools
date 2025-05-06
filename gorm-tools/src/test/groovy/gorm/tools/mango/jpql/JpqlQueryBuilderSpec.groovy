@@ -1,10 +1,13 @@
 package gorm.tools.mango.jpql
 
 import org.hibernate.engine.jdbc.internal.BasicFormatterImpl
+import org.springframework.beans.factory.annotation.Autowired
 
 import grails.gorm.DetachedCriteria
 import org.springframework.dao.InvalidDataAccessResourceUsageException
 import spock.lang.Specification
+import yakworks.gorm.config.GormConfig
+import yakworks.spring.AppCtx
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.unit.GormHibernateTest
 
@@ -16,6 +19,9 @@ import static gorm.tools.mango.jpql.JpqlCompareUtils.formatAndStrip
 class JpqlQueryBuilderSpec extends Specification implements GormHibernateTest  {
 
     static List entityClasses = [KitchenSink]
+
+    @Autowired
+    GormConfig gormConfig
 
     static boolean compareQuery(String hql, String expected){
         assert formatAndStrip(hql) == formatAndStrip(expected)
@@ -31,13 +37,14 @@ class JpqlQueryBuilderSpec extends Specification implements GormHibernateTest  {
 
         when:"A jpa query is built"
         def builder = JpqlQueryBuilder.of(criteria)
+        builder.enableDialectFunctions(true)
         def queryInfo = builder.buildUpdate(name:"SinkUp")
 
         then:"The query is valid"
         compareQuery(queryInfo.query, '''\
             UPDATE yakworks.testing.gorm.model.KitchenSink kitchenSink
             SET kitchenSink.name=:p1
-            WHERE kitchenSink.amount=:p2 AND lower(kitchenSink.name) like lower(:p3)
+            WHERE kitchenSink.amount=:p2 AND flike(kitchenSink.name, :p3 ) = true
         ''')
     }
 
@@ -94,7 +101,7 @@ class JpqlQueryBuilderSpec extends Specification implements GormHibernateTest  {
 
         when:"A jpa query is built"
         def builder = JpqlQueryBuilder.of(criteria)
-        builder.hibernateCompatible = true
+        //builder.hibernateCompatible = true
         def queryInfo = builder.buildUpdate(name:"SinkUp", amount:30)
 
         then:"The query is valid"
@@ -161,7 +168,7 @@ class JpqlQueryBuilderSpec extends Specification implements GormHibernateTest  {
 
         when:"A jpa query is built"
         def builder = JpqlQueryBuilder.of(criteria)
-        builder.hibernateCompatible = true
+        //builder.hibernateCompatible = true
         def query = builder.buildSelect().query
 
         then:"The query is valid"

@@ -4,7 +4,6 @@
 */
 package gorm.tools.repository.bulk
 
-
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.core.Datastore
@@ -263,4 +262,5 @@ trait BulkableRepo<D> {
         def event = new AfterBulkSaveEntityEvent<D>(self, entity, data, syncJobArgs)
         getRepoEventPublisher().publishEvents(self, event, [event] as Object[])
     }
+
 }

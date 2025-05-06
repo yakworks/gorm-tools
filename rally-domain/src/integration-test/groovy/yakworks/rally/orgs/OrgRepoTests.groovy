@@ -7,6 +7,7 @@ import yakworks.rally.orgs.model.OrgCalc
 import yakworks.rally.orgs.model.OrgFlex
 import yakworks.rally.orgs.model.OrgInfo
 import yakworks.rally.orgs.model.OrgMember
+import yakworks.rally.orgs.model.PartitionOrg
 
 import java.time.LocalDate
 
@@ -511,6 +512,45 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
         cleanup:
         OrgDimensionTesting.resetDimensions()
+    }
+
+    void "create and update partition org"() {
+        when: "orgtype is not partition type"
+        Org org = Org.create(num: '0011', name: 'testComp', type: 'Customer')
+        flush()
+
+        then:
+        org
+        !PartitionOrg.findWhere(num:"0011")
+
+        when: "type=partition type"
+        org = Org.create(num: '0012', name: 'testComp', type: 'Company')
+        flush()
+
+        PartitionOrg porg = PartitionOrg.findWhere(num:"0012")
+
+        then:
+        org
+        porg
+        org.id == porg.id
+        org.name == porg.name
+        org.num == porg.num
+
+        when:
+        Org.update(id:org.id, name:"updated", num:"updated")
+        flushAndClear()
+        porg = PartitionOrg.findWhere(num:"updated")
+
+        then:
+        porg.name == "updated"
+        porg.name == "updated"
+
+        when: "delete"
+        orgRepo.removeById(org.id)
+        flush()
+
+        then:
+        !PartitionOrg.get(org.id)
     }
 
 }

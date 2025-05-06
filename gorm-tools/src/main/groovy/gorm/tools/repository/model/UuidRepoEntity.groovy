@@ -6,8 +6,6 @@ package gorm.tools.repository.model
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.repository.GormRepo
-
 /**
  * Default trait for a domain that has a concrete implemented repo and mango query methods.
  *

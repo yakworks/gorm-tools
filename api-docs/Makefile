@@ -75,8 +75,10 @@ oapi.docs-push:
 
 # this runs the test that generates the api.yml from the domains.
 oapi.generate-api-yaml:
-	# HACK, rm test-results to force a run if only editing yaml
-	rm -rf examples/rally-api/build/test-results
+	# HACK, rm test-results to force a run if only editing yaml, NOT WORKING
+	# rm -rf examples/rally-api/build/test-results
+	# Clean so it forces a rerun
+	${gradlew} rally-api:clean
 	${gradlew} rally-api:integrationTest --tests *OpenapiGeneratorSpec*
 
 ## generates api yaml with grails test and runs eleventy server for api docs

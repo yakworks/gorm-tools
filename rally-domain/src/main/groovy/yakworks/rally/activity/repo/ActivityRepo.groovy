@@ -185,7 +185,7 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
         }
 
         //update name
-        if (activity.kind == ActKind.Note && activity.note) {
+        if (activity.kind == ActKind.Note && activity.note && activity.note.body) {
             int endChar = activity.note.body.trim().length()
             activity.name = (endChar > 255) ? activity.note.body.trim().substring(0, 251) + " ..." : activity.note.body.trim()
         }

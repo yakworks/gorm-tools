@@ -1,3 +1,81 @@
+### v7.3.83
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.82...v7.3.83)
+- release trigger [link](https://github.com/yakworks/gorm-tools/commit/380b0f0da8b25a6a778484bde886a3aad7265a1c)
+- dev merge for release [link](https://github.com/yakworks/gorm-tools/commit/18677b210dc2be2c151ac2bf3b738b92f68b1c32)
+- Fix NPE - MetaGormEntityBuilder (#883) [link](https://github.com/yakworks/gorm-tools/commit/8de11983b058c2f4fc1a6ae931110d13df148489)
+- Get by org (#884) [link](https://github.com/yakworks/gorm-tools/commit/3a0db24baa95269dc613e9fc72ddff54b8c886e6)
+- change to bullseye [link](https://github.com/yakworks/gorm-tools/commit/ba3df0d0cdcfccc2d11630b8d2aa7f266659ff51)
+- Activity create : NPE fix (#879) [link](https://github.com/yakworks/gorm-tools/commit/13d2b65f6f9ef8c903cb05a83fef42421b829516)
+- Api docs (#878) [link](https://github.com/yakworks/gorm-tools/commit/de3dcd270ccdd081ac208a545e3d20737f936a6a)
+- MailMessage.msgResponse increase maxSize constrait (#876) [link](https://github.com/yakworks/gorm-tools/commit/be240818685d6430a9559d7be761f20c814b11f1)
+
+### v7.3.82
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.81...v7.3.82)
+- release [link](https://github.com/yakworks/gorm-tools/commit/ec89818dbc1c4859d595aadb59af225e5553fe1a)
+- bump vGroovyCommons=3.16-SNAPSHOT (#875) [link](https://github.com/yakworks/gorm-tools/commit/e795a35cb218bb9a26ed78d93b9b071f8cc67bd7)
+
+### v7.3.81
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.80...v7.3.81)
+- release 7.3.81 [link](https://github.com/yakworks/gorm-tools/commit/0980605b7498ee443a1cf572f10f817f2317dfc9)
+- Merge pull request #874 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/d4dc89acd43a3dbd8c091a85eadba2439c5a2a8f)
+- vGroovyCommons=3.15 [link](https://github.com/yakworks/gorm-tools/commit/3e035294a52848a2341b6789bad71d15053ccccb)
+- MetaMap serialize (#871) [link](https://github.com/yakworks/gorm-tools/commit/b5f7c9eda462f71c40f45cf47b9e4fcb9d736f9c)
+
+### v7.3.80
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.79...v7.3.80)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/3249c60cd1d56326451e476cd10ec84d58b8923a)
+- Merge pull request #872 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/4584a122c6de38acd439e1ed48d5a5724a1fb3d5)
+- fix null pointer. https://github.com/9ci/domain9/issues/2967 (#869) [link](https://github.com/yakworks/gorm-tools/commit/bb4ff1597f0e6998bf3d03af1e57f34d13cf49da)
+- Revert "remove company change for setupMember" (#868) [link](https://github.com/yakworks/gorm-tools/commit/1e0b2ff2d7d227faaf130c2b30231eacffc00b3f)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/541d512c9054f1db3f5dd7a9840081667eb4f4d9)
+- Merge pull request #866 from yakworks/revert_orgService-changes [link](https://github.com/yakworks/gorm-tools/commit/9cc080fcc7e3bc06dd166345db983803a87ff3a7)
+- remove company change for setupMember [link](https://github.com/yakworks/gorm-tools/commit/b82173aca43bc8b376934efd7f86bf70cef670a1)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/01c1dba0913bfae83ffbf0e731da406dcc3eabba)
+- Mailgun logs cleanup (#864) [link](https://github.com/yakworks/gorm-tools/commit/2599f8378571a22b50372c9e15e623133c4e218a)
+
+### v7.3.79
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.78...v7.3.79)
+- release trigger [link](https://github.com/yakworks/gorm-tools/commit/7e5973b62d0e08ca357622f2eb7014f17bf5fea2)
+- Dev (#867) [link](https://github.com/yakworks/gorm-tools/commit/1b64e25705ca8caff7f894b04f114338e756197f)
+
+### v7.3.78
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.78.1...v7.3.78)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/1a1b1c6ab59e8889b237b87bb964b7f4786c38f3)
+
+### v7.3.78.1
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.77...v7.3.78.1)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/12acb13a3c54c9c1c3b7afbe1e3437b0ffc504d7)
+- Merge pull request #863 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/bd8c4054a9c81d5d552a4b57d7f90b5dab3c4624)
+- OrgMember : setup company dimension : Fix (#862) [link](https://github.com/yakworks/gorm-tools/commit/53a81c7f28c15c7ab8ffbc12e0b526d5be7cd62e)
+- 9ci/domain9#2846 Mailgun : Log error (#860) [link](https://github.com/yakworks/gorm-tools/commit/7993ce743e90d3d37374b0c9b20f7d1de99e25d5)
+- subtle null check for unit testing (#861) [link](https://github.com/yakworks/gorm-tools/commit/18765c22cc037a29d0dd13c7e352ed9a2450d045)
+- Partition org domain (#853) [link](https://github.com/yakworks/gorm-tools/commit/31648aa4533393f22cf663930cfd9ac99ebd4ce3)
+- xls export fix & tests (#859) [link](https://github.com/yakworks/gorm-tools/commit/2ff2211348e7ed4ff306b42af5b991709f94971e)
+- Syncjog GET : Add dates (#855) [link](https://github.com/yakworks/gorm-tools/commit/35aa43280d72ae69a02d5153cbdd89d96302e01a)
+- spotless fix [link](https://github.com/yakworks/gorm-tools/commit/150d2aefe11bae9dda9bcd4771f823a2cc0d794b)
+- java docs for MsgState [link](https://github.com/yakworks/gorm-tools/commit/e6e454758c341c5e436fd3fcf5bedab9a81d5698)
+- Merge branch 'clean-up-msgstate-comments' into dev [link](https://github.com/yakworks/gorm-tools/commit/66009004fa199d6e7ced5c19592fc0336d6b7627)
+- clean msgstate comments [link](https://github.com/yakworks/gorm-tools/commit/2bc1d18dbda8423027d2722997adae2abb9d4dbd)
+- Add test for criteria clone (#854) [link](https://github.com/yakworks/gorm-tools/commit/ab60730e0d98fb51c51c65d3a75f90857aba4527)
+- Mailgun config (#856) [link](https://github.com/yakworks/gorm-tools/commit/22f11940939fbe81f8cfb17ee1c3490e1060433c)
+- set back to version=7.3.78 [link](https://github.com/yakworks/gorm-tools/commit/91f63de3638636d80f32d144116bf4906129bb09)
+- fix mapList visibvility [link](https://github.com/yakworks/gorm-tools/commit/bce695af764e24dd7b500647206ba4d10ca3609b)
+- Fn ilike (#848) [link](https://github.com/yakworks/gorm-tools/commit/d8e9e3d4c4b7b155d6d8cc82ae51daa618a3328d)
+- basejump [link](https://github.com/yakworks/gorm-tools/commit/6ac451178438968a2f37a112a2d12e618cff2a39)
+- basejump [link](https://github.com/yakworks/gorm-tools/commit/c0966d1d9b91f58f5149a7b46cc60a0e950b3f75)
+- basejump [link](https://github.com/yakworks/gorm-tools/commit/d5ee543760f72cf6bc13cb7095eb81db282bc672)
+- basejump [link](https://github.com/yakworks/gorm-tools/commit/97ba45ec8ca33965a57d18077885fcc124f9c669)
+- remove restify (#847) [link](https://github.com/yakworks/gorm-tools/commit/5fd02bb18de6116b5161dad63eb166eec9c8e1fc)
+- Grails 5.3.6 groovy 3.0.22 (#846) [link](https://github.com/yakworks/gorm-tools/commit/b1f289567fdae170bd4f8787098d6da228c3413e)
+- Simplify gormrepo (#845) [link](https://github.com/yakworks/gorm-tools/commit/3768b05f6165ffd65820f697b209a51465d4ce10)
+
 ### v7.3.77
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.76...v7.3.77)

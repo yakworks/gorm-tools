@@ -14,7 +14,7 @@ import yakworks.commons.transform.IdEqualsHashCode
 @IdEqualsHashCode
 @Entity
 @GrailsCompileStatic
-class SinkExt implements NamedEntity, RepoEntity<SinkExt>{
+class SinkExt implements NamedEntity, RepoEntity<SinkExt>, Serializable {
     static belongsTo = [KitchenSink]
 
     KitchenSink kitchenParent

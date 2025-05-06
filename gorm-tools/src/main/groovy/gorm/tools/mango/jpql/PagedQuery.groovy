@@ -107,10 +107,12 @@ class PagedQuery {
             def list = qry.list()
             return list
         }
-        //only do the count query if its needed
         int rowCount = dataList.size()
-        //fails on last page
+        //this fails on the last page, concept is close but need more work, see how spring data does it
+        //we need to incorporate a check on the page
         // if(rowCount >= 1 && maxCount && !(rowCount < maxCount)){
+
+        //only do the count query if its needed, meaning the rowcount is more than 1 and the max has been set.
         if(rowCount >= 1 && maxCount ){
             rowCount = countQuery(queryString, params)
         }

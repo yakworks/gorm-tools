@@ -1,10 +1,12 @@
 package gorm.tools.mango.jpql
 
+import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
 import spock.lang.Ignore
 import spock.lang.Specification
+import yakworks.gorm.config.GormConfig
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.unit.GormHibernateTest
@@ -17,6 +19,9 @@ import static gorm.tools.mango.jpql.JpqlCompareUtils.formatAndStrip
 class JpqlQueryBuilderCriteriaMapSpec extends Specification implements GormHibernateTest  {
 
     static List entityClasses = [KitchenSink, SinkItem]
+
+    @Autowired
+    GormConfig gormConfig
 
     boolean compareQuery(String hql, String expected){
         assert formatAndStrip(hql) == formatAndStrip(expected)
@@ -94,6 +99,36 @@ class JpqlQueryBuilderCriteriaMapSpec extends Specification implements GormHiber
         queryInfo.parameters == ['1', '2']
 
         criteria.list().size() == 2
+    }
+
+    void "Test build select with or and ilike"() {
+        given:"Some criteria"
+        def criteria = KitchenSink.query(
+            '$or': [
+                ['name2': 'org1%'],
+                ['num': '1%']
+            ]
+        )
+
+        when:"A jpa query is built"
+        def builder = JpqlQueryBuilder.of(criteria)
+        builder.enableDialectFunctions(true)
+        final queryInfo = builder.buildSelect()
+
+        then:"The query is valid"
+        queryInfo.query!= null
+        //NOTE TODO, see the same query using closure, this adds extra parens
+        compareQuery(queryInfo.query, """
+        SELECT DISTINCT kitchenSink FROM yakworks.testing.gorm.model.KitchenSink AS kitchenSink
+        WHERE ( flike(kitchenSink.name2, :p1 ) = true OR flike(kitchenSink.num, :p2 ) = true )
+        """)
+        queryInfo.parameters == ['org1%', '1%']
+
+        when:
+        List<Map> list = criteria.mapList()
+
+        then:
+        list.size() == 2
     }
 
     @Ignore //blowing up on unknown field, which is should bu we need a way to override

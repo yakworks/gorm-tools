@@ -8,16 +8,15 @@ import groovy.transform.CompileDynamic
 
 import org.grails.datastore.mapping.config.MappingDefinition
 
-import gorm.tools.hibernate.type.JsonType
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.annotation.Entity
+import yakworks.gorm.hibernate.type.JsonType
 import yakworks.security.audit.AuditStampTrait
 
 import static grails.gorm.hibernate.mapping.MappingBuilder.orm
-
 
 /**
  * An instance created right away when "any job" in 9ci is called.
@@ -60,15 +59,14 @@ class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity,  AuditStampTrait, S
     static MappingDefinition getMapping() {
         orm {
             columns(
-                state: property(enumType: 'identity'),
                 problems: property(type: JsonType, typeParams: [type: ArrayList])
             )
         }
     }
 
     static constraintsMap = [
-        payload:[ d: 'The payload this job was sent to process'],
-        data: [d: 'The result data json, will normally be an array with items for errors.']
+        payload:[ d: 'The payload this job was sent to process', oapi: [type: 'object']],
+        data: [d: 'The result data json, will normally be an array with items for errors.', oapi: [type: 'object']]
     ]
 
 }

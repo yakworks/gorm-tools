@@ -17,7 +17,7 @@ import org.grails.datastore.mapping.query.api.Criteria
 import grails.gorm.DetachedCriteria
 
 /**
- * override to elminate the asBoolean
+ * override primarily to eliminate the asBoolean that was firing query on truthy checks
  */
 @SuppressWarnings(['ParameterName', 'VariableName', 'InvertedIfElse'])
 @CompileStatic
@@ -41,8 +41,11 @@ class MangoDetachedAssociationCriteria<T> extends DetachedAssociationCriteria<T>
      * @param associationPath The name of the association
      * @param zalias The alias
      * @return This create
+     *
+     * NOTE: Overriden copy paste in so do we can do instance of this (MangoDetachedAssociationCriteria)
+     *       instead of DetachedAssociationCriteria
      */
-    @Override //Overriden copy paste in just do we can do instance of this instead
+    @Override //Overriden copy paste in so do we can do instance of this instead
     Criteria createAlias(String associationPath, String zalias) {
         initialiseIfNecessary(targetClass)
         PersistentProperty prop
@@ -69,6 +72,7 @@ class MangoDetachedAssociationCriteria<T> extends DetachedAssociationCriteria<T>
         Association a = (Association)prop
         DetachedAssociationCriteria associationCriteria = associationCriteriaMap[associationPath]
         if(associationCriteria == null) {
+            //NOTE: Change is here!
             associationCriteria = new MangoDetachedAssociationCriteria(a.associatedEntity.javaClass, a, associationPath, zalias)
             associationCriteriaMap[associationPath] = associationCriteria
             add associationCriteria
@@ -84,10 +88,6 @@ class MangoDetachedAssociationCriteria<T> extends DetachedAssociationCriteria<T>
      */
     @Override
     boolean asBoolean(@DelegatesTo(DetachedCriteria) Closure additionalCriteria = null) {
-        // (Boolean)withQueryInstance(Collections.emptyMap(), additionalCriteria) { Query query ->
-        //     query.projections().count()
-        //     ((Number)query.singleResult()) > 0
-        // }
         throw new UnsupportedOperationException("Truthy check is not supported, use null check instead")
     }
 

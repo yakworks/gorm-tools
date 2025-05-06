@@ -15,7 +15,7 @@ import org.springframework.core.env.MapPropertySource
 @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection'])
 @CompileStatic
 class ConfigDefaults {
-    public static String springBeanIdGenMapping = 'id generator: "gorm.tools.hibernate.SpringBeanIdGenerator"'
+    public static String springBeanIdGenMapping = 'id generator: "yakworks.gorm.hibernate.SpringBeanIdGenerator"'
 
     static String getConfigString(String idGenMapping){
         return """\

@@ -35,9 +35,9 @@ class CacheListApiSpec extends Specification implements OkHttpRestTrait, WithTrx
         Map body = bodyToMap(resp)
 
         then:
+        body
         body.status == 429
         resp.code() == HttpStatus.TOO_MANY_REQUESTS.value()
-
     }
 
 }

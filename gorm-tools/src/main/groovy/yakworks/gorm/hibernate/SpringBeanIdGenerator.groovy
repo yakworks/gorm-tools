@@ -2,7 +2,7 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.hibernate
+package yakworks.gorm.hibernate
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -23,7 +23,7 @@ import yakworks.spring.AppCtx
  * <pre>
  * {@code
  *   gorm.default.mapping = {
- *     id generator:'gorm.tools.hibernate.SpringBeanIdGenerator'
+ *     id generator:'yakworks.gorm.hibernate.SpringBeanIdGenerator'
  *   }
  * }
  * </pre>
@@ -32,7 +32,7 @@ import yakworks.spring.AppCtx
  * <pre>
  * {@code
  *   static mapping = {
- *     id generator:'gorm.tools.hibernate.SpringBeanIdGenerator',
+ *     id generator:'yakworks.gorm.hibernate.SpringBeanIdGenerator',
  *        params:[beanName:'specialIdGen', keyName:'Org.uuid']
  *   }
  * }

@@ -1,11 +1,14 @@
 package yakworks.rally.mango
 
+import org.springframework.beans.factory.annotation.Autowired
+
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.jpql.JpqlQueryBuilder
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
 import spock.lang.Specification
+import yakworks.gorm.config.GormConfig
 import yakworks.rally.orgs.model.Contact
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.orgs.model.Org
@@ -15,6 +18,9 @@ import yakworks.testing.gorm.model.KitchenSink
 @Integration
 @Rollback
 class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest {
+
+    @Autowired
+    GormConfig gormConfig
 
     void buildKitchen(){
         //KitchenSink.withTransaction {
@@ -169,6 +175,8 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
     //FIXME still need to work out alias
     def "exists on contact location"() {
         given:
+        //assert gormConfig.query.dialectFunctions.enabled
+
         def qryContact = Contact.query(
             q: [
                 'location.city': "second City1*",
@@ -185,6 +193,7 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
 
         when: "A jpa query is built"
         def builder = JpqlQueryBuilder.of(qry as MangoDetachedCriteria)//.aliasToMap(true)
+        builder.enableDialectFunctions(true)
         //def builder = JpqlQueryBuilder.of(qryContact as MangoDetachedCriteria)//.aliasToMap(true)
         def queryInfo = builder.buildSelect()
         def query = queryInfo.query
@@ -192,11 +201,23 @@ class JpqlQueryBuilderSelectTests extends Specification implements DomainIntTest
         then: "The query is valid"
         query.trim() == strip('''
             SELECT DISTINCT org FROM yakworks.rally.orgs.model.Org AS org
-            WHERE lower(org.name) like lower(:p1) AND
+            WHERE flike(org.name, :p1 ) = true AND
             EXISTS (
             SELECT contact1.id FROM yakworks.rally.orgs.model.Contact contact1
-            WHERE lower(contact1.location.city) like lower(:p2) AND contact1.org.id = org.id
+            WHERE flike(contact1.location.city, :p2 ) = true AND contact1.org.id = org.id
             )
         ''')
+
+        when:
+        //NOTE: This runs the query as is. Without the .aliasToMap(true) it returns a
+        // list of arrays since its not going through the Transformer
+        List res = Org.executeQuery(query, queryInfo.paramMap)
+
+        then:
+        res.size() == 11
+        //see note above on why its arrays
+        // res[0][1] == OrgType.Client
+        // res[0][0] < res[1][0]
+        // res[1][0] < res[2][0]
     }
 }

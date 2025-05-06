@@ -5,11 +5,13 @@
 package gorm.tools.mango.hibernate
 
 import java.lang.reflect.Field
+import javax.persistence.criteria.JoinType
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.finders.DynamicFinder
+import org.grails.datastore.gorm.query.criteria.DetachedAssociationCriteria
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.query.Query
@@ -41,25 +43,29 @@ import org.hibernate.type.BasicType
 import org.hibernate.type.TypeResolver
 import org.springframework.context.ApplicationEventPublisher
 
+import gorm.tools.mango.MangoDetachedAssociationCriteria
 import grails.orm.HibernateCriteriaBuilder
 import grails.orm.RlikeExpression
 
 /**
- * Extends to overrides the myriad of issues with how the DetachedCriteria was translating to the
- * the HibernateQuery. Mostly around the nested and aliases. For example ordering by something like
- * foo.bar.baz was not working at all. Also made it so we can take advantage of being able to specify the
- * ordering for nulls so we can keep postgress consistent with mysql and mssql etc..
+ * Replaces org.grails.orm.hibernate.query.HibernateQuery since there was a myriad of issues with the DetachedCriteria
+ *
+ * Enhancements over what HibernateQuery was not doing properly
+ * - auto setup of nested and aliases
+ * - For example ordering by something like foo.bar.baz will work properly
+ * - take advantage of being able to specify the ordering for nulls so we can keep postgress consistent with mysql and mssql etc..
+ * - working on adding json querying.
  *
  * many of the overrides are here so we can use our HibernateAliasProjectionList
- *
  */
 @CompileStatic
 class HibernateMangoQuery extends AbstractHibernateQuery  {
 
-    public static final HibernateCriterionAdapter HIBERNATE_CRITERION_ADAPTER = new HibernateCriterionAdapter();
+    public static final HibernateCriterionAdapter HIBERNATE_CRITERION_ADAPTER = new HibernateCriterionAdapter()
 
     HibernateAliasProjectionList hibernateAliasProjectionList
 
+    //hack so private hasJoins is accesible.
     Field hasJoinsField
 
     HibernateMangoQuery(Criteria criteria, AbstractHibernateSession session, PersistentEntity entity) {
@@ -71,7 +77,7 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
 
 
     /**
-     * creates and instance of this. Copied in from the Session as is not easily overriden there
+     * creates an instance of this. Copied in from the Session as is not easily overridden there
      */
     static Query createQuery(AbstractHibernateSession hibernateSession, PersistentEntity entity, String alias) {
         Class type = entity.javaClass
@@ -82,50 +88,67 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
         return new HibernateMangoQuery(criteria, hibernateSession, entity)
     }
 
+    /**
+     * Dynamic so we can get to the protected super.criteria
+     */
     @CompileDynamic
     Criteria getHibernateCriteria() {
         return super.@criteria
     }
 
+    /** implements abstract, copied in from HibernateQuery */
     @Override
+    @CompileDynamic
     protected AbstractHibernateCriterionAdapter createHibernateCriterionAdapter() {
+        //add the link to MangoDetachedAssociationCriteria
+        HIBERNATE_CRITERION_ADAPTER.@criterionAdaptors.put(MangoDetachedAssociationCriteria.class,
+            HIBERNATE_CRITERION_ADAPTER.@criterionAdaptors.get(DetachedAssociationCriteria.class))
         return HIBERNATE_CRITERION_ADAPTER
     }
 
+    /** implements abstract, copied in from HibernateQuery */
     @Override
     protected org.hibernate.criterion.Criterion createRlikeExpression(String propertyName, String value) {
         return new RlikeExpression(propertyName, value);
     }
 
+    /** implements abstract, copied in from HibernateQuery */
     @Override
     protected void setDetachedCriteriaValue(QueryableCriteria value, PropertyCriterion pc) {
         DetachedCriteria hibernateDetachedCriteria = HibernateCriteriaBuilder.getHibernateDetachedCriteria(this, value);
         pc.setValue(hibernateDetachedCriteria);
     }
 
+    /** implements abstract, copied in from HibernateQuery */
     @Override
     protected String render(BasicType basic, List<String> columns, SessionFactory sessionFactory, SQLFunction sqlFunction) {
         return sqlFunction.render(basic, columns, (SessionFactoryImplementor) sessionFactory);
     }
 
+    /** implements abstract, copied in from HibernateQuery */
     @Override
     protected PropertyMapping getEntityPersister(String name, SessionFactory sessionFactory) {
         return (PropertyMapping) ((SessionFactoryImplementor) sessionFactory).getEntityPersister(name);
     }
 
+    /** implements abstract, copied in from HibernateQuery */
     @Override
     @Deprecated
     protected TypeResolver getTypeResolver(SessionFactory sessionFactory) {
         return ((SessionFactoryImplementor) sessionFactory).getTypeResolver();
     }
 
+    /** implements abstract, copied in from HibernateQuery */
     @Override
     @Deprecated
     protected Dialect getDialect(SessionFactory sessionFactory) {
         return ((SessionFactoryImplementor) sessionFactory).getDialect();
     }
 
-    @Override
+    /**
+     * overrides to fix the ordering to work with dot path syntax.
+     */
+    @Override //overrides to fix
     Query order(Order order) {
         if (order != null) {
             orderBy.add(order);
@@ -161,11 +184,97 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
         }
     }
 
-    @CompileDynamic //so we can access protected
+    /**
+     * copy of whats in AbstractHibernateQuery so we can call our own getOrCreateAlias
+     */
+    @Override
+    protected CriteriaAndAlias getCriteriaAndAlias(DetachedAssociationCriteria associationCriteria) {
+        String associationPath = associationCriteria.getAssociationPath();
+        String alias = associationCriteria.getAlias();
+
+        if(associationPath == null) {
+            associationPath = associationCriteria.getAssociation().getName();
+        }
+        return getOrCreateAlias(associationPath, alias);
+    }
+
+    /**
+     * doesnt mess up the association paths so we can keep whats sent into the add method
+     */
+    @Override
+    protected CriteriaAndAlias getOrCreateAlias(String associationName, String alias) {
+        CriteriaAndAlias subCriteria = null;
+        String associationPath = getAssociationPath(associationName);
+        Criteria parentCriteria = getHibernateCriteria();
+        if(alias == null) {
+            alias = generateAlias(associationName);
+        }
+        // else {
+        //     //CriteriaAndAlias criteriaAndAlias = createdAssociationPaths.get(associationPath);
+        //     CriteriaAndAlias criteriaAndAlias = createdAssociationPaths.get(alias);
+        //     if(criteriaAndAlias != null) {
+        //         parentCriteria = getCriteriaOnAlias(criteriaAndAlias);
+        //         if(parentCriteria != null) {
+        //
+        //             alias = associationName + '_' + alias;
+        //             associationPath = getCriteriaAndAliasAssociationPath(criteriaAndAlias) + '.' + associationPath;
+        //         }
+        //     }
+        // }
+
+        if (createdAssociationPaths.containsKey(associationPath)) { //this was using associationName as the key
+            subCriteria = createdAssociationPaths.get(associationPath);
+        }
+        else {
+            JoinType joinType = joinTypes.get(associationName);
+            if(parentCriteria != null) {
+                Criteria sc = parentCriteria.createAlias(associationPath, alias, resolveJoinType(joinType));
+                //nasty hack for groovy and inner classes, need to pass in the instance to newInstance first which is "this"
+                subCriteria = AbstractHibernateQuery.CriteriaAndAlias.newInstance(this, sc, alias, associationPath)
+            }
+            else if(detachedCriteria != null) {
+                DetachedCriteria sc = detachedCriteria.createAlias(associationPath, alias, resolveJoinType(joinType));
+                subCriteria = AbstractHibernateQuery.CriteriaAndAlias.newInstance(this, sc, alias, associationPath)
+            }
+            if(subCriteria != null) {
+
+                createdAssociationPaths.put(associationPath, subCriteria);
+                createdAssociationPaths.put(alias, subCriteria);
+            }
+        }
+        return subCriteria;
+    }
+
+    /**
+     * direct copy of resolveJoinType since its private and we cant override  getOrCreateAlias since it calls it
+     */
+    org.hibernate.sql.JoinType resolveJoinType(JoinType joinType) {
+        if(joinType  == null) {
+            return org.hibernate.sql.JoinType.INNER_JOIN;
+        }
+        switch (joinType) {
+            case JoinType.LEFT:
+                return org.hibernate.sql.JoinType.LEFT_OUTER_JOIN;
+            case JoinType.RIGHT:
+                return org.hibernate.sql.JoinType.RIGHT_OUTER_JOIN;
+            default:
+                return org.hibernate.sql.JoinType.INNER_JOIN;
+        }
+    }
+
+    //these are CompileDynamic hacks to work around permissions so we can access protected
+    @CompileDynamic
+    String getCriteriaAndAliasAssociationPath(CriteriaAndAlias criteriaAndAlias){
+        return criteriaAndAlias.associationPath
+    }
+
+    //so we can access protected
+    @CompileDynamic
     Criteria getCriteriaOnAlias(CriteriaAndAlias criteriaAndAlias){
         return criteriaAndAlias.criteria
     }
 
+    //so we can access protected
     @CompileDynamic //so we can access protected
     String getCriteriaAlias(CriteriaAndAlias criteriaAndAlias){
         return criteriaAndAlias.alias
@@ -176,7 +285,7 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
      */
     @Override
     List list() {
-        def criteria = getHibernateCriteria()
+        Criteria criteria = getHibernateCriteria()
         if(criteria == null) throw new IllegalStateException("Cannot execute query using a detached criteria instance");
 
         int projectionLength = initProjections()
@@ -191,15 +300,15 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
             //skip the listForCriteria
             //return criteria.list()
         }
-        //this fires Pre and PostQueryEvent, TODO might want to skip this if firing the events hurt performance
         return listForCriteria()
-
     }
 
+    //hack to access the private hasJoins in super
     Boolean getHasJoins(){
         (Boolean)hasJoinsField.get(this)
     }
 
+    //override so we can call our initProjections()
     @Override
     Object singleResult() {
         def criteria = getHibernateCriteria()
@@ -233,7 +342,7 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
         return result;
     }
 
-
+    //super is private so copied in here.
     private Object singleResultViaListCall() {
         def criteria = getHibernateCriteria()
         criteria.setMaxResults(1);
@@ -250,19 +359,19 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
     /**
      * List but uses the CriteriaSpecification.ALIAS_TO_ENTITY_MAP for projection queries
      */
-    List mapList() {
-        def crit = getHibernateCriteria()
-        if(crit == null) throw new IllegalStateException("Cannot execute query using a detached criteria instance");
-
-        int projectionLength = initProjections()
-        crit.setResultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP);
-
-        // applyDefaultSortOrderAndCaching()
-        // applyFetchStrategies()
-
-        // return listForCriteria()
-        return crit.list()
-    }
+    // List mapList() {
+    //     def crit = getHibernateCriteria()
+    //     if(crit == null) throw new IllegalStateException("Cannot execute query using a detached criteria instance");
+    //
+    //     int projectionLength = initProjections()
+    //     crit.setResultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP);
+    //
+    //     // applyDefaultSortOrderAndCaching()
+    //     // applyFetchStrategies()
+    //
+    //     // return listForCriteria()
+    //     return crit.list()
+    // }
 
     /**
      * get the hibernate ProjectionList for when customer query access is needed
@@ -320,6 +429,7 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
         return hibernateAliasProjectionList;
     }
 
+    //copied in from HibernateQuery
     @Override
     Object clone() {
         final CriteriaImpl impl = (CriteriaImpl) getHibernateCriteria();
@@ -342,6 +452,8 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
         }
     }
 
+    //copied in from AbstractHibernateQuery since its protected
+    // and we replace the add() method to handle aliases better
     class HibernateAliasProjectionList extends Query.ProjectionList {
 
         org.hibernate.criterion.ProjectionList _projectionList = Projections.projectionList();
@@ -387,11 +499,11 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
             propName = propName.replace('.', '_')
             switch (p) {
                 case Query.SumProjection:
-                    return "${propName}_sum"
+                    return "${propName}"
                 case Query.CountProjection:
-                    return "${propName}_count"
+                    return "${propName}"
                 case Query.AvgProjection:
-                    return "${propName}_avg"
+                    return "${propName}"
                 default:
                     return propName
             }

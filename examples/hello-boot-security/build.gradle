@@ -1,0 +1,103 @@
+//see the settings.gradle pluginManagement config for usign the recomended graild plugins DSL
+plugins {
+  id 'io.spring.dependency-management'
+  id 'org.springframework.boot'
+  // id "groovy"
+  // id "war"
+  id "org.grails.grails-web"
+  id "org.grails.grails-gsp"
+}
+
+// apply from: "${rootDir}/gradle/spring-bootRun.gradle"
+
+repositories {
+  mavenCentral()
+  maven { url 'https://repo.spring.io/milestone' }
+  maven { url 'https://repo.spring.io/snapshot' }
+  maven { url "https://build.shibboleth.net/nexus/content/repositories/releases/" }
+}
+
+apply from: "${rootDir}/gradle/compile.gradle"
+
+dependencies {
+  developmentOnly("org.springframework.boot:spring-boot-devtools")
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  implementation 'org.springframework.boot:spring-boot-starter-security'
+  implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+  implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+
+  //SAML
+  implementation 'org.springframework.security:spring-security-saml2-service-provider'
+  implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+  // implementation 'org.springframework.security:spring-security-oauth2-authorization-server:0.3.1'
+
+  constraints {
+    implementation "org.opensaml:opensaml-core:4.1.1"
+    implementation "org.opensaml:opensaml-saml-api:4.1.1"
+    implementation "org.opensaml:opensaml-saml-impl:4.1.1"
+  }
+
+  implementation('pl.allegro.tech.boot:handlebars-spring-boot-starter:0.4.1'){
+    exclude group:"com.github.jknack", module: "handlebars-humanize"
+    exclude group:"com.github.jknack", module: "handlebars-markdown"
+    exclude group:"com.github.jknack", module: "handlebars-guava-cache"
+    exclude group:"com.github.jknack", module: "handlebars-jackson2"
+  }
+  implementation 'com.github.jknack:handlebars:4.3.1'
+  implementation 'com.github.jknack:handlebars-springmvc:4.3.1'
+  // implementation 'com.github.jknack:handlebars-helpers:4.2.0',
+  //   'com.github.jknack:handlebars-jackson2:4.2.0',
+  //   'com.github.jknack:handlebars-humanize:4.2.0',
+  //   'com.github.jknack:handlebars-markdown:4.2.0'
+  // implementation 'com.github.jknack:handlebars-springmvc:4.2.0',
+  //   'com.github.jknack:handlebars-guava-cache:4.2.0'
+
+
+  //GRAILS
+  implementation "org.grails:grails-core"
+  implementation "org.grails:grails-web-boot"
+  implementation "org.grails:grails-plugin-url-mappings"
+  implementation "org.grails.plugins:gsp"
+
+  implementation project(":gorm-tools")
+  implementation project(":boot-security-gorm")
+  implementation project(":gorm-audit")
+
+  implementation "org.grails:grails-datastore-gorm-hibernate5:$vGormHibernate"
+  implementation "org.grails.plugins:hibernate5:$vGormHibernate"
+  implementation "org.hibernate:hibernate-core:$vHibernate"
+
+  runtimeOnly "com.h2database:h2:$vH2"
+  runtimeOnly "com.zaxxer:HikariCP:$vHikari"
+
+  // runtimeOnly "com.h2database:h2:$vH2"
+
+  testImplementation project(":gorm-test-support")
+  testImplementation "org.grails:grails-web-testing-support:$vGrailsTesting"
+
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'org.springframework.security:spring-security-test'
+
+  testImplementation("org.spockframework:spock-core:${vSpock}")
+  testImplementation("org.spockframework:spock-spring:${vSpock}")
+}
+
+
+bootRun {
+  ignoreExitValue true
+  jvmArgs('-Dspring.output.ansi.enabled=always', '-noverify', '-XX:TieredStopAtLevel=1', '-Xmx1024m')
+  sourceResources sourceSets.main
+  String springProfilesActive = 'spring.profiles.active'
+  systemProperty springProfilesActive, System.getProperty(springProfilesActive)
+}
+
+tasks.withType(GroovyCompile) {
+  configure(groovyOptions) {
+    forkOptions.jvmArgs = ['-Xmx1024m']
+  }
+}
+
+tasks.withType(Test) {
+  useJUnitPlatform()
+}

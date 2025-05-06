@@ -1,0 +1,36 @@
+plugins {
+  // id 'org.springframework.boot'
+  // id 'io.spring.dependency-management'
+  id "yakworks.groovy-lib"
+}
+
+apply from: "${rootDir}/gradle/gorm-lib.gradle"
+
+dependencies {
+
+  compileOnly "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion"
+  compileOnly project(":gorm-tools")
+
+  api project(":security-core")
+
+  // testImplementation project(":gorm-test-support") //this might seem circular but it can be added to itself as it dif config
+  testImplementation project(":boot-security-gorm")
+  testImplementation("org.spockframework:spock-spring:${vSpock}")
+
+}
+
+configurations.all {
+  resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+    ['grails-datastore-gorm', 'grails-datastore-gorm-validation', 'grails-datastore-gorm-support', 'grails-datastore-core'].each {
+      if (details.requested.name == it) {
+        details.useVersion project['gorm.version']
+      }
+    }
+    ['grails-plugin-datasource', 'grails-plugin-interceptors', 'grails-plugin-controllers',
+     'grails-plugin-url-mappings', 'grails-plugin-rest'].each {
+      if (details.requested.name == it) {
+        details.useVersion project['grailsVersion']
+      }
+    }
+  }
+}

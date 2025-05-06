@@ -4,26 +4,42 @@
 */
 package gorm.tools.mango
 
+import javax.persistence.criteria.JoinType
+
 import groovy.transform.CompileDynamic
+import groovy.util.logging.Slf4j
 
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.gorm.finders.DynamicFinder
+import org.grails.datastore.gorm.finders.FinderMethod
 import org.grails.datastore.gorm.query.criteria.AbstractDetachedCriteria
+import org.grails.datastore.gorm.query.criteria.DetachedAssociationCriteria
 import org.grails.datastore.mapping.core.Session
+import org.grails.datastore.mapping.model.PersistentProperty
+import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.query.Query
+import org.grails.datastore.mapping.query.api.Criteria
 import org.grails.datastore.mapping.query.api.QueryArgumentsAware
 import org.grails.datastore.mapping.query.api.QueryableCriteria
 import org.grails.orm.hibernate.AbstractHibernateSession
+import org.hibernate.QueryException
+import org.springframework.beans.factory.NoSuchBeanDefinitionException
 
+import gorm.tools.beans.Pager
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.hibernate.HibernateMangoQuery
 import gorm.tools.mango.jpql.JpqlQueryBuilder
 import gorm.tools.mango.jpql.JpqlQueryInfo
-import gorm.tools.mango.jpql.SimplePagedQuery
+import gorm.tools.mango.jpql.PagedQuery
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 import grails.gorm.PagedResultList
+import yakworks.api.problem.ThrowableProblem
+import yakworks.api.problem.data.DataProblem
 import yakworks.commons.lang.NameUtils
+import yakworks.gorm.config.GormConfig
+import yakworks.spring.AppCtx
 
 /**
  * This is here to make it easier to build criteria with domain bean paths
@@ -41,10 +57,41 @@ import yakworks.commons.lang.NameUtils
  *
  * ilike('invoice.customer.name', 'foo')
  */
-@SuppressWarnings(['MethodCount']) //ok for this
+@Slf4j
+@SuppressWarnings(['MethodCount', 'ClassSize']) //ok for this
 @GrailsCompileStatic
 class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
+    /** reference to QueryArgs used to build this if it exists */
+    QueryArgs queryArgs
+
+    /**
+     * the root map to apply.
+     * Wont neccesarily be same as whats in the QueryArgs as it will have been run through the tidy operation
+     */
+    Map criteriaMap
+
+    /** the root criteriaClosure to apply */
+    Closure criteriaClosure
+
+    /** the map of aliases, see the  parseAlias method */
+    Map<String, String> propertyAliases = [:]
+
+    /**
+     * auto system created aliases, The aliases we created to make them unique and usable in filters.
+     * for example a projection:['amount':'sum'] will get an alias of 'amount_sum',
+     * we remove that _sum suffix automatically because its set in the systemAliases.
+     * but if we did projection:['amount as amount_totals':'sum'] then that is user specified. we dont want to remove the _totals suffix.
+     */
+    List<String> systemAliases = [] as List<String>
+
+    /**
+     * Query timeout in seconds. If value is set, the timeout would be set on hibernate criteria instance.
+     */
+    Integer timeout = 0
+
+    /** The Gorm config properties for settings.*/
+    GormConfig gormConfig
 
     /**
      * Constructs a DetachedCriteria instance target the given class and alias for the name
@@ -52,14 +99,140 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      * @param targetClass The target class
      * @param alias The root alias to be used in queries
      */
-    MangoDetachedCriteria(Class<T> targetClass, String alias = null) {
-        super(targetClass, alias)
-        if(!alias) this.@alias = "${NameUtils.getPropertyName(targetClass.simpleName)}_"
+    MangoDetachedCriteria(Class<T> targetClass) {
+        super(targetClass, null)
+        this.@alias = "${NameUtils.getPropertyName(targetClass.simpleName)}_"
+    }
+
+    MangoDetachedCriteria(Class<T> targetClass, String zalias) {
+        super(targetClass, zalias)
+        if(!zalias) this.@alias = "${NameUtils.getPropertyName(targetClass.simpleName)}_"
     }
 
     @Override
     protected MangoDetachedCriteria newInstance() {
         new MangoDetachedCriteria(targetClass, alias)
+    }
+
+    //make junctions accesible
+    List<Query.Junction> getJunctions(){
+        super.@junctions
+    }
+
+    //make target class accesible
+    Class getEntityClass(){
+        super.@targetClass
+    }
+
+    /**
+     * Method missing handler that deals with the invocation of dynamic finders
+     *
+     * See comments on why we override and replace this.
+     * It was firing an extra count query because of a truthy check
+     *
+     * @param methodName The method name
+     * @param args The arguments
+     * @return The result of the method call
+     */
+    @CompileDynamic
+    @Override
+    def methodMissing(String methodName, Object args) {
+        initialiseIfNecessary(targetClass)
+        def method = dynamicFinders.find { FinderMethod f -> f.isMethodMatch(methodName) }
+        if (method != null) {
+            applyLazyCriteria()
+            return method.invoke(targetClass, methodName, this, args)
+        }
+
+        if (!args) {
+            throw new MissingMethodException(methodName, AbstractDetachedCriteria, args)
+        }
+
+        final prop = persistentEntity.getPropertyByName(methodName)
+        if (!(prop instanceof Association)) {
+            throw new MissingMethodException(methodName, AbstractDetachedCriteria, args)
+        }
+
+
+        def zalias = args[0] instanceof CharSequence ? args[0].toString() : null
+
+        def existing = associationCriteriaMap[methodName]
+        // NOTE: ONLY CHANGE HERE
+        // "!alias && existing" -> !alias && existing != null
+        // since DetachedAssociationCriteria inherits from DetachedCriteria and it implements asBoolean
+        // then the truthy check on "existing" is running the count query
+        //alias = !alias && existing ? existing.alias : alias
+        zalias = !zalias && existing != null ? existing.alias : zalias
+        DetachedAssociationCriteria associationCriteria = zalias ? new MangoDetachedAssociationCriteria(prop.associatedEntity.javaClass, prop, zalias)
+            : new MangoDetachedAssociationCriteria(prop.associatedEntity.javaClass, prop)
+
+        associationCriteriaMap[methodName] = associationCriteria
+        add associationCriteria
+
+        def lastArg = args[-1]
+        if(lastArg instanceof Closure) {
+            Closure callable = lastArg
+            callable.resolveStrategy = Closure.DELEGATE_FIRST
+
+            Closure parentCallable = callable
+            while(parentCallable.delegate instanceof Closure) {
+                parentCallable = (Closure)parentCallable.delegate
+            }
+
+            def previous = parentCallable.delegate
+
+            try {
+                parentCallable.delegate = associationCriteria
+                callable.call()
+            } finally {
+                parentCallable.delegate = previous
+            }
+        }
+    }
+
+    /**
+     * If the underlying datastore supports aliases, then an alias is created for the given association
+     *
+     * @param associationPath The name of the association
+     * @param alias The alias
+     * @return This create
+     */
+    @SuppressWarnings('InvertedIfElse') //not our code so dont want to change it
+    @Override //Overriden copy paste in just do we can do instance of this instead
+    Criteria createAlias(String associationPath, String zalias) {
+        initialiseIfNecessary(targetClass)
+        PersistentProperty prop
+        if(associationPath.contains('.')) {
+            def tokens = associationPath.split(/\./)
+            def entity = this.persistentEntity
+            for(t in tokens) {
+                prop = entity.getPropertyByName(t)
+                if (!(prop instanceof Association)) {
+                    throw new IllegalArgumentException("Argument [$associationPath] is not an association")
+                }
+                else {
+                    entity = ((Association)prop).associatedEntity
+                }
+            }
+        }
+        else {
+            prop = persistentEntity.getPropertyByName(associationPath)
+        }
+        if (!(prop instanceof Association)) {
+            throw new IllegalArgumentException("Argument [$associationPath] is not an association")
+        }
+
+        Association a = (Association)prop
+        DetachedAssociationCriteria associationCriteria = associationCriteriaMap[associationPath]
+        if(associationCriteria == null) {
+            associationCriteria = new MangoDetachedAssociationCriteria(a.associatedEntity.javaClass, a, associationPath, zalias)
+            associationCriteriaMap[associationPath] = associationCriteria
+            add associationCriteria
+        }
+        else {
+            associationCriteria.setAlias(zalias)
+        }
+        return associationCriteria
     }
 
     /**
@@ -81,30 +254,114 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      */
     @Override
     List<T> list(Map args = Collections.emptyMap(), @DelegatesTo(DetachedCriteria) Closure additionalCriteria = null) {
-        (List)withQueryInstance(args, additionalCriteria) { Query query ->
-            if (args?.max) {
-                return new PagedResultList(query)
+        try {
+            (List)withQueryInstance(args, additionalCriteria) { Query query ->
+                if(log.debugEnabled){
+                    log.debug("Query criteria: ${query.criteria}")
+                }
+                if (args?.max) {
+                    return new PagedResultList(query)
+                }
+                return query.list()
             }
-            return query.list()
+        } catch (IllegalArgumentException | QueryException ex) {
+            //Hibernate throws IllegalArgumentException when Antlr fails to parse query
+            //and throws QueryException when hibernate fails to execute query
+            throw toDataProblem(ex)
         }
     }
 
     /**
+     * Calls paged list
+     */
+    List<T> pagedList(Pager pager) {
+        List resList
+        Map args = [max: pager.max, offset: pager.offset]
+        if(this.projections){
+            resList =  this.mapList(args)
+        } else {
+            //return standard list
+            resList =  this.list(args)
+        }
+        return resList as List<T>
+    }
+
+    @Deprecated //use the pagedList(Pager pager)
+    List<T> pagedList() {
+        Pager pager = queryArgs?.pager ? queryArgs.pager : Pager.of([:])
+        return pagedList(pager)
+    }
+
+    /**
      * Lists all records matching the criterion contained within this DetachedCriteria instance
-     * Uses the JpqlQueryBuilder to build jpql with map projections
+     * Uses the JpqlQueryBuilder to build jpql with map projections.
+     * Forces the results to be in a map even if its only 1 column like a count.
      *
      * @return A list of matching instances
      */
-    List<Map> mapList(Map args = Collections.emptyMap()) {
-        def builder = JpqlQueryBuilder.of(this).aliasToMap(true)
+    List<Map> mapList(Map args = [:]) {
+        def builder = JpqlQueryBuilder.of(this) //.aliasToMap(true)
+        if(args.aliasToMap){
+            builder.aliasToMap(true)
+        }
+        if (gormConfig && gormConfig.query.dialectFunctions.enabled) {
+            builder.enableDialectFunctions(true)
+        }
+
         JpqlQueryInfo queryInfo = builder.buildSelect()
+        //use SimplePagedQuery so it can attach the totalCount
+        PagedQuery hq = buildSimplePagedQuery()
+        //def list = hq.list(queryInfo.query, queryInfo.paramMap, args)
+        if(timeout) {
+            args['timeout'] = timeout
+        }
+
+        try {
+            def list = hq.list(queryInfo.query, queryInfo.paramMap, args)
+            return list as List<Map>
+        } catch (IllegalArgumentException | QueryException ex) {
+            //Hibernate throws IllegalArgumentException when Antlr fails to parse query
+            //and throws QueryException when hibernate fails to execute query
+            throw toDataProblem(ex)
+        }
+    }
+
+    static ThrowableProblem toDataProblem(Throwable ex){
+        var dp = DataProblem.of(ex).msg('error.query.invalid')
+        //SECURITY, shorten the desc, gives to much info about query and
+        if(dp.detail) dp.detail(dp.detail.take(100))
+        return dp.toException()
+    }
+
+    PagedQuery buildSimplePagedQuery(){
         def api = currentGormStaticApi()
         //use SimplePagedQuery so it can attach the totalCount
-        SimplePagedQuery hq = new SimplePagedQuery(api)
-        //FIXME do some logic about so that if builder only has 1 sum or 1 count then its already expected that it
-        //will have a single result and there is no need to fire count in the SimplePagedQuery
-        def list = hq.list(queryInfo.query, queryInfo.paramMap, args)
-        return list
+        PagedQuery pq = new PagedQuery(api, this.systemAliases)
+        return pq
+    }
+
+    /**
+     * Where method derives a new query from this query. This method will not mutate the original query, but instead return a new one.
+     *
+     * @param additionalQuery The additional query
+     * @return A new query
+     */
+    @Override
+    MangoDetachedCriteria<T> where(@DelegatesTo(DetachedCriteria) Closure additionalQuery) {
+        MangoDetachedCriteria<T> newQuery = (MangoDetachedCriteria<T>)clone()
+        return newQuery.build(additionalQuery)
+    }
+
+    /**
+     * Where method derives a new query from this query. This method will not mutate the original query, but instead return a new one.
+     *
+     * @param additionalQuery The additional query
+     * @return A new query
+     */
+    MangoDetachedCriteria<T> where(Map additionalQuery) {
+        MangoDetachedCriteria<T> newQuery = (MangoDetachedCriteria<T>)clone()
+        new MangoBuilder().applyMapOrList(newQuery, additionalQuery)
+        return newQuery
     }
 
     /**
@@ -136,14 +393,22 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     }
 
     /**
-     * exists, checks if count is > 0
-     *
-     * @param args The arguments
-     * @return true if count > 0
+     * force an error since this creates unpredictiable truthy checks for criteria
      */
     @Override
     boolean asBoolean(@DelegatesTo(DetachedCriteria) Closure additionalCriteria = null) {
-        (Boolean)withQueryInstance(Collections.emptyMap(), additionalCriteria) { Query query ->
+        // (Boolean)withQueryInstance(Collections.emptyMap(), additionalCriteria) { Query query ->
+        //     query.projections().count()
+        //     ((Number)query.singleResult()) > 0
+        // }
+        throw new UnsupportedOperationException("Truthy check is not supported, use null check instead")
+    }
+
+    /**
+     * uses the count to check if its greater than 0.
+     */
+    boolean exists() {
+        return (Boolean)withQueryInstance(Collections.emptyMap(), null) { Query query ->
             query.projections().count()
             ((Number)query.singleResult()) > 0
         }
@@ -157,8 +422,38 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      */
     @Override
     MangoDetachedCriteria<T> sum(String property) {
+        property = parseAlias(property, "SUM")
         ensureAliases(property)
         projectionList.sum(property)
+        return this
+    }
+
+    /**
+     * Adds a avg projection
+     * @param property The property to sum by
+     * @return This criteria instance
+     */
+    @Override
+    MangoDetachedCriteria<T> avg(String property) {
+        property = parseAlias(property, "AVG")
+        ensureAliases(property)
+        projectionList.avg(property)
+        return this
+    }
+
+    @Override
+    MangoDetachedCriteria<T> min(String property) {
+        property = parseAlias(property, "MIN")
+        ensureAliases(property)
+        projectionList.min(property)
+        return this
+    }
+
+    @Override
+    MangoDetachedCriteria<T> max(String property) {
+        property = parseAlias(property, "MAX")
+        ensureAliases(property)
+        projectionList.max(property)
         return this
     }
 
@@ -169,18 +464,56 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      * @return This criteria instance
      */
     MangoDetachedCriteria<T> groupBy(String property) {
+        property = parseAlias(property, "")
         ensureAliases(property)
         projectionList.groupProperty(property)
         return this
     }
 
     /**
-     * Adds a groupBy projection
+     * Adds a simple property select
+     *
+     * @param property The property to sum by
+     * @return This criteria instance
+     */
+    MangoDetachedCriteria<T> property(String prop) {
+        prop = parseAlias(prop, "")
+        ensureAliases(prop)
+        projectionList.property(prop)
+        return this
+    }
+
+    /**
+     * adds list of properties
+     */
+    MangoDetachedCriteria<T> select(List<String> fields) {
+        for(String prop : fields){
+            this.property(prop)
+        }
+        return this
+    }
+
+    /**
+     * Adds a distinct select
+     *
+     * @param property The property to sum by
+     * @return This criteria instance
+     */
+    // MangoDetachedCriteria<T> distinct(String prop) {
+    //     prop = parseAlias(prop, "")
+    //     ensureAliases(prop)
+    //     projectionList.distinct(prop)
+    //     return this
+    // }
+
+    /**
+     * Adds a countDistinct projection
      *
      * @param property The property to sum by
      * @return This criteria instance
      */
     MangoDetachedCriteria<T> countDistinct(String property) {
+        property = parseAlias(property, "COUNT")
         ensureAliases(property)
         projectionList.countDistinct(property)
         return this
@@ -188,17 +521,16 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
     @Override
     MangoDetachedCriteria<T> eq(String propertyName, Object propertyValue) {
+        //still needed here for some reason. tests failing in domain9
         nestedPathPropCall(propertyName, propertyValue, "eq")
+        //return (MangoDetachedCriteria<T>)super.eq(propertyName, propertyValue)
     }
 
     @Override
     MangoDetachedCriteria<T> ne(String propertyName, Object propertyValue) {
         nestedPathPropCall(propertyName, propertyValue, "ne")
-    }
-
-    @Override
-    MangoDetachedCriteria<T> inList(String propertyName, Collection values) {
-        nestedPathPropCall(propertyName, values, "inList")
+        // ensureAliases(propertyName)
+        // return (MangoDetachedCriteria<T>)super.ne(propertyName, propertyValue)
     }
 
     @CompileDynamic
@@ -216,6 +548,13 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         return this
     }
 
+    /**
+     * allows to do a nested association without compile dynamic
+     *
+     * @param assoc the nested association
+     * @param args the closiure to call on it
+     * @return the object reply of the super.invokeMethod
+     */
     @CompileDynamic
     def assoc(String assoc, Closure args) {
         super.invokeMethod(assoc, args)
@@ -223,7 +562,15 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
     @Override
     protected MangoDetachedCriteria<T> clone() {
-        return (MangoDetachedCriteria)super.clone()
+        MangoDetachedCriteria clonedCriteria = (MangoDetachedCriteria)super.clone()
+        clonedCriteria.queryArgs = queryArgs
+        clonedCriteria.criteriaMap = criteriaMap
+        clonedCriteria.criteriaClosure = criteriaClosure
+        clonedCriteria.propertyAliases = propertyAliases
+        clonedCriteria.systemAliases = systemAliases
+        clonedCriteria.timeout = timeout
+        clonedCriteria.gormConfig = gormConfig
+        return clonedCriteria
     }
 
     /**
@@ -269,8 +616,12 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
             if(session instanceof AbstractHibernateSession) {
                 // query = session.createQuery(targetClass, alias)
                 query = HibernateMangoQuery.createQuery( (AbstractHibernateSession)session, persistentEntity, alias)
+                if(timeout) {
+                    ((HibernateMangoQuery) query).getHibernateCriteria().setTimeout(timeout)
+                }
             }
             else {
+                //Can it ever be here - as we support only hibernate ?
                 query = session.createQuery(targetClass)
             }
 
@@ -351,11 +702,24 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         return this
     }
 
+    @Override
+    MangoDetachedCriteria<T> join(String property, JoinType joinType) {
+        return (MangoDetachedCriteria<T>)super.join(property, joinType)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> join(String property) {
+        return (MangoDetachedCriteria<T>)super.join(property)
+    }
+
     /**
-     * For props with dots in them, for example foo.bar.baz. Will ensure the nested aliases are setup
-     * for foo and foo.bar
+     * For props with dots in them, for example foo.bar.baz. Will ensure the nested aliases are setup for foo and foo.bar
+     * also checks to see if prop is in form "name as alias" for example "foo.bar.baz as baz" so it can track and setup the property
+     * alias if its sent to JpqlQueryBuilder and its an aliasToMap
+     * @return the property to use. will be same as whats passed in unless it has " as " will only return first portion
      */
     void ensureAliases(String prop){
+
         // if (!propertyName.contains('.') || propertyName.endsWith('.id'))
         if(prop.count('.') < 1 || (prop.count('.') == 1 && prop.endsWith('.id'))) return
 
@@ -364,10 +728,29 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         String field = props.removeLast()
 
         //make sure there are nested criterias for the order
-        DetachedCriteria currentCriteria = this as DetachedCriteria
+        DetachedCriteria currentCriteria = this// as DetachedCriteria
         props.each { path ->
             currentCriteria = currentCriteria.createAlias(path, path) as DetachedCriteria
         }
+    }
+
+    String parseAlias(String p, String key) {
+        String prop = p.trim()
+        String aliasKey = "${key}_${p}"
+        if(prop.contains(" as ")) {
+            String[] parts = prop.split(/\sas\s/)
+            p = parts[0].trim()
+            aliasKey = "${key}_${p}"
+            propertyAliases[aliasKey] = parts[1].trim()
+        } else {
+            //if no key its a groupby so just return it
+            if(!key) return p
+            String alas = p.replace('.', '_')
+            alas = "${alas}_${key.toLowerCase()}"
+            propertyAliases[aliasKey] = alas
+            systemAliases << alas
+        }
+        return p
     }
 
     /******** PROPERTY CRITERIAS ************/
@@ -385,15 +768,31 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     }
 
     @Override
-    MangoDetachedCriteria<T> inList(String propertyName, QueryableCriteria<?> subquery) {
-        ensureAliases(propertyName)
-        return (MangoDetachedCriteria<T>)super.inList(propertyName, subquery)
-    }
-
-    @Override
     MangoDetachedCriteria<T> "in"(String propertyName, @DelegatesTo(AbstractDetachedCriteria) Closure<?> subquery) {
         ensureAliases(propertyName)
         return (MangoDetachedCriteria<T>)super.in(propertyName, subquery)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> "in"(String propertyName, Object[] values) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.in(propertyName, values)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> inList(String propertyName, Collection values) {
+        //ensureAliases(propertyName)
+        //org.hibernate.HibernateException: Unknown entity: null
+        // at app//org.hibernate.loader.criteria.CriteriaQueryTranslator.getPropertyMapping(CriteriaQueryTranslator.java:727)
+        //For some reason this is one spot where this is still needed. get the above error in RallyUserServiceSpec if not
+        nestedPathPropCall(propertyName, values, "inList")
+        //return (MangoDetachedCriteria<T>)super.inList(propertyName, values)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> inList(String propertyName, Object[] values) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.inList(propertyName, values)
     }
 
     @Override
@@ -403,9 +802,9 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     }
 
     @Override
-    MangoDetachedCriteria<T> "in"(String propertyName, Object[] values) {
+    MangoDetachedCriteria<T> inList(String propertyName, QueryableCriteria<?> subquery) {
         ensureAliases(propertyName)
-        return (MangoDetachedCriteria<T>)super.in(propertyName, values)
+        return (MangoDetachedCriteria<T>)super.inList(propertyName, subquery)
     }
 
     @Override
@@ -418,18 +817,6 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     MangoDetachedCriteria<T> notIn(String propertyName, @DelegatesTo(AbstractDetachedCriteria) Closure<?> subquery) {
         ensureAliases(propertyName)
         return (MangoDetachedCriteria<T>)super.notIn(propertyName, subquery)
-    }
-
-    // @Override
-    // MangoDetachedCriteria<T> inList(String propertyName, Collection values) {
-    //     ensureAliases(propertyName)
-    //     return (MangoDetachedCriteria<T>)super.inList(propertyName, values)
-    // }
-
-    @Override
-    MangoDetachedCriteria<T> inList(String propertyName, Object[] values) {
-        ensureAliases(propertyName)
-        return (MangoDetachedCriteria<T>)super.inList(propertyName, values)
     }
 
     @Override
@@ -718,4 +1105,5 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         ensureAliases(propertyName)
         return (MangoDetachedCriteria<T>)super.leAll(propertyName, propertyValue)
     }
+
 }

@@ -9,10 +9,11 @@ import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
 import com.opencsv.CSVReaderHeaderAware
+import yakworks.commons.map.LazyPathKeyMap
 import yakworks.commons.map.Maps
-import yakworks.commons.map.PathKeyMap
+
 /**
- * Overrides the CSVReaderHeaderAware to read csv rows into the PathKeyMap
+ * Overrides the CSVReaderHeaderAware to read csv rows into the LazyPathKeyMap
  * which can then be used for the EntityMapBinder
  */
 @Builder(builderStrategy = SimpleStrategy, prefix = "")
@@ -54,8 +55,9 @@ class CSVPathKeyMapReader extends CSVReaderHeaderAware {
     Map<String, Object> readMap() {
         Map data = super.readMap()
         data = prune && data ? Maps.prune(data) : data
+        data = convertNullStrings(data)
         // data = data as Map<String, String>
-        return PathKeyMap.of(data, pathDelimiter) as Map<String, Object>
+        return LazyPathKeyMap.of(data as Map<String, Object>, pathDelimiter)
     }
 
     /**
@@ -64,7 +66,7 @@ class CSVPathKeyMapReader extends CSVReaderHeaderAware {
      * @return the list of maps for entire file
      */
     List<Map<String, Object>> readAllRows() {
-        List result = []
+        List result = [] as List<Map<String, Object>>
         while (hasNext) {
             Map r = readMap()
             if(r) result << r
@@ -96,5 +98,17 @@ class CSVPathKeyMapReader extends CSVReaderHeaderAware {
             line = line.replaceAll("\uFEFF", "").trim()
         }
         return line
+    }
+
+    /**
+     * Converts, string with value "null" constant, to null
+     */
+    static <K, V> Map<K, V> convertNullStrings(Map<K, V> map) {
+        if (!map) return map
+        return map.collectEntries { k, v ->
+            if (v instanceof String && v.trim() == "null") v = null
+            else if (v instanceof Map) v = convertNullStrings(v)
+            return [k, v]
+        } as Map<K, V>
     }
 }

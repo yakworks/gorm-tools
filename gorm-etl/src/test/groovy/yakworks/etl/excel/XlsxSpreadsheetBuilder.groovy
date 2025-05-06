@@ -14,7 +14,7 @@ import org.apache.poi.ss.usermodel.CellStyle
 import builders.dsl.spreadsheet.builder.api.SpreadsheetBuilder
 import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import yakworks.commons.lang.DateUtil
-import yakworks.commons.lang.PropertyTools
+import yakworks.commons.beans.PropertyTools
 import yakworks.commons.map.MapFlattener
 
 /**
@@ -46,7 +46,7 @@ class XlsxSpreadsheetBuilder {
         // BenchmarkHelper.startTime()
         Map<String, Object> firstRow = dataList[0] as Map<String, Object>
         Map flatRow = flattenMap(firstRow)
-        headers = flatRow.keySet()
+        headers = flatRow.keySet() as Set<String>
 
         SpreadsheetBuilder sb = PoiSpreadsheetBuilder.create(outputStream)
         // def psb = new PoiSpreadsheetBuilder(new XSSFWorkbook(), out)

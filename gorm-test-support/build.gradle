@@ -1,27 +1,41 @@
 apply plugin: "yakworks.grails-plugin"
 
+apply from: "${rootDir}/gradle/gorm-lib.gradle"
+
 dependencies {
-  console "org.grails:grails-console"
-
   compileOnly project(":gorm-tools")
-  compileOnly project(":gorm-security")
+  compileOnly project(":gorm-audit")
+  compileOnly project(":boot-security-gorm")
 
-  implementation "org.grails:grails-plugin-controllers"
+  // implementation "org.grails:grails-plugin-controllers"
+
+  compileOnly "org.springframework.security:spring-security-config"
+
+  api ("org.yakworks:grails-kit:$vSpringGrailsKit")
+
+  implementation("org.yakworks:groovy-commons:$vGroovyCommons")
 
   //used for bundled Test traits
-  api "org.grails:grails-gorm-testing-support:$vGrailsTesting"
+  api("org.grails:grails-gorm-testing-support:$vGrailsTesting"){
+    // transitive = false
+  }
+  //bump the gsp so we dont have 5.2.1 and 5.2.2 dups
+  api("org.grails.plugins:gsp:5.2.2")
 
   api("io.github.longwa:build-test-data:$vBuildTestData"){
-    exclude group:"org.grails", module: "grails-gorm-testing-support"
+    //keep the extra stuff out.
+    transitive = false
   }
+
+  //add support for junit4 so before and after works
   api "org.spockframework:spock-junit4:$vSpock"
 
   //used for json parsing but require it to be added to project that uses this
-  compileOnly("org.grails.plugins:views-json:$vViews") {
+  // compileOnly("org.grails.plugins:views-json:$vViews") {
     //exclude controllers since it messes with the domain compile and map constructor
-    exclude group:"org.grails", module: "grails-plugin-controllers"
+    // exclude group:"org.grails", module: "grails-plugin-controllers"
     // exclude group:"org.grails", module: "grails-web-databinding"
-  }
+  // }
   // compile "org.grails.plugins:views-json-templates:$vViews"
 
 }

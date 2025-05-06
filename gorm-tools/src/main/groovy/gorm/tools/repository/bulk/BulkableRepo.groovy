@@ -4,8 +4,6 @@
 */
 package gorm.tools.repository.bulk
 
-import java.util.function.Supplier
-
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.core.Datastore
@@ -15,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
 import gorm.tools.async.AsyncArgs
-import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
@@ -27,10 +24,14 @@ import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.events.AfterBulkSaveEntityEvent
 import gorm.tools.repository.events.BeforeBulkSaveEntityEvent
 import gorm.tools.repository.events.RepoEventPublisher
+import gorm.tools.repository.model.DataOp
+import gorm.tools.repository.model.EntityResult
 import yakworks.api.ApiResults
+import yakworks.api.HttpStatus
 import yakworks.api.Result
+import yakworks.api.problem.data.DataProblem
+import yakworks.commons.map.LazyPathKeyMap
 import yakworks.commons.map.Maps
-import yakworks.commons.map.PathKeyMap
 import yakworks.meta.MetaMap
 
 /**
@@ -42,15 +43,12 @@ trait BulkableRepo<D> {
 
     final private static Logger log = LoggerFactory.getLogger(BulkableRepo)
 
-    @Autowired(required = false)
+    @Autowired(required = false) //optional to make testing easier and can do gorm-tools without syncJob
     SyncJobService syncJobService
 
     @Autowired
     @Qualifier("parallelTools")
     ParallelTools parallelTools
-
-    @Autowired
-    AsyncService asyncService
 
     @Autowired
     MetaMapService metaMapService
@@ -59,10 +57,9 @@ trait BulkableRepo<D> {
     ProblemHandler problemHandler
 
     //Here for @CompileStatic - GormRepo implements these
-    abstract D create(Map data, Map args)
-    abstract D update(Map data, Map args)
     abstract D doCreate(Map data, PersistArgs args)
     abstract D doUpdate(Map data, PersistArgs args)
+    abstract EntityResult<D> upsert(Map data, PersistArgs args)
     abstract  Class<D> getEntityClass()
     abstract void flushAndClear()
     abstract void clear()
@@ -73,58 +70,37 @@ trait BulkableRepo<D> {
 
     /**
      * creates a supplier to wrap doBulkParallel and calls bulk
-     * if syncJobArgs.promiseEnabled = true will return right away
+     * if syncJobArgs.async = true will return right away
      *
      * @param dataList the list of data maps to create
      * @param syncJobArgs the args object to pass on to doBulk
      * @return Job id
      */
     Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs) {
+        //If dataList is empty then error right away.
+        if(dataList == null || dataList.isEmpty()) throw DataProblem.of('error.data.emptyPayload').detail("Bulk Data is Empty").toException()
+
         syncJobArgs.entityClass = getEntityClass()
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
-        Supplier supplierFunc = () -> doBulkParallel(dataList, jobContext)
-        return bulk(supplierFunc, jobContext)
-    }
-
-    /**
-     * Allows to pass in bulk of records at once, for example /api/book/bulk
-     * Each call creates a job that stores info for the call and is returned with results
-     * if jobContext.args.promiseEnabled = true will return right away
-     *
-     * @param supplierFunc the supplier(Promise) that gets passed to asyncService
-     * @param jobContext the jobContext with jobId created
-     * @return Job id
-     */
-    Long bulk(Supplier supplierFunc, SyncJobContext jobContext ) {
-        def asyncArgs = new AsyncArgs(enabled: jobContext.args.promiseEnabled, session: true)
-        // This is the promise call. Will return immediately is syncJobArgs.promiseEnabled=true
-        asyncService
-            .supplyAsync(asyncArgs, supplierFunc)
-            .whenComplete { res, ex ->
-                if(ex){ //should never really happen as we should have already handled any errors
-                    log.error("BulkableRepo unexpected exception", ex)
-                    jobContext.results << problemHandler.handleUnexpected(ex)
-                }
-                jobContext.finishJob()
-            }
-
-        return jobContext.jobId
+        //FIXME why are we setting session: true here? explain. should it be default?
+        def asyncArgs = jobContext.args.asyncArgs.session(true)
+        // This is the promise call. Will return immediately if syncJobArgs.async=true
+        return syncJobService.runJob(asyncArgs, jobContext, () -> doBulkParallel(dataList, jobContext))
     }
 
     void doBulkParallel(List<Map> dataList, SyncJobContext jobContext){
         List<Collection<Map>> sliceErrors = Collections.synchronizedList([] as List<Collection<Map>> )
 
         AsyncArgs pconfig = AsyncArgs.of(getDatastore())
-        pconfig.enabled = jobContext.args.asyncEnabled //same as above, ability to override through params
+        pconfig.enabled = jobContext.args.parallel //same as above, ability to override through params
         // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
         parallelTools.eachSlice(pconfig, dataList) { dataSlice ->
-            Long startTime = System.currentTimeMillis()
             ApiResults results
             try {
                 withTrx {
                     results = doBulk((List<Map>) dataSlice, jobContext.args)
                 }
-                if(results?.ok) updateJobResults(jobContext, results, startTime)
+                if(results?.ok) jobContext.updateJobResults(results, false)
                 // ((List<Map>) dataSlice)*.clear() //clear out so mem can be garbage collected
             } catch(Exception e) {
                 //on pass1 we collect the slices that failed and will run through them again with each item in its own trx
@@ -137,17 +113,14 @@ trait BulkableRepo<D> {
         // this time run each item in the slice in its own transaction
         if(sliceErrors.size()) {
             AsyncArgs asynArgsNoTrx = AsyncArgs.of(getDatastore())
-            asynArgsNoTrx.enabled = jobContext.args.asyncEnabled
+            asynArgsNoTrx.enabled = jobContext.args.parallel
             parallelTools.each(asynArgsNoTrx, sliceErrors) { dataSlice ->
                 try {
-                    Long startTime = System.currentTimeMillis()
                     ApiResults results = doBulk((List<Map>) dataSlice, jobContext.args, true)
-                    updateJobResults(jobContext, results, startTime)
-                    // ((List<Map>) dataSlice)*.clear() //clear out so mem can be garbage collected
+                    jobContext.updateJobResults(results, false)
                 } catch(Exception ex) {
-                    log.error("BulkableRepo unexpected exception", ex)
-                    // just in case, unexpected errors as we should have intercepted them all already in doBulk
-                    jobContext.results << problemHandler.handleException(ex)
+                    //log.error("BulkableRepo unexpected exception", ex)
+                    jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
                 }
             }
         }
@@ -172,8 +145,8 @@ trait BulkableRepo<D> {
         ApiResults results = ApiResults.create(false)
         for (Map item : dataList) {
             try {
-                Map entityMapData = bulkSaveEntity(item, syncJobArgs, transactionPerItem)
-                results << Result.OK().payload(entityMapData).status(syncJobArgs.isCreate() ? 201 : 200)
+                EntityResult<Map> entResult = bulkSaveEntity(item, syncJobArgs, transactionPerItem)
+                results << Result.OK().payload(entResult.entity).status(entResult.status)
             } catch(Exception e) {
                 // if trx by item then collect the exceptions, otherwise throw so it can rollback
                 if(transactionPerItem){
@@ -186,7 +159,7 @@ trait BulkableRepo<D> {
         }
         // flush and clear here so easier to debug problems and clear for memory to help garbage collection
         if(getDatastore().hasCurrentSession()) {
-            // if trx is at item then only clear
+            // if trx is per item then it already flushes at trx commit so only clear.
             transactionPerItem ? clear() : flushAndClear()
         }
 
@@ -200,18 +173,16 @@ trait BulkableRepo<D> {
      * @param data the item data
      * @param syncJobArgs - persistArgs and isCreate will be pulled from here
      * @param transactional true if should be wraped in withTrx
-     * @return the data map after bing run through buildSuccessMap using the includes in the syncJobArgs
+     * @return the EntityResult with the data map as entity after being run through buildSuccessMap
+     *         using the includes in the syncJobArgs
      */
-    Map bulkSaveEntity(Map data, SyncJobArgs syncJobArgs, boolean transactional) {
+    EntityResult<Map> bulkSaveEntity(Map data, SyncJobArgs syncJobArgs, boolean transactional) {
         //need to copy the incoming map, as during create(), repos may remove entries from the data map
         //or it can create circular references - eg org.contact.org - which would result in Stackoverflow when converting to json
         Map dataClone
 
-        if(data instanceof PathKeyMap){
-            // Initialize the PathKey map so that the deep nested structure is created  and repos can expect a deep nested map
-            // Clone after it is initialized, so that it will clone the deep nested structure and not flat map
-            data.init()
-            dataClone = data.cloneMap()   //clone it, probably from CSV
+        if(data instanceof LazyPathKeyMap){
+            dataClone = data.cloneMap()  //clone it, probably from CSV
         } else {
             dataClone = Maps.clone(data)
         }
@@ -219,10 +190,26 @@ trait BulkableRepo<D> {
         def closure = {
             doBeforeBulkSaveEntity(dataClone, syncJobArgs)
             PersistArgs pargs = syncJobArgs.persistArgs
-            D entityInstance = syncJobArgs.isCreate() ? doCreate(dataClone, pargs) : doUpdate(dataClone, pargs)
+            D entityInstance
+            DataOp op = syncJobArgs.op
+            int statusCode
+            if(op == DataOp.add) { // create
+                entityInstance = doCreate(dataClone, pargs)
+                statusCode = HttpStatus.CREATED.code
+            } else if (op == DataOp.update) { // update
+                entityInstance = doUpdate(dataClone, pargs)
+                statusCode = HttpStatus.OK.code
+            } else if (op == DataOp.upsert) { // upsert (insert or update)
+                EntityResult res = upsert(dataClone, pargs)
+                entityInstance = res.entity
+                statusCode = res.status.code
+            } else {
+                throw new UnsupportedOperationException("DataOp $op not supported")
+            }
             doAfterBulkSaveEntity(entityInstance, dataClone, syncJobArgs)
-            return buildSuccessMap(entityInstance, syncJobArgs.includes)
-        } as Closure<Map>
+            Map successMap = buildSuccessMap(entityInstance, syncJobArgs.includes)
+            return EntityResult.of(successMap).status(statusCode)
+        } as Closure<EntityResult<Map>>
 
         return transactional ? withTrx(closure) : closure()
     }
@@ -248,27 +235,12 @@ trait BulkableRepo<D> {
 
     /**
      * uses metaMapService to create the map for the includes in the jobContext.args
-     * Will return a clone to ensure that all properties are called and its a clean, unwrapped map
+     * Will return a clone to ensure that all properties are called
+     * and its a clean, unwrapped, no proxies, map
      */
     Map createMetaMap(D entityInstance, List<String> includes){
         MetaMap entityMapData = metaMapService.createMetaMap(entityInstance, includes)
         return (Map)entityMapData.clone()
-    }
-
-    /**
-     * calls jobContext.updateJobResults and swallows any unexpected exceptions
-     *
-     * @param jobContext the current jobContext
-     * @param results the results of the current slice
-     * @param startTimeMillis the start time in milliseconds used for logging elapsed time
-     */
-    void updateJobResults(SyncJobContext jobContext, ApiResults results, Long startTimeMillis = null){
-        try {
-            jobContext.updateJobResults(results, startTimeMillis)
-        } catch (e){
-            //ok to swallow thi excep since we dont want to disrupt the flow
-            log.error("Unexpected error during updateJobResults", e)
-        }
     }
 
     /**
@@ -290,4 +262,5 @@ trait BulkableRepo<D> {
         def event = new AfterBulkSaveEntityEvent<D>(self, entity, data, syncJobArgs)
         getRepoEventPublisher().publishEvents(self, event, [event] as Object[])
     }
+
 }

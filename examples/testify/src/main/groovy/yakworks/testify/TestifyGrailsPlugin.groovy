@@ -16,7 +16,7 @@ class TestifyGrailsPlugin extends Plugin {
         { ->
         //     xmlns context:"http://www.springframework.org/schema/context"
         //
-        //     context.'component-scan'('base-package': 'restify')
+        //     context.'component-scan'('base-package': 'testify')
         //     {
         //         context.'include-filter'(
         //             type:       'annotation',

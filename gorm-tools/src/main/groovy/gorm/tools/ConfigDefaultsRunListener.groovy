@@ -24,7 +24,7 @@ import org.springframework.core.env.ConfigurableEnvironment
  *   //gorm.flushMode = 'AUTO'
  *   gorm.failOnError = true
  *   gorm.default.mapping = {
- *     // id generator: 'gorm.tools.hibernate.SpringBeanIdGenerator'
+ *     // id generator: 'yakworks.gorm.hibernate.SpringBeanIdGenerator'
  *     '*'(cascadeValidate: 'dirty')
  *   }
  *   gorm.default.constraints = {
@@ -47,8 +47,8 @@ class ConfigDefaultsRunListener implements SpringApplicationRunListener  {
     @Override
     void environmentPrepared(ConfigurableBootstrapContext bootstrapContext, ConfigurableEnvironment environment) {
 
-        Map currentProperties = getCurrentConfig(environment)
-        String encoding = environment.getProperty('grails.config.encoding', String, 'UTF-8')
+        // Map currentProperties = getCurrentConfig(environment)
+        // String encoding = environment.getProperty('grails.config.encoding', String, 'UTF-8')
         environment.propertySources.addFirst(ConfigDefaults.propertySource)
     }
 

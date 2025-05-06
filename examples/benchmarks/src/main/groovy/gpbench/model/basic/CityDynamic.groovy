@@ -1,16 +1,16 @@
 package gpbench.model.basic
 
-import gorm.tools.repository.model.GormRepoEntity
-import gpbench.SecUtil
+
+import gorm.tools.repository.model.RepoEntity
 import gpbench.model.Country
 import gpbench.model.Region
-import gpbench.repo.CityDynamicRepo
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
+import yakworks.security.user.CurrentUserHolder
 
 @Entity
 @IdEqualsHashCode
-class CityDynamic implements GormRepoEntity<CityDynamic, CityDynamicRepo> {
+class CityDynamic implements RepoEntity<CityDynamic> {
     //transient springSecurityService
 
     String name
@@ -42,11 +42,11 @@ class CityDynamic implements GormRepoEntity<CityDynamic, CityDynamicRepo> {
     String toString() { name }
 
     def beforeInsert() {
-        dateCreatedUser = SecUtil.userId
+        dateCreatedUser = CurrentUserHolder.user.id as Long
     }
 
     def beforeUpdate() {
-        lastUpdatedUser = SecUtil.userId
+        lastUpdatedUser = CurrentUserHolder.user.id as Long
     }
 
 }

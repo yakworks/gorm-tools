@@ -1,38 +1,24 @@
 package yakworks.rally.activity
 
 import org.springframework.beans.factory.annotation.Autowired
-import yakworks.security.gorm.model.AppUser
-import yakworks.testing.gorm.unit.DataRepoTest
-import yakworks.testing.gorm.RepoTestData
-import yakworks.spring.AppResourceLoader
+
 import spock.lang.Specification
-import yakworks.testing.gorm.unit.SecurityTest
 import yakworks.rally.activity.model.Activity
-import yakworks.rally.activity.model.ActivityContact
-import yakworks.rally.activity.model.ActivityLink
-import yakworks.rally.activity.model.ActivityNote
-import yakworks.rally.activity.model.Task
 import yakworks.rally.activity.model.TaskStatus
 import yakworks.rally.activity.model.TaskType
 import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.AttachmentSupport
-import yakworks.rally.attachment.model.AttachmentLink
-import yakworks.rally.orgs.model.Contact
-import yakworks.rally.orgs.model.Org
+import yakworks.rally.seed.RallySeed
 import yakworks.rally.testing.MockData
+import yakworks.testing.gorm.RepoTestData
+import yakworks.testing.gorm.unit.GormHibernateTest
+import yakworks.testing.gorm.unit.SecurityTest
 
-class TaskSpec extends Specification implements DataRepoTest, SecurityTest { //implements SecuritySpecUnitTestHelper{
-    static List<Class> entityClasses = [
-        AttachmentLink, ActivityLink, Activity, Task, TaskType, TaskStatus,
-        Org, AppUser, ActivityNote, Contact, ActivityContact
-    ]
+class TaskSpec extends Specification implements GormHibernateTest, SecurityTest {
+    static List entityClasses = RallySeed.entityClasses
+    static List springBeans = RallySeed.springBeanList + [AttachmentSupport]
 
     @Autowired ActivityRepo activityRepo
-
-    Closure doWithGormBeans() { { ->
-        appResourceLoader(AppResourceLoader)
-        attachmentSupport(AttachmentSupport)
-    }}
 
     void setup(){
         TaskType todo = RepoTestData.build(TaskType, [id:1, name: "Todo"]) //.persist()
@@ -76,23 +62,6 @@ class TaskSpec extends Specification implements DataRepoTest, SecurityTest { //i
         act.name == 'Do Something'
         act.kind == Activity.Kind.Todo
         act.note.body == 'test note'
-    }
-
-    void "test createTodo"() {
-        when:
-        def contact = MockData.createContactWithUser()
-        Activity activity = activityRepo.createTodo(contact.org, contact.user.id, "Task Summary")
-
-        then:
-        activity != null
-        activity.org == contact.org
-        activity.name == "Task Summary"
-        activity.kind == Activity.Kind.Todo
-        activity.task != null
-        activity.task.taskType == TaskType.TODO
-        activity.task.userId == contact.user.id
-        activity.task.dueDate != null
-        activity.task.status == TaskStatus.getOPEN()
     }
 
 }

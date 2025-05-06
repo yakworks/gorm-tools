@@ -9,11 +9,9 @@ import java.time.LocalDateTime
 
 import groovy.transform.CompileDynamic
 
-import gorm.tools.hibernate.criteria.CreateCriteriaSupport
 import gorm.tools.model.NameNum
-import gorm.tools.repository.model.GormRepoEntity
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
-import grails.gorm.hibernate.annotation.ManagedEntity
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.security.audit.AuditStamp
@@ -26,13 +24,18 @@ import yakworks.security.audit.AuditStamp
 @Entity
 // @ManagedEntity //see ManagedEntitySinkSpec
 @GrailsCompileStatic
-class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRepo> {
+class KitchenSink implements NameNum, RepoEntity<KitchenSink>, Serializable {
     //<- ext belong to KitchenSink
     // since ext also has an KitchenSink property (kitchenParent) it will confused
     // example of how to explcitly force the "belongsTo"  with the mappedBy
     static mappedBy = [ext: "kitchenSink"]
     static hasMany = [stringList: String]
     static toOneAssociations = [ 'ext' ]
+
+    static Map includes = [
+        qSearch: ['id', 'num', 'name'],
+        stamp: ['id', 'num', 'name']
+    ]
 
     //strings
     String name2
@@ -86,6 +89,7 @@ class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRep
         ext column: 'extId', lazy: true
         thing column: 'thingId', lazy: true
         status enumType: 'identity'
+        sinkLink column: "sinkLinkId"
     }
 
     static constraintsMap = [

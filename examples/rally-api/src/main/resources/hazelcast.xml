@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+  <!--suppress XmlDefaultAttributeValue -->
+<hazelcast xmlns="http://www.hazelcast.com/schema/config"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.hazelcast.com/schema/config
+           http://www.hazelcast.com/schema/config/hazelcast-config-5.1.xsd">
+
+<!--
+    The name of the cluster. All members of a single cluster must have the same cluster name
+    configured and a client connecting to this cluster must use it as well.
+-->
+  <cluster-name>dev</cluster-name>
+  <instance-name>hz-member-1</instance-name>
+
+  <network>
+    <rest-api enabled="true">
+      <endpoint-group name="HEALTH_CHECK" enabled="true"/>
+      <endpoint-group name="DATA" enabled="true"/>
+    </rest-api>
+  </network>
+
+  <properties>
+    <!--set to 80 (default it 70) to reduce somen noise
+      see https://docs.hazelcast.com/hazelcast/5.2/maintain-cluster/monitoring#health-check-and-monitoring-->
+    <property name="hazelcast.health.monitoring.threshold.memory.percentage">80</property>
+    <property name="hazelcast.health.monitoring.threshold.cpu.percentage">80</property>
+    <!--These 3 should not be needed. was trying to match whats in hazel tests for default timeout-->
+    <property name="hazelcast.wait.seconds.before.join">0</property>
+    <property name="hazelcast.graceful.shutdown.max.wait">120</property>
+    <property name="hazelcast.partition.backup.sync.interval">1</property>
+  </properties>
+
+  <!--not sure if this is right, if test oks remove this comment-->
+  <map name="orgCrudApiList">
+    <!--
+        Maximum number of seconds for each entry to stay in the map. Entries that are
+        older than <time-to-live-seconds> and not updated for <time-to-live-seconds>
+        will get automatically evicted from the map.
+        Any integer between 0 and Integer.MAX_VALUE. 0 means infinite. Default is 0
+    -->
+    <time-to-live-seconds>1200</time-to-live-seconds>
+    <!--
+        Maximum number of seconds for each entry to stay idle in the map. Entries that are
+        idle(not touched) for more than <max-idle-seconds> will get
+        automatically evicted from the map. Entry is touched if get, put or containsKey is called.
+        Any integer between 0 and Integer.MAX_VALUE. 0 means infinite. Default is 0.
+    -->
+    <max-idle-seconds>1200</max-idle-seconds>
+
+  </map>
+
+</hazelcast>
+

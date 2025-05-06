@@ -9,11 +9,12 @@ import groovy.transform.CompileStatic
 import org.grails.plugins.web.rest.render.ServletRenderContext
 import org.springframework.beans.factory.annotation.Autowired
 
-import gorm.tools.api.IncludesConfig
 import grails.rest.render.RenderContext
 import grails.util.GrailsWebUtil
 import grails.web.mime.MimeType
 import yakworks.etl.excel.ExcelBuilder
+import yakworks.gorm.api.ApiConfig
+import yakworks.gorm.api.IncludesConfig
 import yakworks.message.MsgKey
 
 /**
@@ -31,6 +32,9 @@ trait XlsRendererTrait<T> implements RendererTrait<T> {
 
     @Autowired
     IncludesConfig includesConfig
+
+    @Autowired
+    ApiConfig apiConfig
 
     ExcelBuilder excelBuilder(RenderContext context) {
         def servletContext = (ServletRenderContext) context

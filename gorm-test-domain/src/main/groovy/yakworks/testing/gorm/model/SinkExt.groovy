@@ -14,13 +14,14 @@ import yakworks.commons.transform.IdEqualsHashCode
 @IdEqualsHashCode
 @Entity
 @GrailsCompileStatic
-class SinkExt implements NamedEntity, RepoEntity<SinkExt>{
+class SinkExt implements NamedEntity, RepoEntity<SinkExt>, Serializable {
     static belongsTo = [KitchenSink]
 
     KitchenSink kitchenParent
     String name
     String textMax
     Thing thing
+    BigDecimal totalDue = 0.0
 
     static mapping = {
         id generator: 'assigned'

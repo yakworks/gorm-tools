@@ -4,13 +4,13 @@
 */
 package yakworks.etl.excel
 
-
 import groovy.transform.CompileStatic
 
-import gorm.tools.api.IncludesConfig
+import yakworks.commons.beans.PropertyTools
 import yakworks.commons.lang.LabelUtils
-import yakworks.commons.lang.PropertyTools
-import yakworks.commons.map.Maps
+import yakworks.commons.lang.Validate
+import yakworks.commons.map.MapFlattener
+import yakworks.gorm.api.ApiConfig
 import yakworks.meta.MetaMapList
 import yakworks.meta.MetaProp
 
@@ -23,29 +23,31 @@ class ExcelBuilderSupport {
     /**
      * kind of a HACK until we clean up the new config. defaults to using whats in gridOptions.colModel
      */
-    static ExcelBuilder useIncludesConfig(ExcelBuilder eb, IncludesConfig includesConfig, MetaMapList dataList){
-        if(dataList.metaEntity){
+    static ExcelBuilder useIncludesConfig(ExcelBuilder eb, ApiConfig apiConfig, List<Map> dataList, String entityClass){
+
+        if(dataList instanceof MetaMapList && dataList.metaEntity){
             //flatten to get the titles
+            entityClass = dataList.metaEntity.className
             Map<String, MetaProp> metaProps = dataList.metaEntity.flatten()
             eb.includes = metaProps.keySet().toList()
-            def pcfg = includesConfig.findConfigByEntityClass(dataList.metaEntity.className)
-            pcfg = Maps.removePropertyListKeys(pcfg)
-            Map colMap = columnLabels(pcfg)
-            if (colMap) {
-                //set the keys from the config
-                eb.includes = colMap.keySet().toList()
-                //update to title to whats in col config.
-                metaProps.each { String key, MetaProp mp ->
-                    String label = colMap[key]
-                    if (label) mp.title = label
-                }
-                eb.headers = eb.includes.collect{
-                    MetaProp mp = metaProps[it]
-                    mp ? mp.title : LabelUtils.getNaturalTitle(it)
-                }
-            }
             // eb.headerTitles = metaProps.values().collect{ it.title } as Set<String>
+        } else if(dataList) {
+            //it could be a regular map in the case when the response was cached. in this case, get keys from the first row
+            Map flatMap = MapFlattener.of(dataList[0]).convertEmptyStringsToNull(false).flatten()
+            eb.includes = flatMap.keySet().toList()
         }
+
+        Map pcfg = apiConfig.getPathMap(entityClass, null)
+        Map colMap = columnLabels(pcfg)
+        if (colMap) {
+            //set the keys from the config
+            eb.includes = colMap.keySet().toList()
+            eb.headers = eb.includes.collect{
+                String label = colMap[it]
+                label ?: LabelUtils.getNaturalTitle(it)
+            }
+        }
+
         return eb
     }
 
@@ -57,8 +59,14 @@ class ExcelBuilderSupport {
         Map colMap = [:] as Map<String, String>
         if(colModel){
             colModel.each {
-                //TODO deal with the hidden values?
-                colMap[(it.name as String)] = it.label as String
+                if(!it.hidden) {
+                    //colModel need to specify at least field name or id, name/id is the name of domain field,
+                    //label is optional, if provided it would be used for xls header
+
+                    String columnName = it['name'] ?: it['id']
+                    Validate.notEmpty(columnName, "name  or id is required for columns in gridOptions.colMode")
+                    colMap[columnName] = it.label as String
+                }
             }
         }
         return colMap

@@ -75,7 +75,7 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
                 [id: tags[4].id]
             ]
         ]
-        def updatedAtt = Attachment.update(dta)
+        def updatedAtt = Attachment.repo.update(dta)
         flush()
         then:
         updatedAtt.tags.size() == 2
@@ -96,14 +96,14 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
                 [id: tags[4].id]
             ]
         ]
-        def updatedAtt = Attachment.update(dta)
+        def updatedAtt = Attachment.repo.update(dta)
         flush()
         then:
         updatedAtt.tags.size() == 3
 
     }
 
-    void "test op:update with empty array to remove all"() {
+    void "test op:update with empty array does nothing"() {
         when:
         def att = setupAnAttachmentWithTags()
         flushAndClear()
@@ -115,11 +115,55 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
                 op:'update', data: []
             ]
         ]
-        def updatedAtt = Attachment.update(dta)
+        def updatedAtt = Attachment.repo.update(dta)
 
-        then:
+        then: "still has them"
+        updatedAtt.hasTags()
+        TagLink.list(updatedAtt).size() == 3
+    }
+
+    void "test op:replace deafult with empty list"() {
+        when:
+        def att = setupAnAttachmentWithTags()
+        flushAndClear()
+
+        def id = att.id
+        def dta = [
+            id: att.id,
+            tags: []
+        ]
+        def updatedAtt = Attachment.repo.update(dta)
+
+        then: "still has them"
         !updatedAtt.hasTags()
         TagLink.list(updatedAtt).size() == 0
+    }
+
+    void "test op:remove with list"() {
+        setup:
+        def att = setupAnAttachmentWithTags()
+        def tag1Id = att.tags[0].id
+        assert tag1Id
+        //starts with 3
+        att.getTags().size() == 3
+        flushAndClear()
+
+        when:
+        //def id = att.id
+        def dta = [
+            id: att.id,
+            tags: [
+                op:'remove', data: [
+                    [id: tag1Id]
+                ]
+            ]
+        ]
+        def updatedAtt = Attachment.repo.update(dta)
+        flushAndClear()
+        updatedAtt.refresh()
+
+        then:
+        updatedAtt.tags.size() == 2
     }
 
     void "test op:remove on one"() {
@@ -138,7 +182,7 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
                 ]
             ]
         ]
-        def updatedAtt = Attachment.update(dta)
+        def updatedAtt = Attachment.repo.update(dta)
 
         then:
         updatedAtt.tags.size() == 2
@@ -164,7 +208,7 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
                 //so the above data only adds 2, there is 1 that exists not mentioned and it will remain
             ]
         ]
-        def updatedAtt = Attachment.update(dta)
+        def updatedAtt = Attachment.repo.update(dta)
         flush()
         then: "it kept the 2 existing and added 2 to the 3 that existed"
         updatedAtt.tags.size() == 5

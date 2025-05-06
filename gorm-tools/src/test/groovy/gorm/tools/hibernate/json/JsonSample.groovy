@@ -4,46 +4,34 @@
 */
 package gorm.tools.hibernate.json
 
-import groovy.transform.CompileDynamic
 
-import gorm.tools.hibernate.type.JsonType
-import gorm.tools.repository.model.UuidGormRepo
 import gorm.tools.repository.model.UuidRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import yakworks.gorm.hibernate.type.JsonType
 
 import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 
 @Entity
 @GrailsCompileStatic
-class JsonSample implements UuidRepoEntity<JsonSample, UuidGormRepo<JsonSample>> {
+class JsonSample implements UuidRepoEntity<JsonSample> {
     UUID id
     String name
 
     Map json = [:]
-    List someList = []
+    List<Integer> someList = []
 
     //json mapped to pogo
     Addy addy
 
-    // static mapping = orm {
-    //     id generator: "assigned"
-    //     version false
-    //     property("json", [type: JsonType, params: [clazz: Map.name] ])
-    //     // property("someList", [type: JsonType, params: [clazz: ArrayList.name] ])
-    //     property("someList", {
-    //         column([name: "someList"])
-    //         type = JsonType
-    //         typeParams = [clazz: ArrayList.name]
-    //     })
-    // }
-    @CompileDynamic
-    static Closure getMapping(){ { ->
+    static mapping = orm {
         id generator: "assigned"
-        json type: JsonType, params: [type: Map]
-        someList type: JsonType, params: [type: ArrayList]
-        addy type: JsonType, params: [type: Addy]
-    }}
+        columns(
+            json: property(type: JsonType, typeParams: [type: Map]),
+            someList: property(type: JsonType, typeParams: [type: ArrayList]),
+            addy: property(type: JsonType, typeParams: [type: Addy]),
+        )
+    }
 
     static constraints = {
         name nullable: false

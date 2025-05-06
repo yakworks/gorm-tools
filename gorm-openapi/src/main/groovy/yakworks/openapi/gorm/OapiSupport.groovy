@@ -30,19 +30,24 @@ class OapiSupport {
 
     OpenAPI openAPI
 
-    OapiSupport(){
+    OapiSupport build() {
+        //FUTURE allow different file to be specfied vs OAPI_SRC
         if(new ClassPathResource(OAPI_SRC).exists()) {
             openAPI = new OpenAPIV3Parser().read(OAPI_SRC)
         } else {
             log.error("Error finding $OAPI_SRC, OapiSupport not instantiated properly")
         }
+        return this
     }
 
-    private static OapiSupport _oapiSupport
+    // see good explanation of thread safe static instance stratgey https://stackoverflow.com/a/16106598/6500859
+    @SuppressWarnings('UnusedPrivateField')
+    private static class Holder {
+        private static final OapiSupport INSTANCE = new OapiSupport().build();
+    }
 
-    static OapiSupport instance(){
-        if(!_oapiSupport) _oapiSupport = new OapiSupport()
-        return _oapiSupport
+    static OapiSupport getInstance() {
+        return Holder.INSTANCE
     }
 
     boolean hasSchema(){

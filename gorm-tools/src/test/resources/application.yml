@@ -2,35 +2,29 @@
 
 spring.config.import: classpath:./gorm/tools/datasource-test.yml
 
+api.config.import: classpath:/api.yml,classpath*:/api/**/*.yml
+
 hibernate.jdbc.batch_size: 50
 
 ---
+hibernate:
+  format_sql: true
+  show_sql: true
 
-#logging:
-#  level:
-#    root: WARN
-#    # For unit test need to setup in the logback-test.xml
+# For unit tests change logback-test.xml to turn things on and off
+logging:
+  level:
+    root: WARN
+    # NOTE: For unit test need to setup logging in the logback-test.xml for SQL debugging
 #    org.springframework: WARN
 #    org.hibernate.orm.deprecation: OFF # turns off deprecation notices
 #    org.hibernate.SQL: DEBUG
 
-gorm:
-  tools:
-    hello: world
+
+yakworks:
+  gorm:
     async:
-      poolSize: 2
-      foo: bar
-    idGenerator:
-      startValue: 1
+      pool-size: 2
+    id-generator:
+      start-value: 1
 
----
-
-
-# add some api configs for testing
-api:
-  paths:
-    security:
-      sinkExt:
-        entityClass: 'yakworks.testing.gorm.model.SinkExt'
-        includes:
-          getCustom: ['id', 'name', 'thing.$stamp' ]

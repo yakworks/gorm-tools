@@ -18,12 +18,9 @@ import grails.buildtestdata.builders.PersistentEntityDataBuilder
 import yakworks.json.groovy.JsonEngine
 
 /**
- * static build methods to wrap {@link RepoTestData} and Jsonify's statics for the json-views.
+ * static build methods to wrap {@link RepoTestData}
  * These helpers enable the easy generation of test data in Map form to test methods like the
  * repo's create and update.
- * Note: when using this in unit test the {@link yakworks.testing.gorm.support.JsonViewSpecSetup} should
- * be used to make sure the proper view-tools beans are setup. This is alrady taken care of if using
- * one of the main DataRepoTest or DomainRepoTest traits
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.1
@@ -61,7 +58,7 @@ class TestDataJson {
 
         // if(fieldsToBuild.contains('id') && !getIncludeList(builder, ctx).contains('id') ) fieldsToBuild.remove('id')
 
-        fieldsToBuild.addAll(data.keySet())
+        fieldsToBuild.addAll(data.keySet() as Set<String>)
 
         builder.persistentEntity.associations.each{ Association assc ->
             if(fieldsToBuild.contains(assc.name) && !(assc.associatedEntity instanceof EmbeddedPersistentEntity)){

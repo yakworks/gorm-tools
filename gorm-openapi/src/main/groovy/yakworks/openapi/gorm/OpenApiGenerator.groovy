@@ -20,7 +20,8 @@ import yakworks.commons.lang.NameUtils
 import yakworks.commons.map.Maps
 import yakworks.commons.util.BuildSupport
 import yakworks.commons.util.StringUtils
-import yakworks.grails.support.ConfigAware
+import yakworks.gorm.api.ApiConfig
+import yakworks.gorm.api.PathItem
 import yakworks.yaml.YamlUtils
 
 import static ApiSchemaEntity.CruType
@@ -33,13 +34,19 @@ import static ApiSchemaEntity.CruType
  */
 @SuppressWarnings(['UnnecessaryGetter', 'AbcMetric', 'Println'])
 @CompileStatic
-class OpenApiGenerator implements ConfigAware {
+class OpenApiGenerator {
+    @Autowired ApiConfig apiConfig
     //inject src and build dirs when setting up bean
     String apiSrc
     String apiBuild
     List namespaceList
 
-    @Autowired GormToSchema gormToSchema
+    GormToSchema gormToSchema
+
+    GormToSchema getGormToSchema(){
+        if(!this.gormToSchema) this.gormToSchema = new GormToSchema()
+        return this.gormToSchema
+    }
 
     void generate(List nsList = []) {
         def buildDest = makeBuildDirs()
@@ -86,33 +93,25 @@ class OpenApiGenerator implements ConfigAware {
 
     //iterate over the restapi keys and add setup the yaml
     void spinThroughRestApi(Map api, List namespaceList){
-        Map restApiPaths = config.getProperty('api.paths', Map)
-
         List tags = (List)api.tags
         Map<String, List> newTagGroups = [:]
 
-        Map namespaces = config.getProperty('api.namespaces', Map, [:])
+        Map namespaces = apiConfig.namespaces ?: [:]
+        Map groupedPaths = apiConfig.paths.groupBy { it.value.namespace }
 
-        for(entry in restApiPaths){
-            if(namespaces.containsKey(entry.key)){
-                String namespace = entry.key
-                if(namespaceList && !namespaceList.contains(namespace)) continue
-                for(epoint in (Map)entry.value){
-                    String endpoint = (String)epoint.key
-                    processEndpoint(api, endpoint, namespace, (Map)epoint.value, newTagGroups, tags)
-                }
-            }
-            else { //normal not namespaced or may have slash like 'foo/bar' as key
-                String pathName = entry.key
-                Map pathCfg = (Map)entry.value
-                Map pathParts = splitPath(pathName, pathCfg)
-                String endpoint = pathParts.name
-                String namespace = pathParts.namespace
+        for(ns in namespaces){
+            //it is possible that there are no entities under a space, eg "reports"
+            Map spacePaths = groupedPaths[ns.key] ?: [:]
+            Map sortedPathz = spacePaths.sort{ it.key }
+            for(entry in sortedPathz){
+                PathItem pathItem = (PathItem)entry.value
+                String endpoint = pathItem.name
+                String namespace = pathItem.namespace
                 if(namespace && namespaceList && !namespaceList.contains(namespace)) continue
-                processEndpoint(api, endpoint, namespace, pathCfg, newTagGroups, tags)
+                processEndpoint(api, endpoint, namespace, pathItem, newTagGroups, tags)
             }
-
         }
+
         api.tags = tags
 
         mergeTagGroups(api, namespaces, newTagGroups)
@@ -151,9 +150,9 @@ class OpenApiGenerator implements ConfigAware {
 
     }
 
-    void processEndpoint(Map api, String endpoint, String namespace, Map pathMap, Map xTagGroups, List tags){
+    void processEndpoint(Map api, String endpoint, String namespace, PathItem pathItem, Map xTagGroups, List tags){
         Map tagEntry = [name: endpoint]
-        if(pathMap.description) tagEntry.description = pathMap.description
+        if(pathItem.description) tagEntry.description = pathItem.description
         tags = tags as List<Map>
         if(!tags.find { it.name == endpoint }) {
             tags << tagEntry
@@ -166,7 +165,7 @@ class OpenApiGenerator implements ConfigAware {
         ((List)xTagGroups[tagGroupKey]).add(endpoint)
 
         try{
-            createPaths(api, endpoint, namespace, pathMap)
+            createPaths(api, endpoint, namespace, pathItem)
         } catch(e){
             String msg = "Error on $endpoint"
             throw new IllegalArgumentException(msg, e)
@@ -174,7 +173,7 @@ class OpenApiGenerator implements ConfigAware {
     }
 
     //create the files for the path
-    Map createPaths(Map api, String endpoint, String namespace, Map restConfig){
+    Map createPaths(Map api, String endpoint, String namespace, PathItem pathItem){
         Map paths = (Map)api.paths ?: [:]
         String namespacePrefix = namespace ? "$namespace/" : ''
         String pathKey = "/${namespacePrefix}${endpoint}"//.toString()
@@ -185,7 +184,7 @@ class OpenApiGenerator implements ConfigAware {
         Files.createDirectories(getApiBuildPath().resolve(pathKeyPrefix))
 
         String capitalName = NameUtils.getClassNameFromKebabCase(endpoint)
-        String modelName = NameUtils.getShortName((String)restConfig.entityClass)
+        String modelName = NameUtils.getShortName(pathItem.entityClass)
         String baseDir = namespace ? '../../' : '../'
         Map model = [
             endpoint: endpoint, name: endpoint, capitalName: capitalName,
@@ -194,26 +193,26 @@ class OpenApiGenerator implements ConfigAware {
 
         //do no param path file
         String filePathRef = "${pathFileBase}.yaml"//.toString()
-        processTplFile(restConfig, 'paths/tpl.yaml', filePathRef, model)
+        processTplFile(pathItem, 'paths/tpl.yaml', filePathRef, model)
         //update the API key
         paths[pathKey] = ['$ref': filePathRef]
 
         //path Id file
         filePathRef = "${pathFileBase}@{id}.yaml"//.toString()
-        processTplFile(restConfig, 'paths/tpl@{id}.yaml', filePathRef, model)
+        processTplFile(pathItem, 'paths/tpl@{id}.yaml', filePathRef, model)
         paths[pathKeyId] = ['$ref': filePathRef]
 
         //if bulk operations are enabled
-        if(restConfig.bulkOps){
+        if(pathItem.bulkOps){
             paths["${pathKey}/bulk"] = ['$ref': "${pathFileBase}@bulk.yaml".toString()]
             filePathRef = "${pathFileBase}@bulk.yaml"//.toString()
-            processTplFile(restConfig, 'paths/tpl@bulk.yaml', filePathRef, model)
+            processTplFile(pathItem, 'paths/tpl@bulk.yaml', filePathRef, model)
         }
 
     }
 
 
-    void processTplFile(Map restConfig, String srcPath, String outputPath, Map model){
+    void processTplFile(PathItem pathItem, String srcPath, String outputPath, Map model){
         Path tplFile = getApiSrcPath().resolve(srcPath)
         String ymlTpl = tplFile.getText()
         ymlTpl = StringUtils.parseStringAsGString(ymlTpl, model)
@@ -222,7 +221,7 @@ class OpenApiGenerator implements ConfigAware {
         //parse the yaml
         Map pathMap = parseAndLoadYaml(srcPath, model)
         //remove ops that are not allowed
-        modifyForAllowedOps(restConfig, pathMap)
+        modifyForAllowedOps(pathItem, pathMap)
         //see if an existing tpl exists in paths to merge into the generated one
         Path existingTplFile = getApiSrcPath().resolve(outputPath)
         if(Files.exists(existingTplFile)){
@@ -252,9 +251,9 @@ class OpenApiGenerator implements ConfigAware {
         return new Yaml().load(ymlTpl)
     }
 
-    void modifyForAllowedOps(Map restConfig, Map pathMap){
+    void modifyForAllowedOps(PathItem pathItem, Map pathMap){
         //if it doesn't have the allowedOps then return
-        List allowedOps = restConfig.allowedOps as List
+        List allowedOps = pathItem.allowedOps
         if(!allowedOps) return
 
         if(!allowedOps.contains('create')){
@@ -271,9 +270,9 @@ class OpenApiGenerator implements ConfigAware {
     void generateModels() {
         def mapctx = GormMetaUtils.getMappingContext()
         for( PersistentEntity entity : mapctx.persistentEntities){
-            def map = gormToSchema.generate(entity, CruType.Read)
-            def mapCreate = gormToSchema.generate(entity, CruType.Create)
-            def mapUpdate = gormToSchema.generate(entity, CruType.Update)
+            def map = getGormToSchema().generate(entity, CruType.Read)
+            def mapCreate = getGormToSchema().generate(entity, CruType.Create)
+            def mapUpdate = getGormToSchema().generate(entity, CruType.Update)
             writeYmlModel(entity.javaClass, map, CruType.Read)
             writeYmlModel(entity.javaClass, mapCreate, CruType.Create)
             writeYmlModel(entity.javaClass, mapUpdate, CruType.Update)
@@ -289,21 +288,21 @@ class OpenApiGenerator implements ConfigAware {
         return path
     }
 
-    static Map splitPath(String resourceName, Map ctrlConfig){
-        Map pathParts = [name: resourceName, namespace: '']
-        if (resourceName.contains("/")) {
-            List parts = resourceName.split("[/]") as List
-            String name = parts.last()
-            pathParts['name'] = name
-            final int nestedIndex = resourceName.lastIndexOf('/')
-            String namespace = resourceName.substring(0, nestedIndex)
-            pathParts['namespace'] = namespace
-            return pathParts
-        } else {
-            pathParts['name'] = resourceName
-            if(ctrlConfig['namespace']) pathParts['namespace'] = ctrlConfig['namespace'] as String
-        }
-        return pathParts
-    }
+    // static Map splitPath(String resourceName, Map ctrlConfig){
+    //     Map pathParts = [name: resourceName, namespace: '']
+    //     if (resourceName.contains("/")) {
+    //         List parts = resourceName.split("[/]") as List
+    //         String name = parts.last()
+    //         pathParts['name'] = name
+    //         final int nestedIndex = resourceName.lastIndexOf('/')
+    //         String namespace = resourceName.substring(0, nestedIndex)
+    //         pathParts['namespace'] = namespace
+    //         return pathParts
+    //     } else {
+    //         pathParts['name'] = resourceName
+    //         if(ctrlConfig['namespace']) pathParts['namespace'] = ctrlConfig['namespace'] as String
+    //     }
+    //     return pathParts
+    // }
 
 }

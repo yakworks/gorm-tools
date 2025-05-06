@@ -1,0 +1,31 @@
+# Use Httyak plugin https://github.com/AnWeber/vscode-httpyac
+@host = http://localhost:8080
+@base_url = {{host}}/api
+
+## 404 not found
+GET {{base_url}}/security-tests/bad
+
+## 500 error
+GET {{base_url}}/security-tests/error500
+
+## TODO 400 validation
+# GET {{host}}/security-tests/error400
+
+## 401 unauth
+GET {{base_url}}/security-tests/error401
+
+### Login
+# @no-cookie-jar
+# @name login
+POST http://admin:123@localhost:8080/api/oauth/token
+Content-Type: application/json
+
+### error401 will succeed now
+# @no-cookie-jar
+# @ref login
+GET http://localhost:8080/api/security-tests/error401
+Authorization: Bearer {{login.access_token}}
+
+## error403 requires role that is not assigned
+GET {{host}}/api/security-tests/error403
+Authorization: Bearer {{login.access_token}}

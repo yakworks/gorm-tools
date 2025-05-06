@@ -28,7 +28,7 @@ class IdGenRepoSpec extends Specification implements GormHibernateTest {
 
     def "test generateId()"() {
         expect:
-        1 == Thing.repo.generateId()
+        1000 == Thing.repo.generateId()
     }
 
     def "test generateId(Ent)"() {
@@ -36,9 +36,9 @@ class IdGenRepoSpec extends Specification implements GormHibernateTest {
         def ent = new Thing()
 
         then:
-        2 == Thing.repo.generateId(ent)
+        1001 == Thing.repo.generateId(ent)
         //should be same if called again as it checks if id is null
-        2 == Thing.repo.generateId(ent)
-        ent.id == 2
+        1001 == Thing.repo.generateId(ent)
+        ent.id == 1001
     }
 }

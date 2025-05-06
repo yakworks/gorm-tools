@@ -63,7 +63,13 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
     ContactFlex flex
     AppUser user
 
-    static hasMany = [phones: ContactPhone, emails: ContactEmail, sources: ContactSource]
+    ContactSource source
+
+    /** transient for isPrimary when creating or updating a contact */
+    Boolean isPrimary
+
+    static transients = ['isPrimary']
+    static hasMany = [phones: ContactPhone, emails: ContactEmail]
 
     static List<String> toOneAssociations = ['flex']
 
@@ -82,44 +88,50 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
         user column: 'userId'
         //FIXME temp mapping until column change
         altName column: 'entityName'
+        source column: 'contactSourceId'
 
         flex cascade: "all"
         emails cascade: "all-delete-orphan"
         phones cascade: "all-delete-orphan"
-        sources cascade: "all-delete-orphan"
     }
 
     static constraintsMap = [
-        num:[ d:'num, used for job or orgnization type contacts', nullable: true, maxSize: 50],
-        name:[ nullable: false, maxSize: 50],
+        num:[ d:'num, used for job or organization type contacts', nullable: true],
+        name:[ d:'Name of Contact, joined using firstName + lastName', nullable: false],
 
-        altName:[d:'alternate name, nickname or job name', nullable: true],
-        inactive:[ d:'is active', nullable: false],
-        // isPrimary:[ nullable: false],
+        altName:[d:'Alternate name, nickname or job name'],
+        inactive:[ d:'True when not active', nullable: false],
+        isPrimary:[d: '''\
+            Set to true is this should this be set as the primary contact for the Org.
+            Not persisted to the data store, this only serves as an instruction command when creating or updating a contact.
+            If the Org already has a primary contact set then this contact will be set as the new primary leaving the old primary contact as
+            a normal contact.
+            ''', oapi:'CU'],
+        location:[ d:'Default location', nullable: true],
+        phone:[ d:'Default phone'],
+        email:[ d:'Default email', email: true],
+        //FIXME this is different than how we do OrgSource and ArTranSource, we require it in those cases.
+        // if we dont require it then we need to think through the implication in our design.
+        source:[ d: 'Originator source info', oapi:[read: true, create: ['source', 'sourceType', 'sourceId']], bindable: false],
 
-        // isLocationDifferent:[ nullable: false],
-        location:[ nullable: true],
-        phone:[ d:'default email', nullable: true],
-        email:[ d:'default phone', email: true, nullable: true],
-
-        firstName:[ nullable: false, maxSize: 50],
+        firstName:[ d:'First name', nullable: false, maxSize: 50],
         // middleName:[ nullable: true, maxSize: 50],
-        lastName:[ nullable: true, maxSize: 50],
+        lastName:[ d:'Last name', nullable: true, maxSize: 50],
         // nickName:[ nullable: true, maxSize: 50],
         // salutation:[ nullable: true, maxSize: 50],
         jobTitle:[ d:'Job title', nullable: true, maxSize: 50],
         // department:[ nullable: true, maxSize: 50],
         // birthday:[ nullable: true],
-        comments:[ d:'notes about the contact', nullable: true],
+        comments:[ d:'Notes about the contact'],
 
-        tagForReminders:[ d:'if this contact should get correspondence', nullable: false],
+        tagForReminders:[ d:'If this contact should get correspondence', nullable: false],
         org:[ description: 'The organization this contact belongs to'],
         orgId:[ description: 'The org id for the contact', nullable: false],
 
         // visibleToOrgType:[ nullable: true],
 
-        flex:[ d:'custom user fields for this contact', nullable: true],
-        user:[ d:'the user if this contact is able to login', nullable: true],
+        flex:[ d:'Custom user fields for this contact', nullable: true],
+        user:[ d:'The user if this contact is able to login', nullable: true],
     ]
 
     static ContactRepo getRepo() { RepoLookup.findRepo(this) as ContactRepo }

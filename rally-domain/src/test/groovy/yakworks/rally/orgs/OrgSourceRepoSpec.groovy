@@ -1,14 +1,18 @@
 package yakworks.rally.orgs
 
 import spock.lang.Specification
+import yakworks.rally.activity.model.Activity
+import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgType
+import yakworks.rally.orgs.model.PartitionOrg
+import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
-import yakworks.testing.gorm.unit.DataRepoTest
 
-class OrgSourceRepoSpec extends Specification implements DataRepoTest, SecurityTest {
-    static List entityClasses = [Org, OrgSource]
+class OrgSourceRepoSpec extends Specification implements GormHibernateTest, SecurityTest {
+    static entityClasses = [Activity, Org, OrgSource, PartitionOrg]
+    static List springBeans = [OrgProps]
 
     void testInsertOrgSources(){
         when:
@@ -41,8 +45,6 @@ class OrgSourceRepoSpec extends Specification implements DataRepoTest, SecurityT
 
         then:
         os != null
-
-
     }
 
     void "test find org by sourceid created from num"() {
@@ -50,13 +52,13 @@ class OrgSourceRepoSpec extends Specification implements DataRepoTest, SecurityT
         Org org = Org.of("foo", "bar", OrgType.Customer)
         Org.repo.createSource(org)
         org.persist()
+        flush()
 
         then: "source id is the default"
         assert org.source.sourceId == "foo"
 
         OrgSource os = OrgSource.findBySourceIdAndOrgType('foo', OrgType.Customer)
         assert os
-
     }
 
 }

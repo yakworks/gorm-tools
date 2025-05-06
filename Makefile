@@ -8,12 +8,21 @@ include $(SHIPKIT_DIR)/makefiles/vault.make
 include $(SHIPKIT_DIR)/makefiles/spring-common.make
 include $(SHIPKIT_DIR)/makefiles/ship-gh-pages.make
 # DB = true # set this to true to turn on the DB environment options
+gw ?= ./gradlew
+
+# open api targets
+include ./api-docs/Makefile
 
 ## Run spotlessApply and normal check
 check: lint
 	# $(gradlew) spotlessApply
 	# $(gradlew) check --max-workers=3
 	$(gradlew) check
+
+## clean and remove the .build-cache/
+clean.all:
+	rm -rf .build-cache/
+	$(MAKE) clean
 
 # should run vault.decrypt before this,
 # sets up github, kubernetes and docker login
@@ -46,6 +55,9 @@ publish.snapshot:
 		$(gradlew) publishJavaLibraryPublicationToMavenRepository
 		$(logr.done) "- libs with version $(VERSION)$(VERSION_SUFFIX) published to snapshot repo"
 	fi
+
+## alias to publish.snapshot
+snapshot.publish: publish.snapshot
 
 ## Build snapshot and publishes to your local maven.
 snapshot:
@@ -115,13 +127,26 @@ endif
 
 ## shows gorm-tools:dependencies --configuration runtime
 gradle.dependencies:
-	 ./gradlew gorm-tools:dependencies --configuration compileClasspath
+	 $(gw) gorm-tools:dependencies # --configuration compileClasspath
 	# ./gradlew rally-api:dependencies --configuration compileClasspath
 	#./gradlew rally-security:dependencies --configuration compileClasspath
 
+rally-api.dependencies:
+	./gradlew rally-api:dependencies --configuration compileClasspath
+	#./gradlew rally-security:dependencies --configuration compileClasspath
+
+## shows spring dependencyManagement, modify to show other projects https://bit.ly/3CpcIls
+spring.dependencyManagement:
+	$(gw) gorm-tools:dependencyManagement
+
+## shows spring dependencyManagement, modify to show other projects https://bit.ly/3CpcIls
+gradle.buildEnvironment:
+	$(gw) buildEnvironment
+	$(gw) gorm-tools:buildEnvironment
+
 ## runs the benchmark tests
 test.benchmarks:
-	$(gradlew) benchmarks:assemble
+	$(gw) benchmarks:assemble
 	cd examples/benchmarks
 	java -server -Xmx3g -XX:MaxMetaspaceSize=256m \
 		-DmultiplyData=3 -Dgorm.tools.async.poolSize=4 -Djava.awt.headless=true \
@@ -133,57 +158,18 @@ test.benchmarks:
 #		-XX:+ScavengeBeforeFullGC -XX:+CMSScavengeBeforeRemark \
 #		-XX:SurvivorRatio=8 \
 
-# start the restify example jar
+## start the rally-api example jar
 start.rally-api: # start.db
-	${gradlew} restify:assemble
-	cd examples/restify
-	java -server -Xmx2g -jar build/libs/restify.jar
+	${gradlew} rally-api:assemble
+	cd examples/rally-api
+	java -server -Xmx2g -jar build/libs/rally-api.jar
 
-#oapi.docs-publish:
-#	cp -r api-docs/build/_site/. build/api-docs
-#	cp api-docs/build/api.yaml build/api-docs
-#	$(MAKE) oapi.docs-push
-#	$(logr.done)
-
-# builds the eleventy docs with npm
-oapi.docs-build:
-	cd api-docs
-	npm install
-	npm run build
-	$(logr.done)
 
 # clones the api-docs branch or this project where we will publish/push
-#oapi.docs-clone:
+# oapi.docs-clone:
 #	mkdir -p $(BUILD_DIR) && rm -rf "$(API_DOCS_BUILD_DIR)"
 #	git clone $(GITHUB_URL) $(API_DOCS_BUILD_DIR) -b $(API_DOCS_BRANCH) --single-branch --depth 1
 #	$(logr.done)
-
-# pushes the changes to the api-docs branch, the way the docs works is it pulls from repo on docker startup and builds
-oapi.docs-push:
-	git -C $(API_DOCS_BUILD_DIR) add -A .
-	# or true so doesnt blow error if no changes
-	git -C $(API_DOCS_BUILD_DIR) commit -a -m "CI API docs published [skip ci]" || true
-	git -C $(API_DOCS_BUILD_DIR) push -q $(GITHUB_URL) $(API_DOCS_BRANCH) || true
-	$(logr.done)
-
-# starts the eleventy server for the api docs, assumes the oapi.generate-api-yaml has been generated already into the dist
-oapi.start:
-	cd api-docs && npm run start
-
-# Runs the test that generates the api.yml from the domains.
-oapi.generate-api-yaml:
-	# HACK, rm test-results to force a run if only editing yaml
-	rm -rf examples/restify/build/test-results
-	${gradlew} restify:integrationTest --tests *OpenapiGeneratorSpec*
-
-# generates api yaml with grails test and runs oapi.start
-oapi.generate-start: oapi.generate-api-yaml oapi.start
-
-oapi.bundle:
-	cd api-docs
-	npm run oapi:bundle
-
-oapi.build: oapi.generate-api-yaml oapi.bundle
 
 ## run to get into builder shell
 # make oapi.generate-apy-yaml
@@ -193,13 +179,6 @@ oapi.build: oapi.generate-api-yaml oapi.bundle
 # npm run start
 BIN_BASH=/bin/bash
 DOCKER_SHELL=yakworks/bullseye:dev
-
-# open shell for oapi
-oapi.shell:
-	docker run --name oapi-shell -it --rm \
-	  -v "$$PWD":/root/project:delegated  \
-	  -p 4567:4567 \
-	  $(DOCKER_SHELL) $(BIN_BASH)
 
 # for testing set up .env or export both GITHUB_TOKEN and the base64 enocded GPG_KEY from lastpass.
 docker.circle.shell:
@@ -211,3 +190,52 @@ docker.circle.shell:
 	-v "$$PWD":/root/project \
 	$(DOCKER_SHELL) $(BIN_BASH)
 	#	-v ~/.gradle_docker:/root/.gradle \
+
+test.token.txt:
+	TOKEN=`http POST admin:123@localhost:8080/api/oauth/token.txt -b`
+	echo "$$TOKEN"
+	http localhost:8080/api -A bearer -a "$$TOKEN"
+
+test.token:
+	RESP=`http -a admin:123 -b POST http://localhost:8080/api/oauth/token`
+	# use awk to parse out the access_token
+	TOKEN=`echo $$RESP | awk -F'"' -v RS="," '/access_token/{ print $$4 }'`
+	echo "$$TOKEN"
+	http localhost:8080/api -A bearer -a "$$TOKEN"
+
+test.token-exchange:
+	RESP=`http -a admin:123 -b POST http://localhost:8080/api/oauth/token`
+	# use awk to parse out the access_token
+	TOKEN=`echo $$RESP | awk -F'"' -v RS="," '/access_token/{ print $$4 }'`
+	echo "$$TOKEN"
+
+	echo "curl -X POST -H 'Authorization: Bearer $$TOKEN' \
+      -d requested_subject=developers@9ci.com \
+      -d grant_type=urn:ietf:params:oauth:grant-type:token-exchange \
+      http://localhost:8080/api/oauth/token"
+	sleep 1
+
+	curl -X POST -H 'Authorization: Bearer $$TOKEN' \
+	-d requested_subject=developers@9ci.com \
+	-d grant_type=urn:ietf:params:oauth:grant-type:token-exchange \
+	http://localhost:8080/api/oauth/token
+	# http localhost:8080/api -A bearer -a "$$TOKEN"
+
+test.token.cookie:
+	RESP=`https -b POST admin:123@localhost:8080/api/oauth/token`
+	# use awk to parse out the access_token
+	TOKEN=`echo $$RESP | awk -F'"' -v RS="," '/access_token/{ print $$4 }'`
+	echo "$$TOKEN"
+	http localhost:8080/api Cookie:jwt="$$TOKEN"
+
+# curl -X POST -H 'Authorization: Bearer 4g2134lkjlkj1324.....' \
+#  -d requested_subject=user@customer.com \
+#  -d grant_type=urn:ietf:params:oauth:grant-type:token-exchange \
+#	https://rcm-api.9ci.io/api/token
+
+test.hello-post:
+	RESP=`http -b POST localhost:8080/api/login username=admin password=123`
+	echo $$RESP
+	TOKEN=`echo $$RESP | awk -F'"' -v RS="," '/access_token/{ print $$4 }'`
+	echo $$TOKEN
+	http localhost:8080 -A bearer -a "$$TOKEN"

@@ -27,7 +27,7 @@ class RepoTestData {
 
     static InitialPropsResolver initialPropsResolver
 
-    static final Map BUILDERS = [: ] as Map<Class, DataBuilder>
+    static final Map BUILDERS = [:] as Map<Class, DataBuilder>
     static final List<DataBuilderFactory> FACTORIES = []
 
     //override the stock one to use persist
@@ -75,6 +75,8 @@ class RepoTestData {
             }
             propValues = ((args?.data) ? args.remove('data') : args) as Map<String, Object>
         }
+        //defaults to flush if save is true and flush wasn't passed in
+        if (!newArgs.containsKey('flush')) newArgs['flush'] = true
         return build(newArgs, entityClass, propValues)
     }
 
@@ -124,7 +126,7 @@ class RepoTestData {
         if(!BUILDERS.containsKey(clazz)){
             BUILDERS.put(clazz, createBuilder(clazz))
         }
-        BUILDERS.get(clazz)
+        return (DataBuilder)BUILDERS.get(clazz)
     }
 
     /**

@@ -4,19 +4,22 @@
 */
 package testing
 
+
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
+import yakworks.gorm.hibernate.type.JsonType
 
+import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 import static yakworks.json.groovy.JsonEngine.parseJson
 
 @IdEqualsHashCode
 @Entity
 @GrailsCompileStatic
-class TestSyncJob implements RepoEntity<TestSyncJob>, SyncJobEntity<TestSyncJob> {
+class TestSyncJob implements RepoEntity<TestSyncJob>, SyncJobEntity {
 
     //parseJson
     <T> T parseData(Class<T> clazz = List){
@@ -38,9 +41,12 @@ class TestSyncJob implements RepoEntity<TestSyncJob>, SyncJobEntity<TestSyncJob>
 
     static TestSyncJobRepo getRepo() { RepoLookup.findRepo(this) as TestSyncJobRepo }
 
-    static mapping = {
-        state column: 'state', enumType: 'identity'
-        payloadBytes sqlType: 'BLOB'
-        dataBytes sqlType: 'BLOB'
+    static mapping = orm {
+        //id(generator: "assigned")
+        columns(
+            payloadBytes: property(sqlType: 'BLOB'),
+            dataBytes: property(sqlType: 'BLOB'),
+            problems: property(type: JsonType, typeParams: [type: ArrayList])
+        )
     }
 }

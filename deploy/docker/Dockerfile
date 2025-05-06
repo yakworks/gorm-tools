@@ -1,6 +1,5 @@
 FROM yakworks/alpine-jre:8
 
-# FIXME this is not good for security, do we really need it?
 USER root
 
 WORKDIR /app

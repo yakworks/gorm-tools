@@ -4,17 +4,20 @@
 */
 package gorm.tools.utils
 
+import org.grails.datastore.mapping.model.PersistentProperty
 import spock.lang.Specification
 import testing.Cust
 import testing.CustType
+import testing.UuidSample
+import yakworks.security.gorm.model.SecRoleUser
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class GormMetaUtilsSpec extends Specification implements GormHibernateTest {
 
-    static List entityClasses = [Cust, CustType]
+    static List entityClasses = [Cust, CustType, UuidSample, SecRoleUser]
 
     void setupSpec(){
-        new CustType(name: 'foo').persist(flush: true)
+        new CustType(id: 1, name: 'foo').persist(flush: true)
     }
 
     def "GetPersistentEntity name string"() {
@@ -39,10 +42,18 @@ class GormMetaUtilsSpec extends Specification implements GormHibernateTest {
         GormMetaUtils.findPersistentEntity("testing.Cust")
     }
 
-    def "getPersistentProperties"(){
+    void "getPersistentProperties"(){
         expect:
         GormMetaUtils.getPersistentProperties("testing.Cust").size()
         GormMetaUtils.getPersistentProperties("testing.Cust").find{it.name == "id"} != null
+
+        when: "when domain has composite identity"
+        List<PersistentProperty> pprops = GormMetaUtils.getPersistentProperties("yakworks.security.gorm.model.SecRoleUser")
+
+        then:
+        pprops.find { it == null} == null //there should be no null prop in persistent props list
+        pprops.find { it.name == 'user'}
+        pprops.find { it.name == 'role'}
     }
 
     void "test getMetaProperties"() {
@@ -66,12 +77,57 @@ class GormMetaUtilsSpec extends Specification implements GormHibernateTest {
         custTypeMap == [id:1, version:0, name: 'foo']
     }
 
-    void "test getProperties"() {
+    void "test isNewOrDirty"() {
         when:
-        Map custTypeMap = GormMetaUtils.getProperties(CustType.get(1))
+        CustType ctNew = new CustType(name: 'foo')
+        UuidSample ctNewUuid = new UuidSample()
+        CustType ctDirty = new CustType(name: "foo").persist()
+        ctDirty.name = 'dirty'
 
         then:
-        custTypeMap == [id:1, version:0, name: 'foo']
+        GormMetaUtils.isNewOrDirty(ctNew)
+        GormMetaUtils.isNewOrDirty(ctNewUuid)
+        GormMetaUtils.isNewOrDirty(ctDirty)
+
+        when: "id is assigned it will still show as new"
+        ctNew.id = 99
+        UuidSample.repo.generateId(ctNewUuid)
+
+        then:
+        ctNew.id
+        ctNewUuid.id
+        GormMetaUtils.isNewOrDirty(ctNew)
+        GormMetaUtils.isNewOrDirty(ctNewUuid)
+
+        when: "version is assigned its no longer new"
+        // ctNew.persist()
+        // ctNewUuid.persist()
+        ctNew.version = 0
+        ctNewUuid.version = 0
+        //trackChanges resets the tracking.
+        ctNew.trackChanges()
+        ctNewUuid.trackChanges()
+
+        then:
+        !ctNew.hasChanged()
+        !GormMetaUtils.isNewOrDirty(ctNew)
+        !GormMetaUtils.isNewOrDirty(ctNewUuid)
+    }
+
+    void "test getEntityClass"() {
+        when:
+        CustType type = CustType.load(999) //doesnt matter, it returns a proxy and thts what we want to verify
+
+        then: "its a proxy"
+        type.getClass().name.contains('$')
+        type.getClass().name != 'testing.CustType'
+
+
+        when:
+        Class clazz = GormMetaUtils.getEntityClass(type)
+
+        then:
+        clazz.name == "testing.CustType"
     }
 
 }

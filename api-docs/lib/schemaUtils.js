@@ -14,6 +14,7 @@ function groupSchemasByXEntity(oapi){
   sKeys.forEach((skey) => {
     let schema = schemas[skey]
     let entity = schema['x-entity']
+    entity = entity == undefined ? "System" : entity
     if (!entitySchemas[entity]) {
       entitySchemas[entity] = {};
     }
@@ -94,7 +95,10 @@ function getType(prop, rootPath){
     type = 'object( ' + getSchemaLink(prop.$ref, rootPath) + ' )';
   } else if((prop.type === 'array') && prop.items && prop.items.$ref){
     type = 'array[ ' + getSchemaLink(prop.items.$ref, rootPath) + ' ]';
-  } else {
+  } else if((prop.type === 'array') && prop.items && prop.items.type){
+    type = 'array[ ' + prop.items.type + ' ]';
+  }
+  else {
     if (prop.format) type = type + '('+prop.format+')';
   }
   if (prop.nullable === true) {

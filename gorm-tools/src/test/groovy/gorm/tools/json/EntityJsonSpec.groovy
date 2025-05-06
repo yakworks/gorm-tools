@@ -51,9 +51,9 @@ class EntityJsonSpec extends Specification implements GormHibernateTest {
         return JsonEngine.toJson(elist)
     }
 
-    void "test Org json stock"() {
+    void "test CustType json stock"() {
         when:
-        def custType = build(CustType)
+        def custType = build(CustType, id:1)
         def res = JsonEngine.toJson(custType)
 
         then:
@@ -63,7 +63,7 @@ class EntityJsonSpec extends Specification implements GormHibernateTest {
     void "test Org json stock"() {
         when:
         def excludes = ['version']
-        def org = build(Cust)
+        def org = build(Cust, id:1)
         def res = toJson(org, ['*', 'type'], excludes)
 
         then:
@@ -75,7 +75,7 @@ class EntityJsonSpec extends Specification implements GormHibernateTest {
             "kind":"CLIENT",
             "beforeValidateCheck":"got it",
             "testIdent":{"id":2,"name":"Num2"},
-            "type":{"id":2}
+            "type":{"id":1000}
         }
         ''')
 
@@ -145,23 +145,6 @@ class EntityJsonSpec extends Specification implements GormHibernateTest {
 
         then:
         result == '[{"name":"name"},{"name":"name"}]'
-    }
-
-    @Ignore //See https://github.com/yakworks/gorm-tools/issues/475
-    void "test buildJson excludes"() {
-        when:
-        def org = build(includes: '*')
-        //FIXME it should automtically exclude the ext.org since its the other side of the association
-        def result =  toJson(org, [excludes:['ext.org']])
-
-        def expected = '''{
-            id:1, name:'name', ext:[id:1, text1:'text1'],
-            date:'2018-01-26T01:36:02Z', inactive:false, locDateTime:'2018-01-01T01:01:01',
-            amount2:0, locDate:'2018-01-25', amount:0, name2:'name2'}'''
-
-        then:
-        assertThatJson(res).isEqualTo(expected)
-
     }
 
 }

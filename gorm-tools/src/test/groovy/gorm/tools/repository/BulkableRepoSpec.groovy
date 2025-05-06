@@ -1,7 +1,9 @@
 package gorm.tools.repository
 
 import gorm.tools.async.AsyncService
-import gorm.tools.config.AsyncConfig
+import yakworks.api.problem.data.DataProblem
+import yakworks.api.problem.data.DataProblemException
+import yakworks.gorm.config.AsyncConfig
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobState
 import gorm.tools.problem.ValidationProblem
@@ -12,7 +14,7 @@ import org.springframework.http.HttpStatus
 import spock.lang.Specification
 import testing.TestSyncJob
 import testing.TestSyncJobService
-import yakworks.commons.map.PathKeyMap
+import yakworks.commons.map.LazyPathKeyMap
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.testing.gorm.model.SinkExt
@@ -22,15 +24,14 @@ import static yakworks.json.groovy.JsonEngine.parseJson
 
 class BulkableRepoSpec extends Specification implements GormHibernateTest {
     static entityClasses = [KitchenSink, SinkExt, TestSyncJob]
-    static springBeans = [syncJobService: TestSyncJobService]
+    static springBeans = [TestSyncJobService]
 
     @Autowired AsyncConfig asyncConfig
     @Autowired AsyncService asyncService
     @Autowired KitchenSinkRepo kitchenSinkRepo
 
     SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
-        return new SyncJobArgs(asyncEnabled: false, op: op, source: "test", sourceId: "test",
-            includes: ["id", "name", "ext.name"])
+        return new SyncJobArgs(parallel: false, async:false, op: op, source: "test", sourceId: "test", includes: ["id", "name", "ext.name"])
     }
 
     void "sanity check bulkable repo"() {
@@ -260,8 +261,8 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
         given:
         List data = [] as List<Map>
 
-        data << PathKeyMap.of([num:'1', name:'Sink1', ext_name:'SinkExt1', bazMap_foo:'bar'], '_')
-        data << PathKeyMap.of([num:'2', name:'Sink2', ext_name:'SinkExt2', bazMap_foo:'bar'], '_')
+        data << LazyPathKeyMap.of([num:'1', name:'Sink1', ext_name:'SinkExt1', bazMap_foo:'bar'], '_')
+        data << LazyPathKeyMap.of([num:'2', name:'Sink2', ext_name:'SinkExt2', bazMap_foo:'bar'], '_')
 
         when: "bulk insert 2 records"
         SyncJobArgs args = setupSyncJobArgs()
@@ -317,4 +318,42 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
         }
     }
 
+    void "test buildErrorMap"() {
+        setup:
+        Map data = [name:"cust-1", num:"cust-1", id:1]
+
+        expect: "when no includes"
+        kitchenSinkRepo.buildErrorMap(data, null) == data
+
+        and: "when includes provided"
+        kitchenSinkRepo.buildErrorMap(data, ["id", "num"]) == [id:1, num: "cust-1"]
+    }
+
+    void "test buildSuccessMap"() {
+        setup:
+        KitchenSink kitchenSink = new KitchenSink(name: "name", secret: "secret", ext: new SinkExt(name:"ext-name", textMax: "test"))
+
+        when: "when includes provided"
+        Map result = kitchenSinkRepo.buildSuccessMap(kitchenSink, ["name", "ext.name"])
+
+        then:
+        result.size() == 2
+        result == [name: "name", ext:[name: "ext-name"]]
+    }
+
+    void "test empty data"() {
+        when:
+        Long jobId = kitchenSinkRepo.bulk(null, setupSyncJobArgs())
+
+        then:
+        DataProblemException ex = thrown()
+        ex.code == 'error.data.emptyPayload'
+
+        when:
+        jobId = kitchenSinkRepo.bulk([], setupSyncJobArgs())
+
+        then:
+        DataProblemException ex2 = thrown()
+        ex2.code == 'error.data.emptyPayload'
+    }
 }

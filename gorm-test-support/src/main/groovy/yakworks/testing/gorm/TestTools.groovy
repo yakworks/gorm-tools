@@ -4,9 +4,13 @@
 */
 package yakworks.testing.gorm
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEntity
+import org.springframework.core.convert.converter.Converter
+import org.springframework.core.convert.support.ConfigurableConversionService
+import org.springframework.core.env.ConfigurableEnvironment
 
 /**
  * Misc utils for testing, asserting and "helpers" in spock tests
@@ -15,7 +19,29 @@ import org.grails.datastore.gorm.GormEntity
  * @since 6.1
  */
 @CompileStatic
+@SuppressWarnings(['ClassForName','MethodParameterTypeRequired'])
 class TestTools {
+
+    static void addEnvConverters(ConfigurableEnvironment env){
+        ConfigurableConversionService conversionService = env.getConversionService()
+        conversionService.addConverter(new Converter<String, Class>() {
+            @Override
+            Class convert(String source) {
+                Class.forName(source)
+            }
+        })
+    }
+
+    @CompileDynamic
+    static void addConfigConverters(cfg){
+        // ConfigurableConversionService conversionService = cfg.conversionService
+        cfg.@conversionService.addConverter(new Converter<String, Class>() {
+            @Override
+            Class convert(String source) {
+                Class.forName(source)
+            }
+        })
+    }
 
     /**
      * Checks if the GormEntity's properties contains whats in expected

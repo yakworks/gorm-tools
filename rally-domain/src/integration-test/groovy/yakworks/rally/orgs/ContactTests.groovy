@@ -23,6 +23,33 @@ class ContactTests extends Specification implements DomainIntTest {
 
     ContactRepo contactRepo
 
+    void "create"() {
+        setup:
+        Org org = Org.create(num:"foo",name:"bar", orgTypeId: OrgType.Customer.id)
+        flush()
+
+        expect:
+        org.id
+        org.source
+
+        when:
+        Map data = [firstName: "C1",  "num": "C1", org:[source:[sourceId:org.source.sourceId, orgType:'Customer']]]
+        Contact contact = Contact.create(data)
+
+        and:
+        flushAndClear()
+        contact.refresh()
+
+        then:
+        noExceptionThrown()
+        contact
+        contact.source == null
+        contact.orgId == org.id
+
+        and:
+        ContactSource.countByContactId(contact.id) == 0
+    }
+
     def "listActive should only return active contacts"() {
         when:
         def result = Contact.listActive(9)
@@ -46,7 +73,7 @@ class ContactTests extends Specification implements DomainIntTest {
     def testDeleteFailure_ForLoggedInUserContact(){
 
         expect:
-        secService.userId == 1
+        currentUser.userId == 1
 
         when:
         Contact contact = Contact.get(1)
@@ -71,7 +98,6 @@ class ContactTests extends Specification implements DomainIntTest {
         ContactEmail email = new ContactEmail(contact: contact, address: "test").persist()
         ContactFlex flex = new ContactFlex(id: contact.id, text1: "test").persist()
         ContactPhone phone = new ContactPhone(contact: contact, num: "123").persist()
-        ContactSource source = new ContactSource(contact: contact, source:"9ci", sourceType: "App", sourceId: "x").persist()
         Location l = Location.first()
         l.contact = contact
         l.persist()
@@ -79,7 +105,6 @@ class ContactTests extends Specification implements DomainIntTest {
         contact.flex = flex
         contact.addToEmails(email)
         contact.addToPhones(phone)
-        contact.addToSources(source)
         contact.persist()
 
         flushAndClear()
@@ -87,15 +112,16 @@ class ContactTests extends Specification implements DomainIntTest {
         when:
         contactRepo.remove(contact)
         flushAndClear()
-        l.refresh()
 
         then:
-        l.contact == null
         Contact.get(contact.id) == null
+        Location.get(l.id) == null
+
+        //following associations should have been deleted through cascade as per mapping.
         ContactEmail.get(email.id) == null
         ContactFlex.get(flex.id) == null
         ContactPhone.get(phone.id) == null
-        ContactSource.get(source.id) == null
+        ContactSource.countByContactId(contact.id) == 0
     }
 
     void "test delete contact fails when its primary contact for org"() {
@@ -130,6 +156,49 @@ class ContactTests extends Specification implements DomainIntTest {
         then:
         contact.org.num == "foo"
 
+    }
+
+    void "update contact with source"() {
+        setup:
+        jdbcTemplate.execute("CREATE UNIQUE INDEX ix_contactsource_sourceid_uniq ON ContactSource(sourceId)")
+        Map data = [
+            "num": "num",
+            "name": "name",
+            "email": "test@9ci.com",
+            "companyId": 2,
+            "orgId":2,
+            "source": ["sourceId":"123"]
+        ]
+
+        when:
+        Contact contact = Contact.create(data)
+        flush()
+
+        then:
+        noExceptionThrown()
+        contact.num == "num"
+        contact.firstName == "name"
+        contact.name == "name"
+        contact.email == "test@9ci.com"
+        contact.source
+        contact.source.sourceId == "123"
+
+        when:"update contact"
+        data.firstName = "name2"
+        data.email = "dev@9ci.com"
+        contact = Contact.repo.update(data)
+        flush()
+
+        then:
+        noExceptionThrown()
+        contact.name == "name2"
+        contact.email == "dev@9ci.com"
+
+        and:
+        ContactSource.countByContactId(contact.id) == 1
+
+        cleanup:
+        jdbcTemplate.execute("DROP index ix_contactsource_sourceid_uniq")
     }
 
 }

@@ -1,19 +1,31 @@
 apply plugin: "yakworks.grails-plugin"
 
+apply from: "${rootDir}/gradle/gorm-lib.gradle"
+
 dependencies {
   //for the RestTomcatWebServerCustomizer
   compileOnly "org.springframework.boot:spring-boot-starter-tomcat"
-  implementation "org.grails:grails-plugin-rest"
-  implementation "org.grails:grails-plugin-url-mappings"
-  implementation "org.grails:grails-plugin-interceptors"
+
+  compileOnly "org.grails:grails-plugin-rest"
+  // implementation "org.grails:grails-plugin-url-mappings"
+  // implementation "org.grails:grails-plugin-interceptors"
 
   api project(":gorm-tools")
   api project(":gorm-etl")
   api project(":gorm-openapi")
 
+  //FIXME this shoudl not be needed anymore now that the EntityReponder is gone and move to CrudApi
+  api project(":boot-security-gorm")
+
+  //FIXME remove this when we upgrade to spring 6 as its built in.
+  // this uses the HttpClient thats built into java 11 for WebClient.
+  // compileOnly 'com.integralblue:java-httpclient-webclient-spring-boot-starter:1.0.0'
+
   // for OkHttpRestTrait test helpers
   compileOnly "com.squareup.okhttp3:okhttp:$vOkhttp"
+  // for WebClientTrait test helpers
+  compileOnly "org.springframework.boot:spring-boot-starter-webflux"
 
-  //tests use the rally domains for the MetaMaps
+  //schemaView tests Org
   testImplementation project(":rally-domain")
 }

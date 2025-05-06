@@ -6,7 +6,8 @@ package yakworks.rally.orgs.model
 
 import groovy.transform.CompileDynamic
 
-import gorm.tools.repository.model.GormRepoEntity
+import gorm.tools.repository.RepoLookup
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
@@ -17,7 +18,7 @@ import yakworks.security.audit.AuditStamp
 @AuditStamp
 @IdEqualsHashCode
 @GrailsCompileStatic
-class Location implements GormRepoEntity<Location, LocationRepo>, Serializable {
+class Location implements RepoEntity<Location>, Serializable {
     static transients = ['addressHtml']
 
     Kind kind = Kind.work
@@ -53,12 +54,12 @@ class Location implements GormRepoEntity<Location, LocationRepo>, Serializable {
     }
 
     static constraintsMap = [
-        org:[ description: 'The organization this belongs to'],
-        orgId:[ description: 'The org id for this', nullable: false],
-        kind:[ description: 'The address type', nullable: true],
+        org:[d: 'The organization this belongs to'],
+        orgId:[d: 'The org id for this', nullable: false],
+        kind:[d: 'The address type', nullable: true],
 
-        contact:[ description: 'The contact this belongs to', nullable: true],
-        name:[ description: 'A descriptive name, can be used for reports an letters', nullable: true],
+        contact:[d: 'The contact this belongs to', nullable: true],
+        name:[d: 'A descriptive name, can be used for reports an letters', nullable: true],
 
         // address fields
         street1:[maxSize: 100],
@@ -79,6 +80,8 @@ class Location implements GormRepoEntity<Location, LocationRepo>, Serializable {
         org column: 'orgId', insertable: false, updateable: false
         contact column: 'contactId'
     }
+
+    static LocationRepo getRepo() { return (LocationRepo) RepoLookup.findRepo(this) }
 
     String getAddressHtml() {
         String markup = ""

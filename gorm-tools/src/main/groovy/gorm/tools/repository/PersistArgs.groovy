@@ -18,7 +18,7 @@ import yakworks.commons.map.Maps
  * Gorm takes a Map of arguments such as validate, failOnError, etc.
  * This is a concrete object for those that that the Gorm-Tools repo utilizes.
  */
-@Builder(builderStrategy= SimpleStrategy, prefix="")
+@Builder(builderStrategy=SimpleStrategy, prefix="")
 @MapConstructor
 @ToString
 @AutoClone
@@ -88,15 +88,31 @@ class PersistArgs {
     /**
      * gets a new default instance
      */
-    static PersistArgs 'new'(){
-        PersistArgs.of()
-    }
+    // static PersistArgs 'new'(){
+    //     PersistArgs.of()
+    // }
 
     /**
      * just a semantic variation of new to create a new.
      */
     static PersistArgs defaults(){
         PersistArgs.of()
+    }
+
+    /**
+     * Flush: true is a very common args. This allows new one to be created by doing
+     * PersistArgs.flush()
+     */
+    static PersistArgs flush(){
+        PersistArgs.of(flush: true)
+    }
+
+    /**
+     * bindId: true true is a very common arg. This allows new one to be created quickly for testing etc
+     * by doing PersistArgs.withBindId()
+     */
+    static PersistArgs withBindId(){
+        PersistArgs.of(bindId: true)
     }
 
     /**

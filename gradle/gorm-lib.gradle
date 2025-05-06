@@ -1,20 +1,15 @@
-apply plugin: 'groovy'
+//Common setup for the gorm libraries in this project
+apply from: "${rootDir}/gradle/compile.gradle"
+apply from: "${rootDir}/gradle/publish.gradle"
+apply from: "${rootDir}/gradle/test-unit.gradle"
 
 dependencies {
-  // compileOnly "io.micronaut:micronaut-inject-groovy"
-  implementation "org.springframework.boot:spring-boot-starter-logging"
-  implementation "org.springframework.boot:spring-boot-autoconfigure"
-  implementation "org.grails:grails-core"
-  implementation "org.grails:grails-web-boot"
-  implementation "org.grails:grails-databinding"
+  implementation "jakarta.annotation:jakarta.annotation-api:$vJakartaAnn"
 
-  // implementation "org.grails.plugins:cache"
+  // implementation "com.fasterxml.jackson.core:jackson-core:$vJackson"
+  // implementation "com.fasterxml.jackson.core:jackson-databind:$vJackson"
 
-  implementation "org.apache.logging.log4j:log4j-to-slf4j:$vLog4j"
-  implementation "org.apache.logging.log4j:log4j-api:$vLog4j"
-
-  implementation 'com.fasterxml.jackson.core:jackson-core:2.13.3'
-  implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
+  implementation 'org.springframework.data:spring-data-jpa:2.7.18'
 
   // implementation "org.grails:grails-datastore-gorm:${vGorm}"
   implementation "org.grails:grails-datastore-gorm-hibernate5:$vGormHibernate"
@@ -22,18 +17,29 @@ dependencies {
   implementation "org.hibernate:hibernate-core:$vHibernate"
   // compileOnly "org.hibernate:hibernate-ehcache:$vHibernate"
 
+  //try and fix the dependecy hell by locking grails version
+  implementation "org.grails:grails-core:$grailsVersion"
+  implementation "org.grails:grails-bootstrap:$grailsVersion"
+
+  testImplementation "org.grails:grails-plugin-codecs:$grailsVersion"
+  testImplementation "org.grails:grails-plugin-domain-class:$grailsVersion"
+  testImplementation "org.grails:grails-test:$grailsVersion"
+
   // tests deps
   testRuntimeOnly "com.h2database:h2:$vH2"
   testRuntimeOnly "com.zaxxer:HikariCP:$vHikari"
+
+  testRuntimeOnly "org.grails:grails-web-testing-support:$vGrailsTesting"
+
+  //testImplementation "net.javacrumbs.json-unit:json-unit-assertj:2.28.0"
+  testRuntimeOnly "com.fasterxml.jackson.core:jackson-databind:$vJackson"
   //testRuntimeOnly "javax.xml.bind:jaxb-api:2.3.1"
 
   testImplementation project(":gorm-test-support") //this might seem circular but it can be added to itself as it dif config
-
-  testImplementation "org.apache.commons:commons-lang3:$vCommonsLang3"
-  testImplementation "org.mockito:mockito-core"
-  testImplementation "org.grails:grails-web-testing-support:$vGrailsTesting"
-
-  // testCompile "org.grails:views-json-testing-support:$vViews"
   testImplementation "net.javacrumbs.json-unit:json-unit-assertj:2.28.0"
-  testImplementation "com.fasterxml.jackson.core:jackson-databind:2.9.10"
+  testImplementation("org.spockframework:spock-spring:$vSpock")
+
+  //to replace grails-web-testing-support, some dependency here make integration tests work, without the gets are null
+  // testImplementation "org.grails:grails-plugin-interceptors"
+
 }

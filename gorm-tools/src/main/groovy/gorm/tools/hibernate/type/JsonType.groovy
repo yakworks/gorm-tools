@@ -12,15 +12,15 @@ import groovy.transform.CompileStatic
 import org.hibernate.type.descriptor.sql.SqlTypeDescriptor
 import org.hibernate.usertype.ParameterizedType
 
-import com.vladmihalcea.hibernate.type.json.internal.JsonTypeDescriptor
-import com.vladmihalcea.hibernate.type.util.Configuration
+import io.hypersistence.utils.hibernate.type.json.internal.JsonTypeDescriptor
 
 /**
  * Overrides so we can access setParameterValues using the gorm mapping
  */
+@Deprecated //MOVED to yakworks.gorm.hibernate.type, use that one
 @SuppressWarnings(["ClassNameSameAsSuperclass"])
 @CompileStatic
-class JsonType extends com.vladmihalcea.hibernate.type.json.JsonType {
+class JsonType extends io.hypersistence.utils.hibernate.type.json.JsonType {
 
     // public static final com.vladmihalcea.hibernate.type.json.JsonType INSTANCE = new JsonExtType();
 
@@ -47,7 +47,7 @@ class JsonType extends com.vladmihalcea.hibernate.type.json.JsonType {
      * @param parameters the params from the mapping
      */
     void setJavaTypeDescriptorClass(Properties parameters) {
-        //type prop can be either class or String of with the class name
+        //type prop can be either Class or String of pkg+class. getProperty will return null if it a Class and not a String
         def typeProp = parameters.getProperty("type")
         //if typeProp then it string ref, otherwise assume its the class ref itself
         Type type = (Class) ( typeProp ? loadClass(typeProp) : parameters.get("type") )

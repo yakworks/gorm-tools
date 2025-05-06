@@ -9,14 +9,17 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.annotation.PostConstruct
 
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.util.ClassUtils
 import org.springframework.util.ReflectionUtils
 import org.springframework.validation.Errors
 
 import gorm.tools.databinding.BindAction
+import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
-import gorm.tools.repository.RepoUtil
 import yakworks.spring.AppCtx
 
 /**
@@ -26,6 +29,7 @@ import yakworks.spring.AppCtx
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
+@Slf4j
 @CompileStatic
 class RepoEventPublisher {
 
@@ -35,15 +39,24 @@ class RepoEventPublisher {
 
     private final Map<String, Map<String, Method>> repoEventMethodCache = new ConcurrentHashMap<>()
 
+    @Autowired(required = false) //not required for testing when there are no repo beans
+    List<GormRepo> repoBeans
+
     @PostConstruct
     void init() {
         scanAndCacheEventsMethods()
         // applicationEventPublisher = (ApplicationEventPublisher) grailsApplication.mainContext
+        log.debug("scanned and found events in repoEventMethodCache, size: ${repoEventMethodCache.size()}")
     }
 
     //iterates over Repos and cache events
     void scanAndCacheEventsMethods() {
-        for (Class repoClass : RepoUtil.getRepoClasses()) {
+        if(!repoBeans) return
+        //def repoBeanClasses = RepoUtil.getRepoClasses()
+        //DefaultGormRepo are set up automatically for an Entity and wont have event methods.
+        List<Class<?>> repoBeanClasses = repoBeans.collect{ getRepoClass(it.class) }.findAll{ it != DefaultGormRepo }
+
+        for (Class repoClass : repoBeanClasses) {
             cacheEventsMethods(repoClass)
         }
     }
@@ -60,7 +73,8 @@ class RepoEventPublisher {
     private void findAndCacheEventMethods(String eventKey, Class repoClass, Map<String, Method> events) {
         Method method = ReflectionUtils.findMethod(repoClass, eventKey, null)
         RepoListener ann = method?.getAnnotation(RepoListener)
-        if (method != null && ann) events[eventKey] = method
+        if (method != null && ann)
+            events[eventKey] = method
     }
 
     public <D> void publishEvents(GormRepo<D> repo, RepositoryEvent<D> event, Object... methodArgs) {
@@ -79,12 +93,12 @@ class RepoEventPublisher {
 //    }
 
     void invokeEventMethod(GormRepo repo, String eventKey, Object... methodArgs) {
-        Map<String, Method> eventMethodMap = repoEventMethodCache.get(repo.class.simpleName)
+        Map<String, Method> eventMethodMap = repoEventMethodCache.get(getRepoClass(repo.class).simpleName)
         //if (!eventMethodMap) return //eventMethodMap = cacheEventsMethods(repo.class)
         Method method = eventMethodMap?.get(eventKey)
         if (!method) return
         //tuncate the args to the number of params for the method
-        Object[] truncMethArgs = methodArgs[0..method.parameterCount-1]
+        Object[] truncMethArgs = methodArgs[0..method.parameterCount-1] as Object[]
         ReflectionUtils.invokeMethod(method, repo, truncMethArgs)
     }
 
@@ -127,6 +141,15 @@ class RepoEventPublisher {
         def event = new AfterRemoveEvent<D>(repo, entity, args)
         publishEvents(repo, event, [entity, event] as Object[])
 
+    }
+
+    /**
+     * Unwraps the proxy and gives the original repo class
+     * If repo class is a spring proxy (eg because of @Cacheable etc) it would not be able to find event methods
+     * See `findAndCacheEventMethods` & `invokeEventMethod` which would otherwise fail to find event methods
+     */
+    Class getRepoClass(Class clazz) {
+        return ClassUtils.getUserClass(clazz)
     }
 
 //    private void findAndCacheListenerAnnotations(Class repoClass, Map<String, Method> listenerMethodMad) {

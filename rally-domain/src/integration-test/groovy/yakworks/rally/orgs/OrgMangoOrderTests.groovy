@@ -1,9 +1,14 @@
 package yakworks.rally.orgs
 
+import org.junit.Before
+import org.junit.BeforeClass
+
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import grails.testing.spock.OnceBefore
 import spock.lang.Ignore
 import spock.lang.Specification
+import yakworks.rally.orgs.model.ContactFlex
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
@@ -12,6 +17,14 @@ import yakworks.rally.orgs.model.Org
 @Rollback
 class OrgMangoOrderTests extends Specification implements DomainIntTest {
 
+    @OnceBefore
+    void setupData(){
+        Org.list().each { Org org ->
+            Long id = org.contact.id
+            org.contact.flex = new ContactFlex(id: id, num1: id * 1.5).persist()
+            org.contact.persist()
+        }
+    }
 
     @Ignore //XXX this should work when we add a manual alias, seems to be getting confused with the auto ones?
     def "order query the manual way"() {

@@ -24,7 +24,6 @@ import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.orgs.model.Org
-import yakworks.security.SecService
 
 /**
  * WIP
@@ -35,20 +34,13 @@ import yakworks.security.SecService
 @CompileStatic
 class ActivityBulk {
 
-    @Autowired(required = false)
-    ActivityRepo activityRepo
+    @Autowired ActivityRepo activityRepo
 
-    @Autowired(required = false)
-    ActivityLinkRepo activityLinkRepo
+    @Autowired ActivityLinkRepo activityLinkRepo
 
-    @Autowired(required = false)
-    AttachmentRepo attachmentRepo
+    @Autowired AttachmentRepo attachmentRepo
 
-    @Autowired(required = false)
-    SecService secService
-
-    @Autowired(required = false)
-    ProblemHandler problemHandler
+    @Autowired ProblemHandler problemHandler
 
     /**
      * insert a single activity and note for a list of domains.
@@ -105,7 +97,7 @@ class ActivityBulk {
     List<Activity> insertMassActivity(List targets, Map activityData, String source = null, boolean newAttachments = false) {
 
         Map<Long, Activity> createdActivities = [:]
-        List attachments = []
+        List attachments = [] as List<Attachment>
         List attachmentData = activityData?.attachments as List
         if (attachmentData) {
             attachments = attachmentRepo.createOrUpdate(attachmentData)

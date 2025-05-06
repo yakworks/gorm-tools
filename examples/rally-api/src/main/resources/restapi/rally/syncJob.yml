@@ -1,0 +1,6 @@
+api:
+  paths:
+    /rally/syncJob:
+      includes:
+        get: [ 'id', 'ok', 'state', 'source', 'sourceId', 'createdDate', 'editedDate', 'createdBy', 'editedBy', 'problems' ]
+

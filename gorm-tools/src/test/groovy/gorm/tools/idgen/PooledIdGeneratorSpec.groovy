@@ -5,7 +5,7 @@
 package gorm.tools.idgen
 
 import gorm.tools.async.ParallelStreamTools
-import gorm.tools.config.AsyncConfig
+import yakworks.gorm.config.AsyncConfig
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Shared
 import spock.lang.Specification
@@ -30,8 +30,8 @@ class PooledIdGeneratorSpec extends Specification implements GormHibernateTest {
 
     void setupSpec() {
         mockdbgen = new MockJdbcIdGenerator()
-        mockdbgen.table.put("table.id", 1)
-        mockdbgen.table.put("table1.id", 99)
+        mockdbgen.hashTable.put("table.id", 1)
+        mockdbgen.hashTable.put("table1.id", 99)
         batchgen = new PooledIdGenerator(mockdbgen)
         //
         // batchgen = idGenerator
@@ -70,7 +70,7 @@ class PooledIdGeneratorSpec extends Specification implements GormHibernateTest {
 
     void "test getNextId with multithreading"() {
         setup:
-        mockdbgen.table.put("table2.id", 1)
+        mockdbgen.hashTable.put("table2.id", 1)
         batchgen.setBatchSize("table2.id", 17)
         List ids = Collections.synchronizedList([])
 

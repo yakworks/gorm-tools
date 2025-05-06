@@ -1,0 +1,65 @@
+plugins {
+  // id 'org.springframework.boot'
+  // id 'io.spring.dependency-management'
+  id 'yakworks.groovy-lib'
+}
+
+//Common setup for the gorm libraries in this project
+apply from: "${rootDir}/gradle/compile.gradle"
+apply from: "${rootDir}/gradle/publish.gradle"
+apply from: "${rootDir}/gradle/test-unit.gradle"
+
+// apply from: "${rootDir}/gradle/gorm-lib.gradle"
+// apply from: "${rootDir}/gradle/test-integration.gradle"
+
+//shared resources to pick up the Gorm defaults from application.groovy, as well as simple logback
+// sourceSets.test.resources.srcDirs += [project(':gorm-test-support').sourceSets.main.resources]
+
+dependencies {
+  api "org.yakworks:groovy-commons:$vGroovyCommons"
+
+  compileOnly "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
+  compileOnly "org.springframework.boot:spring-boot-starter-security:$springBootVersion"
+
+  api project(":security-core")
+
+  //spring security
+  api "org.springframework.security:spring-security-core:$springSecurityVersion"
+  api "org.springframework.security:spring-security-web:$springSecurityVersion"
+  api "org.springframework.security:spring-security-config:$springSecurityVersion"
+
+  //OAUTH
+  api "org.springframework.boot:spring-boot-starter-oauth2-resource-server:$springBootVersion"
+
+  //SAML
+  compileOnly "org.springframework.security:spring-security-saml2-service-provider:$springSecurityVersion"
+  constraints {
+    compileOnly "org.opensaml:opensaml-core:4.1.1"
+    compileOnly "org.opensaml:opensaml-saml-api:4.1.1"
+    compileOnly "org.opensaml:opensaml-saml-impl:4.1.1"
+  }
+
+  compileOnly "jakarta.annotation:jakarta.annotation-api:$vJakartaAnn"
+  compileOnly "javax.inject:javax.inject:1"
+
+  compileOnly 'com.nimbusds:nimbus-jose-jwt'
+
+  testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+  testImplementation "org.springframework.security:spring-security-test:$springSecurityVersion"
+
+  testImplementation("org.spockframework:spock-core:${vSpock}")
+  testImplementation("org.spockframework:spock-spring:${vSpock}")
+  //so we dont end up with multiple versions of jupiter in deps
+  //testImplementation("org.junit.jupiter:junit-jupiter:5.10.1")
+}
+
+// configurations.api {
+//   exclude group: 'org.grails', module: 'grails-plugin-controllers'
+// }
+
+// bootJar {
+//   enabled = false
+// }
+// jar {
+//   enabled = true
+// }

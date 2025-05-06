@@ -4,9 +4,10 @@
 */
 package yakworks.rally.orgs.repo
 
+import javax.inject.Inject
+
 import groovy.transform.CompileStatic
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataRetrievalFailureException
 import org.springframework.validation.Errors
 
@@ -16,13 +17,17 @@ import gorm.tools.model.SourceType
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
+import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.AfterRemoveEvent
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
+import gorm.tools.utils.GormMetaUtils
 import gorm.tools.validation.Rejector
-import yakworks.rally.orgs.OrgMemberService
+import yakworks.rally.config.OrgProps
+import yakworks.rally.orgs.OrgService
+import yakworks.rally.orgs.model.Company
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
@@ -34,21 +39,14 @@ import yakworks.rally.orgs.model.OrgType
  */
 @CompileStatic
 abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
-    //Making these nullable makes it easier to wire up for tests.
-    @Autowired(required=false)
-    LocationRepo locationRepo
 
-    @Autowired(required=false)
-    ContactRepo contactRepo
-
-    @Autowired(required=false)
-    OrgTagRepo orgTagRepo
-
-    @Autowired(required=false)
-    OrgSourceRepo orgSourceRepo
-
-    @Autowired(required=false)
-    OrgMemberService orgMemberService
+    @Inject LocationRepo locationRepo
+    @Inject ContactRepo contactRepo
+    @Inject OrgTagRepo orgTagRepo
+    @Inject OrgSourceRepo orgSourceRepo
+    @Inject OrgService orgService
+    @Inject OrgProps orgProps
+    @Inject PartitionOrgRepo partitionOrgRepo
 
     @RepoListener
     void beforeValidate(Org org, Errors errors) {
@@ -57,10 +55,25 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         }
     }
 
+    /**
+     * makes sure org has a company on it, and sets it self if its a company
+     */
+    void ensureCompany(Org org){
+        if (org.companyId == null) {
+            if (org.type == OrgType.Company){
+                org.companyId = org.id
+            } else {
+                org.companyId = Company.DEFAULT_COMPANY_ID
+            }
+        }
+    }
+
+
     @RepoListener
     void beforeBind(Org org, Map data, BeforeBindEvent be) {
         if (be.isBindCreate()) {
             org.type = getOrgTypeFromData(data)
+
             //bind id early or generate one as we use it in afterBind
             if(data.id) {
                 //dont depend on the args.bindId setting and always do it
@@ -71,37 +84,64 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         }
     }
 
-    @Override
-    void doBeforePersistWithData(Org org, PersistArgs args) {
-        Map data = args.data
-        if (args.bindAction == BindAction.Create) {
-            verifyNumAndOrgSource(org, data)
-            orgMemberService.setupMember(org, data.remove('member') as Map)
+    @RepoListener
+    void afterBind(Org org, Map data, AfterBindEvent e) {
+        if (e.isBindCreate()) {
+            //ensureCompany in afterBind, as it needs to check companyId and orgType and id, by now all of em would have been set
+            ensureCompany(org)
         }
-        // we do primary location and contact here before persist so we persist org only once with contactId it is created
-        if(data.location) createOrUpdatePrimaryLocation(org, data.location as Map)
-        // do contact, support keyContact for legacy and Customers
-        def contactData = data.contact ?: data.keyContact
-        if(contactData) createOrUpdatePrimaryContact(org, contactData as Map)
+    }
+
+    @Override
+    void doBeforePersist(Org org, PersistArgs args) {
+        if(args.bindAction && args.data) {
+            Map data = args.data
+            if (args.bindAction == BindAction.Create) {
+                verifyNumAndOrgSource(org, data)
+                //if no orgType then let it fall through and fail validation, orgService is nullable so its easier to mock for testing
+                if (org.type && orgService?.isOrgMemberEnabled())
+                    orgService.setupMember(org, data.remove('member') as Map)
+            }
+            // we do primary location and contact here before persist so we persist org only once with contactId it is created
+            if (data.location) createOrUpdatePrimaryLocation(org, data.location as Map)
+            // do contact, support keyContact for legacy and Customers
+            def contactData = data.contact ?: data.keyContact
+            if (contactData) createOrUpdatePrimaryContact(org, contactData as Map)
+        }
+        partitionOrgCreateOrUpdate(org)
     }
 
     /**
-     * Called after persist if its had a bind action (create or update) and it has data
+     * do partitionOrg update here in beforePersist because after persist, the dirty state gets reset
+     * and we can not check if name/num has changed
+     */
+    void partitionOrgCreateOrUpdate(Org org){
+        //orgProps can't be null unless its unit testing, so allowing null makes it easier to mock up test data
+        if (orgProps && org.isOrgType(orgProps.partition.type)) {
+            partitionOrgRepo.createOrUpdate(org)
+        }
+    }
+
+    /**
+     * Called after persist
+     * if its had a bind action (create or update) and it has data
      * creates or updates One-to-Many associations for this entity.
      */
     @Override
-    void doAfterPersistWithData(Org org, PersistArgs args) {
-        Map data = args.data
-        if(data.locations) persistToManyWithOrgId(org, Location.repo, data.locations as List<Map>)
-        if(data.contacts) persistToManyWithOrgId(org, Contact.repo, data.contacts as List<Map>)
-        if(data.tags) orgTagRepo.addOrRemove((Persistable)org, data.tags)
+    void doAfterPersist(Org org, PersistArgs args) {
+        if (args.bindAction && args.data) {
+            Map data = args.data
+            if (data.locations) persistToManyWithOrgId(org, Location.repo, data.locations as List<Map>)
+            if (data.contacts) persistToManyWithOrgId(org, Contact.repo, data.contacts as List<Map>)
+            if (data.tags != null) orgTagRepo.addOrRemove((Persistable) org, data.tags)
+        }
     }
 
     @Override
     void persistToOneAssociations(Org org, List<String> associations){
         super.persistToOneAssociations(org, associations)
-        if(org.location?.isNewOrDirty()) org.location.persist() //FIXME is this already validated?
-        if(org.contact?.isNewOrDirty()) org.contact.persist()
+        if(GormMetaUtils.isNewOrDirty(org.location)) org.location.persist() //FIXME is this already validated?
+        if(GormMetaUtils.isNewOrDirty(org.contact)) org.contact.persist()
     }
 
     /**
@@ -115,21 +155,28 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         assocRepo.createOrUpdate(assocList)
     }
 
+    /**
+     * Checks if org can be deleted (sourceType != ERP)
+     * And Deletes associated org domains
+     */
     @RepoListener
     void beforeRemove(Org org, BeforeRemoveEvent e) {
         if (org.source?.sourceType == SourceType.ERP) { //might be more in future
             def args = [name: "Org: ${org.name}, source:${SourceType.ERP}"]
-            throw ValidationProblem.of("error.delete.externalSource", args)
-                .entity(org).toException()
+            throw ValidationProblem.of("error.delete.externalSource", args).entity(org).toException()
         }
-        //remove tags
         orgTagRepo.remove(org)
-        //remove contacts
         contactRepo.removeAll(org)
+
+        if (org.isOrgType(orgProps.partition.type)) {
+            //pass PersistArgs, because default removeById(long) is disabled in PartitionOrgRepo to prevent deletion from API
+            //As delete through api calls removeById(id)
+            partitionOrgRepo.removeById(org.id, PersistArgs.defaults())
+        }
     }
 
     /**
-     * deletes org and all associated persons or users but only if is doesn't have invoices
+     * Deleted associated domains of org
      *
      * @param org the org domain object
      * @throws ValidationProblem.Exception if a spring DataIntegrityViolationException is thrown
@@ -155,8 +202,9 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
 
     Contact createOrUpdatePrimaryContact(Org org, Map data){
         if(!data) return //exit fast if no data
-
-        // if org has a contact then its and update or replace
+        //just in case isPrimary was passed in then null it out so contact doesnt try to set it again.
+        if(data.isPrimary) data.isPrimary = null
+        // if org has a contact then its an update or replace
         if(org.contact) {
             //if data has id
             Long cid = data.id as Long
@@ -168,10 +216,11 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
                 data.id = org.contact.getId()
             }
         }
-        //make sure it has the right settings
-        data.isPrimary = true
+        //contact is already being set as primary, remove if its there so it doesnt re update the org in contactRepo
+        data.remove('isPrimary')
+
         data.orgId = org.getId()
-        org.contact = contactRepo.createOrUpdateItem(data)
+        org.contact = contactRepo.upsert(data).entity
         return org.contact
     }
 
@@ -180,7 +229,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         //make sure params has org key
         data.orgId = org.getId()
         // if it had an op of remove then will return null and this set primary location to null
-        org.location = locationRepo.createOrUpdateItem(data)
+        org.location = locationRepo.upsert(data).entity
         return org.location
     }
 
@@ -223,9 +272,14 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
     /**
      * Lookup Org by num or sourceId. Search by num is usually used for other orgs like division or num (non customer or custAccount)
      * where we have unique num. Search by sourceId is used when there is no org or org.id; for example to assign org on contact
+     * NOTE: This is called from findWithData and is used to locate for updates and associations
+     * SHOULD NOT NORMALLY BE CALLED DIRECTLY, findWithDatais used most of the time
      * @param data (num or source with sourceId and orgType)
      */
-    //FIXME this needs its own test
+    /**
+     * lookup by num or ContactSource
+     * This is called from findWithData and is used to locate contact for updates and associtaions
+     */
     @Override
     Org lookup(Map data) {
         Org org
@@ -234,10 +288,12 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         OrgType orgType = coerceOrgType(data.type)
         // special case for customer lookup when it comes with org.source; for example [org:[source:[sourceId:K14700]]
         if(data.org) {
-            data.source =data.org['source']
-            data.sourceId =data.org['sourceId']
+            data.source = data.org['source']
+            data.sourceId = data.org['sourceId']
         }
+        //nest sourceId under source if pecified up one level.
         if(data.source == null && data.sourceId) data.source = [sourceId: data.sourceId]
+
         if (data.source && data.source['sourceId']) {
             Map source = data.source as Map
             if(!orgType && source.orgType) {

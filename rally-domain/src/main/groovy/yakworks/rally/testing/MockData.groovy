@@ -8,15 +8,25 @@ import java.time.LocalDateTime
 
 import groovy.transform.CompileDynamic
 
+import grails.gorm.Entity
+import yakworks.commons.map.Maps
 import yakworks.rally.activity.model.Activity
+import yakworks.rally.mail.model.MailMessage
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.security.gorm.model.AppUser
+import yakworks.security.gorm.model.SecRole
+import yakworks.security.gorm.model.SecRolePermission
+import yakworks.security.gorm.model.SecRoleUser
 
-@CompileDynamic //ok for testing
+@CompileDynamic
 class MockData {
+
+    /** common entityClasses for base setup */
+    public static List<Class<Entity>> commonEntityClasses = [
+        Org, AppUser, SecRole, SecRoleUser, SecRolePermission ] as List<Class<Entity>>
 
     static Org org(Map dta = [:]) {
         Map vals = [num: 'tsla', name: 'Tesla', type: OrgType.Customer]
@@ -26,7 +36,7 @@ class MockData {
     }
 
     static OrgType orgType(OrgType type = OrgType.Customer) {
-        OrgTypeSetup ots = new OrgTypeSetup(id: type, name: type.name()).persist()
+        OrgTypeSetup ots = new OrgTypeSetup(id: type.id, name: type.name()).persist()
         assert type.typeSetup
         return type
     }
@@ -38,7 +48,7 @@ class MockData {
     }
 
     static Contact contact(Map dta = [:]) {
-        def orgDta = dta?.remove('org') ?: [:]
+        Map orgDta = ( dta?.remove('org') ?: [:] ) as Map
         dta.org = org(orgDta)
         Map vals = [firstName: "Ayne"]
         vals.putAll(dta)
@@ -48,7 +58,7 @@ class MockData {
     }
 
     static AppUser user(Map args = [:]) {
-        Map contactArgs = args?.remove("contact") ?: [:]
+        Map contactArgs = ( args?.remove("contact") ?: [:] )  as Map
         if(!contactArgs.name) contactArgs.name = args.username
         args.contact = contact(contactArgs)
         AppUser user = AppUser.create(username:"karen", password:"karen", repassword:"karen", email:"karen@9ci.com")
@@ -99,6 +109,7 @@ class MockData {
             email    : 'jgalt@taggart.com',
             firstName: 'John',
             lastName : 'Galt',
+            location: [city: "Gulch"],
             locations: [[zipCode: "12345"]]
         ],
         flex: [
@@ -115,7 +126,7 @@ class MockData {
     ]
 
     static Map getCreateOrg() {
-        return baseOrgParams.clone()
+        return Maps.clone(baseOrgParams)
     }
 
     static Map getUpdateOrg(){
@@ -138,6 +149,7 @@ class MockData {
         ]
     }
 
+    @CompileDynamic
     Activity createActNote(Long orgId){
         Map params = [
             org:[id: orgId], //org id does not exist
@@ -158,5 +170,19 @@ class MockData {
                 taskType: [id: 1]
             ]
         ]
+    }
+
+    static MailMessage mailMessage(){
+        def msg = new MailMessage(
+            state: MailMessage.MsgState.Queued,
+            sendTo: 'joe@9ci.com, "Blow, Joe" <joeb@9ci.com>',
+            sendFrom: "Yakworks Account Services <rndc@greenbill.io>",
+            replyTo: "billing@company.com",
+            subject: "Test Email",
+            tags: ["statements"],
+            body: "email body",
+            // attachmentIds: [1,2,3]
+        ).persist()
+        return msg
     }
 }

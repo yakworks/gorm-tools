@@ -6,28 +6,30 @@ package gorm.tools.beans
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Slf4j
 
-import gorm.tools.metamap.services.MetaMapService
+import yakworks.commons.model.TotalCount
 import yakworks.meta.MetaMapList
-import yakworks.spring.AppCtx
 
 /**
- * a holder object for paged data, used mostly in the rest and views
+ * a holder object for both pager settings and the paged data, used mostly in the rest and views
  * but can also be used for paging through and processing data
  */
 @Slf4j
 @CompileStatic
 @SuppressWarnings('ConfusingMethodName') //for max and page
-class Pager {
+//XXX VOODOO Security and logging sometimes fails when this has and EqualsAndHashCode
+@EqualsAndHashCode //(includes=["page", "max", "data", "params"])
+class Pager implements Serializable{
 
     /**
-     * The page we are on
+     * The page we are on, pageNumber
      */
     Integer page = 1
 
     /**
-     * Max rows to show
+     * Max rows to show, the pageSize
      */
     Integer max = 20
 
@@ -49,7 +51,7 @@ class Pager {
     /**
      * List of elements
      */
-    List data
+    List<Map> data
 
     /**
      * Parameters
@@ -66,6 +68,12 @@ class Pager {
      */
     Pager(Map params) {
         setParams(params)
+    }
+
+    static Pager of(Map params){
+        def pg = new Pager()
+        pg.setParams(params)
+        return pg
     }
 
     /**
@@ -102,6 +110,7 @@ class Pager {
         page = params.page = params.page ? toInteger(params.page) : 1
         max = params.max = Math.min(params.max ? toInteger(params.max) : 20, allowedMax)
         this.params = params
+        if(params.data) this.data = params.data as List
     }
 
     /**
@@ -159,38 +168,32 @@ class Pager {
 
     }
 
-
     /**
-     * Setup totalCount property for list, if it absent and fill values that are listed in fieldList
+     * Sets the data from a MetaMapList.
+     * Does nothing special to data but sets the RecordCount from getTotalCount()
      *
-     * @param dlist list of entities
-     * @param includes list of fields names which values should be in the result list based on dlist
-     * @return new list with values selected from dlist based on fieldLists field names
+     * @param metaMapList the list to use for the data
+     * @return reference to this Pager
      */
-    @Deprecated //use setupList
-    Pager setupData(List dlist, List includes = null) {
-        MetaMapList entityMapList = AppCtx.get('metaMapService', MetaMapService).createMetaMapList(dlist, includes)
-        setMetaMapList(entityMapList)
-        return this
-    }
+    Pager dataList(List<Map> metaMapList) {
+        if(metaMapList){
+            if(metaMapList instanceof TotalCount) {
+                setRecordCount(((TotalCount) metaMapList).getTotalCount())
+            } else {
+                setRecordCount(metaMapList.size())
+            }
 
-    /**
-     * Setup the list as a EntityMapList passing in the includes which prepares it to be ready for
-     * an export to json
-     *
-     * @param dlist list of entities
-     * @param includes list of fields names which values should be in the result list based on dlist
-     * @return new list with values selected from dlist based on fieldLists field names
-     */
-    Pager setMetaMapList(MetaMapList entityMapList) {
-        if(entityMapList){
-            setRecordCount(entityMapList.getTotalCount())
-            setData(entityMapList)
+            setData(metaMapList as List<Map>)
         } else {
             setRecordCount(0)
             setData([])
         }
         return this
+    }
+
+    @Deprecated
+    Pager setMetaMapList(MetaMapList metaMapList) {
+        return dataList(metaMapList as List<Map>)
     }
 
 

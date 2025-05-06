@@ -7,9 +7,12 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import groovy.json.JsonException
 import groovy.json.JsonSlurper
+
+import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.api.ApiResults
 import yakworks.api.Result
+import yakworks.api.problem.Problem
 import yakworks.json.groovy.JsonEngine
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.attachment.model.Attachment
@@ -21,7 +24,7 @@ import static yakworks.json.groovy.JsonEngine.parseJson
 @Rollback
 class SyncJobContextTests extends Specification implements DomainIntTest {
 
-    SyncJobService syncJobService
+    DefaultSyncJobService syncJobService
 
     SyncJobContext createJob(){
         def samplePaylod = [1,2,3,4]
@@ -62,18 +65,19 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         SyncJob.get(jobContext.jobId)
     }
 
-    def "test update job"() {
+    void "test update job with problems"() {
         given:
         SyncJobContext jobContext = createJob()
 
         when:
         def apiRes = ApiResults.ofPayload("foo")
-        jobContext.updateJob(apiRes, [id:jobContext.jobId , errorBytes: JsonEngine.toJson(apiRes).bytes ])
+        jobContext.updateJob(apiRes, [id: jobContext.jobId , problems: [[ok:false, title:"oops1"], [ok:false, title:"oops2"]] ])
 
         then:
         SyncJob job = SyncJob.get(jobContext.jobId)
-        job.errorBytes
-
+        job.problems.size() == 2
+        job.problems[0].title == "oops1"
+        job.problems[1].title == "oops2"
     }
 
     void "test update job and save data to file generates valid json"() {
@@ -82,13 +86,12 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         jobContext.args.saveDataAsFile = true
 
         when:
-        Long time = System.currentTimeMillis()
         ApiResults apiRes = ApiResults.OK()
         (1..20).each {
             apiRes << Result.OK().payload([id:it, num:"num-$it", name: "name-$it"])
         }
 
-        jobContext.updateJobResults(apiRes, time)
+        jobContext.updateJobResults(apiRes)
         jobContext.finishJob()
 
         then:
@@ -131,7 +134,7 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
 
     }
 
-    def "test closure"() {
+    def "test transform result closure"() {
         given:
         SyncJobContext jobContext = createJob()
         String transformResultsClosureWasCalled
@@ -149,30 +152,39 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
 
     }
 
-    def "test finish job"() {
+    def "test finish job dataFormat is Payload"() {
         given:
-        SyncJobContext jobContext = createJob()
-        List<Map> renderResults = [[ok: true, status: 200, data: ['boo':'foo']] ,
-                                    [ok: true, status: 200, data: ['boo2':'foo2']] ]
-        List<Map> renderErrorResults = [[ok: false, status: 500, detail: 'error detail'] ]
+        List payload = [1,2,3,4]
+        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', dataFormat: SyncJobArgs.DataFormat.Payload)
+        SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, payload)
+
+        def okResults = ApiResults.OK()
+        okResults.add(Result.OK().payload(['boo':'foo']))
+        okResults.add(Result.OK().payload(['boo2':'foo2']))
+
         when:
-        jobContext.finishJob(renderResults, renderErrorResults)
+        jobContext.updateJobResults(okResults)
+        jobContext.updateJobResults(Problem.ofPayload(['bad':'data']).title("Oops"))
+        jobContext.updateJobResults(Problem.ofPayload(['bad':'data2']).title("Oops2"))
+        jobContext.finishJob()
+        flushAndClear()
 
         then:
         SyncJob job = SyncJob.get(jobContext.jobId)
-        job.errorBytes
+        //job.errorBytes
         List jsonData = parseJson(job.dataToString())
+
+
         jsonData.size() == 2
-        jsonData[0].ok == true
-        jsonData[0].status == 200
-        jsonData[0].data == ['boo':'foo']
-        List jsonErrors = parseJson(job.errorToString())
-        jsonErrors.size() == 1
-        jsonErrors[0].ok == false
-        jsonErrors[0].status == 500
-        jsonErrors[0].detail == "error detail"
+        jsonData[0] == ['boo':'foo']
 
+
+        // List probs = parseJson(job.problemsToString())
+        List probs = job.problems
+        probs.size() == 2
+        probs[0].ok == false
+        probs[0].status == 400
+        probs[0].title == "Oops"
     }
-
 
 }

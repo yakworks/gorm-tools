@@ -11,7 +11,7 @@ import gorm.tools.repository.GormRepo
 import yakworks.commons.util.BuildSupport
 
 @CompileStatic
-class TestSyncJobService implements SyncJobService<TestSyncJob> {
+class TestSyncJobService extends SyncJobService<TestSyncJob> {
 
     @Override
     GormRepo<TestSyncJob> getRepo(){

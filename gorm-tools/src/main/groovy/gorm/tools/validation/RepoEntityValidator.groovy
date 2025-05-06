@@ -331,12 +331,11 @@ class RepoEntityValidator extends PersistentEntityValidator {
         // newCodes.add("${propName}.${code}".toString())
         if(valCode?.jakartaCode) newCodes.add(valCode.jakartaCode)
         newCodes.add(valCode ? valCode.name() : code)
-
-
-        ClassUtils.setPrivateFinal(DefaultMessageSourceResolvable, fieldError, 'codes', newCodes as String[])
+        //sets the private final for codes and args.
+        ClassUtils.setFieldValue(DefaultMessageSourceResolvable, fieldError, 'codes', newCodes as String[])
         // icu4jArgs
         Object[] newArgs = icu4jArgs(valCode, fieldError.arguments)
-        ClassUtils.setPrivateFinal(DefaultMessageSourceResolvable, fieldError, 'arguments', newArgs as Object[])
+        ClassUtils.setFieldValue(DefaultMessageSourceResolvable, fieldError, 'arguments', newArgs as Object[])
     }
 
     /**
@@ -344,8 +343,8 @@ class RepoEntityValidator extends PersistentEntityValidator {
      * To adapt spring messages we put the arg map as the first item in the array
      */
     Object[] icu4jArgs(ValidationCode valCode, Object[] arguments){
-        //if only 3 args then return empy as it doesn' need them
-        if(arguments.size() < 4) return [] as Object[]
+        //if only 3 args or none then return empty as it doesn' need them
+        if(arguments == null || arguments.size() < 4) return [] as Object[]
         //most use arg 2 so get it.
         // value is the key used of the constraint is validating against, not the field value. Its the hibernate field validation defualt
         def value = arguments[3]

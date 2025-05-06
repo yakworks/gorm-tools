@@ -1,14 +1,13 @@
 package gpbench.model
 
-import gorm.tools.repository.model.GormRepoEntity
-import gpbench.repo.RegionRepo
+
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-import yakworks.commons.transform.IdEqualsHashCode
 
 @Entity
 @GrailsCompileStatic
-class Region implements GormRepoEntity<Region, RegionRepo>, Serializable {
+class Region implements RepoEntity<Region>, Serializable {
     static belongsTo = [country: Country]
 
     String name

@@ -13,7 +13,6 @@ import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.events.AfterBindEvent
-import gorm.tools.repository.events.AfterBulkSaveEntityEvent
 import gorm.tools.repository.events.BeforeBulkSaveEntityEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.RepoListener
@@ -27,6 +26,8 @@ import yakworks.commons.lang.IsoDateUtil
 @GormRepository
 @CompileStatic
 class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
+    //for unit tests,
+    static boolean doTestAuditStamp = true
 
     //used for testing and cleanupSpec since gorm spock nulls out appCtx and cant get to it in there.
     static KitchenSinkRepo INSTANCE
@@ -95,20 +96,27 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
     }
 
     /**
-     * Called after persist if its had a bind action (create or update) and it has data
-     * creates or updates One-to-Many associations for this entity.
+     * Called after persist
      */
     @Override
-    void doAfterPersistWithData(KitchenSink kitchenSink, PersistArgs args) {
-        Map data = args.data
-        if(data.sinkItems) super.persistToManyData(kitchenSink, SinkItem.repo, data.sinkItems as List<Map>, "kitchenSink")
+    void doAfterPersist(KitchenSink kitchenSink, PersistArgs args) {
+        if (args.bindAction && args.data) {
+            Map data = args.data
+            if (data.sinkItems) super.persistToManyData(kitchenSink, SinkItem.repo, data.sinkItems as List<Map>, "kitchenSink")
+        }
     }
 
-    void auditStamp(Object ent){
-        ent['createdBy'] = 1
-        ent['createdDate'] = LocalDateTime.now()
-        ent['editedBy'] = 1
-        ent['editedDate'] = LocalDateTime.now()
+    //USED FOR UNIT TESTS
+    static void auditStamp(KitchenSink ent){
+        if(!doTestAuditStamp) return
+        if( ent.isNew()) {
+            ent['createdBy'] = 1
+            ent['createdDate'] = LocalDateTime.now()
+        }
+        if(ent.hasChanged()) {
+            ent['editedBy'] = 1
+            ent['editedDate'] = LocalDateTime.now()
+        }
     }
 
     KitchenSink build(Long id, boolean flushIt = true){
@@ -116,10 +124,12 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
         Map data = generateData(id) as Map<String, Object>
         data.putAll([
             id: id,
+            name2:"KitchenSink-$id",
             thing: [id: id],
             sinkItems: [[name: "red"], [name: "blue"]]
         ])
-        def ks = KitchenSink.create(data, bindId: true)
+
+        def ks = create(data, [bindId: true])
         if(flushIt) flush()
         return ks
     }
@@ -140,7 +150,7 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
             // actDate: LocalDateTime.now().plusDays(id).toDate(),
             localDate: IsoDateUtil.format(LocalDate.now().plusDays(id)),
             localDateTime: IsoDateUtil.format(LocalDateTime.now().plusDays(id)),
-            ext:[ name: "SinkExt$id"],
+            ext:[ name: "SinkExt$id", totalDue: id * 10.25, thing: [id: id]],
             bazMap: [foo: 'bar']
             // thing: [id: id]
         ]

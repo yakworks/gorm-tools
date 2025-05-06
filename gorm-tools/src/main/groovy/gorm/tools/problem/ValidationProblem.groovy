@@ -7,12 +7,16 @@ package gorm.tools.problem
 import groovy.transform.CompileStatic
 
 import org.springframework.validation.Errors
+import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 
+import grails.util.GrailsUtil
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
 import yakworks.api.problem.ProblemUtils
 import yakworks.api.problem.ThrowableProblem
+import yakworks.api.problem.Violation
+import yakworks.api.problem.ViolationFieldError
 import yakworks.api.problem.data.DataProblemException
 import yakworks.api.problem.data.DataProblemTrait
 
@@ -28,6 +32,7 @@ class ValidationProblem implements DataProblemTrait<ValidationProblem> {
     public static String DEFAULT_CODE ='validation.problem'
     public static String DEFAULT_TITLE ='Validation Error(s)'
 
+    /** The errors to convert to violations */
     Errors errors
 
     //overrides
@@ -50,7 +55,14 @@ class ValidationProblem implements DataProblemTrait<ValidationProblem> {
 
     @Override
     ThrowableProblem toException(){
-        return getCause() ? new ValidationProblem.Exception(getCause()).problem(this) : new ValidationProblem.Exception().problem(this)
+        //if it has a cause then use it, otherwise just throw the problem, the code here is verbose on purpose to make it easier to debug
+        Throwable ex = getCause()
+        if(ex){
+            ex = GrailsUtil.deepSanitize(ex)
+            return new ValidationProblem.Exception(getCause()).problem(this)
+        } else {
+            return new ValidationProblem.Exception().problem(this)
+        }
     }
 
     static ValidationProblem of(Object entity, Throwable cause) {
@@ -63,6 +75,24 @@ class ValidationProblem implements DataProblemTrait<ValidationProblem> {
     static ValidationProblem ofEntity(Object entity) {
         return new ValidationProblem().entity(entity);
     }
+
+    /**
+     * Returns list of errors in the format [{field:name, message:error}]
+     * @param errs the erros object to convert
+     */
+    static List<Violation> transateErrorsToViolations(Errors errs) {
+        List<ViolationFieldError> errors = []
+        if(!errs?.allErrors) return errors as List<Violation>
+
+        for (ObjectError err : errs.allErrors) {
+            String message = ProblemHandler.getMsg(err)
+            ViolationFieldError fieldError = ViolationFieldError.of(err.code, message)
+            if (err instanceof FieldError) fieldError.field = err.field
+            errors << fieldError
+        }
+        return errors as List<Violation>
+    }
+
 
     static class Exception extends DataProblemException {
 

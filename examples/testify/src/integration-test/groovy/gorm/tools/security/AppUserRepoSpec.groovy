@@ -1,7 +1,8 @@
 package gorm.tools.security
 
 import org.springframework.security.crypto.password.PasswordEncoder
-
+import yakworks.api.problem.data.DataProblemException
+import yakworks.security.Roles
 import yakworks.security.gorm.model.SecRoleUser
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.AppUserRepo
@@ -29,7 +30,7 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         return ([:] << baseParams << params)
     }
 
-    def "test create"() {
+    void "test create"() {
         when:
         Map params = getUserParams()
         Long id = AppUser.create(params).id
@@ -43,20 +44,43 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         passwordEncoder.matches(params.password, user.passwordHash)
     }
 
+    void "test unique username"() {
+        setup: "this creates initial user"
+        Map params = getUserParams()
+        AppUser.create(params)
+        flushAndClear()
+
+        when: "username exists"
+        AppUser.create(params)
+
+        then: "Fails"
+        Exception ex = thrown()
+        ex instanceof DataProblemException
+        ex.message.contains "Violates unique constraint [username: galt]"
+
+        when: "success"
+        params.username = "galt2"
+        AppUser.create(params)
+
+        then:
+        noExceptionThrown()
+    }
+
     def "test create with roles ids"() {
         when:
         // should convert the strings to long
-        Map params = getUserParams([roles: [1, "2"]])
+        Map params = getUserParams([roles: [Roles.ADMIN, "MANAGER"]])
         Long id = AppUser.create(params).id
         flushAndClear()
 
         then:
         AppUser user = AppUser.get(id)
         user.username == 'galt'
-        SecRoleUser.findAllByUser(user)*.role.id == [1L, 2L]
+        SecRoleUser.findAllByUser(user)*.role.id == [1L, 3L]
 
     }
 
+    /*see SecuritySeedData*/
     def "test create with roles obj"() {
         when:
         // use objects that may get passed in from json in this format
@@ -64,7 +88,7 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
             username: 'galt2',
             email: 'test2@9ci.com',
             roles: [
-                [id: 2 ], [id: 3]
+                [id: 1 ], [id: 3]
             ]
         ])
         Long id2 = AppUser.create(params).id
@@ -73,31 +97,38 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         then:
         AppUser user2 = AppUser.get(id2)
         user2.username == 'galt2'
-        SecRoleUser.findAllByUser(user2)*.role.id == [2L, 3L]
+        SecRoleUser.findAllByUser(user2)*.role.id == [1L, 3L]
     }
 
 
     def "test updating roles"() {
-        when:
-        //assert current admin has 2 roles id:1
-        assert SecRoleUser.getByUser(1)*.role.id == [1,2]
-        Map params = [
+
+        when: "current admin has 2 roles 1,3"
+        assert SecRoleUser.getByUser(1)*.role.id == [1, 3]
+
+        Map updateParams = [
             id:1,
-            roles: [2, 3]
+            roles: [[id: 2], [id: 3]]
         ]
-        AppUser.update(params)
-        flush()
+        //update it to 2 and 3.
+        AppUser.repo.update(updateParams)
+        flushAndClear()
+
         AppUser user = AppUser.get(1)
 
+        def roleIds = SecRoleUser.findAllByUser(AppUser.get(1))*.role.id
+
         then:
-        SecRoleUser.findAllByUser(AppUser.get(1))*.role.id == [2L, 3L]
+        roleIds.size() == 2
+        roleIds.containsAll([3L, 2L])
 
         when:
+        flushAndClear()
         Map params2 = [
-            id:1,
-            roles: [1]
+            id: 1,
+            roles: ["ADMIN"]
         ]
-        AppUser.update(params2)
+        AppUser.repo.update(params2)
         flush()
 
         then:
@@ -106,20 +137,20 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
 
     def "remove roles when user is removed"() {
         setup:
-        Map params = getUserParams([roles: ["1", "2"]])
+        Map params = getUserParams([roles: ["ADMIN", "MANAGER"]])
         AppUser user = AppUser.create(params)
         flushAndClear()
 
         expect:
-        SecRoleUser.get(user.id, 1)
-        SecRoleUser.get(user.id, 2)
+        SecRoleUser.get(1, user.id)
+        SecRoleUser.get("MANAGER", user.id)
 
         when:
         appUserRepo.remove(user)
 
         then:
-        !SecRoleUser.get(user.id, 1)
-        !SecRoleUser.get(user.id, 2)
+        !SecRoleUser.get(1, user.id)
+        !SecRoleUser.get(3, user.id)
     }
 
     def testRemove() {

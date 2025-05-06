@@ -1,0 +1,40 @@
+# Use Httyak plugin https://github.com/AnWeber/vscode-httpyac
+@host = http://localhost:8080
+# @base_url = {{host}}/api
+@base_url = {{host}}
+@contentType = application/json
+@Authorization=Bearer {{login.access_token}}
+# @Authorization=token 1234
+
+### ****** GET Login *******
+GET {{base_url}}/login
+
+### ****** IF SEC ENABLED RUN THIS FIRST TO LOGIN*******
+# @name login
+POST {{base_url}}/api/login
+Content-Type: application/json
+
+{"username":"admin","password":"123"}
+
+### ****** LOGIN as CUSTOMER*******
+# @name login
+POST {{base_url}}/login
+Content-Type: application/json
+
+{"username":"cust","password":"123Foo"}
+
+### VALIDATE AUTH
+# @ref login
+GET {{base_url}}/validate
+Authorization: Bearer {{login.access_token}}
+{{
+  test.status(200);
+}}
+
+### logout
+# @ref login
+POST {{base_url}}/logout
+Authorization: Bearer {{login.access_token}}
+{{
+  test.status(200);
+}}

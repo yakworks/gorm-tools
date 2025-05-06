@@ -1,30 +1,33 @@
 package yakworks.rally.orgs
 
+import org.apache.commons.lang3.RandomStringUtils
 
-import yakworks.testing.gorm.unit.SecurityTest
-import yakworks.testing.gorm.TestDataJson
-import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
+import yakworks.rally.config.OrgProps
+import yakworks.rally.orgs.model.Company
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgCalc
 import yakworks.rally.orgs.model.OrgFlex
 import yakworks.rally.orgs.model.OrgInfo
+import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
+import yakworks.rally.orgs.model.PartitionOrg
+import yakworks.testing.gorm.TestDataJson
+import yakworks.testing.gorm.unit.GormHibernateTest
+import yakworks.testing.gorm.unit.SecurityTest
 
-class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
+class OrgSpec extends Specification implements GormHibernateTest, SecurityTest {
 
-    Closure doWithGormBeans() { { ->
+    static entityClasses = [Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo, OrgMember, PartitionOrg]
+
+    Closure doWithGormBeans(){ { ->
         orgDimensionService(OrgDimensionService)
-        orgMemberService(OrgMemberService)
+        orgProps(OrgProps)
     }}
-
-    void setupSpec() {
-        mockDomains(Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo)
-    }
 
     void "sanity check build"() {
         when:
@@ -35,13 +38,15 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
 
     }
 
-    // void "CRUD tests"() {
-    //     expect:
-    //     createEntity().id
-    //     persistEntity().id
-    //     updateEntity().version > 0
-    //     removeEntity()
-    // }
+    void "test create with of"() {
+        when:
+        Org org = Org.of('foo1', "foo", OrgType.Division)
+        org.persist(flush: true)
+
+        then:
+        org.companyId == 2
+    }
+
 
     void "test org errors, no type"() {
         when:
@@ -51,6 +56,20 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
         !org.validate()
         org.errors.allErrors.size() == 1
         org.errors['type']
+    }
+
+    void "test org errors long name"() {
+        when:
+        Org org = new Org(type: OrgType.Customer, num:'foo1',
+            name: RandomStringUtils.randomAlphabetic(300),
+            comments: RandomStringUtils.randomAlphabetic(300),
+        )
+
+        then:
+        !org.validate()
+        org.errors.allErrors.size() == 2
+        org.errors['name'].code == 'MaxLength'
+        org.errors['comments'].code == 'MaxLength'
     }
 
     void "empty string for name or num"() {
@@ -65,7 +84,7 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
 
     }
 
-    def testOrgSourceChange() {
+    void testOrgSourceChange() {
         when:
         Org org = Org.of("foo", "bar", OrgType.Customer)
         Org.repo.createSource(org)
@@ -92,18 +111,18 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
         assert OrgSource.get(osi).sourceId == "test"
     }
 
-    def "create & update associations"() {
+    void "create & update associations"() {
         setup:
         Long orgId = 1000
 
-        Map flex = TestDataJson.buildMap(OrgFlex, includes: "*")
-        Map calc = TestDataJson.buildMap(OrgCalc, includes: "*")
-        Map info = TestDataJson.buildMap(OrgInfo, includes: "*")
+        Map flex = TestDataJson.buildMap(OrgFlex, includes: "*", save:false)
+        Map calc = TestDataJson.buildMap(OrgCalc, includes: "*", save:false)
+        Map info = TestDataJson.buildMap(OrgInfo, includes: "*", save:false)
 
         Map params = TestDataJson.buildMap(Org) << [id: orgId, flex: flex, info: info, type: 'Customer']
 
         when: "create"
-        def org = Org.create(params, bindId: true)
+        def org = Org.repo.create(params, [bindId: true])
 
         then:
 
@@ -118,7 +137,9 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
         org.info.website
 
         when: "update"
-        org = Org.update([id: org.id, flex: [text1: 'yyy'], info: [phone: '555-1234', fax: '555-1234', website: 'www.test.com']])
+        org = Org.repo.update(
+            [id: org.id, flex: [text1: 'yyy'], info: [phone: '555-1234', fax: '555-1234', website: 'www.test.com']]
+        )
 
         then:
         org.flex.text1 == 'yyy'
@@ -127,15 +148,17 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
         org.info.website == 'www.test.com'
     }
 
-    def "test insert with locations"() {
+    void "test insert with locations"() {
         setup:
         Long orgId = 10000
         //Map location = TestDataJson.buildMap(Location, includes:"*")
         List locations = [[street1: "street1"], [street1: "street loc2"]]
-        Map params = TestDataJson.buildMap(Org) + [locations: locations]
+        Map params = TestDataJson.buildMap(Org, save:false) + [locations: locations]
 
         when:
         def org = Org.create(params)
+        flush()
+
         def locs = org.locations
 
         then:
@@ -156,6 +179,26 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
         OrgType.Branch   | [orgTypeId: '3']
         OrgType.Branch   | [type: OrgType.Branch]
         OrgType.Branch   | [type: [id: 3]]
+    }
+
+    void "ensure company"() {
+        when: "type is company"
+        Org one = Org.repo.create(num:"one", name:"one", type:OrgType.Company)
+
+        then:
+        one.companyId == one.id
+
+        when: "type is other thn company and companyId is provided in data"
+        Org two = Org.repo.create(num:"two", name:"two", type:OrgType.Customer, companyId:3)
+
+        then:
+        two.companyId == 3
+
+        when: "type is other thn company and companyId is not provided"
+        Org three = Org.repo.create(num:"three", name:"three", type:OrgType.Customer)
+
+        then:
+        three.companyId == Company.DEFAULT_COMPANY_ID
     }
 
 }

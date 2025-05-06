@@ -15,10 +15,11 @@ import org.springframework.core.env.MapPropertySource
 @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection'])
 @CompileStatic
 class ConfigDefaults {
-    public static String springBeanIdGenMapping = 'id generator: "gorm.tools.hibernate.SpringBeanIdGenerator"'
+    public static String springBeanIdGenMapping = 'id generator: "yakworks.gorm.hibernate.SpringBeanIdGenerator"'
 
     static String getConfigString(String idGenMapping){
         return """\
+        //hibernate.flush.mode = 'AUTO'
         grails {
             //gorm.flushMode = 'AUTO'
             gorm.failOnError = true
@@ -36,8 +37,8 @@ class ConfigDefaults {
     // Load groovy config from resource
     static Map<String, Object> getConfigMap(boolean isProd = true) {
         ConfigSlurper slurper = new ConfigSlurper()
-        String cfgStr = isProd ? getConfigString(springBeanIdGenMapping) : getConfigString('')
-        // String cfgStr = getConfigString(springBeanIdGenMapping)
+        //String cfgStr = isProd ? getConfigString(springBeanIdGenMapping) : getConfigString("id generator: 'assigned'")
+        String cfgStr = getConfigString(springBeanIdGenMapping)
         ConfigObject configObject = slurper.parse(cfgStr)
         Map<String, Object> properties = configObject.flatten() as Map<String, Object>
         return properties

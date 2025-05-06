@@ -15,7 +15,6 @@ class DomainValidationSpec extends Specification implements GormHibernateTest  {
     static List entityClasses = [ValidationEntity]
 
     Closure doWithGormBeans() { { ->
-        //FIXME this should be in the commonGormBeans, configed so it picks up more
         messageSource(GrailsICUMessageSource){
             searchClasspath = true
             messageBundleLocations = "classpath*:*messages*.properties"

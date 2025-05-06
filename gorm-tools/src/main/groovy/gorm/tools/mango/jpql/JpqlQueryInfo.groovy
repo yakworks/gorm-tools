@@ -6,12 +6,18 @@ package gorm.tools.mango.jpql
 
 import groovy.transform.CompileStatic
 
-
+/**
+ * The result of the JpqlQueryBuilder
+ */
 @CompileStatic
 @SuppressWarnings("rawtypes")
 class JpqlQueryInfo {
 
+    //full query
     String query
+    //where clause
+    String where
+
     List parameters
 
     JpqlQueryInfo(String query, List parameters) {
@@ -26,6 +32,7 @@ class JpqlQueryInfo {
     List getParameters() {
         return parameters
     }
+
     Map getParamMap() {
         Map pmap = [:]
         parameters.eachWithIndex{ v, i ->

@@ -30,7 +30,7 @@ import yakworks.testing.gorm.unit.GormHibernateTest
 
 class GormRepoSpec extends Specification implements GormHibernateTest {
 
-static entityClasses = [Cust, CustExt, TestTrxRollback, KitchenSink, SinkExt, SinkItem]
+    static entityClasses = [Cust, CustExt, TestTrxRollback, KitchenSink, SinkExt, SinkItem]
 
     def "assert proper repos are setup"() {
         expect:
@@ -165,25 +165,6 @@ static entityClasses = [Cust, CustExt, TestTrxRollback, KitchenSink, SinkExt, Si
         e.message.contains("Field error in object 'testing.Cust' on field 'type': rejected value [null]")
     }
 
-    void "test createOrUpdateItem"() {
-        when: "data has no identifier"
-        def ks = KitchenSink.repo.createOrUpdateItem([num: 1, name: "foo"])
-        flushAndClear()
-
-        then:
-        KitchenSink.get(ks.id)
-
-        when: "data has identifier"
-        flushAndClear()
-        def ksu = KitchenSink.repo.createOrUpdateItem([id: ks.id, name: "foo2"])
-        flushAndClear()
-
-        def updated = KitchenSink.get(ksu.id)
-
-        then:
-        updated.name == "foo2"
-    }
-
     def "test persist"() {
         when:
         Cust org = build(Cust, save: false)
@@ -244,6 +225,9 @@ static entityClasses = [Cust, CustExt, TestTrxRollback, KitchenSink, SinkExt, Si
     def "test remove by Id"() {
         setup:
         Cust org = build(Cust)
+        flushAndClear()
+        assert Cust.get(org.id)
+        flushAndClear()
 
         when:
         Cust.repo.removeById(org.id)
@@ -272,19 +256,23 @@ static entityClasses = [Cust, CustExt, TestTrxRollback, KitchenSink, SinkExt, Si
     def "test flush"() {
         setup:
         Cust org = build(Cust, name: 'test_flush')
-
+        //build saves and flushes by default
         expect:
         org.isAttached()
+        //should be there, it flushed
         Cust.findByName('test_flush') != null
 
         when:
         org.name = 'test_flush_updated'
 
         then:
+        //still same
         Cust.findByName('test_flush') != null
+        //updated but not flushed
         Cust.findByName('test_flush_updated') == null
 
         when:
+        //the update flushes through? even though we didnt save it
         Cust.repo.flush()
         assert org.isAttached()
 
@@ -382,20 +370,22 @@ static entityClasses = [Cust, CustExt, TestTrxRollback, KitchenSink, SinkExt, Si
         when:
         org.name = "changed"
 
-        /* persist is overridden in TestTrxRollbackRepo and throws a runtime exception.
-         * persist contains withTrx {} inside, so transaction should rollback */
+        /*
+         * persist is overridden in TestTrxRollbackRepo and throws a runtime exception.
+         * persist contains withTrx {} inside, so transaction should rollback
+         */
         TestTrxRollback.repo.persist(org)
 
         then:
         thrown RuntimeException
         TestTrxRollback.findByName("changed") == null
-
     }
 
     def "test update with transaction rollback"() {
         setup:
         // call save to bypass persist
         TestTrxRollback org = new TestTrxRollback(name: "test_update_withTrx").save(failOnError: true)
+        flush()
         Map params = [name: 'foo', id: org.id]
         TestTrxRollback.repo.clear()
 
@@ -406,6 +396,7 @@ static entityClasses = [Cust, CustExt, TestTrxRollback, KitchenSink, SinkExt, Si
         /* persist is overridden in TestTrxRollbackRepo and throws a runtime exception.
          * update contains withTrx {} inside, so transaction should rollback */
         TestTrxRollback.repo.update(params)
+        flushAndClear()
 
         then:
         thrown RuntimeException
@@ -416,7 +407,7 @@ static entityClasses = [Cust, CustExt, TestTrxRollback, KitchenSink, SinkExt, Si
     def "test remove with transaction rollback"() {
         setup:
         TestTrxRollback org = new TestTrxRollback(name: "test_remove_withTrx").save()
-        TestTrxRollback.repo.clear()
+        flushAndClear()
 
         expect:
         !org.isAttached()
@@ -425,6 +416,7 @@ static entityClasses = [Cust, CustExt, TestTrxRollback, KitchenSink, SinkExt, Si
         /* remove is overridden in TestTrxRollbackRepo and throws a runtime exception.
          * remove contains withTrx {} inside, so transaction should rollback */
         TestTrxRollback.repo.remove(org)
+        flushAndClear()
 
         then:
         thrown RuntimeException

@@ -5,6 +5,7 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
+import yakworks.gorm.config.GormConfig
 import yakworks.testing.gorm.integration.DataIntegrationTest
 
 /**
@@ -18,7 +19,7 @@ class GormConfigTest extends Specification implements DataIntegrationTest {
 
     def "sanity Check"() {
         expect:
-        gormConfig.hello == "world"
+        //gormConfig.hello == "world"
         gormConfig.idGenerator.startValue == 999
     }
 

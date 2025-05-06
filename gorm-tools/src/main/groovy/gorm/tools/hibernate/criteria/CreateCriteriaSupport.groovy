@@ -29,6 +29,7 @@ import grails.util.Holders
  *  }
  * simliar with eq, like and in
  */
+@Deprecated
 @CompileDynamic
 trait CreateCriteriaSupport {
 

@@ -5,7 +5,6 @@
 package gorm.tools.job
 
 import java.nio.file.Path
-import java.text.DecimalFormat
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -17,7 +16,10 @@ import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 import groovy.util.logging.Slf4j
 
+import org.codehaus.groovy.runtime.StackTraceUtils
+
 import gorm.tools.repository.model.IdGeneratorRepo
+import gorm.tools.utils.BenchmarkHelper
 import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.api.ResultUtils
@@ -29,6 +31,8 @@ import yakworks.json.groovy.JsonStreaming
 import yakworks.message.spi.MsgService
 import yakworks.spring.AppCtx
 
+import static gorm.tools.job.SyncJobArgs.DataFormat
+
 /**
  * Holds the basic state and primary action methods for a Bulk job.
  * Creates and updates the job status as it progresses and finalizes its results when finished.
@@ -36,26 +40,29 @@ import yakworks.spring.AppCtx
 @SuppressWarnings('Println')
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @MapConstructor
-@ToString
+@ToString(includeNames = true, includes = ['ok', 'startTime', 'jobId'])
 @Slf4j
 @CompileStatic
 class SyncJobContext {
-
+    /** Thread safe state tracking, any problem will update this to false. */
     AtomicBoolean ok = new AtomicBoolean(true)
 
     //reference back to the syncJobService that created this.
     SyncJobService syncJobService
 
+    /** Arguments for this job.*/
     SyncJobArgs args
 
-    /**
-     * The master results object
-     */
+    /** Tracks the start time of the job to use in logging updates*/
+    Long startTime
+
+    /** The master results object */
     ApiResults results
 
-    /**
-     * Payload input data used for job operations
-     */
+    /** The problems will be populated if dataFormat="payload", then this will be where they are stored */
+    List<Problem> problems = [] as List<Problem>
+
+    /** Payload input data used for job operations */
     Object payload
 
     int payloadSize
@@ -88,7 +95,7 @@ class SyncJobContext {
 
         Map data = [
             id: args.jobId, source: args.source, sourceId: args.sourceId,
-            state: SyncJobState.Running, payload: payload
+            state: args.jobState, payload: payload
         ] as Map<String,Object>
 
         if(payload instanceof Collection && payload.size() > 1000) {
@@ -115,42 +122,200 @@ class SyncJobContext {
         return this
     }
 
-    void setPayloadSize(Object payload){
+    /**
+     * Update the job results with the current progress info
+     *
+     * @param apiResults the ApiResults
+     * @param startTimeMillis the start time in millis, used to deduce time elapsed
+     * @param throwEx if false then only does log.error and will not throw on an exception so flow is not disrupted if this flakes out
+     */
+    void updateJobResults(Result apiResults, boolean throwEx = true) {
+        try {
+
+            if(!apiResults.ok) {
+                ok.set(false)
+                //if not ok then update the problemCount
+                int probCnt = (apiResults instanceof ApiResults) ? apiResults.getProblems().size() : 1
+                problemCount.addAndGet(probCnt)
+            }
+            //increment the processedCount
+            int processedCnt = (apiResults instanceof ApiResults) ? apiResults.list.size() : 1
+            processedCount.addAndGet(processedCnt)
+
+            String message = getJobUpdateMessage(apiResults.ok)
+
+            updateJob(apiResults, [id: jobId, ok: ok.get(), message: message])
+        } catch (e) {
+            //ok to swallow this excep since we dont want to disrupt the flow
+            log.error("Unexpected error during updateJobResults", StackTraceUtils.deepSanitize(e))
+            if(throwEx) throw e
+        }
+    }
+
+    /**
+     * Update the total counts for processedCount and problemCount
+     * and updates message only with the counts, doesn't add or update any results.
+     * FIXME WIP, needs tests, not used anywhere yet.
+     *
+     * @param processedCnt the count to add to the the total processedCount
+     * @param probCnt the problems to add to the problemCount
+     */
+    void updateMessage(int processedCnt, int probCnt) {
+        try {
+            if(processedCnt) processedCount.addAndGet(probCnt)
+            if(probCnt) problemCount.addAndGet(probCnt)
+
+            String message = getJobUpdateMessage(probCnt > 0)
+
+            updateJob(null, [id: jobId, ok: ok.get(), message: message])
+        } catch (e) {
+            //ok to swallow this excep since we dont want to disrupt the flow, really this should be async
+            log.error("Unexpected error during updateJobResults", StackTraceUtils.deepSanitize(e))
+        }
+    }
+
+    /**
+     * updates job with a result or a problem
+     */
+    void updateWithResult(Result result) {
+        if(!result.ok) {
+            ok.set(false)
+            problemCount.addAndGet(1)
+        }
+        updateJob(result, [id: jobId, ok: ok.get()])
+    }
+
+    /**
+     * Finalize Job by completing data bytes and setting state to Finished.
+     * @return the finalized SyncJobEntity
+     */
+    SyncJobEntity finishJob() {
+        Map data = [id: jobId] as Map<String, Object>
+        if(args.saveDataAsFile){
+            // if saveDataAsFile then it will have been writing out the data results as it goes
+            //close out the file
+            dataPath.withWriterAppend { wr ->
+                wr.write('\n]\n')
+            }
+            data['dataId'] = syncJobService.createAttachment(dataPath, "SyncJobData_${jobId}_.json")
+        } else {
+            // if NOT saveDataAsFile then we need to write out the results to dataBytes since results have not been written out yet.
+            List<Map> renderResults = transformResults(results)
+            data.dataBytes = JsonEngine.toJson(renderResults).bytes
+        }
+        //if dataFormat is payload then we need to save the problems.
+        if(args.dataFormat == DataFormat.Payload && problems.size() > 0) {
+            //data.errorBytes = JsonEngine.toJson(problems).bytes
+            data.problems = problems*.asMap()
+        }
+
+        //first just update the data/databytes on syncjob to ensure that data is always available if syncjob = finished
+        syncJobService.updateJob(data)
+
+        //update "ok" and status after data is updated
+        SyncJobEntity entity = syncJobService.updateJob([id:jobId, ok:ok.get(), state: SyncJobState.Finished])
+
+        AppCtx.publishEvent(SyncJobFinishedEvent.of(this))
+        return entity
+    }
+
+    /**
+     * Standard transformation for the apiResults into a List of Maps so it can be saved as databytes
+     * @param resultsToTransform normally an ApiResults but can be any Problem or Result
+     * @return the transformed List
+     */
+    List<Map> transformResults(Result resultToTransform) {
+        // exit fast if closure is used
+        if(transformResultsClosure) {
+            return transformResultsClosure.call(resultToTransform) as List<Map>
+        }
+        List<Result> resultList = (resultToTransform instanceof ApiResults) ? resultToTransform.list : [ resultToTransform ]
+        List<Map> ret = args.dataFormat == DataFormat.Payload ? transformResultPayloads(resultList) : transformResultToMap(resultList)
+        return ret
+    }
+
+    List<Map> transformResultToMap(List<Result> resultList) {
+        MsgService msgService = syncJobService.messageSource
+        List<Map> resMapList = []
+        for (Result r : resultList) {
+            //these are common across both problems and success results.
+            def map = [ok: r.ok, status: r.status.code, data: r.payload] as Map<String, Object>
+            //do the failed
+            if (r instanceof Problem) {
+                map.putAll([
+                    code: r.code,
+                    title: ResultUtils.getMessage(msgService, r),
+                    detail: r.detail,
+                ])
+                if(r.violations) map["errors"] = r.violations //put errors only if violations are not empty
+            }
+            resMapList <<  map
+        }
+        return resMapList
+    }
+
+    /**
+     * When useErrorsField this will remove any errors from the list and put them into the errors list.
+     * and if success just return the "data" of the result which is stored in result.payload
+     * @return the "data", which is the list or payloads for the successful results.
+     */
+    List<Map> transformResultPayloads(List<Result> resultList) {
+        List<Map> resMapList = []
+        for (Result r : resultList) {
+            if (r instanceof Problem) {
+                problems.add(r)
+            } else {
+                resMapList.add( r.payload as Map)
+            }
+        }
+        return resMapList
+    }
+
+    /**
+     * builds a status message to update the job
+     */
+    protected String getJobUpdateMessage(boolean resOk){
+        String timing = startTime ? " | ${BenchmarkHelper.elapsedTime(startTime)}" : ''
+        String mem = " | used mem: ${BenchmarkHelper.getUsedMem()}"
+
+        String message = "slice ok: ${resOk} | processed ${processedCount.get()} of ${payloadSize}${timing}${mem}"
+        int problemSize = problemCount.get()
+        if(problemSize){
+            message = "$message | Has ${problemSize} problems so far"
+        }
+        if(log.isDebugEnabled()){
+            log.debug(message)
+        }
+        return message
+    }
+
+    /**
+     * called from createJob to set the payloads size. which is used to decide whether its stored at file or in db as bytes.
+     */
+    protected void setPayloadSize(Object payload){
         if(payload instanceof Collection){
             this.payloadSize = payload.size()
         }
     }
 
     /**
-     * Update the job resiults with the current progress info
-     *
-     * @param currentResults the ApiResults
-     * @param startTimeMillis the start time in millis, used to deduce time elapsed
+     * Update the job with status on whats been processed and append the json data
+     * @param currentResults the results to append, normally will be an ApiResults but can be any Problem or Result
      */
-    void updateJobResults(ApiResults currentResults,   Long startTimeMillis) {
-        if(!currentResults.ok) ok.set(false)
-        boolean curOk = ok.get()
-
-        int processedSize = processedCount.addAndGet(currentResults.list.size())
-        DecimalFormat decFmt = new DecimalFormat("0.0")
-        BigDecimal endTime = (System.currentTimeMillis() - startTimeMillis) / 1000
-        String timing = "${decFmt.format(endTime)}s"
-
-        String mem = decFmt.format(getUsedMem())
-
-        String message = "slice ok: ${currentResults.ok}, processed ${processedSize} of ${payloadSize} in ${timing}, used mem: ${mem}gb"
-        if(!currentResults.ok){
-            int problemSize = problemCount.addAndGet(currentResults.getProblems().size())
-            message = "$message\n Has ${problemSize} problems so far"
+    protected void updateJob(Result currentResults, Map data){
+        //sync to only one thread for the SyncJob can update at a time
+        synchronized ("SyncJob${jobId}".toString().intern()) {
+            syncJobService.updateJob(data)
+            // append json to dataFile
+            if(currentResults) appendDataResults(currentResults)
         }
-        if(log.isDebugEnabled()){
-            println(message)
-        }
-
-        updateJob(currentResults, [id: jobId, ok: curOk, message: message])
     }
 
-    void appendDataResults(ApiResults currentResults){
+    /**
+     * Append the results. called from updateJob
+     * @param currentResults the results to append, normally will be an ApiResults but can be any Problem or Result
+     */
+    protected void appendDataResults(Result currentResults){
         if(args.saveDataAsFile){
             boolean isFirstWrite = false
             if(!dataPath) {
@@ -173,41 +338,10 @@ class SyncJobContext {
 
     }
 
-    SyncJobEntity finishJob(List<Map> renderResults = [], List<Map> renderErrorResults = []) {
-        Map data = [id: jobId, state: SyncJobState.Finished] as Map<String, Object>
-        if(renderErrorResults){
-            //it fails, they are still ProblemTraits
-            data.errorBytes = JsonEngine.toJson(renderErrorResults).bytes
-        }
-        if(args.saveDataAsFile){
-            //close out the file
-            dataPath.withWriterAppend { wr ->
-                wr.write('\n]\n')
-            }
-            data['dataId'] = syncJobService.createAttachment(dataPath, "SyncJobData_${jobId}_.json")
-        } else {
-            renderResults = renderResults ?: transformResults(results)
-            data.dataBytes = JsonEngine.toJson(renderResults).bytes
-            data.ok = ok.get()
-        }
-        SyncJobEntity entity = syncJobService.updateJob(data)
-        AppCtx.publishEvent(SyncJobFinishedEvent.of(this))
-        return entity
-    }
-
     /**
-     * Update the job with status on whats been processed and append the json data
+     * when args.saveDataAsFile = true, this is called to initialize the datafile
      */
-    void updateJob(ApiResults currentResults, Map data){
-        //sync to only one thread for the SyncJob can update at a time
-        synchronized ("SyncJob${jobId}".toString().intern()) {
-            syncJobService.updateJob(data)
-            // append json to dataFile
-            appendDataResults(currentResults)
-        }
-    }
-
-    void initJsonDataFile() {
+    protected void initJsonDataFile() {
         String filename = "SyncJobData_${jobId}_.json"
         dataPath = syncJobService.createTempFile(filename)
         //init with the opening brace
@@ -216,39 +350,22 @@ class SyncJobContext {
         }
     }
 
-    List<Map> transformResults(ApiResults apiResults) {
-        // exit fast if closure is used
-        if(transformResultsClosure) {
-            return transformResultsClosure.call(apiResults) as List<Map>
-        }
-        MsgService msgService = syncJobService.messageSource
-        List<Map> ret = []
-        boolean ok = true
-        for (Result r : apiResults.list) {
-            def map = [ok: r.ok, status: r.status.code, data: r.payload] as Map<String, Object>
-            //do the failed
-            if (r instanceof Problem) {
-                map.putAll([
-                    code: r.code,
-                    title: ResultUtils.getMessage(msgService, r),
-                    detail: r.detail,
-                ])
-                if(r.violations) map["errors"] = r.violations //put errors only if violations are not empty
-            } else {
-                map.data = r.payload as Map
-            }
-            ret << map
-        }
-        return ret
-    }
-
-    Long writePayloadFile(Collection payload){
+    /**
+     * when args.savePayload and args.savePayloadAsFile are true, this is called to save the payload to file
+     * @param payload the payload List or Map that was sent (will normally have been json when called via REST
+     * @return the Attachment id.
+     */
+    protected Long writePayloadFile(Collection payload){
         String filename = "SyncJobPayload_${jobId}_.json"
         Path path = syncJobService.createTempFile(filename)
         JsonStreaming.streamToFile(payload, path)
         return syncJobService.createAttachment(path, filename)
     }
 
+    /**
+     * helper to add memory usage to the progress message.
+     * @return the used mem in gigabytes.
+     */
     static BigDecimal getUsedMem(){
         int gb = 1024*1024*1024;
 

@@ -10,8 +10,11 @@ import groovy.transform.ToString
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
+import gorm.tools.async.AsyncArgs
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp
+import yakworks.commons.lang.EnumUtils
 
 /**
  * Value Object are better than using a Map to store arguments and parameters.
@@ -21,9 +24,11 @@ import gorm.tools.repository.model.DataOp
  */
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @MapConstructor
-@ToString
+@ToString(includeNames = true, includes = ['jobId', 'op', 'source', 'sourceId', 'async'])
 @CompileStatic
 class SyncJobArgs {
+    public static final DATA_FORMAT_RESULT = "result"
+    public static final DATA_FORMAT_PAYLOAD = "payload"
 
     SyncJobArgs() { this([:])}
 
@@ -39,7 +44,7 @@ class SyncJobArgs {
     Object payload
 
     /**
-     * force how to store the payload
+     * force how to store the payload (what was sent)
      */
     Boolean savePayload = true
 
@@ -49,9 +54,24 @@ class SyncJobArgs {
     Boolean savePayloadAsFile = false
 
     /**
-     * resulting data is always saved but can force it to save to file instead of bytes in column
+     * resulting data (what is returned in response) is always saved but can force it to save to file instead of bytes in column
      */
     Boolean saveDataAsFile = false
+
+    /**
+     * If dataFormat=Payload then errors should be stored separate from result data.
+     * If dataFormat=Result then errors are mixed in and the syncJob.data is just a rendered list of the results.
+     * When dataFormat=Payload then the rendering of the data is only list of whats in each results payload.
+     * as opposed to a list of Results objects when dataFormat=Result
+     * For example if processing export then instead of getting syncJob.data as a list of results objects it will be a list of what
+     * the requested export is, such as Invoices. would look as if the call was made to the rest endpoint for a list synchronously
+     * Since data can only support a list of entities then any issues or errors get stored in a separate errors field,
+     * syncjob.errorBytes will be populated with error results
+     */
+    DataFormat dataFormat = DataFormat.Result
+
+    @CompileStatic
+    static enum DataFormat { Result, Payload }
 
     /**
      * the operation to perform, Used in bulk and limited to add and update right now.
@@ -91,25 +111,39 @@ class SyncJobArgs {
     boolean transactional = false
 
     /**
-     * Allows override for the default async from gorm.tools.async.enabled
-     * whether it should run async with a CompletableFuture and return the job immediately
-     * or run in a standard blocking synchronous
+     * Normally used for testing and debugging, or when encountering deadlocks.
+     * Allows to override and turn off the AsyncArgs.enabled passed to ParallelTools
+     * When the processes slices it will parallelize and run them async. If false then will not run in parallel and will be single threaded
+     * NOTE: This is null by default and should not default to true/false, when it gets set to AsyncArgs.enabled if thats null
+     * then it will use the system/config defaults from gorm.tools.async.enabled
      */
-    Boolean asyncEnabled
+    Boolean parallel //keep NULL by default
 
     /**
-     * Whether it should run async with a CompletableFuture and return the job immediately
-     * or run in a standard blocking synchronous
+     * Whether it should run in async background thread and return the job immediately.
+     * Essentially makes the job a sort of Promise or Future.
+     * when false (default) run in a standard blocking synchronous thread and return when job is done
      */
-    Boolean promiseEnabled = false
+    Boolean async = true
 
     /**
      * the args, such as flush:true etc.., to pass down to the repo methods
      */
     Map persistArgs
 
-    /** returns new PersistArgs instance on each call */
-    PersistArgs getPersistArgs() { return this.persistArgs ? PersistArgs.of(this.persistArgs) : new PersistArgs() }
+    /**
+     * returns new PersistArgs instance on each call.
+     * GormRepo make changes as it goes so we dont want the same one going through multiple cylces
+     */
+    PersistArgs getPersistArgs() {
+        return this.persistArgs ? PersistArgs.of(this.persistArgs) : new PersistArgs()
+    }
+
+    /**
+     * When params include a mango query this is the QueryArgs that are created from it. Used for the ExportSyncArgs.
+     * FUTURE USE
+     */
+    QueryArgs queryArgs
 
     /**
      * The job id, will get populated when the job is created, normally from the syncJobContext.
@@ -124,6 +158,12 @@ class SyncJobArgs {
 
     //reference back to the SyncJobContext built from these args.
     SyncJobContext context
+
+    /**
+     * SyncJobState to use when creating new job.
+     * Default is Running. But Queued can be used for jobs which are scheduled to run later, eg BulkExport.
+     */
+    SyncJobState jobState = SyncJobState.Running
 
     /** helper to return true if op=DataOp.add */
     boolean isCreate(){
@@ -144,5 +184,36 @@ class SyncJobArgs {
         new SyncJobArgs(args)
     }
 
+    static SyncJobArgs withParams(Map params){
+        SyncJobArgs syncJobArgs = new SyncJobArgs(params:params)
+        //parallel is NULL by default
+        if(params.parallel != null) syncJobArgs.parallel = params.getBoolean('parallel')
+
+        //when this is true then runs "non-blocking" in background and will job immediately with state=running
+        syncJobArgs.async = params.getBoolean('async', true)
+
+        //save payload is true by default
+        if(params.savePayload != null) syncJobArgs.savePayload = params.getBoolean('savePayload')
+        if(params.saveDataAsFile != null) syncJobArgs.saveDataAsFile = params.getBoolean('saveDataAsFile')
+
+        syncJobArgs.sourceId = params.sourceId
+        //can use both jobSource and source to support backward compat, jobSource wins if both are set
+        if(params.source != null) syncJobArgs.source = params.source
+        if(params.jobSource != null) syncJobArgs.source = params.jobSource
+
+        //allow to specify the dataFormat
+        if(params.dataFormat != null) syncJobArgs.dataFormat = EnumUtils.getEnumIgnoreCase(DataFormat, params.dataFormat as String)
+
+        //setup queryArgs
+        if(params.containsKey("q") || params.containsKey("qSearch") ) {
+            syncJobArgs.queryArgs = QueryArgs.of(params)
+        }
+
+        return syncJobArgs
+    }
+
+    AsyncArgs getAsyncArgs() {
+        return new AsyncArgs(enabled: async)
+    }
 
 }

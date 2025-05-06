@@ -4,6 +4,7 @@ import groovy.json.JsonSlurper
 
 import org.springframework.http.HttpStatus
 
+
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
@@ -14,9 +15,13 @@ class BadUrlSpec extends Specification implements OkHttpRestTrait {
 
     String path = "/api/this/is/no/good"
 
+    def setup(){
+        login()
+    }
+
     void "good url"() {
         when:
-        Response resp = get('/api/rally/org')
+        Response resp = get('/api/rally/org?q=*')
         String bodyString = resp.body().string()
 
         then:
@@ -32,7 +37,8 @@ class BadUrlSpec extends Specification implements OkHttpRestTrait {
         then:
         resp.code() == HttpStatus.NOT_FOUND.value()
         Map body = new JsonSlurper().parseText(bodyString) as Map
-        body.error == 404
+        body.status == 404
+        // body.error == 404
     }
 
 }

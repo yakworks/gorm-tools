@@ -8,6 +8,7 @@ import java.util.regex.Pattern
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.repository.RepoUtil
 import grails.core.ArtefactHandlerAdapter
 import yakworks.commons.lang.NameUtils
 
@@ -59,7 +60,8 @@ class RepositoryArtefactHandler extends ArtefactHandlerAdapter {
         return "${domainClass.name}$SUFFIX"
     }
 
-    static String getRepoBeanName(Class domainClass) {
-        return "${NameUtils.getPropertyName(domainClass.name)}$SUFFIX"
-    }
+    // static String getRepoBeanName(Class domainClass) {
+    //     RepoUtil.getRepoBeanName(domainClass)
+    //     return "${NameUtils.getPropertyName(domainClass.name)}$SUFFIX"
+    // }
 }

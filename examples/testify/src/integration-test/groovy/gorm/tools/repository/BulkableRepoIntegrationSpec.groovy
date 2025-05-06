@@ -41,7 +41,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
     }
 
     SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
-        return new SyncJobArgs(asyncEnabled: false, op: op, source: "test", sourceId: "test",
+        return new SyncJobArgs(parallel: false, async:false, op: op, source: "test", sourceId: "test",
             includes: ["id", "name", "ext.name"])
     }
 
@@ -58,7 +58,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         List<Map> jsonList = generateOrgData(3)
 
         when:
-        Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create(asyncEnabled: false))
+        Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create(parallel: false, async:false))
         SyncJob job = getJob(jobId) //= SyncJob.repo.read(jobId)
         assert job.state == SyncJobState.Finished
         List json = parseJson(job.dataToString())
@@ -104,17 +104,18 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         list[5].num ="num1" //will fail (During flush) on this one as it already exists
 
         Long jobId = kitchenSinkRepo.bulk(list, setupSyncJobArgs())
-        def job, dbData
+        def job, dbData, successCount
 
         KitchenSink.withNewTransaction {
             job = SyncJob.get(jobId)
             dbData = KitchenSink.findAllWhere(comments: 'GoDogGo')
+            successCount = KitchenSink.countByComments("GoDogGo") //All except 1 should have been inserted
         }
 
         then: "verify job"
         job.state == SyncJobState.Finished
-        dbData.size() == 299 //All except 1 should have been inserted
         //first slice will have run through second time, make sure its good
+        successCount == 299
         dbData[0].name2 != null
         dbData[2].name2 != null
 
@@ -130,7 +131,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         List<Map> jsonList = generateOrgData(5)
 
         when:
-        Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create(asyncEnabled: false))
+        Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create(parallel: false, async: false))
         SyncJob job = getJob(jobId) //SyncJob.get(jobId)
 
         then:
@@ -146,7 +147,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
             it["comments"] = "flubber${it.id}"
         }
 
-        jobId = orgRepo.bulk(jsonList, SyncJobArgs.update(asyncEnabled: false))
+        jobId = orgRepo.bulk(jsonList, SyncJobArgs.update(parallel: false, async: false))
         job = getJob(jobId) //SyncJob.get(jobId)
         // flushAndClear()
 
@@ -176,7 +177,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         List<Map> contactData = [[org:[id: org.id], street1: "street1", street2: "street2", city: "city", state:"IN"]]
 
         when:
-        SyncJobArgs args = SyncJobArgs.create(asyncEnabled: false)
+        SyncJobArgs args = SyncJobArgs.create(parallel: false, async: false)
 
         //include field from org, here org would be a lazy association, and would fail when its property accessed during json building
         args.includes = ["id", "org.source.id"]
@@ -206,7 +207,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         jsonList[0].num = StringUtils.rightPad("ORG-1-", 110, "X")
 
         when:
-        Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create(asyncEnabled: false))
+        Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create(parallel: false,  async: false))
         SyncJob job = SyncJob.repo.getWithTrx(jobId)
         flush()
 
@@ -275,7 +276,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         jsonList[1].num = "testorg-1"
 
         when:
-        Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create())
+        Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create(async:false))
         SyncJob job = SyncJob.repo.getWithTrx(jobId)
 
         then:
@@ -288,7 +289,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         then:
         json != null
         json.findAll({ it.ok == true}).size() == 299
-        OrgFlex.findAllWhere(text1: 'goGoGadget').size() == 299
+        OrgFlex.countByText1('goGoGadget') == 299
 
         when:
         Map failed =  json.find({ it.ok == false})
@@ -308,7 +309,6 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         failed.data.info instanceof Map
         failed.data.flex instanceof Map
 
-
         cleanup:
         Org.withNewTransaction {
             jdbcTemplate.execute("DROP index org_num_unique")
@@ -327,11 +327,12 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         jsonList[3].num = "testorg-2" //this one should cause error when processing slice errors
 
         when:
-        Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create())
+        Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create(async:false))
         SyncJob job = SyncJob.repo.getWithTrx(jobId)
 
         then:
         noExceptionThrown()
+        job.state == SyncJobState.Finished
         job.data != null
 
         when: "verify json"

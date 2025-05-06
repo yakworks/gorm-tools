@@ -5,45 +5,32 @@
 package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.validation.Errors
 
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
+import gorm.tools.mango.api.QueryService
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
-import grails.gorm.DetachedCriteria
-import yakworks.commons.beans.Transform
-import yakworks.rally.orgs.model.Company
 import yakworks.rally.orgs.model.Org
-import yakworks.rally.orgs.model.OrgTag
-import yakworks.rally.orgs.model.OrgType
 
 @GormRepository
 @CompileStatic
+@Slf4j
 class OrgRepo extends AbstractOrgRepo {
-
 
     // add @Override
     @RepoListener
     void beforeValidate(Org org, Errors errors) {
         super.beforeValidate(org, errors)
-        wireOrgMember(org)
-        verifyCompany(org)
+        //dont try to setup member if it has any errors
+        if(!errors.hasErrors()) wireOrgMember(org)
+        //verifyCompany(org)
     }
 
-    /**
-     * makes sure org has a company on it, and sets it self if its a company
-     */
-    void verifyCompany(Org org){
-        if (org.companyId == null) {
-            if (org.type == OrgType.Company){
-                org.companyId = org.id
-            } else {
-                org.companyId = Company.DEFAULT_COMPANY_ID
-            }
-        }
-    }
 
     /**
      * Org member needs org set for validation
@@ -59,21 +46,13 @@ class OrgRepo extends AbstractOrgRepo {
      * special handling for tags
      */
     @Override
-    MangoDetachedCriteria<Org> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure = null) {
-        List critTags = queryArgs.criteria.remove('tags') as List
-        List critTagIds = queryArgs.criteria.remove('tagIds') as List
-
-        DetachedCriteria<Org> detCrit = getMangoQuery().query(Org, queryArgs, closure)
-
-        //if it has tags key
-        if(critTags){
-            //convert to id long list
-            List<Long> tagIds = Transform.objectToLongList(critTags)
-            detCrit.exists(OrgTag.buildExistsCriteria(tagIds))
-        } else if(critTagIds) {
-            //should be list of id if this key is present
-            detCrit.exists(OrgTag.buildExistsCriteria(critTagIds))
-        }
-        return detCrit
+    MangoDetachedCriteria<Org> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure applyClosure) {
+        MangoDetachedCriteria<Org> mangoCriteria = getQueryService().createCriteria(queryArgs, applyClosure)
+        //do the tags
+        orgTagRepo.doExistsCriteria(mangoCriteria.criteriaMap)
+        //apply as normal
+        getQueryService().applyCriteria(mangoCriteria)
+        return mangoCriteria
     }
+
 }

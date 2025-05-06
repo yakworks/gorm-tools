@@ -30,7 +30,21 @@ class Org implements NameNum, RepoEntity<Org>, HasTags, CreateCriteriaSupport, S
     static List<String> toOneAssociations = ['flex', 'info', 'calc', 'member']
 
     String  comments
+
+    /**
+     * Denormalized from the relevant field in OrgMember.
+     * Company is the highest level in any dimension heirarchy and is used heavily for segmenting permissions and mini-multi tenant concepts.
+     */
     Long    companyId
+
+    /**
+     * The Partition Org this org belongs to. Denormalized from the relevant field in OrgMember.
+     * When the partition.orgType = Company that the highest level in the dimension and this will be set to itself for the company records
+     * In the example where partition.orgType = Division and the dimension heirarchy = Customer -> Division -> Company
+     * Then this will be null for the Company orgs and the Division orgs will have this set to themselves.
+     */
+    // Org    partitionOrg
+
     Long    orgTypeId
     OrgType type
     Boolean inactive = false  // no logic attached. Just a flag for reports for now.
@@ -51,8 +65,8 @@ class Org implements NameNum, RepoEntity<Org>, HasTags, CreateCriteriaSupport, S
     // OrgDynamicCalc formulaz
 
     static constraintsMap = [
-        num: [d: 'Unique alpha-numeric identifier for this organization', example: 'SPX-321'],
-        name: [d: 'The full name for this organization', example: 'SpaceX Corp.'],
+        num: [d: 'Unique alpha-numeric identifier for this organization', example: 'SPX-321', nullable: false, maxSize: 50],
+        name: [d: 'The full name for this organization', example: 'SpaceX Corp.', nullable: false, maxSize: 255],
         type:[ d: 'The type of org', example: 'Customer',
                nullable: false, bindable: false],
         comments:[ d: 'A user visible comment', example: 'Lorem ipsum'],
@@ -70,8 +84,7 @@ class Org implements NameNum, RepoEntity<Org>, HasTags, CreateCriteriaSupport, S
         location:[ description: 'The primary organization address info',
                    bindable: false, oapi:[read: true, edit: ['$ref']]
         ],
-        calc:[ description: 'Calculated fields',
-               bindable: false, editable: false],
+        calc:[ description: 'Calculated fields', bindable: false, editable: false],
         member:[ description: 'Dimension hierarchy fields',
                  bindable: false, oapi:[read: true, edit: ['$ref']]
         ],
@@ -93,7 +106,7 @@ class Org implements NameNum, RepoEntity<Org>, HasTags, CreateCriteriaSupport, S
         // formulaz insertable: false, updateable: false , column:'id', lazy: true
     }
 
-    static OrgRepo getRepo() { RepoLookup.findRepo(this) as OrgRepo }
+    static OrgRepo getRepo() { (OrgRepo) RepoLookup.findRepo(this) }
 
     //gorm event
     def beforeInsert() {
@@ -115,18 +128,18 @@ class Org implements NameNum, RepoEntity<Org>, HasTags, CreateCriteriaSupport, S
     }
 
     /**
-     * quick shortcut to make an Org. unlike create, this returns and UNSAVED new entity
+     * quick shortcut to make an Org. unlike create, this returns an UNSAVED new entity
      */
-    static Org of(String num, String name, Long orgTypeId, Long companyId = Company.DEFAULT_COMPANY_ID) {
-        of(num, name, OrgType.get(orgTypeId), companyId)
-    }
+    // static Org of(String num, String name, Long orgTypeId, Long companyId = Company.DEFAULT_COMPANY_ID) {
+    //     of(num, name, OrgType.get(orgTypeId), companyId)
+    // }
 
     /**
      * quick shortcut to make an Org. unlike create, this returns and UNSAVED new entity
      */
     static Org of(String num, String name, OrgType orgType, Long companyId = Company.DEFAULT_COMPANY_ID) {
-        def o = new Org(num: num, name: name, companyId: companyId)
-        o.type = orgType
+        def o = new Org(num: num, name: name, type: orgType, companyId: companyId)
+        //o.companyId = companyId
         return o
     }
 }

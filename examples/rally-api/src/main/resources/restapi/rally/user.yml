@@ -1,0 +1,27 @@
+api:
+  paths:
+    /rally/user:
+      includes:
+        get: [ '*', roles.$*]
+
+      gridOptions:
+        colModel:
+          - { name: id, hidden: true }
+          - { name: username, width: 120, formatter: editActionLink }
+          - { name: name, width: 120 }
+          - { name: email, width: 120 }
+          - { name: inactive, width: 40, formatter: okIcon }
+
+      editForm:
+        username:
+          required: true
+        name:
+          required: true
+        email:
+          required: true
+        inactive:
+          type: checkbox
+        roles:
+          type: select
+          dataApiKey: rally/role
+          selectOptions: { multiple: true }

@@ -5,12 +5,12 @@
 package yakworks.rally.activity.repo
 
 import java.time.LocalDateTime
-import javax.persistence.criteria.JoinType
 
 import groovy.transform.CompileStatic
 
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.validation.Errors
 
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
@@ -24,15 +24,13 @@ import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
+import gorm.tools.validation.Rejector
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.ReadOnly
-import grails.gorm.transactions.Transactional
-import yakworks.commons.lang.Validate
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
-import yakworks.rally.activity.model.Task
 import yakworks.rally.activity.model.TaskStatus
 import yakworks.rally.activity.model.TaskType
 import yakworks.rally.attachment.model.Attachment
@@ -40,30 +38,34 @@ import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.TagLink
-import yakworks.security.SecService
+import yakworks.security.user.CurrentUser
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKind
-import static yakworks.rally.activity.model.Activity.VisibleTo
 
 @GormRepository
 @CompileStatic
 class ActivityRepo extends LongIdGormRepo<Activity> {
 
-    @Autowired(required = false)
-    ActivityLinkRepo activityLinkRepo
-
-    @Autowired(required = false)
-    AttachmentRepo attachmentRepo
-
-    @Autowired(required = false)
-    SecService secService
-
-    @Autowired(required = false)
-    ProblemHandler problemHandler
+    @Autowired ActivityLinkRepo activityLinkRepo
+    @Autowired AttachmentRepo attachmentRepo
+    @Autowired CurrentUser currentUser
+    @Autowired ProblemHandler problemHandler
 
     @RepoListener
-    void beforeValidate(Activity activity) {
+    void beforeValidate(Activity activity, Errors errors) {
         updateNameSummary(activity)
+        validateActDate(activity, errors)
+    }
+
+    void validateActDate(Activity activity, Errors errors) {
+        if(activity.isNew()) {
+            if(!activity.actDate) {
+                activity.actDate = LocalDateTime.now()
+            }
+        } else if(activity.hasChanged('actDate')) {
+            //actDate can not be updated.
+            Rejector.of(activity, errors).withError('actDate', activity.actDate, 'error.notupdateable', [name:"actDate"])
+        }
     }
 
     @RepoListener
@@ -115,22 +117,25 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
     }
 
     /**
-     * Called after persist if its had a bind action (create or update) and it has data
+     * Called after persist .
+     * if its had a bind action (create or update) and it has data
      * creates or updates One-to-Many associations for this entity.
      */
     @Override
-    void doAfterPersistWithData(Activity activity, PersistArgs args) {
-        Map data = args.data
-        if(data.attachments) doAttachments(activity, data.attachments)
-        if(data.contacts) ActivityContact.addOrRemove(activity, data.contacts)
-        if(data.tags) TagLink.addOrRemoveTags(activity, data.tags)
+    void doAfterPersist(Activity activity, PersistArgs args) {
+        if (args.bindAction && args.data) {
+            Map data = args.data
+            if (data.attachments) doAttachments(activity, data.attachments)
+            if (data.contacts != null) ActivityContact.addOrRemove(activity, data.contacts)
+            if (data.tags != null) TagLink.addOrRemoveTags(activity, data.tags)
 
-        if(args.bindAction?.isCreate()){
-            if(data.linkedId && data.linkedEntity) {
-                activityLinkRepo.create(data.linkedId as Long, data.linkedEntity as String, activity)
-            } else if(data.links) {
-                assert data.links instanceof List<Map>
-                doLinks(activity, data.links as List<Map>)
+            if (args.bindAction?.isCreate()) {
+                if (data.linkedId && data.linkedEntity) {
+                    activityLinkRepo.create(data.linkedId as Long, data.linkedEntity as String, activity)
+                } else if (data.links) {
+                    assert data.links instanceof List<Map>
+                    doLinks(activity, data.links as List<Map>)
+                }
             }
         }
     }
@@ -138,26 +143,20 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
     /**
      * Override query for custom search for Tags and ActivityLinks
      */
-    @Override
-    MangoDetachedCriteria<Activity> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
-        Map crit = queryArgs.criteria
-        DetachedCriteria tagExistsCrit
+
+    MangoDetachedCriteria<Activity> queryOld(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
+        Map crit = queryArgs.criteriaMap
         DetachedCriteria actLinkExists
-        if(crit.tags || crit.tagIds) {
-            Map tagCriteriaMap = [tags: crit.remove('tags'), tagIds: crit.remove('tagIds')]
-            //if its has tags keys then this returns something to add to exists, will remove the keys as well
-            tagExistsCrit = TagLink.getExistsCriteria(tagCriteriaMap, Activity, 'activity_.id')
-        }
+
+        //NOTE: tags are handled in the TagsMangoCriteriaEventListener
+
         if(crit.linkedId && crit.linkedEntity) {
             Long linkedId = crit.remove('linkedId') as Long //remove so they dont flow through to query
             String linkedEntity = crit.remove('linkedEntity') as String
             actLinkExists = getActivityLinkCriteria(linkedId, linkedEntity)
         }
-        MangoDetachedCriteria<Activity> detCrit = getMangoQuery().query(Activity, queryArgs, closure)
-        //if it has tags key
-        if(tagExistsCrit != null) {
-            detCrit.exists(tagExistsCrit.id())
-        }
+        MangoDetachedCriteria<Activity> detCrit = getQueryService().query(queryArgs, closure)
+
         if(actLinkExists != null) {
             detCrit.exists(actLinkExists.id())
         }
@@ -186,7 +185,7 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
         }
 
         //update name
-        if (activity.kind == ActKind.Note && activity.note) {
+        if (activity.kind == ActKind.Note && activity.note && activity.note.body) {
             int endChar = activity.note.body.trim().length()
             activity.name = (endChar > 255) ? activity.note.body.trim().substring(0, 251) + " ..." : activity.note.body.trim()
         }
@@ -241,41 +240,6 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
         return act.note
     }
 
-    void completeTask(Task task, Long completedById) {
-        Validate.notNull(completedById, "[completedById]")
-        task.bind(status: TaskStatus.COMPLETE,
-                state: TaskStatus.COMPLETE.id as Integer,
-                completedDate: LocalDateTime.now(),
-                completedBy: completedById)
-
-    }
-
-    /**
-     * quick easy way to create a Todo activity
-     */
-    @Transactional
-    Activity createTodo(Org org, Long userId, String name, String linkedEntity = null,
-                        List<Long> linkedIds = null, LocalDateTime dueDate = LocalDateTime.now()) {
-
-        Activity activity = create(org: org, name: name, kind : Activity.Kind.Todo)
-
-        if(linkedIds){
-            for(Long linkedId: linkedIds){
-                ActivityLink activityLink = new ActivityLink(activity: activity, linkedId: linkedId, linkedEntity: linkedEntity)
-                activityLink.persist()
-            }
-        }
-
-        activity.task = new Task(
-            taskType: TaskType.TODO,
-            userId  : userId,
-            dueDate : dueDate,
-            status  : TaskStatus.OPEN
-        )
-        activity.persist()
-        return activity
-    }
-
     void fixUpTaskParams(Map params) {
         //if there is no due date then assume its not a task and remove all the task stuff if it exists
         Map taskParams = params.task as Map
@@ -316,33 +280,6 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
             eqProperty("activity.id", "activity_.id")
             eq("linkedId", linkedId)
             eq("linkedEntity", linkedEntity)
-        }
-    }
-
-    @Deprecated //unused, here for reference on custArea
-    DetachedCriteria<Activity> zzzgetActivityByLinkedCriteria(Long linkedId,  String linkedEntity, boolean custArea = false) {
-        def actLinkExists = getActivityLinkCriteria(linkedId, linkedEntity)
-
-        return Activity.query {
-            setAlias 'activity_' //match default
-            createAlias('task', 'task')
-            join('task', JoinType.LEFT)
-            exists actLinkExists.id()
-            or {
-                isNull("task")
-                le("task.state", 1)
-            }
-            or {
-                eq("visibleTo", VisibleTo.Everyone)
-                if (!custArea) {
-                    ne("visibleTo", VisibleTo.Owner)
-                    and {
-                        eq("visibleTo", VisibleTo.Owner)
-                        eq("createdBy", secService.userId)
-                    }
-                }
-            }
-
         }
     }
 

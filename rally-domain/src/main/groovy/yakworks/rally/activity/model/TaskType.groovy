@@ -24,6 +24,7 @@ class TaskType implements NameCodeDescription, RepoEntity<TaskType>, Serializabl
 
     static mapping = {
         cache "nonstrict-read-write"
+        id generator: 'assigned'
     }
 
     static constraints = {

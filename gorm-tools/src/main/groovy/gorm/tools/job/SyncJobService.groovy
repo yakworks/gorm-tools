@@ -5,6 +5,7 @@
 package gorm.tools.job
 
 import java.nio.file.Path
+import java.util.function.Supplier
 
 import groovy.transform.CompileStatic
 
@@ -12,6 +13,9 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 
+import gorm.tools.async.AsyncArgs
+import gorm.tools.async.AsyncService
+import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.transaction.TrxService
 import yakworks.i18n.icu.ICUMessageSource
@@ -19,7 +23,7 @@ import yakworks.spring.AppCtx
 
 /** Trait for a conretete SyncJobService that provides standard functionality to create and update a jobs status */
 @CompileStatic
-trait SyncJobService<D> {
+abstract class SyncJobService<D> {
     final static Logger LOG = LoggerFactory.getLogger(SyncJobService)
 
     @Autowired
@@ -27,6 +31,12 @@ trait SyncJobService<D> {
 
     @Autowired
     TrxService trxService
+
+    @Autowired
+    ProblemHandler problemHandler
+
+    @Autowired
+    AsyncService asyncService
 
     /**
      * get the repo so the synJob
@@ -42,6 +52,7 @@ trait SyncJobService<D> {
         trxService.withNewTrx {
             jobContext = SyncJobContext.of(args).syncJobService(this).payload(payload)
             jobContext.createJob()
+            jobContext.startTime = System.currentTimeMillis()
         }
         AppCtx.publishEvent(SyncJobStartEvent.of(jobContext))
         return jobContext
@@ -89,5 +100,40 @@ trait SyncJobService<D> {
      * @return the attachmentId
      */
     abstract Long createAttachment(Path path, String name)
+
+    /**
+     * Standard pattern to run a function asynchrons (assuming asyncArgs is setup that way).
+     * Will call the finish job when its done.  Supplier can be anything really.
+     * @param asyncArgs the async args to pass to supplyAsync
+     * @param jobContext the active jobContext
+     * @param runnable the runnable function to run
+     * @return the job id from the jobContext.jobId
+     */
+    Long runJob(AsyncArgs asyncArgs, SyncJobContext jobContext, Runnable runnable) {
+        //process each glbatch in async
+        asyncService
+            .supplyAsync (asyncArgs, () -> runnable.run()) //FIXME we really should be using runAsync as we do nothing with what the supplier returns
+            .whenComplete { res, ex ->
+                if (ex) {
+                    //ideally should not happen as the pattern here is that all exceptions should be handled in supplierFunc
+                    jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
+                }
+                jobContext.finishJob()
+            }
+
+        return jobContext.jobId
+    }
+
+    /**
+     * Standard pattern to run a function asynchrons (assuming asyncArgs is setup that way).
+     * Will call the finish job when its done.  Supplier can be anything really.
+     * @param asyncArgs the async args to pass to supplyAsync
+     * @param jobContext the active jobContext
+     * @param runnable the runnable function to run
+     * @return the job id from the jobContext.jobId
+     */
+    Long runJob(SyncJobContext jobContext, Runnable runnable) {
+        return runJob(jobContext.args.asyncArgs, jobContext, runnable)
+    }
 
 }

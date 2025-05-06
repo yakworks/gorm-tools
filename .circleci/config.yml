@@ -5,15 +5,17 @@ executors:
   builder-large:  # 4cpus 8gb ram
     resource_class: 'large'
     environment:
+      # JAVA_OPTIONS: "-Xmx1792m"
       GRADLE_OPTS: "-Dorg.gradle.caching=true -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=4 -Dorg.gradle.console=plain"
     docker:
-      - image: yakworks/builder:jdk11
+      - image: yakworks/bullseye:jdk11
   builder-medium: # 2cpus 4gb ram
     resource_class: 'medium'
     environment:
+      # JAVA_OPTIONS: "-Xmx1792m"
       GRADLE_OPTS: "-Dorg.gradle.caching=true -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dorg.gradle.console=plain"
     docker:
-      - image: yakworks/builder:jdk11
+      - image: yakworks/bullseye:jdk11
 
 commands:
   restore_gradle_cache:
@@ -50,8 +52,9 @@ commands:
           paths: [
             ".gradle", ".build-cache",
             "./gorm-test-domain/build", "./gorm-test-support/build", "./gorm-tools/build",
-            "./gorm-etl/build", "./gorm-rest/build", "./gorm-security/build",
-            "./rally-domain/build", "./rally-security/build"
+            "./gorm-audit/build", "./gorm-etl/build", "./gorm-rest/build",
+            "./security/boot-security/build", "./security/boot-security-gorm/build", "./security/security-core/build",
+            "./rally-domain/build"
           ]
           key: build-{{ .Branch }}-{{ checksum "day-version-cache-key.tmp" }}
 
@@ -71,9 +74,14 @@ jobs:
       - restore_gradle_cache
       - restore_build_cache
 
+      # do just gorm-tools so we dont run out of memory
+      - run:
+          name: ✔︎ -- compile
+          command: ./gradlew gorm-tools:classes
+
       - run:
           name: ✔︎ -- assemble
-          command: ./gradlew assemble -x restify:assemble -x testify:assemble -x benchmarks:assemble -x rally-api:assemble
+          command: ./gradlew assemble -x testify:assemble -x benchmarks:assemble -x rally-api:assemble -x hello-boot-security:check
 
       - save_gradle_cache
       - save_workspace
@@ -89,11 +97,13 @@ jobs:
       - run:
           name: ✔︎ -- check
           command: |
-            ./gradlew check -x rally-domain:check -x rally-security:check \
-            -x restify:check -x testify:check -x benchmarks:check -x rally-api:check
+            ./gradlew check -x rally-domain:check -x hello-boot-security:check \
+            -x testify:check -x benchmarks:check -x rally-api:check
 
       - run: make gradle.merge-test-results
       - store_test_results: { path: build/test-results/ }
+      - store_artifacts:
+          path: build/reports/
 
   rally:
     executor: builder-medium
@@ -103,9 +113,12 @@ jobs:
       - attach_workspace:
           at: .
 
-      - run: ./gradlew rally-domain:check rally-security:check --parallel
+      - run: ./gradlew rally-domain:check --parallel
       - run: make gradle.merge-test-results
       - store_test_results: { path: build/test-results/ }
+      - store_artifacts:
+          path: rally-domain/build/reports/
+          destination: reports/rally-domain
 
   examples:
     executor: builder-large
@@ -114,9 +127,12 @@ jobs:
       - restore_gradle_cache
       - attach_workspace:
           at: .
-      - run: ./gradlew rally-api:check testify:check restify:check -x benchmarks:check --parallel
+      - run: ./gradlew rally-api:check testify:check hello-boot-security:check --parallel
       - run: make gradle.merge-test-results
       - store_test_results: { path: build/test-results/ }
+      - store_artifacts:
+          path: build/reports/
+          destination: reports
 
   ship-gh-pages:
     docker:

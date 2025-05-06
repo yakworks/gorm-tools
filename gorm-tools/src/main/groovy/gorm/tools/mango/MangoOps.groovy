@@ -24,6 +24,7 @@ class MangoOps {
     public static final String SORT = '$sort'
     public static final String Q = '$q'
     public static final String PROJECTIONS = '$projections'
+    public static final String SELECT = '$select'
     // if passing q but also want the fuzzy search then nest it in this field
     public static final String QSEARCH = '$qSearch'
 
@@ -78,6 +79,18 @@ class MangoOps {
         String getOp(){ return op }
 
         JunctionOp() {
+            this.op = name().substring(1) //remove $
+        }
+    }
+
+    @CompileStatic
+    static enum SubQueryOp {
+        $exists
+
+        private final String op //private for security
+        String getOp(){ return op }
+
+        SubQueryOp() {
             this.op = name().substring(1) //remove $
         }
     }

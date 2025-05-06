@@ -102,7 +102,7 @@ abstract class BaseUpdateBenchmark<T> extends BaseBatchInsertBenchmark<T> {
 
     Long getRandomRegionId() {
         int rand = ThreadLocalRandom.current().nextInt(1, (int)regionCount)
-        return regionIds.get(rand)
+        return regionIds.get(rand) as Long
     }
 
 }

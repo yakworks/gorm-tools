@@ -2,6 +2,7 @@ package yakworks.rest
 
 import org.springframework.http.HttpStatus
 
+
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
@@ -13,6 +14,10 @@ import yakworks.json.groovy.JsonEngine
 @Integration
 class AppConfigRestApiSpec extends Specification implements OkHttpRestTrait {
 
+    def setup(){
+        login()
+    }
+
     void "test config values"() {
         when:
         Response resp = get('/api/appConfig/rally/org')
@@ -22,7 +27,7 @@ class AppConfigRestApiSpec extends Specification implements OkHttpRestTrait {
 
         then: "should have excluded the flattened spring array keys"
         resp.code() == HttpStatus.OK.value()
-        body.includes.get == [ '*', 'calc.totalDue', 'tags', 'contact.$*', 'contact.flex.num1'  ]
+        body.includes.get == [ '*', 'calc.totalDue', 'contact.$*', 'tags', 'contact.flex.num1'  ]
     }
 
 }

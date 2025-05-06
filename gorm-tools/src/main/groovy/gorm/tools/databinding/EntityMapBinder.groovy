@@ -8,9 +8,9 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.concurrent.ConcurrentHashMap
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
+import org.apache.commons.lang3.StringUtils
 import org.grails.core.artefact.AnnotationDomainClassArtefactHandler
 import org.grails.core.artefact.DomainClassArtefactHandler
 import org.grails.core.exceptions.GrailsConfigurationException
@@ -25,7 +25,6 @@ import org.springframework.core.convert.support.DefaultConversionService
 import org.springframework.validation.AbstractBindingResult
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.BindingResult
-import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 
@@ -41,6 +40,8 @@ import grails.util.Environment
 import grails.validation.ValidationErrors
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.IsoDateUtil
+
+import static gorm.tools.utils.GormMetaUtils.getEntityClass
 
 /**
  * Faster data binder for PersistentEntity.persistentProperties. Uses the persistentProperties to assign values from the Map
@@ -108,7 +109,10 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
      */
     @Override
     void bind(Object object, DataBindingSource source, String filter, List whiteList, List blackList, DataBindingListener listener) {
-        BindingResult bindingResult = new BeanPropertyBindingResult(object, object.getClass().name)
+
+        String className = getEntityClass(object).name
+
+        BindingResult bindingResult = new BeanPropertyBindingResult(object, className)
         doBind object, source, filter, whiteList, blackList, listener, bindingResult
     }
 
@@ -305,11 +309,8 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
         return sval.trim() ?: null
     }
 
-    //FIXME clean this up so its a compile static
-    @CompileDynamic
     def getEnumWithGet(Class<?> enumClass, Number id){
-        //See the repoEvents code, we can use ReflectionUtils and cache the the get method, then use CompileStatic
-        return enumClass.get(id)
+        return ClassUtils.callStaticMethod(enumClass, 'get', id)
     }
 
     /**
@@ -353,8 +354,8 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             String sval = value as String
             //if its an empty string then its nothing so return
             if(!sval.trim()) return
-            //convert to long
-            value = sval as Long
+            //convert to long if its numeric
+            if(StringUtils.isNumeric(sval.trim())) value = sval as Long
         }
 
         // if its a number then its the identifier so set it
@@ -363,7 +364,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             return
         }
 
-        //at this point if its assumed the value is mostlikely a Map or some object with and id property
+        //at this point if its assumed the value is mostlikely a Map or some object with an id property or maybe a UUID
         Object idValue = isDomainClass(value.getClass()) ? value['id'] : getIdentifierValueFrom(value)
         idValue = idValue == 'null' ? null : idValue
 
@@ -380,7 +381,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
 
             //bind if not null, map has values other then id, and the association is owning side or bindable
             if(target[aprop] && value instanceof Map && value.size() > 1 && shouldBindAssociation(target, association)) {
-                fastBind(target[aprop], new SimpleMapDataBindingSource((Map) value))
+                fastBind(target[aprop], new SimpleMapDataBindingSource((Map) value), getBindingIncludeList(target[aprop]))
             }
 
         }
@@ -394,7 +395,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             //if its null then set it up
             if (target[aprop] == null) target[aprop] = association.type.newInstance()
             //recursive call to set the association up and assume its a map
-            fastBind(target[aprop], new SimpleMapDataBindingSource((Map) value))
+            fastBind(target[aprop], new SimpleMapDataBindingSource((Map) value), getBindingIncludeList(target[aprop]))
         }
     }
 
@@ -512,7 +513,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
         PersistentEntity domain = getPersistentEntity(obj.getClass())
 
         if (domain != null && bindingResult != null) {
-            def newResult = new ValidationErrors(obj)
+            def newResult = new ValidationErrors(obj, getEntityClass(obj).name)
             for (Object error : bindingResult.getAllErrors()) {
                 if (error instanceof FieldError) {
                     def fieldError = (FieldError)error
@@ -542,6 +543,9 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
         def mc = obj.metaClass
         if (mc.hasProperty(obj, "errors") != null && bindingResult != null) {
             def errors = obj['errors'] as AbstractBindingResult //this has the addError method
+
+            //Here the 'objectName' in bindingResult and 'objectName' in 'errors' must match.
+            //Ensure its not a proxy name in bindingResult, or else it will give IllegalArgumentException below when doing addAllErrors
             errors.addAllErrors(bindingResult)
         }
     }

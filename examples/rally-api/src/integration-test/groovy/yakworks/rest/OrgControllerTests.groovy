@@ -1,18 +1,21 @@
 package yakworks.rest
 
-import yakworks.rest.gorm.controller.RestRepoApiController
+import org.springframework.http.HttpStatus
+import yakworks.rally.orgs.model.ContactFlex
+import yakworks.rest.gorm.controller.CrudApiController
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import yakworks.commons.map.Maps
+import yakworks.testing.gorm.integration.SecuritySpecHelper
 import yakworks.testing.rest.RestIntTest
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
 
 @Rollback
 @Integration
-class OrgControllerTests extends RestIntTest {
+class OrgControllerTests extends RestIntTest implements SecuritySpecHelper {
 
-    RestRepoApiController<Org> controller
+    CrudApiController<Org> controller
 
     void setup() {
         controllerName = 'OrgController'
@@ -33,7 +36,18 @@ class OrgControllerTests extends RestIntTest {
 
         then:
         response.status == 200
-        Maps.containsAll(body, [id:9, num: '9', name: 'Org9'])
+        Maps.containsAll(body, [id:9, num: '9', name: 'Branch9'])
+    }
+
+    void "test post"() {
+        when:
+        request.json = [num:"test1", name:"test1", type: 'Customer']
+        controller.post()
+        Map body = response.bodyToMap()
+
+        then:
+        response.status == 201
+        body.num == 'test1'
     }
 
     void "post with empty data"() {
@@ -79,10 +93,41 @@ class OrgControllerTests extends RestIntTest {
         body.tags[0].id == tag1.id
     }
 
-    void "list sort"() {
+    void "test UPSERT insert"() {
+        when:
+        request.json = [num:"test1", name:"test1", type: 'Customer']
+        controller.upsert()
+        Map body = response.bodyToMap()
+
+        then:
+        response.status == HttpStatus.CREATED.value()
+        body.num == 'test1'
+    }
+
+    void "test UPSERT update"() {
+        when:
+        request.json = [id:1, name:"updated"]
+        controller.upsert()
+        Map body = response.bodyToMap()
+
+        then:
+        response.status == HttpStatus.OK.value()
+        body.name == 'updated'
+    }
+
+    void "list sort 3rd level nested object"() {
+        setup:
+        Org.list().each { Org org ->
+            //some other test is not cleaning up so only set if it has a contact
+            if(!org.contact) return
+            Long id = org.contact.id
+            org.contact.flex = new ContactFlex(id: id, num1: id * 1.5).persist()
+            org.contact.persist()
+        }
+        flushAndClear()
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:
-        controller.params << [max:20, sort:'contact.flex.num1', order:'desc']
+        controller.params << [q:"*", max:20, sort:'{contact.flex.num1: desc}']
         controller.list()
         Map body = response.bodyToMap()
         List data = body.data
@@ -90,12 +135,42 @@ class OrgControllerTests extends RestIntTest {
         then:
         response.status == 200
         data[0].contact.flex.num1 > data[1].contact.flex.num1
+        data[1].contact.flex.num1 > data[2].contact.flex.num1
+    }
+
+    void "list filter"() {
+        when:
+        controller.params << [q:'{"name":"Org1*"}']
+        controller.list()
+        Map body = response.bodyToMap()
+        List data = body.data
+
+        then:
+        response.status == 200
+        body.page == 1
+        body.total == 1
+        body.records == 12
+        data[0].name == 'Org1'
+    }
+
+    void "list fail no q"() {
+        when:
+        controller.params << [max:20]
+        controller.list()
+        Map body = response.bodyToMap()
+
+        then:
+        response.status == 418
+        !body.ok
+        body.code == "error.query.qRequired"
+
+        //data[0].name == 'Org10'
     }
 
     void "list CSV"() {
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:
-        controller.params << [format:'csv']
+        controller.params << [q:"*", format:'csv']
         controller.list()
         // Map body = response.bodyToMap()
         // List data = body.data
@@ -111,7 +186,7 @@ class OrgControllerTests extends RestIntTest {
     void "sanity check XLSX"() {
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:
-        controller.params << [format:'xlsx']
+        controller.params << [q:"*", format:'xlsx']
         controller.list()
         // Map body = response.bodyToMap()
         // List data = body.data
@@ -125,7 +200,7 @@ class OrgControllerTests extends RestIntTest {
     void "list with includes"() {
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:
-        controller.params << [includes:"id,num"]
+        controller.params << [q:"*", includes:"id,num"]
         controller.list()
         Map body = response.bodyToMap()
         List data = body.data
@@ -138,7 +213,7 @@ class OrgControllerTests extends RestIntTest {
     void "list with includesKey"() {
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:
-        controller.params << [includesKey:'bulk']
+        controller.params << [q:"*", includesKey:'bulk']
         controller.list()
         Map body = response.bodyToMap()
         List data = body.data
@@ -146,6 +221,20 @@ class OrgControllerTests extends RestIntTest {
         then:
         response.status == 200
         (data[0] as Map).keySet().size() == 4
+    }
+
+    void "list with bad includes should not stackoverflow the app"() {
+        when:
+        controller.params << [
+            q:"*",
+            includes: 'bad.*'
+        ]
+        controller.list()
+        Map body = response.bodyToMap()
+
+        then:
+        response.status == 400
+        body.detail.contains("invalid properties")
     }
 
 }

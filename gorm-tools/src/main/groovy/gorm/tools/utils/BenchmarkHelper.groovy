@@ -81,4 +81,24 @@ class BenchmarkHelper {
         println emsg
         return emsg
     }
+
+    /**
+     * formatted elapsed time from startTime to now in seconds
+     */
+    static String elapsedTime(Long startTime){
+        BigDecimal endTime = (System.currentTimeMillis() - startTime) / 1000
+        return new DecimalFormat("#0.0s").format(endTime)
+    }
+
+    /**
+     * format used mem in GB
+     */
+    static String getUsedMem(){
+        int gb = 1024*1024*1024;
+
+        //Getting the runtime reference from system
+        Runtime runtime = Runtime.getRuntime()
+        BigDecimal mem = (runtime.totalMemory() - runtime.freeMemory()) / gb
+        return new DecimalFormat("#0.0GB").format(mem)
+    }
 }

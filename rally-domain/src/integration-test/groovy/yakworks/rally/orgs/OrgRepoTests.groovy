@@ -1,7 +1,13 @@
 package yakworks.rally.orgs
 
 import yakworks.commons.map.Maps
+import yakworks.rally.orgs.model.Company
+import yakworks.rally.orgs.model.Location
+import yakworks.rally.orgs.model.OrgCalc
+import yakworks.rally.orgs.model.OrgFlex
+import yakworks.rally.orgs.model.OrgInfo
 import yakworks.rally.orgs.model.OrgMember
+import yakworks.rally.orgs.model.PartitionOrg
 
 import java.time.LocalDate
 
@@ -9,6 +15,7 @@ import org.springframework.dao.DataRetrievalFailureException
 
 import gorm.tools.model.SourceType
 import gorm.tools.problem.ValidationProblem
+import yakworks.rally.testing.OrgDimensionTesting
 import yakworks.testing.gorm.TestDataJson
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
@@ -75,8 +82,9 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         org.contact.org
         org.contact.org == org
         org.contact.firstName == params.contact.firstName
-        org.contact.locations.size() == 1
-        org.contact.locations[0].zipCode == "12345"
+        org.contact.location.city == 'Gulch'
+        org.contact.locations.size() == 2
+        org.contact.locations[1].zipCode == "12345"
 
         org.flex
         org.flex.id == org.id
@@ -113,9 +121,9 @@ class OrgRepoTests extends Specification implements DomainIntTest {
     void "test create duplicate fail"() {
         when:
         def params = MockData.createOrg
-        params.num = '9' //should already exist in test db
+        params.num = '10' //should already exist in test db
         //flush during create so it forces the error catching
-        def org = orgRepo.create(Maps.deepCopy(params), [flush: true])
+        def org = orgRepo.create(Maps.clone(params), [flush: true])
         // orgRepo.flush()
 
         then:
@@ -125,11 +133,8 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         ge.code == DataProblemCodes.UniqueConstraint.code
 
         // def rootCause = NestedExceptionUtils.getRootCause(ge)
-        problem.detail.contains("Unique index or primary key violation") || //mysql and H2
-            problem.contains("Duplicate entry") || //mysql
-            problem.contains("Violation of UNIQUE KEY constraint") || //sql server
-            problem.contains("duplicate key value violates unique constraint") //postgres
-
+        problem.code == DataProblemCodes.UniqueConstraint.code
+        problem.detail.contains("Violates unique constraint")
     }
 
     def "test null num fails"() {
@@ -138,7 +143,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
             name: 'testComp',
             type: 'Customer'
         ]
-        orgRepo.create(Maps.deepCopy(params))
+        orgRepo.create(Maps.clone(params))
         orgRepo.flush()
 
         then:
@@ -149,8 +154,9 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
     def "change key contact"() {
         when:
-        assert Org.get(10).contact.num == 'primary10'
+        assert Org.get(10).contact.id == 10
         def c2 = Contact.findByNum('secondary10')
+        assert c2.id != 10
 
         def params = [
             id        : 10,
@@ -240,7 +246,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
     void "test insert with orgmembers"() {
         given:
-        orgDimensionService.testInit('Branch.Division.Business')
+        OrgDimensionTesting.setDimensions(['Branch', 'Division', 'Business'])
         Org division = Org.of("Division", "Division", OrgType.Division).persist()
         division.member = OrgMember.make(division)
         division.member.business = Org.of("Business", "Business", OrgType.Business).persist()
@@ -259,11 +265,13 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         result.member != null
         result.member.division.id == division.id
         result.member.business.id == division.member.business.id
+        result.member.company
+        result.member.companyId == Company.DEFAULT_COMPANY_ID
 
         when:
         Org otherBusiness = Org.of("b2", "b2", OrgType.Business).persist([flush: true])
         params = [
-            name: "test", num: "test", orgTypeId: "3",
+            name: "test", num: "test2", orgTypeId: "3",
             member: [
                 division: [id: division.id],
                 business: [id: otherBusiness.id]
@@ -275,10 +283,10 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         result.member.business == division.member.business
 
         cleanup:
-        orgDimensionService.testInit(null)
+        OrgDimensionTesting.resetDimensions()
     }
 
-    def "delete should fail when source is ERP"() {
+    void "delete should fail when source is ERP"() {
         when:
         def org = Org.get(9)
         org.source.sourceType = SourceType.ERP
@@ -290,25 +298,46 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         e.code == 'error.delete.externalSource'
     }
 
-    void "delete contact with org"() {
+    void "delete associated domains with org"() {
         when:
-        def org = Org.get(9)
-        def contact = Contact.get(9)
-        def contact2 = Contact.findWhere(num: 'secondary9')
+        Org org = Org.get(10)
+        Contact contact = Contact.get(10)
+        Contact contact2 = Contact.findWhere(num: 'secondary10')
+        OrgCalc calc = new OrgCalc(id:org.id).persist()
+        org.calc = calc
+        assert org.member
+        // org.member = OrgMember.make(org).persist()
+        // org.persist(flush:true)
 
         then:
         contact
         contact2
         org.contact == contact
+        contact2.org == org
+        org.flex != null
+        org.info != null
+        OrgInfo.get(org.id) != null
+        OrgCalc.get(org.id) != null
+        OrgSource.findByOrgId(org.id) != null
+        org.source != null
+        OrgMember.get(org.id) != null
+        org.location != null
 
         when:
         org.remove()  // orgRepo.remove or orgRepo.removeById is not removing either
+       // flush()
 
         then:
-        !Org.get(9)
-        !Contact.exists(9)
-        !Contact.findWhere(num: 'secondary9')
+        !Org.get(10)
+        !Contact.exists(10L)
+        !Contact.findWhere(num: 'secondary10')
         !Contact.findAllByOrg(org)
+        !OrgFlex.get(org.id)
+        !OrgCalc.get(10)
+        !OrgSource.findByOrgId(org.id)
+        !OrgMember.get(org.id)
+        !OrgInfo.get(org.id)
+        !Location.findAllByOrg(org)
     }
 
     def "test create Org different orgType same sourceId"() {
@@ -339,48 +368,61 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         source2.sourceType == SourceType.App
     }
 
-    void "test find org by sourceid"() {
-        when: "findWithData has orgType on source"
+    void "test lookup org by sourceid"() {
+        setup: "findWithData has orgType on source"
         Org org = Org.create(num: "foo", name: "bar", type: OrgType.Customer)
         orgRepo.flush()
-        assert org.source.sourceId == "foo"
 
-        Org o = Org.repo.findWithData([source: [sourceId: 'foo', orgType: 'Customer']])
+        expect:
+        org.source.sourceId == "foo"
+        orgRepo.lookup([source: [sourceId: 'foo', orgType: 'Customer']])
+
+        when:
+        Org o = orgRepo.findWithData([source: [sourceId: 'foo', orgType: 'Customer']])
 
         then: "source id is the default"
         o != null
 
         when: "findWithData has type in daya"
         flushAndClear()
-        o = Org.repo.findWithData([type: 'Customer', source: [sourceId: 'foo']])
+        o = orgRepo.findWithData([type: 'Customer', source: [sourceId: 'foo']])
 
         then: "source id is the default"
         o
 
+        expect: "lookup by sourceid contained in org map"
+        orgRepo.lookup([type: 'Customer', org:[source: [sourceId: 'foo']]]) != null
     }
 
-    void "test find org by num"() {
-        when:
-        Org org3 = Org.create(num: "foo3", name: "bar3", type: OrgType.Customer)
+
+    void "test lookup org by num"() {
+        setup:
+        Org.create(num: "foo3", name: "bar3", type: OrgType.Customer)
         orgRepo.flush()
 
-        Org o3 = Org.repo.findWithData(num: "foo3")
-
-        then: "found because unique"
-        assert o3
+        expect:
+        orgRepo.lookup(num: "foo3")
 
         when:
-        o3 = Org.repo.findWithData(num: "foo3", type: OrgType.Customer)
+        Org o3 = orgRepo.findWithData(num: "foo3")
+
+        then: "found because unique"
+        o3 != null
+
+        when:
+        o3 = orgRepo.findWithData(num: "foo3", type: OrgType.Customer)
 
         then: "also found"
-        assert o3
+        o3 != null
     }
 
     void "test find org by num not unique"() {
-        when:
-        Org org = Org.create(num: "foo", name: "bar", type: OrgType.Customer)
-        Org org2 = Org.create(num: "foo", name: "bar2", type: OrgType.CustAccount)
+        setup:
+        Org.create(num: "foo", name: "bar", type: OrgType.Customer)
+        Org.create(num: "foo", name: "bar2", type: OrgType.CustAccount)
         orgRepo.flush()
+
+        when:
         Org o3 = Org.repo.findWithData(num: "foo")
 
         then: "not found because not unique"
@@ -393,31 +435,36 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         thrown DataRetrievalFailureException
     }
 
-    void "test find org by num not unique with type"() {
-        when:
-        Org org = Org.create(num: "foo", name: "bar", type: OrgType.Customer)
-        Org org2 = Org.create(num: "foo", name: "bar2", type: OrgType.CustAccount)
+    void "test lookup org by num not unique with type"() {
+        setup:
+        Org.create(num: "foo", name: "bar", type: OrgType.Customer)
+        Org.create(num: "foo", name: "bar2", type: OrgType.CustAccount)
         orgRepo.flush()
-        Org o3 = Org.repo.findWithData(num: "foo", type: OrgType.Customer)
+
+        expect:
+        orgRepo.lookup(num: "foo", type: OrgType.Customer)
+
+        when:
+        Org o3 = orgRepo.findWithData(num: "foo", type: OrgType.Customer)
 
         then: "found because data has type"
         o3
 
         when: "will uses type"
-        o3 = Org.repo.findWithData(source:[ sourceId: "foo"], type: OrgType.Customer)
+        o3 = orgRepo.findWithData(source:[ sourceId: "foo"], type: OrgType.Customer)
 
         then: "not found because not unique"
         o3
     }
 
-    def "update org lookup by sourceid"() {
+    void "update org lookup by sourceid"() {
         setup:
         Long orgId = 1111
 
         Map params = TestDataJson.buildMap(Org) << [id: orgId, name: 'name', num: 'foo', type: 'Customer']
 
         when: "create"
-        def org = Org.create(params, bindId: true)
+        def org = Org.repo.create(params, [bindId: true])
         orgRepo.flush()
 
         then: "make sure source is assigned properly"
@@ -430,14 +477,14 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         res.size() == 1
 
         when: "update"
-        org = Org.update([source: [sourceId: 'foo', orgType: 'Customer'], name: 'new name'])
+        org = Org.repo.update([source: [sourceId: 'foo', orgType: 'Customer'], name: 'new name'])
 
         then:
         org.name == 'new name'
         org.source.sourceId == 'foo'
 
         when: "just sourceid is passed"
-        def result = Org.repo.lookup(sourceId:"foo", type:org.type)
+        def result = orgRepo.lookup(sourceId:"foo", type:org.type)
 
         then:
         result == org
@@ -445,7 +492,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
     void "create org with member branch lookup by num"() {
         setup:
-        orgDimensionService.testInit('Customer.Branch')
+        OrgDimensionTesting.setDimensions([OrgType.Customer, OrgType.Branch])
         Org branch = Org.findByOrgTypeId(OrgType.Branch.id)
 
         expect:
@@ -455,7 +502,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         Long orgId = 1111
 
         Map params = TestDataJson.buildMap(Org) << [id: orgId, name: 'name', num: 'foo', type: 'Customer', member: [branch: [id: branch.id ]]]
-        def org = Org.create(params, bindId: true)
+        def org = Org.repo.create(params, [bindId: true])
         orgRepo.flush()
 
         then: "make sure member is created with branch"
@@ -464,7 +511,46 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         branch.id == org.member.branch.id
 
         cleanup:
-        orgDimensionService.testInit(null)
+        OrgDimensionTesting.resetDimensions()
+    }
+
+    void "create and update partition org"() {
+        when: "orgtype is not partition type"
+        Org org = Org.create(num: '0011', name: 'testComp', type: 'Customer')
+        flush()
+
+        then:
+        org
+        !PartitionOrg.findWhere(num:"0011")
+
+        when: "type=partition type"
+        org = Org.create(num: '0012', name: 'testComp', type: 'Company')
+        flush()
+
+        PartitionOrg porg = PartitionOrg.findWhere(num:"0012")
+
+        then:
+        org
+        porg
+        org.id == porg.id
+        org.name == porg.name
+        org.num == porg.num
+
+        when:
+        Org.update(id:org.id, name:"updated", num:"updated")
+        flushAndClear()
+        porg = PartitionOrg.findWhere(num:"updated")
+
+        then:
+        porg.name == "updated"
+        porg.name == "updated"
+
+        when: "delete"
+        orgRepo.removeById(org.id)
+        flush()
+
+        then:
+        !PartitionOrg.get(org.id)
     }
 
 }

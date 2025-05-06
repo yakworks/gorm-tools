@@ -1,0 +1,7 @@
+//hibernate dependencies
+dependencies {
+  implementation "org.grails:grails-datastore-gorm-hibernate5:$vGormHibernate"
+  implementation "org.grails.plugins:hibernate5:$vGormHibernate"
+  implementation "org.hibernate:hibernate-core:$vHibernate"
+  // compileOnly "org.hibernate:hibernate-ehcache:$vHibernate"
+}

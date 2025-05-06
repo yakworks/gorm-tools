@@ -1,0 +1,28 @@
+api:
+  paths:
+    /rally/contact:
+      includes:
+        get: [isPrimary, '*', org.$*, user.$*,  flex.text1, flex.text2]
+        bulk: [ 'id', 'num']
+      gridOptions:
+        colModel:
+          - {name: id, width: 10, hidden: true }
+          - {name: name, width: 80, formatter: editPopoverLink}
+          - {name: email, width: 140}
+          - {name: flex.text2, label: 'Email Type', width: 80} #RNDC custom
+          - {name: phone}
+          - {name: flex.text1, label: 'Phone Type', width: 80}
+#            - {name: jobTitle, label: 'Title'}  #RNDC
+          - {name: isPrimary, label: 'Is Primary', width: 80, formatter: okIcon}
+
+      editPopover:
+        - key: firstName
+        - key: lastName
+        - key: email
+        - key: jobTitle
+        - key: phone
+        - key: comments
+        - key: isPrimary
+          '$ref': '#/rally/picklists/isPrimary'
+          options:
+            isMulti: false

@@ -4,14 +4,10 @@
 */
 package yakworks.openapi.gorm
 
-import java.lang.reflect.ParameterizedType
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import org.codehaus.groovy.reflection.CachedMethod
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
@@ -22,9 +18,9 @@ import org.grails.orm.hibernate.cfg.Mapping
 import gorm.tools.utils.GormMetaUtils
 import grails.gorm.validation.ConstrainedProperty
 import grails.gorm.validation.DefaultConstrainedProperty
+import yakworks.commons.beans.PropertyTools
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.NameUtils
-import yakworks.commons.lang.PropertyTools
 import yakworks.commons.map.Maps
 import yakworks.openapi.OapiUtils
 
@@ -96,7 +92,7 @@ class ApiSchemaEntity {
         //def sortedProps = propsMap.sort()
         def p = [:]
         p.putAll(propsMap.sort())
-        //FIXME be smarter about this
+        //TODO be smarter about this
         if(kind == CruType.Read){
             p.putAll(idVerMap)
         }
@@ -112,7 +108,6 @@ class ApiSchemaEntity {
     }
 
     @SuppressWarnings(['MethodSize'])
-    // @CompileDynamic
     private Map getEntityProperties(CruType type) {
         //println "----- ${perEntity.name} getDomainProperties ----"
         //String domainName = NameUtils.getPropertyNameRepresentation(perEntity.name)
@@ -124,6 +119,15 @@ class ApiSchemaEntity {
         //println "-- PersistentProperties --"
         for (PersistentProperty prop : persistentProperties) {
             String propName = prop.name
+            try{
+                if((prop.mapping.mappedForm['type']['name'] as String).endsWith('JsonType')){
+                    //skip JsonTypes so the iteration over constrained props can pick them up and do them.
+                    continue
+                }
+            } catch(e){
+
+            }
+
             def constrainedProperty = (DefaultConstrainedProperty) constrainedProperties[propName]
             //remove from constraint name list so we can spin through the remaining later that are not persistentProperties
             //and set them up to for transients and set them up too.
@@ -153,16 +157,28 @@ class ApiSchemaEntity {
         //println "-- Contrained Non-PersistentProperties --"
         for(String propName : constrainedPropsNames){
             def constrainedProp = (DefaultConstrainedProperty) constrainedProperties[propName]
-
+            // if(propName == 'tags'){
+            //     println "tags"
+            // }
             Map apiProp = getOapiProps(propName, constrainedProp)
             if(!isAllowed(type, apiProp)) continue
+            //keep copy of orig for overrides
+            Map oapiProps = Maps.clone(apiProp)
 
             Class returnType = constrainedProp.propertyType
             if(Collection.isAssignableFrom(returnType)){
                 Class genClass =(Class) PropertyTools.findGenericTypeForCollection(entityClass, propName)
-                // Class genClass = findGenericClassForCollection(entityClass, propName)
-                //println "  ${propName} collection of type ${genClass.simpleName}"
-                Map propsToAdd = setupAssociationObject(type, apiProp, genClass.simpleName, constrainedProp, null)
+                //if its primitive or Object collection then just do the the typ
+                Map propsToAdd
+                if(ClassUtils.isBasicType(genClass)){
+                    propsToAdd = OapiUtils.getJsonType(genClass)
+                }
+                else if(genClass == Object){
+                    propsToAdd = [type: 'object']
+                }
+                else {
+                    propsToAdd = setupAssociationObject(type, apiProp, genClass.simpleName, constrainedProp, null)
+                }
                 apiProp['type'] = 'array'
                 apiProp['items'] = propsToAdd
             } else {
@@ -171,6 +187,12 @@ class ApiSchemaEntity {
             }
             apiProp.remove('allowed') //remove allowed so it doesn't get added to the json output
             if(apiProp.remove('required')) required.add(propName)
+
+            //if its specified in the constraints then use it verbatim
+            if(oapiProps['type']) apiProp.type = oapiProps['type']
+            if(oapiProps['format']) apiProp.format = oapiProps['format']
+            if(oapiProps['items']) apiProp.items = oapiProps['items']
+
             propsMap[propName] = apiProp
         }
         if(required) propsMap.required = required

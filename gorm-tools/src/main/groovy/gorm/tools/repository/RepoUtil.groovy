@@ -8,12 +8,9 @@ import groovy.transform.CompileStatic
 
 import org.springframework.dao.OptimisticLockingFailureException
 
-import gorm.tools.repository.artefact.RepositoryArtefactHandler
-import gorm.tools.transaction.TrxService
 import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.api.problem.data.NotFoundProblem
-import yakworks.grails.GrailsHolder
 
 /**
  * A bunch of statics to support the repositories.
@@ -22,18 +19,13 @@ import yakworks.grails.GrailsHolder
  * @author Joshua Burnett (@basejump)
  * @since 1.0
  */
-@SuppressWarnings(['FieldName'])
 @CompileStatic
 @SuppressWarnings(["FieldName"])
 class RepoUtil {
 
-    static List<Class> getRepoClasses(){
-        GrailsHolder.grailsApplication.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz
-    }
-
-    static String getRepoBeanName(Class domainClass) {
-        RepositoryArtefactHandler.getRepoBeanName(domainClass)
-    }
+    // static List<Class> getRepoClasses(){
+    //     GrailsHolder.grailsApplication.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz
+    // }
 
     /**
      * checks the passed in version with the version on the entity (entity.version)
@@ -62,7 +54,7 @@ class RepoUtil {
      * @param entity - the domain object the check
      * @param id - the identifier use when trying to find it. Will be used to construct the exception message
      * @param domainClassName - the name of the domain that will be used to build error message if thrown
-     * @throws NotFoundProblem if it not found
+     * @throw NotFoundProblem if it not found
      */
     static void checkFound(Object entity, Serializable id, String domainClassName) {
         if (!entity) {
@@ -88,30 +80,4 @@ class RepoUtil {
             throw DataProblem.of('error.data.bindId', [name: entityClass.simpleName])
                 .title("set bindId:true when manually assigning id in create data").toException()
     }
-
-    /**
-     * flushes the session and clears the session cache and the DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
-     */
-    @Deprecated
-    static void flushAndClear() {
-        flush()
-        clear()
-    }
-
-    /**
-     * flushes the session
-     */
-    @Deprecated
-    static void flush() {
-        TrxService.bean().flush()
-    }
-
-    /**
-     * clears the session cache
-     */
-    @Deprecated
-    static void clear() {
-        TrxService.bean().clear()
-    }
-
 }

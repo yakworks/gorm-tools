@@ -11,12 +11,9 @@ import java.lang.annotation.Target
 
 import org.codehaus.groovy.transform.GroovyASTTransformationClass
 
-import yakworks.rest.gorm.controller.RestRepoApiController
-
 /**
- * Meta Annotation to applied to a domain class if it is a REST resource
- * Creates a RestApiDomainController for it if it does not exist.
- * Doesn't allow a uri like @Resource so UrlMappings has to be used.
+ * Meta Annotation to be applied to Spring Confguration class.
+ * Uses the restapi-config.yml for configuration and list of domains to setup.
  *
  * @author Joshua Burnett
  *
@@ -27,10 +24,12 @@ import yakworks.rest.gorm.controller.RestRepoApiController
 @GroovyASTTransformationClass("yakworks.rest.gorm.ast.RestApiConfigTransform")
 @interface RestApiFromConfig {
 
+    //NOTE: THIS IS NOT USED ANYWHERE RIGHT NOW.
     String namespace() default ""
 
     /**
      * @return The Controller class to generate. Can be set to null to skip the generation
+     * NOTE: THIS IS NOT USED ANYWHERE RIGHT NOW.
      */
-    Class<?> controllerTrait() default RestRepoApiController
+    // Class<?> controllerTrait() default CrudApiController
 }

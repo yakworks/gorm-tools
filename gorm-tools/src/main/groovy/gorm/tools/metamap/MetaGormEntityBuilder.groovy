@@ -16,10 +16,10 @@ import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.model.types.ToMany
 
-import gorm.tools.api.IncludesConfig
 import gorm.tools.utils.GormMetaUtils
 import grails.gorm.validation.ConstrainedProperty
-import yakworks.commons.lang.PropertyTools
+import yakworks.commons.beans.PropertyTools
+import yakworks.gorm.api.IncludesConfig
 import yakworks.meta.MetaEntity
 import yakworks.meta.MetaProp
 
@@ -136,7 +136,7 @@ class MetaGormEntityBuilder {
                 //if it start with a $ then use it as includesKey
                 else if (field.startsWith('$')) {
                     String incKey = field.replace('$', '')
-                    Map incsMap = IncludesConfig.bean().getIncludes(entityClass)
+                    Map incsMap = IncludesConfig.bean().getIncludesMap(entityClass)
                     if(incsMap){
                         List props = ( incsMap[incKey] ?: ['id'] ) as List<String>
                         def toMerge = MetaGormEntityBuilder.build(entityClass.name, props)
@@ -182,17 +182,17 @@ class MetaGormEntityBuilder {
         //create the includes class for what we have now along with the the blacklist
         Set blacklist = getBlacklist(persistentEntity) + (this.excludes as Set)
 
-        //only if it has rootProps
-        if (metaEntity.metaProps) {
-            if(blacklist) metaEntity.addBlacklist(blacklist)
-            //if it has nestedProps then go recursive
-            if(nestedProps){
-                buildNested(nestedProps)
-            }
-            return metaEntity
-        } else {
-            return null
+        //if it doesn't have metaProps then Includes must be bad?
+        //XXX WHY DO WE RETURN NULL?
+        if (!metaEntity.metaProps)  return null //throw new IllegalArgumentException("includes must be bad, includes: ${includes}")
+
+        if(blacklist) metaEntity.addBlacklist(blacklist as Set<String>)
+        //if it has nestedProps then go recursive
+        if(nestedProps){
+            buildNested(nestedProps)
         }
+        return metaEntity
+
     }
 
     /** PropMeta from propName depending on whether its a persistentEntity or normal bean */

@@ -10,16 +10,13 @@ import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
 
-import com.vladmihalcea.hibernate.type.json.JsonType
-import gorm.tools.model.Persistable
-import gorm.tools.repository.GormRepo
-import gorm.tools.repository.model.RepoEntity
-import gorm.tools.repository.model.UuidRepoEntity
-import grails.compiler.GrailsCompileStatic
 import org.grails.datastore.gorm.GormEntity
 import org.hibernate.annotations.NaturalId
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.TypeDef
+
+import grails.compiler.GrailsCompileStatic
+import io.hypersistence.utils.hibernate.type.json.JsonType
 
 @Entity(name = "JpaEnt")
 @TypeDef(name = "json", typeClass = JsonType.class)

@@ -12,7 +12,7 @@ import grails.persistence.Entity
 
 @Entity
 @GrailsCompileStatic
-class UuidSample implements UuidRepoEntity<UuidSample, UuidGormRepo<UuidSample>> {
+class UuidSample implements UuidRepoEntity<UuidSample> {
     UUID id
     String name
 

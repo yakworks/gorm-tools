@@ -1,0 +1,8 @@
+spring.config.import: classpath:./gorm/tools/datasource-test.yml
+
+logging:
+  level:
+    root: WARN
+    org.springframework: WARN
+    org.hibernate.orm.deprecation: OFF # turns off deprecation notices
+

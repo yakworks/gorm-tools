@@ -24,9 +24,9 @@ class MetaEntityService {
      * convenience util for getMetaEntity
      * @see #getMetaEntity(String, List, List)
      */
-    MetaEntity getMetaEntity(Class clazz, List<String> includes, List<String> excludes) {
-        return getMetaEntity(clazz.name, includes, excludes)
-    }
+    // MetaEntity getMetaEntity(Class clazz, List<String> includes, List<String> excludes) {
+    //     return getMetaEntity(clazz.name, includes, excludes)
+    // }
 
     /**
      * wrapper around MetaGormEntityBuilder.build that checks cache first

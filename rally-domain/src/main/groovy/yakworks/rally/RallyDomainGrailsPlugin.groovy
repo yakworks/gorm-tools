@@ -9,25 +9,10 @@ import grails.plugins.Plugin
 @SuppressWarnings('Indentation')
 class RallyDomainGrailsPlugin extends Plugin {
 
-    def loadAfter = ['gorm-security']
+    def loadAfter = ['boot-security']
 
     Closure doWithSpring() { {->
-        //FIXME not sure this is needed, hack to get rest app working but not sure why its not picked up
-        // as its already defined in gorm-security
-        // def securityConf = SpringSecurityUtils.securityConfig
-        // if (securityConf.active) {
-        //     userOrgService(UserOrgService)
-        // }
-
-        //temp in place to assign defualt orgId to user as Company default (2)
-        // rallyEventListener(RallyEventListener) { bean ->
-        //     bean.lazyInit = true
-        //     bean.autowire = true
-        // }
-
-        // orgCopier(OrgCopier, lazy())
-        // orgDimensionService(OrgDimensionService, lazy())
-        // orgMemberService(OrgMemberService, lazy())
+        //NOTE: nothing here, in rally-domain we use package scanning and the @Service and @Component.
     }}
 
 }

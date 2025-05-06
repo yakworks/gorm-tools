@@ -32,14 +32,9 @@ import yakworks.rally.tag.model.TagLink
 @CompileStatic
 class ActivityCopier {
 
-    @Autowired(required = false)
-    ActivityLinkRepo activityLinkRepo
-
-    @Autowired(required = false)
-    AttachmentRepo attachmentRepo
-
-    @Autowired
-    ProblemHandler problemHandler
+    @Autowired ActivityLinkRepo activityLinkRepo
+    @Autowired AttachmentRepo attachmentRepo
+    @Autowired ProblemHandler problemHandler
 
     @Transactional
     Activity copy(Activity fromAct, Activity toAct) {
@@ -48,7 +43,7 @@ class ActivityCopier {
         GormUtils.copyDomain(toAct, fromAct, [createdBy: fromAct['createdBy'], editedBy: fromAct['editedBy']])
         toAct.note = GormUtils.copyDomain(ActivityNote, fromAct.note, [activity: toAct], false)
         toAct.task = GormUtils.copyDomain(Task, fromAct.task, [activity: toAct], false)
-        if(fromAct.template) toAct.template = attachmentRepo.copy(fromAct.template)
+        //if(fromAct.template) toAct.template = attachmentRepo.copy(fromAct.template)
         if(!toAct.id) toAct.id = Activity.repo.generateId()
 
         //actCopy.persist()

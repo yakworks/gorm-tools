@@ -1,0 +1,48 @@
+plugins {
+  id 'org.springframework.boot'
+  id 'io.spring.dependency-management'
+  id 'yakworks.grails-plugin'
+}
+
+apply from: "${rootDir}/gradle/gorm-lib.gradle"
+apply from: "${rootDir}/gradle/test-integration.gradle"
+
+//shared resources to pick up the Gorm defaults from application.groovy, as well as simple logback
+// sourceSets.test.resources.srcDirs += [project(':gorm-test-support').sourceSets.main.resources]
+
+dependencies {
+  console "org.grails:grails-console"
+
+  implementation "org.springframework.boot:spring-boot-starter-security"
+  api 'org.springframework.security:spring-security-saml2-service-provider'
+  api 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
+  testRuntimeOnly "org.springframework.boot:spring-boot-autoconfigure"
+  testRuntimeOnly "org.springframework.boot:spring-boot-starter-tomcat"
+
+  // implementation("org.grails.plugins:spring-security-core:$vSpringSecurity"){
+  //   exclude group: 'org.grails', module: 'grails-dependencies'
+  //   exclude group: 'org.grails', module: 'grails-web-boot'
+  // }
+
+  implementation "jakarta.annotation:jakarta.annotation-api:$vJakartaAnn"
+
+  ['aspectj', 'core', 'spring', 'web'].each {
+    api "org.apache.shiro:shiro-$it:$vShiro"
+  }
+
+  compileOnly("org.grails:grails-web-mvc")
+
+  api project(":boot-security-gorm")
+
+  compileOnly project(":gorm-tools")
+
+  // for the org.grails.web.util.WebUtils
+  // compileOnly "org.grails:grails-web-common"
+
+  testImplementation project(":rally-domain")
+}
+
+// configurations.api {
+//   exclude group: 'org.grails', module: 'grails-plugin-controllers'
+// }

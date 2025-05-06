@@ -6,6 +6,7 @@ import grails.testing.mixin.integration.Integration
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
 
+
 @Integration
 @Rollback
 class OpenapiGeneratorSpec extends Specification {

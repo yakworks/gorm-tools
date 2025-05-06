@@ -1,17 +1,22 @@
 package yakworks.rest
 
 import org.springframework.http.HttpStatus
+import org.springframework.jdbc.core.JdbcTemplate
 
-import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
-import org.springframework.jdbc.core.JdbcTemplate
 import spock.lang.Specification
 import yakworks.json.groovy.JsonEngine
+
+import yakworks.rest.client.OkHttpRestTrait
 
 @Integration
 class RestErrorsSpec extends Specification implements OkHttpRestTrait {
     JdbcTemplate jdbcTemplate
+
+    def setup(){
+        login()
+    }
 
     void "entity not found"() {
 
@@ -83,7 +88,7 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         resp.code() == HttpStatus.BAD_REQUEST.value()
         body.status == HttpStatus.BAD_REQUEST.value()
         body.title == "Unique index or primary key violation"
-        ((String)body.detail).contains("IX_ORGSOURCE_UNIQUE")
+        ((String)body.detail).contains("Violates unique constraint")
 
         delete("/api/rally/org", orgId)
     }

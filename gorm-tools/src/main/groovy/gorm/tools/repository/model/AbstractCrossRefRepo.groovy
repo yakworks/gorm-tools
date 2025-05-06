@@ -4,6 +4,8 @@
 */
 package gorm.tools.repository.model
 
+import groovy.json.JsonParserType
+import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
@@ -14,8 +16,11 @@ import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
+import gorm.tools.repository.RepoLookup
+import gorm.tools.repository.RepoUtil
 import yakworks.commons.beans.Transform
 import yakworks.commons.lang.Validate
+import yakworks.commons.map.Maps
 
 import static gorm.tools.utils.GormUtils.collectLongIds
 import static gorm.tools.utils.GormUtils.listToIdMap
@@ -24,12 +29,14 @@ import static gorm.tools.utils.GormUtils.listToIdMap
  * XRef Repo for linking 2 entities. Also called a join table in hibernate.
  * One class is designated as the main and the other as related.
  * The 'main' is the first part the name, and related the second.
- * So for example: ActivityContact xref table, the Activity is the 'main' and the Contact is the 'related'
- * Its really arbitraty but need way to grok it
+ * So for example: ActivityContact xref table, the Activity is the 'primary' or 'main' and the Contact is the 'related'
+ * Its really arbitrary, Contact could be primary and it would be functionaly the same. It just provides a way to grok it
  *
- * @param <X> the cross ref domain
- * @param <P> the the main entity that will have the items as "children"
- * @param <L> the related entity
+ * @param <X> the cross ref domain this Repo is for
+ * @param <P> the the Primary or main entity that will have the items as "children"
+ * @param <R> the Related entity
+ *
+ * NOTE: SEE ActivityContactOpTests for tests
  */
 @Slf4j
 @CompileStatic
@@ -37,6 +44,8 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     Class<P> mainClass
     Class<R> relatedClass
     List<String> propNames
+
+    JsonSlurper jsonSlurper
 
     /** the criteria remover can be customized, useful for replacing in tests */
     CriteriaRemover criteriaRemover
@@ -46,18 +55,51 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
         relatedClass= relatedClazz
         propNames = propKeys
         criteriaRemover = new CriteriaRemover()
+        jsonSlurper = new JsonSlurper().setType(JsonParserType.LAX)
     }
 
     /**
      * in implementation will search for fields and call L.load if it has an id
      * but can do look ups such as for code or sourceId if no id is provided
      */
-    //FIXME #339 the lookup concept should be part of the gormRepo and gormRepo entity chain
-    // we will need it for updates and bulkable too.
-    Persistable lookup(Class clazz, Object data){
-        //FIXME make a generic way to lookup id and code, for now only loads by id
+    Persistable lookup(Class clazz, Map data){
         Long aid = data['id'] as Long
-        return InvokerHelper.invokeStaticMethod(clazz, 'load', aid) as Persistable
+
+        //if there's id, just do a load based on id
+        if(aid != null) {
+            return InvokerHelper.invokeStaticMethod(clazz, 'load', aid) as Persistable
+        } else {
+            //perform lookup using repo
+            GormRepo repo = RepoLookup.findRepo(clazz)
+            return repo.lookup(data) as Persistable
+        }
+    }
+
+    /**
+     * Looks up id list from the data.
+     * If data contains ids (eg {id:1}, {id:2}..) the ids would be returned,
+     * otherwise lookup will be done to find id (eg when data contains [{sourceId:s1},  {sourceId:s2}..] etc
+
+     * @return List<Long> data ids
+     */
+    List<Long> lookupDataIds(Class clazz, List<Map> dataList) {
+        if(!dataList) return []
+
+        List<Long> ids = dataList.collect {
+
+            //if data row has id, just use it
+            if(it.containsKey('id')) {
+                return it['id'] as Long
+            }
+            else {
+                //do lookup and get id
+                Persistable r = lookup(clazz, it)
+                RepoUtil.checkFound(r, (Serializable)it, clazz.simpleName)
+                return r.id as Long
+            }
+        }
+
+        return ids
     }
 
     String getMainPropName(){
@@ -78,7 +120,7 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     }
 
     /**
-     * this is the map that makes the composite key across the 3 fields.
+     * this is the map that makes the composite key with the fields.
      */
     Map getKeyMap(P main, R related){
         [ (mainPropName): main, (relatedPropName): related ]
@@ -100,12 +142,15 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
         return create(params, args)
     }
 
+    /**
+     * Transactional wrap for {@link #doCreate}
+     */
     @Override
-    X create(Map data, Map args) {
+    X create(Map data, PersistArgs pargs) {
         X leInstance = (X) getEntityClass().newInstance(data)
         // default is to give it insert as a hint
-        def sargs = PersistArgs.of(args).insert(true)
-        doPersist leInstance, sargs
+        pargs.insert(true)
+        doPersist leInstance, pargs
         return leInstance
     }
 
@@ -177,8 +222,8 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     /**
      * query by the composite key
      */
-    MangoDetachedCriteria<X> queryFor(Persistable linkedEntity, R related){
-        queryByMain(linkedEntity).eq(relatedPropName, related)
+    MangoDetachedCriteria<X> queryFor(Persistable main, R related){
+        queryByMain(main).eq(relatedPropName, related)
     }
 
 
@@ -193,15 +238,27 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
      *
      * If itemParams is an object and has op=update then it will spin through and look for the op field in each object
      *  - if no op field in data then its assumed to be an add and will add if not exists
-     *  - if op=delete then removes
+     *  - if op=remove then removes
+     *
+     * NOTE: Good tests in TagLinkSpec and TagDataOpSpec
      *
      * @param main the primary entity, or linkedEntity if its a linkedEntityRepo
      * @param itemParams the List or Map data
      * @return the list or created or updated
      */
     List<X> addOrRemove(P main, Object itemParams){
-        if(!itemParams) return []
-        Long mainId = main['id'] as Long
+
+        //check specifically for null, to support empty list which should remove all refs.
+        if(itemParams == null) return []
+
+        //handle if it's a json array in string, largely for CSV support and the binding that occurs during that process,
+        // such as creating orgs with tags
+        if(itemParams instanceof String) {
+            Validate.isTrue(itemParams.trim().startsWith('['), "bind data of type string must be a json array")
+            itemParams = jsonSlurper.parseText(itemParams) as List
+            //parseText returns LazyValueMap which will throw `Not that kind of map` when trying to add new key (eg lookup() methods does modify the maps)
+            itemParams = Maps.clone(itemParams)
+        }
 
         Validate.isTrue(itemParams instanceof List || itemParams instanceof Map, "bind data must be map or list: %s", itemParams.class)
 
@@ -209,15 +266,20 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
 
         //default is to replace the tags with whats in tagParams
         if (itemParams instanceof Map) {
-            DataOp op = DataOp.get(itemParams.op)
-            List dataList = (List)itemParams.data
+            DataOp op = DataOp.get(itemParams['op'])
+            List dataList = (List)itemParams['data']
 
-            Validate.isTrue(itemParams.data instanceof List)
+            Validate.isTrue(itemParams['data'] instanceof List)
             if(op == DataOp.update) {
                 xlist =  addOrRemoveList(main, dataList as List)
             }
+            else if(op == DataOp.remove){
+                removeList(main, dataList as List)
+            }
             else {
-                throw new UnsupportedOperationException("op=update is currently the only supported operation when passing a map for associations")
+                throw new UnsupportedOperationException(
+                    "op=update and op=remove are currently the only supported operation when passing a map for associations"
+                )
             }
         } else { //its a list
             xlist = replaceList(main, itemParams as List)
@@ -226,18 +288,27 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     }
 
     /**
-     * iterates over list and calls the createOrRemove
+     * remove just whats in the list
+     */
+    void removeList(P main, List<Map> dataList){
+        //if the top level op is remove then remove the whole list
+        for (Map relatedItem : dataList) {
+            R related = (R)lookup(relatedClass, relatedItem)
+            remove(main, related)
+        }
+    }
+
+    /**
+     * Called if top level op:update, iterates over list and calls the createOrRemove
      * This should NOT normally be called directly, use addOrRemove
      */
     List<X> addOrRemoveList(P main, List<Map> dataList){
-        //if its passing in an empty list on update then clear it out
-        if(dataList.isEmpty()) {
-            remove(main)
-            return []
-        }
+        //if its passing in null on update that means make no changes
+        if(dataList == null)  return []
 
         List xlist = [] as List<X>
         for (Map relatedItem : dataList) {
+            //if the top level op is remove then remove the whole list
             X xref = createOrRemove(main, relatedItem)
             if(xref) xlist.add(xref)
         }
@@ -245,23 +316,26 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     }
 
     List<X> replaceList(P main, List<Map> dataList){
-        def itemList = dataList as List<Map>
-        // if its empty, then remove all
+        // if empty list came in, clear all tags.
         if(dataList.isEmpty()) {
+            remove(main)
             return []
         } else {
             //list of existing related items
             List currentLinkList = queryFor(main).list()
             List<Long> currentLinkIds = collectLongIds(currentLinkList, "${relatedPropName}Id")
-            List<Long> dataIds = collectLongIds(dataList)
+            List<Long> dataIds = lookupDataIds(relatedClass, dataList)
 
+            //first remove which ever existing ids are not in incoming list
+            //this will preserve existing tags which are already in incoming list
+            List<Long> itemsToRemove = currentLinkIds - dataIds
+            remove(main, itemsToRemove)
 
+            //add new tags
             List<Long> itemsToAdd = dataIds - currentLinkIds
             List<Map> itemsToAddMap = listToIdMap(itemsToAdd)
             List xlist = addOrRemoveList(main, itemsToAddMap)
 
-            List<Long> itemsToRemove = currentLinkIds - dataIds
-            remove(main, itemsToRemove)
             return xlist
         }
 
@@ -271,7 +345,7 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
      * Creates link xref from data map or removes xref if data.op = remove
      */
     X createOrRemove(P main, Map data){
-        Validate.notNull(data.id, "createOrRemove requires data map to have an id key")
+        //Validate.notNull(data.id, "createOrRemove requires data map to have an id key")
         X xrefEntity
         DataOp op = DataOp.get(data.op) //add, update, delete really only needed for delete
         R related = (R)lookup(relatedClass, data)
@@ -302,13 +376,13 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     // ***** Unsupported some gormRepo methods should not be called with an XRef tables so blow errors for these
 
     @Override
-    X createOrUpdateItem(Map data, PersistArgs args){
+    EntityResult<X> upsert(Map data, PersistArgs args){
         throw new UnsupportedOperationException("Method createOrUpdate is not supported by this implementation")
     }
 
     // ***** some gormRepo methods should not be called with an XRef tables so blow errors for these
     @Override
-    void removeById(Serializable id, Map args) {
+    void removeById(Serializable id, PersistArgs args) {
         throw new UnsupportedOperationException("Method removeById is not supported by this implementation")
     }
 
@@ -318,7 +392,8 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
             "Standard Method bind(entity,data,bindAction ) is not supported by this implementation")
     }
 
-    X doUpdate(Map data, Map args) {
+    @Override
+    X doUpdate(Map data, PersistArgs args){
         throw new UnsupportedOperationException(
             "Method doUpdate(entity,data,bindAction ) is not supported, these ar immutable and should only ever get inserted or removed")
     }

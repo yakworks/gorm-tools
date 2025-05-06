@@ -12,19 +12,18 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.util.ClassUtils
 
-import gorm.tools.api.IncludesConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelStreamTools
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.PooledIdGenerator
-import gorm.tools.mango.DefaultMangoQuery
 import gorm.tools.mango.MangoBuilder
+import gorm.tools.mango.QuickSearchSupport
 import gorm.tools.metamap.services.MetaEntityService
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.GormRepo
-import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
@@ -35,6 +34,9 @@ import grails.config.Config
 import grails.core.GrailsApplication
 import grails.persistence.support.NullPersistentContextInterceptor
 import grails.spring.BeanBuilder
+import yakworks.gorm.api.ApiConfig
+import yakworks.gorm.api.IncludesConfig
+import yakworks.gorm.config.GormConfig
 import yakworks.grails.GrailsHolder
 import yakworks.i18n.icu.GrailsICUMessageSource
 import yakworks.spring.AppCtx
@@ -90,20 +92,23 @@ class RepoTestUtils {
         repoEventPublisher(RepoEventPublisher, lazy())
         //repoUtilBean(RepoUtil)
         repoExceptionSupport(RepoExceptionSupport, lazy())
-        mangoQuery(DefaultMangoQuery, lazy())
+        // mangoQuery(DefaultQueryService, lazy())
         mangoBuilder(MangoBuilder, lazy())
+        //gormConfig(GormConfig) //GrailsAppBuilder is doing a scan on yakworks.gorm.config
+        quickSearchSupport(QuickSearchSupport, lazy())
         trxService(TrxService, lazy())
         jdbcIdGenerator(MockJdbcIdGenerator, lazy())
         idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"), lazy())
         persistenceContextInterceptor(NullPersistentContextInterceptor, lazy()) //required for parallelTools
         parallelTools(ParallelStreamTools, lazy())
         asyncService(AsyncService, lazy())
+        apiConfig(ApiConfig, lazy())
         includesConfig(IncludesConfig, lazy())
         metaEntityService(MetaEntityService, lazy())
         metaMapService(MetaMapService, lazy())
         problemHandler(ProblemHandler, lazy())
         messageSource(GrailsICUMessageSource, lazy())
-        externalConfigLoader(ExternalConfigLoader, lazy())
+        //externalConfigLoader(ExternalConfigLoader, lazy())
     }}
 
     @CompileDynamic
@@ -117,7 +122,7 @@ class RepoTestUtils {
         for(Class domainClass in domainClassesToMock){
             Class repoClass = findRepoClass(domainClass)
             grailsApplication.addArtefact(RepositoryArtefactHandler.TYPE, repoClass)
-            String repoName = RepoUtil.getRepoBeanName(domainClass)
+            String repoName = RepoLookup.getRepoBeanName(domainClass)
             if (repoClass == DefaultGormRepo || repoClass == UuidGormRepo) {
                 "$repoName"(repoClass, domainClass, lazy())
             } else {

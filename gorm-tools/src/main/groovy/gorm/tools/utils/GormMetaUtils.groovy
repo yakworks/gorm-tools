@@ -17,15 +17,17 @@ import org.grails.datastore.mapping.proxy.ProxyHandler
 import org.grails.orm.hibernate.cfg.Mapping
 import org.springframework.validation.Validator
 
+import gorm.tools.model.Persistable
 import gorm.tools.validation.ApiConstraints
 import grails.gorm.validation.ConstrainedEntity
 import grails.gorm.validation.ConstrainedProperty
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.NameUtils
+import yakworks.commons.lang.Validate
 import yakworks.spring.AppCtx
 
 /**
- * A bunch of helper and lookup/finder statics for dealing with domain classes and PersistentEntity.
+ * A bunch of static helpers and lookup/finder statics for dealing with domain classes and PersistentEntity.
  * Useful methods to find the PersistentEntity and the mapping and meta fields.
  *
  * @author Joshua Burnett (@basejump)
@@ -95,11 +97,23 @@ class GormMetaUtils {
         AppCtx.get("grailsDomainClassMappingContext", MappingContext)
     }
 
+    static ProxyHandler getProxyHandler() {
+        getMappingContext().getProxyHandler()
+    }
+
     /**
      * the mapping grailsDomainClassMappingContext. This is the main holder for the persistentEntities
      */
     static Object unwrap(Object entity) {
-        getMappingContext().getProxyHandler().unwrap(entity)
+        getProxyHandler().unwrap(entity)
+    }
+
+    /**
+     * Returns the original class if the instance is a hibernate proxy. or returns the class name of the object
+     */
+    static Class getEntityClass(Object entity) {
+        Validate.notNull(entity, "Entity is null")
+        return getProxyHandler().getProxiedClass(entity)
     }
 
     /**
@@ -120,6 +134,21 @@ class GormMetaUtils {
         return name
     }
 
+    /**
+     * checks if its new or if its dirty
+     */
+    static boolean isNewOrDirty(GormEntity entity) {
+        if(entity == null){
+            return false
+        }
+        // if its a proxy and its not initialized then its can't be new or dirty
+        else if(!proxyHandler.isInitialized(entity)){
+            return false
+        } else {
+            return entity.hasChanged() || ((Persistable)entity).isNew()
+        }
+
+    }
     /**
      * Returns the mapping for the entity to DB.
      *
@@ -184,6 +213,21 @@ class GormMetaUtils {
 
     }
 
+    /** get PersistentProperty for path */
+    @CompileDynamic
+    static PersistentProperty getPersistentProperty(PersistentEntity domain, String property) {
+        Closure getPerProperty
+        getPerProperty = { PersistentEntity domainClass, List path ->
+            PersistentProperty prop = domainClass?.getPropertyByName(path[0].toString())
+            if (path.size() > 1 && prop) {
+                getPerProperty(prop.associatedEntity, path.tail())
+            } else {
+                prop
+            }
+        }
+        getPerProperty(domain, property.split("[.]") as List)
+    }
+
     /**
      * Returns persistent properties for persistent entity(finds by name)
      * Adds composite identeties, which are not in persistent properties by default
@@ -205,22 +249,28 @@ class GormMetaUtils {
      */
     static List<PersistentProperty> getPersistentProperties(PersistentEntity domain){
         List<PersistentProperty> result = domain.persistentProperties.collect() // collect copies it
-        if(domain.compositeIdentity) result.addAll(domain.compositeIdentity)
-        result.add(0, domain.getIdentity())
+        if(domain.compositeIdentity) {
+            result.addAll(domain.compositeIdentity)
+        }
+        else {
+            //domain.getIdentity() would be null if domain has compositeIdentity, so dont add a null prop
+            result.add(0, domain.getIdentity())
+        }
         result.unique()
     }
 
     /**
      * gets the id on the instance using entity reflector and trying not to init the proxy if its is one
      */
-    static Serializable getId(GormEntity instance) {
-        PersistentEntity persistentEntity = getPersistentEntity(instance)
+    static Serializable getId(Object instance) {
+        GormEntity entity = (GormEntity)instance
+        PersistentEntity persistentEntity = getPersistentEntity(entity)
         ProxyHandler proxyHandler = persistentEntity.mappingContext.proxyHandler
-        if(proxyHandler.isProxy(instance)) {
-            return proxyHandler.getIdentifier(instance)
+        if(proxyHandler.isProxy(entity)) {
+            return proxyHandler.getIdentifier(entity)
         }
         else {
-            persistentEntity.mappingContext.getEntityReflector(persistentEntity).getIdentifier(instance)
+            persistentEntity.mappingContext.getEntityReflector(persistentEntity).getIdentifier(entity)
         }
     }
 
@@ -251,7 +301,7 @@ class GormMetaUtils {
     /**
      * default get properties for gorm entity class
      */
-    static Map<String, Object> getProperties(GormEntity instance) {
+    static Map<String, Object> getProperties(Object instance) {
         Map<String, Object> props = [:]
         for (MetaProperty mp : getMetaProperties(instance.class)) {
             props[mp.name] = mp.getProperty(instance)

@@ -27,15 +27,15 @@ trait NameCode<D> extends NamedEntity implements Lookupable<D> {
 
     static constraintsMap = [
         code:[ d: 'Short code, alphanumeric with no special characters except dash (for space) and underscore',
-               nullable: false, maxSize: 10, matches: "[a-zA-Z0-9-_]+" ]
+               nullable: false, matches: "[a-zA-Z0-9-_]+",  maxSize: 10 ]
     ]
 
     void beforeValidate() {
         if(!this.name && this.code) this.name = code.replaceAll('-', ' ')
     }
 
-    //FIXME #339 framed out example
     static D lookup(Map data){
+        //FIXME does this have a test? also, on else it returns nothing, should be specific and return null otherwise
         if(data['code']) {
             (D) RepoLookup.findRepo(this).query(code: data['code']).get()
         }

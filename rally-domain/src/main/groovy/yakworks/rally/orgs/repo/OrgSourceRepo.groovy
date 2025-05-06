@@ -7,10 +7,14 @@ package yakworks.rally.orgs.repo
 import groovy.transform.CompileStatic
 
 import gorm.tools.databinding.BindAction
+import gorm.tools.mango.jpql.ComboKeyExistsQuery
 import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepository
+import gorm.tools.repository.events.BeforePersistEvent
+import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import grails.gorm.transactions.Transactional
+import yakworks.api.problem.data.DataProblemCodes
 import yakworks.commons.lang.Validate
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
@@ -19,6 +23,20 @@ import yakworks.rally.orgs.model.OrgType
 @GormRepository
 @CompileStatic
 class OrgSourceRepo extends LongIdGormRepo<OrgSource> {
+
+    ComboKeyExistsQuery orgSourcExistsQuery
+
+    @RepoListener
+    void beforePersist(OrgSource os, BeforePersistEvent e) {
+        if(os.isNew()) {
+            //we check when new to avoid unique index error.
+            if(exists(os.sourceType, os.sourceId, os.orgType)){
+                throw DataProblemCodes.UniqueConstraint.get()
+                    .detail("Violates unique constraint [sourceType: ${os.sourceType}, sourceId: ${os.sourceId}, orgType:${os.orgType}]")
+                    .toException()
+            }
+        }
+    }
 
     /**
      * creates the source from org and its data and sets it to its org.source
@@ -97,6 +115,12 @@ class OrgSourceRepo extends LongIdGormRepo<OrgSource> {
             [sourceId: theSourceId, orgType: theOrgType] )
         // will only return 1
         res ? res[0] as Long : null
+    }
+
+    boolean exists(SourceType sourceType, String sourceId, OrgType orgType) {
+        if( !orgSourcExistsQuery ) orgSourcExistsQuery = ComboKeyExistsQuery.of(getEntityClass())
+            .keyNames(['sourceType', 'sourceId', 'orgType'])
+        return orgSourcExistsQuery.exists(sourceType: sourceType, sourceId: sourceId, orgType: orgType)
     }
 
 }

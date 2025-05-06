@@ -4,20 +4,25 @@
 */
 package yakworks.rally.job
 
+import org.springframework.beans.factory.annotation.Autowired
+
 import gorm.tools.model.SourceType
-import yakworks.testing.gorm.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.json.groovy.JsonEngine
-import yakworks.testing.gorm.unit.SecurityTest
-import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.rally.config.MaintenanceProps
+import yakworks.testing.gorm.unit.GormHibernateTest
+import yakworks.testing.gorm.unit.SecurityTest
 
-class SyncJobSpec extends Specification implements DataRepoTest, SecurityTest {
-    static entityClasses = [SyncJob, Attachment]
+class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTest {
+    static entityClasses = [SyncJob, Attachment, AttachmentLink]
     static springBeans = [
-        attachmentSupport:AttachmentSupport,
-        syncJobService:DefaultSyncJobService
+        MaintenanceProps,
+        [syncJobService: DefaultSyncJobService]
     ]
+
+    @Autowired DefaultSyncJobService syncJobService
 
     SyncJob createJob(){
         return new SyncJob([sourceType: SourceType.ERP, sourceId: 'ar/org']).persist(flush:true)
@@ -28,6 +33,11 @@ class SyncJobSpec extends Specification implements DataRepoTest, SecurityTest {
         SyncJob job = new SyncJob([sourceType: SourceType.ERP, sourceId: 'ar/org'])
         job.validate()
         job.persist()
+    }
+
+    void "smoke test jobProps"() {
+        expect:
+        syncJobService.maintenanceProps.crons.size() == 2
     }
 
     void "kick off simulation of Job"() {
@@ -44,17 +54,40 @@ class SyncJobSpec extends Specification implements DataRepoTest, SecurityTest {
         job.payloadBytes.size() > 0
     }
 
-    void "make sure update works with error bytes"() {
+    void "check that problems save properly"() {
         when:
-        def jobId = createJob().id
-        def errorList = ["ok":false,"tile":"bad stuff here"]
-        def job = SyncJob.repo.update(id:jobId, errorBytes:errorList.toString().bytes)
+        // def errorList = ["ok":false,"tile":"bad stuff here"]
+        def job = new SyncJob(problems: [["ok":false,"title":"error"]]).persist()
+        def jobId = job.id
+        // job.problems = [["ok":false,"title":"error"]]
+        // job.persist(flush:true)
+        flushAndClear()
+
+        def job1 = SyncJob.get(jobId)
 
         then:
-        job
-        job.errorBytes.size() > 0
+        job1
+        job1.problems.size() == 1
+        job1.problems[0].ok == false
+        job1.problems[0].title == "error"
     }
 
+    void "problems update"() {
+        when:
+        def job = new SyncJob().persist()
+        def jobId = job.id
+        flushAndClear()
+        SyncJob.repo.update([id: jobId, problems: [["ok":false,"title":"error"]]])
+        flushAndClear()
+
+        def job1 = SyncJob.get(jobId)
+
+        then:
+        job1
+        job1.problems.size() == 1
+        job1.problems[0].ok == false
+        job1.problems[0].title == "error"
+    }
 
     void "convert json to byte array"() {
         setup:
@@ -74,11 +107,5 @@ class SyncJobSpec extends Specification implements DataRepoTest, SecurityTest {
         j
         res.bytes == j.payloadBytes
         res == j.payloadToString()
-
     }
-
-
-
-
-
 }

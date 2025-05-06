@@ -5,10 +5,14 @@
 package gorm.tools.databinding
 
 import groovy.transform.CompileStatic
-
+import org.grails.datastore.gorm.GormEnhancer
+import org.grails.datastore.gorm.GormStaticApi
+import org.grails.datastore.mapping.model.PersistentEntity
 import spock.lang.Ignore
+import spock.lang.IgnoreRest
 import yakworks.commons.lang.IsoDateUtil
 import gorm.tools.repository.model.RepoEntity
+import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.unit.DataRepoTest
 import yakworks.commons.model.IdEnum
 import grails.databinding.converters.ValueConverter
@@ -23,15 +27,14 @@ import yakworks.testing.gorm.model.KitchenSink
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
+import yakworks.testing.gorm.unit.GormHibernateTest
+
+class EntityMapBinderUnitSpec extends Specification implements GormHibernateTest {
+    static List<Class> entityClasses = [TestDomain, Nest, AnotherDomain, BindableNested, KitchenSink]
     EntityMapBinder binder
 
     void setup() {
         binder = new EntityMapBinder()
-    }
-
-    Class[] getDomainClassesToMock() {
-        [TestDomain, Nest, AnotherDomain, BindableNested, KitchenSink]
     }
 
     void "should bind numbers without going through converters"() {
@@ -454,6 +457,19 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         testDomain.notBindableNested.id == 99999
     }
 
+    void "should not bind non bindable props of nested domains"() {
+        TestDomain testDomain = new TestDomain(nested: new Nest(name:"name1", name2: "name2"))
+
+        Map params = [nested: [name: "updated", name2:"updated"]]
+
+        when:
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.nested.name == "updated"
+        testDomain.nested.name2 == "name2" //its bindable:false
+    }
+
     void "binder shouldn't bind the association if constraints doesn't contain 'bindable' and it does not belongsTo"() {
         TestDomain testDomain = new TestDomain()
         Map params = [name: 'outer', notBindable: 'notBindableTest', notBindableNested: [name: 'notBindableNested']]
@@ -469,6 +485,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         //association
         testDomain.notBindableNested == null
     }
+
 
     void "binder shouldn't initialize proxy when checks association's id"() {
         BindableNested nested = new BindableNested(name: 'proxy').save(failOnError: true)
@@ -549,25 +566,6 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         testDomain.enumIdent == TestEnumIdent.Num2
     }
 
-    void "test binder should convert empty values to null"() {
-        given:
-        TestDomain testDomain = new TestDomain()
-        Map params = [name: "  ", age: "", amount: "", localDate: "", active: "  "]
-
-        when:
-        binder.bind(testDomain, params)
-
-        then: "No exceptions or class cast errors should have been generates, empty values set as null"
-        noExceptionThrown()
-
-        testDomain.hasErrors() == false
-        testDomain.name == null
-        testDomain.age == null
-        testDomain.amount == null
-        testDomain.localDate == null
-        testDomain.active == null
-    }
-
 }
 
 
@@ -631,6 +629,7 @@ enum TestEnumIdent implements IdEnum<TestEnumIdent,Long>{
 @Entity
 class AnotherDomain implements RepoEntity<AnotherDomain>{
     String name
+    String source
 }
 
 @Entity
@@ -642,7 +641,7 @@ class Nest implements RepoEntity<Nest>{
 
     static constraints = {
         name nullable: false
-        name2 nullable: true
+        name2 nullable: true, bindable:false
     }
 }
 

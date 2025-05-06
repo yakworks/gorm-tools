@@ -54,7 +54,7 @@ class BulkApiSupport<D> {
         this.entityClass = entityClass
     }
 
-    public static <D> BulkApiSupport<D> of(Class<D> entityClass){
+    static <D> BulkApiSupport<D> of(Class<D> entityClass){
         def bcs = new BulkApiSupport(entityClass)
         AppCtx.autowire(bcs)
         // bcs.syncJobService = AppCtx.get('syncJobService', SyncJobService)
@@ -81,6 +81,8 @@ class BulkApiSupport<D> {
             data.payload = payloadBody
         }
 
+        //XXX @JB if we dont call SyncJobService.createJob, thn dont we need to savePayloadAsFile if payload size > 1000 etc?
+        //XXX we need to save entityClassName also so that when running the job, we can lookup entity specific BulkApiSupport/repo etc
         SyncJobEntity jobEntity = syncJobService.repo.create(data, [flush: true, bindId: true]) as SyncJobEntity
 
         return jobEntity

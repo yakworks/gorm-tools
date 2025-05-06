@@ -32,7 +32,7 @@ class BulkApiSupportSpec extends Specification implements DomainIntTest {
         BulkApiSupport bs = BulkApiSupport.of(Org)
 
         when:
-        SyncJob job = bs.submitJob(DataOp.add, [q:[typeId: OrgType.Customer.id], attachmentId:1L], "test-job", [[num:"T1", name:"T1"]])
+        SyncJob job = bs.queueJob(DataOp.add, [q:[typeId: OrgType.Customer.id], attachmentId:1L], "test-job", [[num:"T1", name:"T1"]])
         flushAndClear()
         assert job.id
         job = SyncJob.get(job.id)

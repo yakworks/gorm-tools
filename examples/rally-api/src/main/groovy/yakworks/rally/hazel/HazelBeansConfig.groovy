@@ -9,9 +9,11 @@ import java.util.concurrent.BlockingQueue
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
+import org.springframework.context.annotation.Profile
 
 import com.hazelcast.core.HazelcastInstance
 
@@ -25,17 +27,28 @@ class HazelBeansConfig {
 
     public static final String QUE_NAME = "demoJobQueue"
 
-    @Autowired HazelcastInstance hazelcastInstance
+   // @Autowired HazelcastInstance hazelcastInstance
 
-    @Bean
-    public BlockingQueue<Long> demoJobQueue() {
-        return hazelcastInstance.getQueue(QUE_NAME);
+    @Configuration
+    @Profile('!test')
+    //@ConditionalOnProperty(value="app.mail.mailgun.enabled", havingValue = "true")
+    static class DemoBeans {
+        @Bean
+        public BlockingQueue<Long> demoJobQueue(HazelcastInstance hazelcastInstance) {
+            return hazelcastInstance.getQueue(QUE_NAME);
+        }
+
+        @Bean
+        public DemoConsumer demoConsumer(BlockingQueue<Long> demoJobQueue, DemoJobService demoJobService) {
+            new DemoConsumer(demoJobQueue, demoJobService);
+        }
+
+        @Bean
+        public DemoSpringJobs demoSpringJobs() {
+            new DemoSpringJobs()
+        }
     }
 
-    @Bean
-    public DemoConsumer demoConsumer(BlockingQueue<Long> demoJobQueue, DemoJobService demoJobService) {
-        new DemoConsumer(demoJobQueue, demoJobService);
-    }
 
 
 

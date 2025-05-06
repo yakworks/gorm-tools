@@ -62,10 +62,10 @@ class BulkApiSupport<D> {
         return bcs
     }
 
-    SyncJobEntity submitJob(DataOp dataOp, Map qParams, String sourceId, List<Map> payloadBody) {
+    SyncJobEntity queueJob(DataOp dataOp, Map qParams, String sourceId, List<Map> payloadBody) {
         SyncJobArgs args = setupSyncJobArgs(dataOp, qParams, sourceId)
         //add dataOp to params
-        qParams['dataOp'] = dataOp.toString()
+        qParams['dataOp'] = dataOp.name()
         Map data = [
             id: args.jobId,
             source: args.source,
@@ -78,6 +78,7 @@ class BulkApiSupport<D> {
         if(qParams.attachmentId) {
             data.payloadId = qParams.attachmentId
         } else if(payloadBody){
+            //XXX do bytes conversion here
             data.payload = payloadBody
         }
 

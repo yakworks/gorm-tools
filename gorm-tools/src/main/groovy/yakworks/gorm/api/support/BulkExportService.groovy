@@ -28,6 +28,7 @@ import yakworks.json.groovy.JsonEngine
 import yakworks.meta.MetaMapList
 import yakworks.spring.AppCtx
 
+//XXX this whole thing should use new flow
 @CompileStatic
 @Slf4j
 class BulkExportService {

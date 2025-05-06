@@ -10,8 +10,6 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.context.annotation.Lazy
-import org.springframework.stereotype.Component
 
 import com.hazelcast.collection.ICollection
 import com.hazelcast.collection.ItemEvent

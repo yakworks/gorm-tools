@@ -42,6 +42,10 @@ class SyncJobArgs {
      * Payload input data used for job operations
      */
     Object payload
+    /**
+     * if attachment already created, this is the attachmentId
+     */
+    Long payloadId
 
     /**
      * force how to store the payload (what was sent)
@@ -59,8 +63,8 @@ class SyncJobArgs {
     Boolean saveDataAsFile = false
 
     /**
-     * If dataFormat=Payload then errors should be stored separate from result data.
-     * If dataFormat=Result then errors are mixed in and the syncJob.data is just a rendered list of the results.
+     * If dataFormat=Payload then data is just a json list or map, and errors will be in the problems field. Bulk uses this way.
+     * If dataFormat=Result then errors are mixed in and the syncJob.data is just a rendered list of the Result or Problem objects.
      * When dataFormat=Payload then the rendering of the data is only list of whats in each results payload.
      * as opposed to a list of Results objects when dataFormat=Result
      * For example if processing export then instead of getting syncJob.data as a list of results objects it will be a list of what
@@ -157,13 +161,7 @@ class SyncJobArgs {
     Class entityClass
 
     //reference back to the SyncJobContext built from these args.
-    SyncJobContext context
-
-    /**
-     * SyncJobState to use when creating new job.
-     * Default is Running. But Queued can be used for jobs which are scheduled to run later, eg BulkExport.
-     */
-    SyncJobState jobState = SyncJobState.Running
+    //SyncJobContext context
 
     /** helper to return true if op=DataOp.add */
     boolean isCreate(){
@@ -179,10 +177,10 @@ class SyncJobArgs {
         new SyncJobArgs(args)
     }
 
-    static SyncJobArgs update(Map args = [:]){
-        args.op = DataOp.update
-        new SyncJobArgs(args)
-    }
+    // static SyncJobArgs update(Map args = [:]){
+    //     args.op = DataOp.update
+    //     new SyncJobArgs(args)
+    // }
 
     static SyncJobArgs withParams(Map params){
         SyncJobArgs syncJobArgs = new SyncJobArgs(params:params)

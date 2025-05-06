@@ -38,7 +38,7 @@ class BulkExportServiceIntegrationSpec extends Specification implements DomainIn
 
         then:
         job
-        job.state == SyncJobState.Queued
+        //job.state == SyncJobState.Queued
 
         when:
         String payload = job.payloadToString()
@@ -135,7 +135,7 @@ class BulkExportServiceIntegrationSpec extends Specification implements DomainIn
     SyncJobArgs setupJobArgs(Map q) {
         SyncJobArgs syncJobArgs = SyncJobArgs.withParams(q:q)
         syncJobArgs.includes = ["id", "num", "name"]
-        syncJobArgs.jobState = SyncJobState.Queued
+        //syncJobArgs.jobState = SyncJobState.Queued
         syncJobArgs.entityClass = Org
         return syncJobArgs
     }

@@ -91,16 +91,16 @@ jobs:
       - save_workspace
       - save_build_cache
 
-  timeout:
+  timeout-check:
     executor: builder-small
     steps:
       - run:
-    name: Cancel build after set time
-    background: true
-    command: |
-      sleep 1000
-      echo "Canceling workflow as too much time has elapsed"
-      curl -X POST --header "Content-Type: application/json" "https://circleci.com/api/v2/workflow/${CIRCLE_WORKFLOW_ID}/cancel?circle-token=${CIRCLE_TOKEN}"
+          name: Cancel build after set time
+          background: true
+          command: |
+            sleep 600 # 10min
+            echo "Canceling workflow as too much time has elapsed"
+            curl -X POST --header "Content-Type: application/json" "https://circleci.com/api/v2/workflow/${CIRCLE_WORKFLOW_ID}/cancel?circle-token=${CIRCLE_TOKEN}"
 
   gorm-tools:
     executor: builder-large

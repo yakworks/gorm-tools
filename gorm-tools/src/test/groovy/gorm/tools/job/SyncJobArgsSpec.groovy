@@ -46,4 +46,32 @@ class SyncJobArgsSpec extends Specification  {
         expect:
         dfoo == null
     }
+
+    void "test groovy as for enum casting"() {
+        when:
+        String addVal = 'add'
+        DataOp addOp = addVal as DataOp
+
+        String nullVal
+        DataOp nullOp = EnumUtils.getEnumIgnoreCase(DataOp, nullVal)
+
+        then:
+        !nullOp
+        addOp == DataOp.add
+
+        when: "bad val"
+        String fooVal = 'foo'
+        DataOp fooOp = fooVal as DataOp
+
+        then:
+        thrown(IllegalArgumentException)
+
+        when: "EnumUtils does not throw"
+        fooOp = EnumUtils.getEnumIgnoreCase(DataOp, nullVal)
+
+        then:
+        !fooOp
+
+    }
+
 }

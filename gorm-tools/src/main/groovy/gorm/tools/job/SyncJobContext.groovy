@@ -79,7 +79,7 @@ class SyncJobContext {
     /** creates a context from the SynJobArgs and assign a back reference to this in SyncJobArgs. */
     static SyncJobContext of(SyncJobArgs args){
         def sjc = new SyncJobContext(args: args)
-        args.context = sjc
+        //args.context = sjc
         return sjc
     }
 
@@ -348,18 +348,6 @@ class SyncJobContext {
         dataPath.withWriter { wr ->
             wr.write('[\n')
         }
-    }
-
-    /**
-     * when args.savePayload and args.savePayloadAsFile are true, this is called to save the payload to file
-     * @param payload the payload List or Map that was sent (will normally have been json when called via REST
-     * @return the Attachment id.
-     */
-    protected Long writePayloadFile(Collection payload){
-        String filename = "SyncJobPayload_${jobId}_.json"
-        Path path = syncJobService.createTempFile(filename)
-        JsonStreaming.streamToFile(payload, path)
-        return syncJobService.createAttachment(path, filename)
     }
 
     /**

@@ -147,7 +147,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
             it["comments"] = "flubber${it.id}"
         }
 
-        jobId = orgRepo.bulk(jsonList, SyncJobArgs.update(parallel: false, async: false))
+        jobId = orgRepo.bulk(jsonList, new SyncJobArgs(parallel: false, async: false).op(DataOp.update))
         job = getJob(jobId) //SyncJob.get(jobId)
         // flushAndClear()
 

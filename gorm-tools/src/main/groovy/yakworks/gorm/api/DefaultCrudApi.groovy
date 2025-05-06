@@ -214,7 +214,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
          */
 
         //submit the job
-        SyncJobEntity job = getBulkApiSupport().queueJob(dataOp, qParams, sourceId, dataList)
+        SyncJobEntity job = getBulkApiSupport().queueImportJob(dataOp, qParams, sourceId, dataList)
         //if not async then wait
         if(!qParams.getBoolean('async', true)){
             //XXX new process loop and wait for job to finish
@@ -225,7 +225,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     }
 
     SyncJobEntity bulkExport(Map params, String sourceId) {
-        return getBulkApiSupport().processBulkExport(params, sourceId)
+        return  getBulkApiSupport().queueExportJob(params, sourceId)
     }
 
     protected List<D> queryList(QueryArgs qargs) {

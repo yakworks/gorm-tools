@@ -62,50 +62,50 @@ class BulkApiSupport<D> {
         return bcs
     }
 
-    SyncJobEntity queueJob(DataOp dataOp, Map qParams, String sourceId, List<Map> payloadBody) {
-        SyncJobArgs args = setupSyncJobArgs(dataOp, qParams, sourceId)
-        //add dataOp to params
-        qParams['dataOp'] = dataOp.name()
-        Map data = [
-            id: args.jobId,
-            source: args.source,
-            sourceId: args.sourceId,
-            state: SyncJobState.Queued,
-            params: qParams
-        ] as Map<String,Object>
+    SyncJobEntity queueImportJob(DataOp dataOp, Map qParams, String sourceId, List<Map> payloadBody) {
 
+        SyncJobArgs args = setupSyncJobArgs(dataOp, qParams, sourceId)
+        //add dataOp to params if exists
+        args.params['dataOp'] = dataOp.name()
         //if attachmentId then assume its a csv
         if(qParams.attachmentId) {
-            data.payloadId = qParams.attachmentId
+            args.payloadId = qParams.attachmentId as Long
         } else if(payloadBody){
-            //XXX do bytes conversion here
-            data.payload = payloadBody
+            args.payload = payloadBody
         }
 
-        //XXX @JB if we dont call SyncJobService.createJob, thn dont we need to savePayloadAsFile if payload size > 1000 etc?
-        //XXX we need to save entityClassName also so that when running the job, we can lookup entity specific BulkApiSupport/repo etc
-        SyncJobEntity jobEntity = syncJobService.repo.create(data, [flush: true, bindId: true]) as SyncJobEntity
-
-        return jobEntity
+        return syncJobService.queueJob(args)
     }
 
+    SyncJobEntity queueExportJob(Map qParams, String sourceId) {
+
+        SyncJobArgs args = setupBulkExportArgs(qParams, sourceId)
+
+        return syncJobService.queueJob(args)
+    }
+
+    //WIP
     SyncJobEntity startJob(Long jobId) {
         SyncJobEntity job = syncJobService.getJob(jobId)
+        assert job.state == SyncJobState.Queued
+
         List<Map> dataList
         Map qParams = job.params
         //1. check payloadId and see if its a zip and csv
         //XXX right now we assume its csv in zip but we should have more info stored to say that.
+        // Check the dataFormat if its a zip to verify its CSV
         if(qParams.attachmentId) {
             //We set savePayload to false by default for CSV since we already have the csv file as attachment
             qParams.savePayload = false
             //sets the datalist from the csv instead of body
             dataList = transformCsvToBulkList(qParams)
-        } else if(job.payloadId || job.payloadBytes) {
+        }
+        else if(job.payloadId || job.payloadBytes) {
+            //if no attachmentId was passed to params then
             dataList = JsonEngine.parseJson(job.payloadToString(), List<Map>)
         }
         //2. get dataOp from params
-        DataOp dataOp = qParams['dataOp'] as DataOp
-        assert(dataOp)
+        DataOp dataOp = EnumUtils.getEnumIgnoreCase(DataOp, qParams['dataOp'] as String)
 
         SyncJobArgs syncJobArgs = setupSyncJobArgs(dataOp, qParams, job.sourceId)
         SyncJobContext sctx = syncJobService.initContext(syncJobArgs, dataList)

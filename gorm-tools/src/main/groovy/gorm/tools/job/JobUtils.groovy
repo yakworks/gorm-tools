@@ -36,6 +36,7 @@ class JobUtils {
             id: job['id'],
             ok: job.ok,
             state: job.state.name(),
+            message: job.message,
             source: job.source,
             sourceId: job.sourceId,
             data: rawDataJson

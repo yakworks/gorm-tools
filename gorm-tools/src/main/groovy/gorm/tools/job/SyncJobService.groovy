@@ -5,7 +5,6 @@
 package gorm.tools.job
 
 import java.nio.file.Path
-import java.util.function.Supplier
 
 import groovy.transform.CompileStatic
 
@@ -23,6 +22,7 @@ import yakworks.api.ApiResults
 import yakworks.commons.lang.Validate
 import yakworks.i18n.icu.ICUMessageSource
 import yakworks.json.groovy.JsonEngine
+import yakworks.json.groovy.JsonStreaming
 import yakworks.spring.AppCtx
 
 /** Trait for a conretete SyncJobService that provides standard functionality to create and update a jobs status */
@@ -60,6 +60,51 @@ abstract class SyncJobService<D> {
     }
 
     /**
+     * Creates a SyncJob with SyncJobState.Queued and fires event.
+     * @param args SyncJobArgs
+     * @return the created SyncJobEntity
+     */
+    SyncJobEntity queueJob(SyncJobArgs args) {
+        args.jobId = ((IdGeneratorRepo)getRepo()).generateId()
+
+        Map data = [
+            id: args.jobId,
+            source: args.source,
+            sourceId: args.sourceId,
+            state: SyncJobState.Queued,
+            params: args.params
+        ] as Map<String,Object>
+
+        if(args.payloadId) {
+            //if payloadId, then probably attachmentId with csv for example. Just store it and dont do payload conversion
+            data.payloadId = args.payloadId
+        }
+        else if(args.payload){
+            // When collection then check size and set args
+            if(args.payload instanceof Collection && ((Collection)args.payload).size() > 1000) {
+                //if list if over 1000 then save both as file and not in column
+                args.savePayloadAsFile = true
+                args.saveDataAsFile = true
+            }
+            //savePayload is true by default
+            if(args.savePayload){
+                if (args.payload instanceof Collection && args.savePayloadAsFile) {
+                    data.payloadId = writePayloadFile(args.jobId, args.payload as Collection)
+                }
+                else {
+                    String res = JsonEngine.toJson(args.payload)
+                    data.payloadBytes = res.bytes
+                }
+            }
+        }
+
+        //the call to this createJob method is already wrapped in a new trx
+        SyncJobEntity jobEntity = getRepo().create(data, [flush: true, bindId: true]) as SyncJobEntity
+        return jobEntity
+    }
+
+
+    /**
      * creates and saves the Job and returns the SyncJobContext with the jobId
      */
     SyncJobContext createJob(SyncJobArgs args, Object payload){
@@ -89,8 +134,8 @@ abstract class SyncJobService<D> {
             id: syncJobArgs.jobId,
             source: syncJobArgs.source,
             sourceId: syncJobArgs.sourceId,
-            state: syncJobArgs.jobState,
-            payload: payload //XXX we add payload here despite the savePayload, what are the implications?
+            state: SyncJobState.Running,
+            payload: payload //XXX we were adding payload here despite the savePayload, what are the implications?
         ] as Map<String,Object>
 
         if(payload instanceof Collection && payload.size() > 1000) {
@@ -100,7 +145,7 @@ abstract class SyncJobService<D> {
 
         if(syncJobArgs.savePayload){
             if (payload && syncJobArgs.savePayloadAsFile) {
-                data.payloadId = jobContext.writePayloadFile(payload as Collection)
+                data.payloadId = writePayloadFile(syncJobArgs.jobId, payload as Collection)
             }
             else {
                 String res = JsonEngine.toJson(payload)
@@ -192,4 +237,15 @@ abstract class SyncJobService<D> {
         return runJob(jobContext.args.asyncArgs, jobContext, runnable)
     }
 
+    /**
+     * when args.savePayload and args.savePayloadAsFile are true, this is called to save the payload to file
+     * @param payload the payload List or Map that was sent (will normally have been json when called via REST
+     * @return the Attachment id.
+     */
+    protected Long writePayloadFile(Serializable jobId, Collection payload){
+        String filename = "SyncJobPayload_${jobId}_.json"
+        Path path = createTempFile(filename)
+        JsonStreaming.streamToFile(payload, path)
+        return createAttachment(path, filename)
+    }
 }

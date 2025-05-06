@@ -50,6 +50,8 @@ trait SyncJobEntity implements SourceTrait {
 
     public static int MAX_MEG_IN_BYTES = 1024 * 1024 * 10 //10 megabytes
 
+    abstract Long getId()
+
     /**
      * will be true if State.Finished without any issues, false if any problems ar in the results data
      */

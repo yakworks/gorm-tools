@@ -4,9 +4,12 @@
 */
 package yakworks.rally
 
+import java.sql.SQLException
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
+import org.h2.tools.Server
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
@@ -14,10 +17,13 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Import
+import org.springframework.context.annotation.Lazy
+import org.springframework.context.annotation.Profile
 
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
 import grails.util.BuildSettings
+import yakworks.rally.boot.AsyncConfig
 import yakworks.rally.boot.CacheMgrConfig
 import yakworks.rally.boot.RallyApiSpringConfig
 import yakworks.rally.boot.WebMvcConfiguration
@@ -27,14 +33,14 @@ import yakworks.rest.gorm.RestApiFromConfig
  * Grails adds the @EnableWebMvc to the Application class. This annotation imports DelegatingWebMvcConfiguration and doesn't allow
  * us to import ours. See the WebMvcConfiguration which is needed to create our custom RequestMappingHandlerAdapter.
  */
-@ComponentScan(['yakworks.testing.gorm.model'])
+@ComponentScan(['yakworks.testing.gorm.model','yakworks.rally.hazel'])
 @RestApiFromConfig
 // caching will use hazelcast for spring caching too, look into how to use caffiene for spring stuff and hazel for hibernate.
 @EnableCaching
 @EnableAutoConfiguration(
     exclude = [DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class]
 )
-@Import([RallyApiSpringConfig, WebMvcConfiguration, CacheMgrConfig])
+@Import([RallyApiSpringConfig, WebMvcConfiguration, CacheMgrConfig, AsyncConfig])
 //@SpringBootApplication
 @CompileStatic
 class SpringApplication extends GrailsAutoConfiguration {
@@ -54,6 +60,20 @@ class SpringApplication extends GrailsAutoConfiguration {
         System.setProperty(BuildSettings.MAIN_CLASS_NAME, "yakworks.rally.boot.SpringApplication")
     }
 
+    /**
+     * Start internal H2 server so we can query the DB from IDE
+     *
+     * @return H2 Server instance
+     * @throws SQLException
+     */
+    @Profile("server")
+    @Lazy(false)
+    @Bean(initMethod = "start", destroyMethod = "stop")
+    public Server h2Server() throws SQLException {
+        println "***********************Starting H2 Server********************"
+        return Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "9090");
+    }
+
     /*
     grails HibernateDatastoreConnectionSourcesRegistrar.postProcessBeanDefinitionRegistry sets up the dataSource but checks for existing first.
     in order for other spring boot Autoconfigure (such as actuator metrics) to get picked up then datasource needs to be setup early.
@@ -62,7 +82,7 @@ class SpringApplication extends GrailsAutoConfiguration {
     and the Datasource early (which looks like it should be a factory based on dataSourceConnectionSourceFactory)
     this is a WIP example.
     */
-    @Bean // @Primary
+    //@Bean // @Primary
     // DataSource dataSource() {
     //     return DataSourceBuilder
     //         .create()

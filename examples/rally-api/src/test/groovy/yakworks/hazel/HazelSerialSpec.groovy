@@ -7,7 +7,7 @@ import gorm.tools.beans.Pager
 import spock.lang.Specification
 
 /**
- * Cookbook tests for handlebars
+ * Serialization smoke test
  */
 class HazelSerialSpec extends Specification {
 

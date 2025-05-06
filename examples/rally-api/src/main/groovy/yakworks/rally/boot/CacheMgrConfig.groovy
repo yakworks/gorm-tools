@@ -66,7 +66,7 @@ class CacheMgrConfig {
             //can be set from app.yml too, see https://docs.hazelcast.com/hazelcast/5.5/spring/add-caching
             hcm.defaultLockTimeout = 5_000L //in millis
             //hcm.lockTimeoutMap['orgApiList'] = 10_000L //in millis
-            //setup a defdault cache, not really needed, just testing
+            //setup a default cache, not really needed, just testing
             //hcm.getCache('orgApiList')
             return hcm
         }

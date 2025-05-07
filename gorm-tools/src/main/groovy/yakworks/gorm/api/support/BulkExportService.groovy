@@ -43,9 +43,6 @@ class BulkExportService {
      */
     Long scheduleBulkExportJob(SyncJobArgs syncJobArgs) {
         if(syncJobArgs.queryArgs == null) throw DataProblem.of('error.query.qRequired').detail("q criteria required").toException()
-        //resulting data should be saved as a file
-        syncJobArgs.saveDataAsFile = true //XXX Whats the point of setting this? doesnt get saved.
-        //syncJobArgs.jobState = SyncJobState.Queued
 
         //Store QueryArgs and includes list as payload, these are the two things we need when running export
         //so that we can construct it back when syncjob runs
@@ -54,8 +51,8 @@ class BulkExportService {
             includes: syncJobArgs.includes,
             domain: syncJobArgs.entityClass.simpleName
         ]
-        SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, payload)
-        return jobContext.jobId
+        SyncJobEntity job = syncJobService.queueJob(syncJobArgs)
+        return job.id
     }
 
     /**
@@ -65,18 +62,25 @@ class BulkExportService {
      */
     Long runBulkExportJob(Long jobId, boolean async = true) {
         //build job context and syncjobargs from previously saved syncjob's payload
-        SyncJobContext context = buildJobContext(jobId)
-        context.args.async = async
+        SyncJobContext jobContext = buildJobContext(jobId)
+        jobContext.args.async = async
 
-        //change job state to running
-        changeJobStatusToRunning(jobId)
+        try {
+            //change job state to running
+            changeJobStatusToRunning(jobId)
+            //load repo for the domain class name stored in payload
+            GormRepo repo = loadRepo(jobContext.payload['domain'] as String)
+            jobContext.args.entityClass = repo.entityClass
+            doBulkExport(jobContext, repo)
+        } catch (ex){
+            //ideally should not happen as the pattern here is that all exceptions should be handled in doBulkParallel
+            jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
+        }
+        finally {
+            jobContext.finishJob()
+        }
 
-        //load repo for the domain class name stored in payload
-        GormRepo repo = loadRepo(context.payload['domain'] as String)
-        context.args.entityClass = repo.entityClass
-
-        //run job
-        return syncJobService.runJob(context.args.asyncArgs, context, () -> doBulkExport(context, repo))
+        return jobId
     }
 
     /**

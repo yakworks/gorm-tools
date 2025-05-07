@@ -18,6 +18,7 @@ import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.DataOp
+import yakworks.api.problem.data.DataProblem
 import yakworks.commons.lang.EnumUtils
 import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.IncludesKey
@@ -110,7 +111,7 @@ class BulkApiSupport<D> {
         SyncJobArgs syncJobArgs = setupSyncJobArgs(dataOp, qParams, job.sourceId)
         SyncJobContext sctx = syncJobService.initContext(syncJobArgs, dataList)
         //run it.
-        getRepo().bulkProcess(dataList, sctx)
+        getRepo().bulkImport(dataList, sctx)
 
         return syncJobService.getJob(jobId)
     }

@@ -25,7 +25,7 @@ import yakworks.json.groovy.JsonEngine
 import yakworks.json.groovy.JsonStreaming
 import yakworks.spring.AppCtx
 
-/** Trait for a conretete SyncJobService that provides standard functionality to create and update a jobs status */
+/** Abstract base class for a conretete SyncJobService that provides standard functionality to create and update a jobs status */
 @CompileStatic
 abstract class SyncJobService<D> {
     final static Logger LOG = LoggerFactory.getLogger(SyncJobService)
@@ -64,14 +64,14 @@ abstract class SyncJobService<D> {
      * @param args SyncJobArgs
      * @return the created SyncJobEntity
      */
-    SyncJobEntity queueJob(SyncJobArgs args) {
+    SyncJobEntity queueJob(SyncJobArgs args, SyncJobState state = SyncJobState.Queued) {
         args.jobId = ((IdGeneratorRepo)getRepo()).generateId()
 
         Map data = [
             id: args.jobId,
             source: args.source,
             sourceId: args.sourceId,
-            state: SyncJobState.Queued,
+            state: state,
             params: args.params
         ] as Map<String,Object>
 
@@ -80,15 +80,9 @@ abstract class SyncJobService<D> {
             data.payloadId = args.payloadId
         }
         else if(args.payload){
-            // When collection then check size and set args
-            if(args.payload instanceof Collection && ((Collection)args.payload).size() > 1000) {
-                //if list if over 1000 then save both as file and not in column
-                args.savePayloadAsFile = true
-                args.saveDataAsFile = true
-            }
             //savePayload is true by default
             if(args.savePayload){
-                if (args.payload instanceof Collection && args.savePayloadAsFile) {
+                if (args.isSavePayloadAsFile()) {
                     data.payloadId = writePayloadFile(args.jobId, args.payload as Collection)
                 }
                 else {
@@ -111,52 +105,17 @@ abstract class SyncJobService<D> {
         SyncJobContext jobContext
         //keep it in its own transaction so it doesn't depend on wrapping
         trxService.withNewTrx {
-            jobContext = SyncJobContext.of(args).syncJobService(this).payload(payload)
+            //set the payload if not already
+            if(!args.payload) args.payload = payload
             //jobContext.createJob()
-            doCreateJob(jobContext)
+            queueJob(args, SyncJobState.Running)
+
+            jobContext = SyncJobContext.of(args).syncJobService(this).payload(payload)
             jobContext.results = ApiResults.create()
             jobContext.startTime = System.currentTimeMillis()
         }
         AppCtx.publishEvent(SyncJobStartEvent.of(jobContext))
         return jobContext
-    }
-
-    /** create a job using the syncJobService.repo.create */
-    protected SyncJobEntity doCreateJob(SyncJobContext jobContext){
-        Object payload = jobContext.payload
-        Validate.notNull(jobContext.payload)
-        SyncJobArgs syncJobArgs = jobContext.args
-        //get jobId early so it can be used, might not need this anymore
-        syncJobArgs.jobId = ((IdGeneratorRepo)getRepo()).generateId()
-        jobContext.setPayloadSize(payload)
-
-        Map data = [
-            id: syncJobArgs.jobId,
-            source: syncJobArgs.source,
-            sourceId: syncJobArgs.sourceId,
-            state: SyncJobState.Running,
-            payload: payload //XXX we were adding payload here despite the savePayload, what are the implications?
-        ] as Map<String,Object>
-
-        if(payload instanceof Collection && payload.size() > 1000) {
-            syncJobArgs.savePayloadAsFile = true
-            syncJobArgs.saveDataAsFile = true
-        }
-
-        if(syncJobArgs.savePayload){
-            if (payload && syncJobArgs.savePayloadAsFile) {
-                data.payloadId = writePayloadFile(syncJobArgs.jobId, payload as Collection)
-            }
-            else {
-                String res = JsonEngine.toJson(payload)
-                data.payloadBytes = res.bytes
-            }
-        }
-
-        //the call to this createJob method is already wrapped in a new trx
-        SyncJobEntity jobEntity = getRepo().create(data, [flush: true, bindId: true]) as SyncJobEntity
-
-        return jobEntity
     }
 
     /**

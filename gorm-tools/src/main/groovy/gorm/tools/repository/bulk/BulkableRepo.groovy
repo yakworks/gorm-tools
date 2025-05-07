@@ -30,6 +30,7 @@ import yakworks.api.ApiResults
 import yakworks.api.HttpStatus
 import yakworks.api.Result
 import yakworks.api.problem.data.DataProblem
+import yakworks.commons.lang.Validate
 import yakworks.commons.map.LazyPathKeyMap
 import yakworks.commons.map.Maps
 import yakworks.meta.MetaMap
@@ -82,6 +83,7 @@ trait BulkableRepo<D> {
         if(dataList == null || dataList.isEmpty()) throw DataProblem.of('error.data.emptyPayload').detail("Bulk Data is Empty").toException()
 
         syncJobArgs.entityClass = getEntityClass()
+
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
         //XXX why are we setting session: true here? explain. should it be default?
         //def asyncArgs = jobContext.args.asyncArgs.session(true)
@@ -96,9 +98,11 @@ trait BulkableRepo<D> {
      * @param jobContext the jobContext for the job
      * @return the id, just whats in jobContext
      */
-    Long bulkProcess(List<Map> dataList, SyncJobContext jobContext) {
+    Long bulkImport(List<Map> dataList, SyncJobContext jobContext) {
         //If dataList is empty then error right away.
         if(dataList == null || dataList.isEmpty()) throw DataProblem.of('error.data.emptyPayload').detail("Bulk Data is Empty").toException()
+        //make sure it has a job here.
+        Validate.notNull(jobContext.jobId)
 
         try {
             jobContext.args.entityClass = getEntityClass()

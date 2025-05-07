@@ -32,8 +32,6 @@ class SyncJobArgs {
 
     SyncJobArgs() { this([:])}
 
-    SyncJobService syncJobService //reference to the syncJobService
-
     String source
 
     String sourceId
@@ -42,6 +40,7 @@ class SyncJobArgs {
      * Payload input data used for job operations
      */
     Object payload
+
     /**
      * if attachment already created, this is the attachmentId
      */
@@ -55,7 +54,7 @@ class SyncJobArgs {
     /**
      * force payload to store as file instead of bytes
      */
-    Boolean savePayloadAsFile = false
+    Boolean savePayloadAsFile
 
     /**
      * resulting data (what is returned in response) is always saved but can force it to save to file instead of bytes in column
@@ -106,13 +105,14 @@ class SyncJobArgs {
      * the job will halt when it hits 100 errors
      * this setting ignored if transactional=true
      */
-    int errorThreshold = 0
+    //TODO not implemented yet
+    // int errorThreshold = 0
 
     /**
      * if true then the bulk operation is all or nothing, meaning 1 error and it will roll back.
      * TODO not implemented yet
      */
-    boolean transactional = false
+    // boolean transactional = false
 
     /**
      * Normally used for testing and debugging, or when encountering deadlocks.
@@ -132,6 +132,7 @@ class SyncJobArgs {
 
     /**
      * the args, such as flush:true etc.., to pass down to the repo methods
+     * Helpful for bindId when bulk importing rows that have id already.
      */
     Map persistArgs
 
@@ -166,6 +167,21 @@ class SyncJobArgs {
     /** helper to return true if op=DataOp.add */
     boolean isCreate(){
         op == DataOp.add
+    }
+
+    boolean isSavePayloadAsFile(){
+        //if its set then use it
+        if(this.savePayloadAsFile != null) return this.savePayloadAsFile
+        // When collection then check size and set args
+        return (payload instanceof Collection && ((Collection)payload).size() > 1000)
+
+    }
+
+    boolean isSaveDataAsFile(){
+        //if its set then use it
+        if(this.saveDataAsFile != null) return this.saveDataAsFile
+        // Base it on the payload, if its big then assume data will be too.
+        return (payload instanceof Collection && ((Collection)payload).size() > 1000)
     }
 
     static SyncJobArgs of(DataOp dataOp){

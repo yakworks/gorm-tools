@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import groovy.json.StreamingJsonBuilder
 import groovy.transform.CompileStatic
 import groovy.transform.MapConstructor
+import groovy.transform.Synchronized
 import groovy.transform.ToString
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
@@ -34,7 +35,7 @@ import yakworks.spring.AppCtx
 import static gorm.tools.job.SyncJobArgs.DataFormat
 
 /**
- * Holds the basic state and primary action methods for a Bulk job.
+ * Holds the basic state and primary action methods while running a Bulk job.
  * Creates and updates the job status as it progresses and finalizes its results when finished.
  */
 @SuppressWarnings('Println')
@@ -191,7 +192,7 @@ class SyncJobContext {
      */
     SyncJobEntity finishJob() {
         Map data = [id: jobId] as Map<String, Object>
-        if(args.saveDataAsFile){
+        if(args.isSaveDataAsFile()){
             // if saveDataAsFile then it will have been writing out the data results as it goes
             //close out the file
             dataPath.withWriterAppend { wr ->
@@ -302,13 +303,11 @@ class SyncJobContext {
      * Update the job with status on whats been processed and append the json data
      * @param currentResults the results to append, normally will be an ApiResults but can be any Problem or Result
      */
+    @Synchronized //sync to only one thread for the SyncJob can update at a time
     protected void updateJob(Result currentResults, Map data){
-        //sync to only one thread for the SyncJob can update at a time
-        synchronized ("SyncJob${jobId}".toString().intern()) {
-            syncJobService.updateJob(data)
-            // append json to dataFile
-            if(currentResults) appendDataResults(currentResults)
-        }
+        syncJobService.updateJob(data)
+        // append json to dataFile
+        if(currentResults) appendDataResults(currentResults)
     }
 
     /**
@@ -316,7 +315,7 @@ class SyncJobContext {
      * @param currentResults the results to append, normally will be an ApiResults but can be any Problem or Result
      */
     protected void appendDataResults(Result currentResults){
-        if(args.saveDataAsFile){
+        if(args.isSaveDataAsFile()){
             boolean isFirstWrite = false
             if(!dataPath) {
                 isFirstWrite = true // its first time writing

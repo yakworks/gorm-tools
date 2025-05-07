@@ -100,7 +100,7 @@ class MailgunService extends EmailService {
             return Result.OK().payload([id: resp.id, message: resp.message])
         } catch(FeignException e){
             //FeignException would happen when mailgun api call fails
-            log.error("Mailgun failed to send email [${e.message}] \n ")
+            log.error("Mailgun failed to send email [${e.message}] \n ${mailTo}")
             if(e.status() == 401) return new DataProblem().title("Unauthorized or bad domain").status(e.status())
             Map msgData =  ObjectMapperUtil.getObjectMapper().readValue(e.contentUTF8(), Map)
             return new DataProblem().title("Mailgun Send Failure").detail(msgData['message'] as String).status(e.status())

@@ -23,7 +23,10 @@ class MailgunServiceSpec extends Specification {
         then:
         //should be tried twice and 2nd attempt would succeed
         2 * mailgunService._mailgunMessagesApi.sendMessage(_, _) >> {
-            if(attempt < 2) { attempt++; throw new FeignException(500, "test") }
+            if(attempt < 2) {
+                attempt++
+                throw new FeignException(500, "test")
+            }
             else {
                 return new MessageResponse("test", "test")
             }

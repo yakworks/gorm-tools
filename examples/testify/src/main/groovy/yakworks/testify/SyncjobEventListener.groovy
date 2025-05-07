@@ -4,7 +4,7 @@ import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 
 import gorm.tools.job.SyncJobFinishedEvent
-import gorm.tools.job.SyncJobStartEvent
+import gorm.tools.job.SyncJobStateEvent
 import gorm.tools.repository.events.AfterBulkSaveEntityEvent
 import gorm.tools.repository.events.BeforeBulkSaveEntityEvent
 import gorm.tools.repository.model.DataOp
@@ -46,7 +46,7 @@ class SyncjobEventListener {
     }
 
     @EventListener
-    void beforeBulk(SyncJobStartEvent<Org> event) {
+    void beforeBulk(SyncJobStateEvent<Org> event) {
         assert event.entityClass.isAssignableFrom(Org)
         if(event.context.args.op != DataOp.add) return
         if(event.context.payload && event.context.payload instanceof Collection) {
@@ -59,7 +59,7 @@ class SyncjobEventListener {
     }
 
     @EventListener
-    void withoutEntityClassStart(SyncJobStartEvent<Object> event) {
+    void withoutEntityClassStart(SyncJobStateEvent<Object> event) {
         if(event.entityClass != Object) return //apply just for the event without entityClass
         if(event.context.payload && event.context.payload instanceof Collection) {
            event.context.payload << 5 //add a new item to payload which can be verified by test

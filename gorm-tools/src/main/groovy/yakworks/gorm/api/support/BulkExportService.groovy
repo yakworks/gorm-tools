@@ -148,7 +148,8 @@ class BulkExportService {
         syncJobService.updateJob([id:jobId, state: SyncJobState.Running])
     }
 
-
+    //XXX Why make it so complicated? We do repo look up all over and its much cleaner than this.
+    // Whats wrong with keeping this centralized in RepoLookup
     GormRepo loadRepo(String domainName) {
         return AppCtx.get("${NameUtils.getPropertyName(domainName)}Repo") as GormRepo
     }

@@ -19,7 +19,6 @@ import gorm.tools.repository.GormRepo
 import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.transaction.TrxService
 import yakworks.api.ApiResults
-import yakworks.commons.lang.Validate
 import yakworks.i18n.icu.ICUMessageSource
 import yakworks.json.groovy.JsonEngine
 import yakworks.json.groovy.JsonStreaming
@@ -114,7 +113,7 @@ abstract class SyncJobService<D> {
             jobContext.results = ApiResults.create()
             jobContext.startTime = System.currentTimeMillis()
         }
-        AppCtx.publishEvent(SyncJobStartEvent.of(jobContext))
+        AppCtx.publishEvent(SyncJobStateEvent.of(jobContext))
         return jobContext
     }
 

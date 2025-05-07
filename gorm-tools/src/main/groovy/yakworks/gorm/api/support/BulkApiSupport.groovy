@@ -20,6 +20,7 @@ import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.DataOp
 import yakworks.api.problem.data.DataProblem
 import yakworks.commons.lang.EnumUtils
+import yakworks.commons.lang.Validate
 import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.IncludesKey
 import yakworks.json.groovy.JsonEngine
@@ -111,9 +112,32 @@ class BulkApiSupport<D> {
         SyncJobArgs syncJobArgs = setupSyncJobArgs(dataOp, qParams, job.sourceId)
         SyncJobContext sctx = syncJobService.initContext(syncJobArgs, dataList)
         //run it.
-        getRepo().bulkImport(dataList, sctx)
+        bulk(dataList, sctx)
 
         return syncJobService.getJob(jobId)
+    }
+
+    /**
+     * calls the doBulkParallel
+     */
+    protected Long bulk(List<Map> dataList, SyncJobContext jobContext) {
+        //If dataList is empty then error right away.
+        if(dataList == null || dataList.isEmpty()) throw DataProblem.of('error.data.emptyPayload').detail("Bulk Data is Empty").toException()
+        //make sure it has a job here.
+        Validate.notNull(jobContext.jobId)
+
+        try {
+            jobContext.args.entityClass = getEntityClass()
+            getRepo().doBulkParallel(dataList, jobContext)
+        } catch (ex){
+            //ideally should not happen as the pattern here is that all exceptions should be handled in doBulkParallel
+            jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
+        }
+        finally {
+            jobContext.finishJob()
+        }
+
+        return jobContext.jobId
     }
 
 

@@ -100,7 +100,7 @@ trait CrudApiController<D> extends RestApiController {
             //Always inject SecureCrudApi, which wraps and delegates to configured custom CrudApi or DefaultCrudApi.
             //this.crudApi = (CrudApi<D>)AppCtx.ctx.getBean("secureCrudApi", [getEntityClass()] as Object[])
 
-            this.crudApi = ServiceLookup.lookup(getEntityClass(), CrudApi<D>, "secureCrudApi")
+            this.crudApi = ServiceLookup.lookup(getEntityClass(), CrudApi<D>, "defaultCrudApi")
 
             //this.crudApi = crudApiFactory.apply(getEntityClass())
             //this.crudApi = crudApiClosure.call(getEntityClass()) as CrudApi<D>

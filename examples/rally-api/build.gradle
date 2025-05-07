@@ -24,6 +24,10 @@ dependencies {
   // implementation "com.github.jknack:handlebars-springmvc:$vHandlebars"
   // implementation "com.github.jknack:handlebars-guava-cache:$vHandlebars"
 
+  ['aspectj', 'core', 'spring', 'web'].each {
+    implementation "org.apache.shiro:shiro-$it:$vShiro"
+  }
+
   // === Spring Sec ===
   implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'

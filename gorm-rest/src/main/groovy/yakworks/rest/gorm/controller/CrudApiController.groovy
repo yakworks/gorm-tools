@@ -67,10 +67,9 @@ trait CrudApiController<D> extends RestApiController {
     @Autowired
     CsvToMapTransformer csvToMapTransformer
 
-    // @Autowired //(required = false)
-    // ObjectProvider<CrudApi<D>> crudApiProvider
-    @Autowired
-    private Function<Class, CrudApi> crudApiFactory
+    //Kept for reference, see comments in DefaultCrudApiConfiguration
+    // @Autowired
+    // private Function<Class, CrudApi> crudApiFactory
 
 
     // @Autowired

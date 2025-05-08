@@ -31,6 +31,7 @@ class HazelBeansConfig {
 
     @Configuration
     @Profile('!test')
+    @Lazy(false) //lazy false so that consumer bean gets registered
     //@ConditionalOnProperty(value="app.mail.mailgun.enabled", havingValue = "true")
     static class DemoBeans {
         @Bean

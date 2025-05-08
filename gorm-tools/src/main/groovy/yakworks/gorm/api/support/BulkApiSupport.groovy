@@ -64,6 +64,9 @@ class BulkApiSupport<D> {
         return bcs
     }
 
+    /**
+     * Creates a bulk import job and puts in hazel queue
+     */
     SyncJobEntity queueImportJob(DataOp dataOp, Map qParams, String sourceId, List<Map> payloadBody) {
 
         SyncJobArgs args = setupSyncJobArgs(dataOp, qParams, sourceId)
@@ -79,10 +82,11 @@ class BulkApiSupport<D> {
         return syncJobService.queueJob(args)
     }
 
+    /**
+     * Creates a bulk export job and puts in hazel queue
+     */
     SyncJobEntity queueExportJob(Map qParams, String sourceId) {
-
         SyncJobArgs args = setupBulkExportArgs(qParams, sourceId)
-
         return syncJobService.queueJob(args)
     }
 

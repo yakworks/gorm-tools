@@ -1,5 +1,6 @@
 package yakworks.rally.job
 
+import gorm.tools.job.SyncJobState
 import groovy.json.JsonException
 import groovy.json.JsonSlurper
 
@@ -42,21 +43,44 @@ class SyncJobServiceTests extends Specification implements DomainIntTest {
 
     void "test queueJob"() {
         when:
+        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', payload: [1,2,3])
+        syncJobArgs.entityClass = Org
+        SyncJobEntity job = syncJobService.queueJob(syncJobArgs)
+        flushAndClear()
+
+        job = SyncJob.get(job.id)
+
+        then:
+        noExceptionThrown()
+        job.id
+        job.state == SyncJobState.Queued
+    }
+
+    void "test queueJob and save payload to file"() {
+        when:
         List payload = []
         (1..1001).each {
             payload << it
         }
 
-        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source')
+        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', payload: payload)
         syncJobArgs.entityClass = Org
         SyncJobEntity job = syncJobService.queueJob(syncJobArgs)
+        flushAndClear()
 
-        SyncJob syncJob = SyncJob.get(job.id)
+        job = SyncJob.get(job.id)
 
         then:
         noExceptionThrown()
         job.id
+        job.state == SyncJobState.Queued
 
+        and:"verify that payload is saved as file"
+        job.payloadId
+        Attachment.exists(job.payloadId)
+
+        cleanup:
+        if(job.payloadId) Attachment.repo.removeById(job.payloadId)
     }
 
     void "test create job and save payload to file"() {

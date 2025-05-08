@@ -47,4 +47,24 @@ class BulkApiSupportSpec extends Specification implements DomainIntTest {
         job.payloadId
         job.payloadId == 1L
     }
+
+    void "test queue export job"() {
+        setup:
+        BulkApiSupport bs = BulkApiSupport.of(Org)
+
+        when:
+        SyncJob job = bs.queueExportJob([q:[typeId: OrgType.Customer.id], attachmentId:1L], "test-job")
+        flushAndClear()
+
+        assert job.id
+        job = SyncJob.get(job.id)
+
+        then:
+        noExceptionThrown()
+        job
+        job.state == SyncJobState.Queued
+        job.sourceId == 'test-job'
+        job.params
+        job.params.q == [typeId: OrgType.Customer.id]
+    }
 }

@@ -6,7 +6,6 @@ package yakworks.gorm.api.support
 
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.mapping.core.Datastore
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,6 +20,7 @@ import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
+import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.events.AfterBulkSaveEntityEvent
 import gorm.tools.repository.events.BeforeBulkSaveEntityEvent
 import gorm.tools.repository.events.RepoEventPublisher
@@ -42,15 +42,12 @@ import yakworks.meta.MetaMap
  */
 @SuppressWarnings(["Println"])
 @CompileStatic
-class BulkImportService<D> {
+class BulkImportSupport<D> {
 
-    final private static Logger log = LoggerFactory.getLogger(BulkImportService)
+    final private static Logger log = LoggerFactory.getLogger(BulkImportSupport)
 
     @Autowired(required = false) //optional to make testing easier and can do gorm-tools without syncJob
     SyncJobService syncJobService
-
-    @Autowired(required = false) //optional to make testing easier and can do gorm-tools without syncJob
-    GormRepo<D> repo
 
     @Autowired
     @Qualifier("parallelTools")
@@ -65,8 +62,14 @@ class BulkImportService<D> {
     @Autowired
     RepoEventPublisher repoEventPublisher
 
-    BulkImportService(GormRepo<D> repo){
-        this.repo = repo
+    Class<D> entityClass // the domain class this is for
+
+    BulkImportSupport(Class<D> entityClass){
+        this.entityClass = entityClass
+    }
+
+    GormRepo<D> getRepo(){
+        return RepoLookup.findRepo(entityClass)
     }
 
     /**

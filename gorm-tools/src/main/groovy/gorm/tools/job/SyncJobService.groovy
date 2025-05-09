@@ -116,7 +116,7 @@ abstract class SyncJobService<D> {
             .whenComplete { res, ex ->
                 if (ex) {
                     //ideally should not happen as the pattern here is that all exceptions should be handled in supplierFunc
-                    LOG.error("Unhandled exception while running job", ex)
+                    LOG.error("Unhandled exception while running job")
                     jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
                 }
                 jobContext.finishJob()

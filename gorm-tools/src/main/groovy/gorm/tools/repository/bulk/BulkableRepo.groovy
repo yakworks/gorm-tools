@@ -17,6 +17,7 @@ import gorm.tools.async.ParallelTools
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobService
+import gorm.tools.mango.api.QueryService
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
@@ -26,6 +27,7 @@ import gorm.tools.repository.events.BeforeBulkSaveEntityEvent
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.DataOp
 import gorm.tools.repository.model.EntityResult
+import gorm.tools.utils.ServiceLookup
 import yakworks.api.ApiResults
 import yakworks.api.HttpStatus
 import yakworks.api.Result
@@ -33,6 +35,8 @@ import yakworks.api.problem.data.DataProblem
 import yakworks.commons.lang.Validate
 import yakworks.commons.map.LazyPathKeyMap
 import yakworks.commons.map.Maps
+import yakworks.gorm.api.CrudApi
+import yakworks.gorm.api.support.BulkImportSupport
 import yakworks.meta.MetaMap
 
 /**
@@ -43,6 +47,9 @@ import yakworks.meta.MetaMap
 trait BulkableRepo<D> {
 
     final private static Logger log = LoggerFactory.getLogger(BulkableRepo)
+
+    //@Autowired(required=false)  //can't autowire, the DefaultGormRepo beans dont retain the D generic
+    BulkImportSupport<D> bulkImportSupport
 
     @Autowired(required = false) //optional to make testing easier and can do gorm-tools without syncJob
     SyncJobService syncJobService
@@ -69,6 +76,13 @@ trait BulkableRepo<D> {
     abstract <T> T withTrx(Closure<T> callable)
     abstract <T> T withNewTrx(Closure<T> callable)
 
+    BulkImportSupport<D> getBulkImportSupport(){
+        if (!bulkImportSupport) {
+            this.bulkImportSupport = ServiceLookup.lookup(getEntityClass(), BulkImportSupport<D>, "defaultBulkImportSupport")
+        }
+        return bulkImportSupport
+    }
+
     /**
      * creates a supplier to wrap doBulkParallel and calls bulk
      * if syncJobArgs.async = true will return right away
@@ -79,43 +93,7 @@ trait BulkableRepo<D> {
      */
     @Deprecated
     Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs) {
-        //If dataList is empty then error right away.
-        if(dataList == null || dataList.isEmpty()) throw DataProblem.of('error.data.emptyPayload').detail("Bulk Data is Empty").toException()
-
-        syncJobArgs.entityClass = getEntityClass()
-
-        SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
-        //XXX why are we setting session: true here? explain. should it be default?
-        //def asyncArgs = jobContext.args.asyncArgs.session(true)
-        // This is the promise call. Will return immediately if syncJobArgs.async=true
-        return syncJobService.runJob( jobContext.args.asyncArgs, jobContext, () -> doBulkParallel(dataList, jobContext))
-    }
-
-    /**
-     * wrap doBulkParallel and calls bulk
-     *
-     * @param dataList the list of data maps to create
-     * @param jobContext the jobContext for the job
-     * @return the id, just whats in jobContext
-     */
-    Long bulkImport(List<Map> dataList, SyncJobContext jobContext) {
-        //If dataList is empty then error right away.
-        if(dataList == null || dataList.isEmpty()) throw DataProblem.of('error.data.emptyPayload').detail("Bulk Data is Empty").toException()
-        //make sure it has a job here.
-        Validate.notNull(jobContext.jobId)
-
-        try {
-            jobContext.args.entityClass = getEntityClass()
-            doBulkParallel(dataList, jobContext)
-        } catch (ex){
-            //ideally should not happen as the pattern here is that all exceptions should be handled in doBulkParallel
-            jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
-        }
-        finally {
-            jobContext.finishJob()
-        }
-
-        return jobContext.jobId
+        return getBulkImportSupport().bulk(dataList, syncJobArgs)
     }
 
     void doBulkParallel(List<Map> dataList, SyncJobContext jobContext){

@@ -15,7 +15,7 @@ import yakworks.commons.lang.Validate
 /**
  * Was SyncJobStartEvent.
  * Event fired on State change.
- * @param <D>
+ * @param <D> the entity class this is for
  */
 @CompileStatic
 class SyncJobStateEvent<D> extends ApplicationEvent implements ResolvableTypeProvider {

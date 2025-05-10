@@ -43,11 +43,13 @@ import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.support.BulkExportService
 import yakworks.gorm.api.support.DefaultQueryArgsValidator
 import yakworks.gorm.api.support.QueryArgsValidator
+import yakworks.gorm.config.DefaultBulkConfiguration
 import yakworks.gorm.config.GormToolsPropertiesConfiguration
 
 @AutoConfiguration
 @Lazy
-@Import([DefaultCrudApiConfiguration, GormToolsPropertiesConfiguration]) //Config Props AsyncConfig, GormConfig, IdGeneratorConfig, QueryConfig
+@Import([DefaultCrudApiConfiguration, GormToolsPropertiesConfiguration, DefaultBulkConfiguration])
+//Config Props AsyncConfig, GormConfig, IdGeneratorConfig, QueryConfig
 // @AutoConfigureBefore([HibernateJpaAutoConfiguration])
 // @AutoConfigureAfter(DataSourceAutoConfiguration)
 @CompileStatic

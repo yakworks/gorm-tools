@@ -18,9 +18,7 @@ import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.DataOp
-import yakworks.api.problem.data.DataProblem
 import yakworks.commons.lang.EnumUtils
-import yakworks.commons.lang.Validate
 import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.IncludesKey
 import yakworks.json.groovy.JsonEngine

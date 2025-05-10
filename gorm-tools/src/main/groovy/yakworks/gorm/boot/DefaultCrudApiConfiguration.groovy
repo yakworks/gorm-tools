@@ -17,7 +17,6 @@ import org.springframework.core.ResolvableType
 
 import yakworks.gorm.api.CrudApi
 import yakworks.gorm.api.DefaultCrudApi
-import yakworks.gorm.api.support.BulkImportSupport
 
 @CompileStatic
 @Configuration
@@ -62,9 +61,4 @@ class DefaultCrudApiConfiguration {
         return new DefaultCrudApi(entityClass);
     }
 
-    @Bean
-    @Scope("prototype")
-    public <D> BulkImportSupport<D> defaultBulkImportSupport(Class<D> entityClass) {
-        return new BulkImportSupport(entityClass);
-    }
 }

@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Lazy
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
@@ -38,9 +39,7 @@ import static org.springframework.security.config.Customizer.withDefaults
 /**
  * An example of explicitly configuring Spring Security with the defaults.
  */
-// keep componentScan in Application.groovy for now so unit test work. see notes in the TestSpringApplication class in tests
-// @ComponentScan(['yakity.security', 'yakworks.security'])
-//@Lazy
+@EnableMethodSecurity
 @EnableWebSecurity //(debug = true)
 @CompileStatic
 @Configuration

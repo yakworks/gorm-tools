@@ -5,6 +5,7 @@ error:
   notFound: '{name} lookup failed using key {key}'
   illegalArgument: Illegal Argument Exception
   notupdateable: '{name} can not be updated'
+  unauthorized: 'Unauthorized'
 
   # DATA
   data:

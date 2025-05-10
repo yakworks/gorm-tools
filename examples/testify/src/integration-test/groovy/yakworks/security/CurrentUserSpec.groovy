@@ -118,7 +118,6 @@ class CurrentUserSpec extends Specification implements DomainIntTest {
 
         new SecUserPermission(user3, 'action:kick').persist()
 
-
         new SecRolePermission(roleAdmin, 'printer:admin').persist()
 
         new SecRolePermission(roleUser, 'printer:use').persist()

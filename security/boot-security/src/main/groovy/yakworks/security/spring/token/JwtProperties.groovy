@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component
 /**
  * Config from application.yml properteis.
  */
-@Component
 @ConfigurationProperties(prefix="app.security.jwt")
 @CompileStatic
 class JwtProperties {

@@ -14,9 +14,9 @@ class SmokeRestApiSpec extends Specification implements OkHttpRestTrait {
 
     String path = "/api/rally"
 
-    // def setup(){
-    //     login()
-    // }
+     void setup(){
+         login()
+     }
 
     // @Value('${local.server.port}')
     // protected Integer serverPort;

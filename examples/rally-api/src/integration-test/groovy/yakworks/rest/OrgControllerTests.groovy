@@ -1,21 +1,19 @@
 package yakworks.rest
 
 import org.springframework.http.HttpStatus
-
-
 import yakworks.rally.orgs.model.ContactFlex
-import yakworks.rally.orgs.model.OrgFlex
 import yakworks.rest.gorm.controller.CrudApiController
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import yakworks.commons.map.Maps
+import yakworks.testing.gorm.integration.SecuritySpecHelper
 import yakworks.testing.rest.RestIntTest
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
 
 @Rollback
 @Integration
-class OrgControllerTests extends RestIntTest {
+class OrgControllerTests extends RestIntTest implements SecuritySpecHelper {
 
     CrudApiController<Org> controller
 

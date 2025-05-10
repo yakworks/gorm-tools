@@ -2,5 +2,5 @@ moduleName = rally-domain-extensions
 moduleVersion = ${moduleVersion}
 extensionClasses = yakworks.rally.extensions.CurrentUserExt,\
                     yakworks.rally.extensions.UserInfoExt
-staticExtensionClasses = yakworks.rally.extensions.LocalDateTimeStaticExt,\
-                            yakworks.rally.extensions.ZonedTimeStaticExt
+#staticExtensionClasses = yakworks.rally.extensions.LocalDateTimeStaticExt,\
+#                            yakworks.rally.extensions.ZonedTimeStaticExt

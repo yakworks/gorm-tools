@@ -5,12 +5,13 @@ import yakworks.rest.gorm.controller.CrudApiController
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import yakworks.commons.map.Maps
+import yakworks.testing.gorm.integration.SecuritySpecHelper
 import yakworks.testing.rest.RestIntTest
 import yakworks.rally.orgs.model.Contact
 
 @Rollback
 @Integration
-class ContactControllerTests extends RestIntTest {
+class ContactControllerTests extends RestIntTest implements SecuritySpecHelper {
 
     CrudApiController<Contact> controller
     // String controllerName = 'ContactController'

@@ -77,7 +77,7 @@ class BulkImportSupportSpec extends Specification implements DomainIntTest {
         org.comments == "testorg-1-SyncJobFinishedEvent"
         org.info != null
         //verify the SyncjobEventListener registered properly
-        org.info.fax == "SyncJobStartEvent"
+        org.info.fax == "SyncJobStateEvent"
         //verify the Before and AfterCreateOrUpdate
         org.flex.text9 == 'from before'
         org.flex.text10 == 'from after'

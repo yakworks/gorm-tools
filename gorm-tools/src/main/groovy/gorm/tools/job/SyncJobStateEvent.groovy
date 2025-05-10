@@ -12,10 +12,16 @@ import org.springframework.core.ResolvableTypeProvider
 
 import yakworks.commons.lang.Validate
 
+/**
+ * Was SyncJobStartEvent.
+ * Event fired on State change.
+ * @param <D>
+ */
 @CompileStatic
 class SyncJobStateEvent<D> extends ApplicationEvent implements ResolvableTypeProvider {
 
     Long jobId
+    SyncJobState state
     SyncJobContext context
     Class entityClass //domain class for which this sync job is
 

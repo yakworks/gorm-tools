@@ -46,7 +46,8 @@ class TestSyncJob implements RepoEntity<TestSyncJob>, SyncJobEntity {
         columns(
             payloadBytes: property(sqlType: 'BLOB'),
             dataBytes: property(sqlType: 'BLOB'),
-            problems: property(type: JsonType, typeParams: [type: ArrayList])
+            problems: property(type: JsonType, typeParams: [type: ArrayList]),
+            params: property(type: JsonType, typeParams: [type: Map])
         )
     }
 }

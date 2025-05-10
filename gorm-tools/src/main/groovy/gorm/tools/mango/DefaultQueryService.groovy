@@ -101,8 +101,8 @@ class DefaultQueryService<D> implements QueryService<D> {
      * @param pagerParams the map with max, offset and page
      * @return list of entities
      */
-    @Transactional(readOnly = true)
-    public List pagedList(MangoDetachedCriteria criteria, Pager pager) {
+    //@Transactional(readOnly = true)
+    //public List pagedList(MangoDetachedCriteria criteria, Pager pager) {
         //NOT USED RIGHT NOW
         // Map args = [max: pager.max, offset: pager.offset]
         // List resList
@@ -112,8 +112,8 @@ class DefaultQueryService<D> implements QueryService<D> {
         //     //return standard list
         //     resList =  criteria.list(args)
         // }
-        return null
-    }
+        //return []
+    //}
 
     /**
      *  Calculates sums for specified properties in enities query restricted by mango criteria

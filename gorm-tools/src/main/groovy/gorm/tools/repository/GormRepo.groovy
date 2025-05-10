@@ -22,13 +22,14 @@ import org.springframework.transaction.TransactionDefinition
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
+import gorm.tools.job.SyncJobArgs
 import gorm.tools.mango.api.QueryService
 import gorm.tools.mango.api.QueryServiceLookup
 import gorm.tools.mango.jpql.KeyExistsQuery
 import gorm.tools.model.Lookupable
 import gorm.tools.model.Persistable
 import gorm.tools.problem.ValidationProblem
-import gorm.tools.repository.bulk.BulkableRepo
+import gorm.tools.repository.bulk.BulkImporter
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.ApiCrudRepo
@@ -36,6 +37,7 @@ import gorm.tools.repository.model.EntityResult
 import gorm.tools.repository.model.PersistableRepoEntity
 import gorm.tools.transaction.TrxUtils
 import gorm.tools.utils.GormMetaUtils
+import gorm.tools.utils.ServiceLookup
 import grails.core.support.proxy.ProxyHandler
 import grails.validation.ValidationException
 import yakworks.api.HttpStatus
@@ -51,7 +53,7 @@ import yakworks.commons.lang.ClassUtils
  */
 @SuppressWarnings(['EmptyMethod', 'MethodCount'])
 @CompileStatic
-trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProvider {
+trait GormRepo<D> implements ApiCrudRepo<D>, ResolvableTypeProvider {
 
     @Autowired EntityMapBinder entityMapBinder
 
@@ -76,6 +78,8 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
     //cached instance of the query for id to keep it fast
     KeyExistsQuery idExistsQuery
 
+    BulkImporter<D> bulkImporter
+
     /**
      * The gorm domain class. uses the {@link org.springframework.core.GenericTypeResolver} is not set during contruction
      */
@@ -91,6 +95,13 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
             this.queryService = QueryServiceLookup.lookup(getEntityClass())
         }
         return this.queryService
+    }
+
+    BulkImporter<D> getBulkImporter(){
+        if (!bulkImporter) {
+            this.bulkImporter = ServiceLookup.lookup(getEntityClass(), BulkImporter<D>, "defaultBulkImporter")
+        }
+        return bulkImporter
     }
 
     @Override
@@ -307,6 +318,10 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
         }
         // Result.OK().status(status).payload(instance)
         return EntityResult.of(instance).status(status)
+    }
+
+    Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs) {
+        return getBulkImporter().bulk(dataList, syncJobArgs)
     }
 
     /**

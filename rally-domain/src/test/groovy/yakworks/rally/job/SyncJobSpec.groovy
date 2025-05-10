@@ -4,6 +4,7 @@
 */
 package yakworks.rally.job
 
+import gorm.tools.job.SyncJobState
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.model.SourceType
@@ -70,6 +71,24 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
         job1.problems.size() == 1
         job1.problems[0].ok == false
         job1.problems[0].title == "error"
+    }
+
+    void "check params are persisted"() {
+        setup:
+        Map params = [q:[amount:['$gt':100.00]], async:true, parallel:true]
+        Map data = [sourceType: SourceType.ERP, sourceId: 'ar/org', state: SyncJobState.Queued, params:params]
+
+        when:
+        SyncJob job = SyncJob.repo.create(data)
+        flushAndClear()
+        job.refresh()
+
+        then:
+        noExceptionThrown()
+        job
+        job.params
+        job.params.q == [amount:['$gt':100.00]]
+
     }
 
     void "problems update"() {

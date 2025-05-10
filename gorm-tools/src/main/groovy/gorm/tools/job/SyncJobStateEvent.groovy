@@ -12,23 +12,29 @@ import org.springframework.core.ResolvableTypeProvider
 
 import yakworks.commons.lang.Validate
 
+/**
+ * Was SyncJobStartEvent.
+ * Event fired on State change.
+ * @param <D> the entity class this is for
+ */
 @CompileStatic
-class SyncJobStartEvent<D> extends ApplicationEvent implements ResolvableTypeProvider {
+class SyncJobStateEvent<D> extends ApplicationEvent implements ResolvableTypeProvider {
 
     Long jobId
+    SyncJobState state
     SyncJobContext context
     Class entityClass //domain class for which this sync job is
 
-    SyncJobStartEvent(SyncJobContext ctx) {
+    SyncJobStateEvent(SyncJobContext ctx) {
         super(ctx)
         this.context = ctx
         this.jobId = ctx.jobId
         this.entityClass = ctx.args.entityClass ?: Object //if no entityClass - eg for exportSync
     }
 
-    static SyncJobStartEvent of(SyncJobContext ctx) {
+    static SyncJobStateEvent of(SyncJobContext ctx) {
         Validate.notNull(ctx, "syncJobContext is null")
-        return new SyncJobStartEvent(ctx)
+        return new SyncJobStateEvent(ctx)
     }
 
     @Override

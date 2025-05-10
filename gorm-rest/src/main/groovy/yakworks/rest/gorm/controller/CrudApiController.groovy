@@ -27,9 +27,9 @@ import gorm.tools.repository.model.DataOp
 import gorm.tools.utils.ServiceLookup
 import grails.web.Action
 import yakworks.api.problem.Problem
-import yakworks.etl.csv.CsvToMapTransformer
 import yakworks.gorm.api.CrudApi
 import yakworks.gorm.api.IncludesProps
+import yakworks.gorm.api.support.CsvToMapTransformer
 import yakworks.spring.AppCtx
 
 import static gorm.tools.problem.ProblemHandler.isBrokenPipe
@@ -257,8 +257,9 @@ trait CrudApiController<D> extends RestApiController {
     def bulkExport() {
         try {
             Map qParams = getParamsMap()
+            //XXX @SUD We will disallow
             SyncJobEntity job = getCrudApi().bulkExport(qParams,  requestToSourceId(request))
-            respondWith(job, [status: MULTI_STATUS])
+            respondWith(job, [status: qParams.getBoolean('async') == false ? MULTI_STATUS : CREATED])
         } catch (Exception | AssertionError e) {
             respondWith(
                 BulkExceptionHandler.of(getEntityClass(), problemHandler).handleBulkOperationException(request, e)
@@ -274,9 +275,10 @@ trait CrudApiController<D> extends RestApiController {
 
         //if attachmentId then assume its a csv
         if(qParams.attachmentId) {
-            // We set savePayload to false by default for CSV since we already have the csv file as attachment?
+            //XXX We set savePayload to false by default for CSV since we already have the csv file as attachment?
             qParams.savePayload = false
             //sets the datalist from the csv instead of body
+            //Transform csv here, so bulk processing remains same, regardless the incoming payload is csv or json
             dataList = transformCsvToBulkList(qParams)
         } else {
             //XXX dirty ugly hack since we were not consistent and now need to do clean up
@@ -285,7 +287,18 @@ trait CrudApiController<D> extends RestApiController {
         }
 
         SyncJobEntity job = getCrudApi().bulk(dataOp, dataList, qParams, sourceId)
-        respondWith(job, [status: MULTI_STATUS])
+        respondWith(job, [status: qParams.getBoolean('async') == false ? MULTI_STATUS : CREATED])
+    }
+
+    //XXX New bulkProcess
+    void bulkImport(DataOp dataOp) {
+        List dataList = bodyAsList() as List<Map>
+        Map qParams = getParamsMap()
+        String sourceId = requestToSourceId(request)
+        SyncJobEntity job = getCrudApi().bulkImport(dataOp, dataList, qParams, sourceId)
+        //if its async=false then it will be the Finished job and equivalent to the GET on SyncJob, SO MULTI_STATUS
+        // if its not async, then its just returning the created Job and equivalent to the POST on SyncJob, so a CREATED status
+        respondWith(job, [status: qParams.getBoolean('async') == false ? MULTI_STATUS : CREATED])
     }
 
     String requestToSourceId(HttpServletRequest req){

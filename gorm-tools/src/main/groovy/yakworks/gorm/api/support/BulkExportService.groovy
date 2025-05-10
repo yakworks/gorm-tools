@@ -2,7 +2,7 @@
 * Copyright 2025 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.repository.bulk
+package yakworks.gorm.api.support
 
 import javax.inject.Inject
 
@@ -28,6 +28,7 @@ import yakworks.json.groovy.JsonEngine
 import yakworks.meta.MetaMapList
 import yakworks.spring.AppCtx
 
+//XXX this whole thing should use new flow
 @CompileStatic
 @Slf4j
 class BulkExportService {
@@ -42,9 +43,6 @@ class BulkExportService {
      */
     Long scheduleBulkExportJob(SyncJobArgs syncJobArgs) {
         if(syncJobArgs.queryArgs == null) throw DataProblem.of('error.query.qRequired').detail("q criteria required").toException()
-        //resulting data should be saved as a file
-        syncJobArgs.saveDataAsFile = true
-        syncJobArgs.jobState = SyncJobState.Queued
 
         //Store QueryArgs and includes list as payload, these are the two things we need when running export
         //so that we can construct it back when syncjob runs
@@ -53,8 +51,8 @@ class BulkExportService {
             includes: syncJobArgs.includes,
             domain: syncJobArgs.entityClass.simpleName
         ]
-        SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, payload)
-        return jobContext.jobId
+        SyncJobEntity job = syncJobService.queueJob(syncJobArgs)
+        return job.id
     }
 
     /**
@@ -64,18 +62,25 @@ class BulkExportService {
      */
     Long runBulkExportJob(Long jobId, boolean async = true) {
         //build job context and syncjobargs from previously saved syncjob's payload
-        SyncJobContext context = buildJobContext(jobId)
-        context.args.async = async
+        SyncJobContext jobContext = buildJobContext(jobId)
+        jobContext.args.async = async
 
-        //change job state to running
-        changeJobStatusToRunning(jobId)
+        try {
+            //change job state to running
+            changeJobStatusToRunning(jobId)
+            //load repo for the domain class name stored in payload
+            GormRepo repo = loadRepo(jobContext.payload['domain'] as String)
+            jobContext.args.entityClass = repo.entityClass
+            doBulkExport(jobContext, repo)
+        } catch (ex){
+            //ideally should not happen as the pattern here is that all exceptions should be handled in doBulkParallel
+            jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
+        }
+        finally {
+            jobContext.finishJob()
+        }
 
-        //load repo for the domain class name stored in payload
-        GormRepo repo = loadRepo(context.payload['domain'] as String)
-        context.args.entityClass = repo.entityClass
-
-        //run job
-        return syncJobService.runJob(context.args.asyncArgs, context, () -> doBulkExport(context, repo))
+        return jobId
     }
 
     /**
@@ -143,7 +148,8 @@ class BulkExportService {
         syncJobService.updateJob([id:jobId, state: SyncJobState.Running])
     }
 
-
+    //XXX Why make it so complicated? We do repo look up all over and its much cleaner than this.
+    // Whats wrong with keeping this centralized in RepoLookup
     GormRepo loadRepo(String domainName) {
         return AppCtx.get("${NameUtils.getPropertyName(domainName)}Repo") as GormRepo
     }

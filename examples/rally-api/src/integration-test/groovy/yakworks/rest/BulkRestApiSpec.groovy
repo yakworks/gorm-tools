@@ -212,7 +212,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
 
     void "bulk export"() {
         when:
-        Response resp = get("/api/rally/org/bulk?q=*&parallel=false&async=false")
+        Response resp = get("/api/rally/org/bulk?q=*&async=false")
         Map body = bodyToMap(resp)
 
         then:

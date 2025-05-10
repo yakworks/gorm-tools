@@ -44,6 +44,7 @@ class DefaultCrudApiConfiguration {
      * }</pre>
      *
      */
+    //This is here as reference to show alternate way to do the ServiceLookup.lookup
     @Bean
     public <D> Function<Class<D>, CrudApi<D>> crudApiFactory() {
         return (Class<D> clazz) -> {

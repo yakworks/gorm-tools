@@ -1,30 +1,31 @@
 package yakworks.rally.job
 
-import gorm.tools.job.SyncJobArgs
-import gorm.tools.job.SyncJobContext
-import gorm.tools.job.SyncJobService
-import grails.gorm.transactions.Rollback
-import grails.testing.mixin.integration.Integration
+import gorm.tools.job.SyncJobState
 import groovy.json.JsonException
 import groovy.json.JsonSlurper
 
-import spock.lang.Ignore
+import org.springframework.beans.factory.annotation.Autowired
+
+import gorm.tools.job.SyncJobArgs
+import gorm.tools.job.SyncJobContext
+import gorm.tools.job.SyncJobEntity
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.api.problem.Problem
-import yakworks.json.groovy.JsonEngine
-import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Org
+import yakworks.testing.gorm.integration.DomainIntTest
 
 import static yakworks.json.groovy.JsonEngine.parseJson
 
 @Integration
 @Rollback
-class SyncJobContextTests extends Specification implements DomainIntTest {
+class SyncJobServiceTests extends Specification implements DomainIntTest {
 
-    DefaultSyncJobService syncJobService
+    @Autowired DefaultSyncJobService syncJobService
 
     SyncJobContext createJob(){
         def samplePaylod = [1,2,3,4]
@@ -36,9 +37,50 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
     void "sanity check JsonSlurper is not lax by default"() {
         when:
         new JsonSlurper().parseText('{"data": [{"one": 1}, {"two": 2},]}')
-
         then:
         JsonException ex = thrown()
+    }
+
+    void "test queueJob"() {
+        when:
+        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', payload: [1,2,3])
+        syncJobArgs.entityClass = Org
+        SyncJobEntity job = syncJobService.queueJob(syncJobArgs)
+        flushAndClear()
+
+        job = SyncJob.get(job.id)
+
+        then:
+        noExceptionThrown()
+        job.id
+        job.state == SyncJobState.Queued
+    }
+
+    void "test queueJob and save payload to file"() {
+        when:
+        List payload = []
+        (1..1001).each {
+            payload << it
+        }
+
+        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', payload: payload)
+        syncJobArgs.entityClass = Org
+        SyncJobEntity job = syncJobService.queueJob(syncJobArgs)
+        flushAndClear()
+
+        job = SyncJob.get(job.id)
+
+        then:
+        noExceptionThrown()
+        job.id
+        job.state == SyncJobState.Queued
+
+        and:"verify that payload is saved as file"
+        job.payloadId
+        Attachment.exists(job.payloadId)
+
+        cleanup:
+        if(job.payloadId) Attachment.repo.removeById(job.payloadId)
     }
 
     void "test create job and save payload to file"() {

@@ -7,8 +7,6 @@ package gorm.tools.repository.bulk
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 

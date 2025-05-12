@@ -48,8 +48,8 @@ class SecureCrudApi<D> implements CrudApi<D> {
 
     @Override
     @PreAuthorize("!hasRole('ROLE_READ_ONLY')")
-    SyncJobEntity bulk(DataOp dataOp, List<Map> dataList, Map params, String sourceId) {
-        return defaultCrudApi.bulk(dataOp, dataList, params, sourceId)
+    SyncJobEntity bulkImport(DataOp dataOp, List<Map> dataList, Map params, String sourceId) {
+        return defaultCrudApi.bulkImport(dataOp, dataList, params, sourceId)
     }
 
 }

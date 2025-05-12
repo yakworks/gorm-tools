@@ -4,7 +4,6 @@
 */
 package yakworks.gorm.api
 
-
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
@@ -56,6 +55,8 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     /** Not required but if an BulkSupport bean is setup then it will get get used */
     @Autowired(required = false)
     BulkApiSupport<D> bulkApiSupport
+
+    boolean legacyBulk = true
 
     DefaultCrudApi(Class<D> entityClass){
         this.entityClass = entityClass
@@ -192,14 +193,34 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     }
 
     @Override
-    SyncJobEntity bulk(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
+    SyncJobEntity bulkImport(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
+        if(legacyBulk){
+            return bulkImportLegacy(dataOp, dataList, qParams, sourceId)
+        } else {
+            return bulkImportNew(dataOp, dataList, qParams, sourceId)
+        }
+    }
+
+    SyncJobEntity bulkImportLegacy(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
+        //if attachmentId then assume its a csv
+        if(qParams.attachmentId) {
+            //XXX We set savePayload to false by default for CSV since we already have the csv file as attachment?
+            qParams.savePayload = false
+            //sets the datalist from the csv instead of body
+            //Transform csv here, so bulk processing remains same, regardless the incoming payload is csv or json
+            dataList = getBulkApiSupport().transformCsvToBulkList(qParams)
+        } else {
+            //XXX dirty ugly hack since we were not consistent and now need to do clean up
+            // RNDC expects async to be false by default when its not CSV
+            if(!qParams.containsKey('async')) qParams['async'] = false
+        }
         SyncJobArgs syncJobArgs = getBulkApiSupport().setupSyncJobArgs(dataOp, qParams, sourceId)
         SyncJobEntity job = getBulkApiSupport().process(dataList, syncJobArgs)
         return job
     }
 
-    @Override
-    SyncJobEntity bulkImport(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
+    //WIP
+    SyncJobEntity bulkImportNew(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
         /*
         1. create the Job
         2. adds to the queue

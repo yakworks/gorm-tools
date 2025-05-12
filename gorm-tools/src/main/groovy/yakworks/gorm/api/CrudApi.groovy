@@ -106,7 +106,7 @@ interface CrudApi<D> {
      * @param sourceId: sourceId for the Job, controller uses JobUtils.requestToSourceId to set it.
      * @return the created SyncJobEntity, normally async=true and syncJob.state will be 'Running'
      */
-    SyncJobEntity bulk(DataOp dataOp, List<Map> dataList, Map params, String sourceId)
+    //SyncJobEntity bulkLegacy(DataOp dataOp, List<Map> dataList, Map params, String sourceId)
 
     SyncJobEntity bulkImport(DataOp dataOp, List<Map> dataList, Map params, String sourceId)
 

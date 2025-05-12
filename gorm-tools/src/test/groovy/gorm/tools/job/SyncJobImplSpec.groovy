@@ -4,13 +4,16 @@
 */
 package gorm.tools.job
 
+import org.springframework.core.task.SimpleAsyncTaskExecutor
+
 import gorm.tools.model.SourceType
 import spock.lang.Specification
 import testing.TestSyncJob
 import yakworks.json.groovy.JsonEngine
 import yakworks.testing.gorm.unit.DataRepoTest
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class SyncJobImplSpec extends Specification  implements DataRepoTest  {
+class SyncJobImplSpec extends Specification  implements GormHibernateTest{
     static List entityClasses = [TestSyncJob]
 
     void "sanity check validation with String as data"() {

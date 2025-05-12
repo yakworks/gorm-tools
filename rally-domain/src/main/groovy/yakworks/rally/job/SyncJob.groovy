@@ -29,6 +29,8 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity, AuditStampTrait, Serializable {
 
     // List<Map> problems
+    //XXX until db is updated
+    //static transients = ['params']
 
     byte[] getData(){
         getRepo().getData(this)

@@ -169,7 +169,7 @@ abstract class SyncJobService<D> {
      * @return the job id from the jobContext.jobId
      */
     Long runJob(AsyncArgs asyncArgs, SyncJobContext jobContext, Runnable runnable) {
-        //process each glbatch in async
+        //process in async
         asyncService
             .supplyAsync (asyncArgs, () -> runnable.run()) //FIXME we really should be using runAsync as we do nothing with what the supplier returns
             .whenComplete { res, ex ->

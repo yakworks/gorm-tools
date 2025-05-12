@@ -4,6 +4,7 @@
 */
 package gorm.tools.job
 
+
 import groovy.transform.CompileStatic
 
 import gorm.tools.model.SourceTrait
@@ -106,7 +107,7 @@ trait SyncJobEntity implements SourceTrait {
     /**
      * Job request body
      */
-    Map<String, Object> body
+    // Map<String, Object> body
 
     /**
      * The data is a response of resources that were successfully and unsuccessfully updated or created after processing.

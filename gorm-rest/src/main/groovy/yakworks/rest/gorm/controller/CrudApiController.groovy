@@ -64,8 +64,8 @@ trait CrudApiController<D> extends RestApiController {
     //@Autowired(required = false)
     CrudApi<D> crudApi
 
-    @Autowired
-    CsvToMapTransformer csvToMapTransformer
+    // @Autowired
+    // CsvToMapTransformer csvToMapTransformer
 
     //Kept for reference, see comments in DefaultCrudApiConfiguration
     // @Autowired
@@ -101,18 +101,6 @@ trait CrudApiController<D> extends RestApiController {
 
             this.crudApi = ServiceLookup.lookup(getEntityClass(), CrudApi<D>, "defaultCrudApi")
 
-            //this.crudApi = crudApiFactory.apply(getEntityClass())
-            //this.crudApi = crudApiClosure.call(getEntityClass()) as CrudApi<D>
-            // try {
-            //     // var rt = ResolvableType.forClassWithGenerics(CrudApi, getEntityClass())
-            //     // var ctx = AppCtx.ctx
-            //     // var names = ctx.getBeanNamesForType(rt)
-            //     //check if concrete crudApi bean is setup, wont return nul since it will try the prototype
-            //     this.crudApi = crudApiProvider.getObject()
-            // } catch(UnsatisfiedDependencyException ex){
-            //     //will throw error if not as it tried to call the prototype defaultCrudApi() with no args, so call it now with args
-            //     this.crudApi = crudApiProvider.getObject(getEntityClass())
-            // }
         }
         return crudApi
     }
@@ -233,7 +221,7 @@ trait CrudApiController<D> extends RestApiController {
     @Action
     def bulkCreate() {
         try {
-            bulkProcess(DataOp.add)
+            bulkImport(DataOp.add)
         } catch (Exception | AssertionError e) {
             respondWith(
                 BulkExceptionHandler.of(getEntityClass(), problemHandler).handleBulkOperationException(request, e)
@@ -245,7 +233,7 @@ trait CrudApiController<D> extends RestApiController {
     @Action
     def bulkUpdate() {
         try {
-            bulkProcess(DataOp.update)
+            bulkImport(DataOp.update)
         } catch (Exception | AssertionError e) {
             respondWith(
                 BulkExceptionHandler.of(getEntityClass(), problemHandler).handleBulkOperationException(request, e)
@@ -267,28 +255,28 @@ trait CrudApiController<D> extends RestApiController {
         }
     }
 
-    void bulkProcess(DataOp dataOp) {
-        List dataList = bodyAsList() as List<Map>
-        Map qParams = getParamsMap()
-
-        String sourceId = requestToSourceId(request)
-
-        //if attachmentId then assume its a csv
-        if(qParams.attachmentId) {
-            //XXX We set savePayload to false by default for CSV since we already have the csv file as attachment?
-            qParams.savePayload = false
-            //sets the datalist from the csv instead of body
-            //Transform csv here, so bulk processing remains same, regardless the incoming payload is csv or json
-            dataList = transformCsvToBulkList(qParams)
-        } else {
-            //XXX dirty ugly hack since we were not consistent and now need to do clean up
-            // RNDC expects async to be false by default when its not CSV
-            if(!qParams.containsKey('async')) qParams['async'] = false
-        }
-
-        SyncJobEntity job = getCrudApi().bulk(dataOp, dataList, qParams, sourceId)
-        respondWith(job, [status: qParams.getBoolean('async') == false ? MULTI_STATUS : CREATED])
-    }
+    // void bulkLegacy(DataOp dataOp) {
+    //     List dataList = bodyAsList() as List<Map>
+    //     Map qParams = getParamsMap()
+    //
+    //     String sourceId = requestToSourceId(request)
+    //
+    //     //if attachmentId then assume its a csv
+    //     if(qParams.attachmentId) {
+    //         //XXX We set savePayload to false by default for CSV since we already have the csv file as attachment?
+    //         qParams.savePayload = false
+    //         //sets the datalist from the csv instead of body
+    //         //Transform csv here, so bulk processing remains same, regardless the incoming payload is csv or json
+    //         dataList = transformCsvToBulkList(qParams)
+    //     } else {
+    //         //XXX dirty ugly hack since we were not consistent and now need to do clean up
+    //         // RNDC expects async to be false by default when its not CSV
+    //         if(!qParams.containsKey('async')) qParams['async'] = false
+    //     }
+    //
+    //     SyncJobEntity job = getCrudApi().bulkLegacy(dataOp, dataList, qParams, sourceId)
+    //     respondWith(job, [status: qParams.getBoolean('async') == false ? MULTI_STATUS : CREATED])
+    // }
 
     //XXX New bulkProcess
     void bulkImport(DataOp dataOp) {
@@ -321,9 +309,9 @@ trait CrudApiController<D> extends RestApiController {
      * @param syncJobArgs the syncJobArgs that is setup, important to have params on it
      * @return the jobId
      */
-    List<Map> transformCsvToBulkList(Map gParams) {
-        return getCsvToMapTransformer().process(gParams)
-    }
+    // List<Map> transformCsvToBulkList(Map gParams) {
+    //     return getCsvToMapTransformer().process(gParams)
+    // }
 
     /**
      * Helper method to convert entity instance to map and respond

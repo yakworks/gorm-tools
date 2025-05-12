@@ -43,12 +43,11 @@ class BulkApiSupport<D> {
     ProblemHandler problemHandler
 
     @Autowired
-    BulkExportService bulkExportService
-
-    @Autowired
     CsvToMapTransformer csvToMapTransformer
 
     Class<D> entityClass // the domain class this is for
+
+    boolean legacyBulk = true
 
     BulkApiSupport(Class<D> entityClass){
         this.entityClass = entityClass
@@ -57,9 +56,56 @@ class BulkApiSupport<D> {
     static <D> BulkApiSupport<D> of(Class<D> entityClass){
         def bcs = new BulkApiSupport(entityClass)
         AppCtx.autowire(bcs)
-        // bcs.syncJobService = AppCtx.get('syncJobService', SyncJobService)
-        // if(AppCtx.ctx.containsBean('csvToMapTransformer')) bcs.csvToMapTransformer = AppCtx.get('csvToMapTransformer', CsvToMapTransformer)
         return bcs
+    }
+
+    SyncJobEntity bulkImport(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
+        if(legacyBulk){
+            return bulkImportLegacy(dataOp, dataList, qParams, sourceId)
+        } else {
+            return bulkImportNew(dataOp, dataList, qParams, sourceId)
+        }
+    }
+
+    SyncJobEntity bulkImportLegacy(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
+        //if attachmentId then assume its a csv
+        if(qParams.attachmentId) {
+            //XXX We set savePayload to false by default for CSV since we already have the csv file as attachment?
+            qParams.savePayload = false
+            //sets the datalist from the csv instead of body
+            //Transform csv here, so bulk processing remains same, regardless the incoming payload is csv or json
+            dataList = transformCsvToBulkList(qParams)
+        } else {
+            //XXX dirty ugly hack since we were not consistent and now need to do clean up
+            // RNDC expects async to be false by default when its not CSV
+            if(!qParams.containsKey('async')) qParams['async'] = false
+        }
+        SyncJobArgs syncJobArgs = setupSyncJobArgs(dataOp, qParams, sourceId)
+        Long jobId = getRepo().bulk(dataList, syncJobArgs)
+        SyncJobEntity job = syncJobService.getJob(jobId)
+        return job
+    }
+
+    //WIP
+    SyncJobEntity bulkImportNew(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
+
+        //submit the job
+        SyncJobEntity job = queueImportJob(dataOp, qParams, sourceId, dataList)
+        Long jobId = job.id
+        //if not async then wait for it to finish
+        if(!qParams.getBoolean('async', true)){
+            //XXX new process loop and wait for job to finish
+            while(true){
+                job = syncJobService.getJob(jobId)
+                //not running and not queue
+                if(job.state != SyncJobState.Running && job.state != SyncJobState.Queued){
+                    break
+                }
+                sleep(1000)
+            }
+        }
+
+        return job
     }
 
     /**
@@ -80,13 +126,6 @@ class BulkApiSupport<D> {
         return syncJobService.queueJob(args)
     }
 
-    /**
-     * Creates a bulk export job and puts in hazel queue
-     */
-    SyncJobEntity queueExportJob(Map qParams, String sourceId) {
-        SyncJobArgs args = setupBulkExportArgs(qParams, sourceId)
-        return syncJobService.queueJob(args)
-    }
 
     //WIP
     SyncJobEntity startJob(Long jobId) {
@@ -124,12 +163,12 @@ class BulkApiSupport<D> {
     List<Map> transformCsvToBulkList(Map gParams) {
         return getCsvToMapTransformer().process(gParams)
     }
-
-    SyncJobEntity process(List<Map> dataList, SyncJobArgs syncJobArgs) {
-        Long jobId = getRepo().bulk(dataList, syncJobArgs)
-        SyncJobEntity job = syncJobService.getJob(jobId)
-        return job
-    }
+    //
+    // SyncJobEntity process(List<Map> dataList, SyncJobArgs syncJobArgs) {
+    //     Long jobId = getRepo().bulk(dataList, syncJobArgs)
+    //     SyncJobEntity job = syncJobService.getJob(jobId)
+    //     return job
+    // }
 
     /**
      * sets up the SyncJobArgs from whats passed in from params
@@ -153,23 +192,6 @@ class BulkApiSupport<D> {
 
         return syncJobArgs
     }
-
-    SyncJobArgs setupBulkExportArgs(Map params, String sourceId){
-        List bulkIncludes = includesConfig.findByKeys(getEntityClass(), [IncludesKey.list, IncludesKey.get])
-        SyncJobArgs syncJobArgs = SyncJobArgs.withParams(params)
-        //syncJobArgs.op = DataOp.update.export
-        syncJobArgs.includes = bulkIncludes
-        syncJobArgs.sourceId = sourceId
-        syncJobArgs.entityClass = getEntityClass()
-        return syncJobArgs
-    }
-
-    SyncJobEntity processBulkExport(Map params, String sourceId) {
-        SyncJobArgs args = setupBulkExportArgs(params, sourceId)
-        Long jobId = bulkExportService.scheduleBulkExportJob(args)
-        return syncJobService.getJob(jobId)
-    }
-
 
     GormRepo<D> getRepo() {
         RepoLookup.findRepo(getEntityClass())

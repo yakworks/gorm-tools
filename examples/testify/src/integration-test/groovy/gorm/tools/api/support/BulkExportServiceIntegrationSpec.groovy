@@ -4,13 +4,15 @@ import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobState
 import spock.lang.Ignore
-import yakworks.gorm.api.support.BulkExportService
+import yakworks.gorm.api.support.BulkApiSupport
+import yakworks.gorm.api.support.BulkExportSupport
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.OrgType
 import yakworks.testing.gorm.integration.DomainIntTest
 
 import javax.inject.Inject
@@ -22,7 +24,28 @@ import static yakworks.json.groovy.JsonEngine.parseJson
 @Ignore //XXX all failing
 class BulkExportServiceIntegrationSpec extends Specification implements DomainIntTest {
 
-    @Inject BulkExportService bulkExportService
+    @Inject BulkExportSupport bulkExportService
+
+
+    void "test queue export job"() {
+        setup:
+        BulkApiSupport bs = BulkApiSupport.of(Org)
+
+        when:
+        SyncJob job = bs.queueExportJob([q:[typeId: OrgType.Customer.id], attachmentId:1L], "test-job")
+        flushAndClear()
+
+        assert job.id
+        job = SyncJob.get(job.id)
+
+        then:
+        noExceptionThrown()
+        job
+        job.state == SyncJobState.Queued
+        job.sourceId == 'test-job'
+        job.params
+        job.params.q == [typeId: OrgType.Customer.id]
+    }
 
     void "test scheduleBulkExportJob"() {
         setup:

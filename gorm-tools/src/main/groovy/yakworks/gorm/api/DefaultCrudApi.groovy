@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
 import gorm.tools.beans.Pager
-import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.metamap.services.MetaMapService
@@ -26,6 +25,7 @@ import gorm.tools.transaction.TrxUtils
 import grails.gorm.transactions.Transactional
 import yakworks.api.problem.data.DataProblemException
 import yakworks.gorm.api.support.BulkApiSupport
+import yakworks.gorm.api.support.BulkExportSupport
 import yakworks.gorm.api.support.QueryArgsValidator
 import yakworks.gorm.config.QueryConfig
 import yakworks.meta.MetaMap
@@ -54,9 +54,11 @@ class DefaultCrudApi<D> implements CrudApi<D> {
 
     /** Not required but if an BulkSupport bean is setup then it will get get used */
     @Autowired(required = false)
-    BulkApiSupport<D> bulkApiSupport
+    BulkExportSupport<D> bulkExportSupport
 
-    boolean legacyBulk = true
+    /** Not required but if an BulkSupport bean is setup then it will get get used */
+    @Autowired(required = false)
+    BulkApiSupport<D> bulkApiSupport
 
     DefaultCrudApi(Class<D> entityClass){
         this.entityClass = entityClass
@@ -92,6 +94,11 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     BulkApiSupport<D> getBulkApiSupport(){
         if (!bulkApiSupport) this.bulkApiSupport = BulkApiSupport.of(getEntityClass())
         return bulkApiSupport
+    }
+
+    BulkExportSupport<D> getBulkExportSupport(){
+        if (!bulkExportSupport) this.bulkExportSupport = new BulkExportSupport(getEntityClass())
+        return bulkExportSupport
     }
 
     /**
@@ -194,59 +201,11 @@ class DefaultCrudApi<D> implements CrudApi<D> {
 
     @Override
     SyncJobEntity bulkImport(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
-        if(legacyBulk){
-            return bulkImportLegacy(dataOp, dataList, qParams, sourceId)
-        } else {
-            return bulkImportNew(dataOp, dataList, qParams, sourceId)
-        }
-    }
-
-    SyncJobEntity bulkImportLegacy(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
-        //if attachmentId then assume its a csv
-        if(qParams.attachmentId) {
-            //XXX We set savePayload to false by default for CSV since we already have the csv file as attachment?
-            qParams.savePayload = false
-            //sets the datalist from the csv instead of body
-            //Transform csv here, so bulk processing remains same, regardless the incoming payload is csv or json
-            dataList = getBulkApiSupport().transformCsvToBulkList(qParams)
-        } else {
-            //XXX dirty ugly hack since we were not consistent and now need to do clean up
-            // RNDC expects async to be false by default when its not CSV
-            if(!qParams.containsKey('async')) qParams['async'] = false
-        }
-        SyncJobArgs syncJobArgs = getBulkApiSupport().setupSyncJobArgs(dataOp, qParams, sourceId)
-        SyncJobEntity job = getBulkApiSupport().process(dataList, syncJobArgs)
-        return job
-    }
-
-    //WIP
-    SyncJobEntity bulkImportNew(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
-        /*
-        1. create the Job
-        2. adds to the queue
-        3. if its async then loop until its marked as finished
-            a. sleep and check every 2 seconds for the first 5 iterations
-            b. then check every 5 seconds for the next iterations.
-            c. so we an intercept the timeout, if its going to exceed the 1 or 2 minute timeout then return job and error
-               error is that job is still running but request is going to timeout.
-        4. if its not async then just return the job.
-
-        for 3 above we can also make a hazelcast Job cache to check so we dont hit database every 2 seconds.
-         */
-
-        //submit the job
-        SyncJobEntity job = getBulkApiSupport().queueImportJob(dataOp, qParams, sourceId, dataList)
-        //if not async then wait
-        if(!qParams.getBoolean('async', true)){
-            //XXX new process loop and wait for job to finish
-
-        }
-
-        return job
+        getBulkApiSupport().bulkImport(dataOp, dataList, qParams, sourceId)
     }
 
     SyncJobEntity bulkExport(Map params, String sourceId) {
-        return  getBulkApiSupport().queueExportJob(params, sourceId)
+        return  getBulkExportSupport().queueExportJob(params, sourceId)
     }
 
     protected List<D> queryList(QueryArgs qargs) {

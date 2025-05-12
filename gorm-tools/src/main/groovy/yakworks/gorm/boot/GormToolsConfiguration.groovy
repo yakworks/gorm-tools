@@ -40,7 +40,7 @@ import gorm.tools.transaction.TrxService
 import gorm.tools.validation.RepoValidatorRegistry
 import yakworks.gorm.api.ApiConfig
 import yakworks.gorm.api.IncludesConfig
-import yakworks.gorm.api.support.BulkExportService
+import yakworks.gorm.api.support.BulkExportSupport
 import yakworks.gorm.api.support.DefaultQueryArgsValidator
 import yakworks.gorm.api.support.QueryArgsValidator
 import yakworks.gorm.config.DefaultBulkConfiguration
@@ -152,10 +152,10 @@ class GormToolsConfiguration {
         new DefaultQueryArgsValidator()
     }
 
-    @Bean
-    @ConditionalOnMissingBean
-    BulkExportService bulkExportService() {
-        return new BulkExportService()
-    }
+    // @Bean
+    // @ConditionalOnMissingBean
+    // BulkExportSupport bulkExportService() {
+    //     return new BulkExportSupport()
+    // }
 
 }

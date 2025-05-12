@@ -68,8 +68,14 @@ class BulkableDoBulkSpec extends Specification implements GormHibernateTest {
         res1 instanceof OkResult
         res1.status == HttpStatus.CREATED //should be 201 CREATED
 
-        and: "check database records"
-        def bcks = KitchenSink.findByName("Blue Cheese")
+        when:
+        def bcks
+        KitchenSink.withTransaction {
+            bcks = KitchenSink.findByName("Blue Cheese")
+        }
+
+        then: "check database records"
+
         bcks
         bcks.ext.name == "SinkExt1"
         KitchenSink.count() == 100

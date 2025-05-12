@@ -9,6 +9,8 @@ import javax.inject.Inject
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.springframework.beans.factory.annotation.Autowired
+
 import gorm.tools.beans.Pager
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
@@ -24,6 +26,8 @@ import yakworks.api.Result
 import yakworks.api.problem.data.DataProblem
 import yakworks.commons.lang.NameUtils
 import yakworks.commons.lang.Validate
+import yakworks.gorm.api.IncludesConfig
+import yakworks.gorm.api.IncludesKey
 import yakworks.json.groovy.JsonEngine
 import yakworks.meta.MetaMapList
 import yakworks.spring.AppCtx
@@ -31,12 +35,52 @@ import yakworks.spring.AppCtx
 //XXX this whole thing should use new flow
 @CompileStatic
 @Slf4j
-class BulkExportService {
+class BulkExportSupport<D> {
 
     @Inject SyncJobService syncJobService
     @Inject GrailsApplication grailsApplication
     @Inject MetaMapService metaMapService
     @Inject ProblemHandler problemHandler
+    @Autowired
+    IncludesConfig includesConfig
+
+    @Autowired
+    CsvToMapTransformer csvToMapTransformer
+
+    Class<D> entityClass // the domain class this is for
+
+    boolean legacyBulk = true
+
+    BulkExportSupport(Class<D> entityClass){
+        this.entityClass = entityClass
+    }
+
+    /**
+     * Creates a bulk export job and puts in hazel queue
+     */
+    SyncJobEntity queueExportJob(Map qParams, String sourceId) {
+        SyncJobArgs args = setupBulkExportArgs(qParams, sourceId)
+        return syncJobService.queueJob(args)
+    }
+
+
+    SyncJobArgs setupBulkExportArgs(Map params, String sourceId){
+        List bulkIncludes = includesConfig.findByKeys(getEntityClass(), [IncludesKey.list, IncludesKey.get])
+        SyncJobArgs syncJobArgs = SyncJobArgs.withParams(params)
+        //syncJobArgs.op = DataOp.update.export
+        syncJobArgs.includes = bulkIncludes
+        syncJobArgs.sourceId = sourceId
+        syncJobArgs.entityClass = getEntityClass()
+        return syncJobArgs
+    }
+
+    SyncJobEntity processBulkExport(Map params, String sourceId) {
+        SyncJobArgs args = setupBulkExportArgs(params, sourceId)
+        Long jobId = scheduleBulkExportJob(args)
+        return syncJobService.getJob(jobId)
+    }
+
+
 
     /**
      * Creates a new bulk export job with status : "Queued" and QueryArgs stored in job payload

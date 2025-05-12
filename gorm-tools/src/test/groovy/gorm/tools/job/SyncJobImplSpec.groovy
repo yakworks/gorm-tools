@@ -18,7 +18,10 @@ class SyncJobImplSpec extends Specification  implements GormHibernateTest{
 
     void "sanity check validation with String as data"() {
         expect:
-        TestSyncJob job = new TestSyncJob(sourceType: SourceType.ERP, sourceId: 'ar/org')
+        TestSyncJob job = new TestSyncJob(
+            state: SyncJobState.Running,
+            sourceType: SourceType.ERP, sourceId: 'ar/org'
+        )
         job.validate()
         job.persist()
     }

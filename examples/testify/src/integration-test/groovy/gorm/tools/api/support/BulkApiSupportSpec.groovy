@@ -4,9 +4,8 @@ import gorm.tools.job.SyncJobState
 import gorm.tools.repository.model.DataOp
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.gorm.api.support.BulkApiSupport
+import yakworks.gorm.api.bulk.BulkApiSupport
 import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType

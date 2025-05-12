@@ -31,7 +31,7 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
 
     void "sanity check validation with String as data"() {
         expect:
-        SyncJob job = new SyncJob([sourceType: SourceType.ERP, sourceId: 'ar/org'])
+        SyncJob job = new SyncJob([sourceType: SourceType.ERP, sourceId: 'ar/org', state: SyncJobState.Running])
         job.validate()
         job.persist()
     }
@@ -48,7 +48,11 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
         def sourceId = "api/ar/org"
         def source = "Oracle"
         def sourceType = SourceType.RestApi
-        def job = SyncJob.repo.create(payloadBytes:dataList.toString().bytes, source:source, sourceType: sourceType, sourceId:sourceId)
+        def job = SyncJob.repo.create(
+            state: SyncJobState.Running,
+            payloadBytes:dataList.toString().bytes,
+            source:source, sourceType: sourceType, sourceId:sourceId
+        )
 
         then:
         job
@@ -58,7 +62,10 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
     void "check that problems save properly"() {
         when:
         // def errorList = ["ok":false,"tile":"bad stuff here"]
-        def job = new SyncJob(problems: [["ok":false,"title":"error"]]).persist()
+        def job = new SyncJob(
+            state: SyncJobState.Running,
+            problems: [["ok":false,"title":"error"]]
+        ).persist()
         def jobId = job.id
         // job.problems = [["ok":false,"title":"error"]]
         // job.persist(flush:true)
@@ -93,7 +100,7 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
 
     void "problems update"() {
         when:
-        def job = new SyncJob().persist()
+        def job = new SyncJob(state: SyncJobState.Running).persist()
         def jobId = job.id
         flushAndClear()
         SyncJob.repo.update([id: jobId, problems: [["ok":false,"title":"error"]]])
@@ -113,7 +120,11 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
         def res = JsonEngine.toJson(["One", "Two", "Three"])
 
         when:
-        SyncJob job = new SyncJob(sourceType: SourceType.ERP, sourceId: 'ar/org', payloadBytes: res.bytes)
+        SyncJob job = new SyncJob(
+            state: SyncJobState.Running,
+            sourceType: SourceType.ERP, sourceId: 'ar/org',
+            payloadBytes: res.bytes
+        )
         def jobId = job.persist().id
 
         then: "get jobId"

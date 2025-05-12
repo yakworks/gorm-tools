@@ -61,7 +61,7 @@ trait SyncJobEntity implements SourceTrait {
     /**
      * the current state of the job.
      */
-    SyncJobState state = SyncJobState.Running
+    SyncJobState state //= SyncJobState.Running
 
     String message
 

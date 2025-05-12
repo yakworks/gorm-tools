@@ -2,7 +2,7 @@
 * Copyright 2022 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.job
+package yakworks.gorm.api.bulk
 
 import groovy.transform.CompileStatic
 
@@ -10,6 +10,8 @@ import org.springframework.context.ApplicationEvent
 import org.springframework.core.ResolvableType
 import org.springframework.core.ResolvableTypeProvider
 
+import gorm.tools.job.SyncJobContext
+import gorm.tools.job.SyncJobState
 import yakworks.commons.lang.Validate
 
 /**
@@ -18,23 +20,23 @@ import yakworks.commons.lang.Validate
  * @param <D> the entity class this is for
  */
 @CompileStatic
-class SyncJobStateEvent<D> extends ApplicationEvent implements ResolvableTypeProvider {
+class BulkSyncJobQueueEvent<D> extends ApplicationEvent implements ResolvableTypeProvider {
 
     Long jobId
     SyncJobState state
     SyncJobContext context
     Class entityClass //domain class for which this sync job is
 
-    SyncJobStateEvent(Long jobId, SyncJobContext ctx, SyncJobState state) {
+    BulkSyncJobQueueEvent(Long jobId, SyncJobContext ctx, SyncJobState state) {
         super(ctx)
         this.context = ctx
         this.jobId = ctx.jobId
         this.entityClass = ctx.args.entityClass ?: Object //if no entityClass - eg for exportSync
     }
 
-    static SyncJobStateEvent of(Long jobId, SyncJobContext ctx, SyncJobState state) {
+    static BulkSyncJobQueueEvent of(Long jobId, SyncJobContext ctx, SyncJobState state) {
         Validate.notNull(ctx, "syncJobContext is null")
-        return new SyncJobStateEvent(jobId, ctx, state)
+        return new BulkSyncJobQueueEvent(jobId, ctx, state)
     }
 
     @Override

@@ -2,7 +2,7 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.gorm.api.support
+package yakworks.gorm.api.bulk
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -21,6 +21,7 @@ import gorm.tools.repository.model.DataOp
 import yakworks.commons.lang.EnumUtils
 import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.IncludesKey
+import yakworks.gorm.config.GormConfig
 import yakworks.json.groovy.JsonEngine
 import yakworks.spring.AppCtx
 
@@ -45,9 +46,9 @@ class BulkApiSupport<D> {
     @Autowired
     CsvToMapTransformer csvToMapTransformer
 
-    Class<D> entityClass // the domain class this is for
+    @Autowired GormConfig gormConfig
 
-    boolean legacyBulk = true
+    Class<D> entityClass // the domain class this is for
 
     BulkApiSupport(Class<D> entityClass){
         this.entityClass = entityClass
@@ -60,10 +61,10 @@ class BulkApiSupport<D> {
     }
 
     SyncJobEntity bulkImport(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
-        if(legacyBulk){
+        if(gormConfig.legacyBulk){
             return bulkImportLegacy(dataOp, dataList, qParams, sourceId)
         } else {
-            return bulkImportNew(dataOp, dataList, qParams, sourceId)
+            return doBulkImport(dataOp, dataList, qParams, sourceId)
         }
     }
 
@@ -87,13 +88,15 @@ class BulkApiSupport<D> {
     }
 
     //WIP
-    SyncJobEntity bulkImportNew(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
+    SyncJobEntity doBulkImport(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
 
         //submit the job
         SyncJobEntity job = queueImportJob(dataOp, qParams, sourceId, dataList)
         Long jobId = job.id
         //if not async then wait for it to finish
         if(!qParams.getBoolean('async', true)){
+            //sleep first to give the job runner time to pick it up
+            sleep(1000)
             //XXX new process loop and wait for job to finish
             while(true){
                 job = syncJobService.getJob(jobId)

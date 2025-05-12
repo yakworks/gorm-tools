@@ -91,20 +91,20 @@ public class HazelCache extends HazelcastCache {
      * in case of the value loader callback failing with an exception.
      * @since 4.3
      */
-    @SuppressWarnings("serial")
-    class LockTimoutException extends RuntimeException {
-
-        private final Object key;
-        private final long lockTimeoutSeconds
-
-        public LockTimoutException(Object key, long lockTimeoutSeconds) {
-            super("Lock timeout on key $key, waited ${lockTimeoutSeconds/1000}s")
-            this.key = key
-            this.lockTimeoutSeconds = lockTimeoutSeconds
-        }
-
-        public Object getKey() {
-            return this.key;
-        }
-    }
+    // @SuppressWarnings("serial")
+    // class LockTimoutException extends RuntimeException {
+    //
+    //     private final Object key;
+    //     private final long lockTimeoutSeconds
+    //
+    //     public LockTimoutException(Object key, long lockTimeoutSeconds) {
+    //         super("Lock timeout on key $key, waited ${lockTimeoutSeconds/1000}s")
+    //         this.key = key
+    //         this.lockTimeoutSeconds = lockTimeoutSeconds
+    //     }
+    //
+    //     public Object getKey() {
+    //         return this.key;
+    //     }
+    // }
 }

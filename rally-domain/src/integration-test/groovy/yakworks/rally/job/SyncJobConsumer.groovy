@@ -4,7 +4,6 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.task.TaskExecutor
-import yakworks.gorm.api.support.BulkApiSupport
 
 import javax.annotation.PostConstruct
 import java.util.concurrent.BlockingQueue

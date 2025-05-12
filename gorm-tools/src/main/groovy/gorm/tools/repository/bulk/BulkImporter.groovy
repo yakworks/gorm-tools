@@ -99,14 +99,16 @@ class BulkImporter<D> {
      */
     Long bulkImport(List<Map> dataList, SyncJobContext jobContext) {
         //If dataList is empty then error right away.
-        if(dataList == null || dataList.isEmpty()) throw DataProblem.of('error.data.emptyPayload').detail("Bulk Data is Empty").toException()
+        if(dataList == null || dataList.isEmpty())
+            throw DataProblem.of('error.data.emptyPayload').detail("Bulk Data is Empty").toException()
+
         //make sure it has a job here.
         Validate.notNull(jobContext.jobId)
 
         try {
             //jobContext.args.entityClass = getEntityClass()
             doBulkParallel(dataList, jobContext)
-        } catch (ex){
+        } catch (ex) {
             //ideally should not happen as the pattern here is that all exceptions should be handled in doBulkParallel
             jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
         }

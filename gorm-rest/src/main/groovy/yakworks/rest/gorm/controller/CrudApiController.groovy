@@ -6,7 +6,6 @@ package yakworks.rest.gorm.controller
 
 import java.net.http.HttpRequest
 import java.nio.charset.StandardCharsets
-import java.util.function.Function
 import javax.persistence.LockTimeoutException
 import javax.servlet.http.HttpServletRequest
 
@@ -14,7 +13,6 @@ import groovy.transform.CompileStatic
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.AccessDeniedException
@@ -29,8 +27,6 @@ import grails.web.Action
 import yakworks.api.problem.Problem
 import yakworks.gorm.api.CrudApi
 import yakworks.gorm.api.IncludesProps
-import yakworks.gorm.api.support.CsvToMapTransformer
-import yakworks.spring.AppCtx
 
 import static gorm.tools.problem.ProblemHandler.isBrokenPipe
 import static org.springframework.http.HttpStatus.CREATED

@@ -102,18 +102,19 @@ abstract class SyncJobService<D> {
      */
     SyncJobContext createJob(SyncJobArgs args, Object payload){
         SyncJobContext jobContext
+        SyncJobEntity syncJobEntity
         //keep it in its own transaction so it doesn't depend on wrapping
         trxService.withNewTrx {
             //set the payload if not already
             if(!args.payload) args.payload = payload
             //jobContext.createJob()
-            queueJob(args, SyncJobState.Running)
+            syncJobEntity = queueJob(args, SyncJobState.Running)
 
             jobContext = SyncJobContext.of(args).syncJobService(this).payload(payload)
             jobContext.results = ApiResults.create()
             jobContext.startTime = System.currentTimeMillis()
         }
-        AppCtx.publishEvent(SyncJobStateEvent.of(jobContext))
+        AppCtx.publishEvent(SyncJobStateEvent.of(syncJobEntity.id, jobContext, syncJobEntity.state))
         return jobContext
     }
 

@@ -7,6 +7,8 @@ package yakworks.rally.mail.mailgun
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.springframework.dao.OptimisticLockingFailureException
+
 import com.mailgun.api.v3.MailgunEventsApi
 import com.mailgun.api.v3.MailgunMessagesApi
 import com.mailgun.client.MailgunClient
@@ -52,6 +54,37 @@ class MailgunService extends EmailService {
     }
 
     /**
+     * Will try to send mail through mailgun api, and retry twice before giving up.
+     * With 3 seconds pause between retries
+     */
+    MessageResponse sendWithRetry(String domain, Message message) {
+        int attempts = 0
+        boolean success = false
+        int maxTries = 2
+        int retryAfterSeconds = 3
+
+        while (!success && attempts < maxTries) {
+            try {
+                MessageResponse resp = sendMessage(domain, message)
+                success = true
+                return resp
+            } catch (FeignException e) {
+                //FeignException would happen when mailgun api call fails, eg 500 API Error
+                attempts++
+                log.warn("Mailgun API call failed, attempt:$attempts, to:${message.to}, subject:${message.subject}")
+                //if 2 attempts are over, or if we receive 401 Unauthorized, thn dont attempt again.
+                if (attempts == maxTries || e.status() == 401) {
+                    throw e
+                } else {
+                    //sleep before retrying again
+                    sleep(retryAfterSeconds * 1000)
+                }
+            }
+        }
+    }
+
+
+    /**
      * calls mailgunMessagesApi.sendMessage
      * The return Result has a payload Map with id and message
      * @param domain the mailgun domain name
@@ -62,7 +95,7 @@ class MailgunService extends EmailService {
     Result send(String domain, MailTo mailTo){
         try{
             Message message = mailMsgToMessage(mailTo)
-            MessageResponse resp = sendMessage(domain, message)
+            MessageResponse resp = sendWithRetry(domain, message)
             log.debug("Mail gun response : domain:$domain, id:${resp.id}, message:${resp.message}")
             return Result.OK().payload([id: resp.id, message: resp.message])
         } catch(FeignException e){

@@ -1,3 +1,10 @@
+### v7.3.84
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.83...v7.3.84)
+- release [link](https://github.com/yakworks/gorm-tools/commit/e990dc32f71fb394e48cd45fd870acd75809f856)
+- Log error before handleUnexpected (#897) [link](https://github.com/yakworks/gorm-tools/commit/ebb2f846abeee9fe5d8727c38efd3c24147328af)
+- Mailgun API 500 Retry (#896) [link](https://github.com/yakworks/gorm-tools/commit/78c8283e4f1ae2dad4057e6076d3cb805d1675e7)
+
 ### v7.3.83
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.82...v7.3.83)

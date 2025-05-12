@@ -49,7 +49,7 @@ abstract class EmailService {
     /**
      * The class is used for sending messages(emails) using the Email and Mailgun API.
      */
-    @ToString(includePackage = false, includeNames = true, ignoreNulls = true, excludes = "attachments,inline")
+    @ToString(includePackage = false, includeNames = true, ignoreNulls = true, excludes = "attachments,inline,text,html")
     static class MailTo {
 
         /** Email address for From header */

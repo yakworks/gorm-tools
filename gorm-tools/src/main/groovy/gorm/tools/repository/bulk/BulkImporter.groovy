@@ -77,11 +77,12 @@ class BulkImporter<D> {
      * @return Job id
      */
     @Deprecated
-    Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs) {
+    Long bulkLegacy(List<Map> dataList, SyncJobArgs syncJobArgs) {
         //If dataList is empty then error right away.
         if(dataList == null || dataList.isEmpty()) throw DataProblem.of('error.data.emptyPayload').detail("Bulk Data is Empty").toException()
 
         syncJobArgs.entityClass = getEntityClass()
+        if(!syncJobArgs.jobType) syncJobArgs.jobType = 'bulk.import'
 
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
         //XXX why are we setting session: true here? explain. should it be default?

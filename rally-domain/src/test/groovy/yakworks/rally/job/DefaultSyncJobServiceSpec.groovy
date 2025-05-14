@@ -57,6 +57,7 @@ class DefaultSyncJobServiceSpec extends Specification implements GormHibernateTe
             .sourceId('123')
             .payload(payload)
             .entityClass(Org)
+            .jobType('foo')
             .params(params)
 
         SyncJobEntity job = syncJobService.queueJob(syncJobArgs)
@@ -68,6 +69,7 @@ class DefaultSyncJobServiceSpec extends Specification implements GormHibernateTe
         noExceptionThrown()
         job.id
         syncJob.state.name() == "Queued"
+        syncJob.jobType == 'foo'
         syncJob.source == syncJobArgs.source
         syncJob.sourceId == syncJobArgs.sourceId
         syncJob.payloadId
@@ -84,7 +86,9 @@ class DefaultSyncJobServiceSpec extends Specification implements GormHibernateTe
     void "test createJob"() {
         when:
         maintenanceProps.crons = []
-        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source')
+        SyncJobArgs syncJobArgs = new SyncJobArgs(
+            sourceId: '123', source: 'some source', jobType: 'foo'
+        )
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, [])
         then:
         noExceptionThrown()

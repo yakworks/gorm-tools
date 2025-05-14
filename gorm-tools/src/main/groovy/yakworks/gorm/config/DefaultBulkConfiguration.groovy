@@ -6,26 +6,38 @@ package yakworks.gorm.config
 
 import groovy.transform.CompileStatic
 
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.ApplicationContext
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
 import org.springframework.context.annotation.Scope
 
 import gorm.tools.repository.bulk.BulkImporter
+import yakworks.gorm.api.bulk.BulkImportService
+import yakworks.gorm.api.bulk.DefaultBulkJobQueueListener
 
 @CompileStatic
-@Configuration
-@Lazy(false)
+@Configuration @Lazy(false)
 class DefaultBulkConfiguration {
 
-    @Autowired
-    private ApplicationContext appCtx;
+    // @Autowired
+    // private ApplicationContext appCtx;
 
     @Bean
     @Scope("prototype")
     public <D> BulkImporter<D> defaultBulkImporter(Class<D> entityClass) {
         return new BulkImporter(entityClass);
+    }
+
+    @Bean
+    @Scope("prototype")
+    public <D> BulkImportService<D> defaultBulkImportService(Class<D> entityClass) {
+        return new BulkImportService(entityClass);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    DefaultBulkJobQueueListener bulkJobQueueListener() {
+        return new DefaultBulkJobQueueListener()
     }
 }

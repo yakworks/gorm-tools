@@ -312,6 +312,7 @@ class SyncJobContext {
      * @param currentResults the results to append, normally will be an ApiResults but can be any Problem or Result
      */
     protected void appendDataResults(Result currentResults){
+        //if isSaveDataAsFile then write out the results now
         if(args.isSaveDataAsFile()){
             boolean isFirstWrite = false
             if(!dataPath) {
@@ -329,6 +330,7 @@ class SyncJobContext {
             }
             IOUtils.flushAndClose(writer)
         } else {
+            //if not save to file then saves it in memory and will write it out to the prop at finish
             results.merge currentResults
         }
 

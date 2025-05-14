@@ -4,8 +4,8 @@ import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobState
 import spock.lang.Ignore
-import yakworks.gorm.api.bulk.BulkApiSupport
-import yakworks.gorm.api.bulk.BulkExportSupport
+import yakworks.gorm.api.bulk.BulkImportService
+import yakworks.gorm.api.bulk.BulkExportService
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
@@ -24,12 +24,12 @@ import static yakworks.json.groovy.JsonEngine.parseJson
 @Ignore //XXX all failing
 class BulkExportServiceIntegrationSpec extends Specification implements DomainIntTest {
 
-    @Inject BulkExportSupport bulkExportService
+    @Inject BulkExportService bulkExportService
 
 
     void "test queue export job"() {
         setup:
-        BulkApiSupport bs = BulkApiSupport.of(Org)
+        BulkImportService bs = BulkImportService.of(Org)
 
         when:
         SyncJob job = bs.queueExportJob([q:[typeId: OrgType.Customer.id], attachmentId:1L], "test-job")

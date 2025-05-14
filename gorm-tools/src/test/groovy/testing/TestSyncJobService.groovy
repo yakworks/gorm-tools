@@ -6,7 +6,10 @@ import java.nio.file.Paths
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.job.SyncJobArgs
+import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
+import gorm.tools.job.SyncJobState
 import gorm.tools.repository.GormRepo
 import yakworks.commons.util.BuildSupport
 
@@ -17,6 +20,14 @@ class TestSyncJobService extends SyncJobService<TestSyncJob> {
     GormRepo<TestSyncJob> getRepo(){
         return TestSyncJob.repo
     }
+
+    /**
+     * In test we queue it and run it at same time
+     */
+    // @Override
+    // SyncJobEntity queueJob(SyncJobArgs args, SyncJobState state = SyncJobState.Queued) {
+    //     SyncJobEntity sje = super.queueJob(args, state)
+    // }
 
     @Override
     Path createTempFile(String filename){

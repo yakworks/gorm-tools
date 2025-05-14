@@ -5,7 +5,7 @@ import gorm.tools.repository.model.DataOp
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import yakworks.gorm.api.bulk.BulkApiSupport
+import yakworks.gorm.api.bulk.BulkImportService
 import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
@@ -18,7 +18,7 @@ class BulkApiSupportSpec extends Specification implements DomainIntTest {
 
     void "sanity check"() {
         when:
-        BulkApiSupport bs = BulkApiSupport.of(KitchenSink)
+        BulkImportService bs = BulkImportService.of(KitchenSink)
 
         then:
         noExceptionThrown()
@@ -29,7 +29,7 @@ class BulkApiSupportSpec extends Specification implements DomainIntTest {
 
     void "test queueImportJob"() {
         setup:
-        BulkApiSupport bs = BulkApiSupport.of(Org)
+        BulkImportService bs = BulkImportService.of(Org)
 
         when:
         SyncJob job = bs.queueImportJob(DataOp.add, [q:[typeId: OrgType.Customer.id], attachmentId:1L], "test-job", [[num:"T1", name:"T1"]])

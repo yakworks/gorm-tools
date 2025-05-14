@@ -54,6 +54,11 @@ trait SyncJobEntity implements SourceTrait {
     abstract Long getId()
 
     /**
+     * The name of the queue to add this to
+     */
+    String jobType
+
+    /**
      * will be true if State.Finished without any issues, false if any problems ar in the results data
      */
     Boolean ok = false // change to TRUE if State.Finished without any issues
@@ -135,6 +140,7 @@ trait SyncJobEntity implements SourceTrait {
         dataId      : [d: 'If data is saved as attahchment file this is the id', oapi: "NO"],
         dataBytes   : [d: 'The result data stored as bytes', maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
         //errorBytes  : [d: 'The error data stored as bytes', maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
-        sourceId : [d: 'the unique id from the outside source for the scheduled job', nullable: true]
+        sourceId : [d: 'the unique id from the outside source for the scheduled job', nullable: true],
+        jobType : [d: 'The type indicator for the kind of job', nullable: false]
     ]
 }

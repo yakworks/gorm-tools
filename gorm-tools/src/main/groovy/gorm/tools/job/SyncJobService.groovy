@@ -71,7 +71,8 @@ abstract class SyncJobService<D> {
             source: args.source,
             sourceId: args.sourceId,
             state: state,
-            params: args.params
+            params: args.params,
+            jobType: args.jobType
         ] as Map<String,Object>
 
         if(args.payloadId) {
@@ -90,30 +91,32 @@ abstract class SyncJobService<D> {
                 }
             }
         }
+        //create is transactional
+        SyncJobEntity jobEntity
 
-        //the call to this createJob method is already wrapped in a new trx
-        SyncJobEntity jobEntity = getRepo().create(data, [flush: true, bindId: true]) as SyncJobEntity
+        trxService.withNewTrx {
+            jobEntity = getRepo().create(data, [flush: true, bindId: true]) as SyncJobEntity
+        }
+        //NOTE: The event listener is where its either picked up and run or it put on hazelcast queue to be picked up and run
+        AppCtx.publishEvent(new SyncJobQueueEvent(jobEntity, args))
+
         return jobEntity
     }
 
 
     /**
-     * creates and saves the Job and returns the SyncJobContext with the jobId
+     * creates and saves a Running Job and returns the SyncJobContext with the jobId
      */
     SyncJobContext createJob(SyncJobArgs args, Object payload){
-        SyncJobContext jobContext
-        SyncJobEntity syncJobEntity
-        //keep it in its own transaction so it doesn't depend on wrapping
-        trxService.withNewTrx {
-            //set the payload if not already
-            if(!args.payload) args.payload = payload
-            //jobContext.createJob()
-            syncJobEntity = queueJob(args, SyncJobState.Running)
+        //set the payload if not already
+        if(!args.payload) args.payload = payload
+        //jobContext.createJob()
+        SyncJobEntity syncJobEntity = queueJob(args, SyncJobState.Running)
 
-            jobContext = SyncJobContext.of(args).syncJobService(this).payload(payload)
-            jobContext.results = ApiResults.create()
-            jobContext.startTime = System.currentTimeMillis()
-        }
+        SyncJobContext jobContext = SyncJobContext.of(args).syncJobService(this).payload(payload)
+        jobContext.results = ApiResults.create()
+        jobContext.startTime = System.currentTimeMillis()
+
         AppCtx.publishEvent(SyncJobStateEvent.of(syncJobEntity.id, jobContext, syncJobEntity.state))
         return jobContext
     }

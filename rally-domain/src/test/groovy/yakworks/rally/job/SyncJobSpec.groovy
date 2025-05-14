@@ -31,7 +31,9 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
 
     void "sanity check validation with String as data"() {
         expect:
-        SyncJob job = new SyncJob([sourceType: SourceType.ERP, sourceId: 'ar/org', state: SyncJobState.Running])
+        SyncJob job = new SyncJob(
+            sourceType: SourceType.ERP, sourceId: 'ar/org', state: SyncJobState.Running, jobType: 'bulk'
+        )
         job.validate()
         job.persist()
     }
@@ -49,7 +51,7 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
         def source = "Oracle"
         def sourceType = SourceType.RestApi
         def job = SyncJob.repo.create(
-            state: SyncJobState.Running,
+            state: SyncJobState.Running, jobType: 'bulk',
             payloadBytes:dataList.toString().bytes,
             source:source, sourceType: sourceType, sourceId:sourceId
         )
@@ -63,7 +65,7 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
         when:
         // def errorList = ["ok":false,"tile":"bad stuff here"]
         def job = new SyncJob(
-            state: SyncJobState.Running,
+            state: SyncJobState.Running, jobType: 'bulk',
             problems: [["ok":false,"title":"error"]]
         ).persist()
         def jobId = job.id
@@ -83,7 +85,7 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
     void "check params are persisted"() {
         setup:
         Map params = [q:[amount:['$gt':100.00]], async:true, parallel:true]
-        Map data = [sourceType: SourceType.ERP, sourceId: 'ar/org', state: SyncJobState.Queued, params:params]
+        Map data = [sourceType: SourceType.ERP, sourceId: 'ar/org', state: SyncJobState.Queued, params:params, jobType: 'bulk']
 
         when:
         SyncJob job = SyncJob.repo.create(data)
@@ -100,7 +102,7 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
 
     void "problems update"() {
         when:
-        def job = new SyncJob(state: SyncJobState.Running).persist()
+        def job = new SyncJob(state: SyncJobState.Running, jobType: 'bulk').persist()
         def jobId = job.id
         flushAndClear()
         SyncJob.repo.update([id: jobId, problems: [["ok":false,"title":"error"]]])
@@ -121,7 +123,7 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
 
         when:
         SyncJob job = new SyncJob(
-            state: SyncJobState.Running,
+            state: SyncJobState.Running, jobType: 'bulk',
             sourceType: SourceType.ERP, sourceId: 'ar/org',
             payloadBytes: res.bytes
         )

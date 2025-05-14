@@ -26,6 +26,11 @@ class TestSyncJob implements RepoEntity<TestSyncJob>, SyncJobEntity {
         parseJson(dataToString(), clazz)
     }
 
+    //parseJson
+    <T> T parsePayload(Class<T> clazz = List){
+        parseJson(payloadToString(), clazz)
+    }
+
     @Override
     String dataToString(){
         def dta = dataBytes

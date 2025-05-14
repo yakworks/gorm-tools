@@ -32,7 +32,7 @@ import yakworks.spring.AppCtx
  */
 @Slf4j
 @CompileStatic
-class BulkApiSupport<D> {
+class BulkImportService<D> {
 
     @Autowired
     SyncJobService syncJobService
@@ -50,12 +50,12 @@ class BulkApiSupport<D> {
 
     Class<D> entityClass // the domain class this is for
 
-    BulkApiSupport(Class<D> entityClass){
+    BulkImportService(Class<D> entityClass){
         this.entityClass = entityClass
     }
 
-    static <D> BulkApiSupport<D> of(Class<D> entityClass){
-        def bcs = new BulkApiSupport(entityClass)
+    static <D> BulkImportService<D> of(Class<D> entityClass){
+        def bcs = new BulkImportService(entityClass)
         AppCtx.autowire(bcs)
         return bcs
     }
@@ -82,6 +82,7 @@ class BulkApiSupport<D> {
             if(!qParams.containsKey('async')) qParams['async'] = false
         }
         SyncJobArgs syncJobArgs = setupSyncJobArgs(dataOp, qParams, sourceId)
+        syncJobArgs.jobType = 'bulkImport'
         Long jobId = getRepo().bulk(dataList, syncJobArgs)
         SyncJobEntity job = syncJobService.getJob(jobId)
         return job
@@ -117,8 +118,14 @@ class BulkApiSupport<D> {
     SyncJobEntity queueImportJob(DataOp dataOp, Map qParams, String sourceId, List<Map> payloadBody) {
 
         SyncJobArgs args = setupSyncJobArgs(dataOp, qParams, sourceId)
+        //give it the bulkImport type
+        args.jobType = 'bulk.import'
         //add dataOp to params if exists
         args.params['dataOp'] = dataOp.name()
+        //make sure className is set to params
+        args.params['entityClassName'] = getEntityClass().name
+        args.entityClass = getEntityClass()
+
         //if attachmentId then assume its a csv
         if(qParams.attachmentId) {
             args.payloadId = qParams.attachmentId as Long
@@ -130,7 +137,9 @@ class BulkApiSupport<D> {
     }
 
 
-    //WIP
+    /**
+     * Starts a bulk import job
+     */
     SyncJobEntity startJob(Long jobId) {
         SyncJobEntity job = syncJobService.getJob(jobId)
         assert job.state == SyncJobState.Queued
@@ -154,12 +163,12 @@ class BulkApiSupport<D> {
         DataOp dataOp = EnumUtils.getEnumIgnoreCase(DataOp, qParams['dataOp'] as String)
 
         SyncJobArgs syncJobArgs = setupSyncJobArgs(dataOp, qParams, job.sourceId)
+        syncJobArgs.jobId = jobId
         SyncJobContext sctx = syncJobService.initContext(syncJobArgs, dataList)
 
-        //run it based on whether its import or export
-        //bulk(dataList, sctx)
+        Long jobIdent = getRepo().bulkImporter.bulkImport(dataList, sctx)
 
-        return syncJobService.getJob(jobId)
+        return syncJobService.getJob(jobIdent)
     }
 
 
@@ -177,7 +186,7 @@ class BulkApiSupport<D> {
      * sets up the SyncJobArgs from whats passed in from params
      */
     SyncJobArgs setupSyncJobArgs(DataOp dataOp, Map params, String sourceId){
-        List bulkIncludes = includesConfig.findByKeys(getEntityClass(), [IncludesKey.bulk, IncludesKey.get])
+        List bulkIncludes = params.includes ? (List)params.includes : includesConfig.findByKeys(getEntityClass(), [IncludesKey.bulk, IncludesKey.get])
         //want the error includes to be blank if its not there
         List bulkErrorIncludes = includesConfig.getByKey(getEntityClass(), 'bulkError') as List<String>
 

@@ -29,7 +29,7 @@ class SyncJobServiceTests extends Specification implements DomainIntTest {
 
     SyncJobContext createJob(){
         def samplePaylod = [1,2,3,4]
-        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source')
+        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', jobType: 'foo')
         syncJobArgs.entityClass = Org
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, samplePaylod)
     }
@@ -43,7 +43,9 @@ class SyncJobServiceTests extends Specification implements DomainIntTest {
 
     void "test queueJob"() {
         when:
-        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', payload: [1,2,3])
+        SyncJobArgs syncJobArgs = new SyncJobArgs(
+            sourceId: '123', source: 'some source', payload: [1,2,3], jobType: 'bulk.import'
+        )
         syncJobArgs.entityClass = Org
         SyncJobEntity job = syncJobService.queueJob(syncJobArgs)
         flushAndClear()
@@ -63,7 +65,9 @@ class SyncJobServiceTests extends Specification implements DomainIntTest {
             payload << it
         }
 
-        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', payload: payload)
+        SyncJobArgs syncJobArgs = new SyncJobArgs(
+            sourceId: '123', source: 'some source', payload: payload, jobType: 'bulk.import'
+        )
         syncJobArgs.entityClass = Org
         SyncJobEntity job = syncJobService.queueJob(syncJobArgs)
         flushAndClear()
@@ -86,7 +90,7 @@ class SyncJobServiceTests extends Specification implements DomainIntTest {
     void "test create job and save payload to file"() {
         when:
         List payload = [1,2,3,4]
-        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source')
+        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', jobType: 'foo')
         syncJobArgs.entityClass = Org
         syncJobArgs.savePayload = true
         //syncJobArgs.savePayloadAsFile = true
@@ -197,7 +201,9 @@ class SyncJobServiceTests extends Specification implements DomainIntTest {
     def "test finish job dataFormat is Payload"() {
         given:
         List payload = [1,2,3,4]
-        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', dataFormat: SyncJobArgs.DataFormat.Payload)
+        SyncJobArgs syncJobArgs = new SyncJobArgs(
+            sourceId: '123', source: 'some source', jobType: 'foo',
+            dataFormat: SyncJobArgs.DataFormat.Payload)
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, payload)
 
         def okResults = ApiResults.OK()

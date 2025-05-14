@@ -321,7 +321,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, ResolvableTypeProvider {
     }
 
     Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs) {
-        return getBulkImporter().bulk(dataList, syncJobArgs)
+        return getBulkImporter().bulkLegacy(dataList, syncJobArgs)
     }
 
     /**

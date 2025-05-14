@@ -35,7 +35,7 @@ import yakworks.spring.AppCtx
 //XXX this whole thing should use new flow
 @CompileStatic
 @Slf4j
-class BulkExportSupport<D> {
+class BulkExportService<D> {
 
     @Inject SyncJobService syncJobService
     @Inject GrailsApplication grailsApplication
@@ -51,7 +51,7 @@ class BulkExportSupport<D> {
 
     boolean legacyBulk = true
 
-    BulkExportSupport(Class<D> entityClass){
+    BulkExportService(Class<D> entityClass){
         this.entityClass = entityClass
     }
 

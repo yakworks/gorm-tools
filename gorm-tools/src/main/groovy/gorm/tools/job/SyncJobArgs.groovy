@@ -36,6 +36,9 @@ class SyncJobArgs {
 
     String sourceId
 
+    /** the type of the SyncJob, used for queue and to switch on routing to run */
+    String jobType
+
     /**
      * Payload input data used for job operations
      */
@@ -214,6 +217,7 @@ class SyncJobArgs {
         //can use both jobSource and source to support backward compat, jobSource wins if both are set
         if(params.source != null) syncJobArgs.source = params.source
         if(params.jobSource != null) syncJobArgs.source = params.jobSource
+        if(params.jobType != null) syncJobArgs.jobType = params.jobType
 
         //allow to specify the dataFormat
         if(params.dataFormat != null) syncJobArgs.dataFormat = EnumUtils.getEnumIgnoreCase(DataFormat, params.dataFormat as String)

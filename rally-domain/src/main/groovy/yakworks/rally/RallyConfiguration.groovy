@@ -19,7 +19,7 @@ import yakworks.security.gorm.api.UserSecurityConfig
 import yakworks.security.spring.DefaultSecurityConfiguration
 
 @Configuration @Lazy
-@Import([DefaultSecurityConfiguration, SecurityGormConfiguration, AuditStampConfiguration, MailSpringConfig, UserSecurityConfig])
+@Import([DefaultSecurityConfiguration, SecurityGormConfiguration, AuditStampConfiguration, MailSpringConfig])
 @ConfigurationPropertiesScan([ "yakworks.rally" ])
 @ComponentScan(['yakworks.security.gorm', 'yakworks.rally'])
 @CompileStatic

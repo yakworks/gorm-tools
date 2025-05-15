@@ -60,10 +60,12 @@ class ExcelBuilderSupport {
         if(colModel){
             colModel.each {
                 if(!it.hidden) {
-                    //colModel would need to atleast specify field name, but if label is provided it would be used for xls header
-                    //name is the name of domain field, label is what gets displayed as xls header
-                    Validate.notEmpty(it.name, "name is required for columns in gridOptions.colMode")
-                    colMap[(it.name as String)] = it.label as String
+                    //colModel need to specify at least field name or id, name/id is the name of domain field,
+                    //label is optional, if provided it would be used for xls header
+
+                    String columnName = it['name'] ?: it['id']
+                    Validate.notEmpty(columnName, "name  or id is required for columns in gridOptions.colMode")
+                    colMap[columnName] = it.label as String
                 }
             }
         }

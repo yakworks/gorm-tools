@@ -108,7 +108,6 @@ class ApiSchemaEntity {
     }
 
     @SuppressWarnings(['MethodSize'])
-    // @CompileDynamic
     private Map getEntityProperties(CruType type) {
         //println "----- ${perEntity.name} getDomainProperties ----"
         //String domainName = NameUtils.getPropertyNameRepresentation(perEntity.name)

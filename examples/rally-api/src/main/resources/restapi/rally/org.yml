@@ -14,6 +14,7 @@ api:
           - {name: type.name, label: Type, width: 40}
           - {name: calc.totalDue, label: TotalDue, width: 40, formatter: currency}
           - {name: flex.text1, width: 40} #A column without label, should not fail, and would use name as header, both in grid and in xslx export
+          - {id: flex.text2, label: Text 2} #use id instead of name, excel builder should work with either of them
         # shrinkToFit: true
         contextMenu: true
 

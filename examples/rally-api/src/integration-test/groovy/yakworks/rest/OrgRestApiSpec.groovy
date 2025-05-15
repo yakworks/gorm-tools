@@ -6,7 +6,10 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.http.HttpStatus
+
+import spock.lang.Ignore
 import spock.lang.IgnoreRest
+import yakworks.rest.client.OkAuth
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.HttpUrl
@@ -372,8 +375,6 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
 
     }
 
-
-
     void "test post with tags"() {
         when: "Create a test tag"
         Tag tag1 = Tag.create(code: 'T1', entityName: 'Customer')
@@ -417,4 +418,28 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
         body.detail.contains "expecting '}'"
     }
 
+    //XXX @SUD turn back on when secureCrudApi is sorted out
+    // is this the only test we have?
+    @Ignore
+    void "test readonly operation"() {
+        setup:
+        OkAuth.TOKEN = null
+        login("readonly", "123")
+
+        when:
+        String q = '{name: "Org20"}'
+        def resp = post(path,  [num:"C1", name:"C1", type: 'Customer'])
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code() == HttpStatus.UNAUTHORIZED.value()
+        body
+        !body.ok
+        body.code == "error.unauthorized"
+        body.title == 'Unauthorized'
+        body.detail == 'Access Denied'
+
+        cleanup:
+        OkAuth.TOKEN = null
+    }
 }

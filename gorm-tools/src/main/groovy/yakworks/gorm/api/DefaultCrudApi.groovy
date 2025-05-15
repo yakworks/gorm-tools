@@ -175,6 +175,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     Pager list(Map qParams, URI uri){
         Pager pager = Pager.of(qParams)
         QueryArgs qargs = createQueryArgs(pager, qParams, uri)
+
         List dlist = queryList(qargs)
         List<String> incs = getIncludes(qParams, [IncludesKey.list, IncludesKey.get])
         return createPagerResult(pager, qParams, dlist, incs)
@@ -195,6 +196,10 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         SyncJobArgs syncJobArgs = getBulkApiSupport().setupSyncJobArgs(dataOp, qParams, sourceId)
         SyncJobEntity job = getBulkApiSupport().process(dataList, syncJobArgs)
         return job
+    }
+
+    SyncJobEntity bulkExport(Map params, String sourceId) {
+        return getBulkApiSupport().processBulkExport(params, sourceId)
     }
 
     protected List<D> queryList(QueryArgs qargs) {

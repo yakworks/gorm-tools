@@ -12,7 +12,8 @@ import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 
 import spock.lang.Specification
-import yakworks.rally.common.ZonedDateUtil
+import yakworks.commons.lang.ZonedDateUtil
+import yakworks.commons.extensions.AppTimeZone
 
 class AppTimeZoneSpec extends Specification {
 

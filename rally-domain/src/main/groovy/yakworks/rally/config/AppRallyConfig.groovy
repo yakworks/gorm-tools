@@ -10,11 +10,9 @@ import groovy.transform.CompileStatic
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 
-import yakworks.rally.extensions.AppTimeZone
+import yakworks.commons.extensions.AppTimeZone
 
-// @Configuration(proxyBeanMethods = false)
 @ConfigurationProperties(prefix="app")
-// @ConfigurationPropertiesScan
 @CompileStatic
 class AppRallyConfig {
     String hello = "world"

@@ -19,7 +19,6 @@ import java.util.Map;
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
-// @CompileStatic
 public interface QueryService<D> {
 
     Class<D> getEntityClass();

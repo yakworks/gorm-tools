@@ -8,6 +8,7 @@ package yakworks.rest
 import org.grails.datastore.gorm.validation.constraints.registry.DefaultConstraintRegistry
 
 import grails.plugins.Plugin
+import yakworks.rest.gorm.SecuredCrudApiConfiguration
 import yakworks.rest.gorm.mapping.RepoApiMappingsService
 import yakworks.rest.gorm.render.ApiResultsRenderer
 import yakworks.rest.gorm.render.CSVPagerRenderer
@@ -48,6 +49,7 @@ class GormRestGrailsPlugin extends Plugin {
 
         csvPagerRenderer(CSVPagerRenderer)
         xlsxPagerRenderer(XlsxPagerRenderer)
+        secureCrudApiConfiguration(SecuredCrudApiConfiguration)
     } }
 
 }

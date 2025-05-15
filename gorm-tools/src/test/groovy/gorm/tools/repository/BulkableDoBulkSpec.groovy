@@ -6,6 +6,7 @@ import gorm.tools.job.SyncJobArgs
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.bulk.BulkImporter
 import gorm.tools.repository.model.DataOp
+import spock.lang.Ignore
 import spock.lang.Specification
 import testing.Cust
 import testing.TestSyncJob
@@ -68,18 +69,18 @@ class BulkableDoBulkSpec extends Specification implements GormHibernateTest {
         res1 instanceof OkResult
         res1.status == HttpStatus.CREATED //should be 201 CREATED
 
-        when:
-        def bcks
-        KitchenSink.withTransaction {
-            bcks = KitchenSink.findByName("Blue Cheese")
-        }
+        // when:
+        // var bcks = KitchenSink.findWhere(name: "Blue Cheese")
+        // // KitchenSink.withTransaction {
+        // //     bcks = KitchenSink.findByName("Blue Cheese")
+        // // }
 
-        then: "check database records"
-
+        and: "check database records"
+        var bcks = KitchenSink.findWhere(name: "Blue Cheese")
         bcks
         bcks.ext.name == "SinkExt1"
         KitchenSink.count() == 100
-        KitchenSink.findByName("Oranges")
+        KitchenSink.findWhere(name: "Oranges")
     }
 
     void "test bulk update"() {

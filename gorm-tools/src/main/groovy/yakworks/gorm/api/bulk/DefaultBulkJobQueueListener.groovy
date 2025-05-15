@@ -4,19 +4,20 @@
 */
 package yakworks.gorm.api.bulk
 
+import groovy.transform.CompileStatic
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.event.EventListener
 
 import gorm.tools.job.SyncJobArgs
-import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobQueueEvent
 import gorm.tools.utils.ServiceLookup
-import yakworks.api.ApiResults
 import yakworks.gorm.config.GormConfig
 
 /**
  * Default used for firing bulk jobs
  */
+@CompileStatic
 class DefaultBulkJobQueueListener {
 
     @Autowired GormConfig gormConfig
@@ -33,7 +34,7 @@ class DefaultBulkJobQueueListener {
     }
 
     public <D> BulkImportService<D> getBulkImportService(Class<D> entityClass){
-        return ServiceLookup.lookup(getEntityClass(), BulkImportService<D>, "defaultBulkImportService")
+        return ServiceLookup.lookup(entityClass, BulkImportService<D>, "defaultBulkImportService")
     }
 
 }

@@ -18,6 +18,7 @@ import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.DataOp
+import yakworks.api.problem.data.DataProblemCodes
 import yakworks.commons.lang.EnumUtils
 import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.IncludesKey
@@ -131,6 +132,8 @@ class BulkImportService<D> {
             args.payloadId = qParams.attachmentId as Long
         } else if(payloadBody){
             args.payload = payloadBody
+        } else {
+            throw DataProblemCodes.EmptyPayload.get().toException()
         }
 
         return syncJobService.queueJob(args)

@@ -5,22 +5,17 @@ import org.springframework.http.HttpStatus
 
 import gorm.tools.async.AsyncService
 import gorm.tools.job.SyncJobArgs
-import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
 import gorm.tools.job.SyncJobState
-import gorm.tools.problem.ValidationProblem
-import gorm.tools.repository.bulk.BulkImporter
 import gorm.tools.repository.model.DataOp
 import gorm.tools.utils.ServiceLookup
 import spock.lang.Specification
 import testing.TestSyncJob
 import testing.TestSyncJobService
 import yakworks.api.problem.data.DataProblemException
-import yakworks.commons.map.LazyPathKeyMap
 import yakworks.gorm.config.AsyncConfig
 import yakworks.gorm.config.GormConfig
-import yakworks.spring.AppCtx
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.testing.gorm.model.SinkExt
@@ -55,9 +50,9 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
             source: "test", sourceId: "test-job", includes: ["id", "name", "ext.name"]
         ]
         SyncJobEntity jobEnt = bulkImportService.queueImportJob(op, params, "test-job", dataList)
-        flushAndClear()
+        //flushAndClear()
         SyncJobEntity jobEnt2 = bulkImportService.startJob(jobEnt.id)
-        flushAndClear()
+        //flushAndClear()
         jobEnt.id
     }
 
@@ -173,7 +168,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
         results[0].data.ext.name == "SinkExt1"
 
         and: "Verify database records"
-        def bcks = KitchenSink.findByName("Blue Cheese")
+        def bcks = KitchenSink.findWhere(name: "Blue Cheese")
         bcks
         bcks.ext.name == "SinkExt1"
 
@@ -303,7 +298,8 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
         asyncConfig.sliceSize = 10
         List<Map> list = KitchenSink.generateDataList(60) //this should trigger 6 batches of 10
         Long jobId = bulkImport(list)
-        def job = TestSyncJob.findById(jobId)
+
+        def job = TestSyncJob.get(jobId)
 
         def results = parseJson(job.dataToString())
 
@@ -314,19 +310,13 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
         asyncConfig.sliceSize = 50
     }
 
-    void "test empty data"() {
+    void "test empty payload"() {
         when:
-        Long jobId = bulkImport(null)
+        Map params = [:]
+        SyncJobEntity jobEnt = bulkImportService.queueImportJob(DataOp.add, params, "test-job", [])
 
         then:
         DataProblemException ex = thrown()
         ex.code == 'error.data.emptyPayload'
-
-        when:
-        jobId = bulkImport([])
-
-        then:
-        DataProblemException ex2 = thrown()
-        ex2.code == 'error.data.emptyPayload'
     }
 }

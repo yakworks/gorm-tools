@@ -4,7 +4,6 @@
 */
 package yakworks.gorm.api.bulk
 
-import javax.inject.Inject
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -37,15 +36,13 @@ import yakworks.spring.AppCtx
 @Slf4j
 class BulkExportService<D> {
 
-    @Inject SyncJobService syncJobService
-    @Inject GrailsApplication grailsApplication
-    @Inject MetaMapService metaMapService
-    @Inject ProblemHandler problemHandler
-    @Autowired
-    IncludesConfig includesConfig
+    @Autowired SyncJobService syncJobService
+    @Autowired GrailsApplication grailsApplication
+    @Autowired MetaMapService metaMapService
+    @Autowired ProblemHandler problemHandler
+    @Autowired IncludesConfig includesConfig
 
-    @Autowired
-    CsvToMapTransformer csvToMapTransformer
+    @Autowired CsvToMapTransformer csvToMapTransformer
 
     Class<D> entityClass // the domain class this is for
 

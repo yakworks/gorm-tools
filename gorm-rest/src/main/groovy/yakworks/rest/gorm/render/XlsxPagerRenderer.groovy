@@ -5,7 +5,7 @@
 package yakworks.rest.gorm.render
 
 import groovy.transform.CompileStatic
-
+import groovy.util.logging.Slf4j
 import org.grails.plugins.web.rest.render.ServletRenderContext
 import org.springframework.http.HttpStatus
 
@@ -21,6 +21,7 @@ import yakworks.etl.excel.ExcelBuilderSupport
  * @since 7.0.8
  */
 @CompileStatic
+@Slf4j
 class XlsxPagerRenderer implements XlsRendererTrait<Pager> {
 
     @Override
@@ -43,8 +44,16 @@ class XlsxPagerRenderer implements XlsRendererTrait<Pager> {
             ExcelBuilderSupport.useIncludesConfig(eb, apiConfig, dataList, entityClassName)
         }
         eb.writeData(dataList as List<Map>)
-        eb.writeOut()
-        context.setStatus(HttpStatus.OK)
+        try {
+            eb.writeOut()
+            context.setStatus(HttpStatus.OK)
+        } catch(Exception ex) {
+            //catch any exception thrown while writing xsl file to servlet response output stream
+            //Because if exception is thrown at this place, (eg because socket was closed by client) nothing further action can be taken
+            //and trying to send any more response in form of problem result etc would result in another exception
+            //see #2596
+            log.debug("Error encountered while rendering xsl file : ${ex.message}")
+        }
     }
 
     void setContentDisposition(RenderContext context){

@@ -4,7 +4,6 @@
 */
 package yakworks.gorm.api
 
-
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
 import gorm.tools.beans.Pager
-import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.metamap.services.MetaMapService
@@ -24,9 +22,11 @@ import gorm.tools.repository.model.ApiCrudRepo
 import gorm.tools.repository.model.DataOp
 import gorm.tools.repository.model.EntityResult
 import gorm.tools.transaction.TrxUtils
+import gorm.tools.utils.ServiceLookup
 import grails.gorm.transactions.Transactional
 import yakworks.api.problem.data.DataProblemException
-import yakworks.gorm.api.support.BulkApiSupport
+import yakworks.gorm.api.bulk.BulkExportService
+import yakworks.gorm.api.bulk.BulkImportService
 import yakworks.gorm.api.support.QueryArgsValidator
 import yakworks.gorm.config.QueryConfig
 import yakworks.meta.MetaMap
@@ -55,7 +55,11 @@ class DefaultCrudApi<D> implements CrudApi<D> {
 
     /** Not required but if an BulkSupport bean is setup then it will get get used */
     @Autowired(required = false)
-    BulkApiSupport<D> bulkApiSupport
+    BulkExportService<D> bulkExportSupport
+
+    /** Not required but if an BulkSupport bean is setup then it will get get used */
+    //@Autowired(required = false)
+    protected BulkImportService<D> bulkImportService
 
     DefaultCrudApi(Class<D> entityClass){
         this.entityClass = entityClass
@@ -88,9 +92,15 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         RepoLookup.findRepo(getEntityClass())
     }
 
-    BulkApiSupport<D> getBulkApiSupport(){
-        if (!bulkApiSupport) this.bulkApiSupport = BulkApiSupport.of(getEntityClass())
-        return bulkApiSupport
+    BulkImportService<D> getBulkImportService(){
+        if (!this.bulkImportService)
+            this.bulkImportService = ServiceLookup.lookup(getEntityClass(), BulkImportService<D>, "defaultBulkImportService")
+        return bulkImportService
+    }
+
+    BulkExportService<D> getBulkExportService(){
+        if (!bulkExportSupport) this.bulkExportSupport = new BulkExportService(getEntityClass())
+        return bulkExportSupport
     }
 
     /**
@@ -192,14 +202,12 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     }
 
     @Override
-    SyncJobEntity bulk(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
-        SyncJobArgs syncJobArgs = getBulkApiSupport().setupSyncJobArgs(dataOp, qParams, sourceId)
-        SyncJobEntity job = getBulkApiSupport().process(dataList, syncJobArgs)
-        return job
+    SyncJobEntity bulkImport(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
+        getBulkImportService().bulkImport(dataOp, dataList, qParams, sourceId)
     }
 
     SyncJobEntity bulkExport(Map params, String sourceId) {
-        return getBulkApiSupport().processBulkExport(params, sourceId)
+        getBulkExportSupport().queueExportJob(params, sourceId)
     }
 
     protected List<D> queryList(QueryArgs qargs) {

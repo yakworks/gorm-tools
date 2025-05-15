@@ -164,6 +164,15 @@ start.rally-api: # start.db
 	cd examples/rally-api
 	java -server -Xmx2g -jar build/libs/rally-api.jar
 
+## start rcm-jobs, gradle rcm-jobs:bootRun
+run.rally-api: # start.db
+	${gradlew} rally-api:bootRun --args='--server.port=8083 --spring.profiles.active=local,server'
+
+run.rally-api2: # start.db
+	${gradlew} rally-api:bootRun --args='--server.port=8084 --spring.profiles.active=local,client -Dgrails.env=client'
+
+run.rally-api3: # start.db
+	${gradlew} rally-api:bootRun --args='--server.port=8085 --spring.profiles.active=local,client'
 
 # clones the api-docs branch or this project where we will publish/push
 # oapi.docs-clone:

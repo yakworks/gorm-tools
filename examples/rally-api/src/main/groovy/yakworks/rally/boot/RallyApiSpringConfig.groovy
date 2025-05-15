@@ -6,6 +6,7 @@ package yakworks.rally.boot
 
 import groovy.transform.CompileStatic
 
+import org.apache.shiro.subject.support.SubjectThreadState
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties
@@ -61,6 +62,7 @@ class RallyApiSpringConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        //var sth = new SubjectThreadState(null);
         //defaults permit all
         List permitAllMatchers = [
             "/actuator/**",

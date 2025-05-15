@@ -16,6 +16,10 @@ executors:
       GRADLE_OPTS: "-Dorg.gradle.caching=true -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dorg.gradle.console=plain"
     docker:
       - image: yakworks/bullseye:jdk11
+  builder-small: # 1cpus 2gb ram, cheapest, used for timeout
+    resource_class: 'small'
+    docker:
+      - image: yakworks/bullseye:jdk11
 
 commands:
   restore_gradle_cache:
@@ -86,6 +90,17 @@ jobs:
       - save_gradle_cache
       - save_workspace
       - save_build_cache
+
+  timeout-check:
+    executor: builder-small
+    steps:
+      - run:
+          name: Cancel build after set time
+          background: true
+          command: |
+            sleep 600 # 10min
+            echo "Canceling workflow as too much time has elapsed"
+            curl -X POST --header "Content-Type: application/json" "https://circleci.com/api/v2/workflow/${CIRCLE_WORKFLOW_ID}/cancel?circle-token=${CIRCLE_TOKEN}"
 
   gorm-tools:
     executor: builder-large

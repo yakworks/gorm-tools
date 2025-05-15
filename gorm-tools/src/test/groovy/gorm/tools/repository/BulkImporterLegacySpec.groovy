@@ -1,20 +1,21 @@
 package gorm.tools.repository
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
+
 import gorm.tools.async.AsyncService
-import yakworks.api.problem.data.DataProblem
-import yakworks.api.problem.data.DataProblemException
-import yakworks.gorm.config.AsyncConfig
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobState
 import gorm.tools.problem.ValidationProblem
-import gorm.tools.repository.bulk.BulkableRepo
+import gorm.tools.repository.bulk.BulkImporter
 import gorm.tools.repository.model.DataOp
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import spock.lang.Specification
 import testing.TestSyncJob
 import testing.TestSyncJobService
+import yakworks.api.problem.data.DataProblemException
 import yakworks.commons.map.LazyPathKeyMap
+import yakworks.gorm.config.AsyncConfig
+import yakworks.spring.AppCtx
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.testing.gorm.model.SinkExt
@@ -22,7 +23,7 @@ import yakworks.testing.gorm.unit.GormHibernateTest
 
 import static yakworks.json.groovy.JsonEngine.parseJson
 
-class BulkableRepoSpec extends Specification implements GormHibernateTest {
+class BulkImporterLegacySpec extends Specification implements GormHibernateTest {
     static entityClasses = [KitchenSink, SinkExt, TestSyncJob]
     static springBeans = [TestSyncJobService]
 
@@ -31,14 +32,17 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
     @Autowired KitchenSinkRepo kitchenSinkRepo
 
     SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
-        return new SyncJobArgs(parallel: false, async:false, op: op, source: "test", sourceId: "test", includes: ["id", "name", "ext.name"])
+        return new SyncJobArgs(
+            parallel: false, async:false, op: op, jobType: 'bulk.import',
+            source: "test", sourceId: "test", includes: ["id", "name", "ext.name"]
+        )
     }
 
-    void "sanity check bulkable repo"() {
-        expect:
-        KitchenSink.repo instanceof BulkableRepo
+    BulkImporter getBulkImporter(){
+        def bis = new BulkImporter(KitchenSink)
+        AppCtx.autowire(bis)
+        return bis
     }
-
 
     def "sanity check single validation"() {
         when:
@@ -55,7 +59,7 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
         List list = KitchenSink.generateDataList(10)
 
         when: "bulk insert 20 records"
-        Long jobId = kitchenSinkRepo.bulk(list, setupSyncJobArgs())
+        Long jobId = bulkImporter.bulkLegacy(list, setupSyncJobArgs())
         def job = TestSyncJob.get(jobId)
         List results = job.parseData()
 
@@ -70,7 +74,7 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
 
         when: "bulk insert 20 records"
 
-        Long jobId = kitchenSinkRepo.bulk(list, setupSyncJobArgs())
+        Long jobId = bulkImporter.bulkLegacy(list, setupSyncJobArgs())
         def job = TestSyncJob.get(jobId)
 
 
@@ -130,7 +134,7 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
         List list = KitchenSink.generateDataList(10)
 
         when: "insert records"
-        Long jobId = kitchenSinkRepo.bulk(list, setupSyncJobArgs())
+        Long jobId = bulkImporter.bulkLegacy(list, setupSyncJobArgs())
         def job = TestSyncJob.get(jobId)
 
         then:
@@ -145,7 +149,7 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
             it.id = idx + 1
         }
 
-        jobId = kitchenSinkRepo.bulk(list, setupSyncJobArgs(DataOp.update))
+        jobId = bulkImporter.bulkLegacy(list, setupSyncJobArgs(DataOp.update))
         job = TestSyncJob.get(jobId)
 
         then:
@@ -169,7 +173,7 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
 
         when: "bulk insert"
 
-        Long jobId = kitchenSinkRepo.bulk(list, setupSyncJobArgs())
+        Long jobId = bulkImporter.bulkLegacy(list, setupSyncJobArgs())
         def job = TestSyncJob.get(jobId)
 
         def results = parseJson(job.dataToString())
@@ -212,7 +216,7 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
 
         when: "bulk insert"
 
-        Long jobId = kitchenSinkRepo.bulk(list, setupSyncJobArgs())
+        Long jobId = bulkImporter.bulkLegacy(list, setupSyncJobArgs())
         def job = TestSyncJob.get(jobId)
 
         then: "verify job"
@@ -245,7 +249,7 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
         List<Map> list = KitchenSink.generateDataList(60) //this should trigger 6 batches of 10
 
         when: "bulk insert in multi batches"
-        Long jobId = kitchenSinkRepo.bulk(list, setupSyncJobArgs())
+        Long jobId = bulkImporter.bulkLegacy(list, setupSyncJobArgs())
         def job = TestSyncJob.findById(jobId)
 
         def results = parseJson(job.dataToString())
@@ -266,7 +270,7 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
 
         when: "bulk insert 2 records"
         SyncJobArgs args = setupSyncJobArgs()
-        Long jobId = kitchenSinkRepo.bulk(data, args)
+        Long jobId = bulkImporter.bulkLegacy(data, args)
         def job = TestSyncJob.get(jobId)
 
 
@@ -286,9 +290,9 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
         payload != null
         payload instanceof List
         payload.size() == 2
-//        payload[0].name == "Sink1"
-//        payload[0].ext.name == "SinkExt1"
-//        payload[1].name == "Sink2"
+        //        payload[0].name == "Sink1"
+        //        payload[0].ext.name == "SinkExt1"
+        //        payload[1].name == "Sink2"
 
         when: "verify job.data (job results)"
         def dataString = job.dataToString()
@@ -323,10 +327,10 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
         Map data = [name:"cust-1", num:"cust-1", id:1]
 
         expect: "when no includes"
-        kitchenSinkRepo.buildErrorMap(data, null) == data
+        bulkImporter.buildErrorMap(data, null) == data
 
         and: "when includes provided"
-        kitchenSinkRepo.buildErrorMap(data, ["id", "num"]) == [id:1, num: "cust-1"]
+        bulkImporter.buildErrorMap(data, ["id", "num"]) == [id:1, num: "cust-1"]
     }
 
     void "test buildSuccessMap"() {
@@ -334,7 +338,7 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
         KitchenSink kitchenSink = new KitchenSink(name: "name", secret: "secret", ext: new SinkExt(name:"ext-name", textMax: "test"))
 
         when: "when includes provided"
-        Map result = kitchenSinkRepo.buildSuccessMap(kitchenSink, ["name", "ext.name"])
+        Map result = bulkImporter.buildSuccessMap(kitchenSink, ["name", "ext.name"])
 
         then:
         result.size() == 2
@@ -343,14 +347,14 @@ class BulkableRepoSpec extends Specification implements GormHibernateTest {
 
     void "test empty data"() {
         when:
-        Long jobId = kitchenSinkRepo.bulk(null, setupSyncJobArgs())
+        Long jobId = bulkImporter.bulkLegacy(null, setupSyncJobArgs())
 
         then:
         DataProblemException ex = thrown()
         ex.code == 'error.data.emptyPayload'
 
         when:
-        jobId = kitchenSinkRepo.bulk([], setupSyncJobArgs())
+        jobId = bulkImporter.bulkLegacy([], setupSyncJobArgs())
 
         then:
         DataProblemException ex2 = thrown()

@@ -58,10 +58,10 @@ grails:
   cache:
     enabled: false
   # NOTE: reminder that anything in config.locations wins and ovewrites whats in this config
-  config:
-    locations:
-      - "classpath:restapi-config.yml"
-      - "classpath*:restapi/rally/*.yml"
+#  config:
+#    locations:
+#      - "classpath:restapi-config.yml"
+#      - "classpath*:restapi/rally/*.yml"
 
 info:
   app:

@@ -24,7 +24,6 @@ import org.grails.datastore.mapping.query.api.QueryArgumentsAware
 import org.grails.datastore.mapping.query.api.QueryableCriteria
 import org.grails.orm.hibernate.AbstractHibernateSession
 import org.hibernate.QueryException
-import org.springframework.beans.factory.NoSuchBeanDefinitionException
 
 import gorm.tools.beans.Pager
 import gorm.tools.mango.api.QueryArgs
@@ -39,7 +38,6 @@ import yakworks.api.problem.ThrowableProblem
 import yakworks.api.problem.data.DataProblem
 import yakworks.commons.lang.NameUtils
 import yakworks.gorm.config.GormConfig
-import yakworks.spring.AppCtx
 
 /**
  * This is here to make it easier to build criteria with domain bean paths

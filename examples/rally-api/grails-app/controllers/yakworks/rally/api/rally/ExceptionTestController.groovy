@@ -10,9 +10,9 @@ import yakworks.api.problem.data.DataProblem
 import yakworks.rally.orgs.model.Org
 import yakworks.rest.gorm.controller.CrudApiController
 
-import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
 
+@SuppressWarnings(['ThrowRuntimeException'])
 @CompileStatic
 class ExceptionTestController implements CrudApiController<Org> {
     static String namespace = 'rally'

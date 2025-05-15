@@ -4,13 +4,16 @@ import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.problem.ValidationProblem
+import gorm.tools.repository.bulk.BulkImporter
 import gorm.tools.repository.model.DataOp
+import spock.lang.Ignore
 import spock.lang.Specification
 import testing.Cust
 import testing.TestSyncJob
 import yakworks.api.ApiResults
 import yakworks.api.HttpStatus
 import yakworks.api.OkResult
+import yakworks.spring.AppCtx
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.testing.gorm.model.SinkExt
@@ -31,13 +34,19 @@ class BulkableDoBulkSpec extends Specification implements GormHibernateTest {
         return new SyncJobArgs(parallel: false, async:false, op: op, source: "test", sourceId: "test", includes: ["id", "name", "ext.name"])
     }
 
+    BulkImporter getBulkImporter(){
+        def bis = new BulkImporter(KitchenSink)
+        AppCtx.autowire(bis)
+        return bis
+    }
+
     void "success doBulk add"() {
         given:
         List list = KitchenSink.generateDataList(100)
         def syncArgs = setupSyncJobArgs()
 
         when: "doBulk insert records"
-        ApiResults res = kitchenSinkRepo.doBulk(list, syncArgs)
+        ApiResults res = bulkImporter.doBulkSlice(list, syncArgs)
 
         then: "verify"
         res.ok //all ok
@@ -60,12 +69,18 @@ class BulkableDoBulkSpec extends Specification implements GormHibernateTest {
         res1 instanceof OkResult
         res1.status == HttpStatus.CREATED //should be 201 CREATED
 
+        // when:
+        // var bcks = KitchenSink.findWhere(name: "Blue Cheese")
+        // // KitchenSink.withTransaction {
+        // //     bcks = KitchenSink.findByName("Blue Cheese")
+        // // }
+
         and: "check database records"
-        def bcks = KitchenSink.findByName("Blue Cheese")
+        var bcks = KitchenSink.findWhere(name: "Blue Cheese")
         bcks
         bcks.ext.name == "SinkExt1"
         KitchenSink.count() == 100
-        KitchenSink.findByName("Oranges")
+        KitchenSink.findWhere(name: "Oranges")
     }
 
     void "test bulk update"() {
@@ -78,7 +93,7 @@ class BulkableDoBulkSpec extends Specification implements GormHibernateTest {
         def syncArgs = setupSyncJobArgs(DataOp.update)
 
         when: "doBulk update records"
-        ApiResults res = kitchenSinkRepo.doBulk(updateList, syncArgs)
+        ApiResults res = bulkImporter.doBulkSlice(updateList, syncArgs)
 
         then:
         res.ok
@@ -104,13 +119,13 @@ class BulkableDoBulkSpec extends Specification implements GormHibernateTest {
         list[1].name = null
 
         when: "bulk insert"
-        ApiResults res = kitchenSinkRepo.doBulk(list, syncArgs)
+        ApiResults res = bulkImporter.doBulkSlice(list, syncArgs)
 
         then: "should have thrown exception"
         thrown(ValidationProblem.Exception)
 
         when: "bulk insert with trx per item"
-        res = kitchenSinkRepo.doBulk(list, syncArgs, true)
+        res = bulkImporter.doBulkSlice(list, syncArgs, true)
 
         then: "should have thrown exception"
         !res.ok //all ok
@@ -145,7 +160,7 @@ class BulkableDoBulkSpec extends Specification implements GormHibernateTest {
         syncArgs.persistArgs(bindId: true)
 
         when: "doBulk UPSERT records"
-        ApiResults res = kitchenSinkRepo.doBulk(upsertList, syncArgs)
+        ApiResults res = bulkImporter.doBulkSlice(upsertList, syncArgs)
 
         then:
         res.ok

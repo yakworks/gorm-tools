@@ -26,9 +26,7 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.orm
  */
 @Entity
 @GrailsCompileStatic
-class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity,  AuditStampTrait, Serializable {
-
-    // List<Map> problems
+class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity, AuditStampTrait, Serializable {
 
     byte[] getData(){
         getRepo().getData(this)
@@ -59,7 +57,8 @@ class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity,  AuditStampTrait, S
     static MappingDefinition getMapping() {
         orm {
             columns(
-                problems: property(type: JsonType, typeParams: [type: ArrayList])
+                problems: property(type: JsonType, typeParams: [type: ArrayList]),
+                params: property(type: JsonType, typeParams: [type: Map])
             )
         }
     }

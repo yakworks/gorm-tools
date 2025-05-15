@@ -1,3 +1,9 @@
+### v7.3.85
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.84...v7.3.85)
+- release [link](https://github.com/yakworks/gorm-tools/commit/a971edb0ade321bfb59d9f832e570d142372ddde)
+- Handle exception during excel file rendering (#899) [link](https://github.com/yakworks/gorm-tools/commit/a2d765324913a16ea4ba71a1a0f2cb9ef9fa8e7d)
+
 ### v7.3.84
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.83...v7.3.84)

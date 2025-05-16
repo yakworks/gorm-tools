@@ -28,6 +28,8 @@ dependencies {
   compileOnly "com.hazelcast:hazelcast:$vHazelcast"
   compileOnly "com.hazelcast:hazelcast-spring:$vHazelcast"
   compileOnly "com.github.ben-manes.caffeine:caffeine:$vCaffeine"
+  compileOnly("org.apache.ignite:ignite-core:$vIgnite")
+  compileOnly("org.apache.ignite:ignite-spring-cache-ext:$vIgniteSpringCache")
 
   //mailgun
   api 'com.mailgun:mailgun-java:1.0.7'

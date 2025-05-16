@@ -24,9 +24,19 @@ dependencies {
   // implementation "com.github.jknack:handlebars-springmvc:$vHandlebars"
   // implementation "com.github.jknack:handlebars-guava-cache:$vHandlebars"
 
+  //SHIRO, not used yet
   ['aspectj', 'core', 'spring', 'web'].each {
     implementation "org.apache.shiro:shiro-$it:$vShiro"
   }
+
+  //APACHE IGNITE
+  implementation("org.apache.ignite:ignite-core:2.17.0")
+  //implementation("org.apache.ignite:ignite-kubernetes:2.17.0")
+  //implementation("org.apache.ignite:ignite-indexing:2.17.0")
+  implementation("org.apache.ignite:ignite-spring:2.17.0")
+  implementation("org.apache.ignite:ignite-spring-cache-ext:1.0.0")
+  implementation("org.apache.ignite:ignite-slf4j:2.17.0")
+  implementation("org.apache.ignite:ignite-spring-boot-autoconfigure-ext:1.0.0")
 
   // === Spring Sec ===
   implementation 'org.springframework.boot:spring-boot-starter-security'

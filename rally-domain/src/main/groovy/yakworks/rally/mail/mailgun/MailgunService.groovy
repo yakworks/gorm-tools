@@ -7,8 +7,6 @@ package yakworks.rally.mail.mailgun
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.springframework.dao.OptimisticLockingFailureException
-
 import com.mailgun.api.v3.MailgunEventsApi
 import com.mailgun.api.v3.MailgunMessagesApi
 import com.mailgun.client.MailgunClient

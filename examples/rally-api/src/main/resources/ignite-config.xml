@@ -7,9 +7,9 @@
         http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <bean class="org.apache.ignite.configuration.IgniteConfiguration">
-    <!--<property name="workDirectory" value="/path/to/work/directory"/>-->
-    <!---->
-    <property name="igniteInstanceName" value="${spring.application.name}-server-${random.uuid}"/>
+    <property name="workDirectory" value="/path/to/work/directory"/>
+    <!--<property name="igniteInstanceName" value="${spring.application.name}-server-${random.uuid}"/>-->
+    <!--<property name="igniteInstanceName" value="rally-ignite1"/>-->
     <property name="cacheConfiguration">
       <bean class="org.apache.ignite.configuration.CacheConfiguration">
         <property name="name" value="myCache"/>

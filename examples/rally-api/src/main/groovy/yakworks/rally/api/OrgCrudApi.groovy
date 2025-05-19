@@ -40,9 +40,10 @@ class OrgCrudApi extends DefaultCrudApi<Org> {
     //, cacheManager = "hazelCacheManager"
     String cacheName = 'WTF'
 
+    //NOTE: change to hazelCacheManager to test that one.
     @Cacheable(
         value='crudApi:list',
-        cacheManager = "hazelCacheManager",
+        cacheManager = "igniteCacheManager",
         key="{@currentUser.getUserId(), #qParams.toString(), #root.target.entityClass.simpleName}",
         sync=true
     )

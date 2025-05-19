@@ -30,7 +30,8 @@ class HazelBeansConfig {
    // @Autowired HazelcastInstance hazelcastInstance
 
     @Configuration
-    @Profile('!test')
+    //@Profile('!test')
+    @Profile('hazel-jobs')
     @Lazy(false) //lazy false so that consumer bean gets registered
     //@ConditionalOnProperty(value="app.mail.mailgun.enabled", havingValue = "true")
     static class DemoBeans {

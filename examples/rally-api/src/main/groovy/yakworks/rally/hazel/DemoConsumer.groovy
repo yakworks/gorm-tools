@@ -37,7 +37,7 @@ class DemoConsumer {
     }
 
     public void startConsuming() {
-        //run Async, the @Async annotation is goofy in ApplicationListeners
+        //run @Async, use taskExecutor.execute as it inside class
         taskExecutor.execute(() -> {
             consumeMessages()
         });

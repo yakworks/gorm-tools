@@ -41,7 +41,7 @@ class AsyncConfig implements AsyncConfigurer {
      * see the config/spring.yml for settings
      * @see org.springframework.boot.autoconfigure.task.TaskExecutionProperties
      */
-    @Lazy //XXX why is this lazy?
+    //@Lazy //XXX why is this lazy?
     @Bean
     ThreadPoolTaskExecutor applicationTaskExecutor(TaskExecutorBuilder builder) {
         ThreadPoolTaskExecutor executor = builder.build();
@@ -71,6 +71,8 @@ class AsyncConfig implements AsyncConfigurer {
     //@ConditionalOnMissingBean({ SchedulingConfigurer.class, TaskScheduler.class, ScheduledExecutorService.class })
     ThreadPoolTaskScheduler taskScheduler(TaskSchedulerBuilder builder) {
         ThreadPoolTaskScheduler sched = builder.build();
+        //default is one, which means on 1 @Scheduled can be running at a time across the app.
+        sched.setPoolSize(4)
         sched.threadFactory = getClassLoaderCustomizableThreadFactory(sched.getThreadNamePrefix())
         return sched
     }

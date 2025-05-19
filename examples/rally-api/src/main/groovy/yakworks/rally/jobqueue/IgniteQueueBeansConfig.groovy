@@ -32,7 +32,7 @@ import yakworks.rally.job.SyncJob
 @CompileStatic
 class IgniteQueueBeansConfig {
 
-    @Autowired Ignite igniteInstance
+    //@Autowired Ignite igniteInstance
 
     public static final String QUE_NAME = "syncJobQueue"
 
@@ -74,10 +74,12 @@ class IgniteQueueBeansConfig {
 
         @Autowired Ignite igniteInstance
         @Autowired BlockingQueue<SyncJob> syncJobQueue
+        @Autowired QueuedJobRunner queuedJobRunner
 
         /**
          * Sticks stuff in the queue every 2 seconds
          */
+        @Profile('server')
         @Scheduled(fixedDelay = 10_000L, initialDelay = 5000L)
         public void producerJob() {
             log.info("  OFFER some jobs on queue")
@@ -107,8 +109,8 @@ class IgniteQueueBeansConfig {
                 var job = bque.poll()
                 // process event
                 if (job != null) {
-                    log.info("Found one consumerJob poller::: Processing {} ", job);
-                    //demoJobService.runJob(qid);
+                    //log.info("Found one consumerJob poller::: Processing {} ", job);
+                    queuedJobRunner.runJob(job);
                 } else {
                     log.info("null poll, breaking")
                     break;
@@ -126,7 +128,8 @@ class IgniteQueueBeansConfig {
             // process event
             if (job != null) {
                 //sleep(5000)
-                log.info("🤡  Consumer2 Found one consumerJob poller::: Processing {} ", job);
+                //log.info("🤡  Consumer2 Found one consumerJob poller::: Processing {} ", job);
+                queuedJobRunner.runJob(job);
                 //demoJobService.runJob(qid);
             }
             //sleep(5000)

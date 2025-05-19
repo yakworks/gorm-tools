@@ -18,6 +18,8 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
 
+import yakworks.commons.util.BuildSupport
+
 //@AutoConfiguration(after = org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration)
 @Configuration(proxyBeanMethods = false)
 @Lazy(false)
@@ -58,7 +60,8 @@ class IgniteConfig {
             IgniteLogger log = new Slf4jLogger();
             cfg.setGridLogger(log);
             //can add customization here
-            // cfg.setWorkDirectory("build/ignite")
+            //cfg.workDirectory = BuildSupport.projectPath.toAbsolutePath().resolve("build/ignite")
+
         };
     }
 

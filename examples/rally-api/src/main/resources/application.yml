@@ -26,7 +26,7 @@ foo:
 
 logging:
   level:
-    root: warn
+    root: info
     org.springframework: INFO
     org.hibernate.orm.deprecation: OFF # turns off deprecation notices
     #org.springframework.security: DEBUG
@@ -110,7 +110,7 @@ handlebars.enabled: true
 
 ignite:
   igniteInstanceName: ${info.app.name}-server-${random.uuid}
-  workDirectory: "${project.projectDir}/build/ignite"
+  #workDirectory: "${project.projectDir}/build/ignite"
 # These blow up on converter. No converter found org.grails.config.NavigableMap
 #  communicationSpi:
 #    localPort: 5555

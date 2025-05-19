@@ -17,7 +17,12 @@ import yakworks.rest.client.OkHttpRestTrait
 class TokenRestApiSpec extends Specification implements OkHttpRestTrait {
 
     def setup(){
+        OkAuth.TOKEN = null
         login()
+    }
+
+    void cleanupSpec() {
+        OkAuth.TOKEN = null
     }
 
     Response doTokenPost(Map params){

@@ -1,6 +1,8 @@
 package yakworks.security.spring;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import yakworks.security.SecService;
 import yakworks.security.services.PasswordValidator;
 import yakworks.security.spring.token.CookieAuthSuccessHandler;
@@ -118,7 +120,8 @@ public class DefaultSecurityConfiguration {
         // http.csrf((csrf) -> csrf.ignoringAntMatchers("/token"))
         http.csrf().disable();
         http.oauth2ResourceServer((oauth2) -> {
-            oauth2.jwt();
+            oauth2.jwt()
+                .jwtAuthenticationConverter(jwtAuthenticationConverter());
             // oauth2.authenticationManagerResolver(authenticationManagerResolver);
         });
         // .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -126,6 +129,20 @@ public class DefaultSecurityConfiguration {
         // 		.authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
         // 		.accessDeniedHandler(new BearerTokenAccessDeniedHandler())
         // );
+    }
+
+    /**
+     * JwtAuthenticationConverter that grabs roles/authorities from jwt token.
+     * By default, JwtGrantedAuthoritiesConverter would put `scope_` prefix for every role. eg SCOPE_ROLE_READOLY
+     * and hence it wont match expressions such as "hasRole("ROLE_READ_ONLY")
+     * its here, mainly to set setAuthorityPrefix to empty string
+     */
+    static private JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+        return jwtAuthenticationConverter;
     }
 
     /**

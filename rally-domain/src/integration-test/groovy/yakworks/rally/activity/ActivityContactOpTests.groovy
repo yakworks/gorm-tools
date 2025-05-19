@@ -1,6 +1,5 @@
 package yakworks.rally.activity
 
-import yakworks.json.groovy.JsonEngine
 import yakworks.testing.gorm.integration.SecuritySpecHelper
 import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback

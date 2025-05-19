@@ -22,6 +22,7 @@ class Roles {
     static final String GUEST = "GUEST"
     // single customer user
     static final String CUSTOMER = "CUSTOMER"
+    static final String READ_ONLY = "READ_ONLY"
 
     //FIXME move into domain9 when we move over domain9 logic from RallyUserService
     static final String AR_MANAGER = "AR_MANAGER"  //can see other collector tasks, approvals

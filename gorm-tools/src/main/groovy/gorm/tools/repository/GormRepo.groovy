@@ -497,7 +497,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
 
     /**
      * load without hydrating
-     *
+     *x
      * @param id required, the id to get
      * @return the retrieved entity
      */

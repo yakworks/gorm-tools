@@ -18,7 +18,7 @@ class BulkApiSupportSpec extends Specification implements DomainIntTest {
 
     void "sanity check"() {
         when:
-        BulkImportService bs = BulkImportService.of(KitchenSink)
+        BulkImportService bs = BulkImportService.lookup(KitchenSink)
 
         then:
         noExceptionThrown()
@@ -29,7 +29,7 @@ class BulkApiSupportSpec extends Specification implements DomainIntTest {
 
     void "test queueImportJob"() {
         setup:
-        BulkImportService bs = BulkImportService.of(Org)
+        BulkImportService bs = BulkImportService.lookup(Org)
 
         when:
         SyncJob job = bs.queueImportJob(DataOp.add, [q:[typeId: OrgType.Customer.id], attachmentId:1L], "test-job", [[num:"T1", name:"T1"]])

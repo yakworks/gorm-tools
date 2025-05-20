@@ -2,15 +2,13 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.rally.boot
+package yakworks.rally.config
 
 import java.util.concurrent.TimeUnit
 
 import groovy.transform.CompileStatic
 
-import org.springframework.cache.CacheManager
 import org.springframework.cache.caffeine.CaffeineCacheManager
-import org.springframework.cache.support.NoOpCacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
@@ -26,7 +24,7 @@ import yakworks.spring.hazelcast.HazelCacheManager
 @Configuration(proxyBeanMethods = false)
 @Lazy(false)
 @CompileStatic
-class CacheMgrConfig {
+class CacheMgrConfiguration {
 
     // @Bean
     // HazelcastConfigCustomizer hazelcastCustomizer() {
@@ -59,35 +57,19 @@ class CacheMgrConfig {
             return caffeineCacheManager;
         }
 
-        @Bean
-        HazelcastCacheManager hazelCacheManager(HazelcastInstance instance) {
-            //var hcm = new HazelcastCacheManager(instance)
-            var hcm = new HazelCacheManager(instance)
-            //can be set from app.yml too, see https://docs.hazelcast.com/hazelcast/5.5/spring/add-caching
-            hcm.defaultLockTimeout = 5_000L //in millis
-            //hcm.lockTimeoutMap['orgApiList'] = 10_000L //in millis
-            //setup a default cache, not really needed, just testing
-            //hcm.getCache('orgApiList')
-            return hcm
-        }
-
     }
 
-    //@Configuration
-    //@Profile("test")
-    // static class TestCacheBeans {
-    //
-    //     @Bean
-    //     @Primary
-    //     CacheManager cacheManager() {
-    //         return new NoOpCacheManager();
-    //     }
-    //
-    //     @Bean
-    //     CacheManager hazelCacheManager() {
-    //         return new NoOpCacheManager();
-    //     }
-    //
-    //
-    // }
+    @Bean
+    @Profile("!ignite")
+    HazelcastCacheManager gridCacheManager(HazelcastInstance instance) {
+        //var hcm = new HazelcastCacheManager(instance)
+        var hcm = new HazelCacheManager(instance)
+        //can be set from app.yml too, see https://docs.hazelcast.com/hazelcast/5.5/spring/add-caching
+        hcm.defaultLockTimeout = 5_000L //in millis
+        //hcm.lockTimeoutMap['orgApiList'] = 10_000L //in millis
+        //setup a default cache, not really needed, just testing
+        //hcm.getCache('orgApiList')
+        return hcm
+    }
+
 }

@@ -158,6 +158,9 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
         return data
     }
 
+    /**
+     * Generates a list of maps for import tests
+     */
     List<Map> generateDataList(int numRecords, Map extraData = [:]) {
         _faker = new Faker(new Random(0))
         List<Map> list = []

@@ -29,7 +29,7 @@ class BulkExportServiceIntegrationSpec extends Specification implements DomainIn
 
     void "test queue export job"() {
         setup:
-        BulkImportService bs = BulkImportService.of(Org)
+        //BulkImportService bs = BulkImportService.of(Org)
 
         when:
         SyncJob job = bs.queueExportJob([q:[typeId: OrgType.Customer.id], attachmentId:1L], "test-job")

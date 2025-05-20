@@ -36,7 +36,7 @@ dependencies {
   implementation("org.apache.ignite:ignite-spring:2.17.0")
   implementation("org.apache.ignite:ignite-spring-cache-ext:1.0.0")
   implementation("org.apache.ignite:ignite-slf4j:2.17.0")
-  implementation("org.apache.ignite:ignite-spring-boot-autoconfigure-ext:1.0.0")
+  //implementation("org.apache.ignite:ignite-spring-boot-autoconfigure-ext:1.0.0")
 
   // === Spring Sec ===
   implementation 'org.springframework.boot:spring-boot-starter-security'

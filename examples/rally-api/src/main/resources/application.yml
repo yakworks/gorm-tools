@@ -108,8 +108,8 @@ app:
 handlebars.enabled: true
 # handlebars.failOnMissingFile: false
 
-ignite:
-  igniteInstanceName: ${info.app.name}-server-${random.uuid}
+#ignite:
+#  igniteInstanceName: ${info.app.name}-server-${random.uuid}
   #workDirectory: "${project.projectDir}/build/ignite"
 # These blow up on converter. No converter found org.grails.config.NavigableMap
 #  communicationSpi:

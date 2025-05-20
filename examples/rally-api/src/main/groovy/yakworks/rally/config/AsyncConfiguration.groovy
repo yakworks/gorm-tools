@@ -2,7 +2,7 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.rally.boot
+package yakworks.rally.config
 
 import java.util.concurrent.ThreadPoolExecutor
 
@@ -33,7 +33,7 @@ import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecu
 @EnableAsync
 @EnableScheduling
 @CompileStatic
-class AsyncConfig implements AsyncConfigurer {
+class AsyncConfiguration implements AsyncConfigurer {
 
     /**
      * Copied in from TaskExecutionAutoConfiguration

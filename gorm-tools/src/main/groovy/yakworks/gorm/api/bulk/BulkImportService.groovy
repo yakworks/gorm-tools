@@ -18,6 +18,7 @@ import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.DataOp
+import gorm.tools.utils.ServiceLookup
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.commons.lang.EnumUtils
 import yakworks.gorm.api.IncludesConfig
@@ -55,10 +56,8 @@ class BulkImportService<D> {
         this.entityClass = entityClass
     }
 
-    static <D> BulkImportService<D> of(Class<D> entityClass){
-        def bcs = new BulkImportService(entityClass)
-        AppCtx.autowire(bcs)
-        return bcs
+    static <D> BulkImportService<D> lookup(Class<D> entityClass){
+        ServiceLookup.lookup(entityClass, BulkImportService<D>, "defaultBulkImportService")
     }
 
     SyncJobEntity bulkImport(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){

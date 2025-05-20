@@ -2,26 +2,21 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.rally.boot
+package yakworks.rally.config
 
 import groovy.transform.CompileStatic
 
-import org.apache.shiro.subject.support.SubjectThreadState
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties
-import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import org.springframework.context.annotation.Lazy
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
 
 import yakworks.gorm.api.support.QueryArgsValidator
 import yakworks.openapi.gorm.OpenApiGenerator
@@ -45,7 +40,7 @@ import static org.springframework.security.config.Customizer.withDefaults
 @CompileStatic
 @Configuration
 @Import([RallyConfiguration])
-class RallyApiSpringConfig {
+class RallyApiSpringConfiguration {
 
     @Value('${app.security.enabled:true}')
     boolean securityEnabled

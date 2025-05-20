@@ -41,7 +41,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
     }
 
     BulkImportService<KitchenSink> getBulkImportService(){
-        ServiceLookup.lookup(KitchenSink, BulkImportService<KitchenSink>, "defaultBulkImportService")
+        BulkImportService.lookup(KitchenSink)
     }
 
     Long bulkImport(List dataList, DataOp op = DataOp.add){

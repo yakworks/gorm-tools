@@ -94,7 +94,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
 
     BulkImportService<D> getBulkImportService(){
         if (!this.bulkImportService)
-            this.bulkImportService = ServiceLookup.lookup(getEntityClass(), BulkImportService<D>, "defaultBulkImportService")
+            this.bulkImportService = BulkImportService.lookup(getEntityClass())
         return bulkImportService
     }
 

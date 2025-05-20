@@ -34,7 +34,7 @@ class DefaultBulkJobQueueListener {
     }
 
     public <D> BulkImportService<D> getBulkImportService(Class<D> entityClass){
-        return ServiceLookup.lookup(entityClass, BulkImportService<D>, "defaultBulkImportService")
+        return BulkImportService.lookup(entityClass)
     }
 
 }

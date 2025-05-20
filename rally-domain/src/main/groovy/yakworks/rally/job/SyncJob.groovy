@@ -17,6 +17,8 @@ import yakworks.gorm.hibernate.type.JsonType
 import yakworks.security.audit.AuditStampTrait
 
 import static grails.gorm.hibernate.mapping.MappingBuilder.orm
+import static yakworks.json.groovy.JsonEngine.parseJson
+import static yakworks.json.groovy.JsonEngine.parseJson
 
 /**
  * An instance created right away when "any job" in 9ci is called.
@@ -68,4 +70,13 @@ class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity, AuditStampTrait, Se
         data: [d: 'The result data json, will normally be an array with items for errors.', oapi: [type: 'object']]
     ]
 
+        //parseJson
+    public <T> T parseData(Class<T> clazz = List){
+        parseJson(dataToString(), clazz)
+    }
+
+        //parseJson
+    public <T> T parsePayload(Class<T> clazz = List){
+        parseJson(payloadToString(), clazz)
+    }
 }

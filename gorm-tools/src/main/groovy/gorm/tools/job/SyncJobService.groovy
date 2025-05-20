@@ -129,6 +129,7 @@ abstract class SyncJobService<D> {
         try{
             //keep it in its own transaction so it doesn't depend on and existing. Should be on its own
             trxService.withNewTrx {
+                //XXX @SUD not sure what this was for, seems dangerous to clear cache in middle of run
                 getRepo().clear() //clear so doesn't pull from cache and we dont get optimistic error
                 sje = getRepo().update(data, [flush: true]) as SyncJobEntity
             }

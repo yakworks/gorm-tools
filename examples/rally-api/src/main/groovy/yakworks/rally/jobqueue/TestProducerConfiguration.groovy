@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
 
 import gorm.tools.repository.model.DataOp
+import yakworks.gorm.api.bulk.BulkExportService
 import yakworks.gorm.api.bulk.BulkImportService
 import yakworks.rally.job.SyncJob
 import yakworks.testing.gorm.model.KitchenSink
@@ -42,10 +43,17 @@ class TestProducerConfiguration {
         // offer returns true or false, can also pass in timeout
         // add throws exception if not space
         // put will block until it can be added
-        (1..10).each {
-            var job = createJob()
+        //IMPORT
+        (1..3).each {
+            var job = submitImportJob()
             syncJobQueue.offer(job)
-            log.info("🌶  OFFER Finished adding ${job.id} to queue\n")
+            log.info("⏱️🗂️ OFFER Finished adding IMPORT ${job.id} to queue\n")
+        }
+        //EXPORT
+        (1..3).each {
+            var jobEx = submitExportJob()
+            syncJobQueue.offer(jobEx)
+            log.info("⏱️📤   OFFER Finished adding EXPORT ${jobEx.id} to queue\n")
         }
         //sleep(10000)
         log.info(" END OFFER")
@@ -65,7 +73,7 @@ class TestProducerConfiguration {
     //     //igniteInstance.queue(QUE_NAME, 0, null) as IgniteQueue<SyncJob>
     // }
 
-    SyncJob createJob(){
+    SyncJob submitImportJob(){
         // return new SyncJob(
         //     sourceType: SourceType.ERP, sourceId: 'ar/org',
         //     jobType: 'bulk.import',
@@ -81,6 +89,17 @@ class TestProducerConfiguration {
             source: "test", sourceId: "test-job", includes: ["id", "name", "ext.name"]
         ]
         SyncJob jobEnt = (SyncJob)bulkImportService.queueImportJob(DataOp.add, params, "test-job", dataList)
+        return jobEnt
+    }
+
+    SyncJob submitExportJob(){
+        var bulkExportService = BulkExportService.lookup(KitchenSink)
+
+        Map params = [
+            q: '{"id":{"$gte":1}}',
+            sourceId: "test-job", includes: ["id", "name", "ext.name"]
+        ]
+        SyncJob jobEnt = (SyncJob)bulkExportService.queueExportJob(params, "test-job")
         return jobEnt
     }
 

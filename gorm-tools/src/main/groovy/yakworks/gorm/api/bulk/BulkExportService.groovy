@@ -22,6 +22,7 @@ import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
 import gorm.tools.utils.ServiceLookup
 import grails.core.GrailsApplication
+import grails.gorm.transactions.ReadOnly
 import yakworks.api.Result
 import yakworks.api.problem.data.DataProblem
 import yakworks.commons.lang.Validate
@@ -62,26 +63,6 @@ class BulkExportService<D> {
         return syncJobService.queueJob(args)
     }
 
-
-    SyncJobArgs setupSyncJobArgs(Map qParams, String sourceId){
-        SyncJobArgs args = SyncJobArgs.withParams(qParams)
-
-        //make sure they passed in q or qsearch. queryArgs will have been populated if they did
-        if(!args.queryArgs) {
-            throw DataProblem.of('error.query.qRequired').detail("q criteria required").toException()
-        }
-        //give it the bulkImport type
-        args.jobType = 'bulk.export'
-        //do includes, one of the keys is required. This is not used on queue, only for run.
-        if(!qParams.includes && !qParams.includesKey) {
-            throw DataProblem.ex("includes or includesKey are required params")
-        }
-
-        args.sourceId = sourceId
-        args.params['entityClassName'] = getEntityClass().name
-        return args
-    }
-
     /**
      * Starts a bulk import job
      */
@@ -98,6 +79,26 @@ class BulkExportService<D> {
         bulkExport(jobContext)
 
         return syncJobService.getJob(jobId)
+    }
+
+
+    protected SyncJobArgs setupSyncJobArgs(Map qParams, String sourceId){
+        SyncJobArgs args = SyncJobArgs.withParams(qParams)
+
+        //make sure they passed in q or qsearch. queryArgs will have been populated if they did
+        if(!args.queryArgs) {
+            throw DataProblem.of('error.query.qRequired').detail("q criteria required").toException()
+        }
+        //give it the bulkImport type
+        args.jobType = 'bulk.export'
+        //do includes, one of the keys is required. This is not used on queue, only for run.
+        if(!qParams.includes && !qParams.includesKey) {
+            throw DataProblem.ex("includes or includesKey are required params")
+        }
+
+        args.sourceId = sourceId
+        args.params['entityClassName'] = getEntityClass().name
+        return args
     }
 
     /**
@@ -133,10 +134,12 @@ class BulkExportService<D> {
     /**
      * Run bulk export job
      */
+
     protected void doBulkExport(SyncJobContext jobContext) {
         try {
             //paginate and fetch data list, update job results for each page of data.
-            eachPage(getRepo(), jobContext.args.queryArgs) { List pageData ->
+            eachPage(jobContext.args.queryArgs) { List pageData ->
+                //This closure is called for each page of data, this will be inside readonly TRX
                 //create metamap list with includes
                 MetaMapList entityMapList = metaMapService.createMetaMapList(pageData, jobContext.args.includes)
                 Result result = Result.OK().payload(entityMapList as List)
@@ -186,21 +189,29 @@ class BulkExportService<D> {
      * Instead of loading all the data for bulkexport, it paginates and loads one page at a time
      */
     //XXX @SUD add tests for these, not reason not to be adding unit tests
-    protected void eachPage(GormRepo repo, QueryArgs queryArgs, Closure cl) {
+
+    protected void eachPage(QueryArgs queryArgs, Closure cl) {
+        Pager paginator = Pager.of(max:500) //XXX @SUD why 10? changed to 100, lets make it configurable
         //count total records based on query args and build a paginator
-        Integer totalRecords = repo.query(queryArgs).count() as Integer
-        Pager paginator = Pager.of(max:10) //XXX @SUD why 10?
-        paginator.recordCount = totalRecords
+        paginator.recordCount = getTotalCount(queryArgs)
 
         //XXX @SUD test should show it paging through, its not, same results are done over and over.
         // you were not casting offset and max, so it return the fist pge over and over again
         paginator.eachPage { page, max, offset ->
-            //queryArgs.pager = Pager.of(max: (Integer)max, offset: (Integer)offset)
-            // queryArgs.pager.max = (Integer)max
-            // queryArgs.pager.offset = (Integer)offset
-            List pageData = repo.query(queryArgs).pagedList(Pager.of(max: max, page: page))
-            cl.call(pageData)
+            runPageQuery(queryArgs, Pager.of(max: max, page: page), cl)
+            getRepo().flushAndClear()
         }
+    }
+
+    @ReadOnly
+    protected void runPageQuery(QueryArgs queryArgs, Pager pager, Closure cl) {
+        List pageData = getRepo().query(queryArgs).pagedList(pager)
+        cl.call(pageData)
+    }
+
+    @ReadOnly
+    protected Integer getTotalCount(QueryArgs queryArgs) {
+       return getRepo().query(queryArgs).count() as Integer
     }
 
 }

@@ -41,7 +41,6 @@ class AsyncConfiguration implements AsyncConfigurer {
      * see the config/spring.yml for settings
      * @see org.springframework.boot.autoconfigure.task.TaskExecutionProperties
      */
-    //@Lazy //XXX why is this lazy?
     @Bean
     ThreadPoolTaskExecutor applicationTaskExecutor(TaskExecutorBuilder builder) {
         ThreadPoolTaskExecutor executor = builder.build();
@@ -78,7 +77,7 @@ class AsyncConfiguration implements AsyncConfigurer {
     }
 
     //see https://stackoverflow.com/a/59444016/6500859
-    //XXX this might be angry monkey thing. Should remove and test.
+    //FIXME this might be angry monkey thing. Should remove and test.
     // goal here is to use the main classloader with java11 so we dont get the ClassNotFoundException
     CustomizableThreadFactory getClassLoaderCustomizableThreadFactory(String threadNamePrefix){
         ClassLoader invokingThreadCL = Thread.currentThread().getContextClassLoader()

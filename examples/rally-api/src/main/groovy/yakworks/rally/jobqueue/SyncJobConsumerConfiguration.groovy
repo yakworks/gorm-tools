@@ -82,7 +82,7 @@ class SyncJobConsumerConfiguration {
         // so if this takes 5 seconds, the next one will run 2 seconds after its finished.
         @Scheduled(fixedDelay = 2000L)
         public void consumerJob2() {
-            log.info("  Consumer2 Running ")
+            //log.info("👾  Consumer Job Running ")
             var job = syncJobQueue.poll() //getJobQueue().poll() //syncJobQueue.poll()
             // process event
             if (job != null) {
@@ -91,7 +91,7 @@ class SyncJobConsumerConfiguration {
             }
             //sleep(5000)
             //throw new RuntimeException("ex test")
-            log.info("  Consumer2 Finished\n")
+            //log.info("👾  Consumer2 Finished\n")
         }
 
     }

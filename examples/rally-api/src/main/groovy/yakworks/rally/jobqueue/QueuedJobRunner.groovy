@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component
 import org.springframework.util.ClassUtils
 
 import gorm.tools.job.SyncJobEntity
+import yakworks.gorm.api.bulk.BulkExportService
 import yakworks.gorm.api.bulk.BulkImportService
 import yakworks.rally.job.SyncJob
 import yakworks.testing.gorm.model.KitchenSink
@@ -21,9 +22,9 @@ import yakworks.testing.gorm.model.KitchenSink
 class QueuedJobRunner {
 
     void runJob(SyncJob syncJob){
-        log.info("🤡    runJob called: $syncJob")
         //sleep(2000)
         String jobType = syncJob.jobType
+        log.info("⚙️📡    runJob called with jobType: $jobType - $syncJob")
         if(jobType == 'bulk.import'){
             runBulkImport(syncJob)
         }
@@ -39,13 +40,19 @@ class QueuedJobRunner {
         var bulkImportService = BulkImportService.lookup(entityClass)
         SyncJobEntity jobEnt2 = bulkImportService.startJob(syncJob.id)
         //sleep for a couple seconds to simulate larger data
-        sleep(2000)
+        //sleep(2000)
         KitchenSink.withTransaction {
-            log.info("🤡    Job Id Completed: ${jobEnt2}, KitchenSink count: ${KitchenSink.count()}")
+            log.info("🟢 🗂️🌶️    BULK IMPORT Completed: ${jobEnt2}, KitchenSink count: ${KitchenSink.count()}")
         }
     }
 
     void runBulkExport(SyncJob syncJob){
-
+        String entityClassName = syncJob.params['entityClassName']
+        Class<?> entityClass = ClassUtils.resolveClassName(entityClassName, null);
+        var bulkExportService = BulkExportService.lookup(entityClass)
+        syncJob = (SyncJob) bulkExportService.startJob(syncJob.id)
+        //debug some info
+        List dataList = syncJob.parseData()
+        log.info("🟢 📤🌶    BULK EXPORT Completed: ${syncJob}, List Size: ${dataList.size()}")
     }
 }

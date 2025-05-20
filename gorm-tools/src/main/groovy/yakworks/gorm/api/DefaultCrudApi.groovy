@@ -53,7 +53,6 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     @Autowired QueryConfig queryConfig
 
     /** Not required but if an BulkSupport bean is setup then it will get get used */
-    @Autowired(required = false)
     protected BulkExportService<D> bulkExportService
 
     /** Not required but if an BulkSupport bean is setup then it will get get used */

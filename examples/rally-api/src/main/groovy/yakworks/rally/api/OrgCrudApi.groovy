@@ -57,7 +57,7 @@ class OrgCrudApi extends DefaultCrudApi<Org> {
 
     @Cacheable(
         value='crudApi:list',
-        cacheManager = "hazelCacheManager",
+        cacheManager = "gridCacheManager",
         key="{@currentUser.getUserId(), #qParams.toString(), #root.target.entityClass.simpleName}",
         sync=true
     )

@@ -23,6 +23,17 @@ class QueuedJobRunner {
     void runJob(SyncJob syncJob){
         log.info("🤡    runJob called: $syncJob")
         //sleep(2000)
+        String jobType = syncJob.jobType
+        if(jobType == 'bulk.import'){
+            runBulkImport(syncJob)
+        }
+        else if (jobType == 'bulk.export'){
+            runBulkExport(syncJob)
+        }
+
+    }
+
+    void runBulkImport(SyncJob syncJob){
         String entityClassName = syncJob.params['entityClassName']
         Class<?> entityClass = ClassUtils.resolveClassName(entityClassName, null);
         var bulkImportService = BulkImportService.lookup(entityClass)
@@ -32,5 +43,9 @@ class QueuedJobRunner {
         KitchenSink.withTransaction {
             log.info("🤡    Job Id Completed: ${jobEnt2}, KitchenSink count: ${KitchenSink.count()}")
         }
+    }
+
+    void runBulkExport(SyncJob syncJob){
+
     }
 }

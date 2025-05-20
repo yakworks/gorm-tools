@@ -11,6 +11,7 @@ import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Org
@@ -18,6 +19,7 @@ import yakworks.testing.gorm.integration.DomainIntTest
 
 // Use as a simple to test when trying to see why application context has problem on init
 @Integration
+@Ignore //XXX @SUD can we run a test pass with profile=ignite so this can run and pass?
 //@Rollback
 class IgniteCacheSpec extends Specification implements DomainIntTest {
 

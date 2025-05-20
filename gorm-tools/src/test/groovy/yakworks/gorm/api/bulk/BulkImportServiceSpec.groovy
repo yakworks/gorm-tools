@@ -28,9 +28,6 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
     static springBeans = [TestSyncJobService]
 
     @Autowired AsyncConfig asyncConfig
-    @Autowired AsyncService asyncService
-    @Autowired KitchenSinkRepo kitchenSinkRepo
-    @Autowired SyncJobService syncJobService
     @Autowired GormConfig gormConfig
 
     SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){

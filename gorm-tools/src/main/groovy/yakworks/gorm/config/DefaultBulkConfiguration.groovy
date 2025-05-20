@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Lazy
 import org.springframework.context.annotation.Scope
 
 import gorm.tools.repository.bulk.BulkImporter
+import yakworks.gorm.api.bulk.BulkExportService
 import yakworks.gorm.api.bulk.BulkImportService
 import yakworks.gorm.api.bulk.DefaultBulkJobQueueListener
 
@@ -33,6 +34,12 @@ class DefaultBulkConfiguration {
     @Scope("prototype")
     public <D> BulkImportService<D> defaultBulkImportService(Class<D> entityClass) {
         return new BulkImportService(entityClass);
+    }
+
+    @Bean
+    @Scope("prototype")
+    public <D> BulkExportService<D> defaultBulkExportService(Class<D> entityClass) {
+        return new BulkExportService(entityClass);
     }
 
     @Bean

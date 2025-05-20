@@ -11,7 +11,6 @@ import org.springframework.context.event.EventListener
 
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobQueueEvent
-import gorm.tools.utils.ServiceLookup
 import yakworks.gorm.config.GormConfig
 
 /**

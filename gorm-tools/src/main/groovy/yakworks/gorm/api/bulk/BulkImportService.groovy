@@ -25,7 +25,6 @@ import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.IncludesKey
 import yakworks.gorm.config.GormConfig
 import yakworks.json.groovy.JsonEngine
-import yakworks.spring.AppCtx
 
 /**
  * Helper for getting things setup for bulk calls
@@ -124,6 +123,7 @@ class BulkImportService<D> {
         args.params['dataOp'] = dataOp.name()
         //make sure className is set to params
         args.params['entityClassName'] = getEntityClass().name
+        //XXX I dont thing we need this
         args.entityClass = getEntityClass()
 
         //if attachmentId then assume its a csv
@@ -171,6 +171,14 @@ class BulkImportService<D> {
         Long jobIdent = getRepo().bulkImporter.bulkImport(dataList, sctx)
 
         return syncJobService.getJob(jobIdent)
+    }
+
+    /**
+     * Changes job state to Running before starting bulk export job
+     */
+    //XXX @SUD incorporate this
+    void changeJobStatusToRunning(Serializable jobId) {
+        syncJobService.updateJob([id:jobId, state: SyncJobState.Running])
     }
 
 

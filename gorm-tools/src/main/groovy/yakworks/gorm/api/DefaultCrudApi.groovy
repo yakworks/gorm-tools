@@ -22,7 +22,6 @@ import gorm.tools.repository.model.ApiCrudRepo
 import gorm.tools.repository.model.DataOp
 import gorm.tools.repository.model.EntityResult
 import gorm.tools.transaction.TrxUtils
-import gorm.tools.utils.ServiceLookup
 import grails.gorm.transactions.Transactional
 import yakworks.api.problem.data.DataProblemException
 import yakworks.gorm.api.bulk.BulkExportService
@@ -55,10 +54,9 @@ class DefaultCrudApi<D> implements CrudApi<D> {
 
     /** Not required but if an BulkSupport bean is setup then it will get get used */
     @Autowired(required = false)
-    BulkExportService<D> bulkExportSupport
+    protected BulkExportService<D> bulkExportService
 
     /** Not required but if an BulkSupport bean is setup then it will get get used */
-    //@Autowired(required = false)
     protected BulkImportService<D> bulkImportService
 
     DefaultCrudApi(Class<D> entityClass){
@@ -99,8 +97,9 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     }
 
     BulkExportService<D> getBulkExportService(){
-        if (!bulkExportSupport) this.bulkExportSupport = new BulkExportService(getEntityClass())
-        return bulkExportSupport
+        if (!bulkExportService)
+            this.bulkExportService = BulkExportService.lookup(getEntityClass())
+        return bulkExportService
     }
 
     /**
@@ -207,7 +206,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     }
 
     SyncJobEntity bulkExport(Map params, String sourceId) {
-        getBulkExportSupport().queueExportJob(params, sourceId)
+        getBulkExportService().queueExportJob(params, sourceId)
     }
 
     protected List<D> queryList(QueryArgs qargs) {
@@ -240,15 +239,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
      * @return the list of fields in our mango format.
      */
     protected List<String> getIncludes(Map qParams, List fallbackIncludesKeys) {
-        //parse the params into the IncludesProps
-        var incProps = IncludesProps.of(qParams).fallbackKeys(fallbackIncludesKeys)
-
-        //if includes was passed in, then it wins
-        if(incProps.includes) return incProps.includes
-
-        //otherwise search based on includesKey
-        List<String> incs = includesConfig.findIncludes(getEntityClass(), incProps)
-        return incs
+        includesConfig.getIncludes(qParams, fallbackIncludesKeys, getEntityClass())
     }
 
     protected QueryArgs createQueryArgs(Pager pager, Map qParams, URI uri) {

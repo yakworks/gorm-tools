@@ -263,7 +263,11 @@ class SyncJobContext {
             if (r instanceof Problem) {
                 problems.add(r)
             } else {
-                resMapList.add( r.payload as Map)
+                if(r.payload instanceof List){
+                    resMapList.addAll( r.payload as List<Map> )
+                } else { //assume its a map
+                    resMapList.add( r.payload as Map)
+                }
             }
         }
         return resMapList

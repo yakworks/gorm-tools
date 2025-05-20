@@ -21,7 +21,7 @@ import static yakworks.json.groovy.JsonEngine.parseJson
 
 @Integration
 @Rollback
-@Ignore //XXX all failing
+@Ignore //XXX all failing, much of this can be moved to the unit test
 class BulkExportServiceIntegrationSpec extends Specification implements DomainIntTest {
 
     @Inject BulkExportService bulkExportService

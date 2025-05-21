@@ -6,7 +6,9 @@ import org.springframework.http.HttpStatus
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobState
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.model.DataOp
+import gorm.tools.utils.BenchmarkHelper
 import spock.lang.Specification
 import testing.TestSyncJob
 import testing.TestSyncJobService
@@ -23,6 +25,11 @@ import static yakworks.json.groovy.JsonEngine.parseJson
 class BulkExportServiceSpec extends Specification implements GormHibernateTest {
     static entityClasses = [KitchenSink, SinkExt, SinkItem, TestSyncJob]
     static springBeans = [TestSyncJobService]
+
+    // @Transactional
+    void setupSpec() {
+        KitchenSink.createKitchenSinks(300)
+    }
 
     SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
         return new SyncJobArgs(
@@ -86,10 +93,48 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
         ex.code == 'error.query.qRequired'
     }
 
+    void "test eachPage"() {
+        when:
+        QueryArgs queryArgs = QueryArgs.of(
+            q: '{"id":{"$gte":1}}'
+        )
+
+        List dataList = []
+        bulkExportService.eachPage(queryArgs){ List dataPage ->
+            dataList.addAll(dataPage)
+        }
+
+        List sortedList = dataList.sort {
+            it.id
+        }
+        //make sure paging is good and they are all different"
+        Long lastId = 0
+        sortedList.each {
+            assert it.id > lastId
+            lastId = it.id
+        }
+
+        then:
+        sortedList.size() == 300
+    }
+
+    void "test eachPage with no data"() {
+        when:
+        QueryArgs queryArgs = QueryArgs.of(
+            q: '{"id":{"$lt":1}}'
+        )
+
+        List dataList = []
+        bulkExportService.eachPage(queryArgs){ List dataPage ->
+            dataList.addAll(dataPage)
+        }
+
+        then:
+        dataList.size() == 0
+    }
+
+
     void "success bulk export"() {
-        given:
-        KitchenSink.createKitchenSinks(300)
-        assert KitchenSink.count() == 300
 
         when:
         Long jobId = bulkExport('{"id":{"$gte":1}}')

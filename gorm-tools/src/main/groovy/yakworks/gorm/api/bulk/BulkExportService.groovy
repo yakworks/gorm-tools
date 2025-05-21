@@ -142,6 +142,8 @@ class BulkExportService<D> {
                 //This closure is called for each page of data, this will be inside readonly TRX
                 //create metamap list with includes
                 MetaMapList entityMapList = metaMapService.createMetaMapList(pageData, jobContext.args.includes)
+                //hydrate it now so we dont later get the "could not initialize proxy - no Session" when converting to json
+                entityMapList.hydrate()
                 Result result = Result.OK().payload(entityMapList as List)
                 //update job with page data
                 jobContext.updateJobResults(result, false)
@@ -164,9 +166,7 @@ class BulkExportService<D> {
         }
         List bulkIncludes = includesConfig.getIncludes(qParams, [IncludesKey.list, IncludesKey.get], getEntityClass())
         args.includes = bulkIncludes
-
         args.sourceId = sourceId
-
         //bulk export always runs async and parallel
         args.async = true
         //XXX @SUD where does this come into play? why true

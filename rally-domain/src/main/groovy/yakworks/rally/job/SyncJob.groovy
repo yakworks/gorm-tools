@@ -18,7 +18,6 @@ import yakworks.security.audit.AuditStampTrait
 
 import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 import static yakworks.json.groovy.JsonEngine.parseJson
-import static yakworks.json.groovy.JsonEngine.parseJson
 
 /**
  * An instance created right away when "any job" in 9ci is called.

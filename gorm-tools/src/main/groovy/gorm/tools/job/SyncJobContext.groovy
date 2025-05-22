@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import groovy.json.StreamingJsonBuilder
 import groovy.transform.CompileStatic
 import groovy.transform.MapConstructor
+import groovy.transform.Synchronized
 import groovy.transform.ToString
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
@@ -18,23 +19,20 @@ import groovy.util.logging.Slf4j
 
 import org.codehaus.groovy.runtime.StackTraceUtils
 
-import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.utils.BenchmarkHelper
 import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.api.ResultUtils
 import yakworks.api.problem.Problem
 import yakworks.commons.io.IOUtils
-import yakworks.commons.lang.Validate
 import yakworks.json.groovy.JsonEngine
-import yakworks.json.groovy.JsonStreaming
 import yakworks.message.spi.MsgService
 import yakworks.spring.AppCtx
 
 import static gorm.tools.job.SyncJobArgs.DataFormat
 
 /**
- * Holds the basic state and primary action methods for a Bulk job.
+ * Holds the basic state and primary action methods while running a Bulk job.
  * Creates and updates the job status as it progresses and finalizes its results when finished.
  */
 @SuppressWarnings('Println')
@@ -79,7 +77,7 @@ class SyncJobContext {
     /** creates a context from the SynJobArgs and assign a back reference to this in SyncJobArgs. */
     static SyncJobContext of(SyncJobArgs args){
         def sjc = new SyncJobContext(args: args)
-        args.context = sjc
+        //args.context = sjc
         return sjc
     }
 
@@ -87,40 +85,40 @@ class SyncJobContext {
     Long getJobId(){ return args.jobId }
 
     /** create a job using the syncJobService.repo.create */
-    SyncJobContext createJob(){
-        Validate.notNull(payload)
-        //get jobId early so it can be used, might not need this anymore
-        args.jobId = ((IdGeneratorRepo)syncJobService.repo).generateId()
-        setPayloadSize(payload)
-
-        Map data = [
-            id: args.jobId, source: args.source, sourceId: args.sourceId,
-            state: args.jobState, payload: payload
-        ] as Map<String,Object>
-
-        if(payload instanceof Collection && payload.size() > 1000) {
-            args.savePayloadAsFile = true
-            args.saveDataAsFile = true
-        }
-
-        if(args.savePayload){
-            if (payload && args.savePayloadAsFile) {
-                data.payloadId = writePayloadFile(payload as Collection)
-            }
-            else {
-                String res = JsonEngine.toJson(payload)
-                data.payloadBytes = res.bytes
-            }
-        }
-
-        //the call to this createJob method is already wrapped in a new trx
-        def jobEntity = syncJobService.repo.create(data, [flush: true, bindId: true]) as SyncJobEntity
-
-        //inititialize the ApiResults to be used in process
-        results = ApiResults.create()
-
-        return this
-    }
+    // SyncJobContext createJob(){
+    //     Validate.notNull(payload)
+    //     //get jobId early so it can be used, might not need this anymore
+    //     args.jobId = ((IdGeneratorRepo)syncJobService.repo).generateId()
+    //     setPayloadSize(payload)
+    //
+    //     Map data = [
+    //         id: args.jobId, source: args.source, sourceId: args.sourceId,
+    //         state: args.jobState, payload: payload
+    //     ] as Map<String,Object>
+    //
+    //     if(payload instanceof Collection && payload.size() > 1000) {
+    //         args.savePayloadAsFile = true
+    //         args.saveDataAsFile = true
+    //     }
+    //
+    //     if(args.savePayload){
+    //         if (payload && args.savePayloadAsFile) {
+    //             data.payloadId = writePayloadFile(payload as Collection)
+    //         }
+    //         else {
+    //             String res = JsonEngine.toJson(payload)
+    //             data.payloadBytes = res.bytes
+    //         }
+    //     }
+    //
+    //     //the call to this createJob method is already wrapped in a new trx
+    //     def jobEntity = syncJobService.repo.create(data, [flush: true, bindId: true]) as SyncJobEntity
+    //
+    //     //inititialize the ApiResults to be used in process
+    //     results = ApiResults.create()
+    //
+    //     return this
+    // }
 
     /**
      * Update the job results with the current progress info
@@ -191,7 +189,7 @@ class SyncJobContext {
      */
     SyncJobEntity finishJob() {
         Map data = [id: jobId] as Map<String, Object>
-        if(args.saveDataAsFile){
+        if(args.isSaveDataAsFile()){
             // if saveDataAsFile then it will have been writing out the data results as it goes
             //close out the file
             dataPath.withWriterAppend { wr ->
@@ -265,7 +263,11 @@ class SyncJobContext {
             if (r instanceof Problem) {
                 problems.add(r)
             } else {
-                resMapList.add( r.payload as Map)
+                if(r.payload instanceof List){
+                    resMapList.addAll( r.payload as List<Map> )
+                } else { //assume its a map
+                    resMapList.add( r.payload as Map)
+                }
             }
         }
         return resMapList
@@ -302,13 +304,11 @@ class SyncJobContext {
      * Update the job with status on whats been processed and append the json data
      * @param currentResults the results to append, normally will be an ApiResults but can be any Problem or Result
      */
+    @Synchronized //sync to only one thread for the SyncJob can update at a time
     protected void updateJob(Result currentResults, Map data){
-        //sync to only one thread for the SyncJob can update at a time
-        synchronized ("SyncJob${jobId}".toString().intern()) {
-            syncJobService.updateJob(data)
-            // append json to dataFile
-            if(currentResults) appendDataResults(currentResults)
-        }
+        syncJobService.updateJob(data)
+        // append json to dataFile
+        if(currentResults) appendDataResults(currentResults)
     }
 
     /**
@@ -316,7 +316,8 @@ class SyncJobContext {
      * @param currentResults the results to append, normally will be an ApiResults but can be any Problem or Result
      */
     protected void appendDataResults(Result currentResults){
-        if(args.saveDataAsFile){
+        //if isSaveDataAsFile then write out the results now
+        if(args.isSaveDataAsFile()){
             boolean isFirstWrite = false
             if(!dataPath) {
                 isFirstWrite = true // its first time writing
@@ -333,6 +334,7 @@ class SyncJobContext {
             }
             IOUtils.flushAndClose(writer)
         } else {
+            //if not save to file then saves it in memory and will write it out to the prop at finish
             results.merge currentResults
         }
 
@@ -348,18 +350,6 @@ class SyncJobContext {
         dataPath.withWriter { wr ->
             wr.write('[\n')
         }
-    }
-
-    /**
-     * when args.savePayload and args.savePayloadAsFile are true, this is called to save the payload to file
-     * @param payload the payload List or Map that was sent (will normally have been json when called via REST
-     * @return the Attachment id.
-     */
-    protected Long writePayloadFile(Collection payload){
-        String filename = "SyncJobPayload_${jobId}_.json"
-        Path path = syncJobService.createTempFile(filename)
-        JsonStreaming.streamToFile(payload, path)
-        return syncJobService.createAttachment(path, filename)
     }
 
     /**

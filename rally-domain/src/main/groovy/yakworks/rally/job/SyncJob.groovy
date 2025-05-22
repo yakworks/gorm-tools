@@ -17,6 +17,7 @@ import yakworks.gorm.hibernate.type.JsonType
 import yakworks.security.audit.AuditStampTrait
 
 import static grails.gorm.hibernate.mapping.MappingBuilder.orm
+import static yakworks.json.groovy.JsonEngine.parseJson
 
 /**
  * An instance created right away when "any job" in 9ci is called.
@@ -26,9 +27,7 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.orm
  */
 @Entity
 @GrailsCompileStatic
-class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity,  AuditStampTrait, Serializable {
-
-    // List<Map> problems
+class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity, AuditStampTrait, Serializable {
 
     byte[] getData(){
         getRepo().getData(this)
@@ -59,7 +58,8 @@ class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity,  AuditStampTrait, S
     static MappingDefinition getMapping() {
         orm {
             columns(
-                problems: property(type: JsonType, typeParams: [type: ArrayList])
+                problems: property(type: JsonType, typeParams: [type: ArrayList]),
+                params: property(type: JsonType, typeParams: [type: Map])
             )
         }
     }
@@ -69,4 +69,13 @@ class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity,  AuditStampTrait, S
         data: [d: 'The result data json, will normally be an array with items for errors.', oapi: [type: 'object']]
     ]
 
+        //parseJson
+    public <T> T parseData(Class<T> clazz = List){
+        parseJson(dataToString(), clazz)
+    }
+
+        //parseJson
+    public <T> T parsePayload(Class<T> clazz = List){
+        parseJson(payloadToString(), clazz)
+    }
 }

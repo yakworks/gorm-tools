@@ -62,7 +62,7 @@ class SecureCrudApiSpec extends Specification {
         ex = thrown()
 
         when:
-        orgSecureCrudApi.bulk(DataOp.update, [orgData], [:], "Test")
+        orgSecureCrudApi.bulkImport(DataOp.update, [orgData], [:], "Test")
 
         then:
         ex = thrown()
@@ -101,7 +101,7 @@ class SecureCrudApiSpec extends Specification {
         ex.message == 'Access Denied'
 
         when:
-        orgSecureCrudApi.bulk(DataOp.update, [orgData], [:], "Test")
+        orgSecureCrudApi.bulkImport(DataOp.update, [orgData], [:], "Test")
 
         then:
         ex = thrown()

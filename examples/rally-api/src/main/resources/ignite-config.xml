@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean class="org.apache.ignite.configuration.IgniteConfiguration">
+    <property name="workDirectory" value="/path/to/work/directory"/>
+    <!--<property name="igniteInstanceName" value="${spring.application.name}-server-${random.uuid}"/>-->
+    <!--<property name="igniteInstanceName" value="rally-ignite1"/>-->
+    <property name="cacheConfiguration">
+      <bean class="org.apache.ignite.configuration.CacheConfiguration">
+        <property name="name" value="myCache"/>
+        <property name="cacheMode" value="PARTITIONED"/>
+        <property name="backups" value="1"/>
+        <property name="rebalanceMode" value="SYNC"/>
+        <property name="writeSynchronizationMode" value="FULL_SYNC"/>
+        <property name="partitionLossPolicy" value="READ_ONLY_SAFE"/>
+        <!-- Other parameters -->
+      </bean>
+    </property>
+  </bean>
+</beans>

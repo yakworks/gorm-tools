@@ -2,7 +2,7 @@
 * Copyright 2021 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.repository.bulk
+package yakworks.gorm.api.bulk
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -14,7 +14,6 @@ import gorm.tools.async.AsyncArgs
 import gorm.tools.async.ParallelTools
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
-import gorm.tools.job.SyncJobService
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
@@ -36,15 +35,13 @@ import yakworks.commons.map.Maps
 import yakworks.meta.MetaMap
 
 /**
- * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>
+ * Core functionality for slicing and insert/update or upsert a list of maps
+ * Primarily used in BulkImportService
  */
 @SuppressWarnings(["Println"])
 @Slf4j
 @CompileStatic
 class BulkImporter<D> {
-
-    @Autowired(required = false) //optional to make testing easier and can do gorm-tools without syncJob
-    SyncJobService syncJobService
 
     @Autowired
     @Qualifier("parallelTools")

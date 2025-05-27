@@ -22,14 +22,12 @@ import org.springframework.transaction.TransactionDefinition
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.job.SyncJobArgs
 import gorm.tools.mango.api.QueryService
 import gorm.tools.mango.api.QueryServiceLookup
 import gorm.tools.mango.jpql.KeyExistsQuery
 import gorm.tools.model.Lookupable
 import gorm.tools.model.Persistable
 import gorm.tools.problem.ValidationProblem
-import gorm.tools.repository.bulk.BulkImporter
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.ApiCrudRepo
@@ -37,7 +35,6 @@ import gorm.tools.repository.model.EntityResult
 import gorm.tools.repository.model.PersistableRepoEntity
 import gorm.tools.transaction.TrxUtils
 import gorm.tools.utils.GormMetaUtils
-import gorm.tools.utils.ServiceLookup
 import grails.core.support.proxy.ProxyHandler
 import grails.validation.ValidationException
 import yakworks.api.HttpStatus

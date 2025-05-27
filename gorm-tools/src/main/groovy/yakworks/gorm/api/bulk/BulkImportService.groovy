@@ -17,7 +17,6 @@ import gorm.tools.job.SyncJobState
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
-import gorm.tools.repository.bulk.BulkImporter
 import gorm.tools.repository.model.DataOp
 import gorm.tools.utils.ServiceLookup
 import yakworks.api.problem.data.DataProblem

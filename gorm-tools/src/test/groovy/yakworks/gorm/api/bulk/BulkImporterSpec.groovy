@@ -1,9 +1,8 @@
-package gorm.tools.repository
+package yakworks.gorm.api.bulk
 
 import gorm.tools.async.AsyncService
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobService
-import gorm.tools.repository.bulk.BulkImporter
 import yakworks.api.problem.data.DataProblemException
 import yakworks.gorm.config.AsyncConfig
 import gorm.tools.job.SyncJobArgs

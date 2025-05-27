@@ -7,7 +7,6 @@ import gorm.tools.async.AsyncService
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobState
 import gorm.tools.problem.ValidationProblem
-import gorm.tools.repository.bulk.BulkImporter
 import gorm.tools.repository.model.DataOp
 import spock.lang.Specification
 import testing.TestSyncJob

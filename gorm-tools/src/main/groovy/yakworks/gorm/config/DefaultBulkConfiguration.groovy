@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
 import org.springframework.context.annotation.Scope
 
-import gorm.tools.repository.bulk.BulkImporter
+import yakworks.gorm.api.bulk.BulkImporter
 import yakworks.gorm.api.bulk.BulkExportService
 import yakworks.gorm.api.bulk.BulkImportService
 import yakworks.gorm.api.bulk.DefaultBulkJobQueueListener

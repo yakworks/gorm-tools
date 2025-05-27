@@ -1,14 +1,11 @@
-package gorm.tools.repository
+package yakworks.gorm.api.bulk
 
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.problem.ValidationProblem
-import gorm.tools.repository.bulk.BulkImporter
 import gorm.tools.repository.model.DataOp
-import spock.lang.Ignore
 import spock.lang.Specification
-import testing.Cust
 import testing.TestSyncJob
 import yakworks.api.ApiResults
 import yakworks.api.HttpStatus
@@ -21,10 +18,10 @@ import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 /**
- * Tests for doBulk without the async and parallel stuff.
+ * Tests for doBulkSlice without the async and parallel stuff.
  * easier to test core logic
  */
-class BulkableDoBulkSpec extends Specification implements GormHibernateTest {
+class BulkDoBulkSliceSpec extends Specification implements GormHibernateTest {
     static entityClasses = [KitchenSink, SinkItem, SinkExt, TestSyncJob]
     // static springBeans = [syncJobService: TestSyncJobService]
 

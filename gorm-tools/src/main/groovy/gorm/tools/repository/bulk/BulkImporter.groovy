@@ -25,6 +25,7 @@ import gorm.tools.repository.events.BeforeBulkSaveEntityEvent
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.DataOp
 import gorm.tools.repository.model.EntityResult
+import gorm.tools.utils.ServiceLookup
 import yakworks.api.ApiResults
 import yakworks.api.HttpStatus
 import yakworks.api.Result
@@ -64,31 +65,12 @@ class BulkImporter<D> {
         this.entityClass = entityClass
     }
 
-    GormRepo<D> getRepo(){
-        return RepoLookup.findRepo(entityClass)
+    static <D> BulkImporter<D> lookup(Class<D> entityClass){
+        ServiceLookup.lookup(entityClass, BulkImporter<D>, "defaultBulkImporter")
     }
 
-    /**
-     * creates a supplier to wrap doBulkParallel and calls bulk
-     * if syncJobArgs.async = true will return right away
-     *
-     * @param dataList the list of data maps to create
-     * @param syncJobArgs the args object to pass on to doBulk
-     * @return Job id
-     */
-    @Deprecated
-    Long bulkLegacy(List<Map> dataList, SyncJobArgs syncJobArgs) {
-        //If dataList is empty then error right away.
-        if(dataList == null || dataList.isEmpty()) throw DataProblem.of('error.data.emptyPayload').detail("Bulk Data is Empty").toException()
-
-        syncJobArgs.entityClass = getEntityClass()
-        if(!syncJobArgs.jobType) syncJobArgs.jobType = 'bulk.import'
-
-        SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
-        //XXX why are we setting session: true here? explain. should it be default?
-        //def asyncArgs = jobContext.args.asyncArgs.session(true)
-        // This is the promise call. Will return immediately if syncJobArgs.async=true
-        return syncJobService.runJob( jobContext.args.asyncArgs, jobContext, () -> doBulkParallel(dataList, jobContext))
+    GormRepo<D> getRepo(){
+        return RepoLookup.findRepo(entityClass)
     }
 
     /**
@@ -172,7 +154,7 @@ class BulkImporter<D> {
      *        also, if true then this method will try not to throw an exception and
      *        it will collect the errors in the results.
      */
-    ApiResults doBulkSlice(List<Map> dataList, SyncJobArgs syncJobArgs, boolean transactionPerItem = false){
+    protected ApiResults doBulkSlice(List<Map> dataList, SyncJobArgs syncJobArgs, boolean transactionPerItem = false){
         // println "will do ${dataList.size()}"
         ApiResults results = ApiResults.create(false)
         for (Map item : dataList) {
@@ -208,7 +190,7 @@ class BulkImporter<D> {
      * @return the EntityResult with the data map as entity after being run through buildSuccessMap
      *         using the includes in the syncJobArgs
      */
-    EntityResult<Map> bulkSaveEntity(Map data, SyncJobArgs syncJobArgs, boolean transactional) {
+    protected EntityResult<Map> bulkSaveEntity(Map data, SyncJobArgs syncJobArgs, boolean transactional) {
         //need to copy the incoming map, as during create(), repos may remove entries from the data map
         //or it can create circular references - eg org.contact.org - which would result in Stackoverflow when converting to json
         Map dataClone
@@ -250,14 +232,14 @@ class BulkImporter<D> {
      * creates response map based on bulk include list
      * this is called instead of just createMetaMap so it can be overriden easily in implementations.
      */
-    Map buildSuccessMap(D entityInstance, List<String> includes) {
+    protected Map buildSuccessMap(D entityInstance, List<String> includes) {
         return createMetaMap(entityInstance, includes)
     }
 
     /**
      * The fields to return when bulk fails for the entity, by default, return entire incoming map back.
      */
-    Map buildErrorMap(Map originalData, List<String> errorIncludes) {
+    protected Map buildErrorMap(Map originalData, List<String> errorIncludes) {
         if(errorIncludes) {
             return originalData.subMap(errorIncludes)
         } else {
@@ -270,7 +252,7 @@ class BulkImporter<D> {
      * Will return a clone to ensure that all properties are called
      * and its a clean, unwrapped, no proxies, map
      */
-    Map createMetaMap(D entityInstance, List<String> includes){
+    protected Map createMetaMap(D entityInstance, List<String> includes){
         MetaMap entityMapData = metaMapService.createMetaMap(entityInstance, includes)
         return (Map)entityMapData.clone()
     }
@@ -280,7 +262,7 @@ class BulkImporter<D> {
      * Gives an oportunity to modify the data with any special changes needed in a bulk op.
      * will be inside the trx if one is created, so can throw an error if needing to reject the save.
      */
-    void doBeforeBulkSaveEntity(Map data, SyncJobArgs syncJobArgs) {
+    protected void doBeforeBulkSaveEntity(Map data, SyncJobArgs syncJobArgs) {
         BeforeBulkSaveEntityEvent<D> event = new BeforeBulkSaveEntityEvent<D>(getRepo(), data, syncJobArgs)
         repoEventPublisher.publishEvents(getRepo(), event, [event] as Object[])
     }
@@ -288,7 +270,7 @@ class BulkImporter<D> {
     /**
      * Called after the doupdate or create has been called for each item.
      */
-    public void doAfterBulkSaveEntity(D entity, Map data, SyncJobArgs syncJobArgs) {
+    protected void doAfterBulkSaveEntity(D entity, Map data, SyncJobArgs syncJobArgs) {
         AfterBulkSaveEntityEvent<D> event = new AfterBulkSaveEntityEvent<D>(getRepo(), entity, data, syncJobArgs)
         repoEventPublisher.publishEvents(getRepo() , event, [event] as Object[])
     }

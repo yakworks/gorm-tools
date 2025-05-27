@@ -32,7 +32,10 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
     void "sanity check validation with String as data"() {
         expect:
         SyncJob job = new SyncJob(
-            sourceType: SourceType.ERP, sourceId: 'ar/org', state: SyncJobState.Running, jobType: 'bulk'
+            sourceType: SourceType.ERP,
+            sourceId: 'ar/org',
+            state: SyncJobState.Running,
+            jobType: 'bulk'
         )
         job.validate()
         job.persist()
@@ -118,6 +121,30 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
     }
 
     void "convert json to byte array"() {
+        setup:
+        def res = JsonEngine.toJson(["One", "Two", "Three"])
+
+        when:
+        SyncJob job = new SyncJob(
+            state: SyncJobState.Running, jobType: 'bulk',
+            sourceType: SourceType.ERP, sourceId: 'ar/org',
+            payloadBytes: res.bytes
+        )
+        def jobId = job.persist().id
+
+        then: "get jobId"
+        jobId
+
+        when: "query the db for job we can read the data"
+        SyncJob j = SyncJob.get(jobId)
+
+        then:
+        j
+        res.bytes == j.payloadBytes
+        res == j.payloadToString()
+    }
+
+    void "check the syncJob args"() {
         setup:
         def res = JsonEngine.toJson(["One", "Two", "Three"])
 

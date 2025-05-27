@@ -1,4 +1,4 @@
-package gorm.tools.repository
+package yakworks.gorm.api.bulk
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -23,7 +23,7 @@ import yakworks.testing.gorm.unit.GormHibernateTest
 
 import static yakworks.json.groovy.JsonEngine.parseJson
 
-class BulkImporterLegacySpec extends Specification implements GormHibernateTest {
+class BulkImportServiceLegacySpec extends Specification implements GormHibernateTest {
     static entityClasses = [KitchenSink, SinkExt, TestSyncJob]
     static springBeans = [TestSyncJobService]
 
@@ -44,6 +44,10 @@ class BulkImporterLegacySpec extends Specification implements GormHibernateTest 
         return bis
     }
 
+    BulkImportService<KitchenSink> getBulkImportService(){
+        BulkImportService.lookup(KitchenSink)
+    }
+
     def "sanity check single validation"() {
         when:
         def ksdata = KitchenSink.repo.generateData(1)
@@ -59,7 +63,7 @@ class BulkImporterLegacySpec extends Specification implements GormHibernateTest 
         List list = KitchenSink.generateDataList(10)
 
         when: "bulk insert 20 records"
-        Long jobId = bulkImporter.bulkLegacy(list, setupSyncJobArgs())
+        Long jobId = bulkImportService.bulkLegacy(list, setupSyncJobArgs())
         def job = TestSyncJob.get(jobId)
         List results = job.parseData()
 
@@ -74,7 +78,7 @@ class BulkImporterLegacySpec extends Specification implements GormHibernateTest 
 
         when: "bulk insert 20 records"
 
-        Long jobId = bulkImporter.bulkLegacy(list, setupSyncJobArgs())
+        Long jobId = bulkImportService.bulkLegacy(list, setupSyncJobArgs())
         def job = TestSyncJob.get(jobId)
 
 
@@ -134,7 +138,7 @@ class BulkImporterLegacySpec extends Specification implements GormHibernateTest 
         List list = KitchenSink.generateDataList(10)
 
         when: "insert records"
-        Long jobId = bulkImporter.bulkLegacy(list, setupSyncJobArgs())
+        Long jobId = bulkImportService.bulkLegacy(list, setupSyncJobArgs())
         def job = TestSyncJob.get(jobId)
 
         then:
@@ -149,7 +153,7 @@ class BulkImporterLegacySpec extends Specification implements GormHibernateTest 
             it.id = idx + 1
         }
 
-        jobId = bulkImporter.bulkLegacy(list, setupSyncJobArgs(DataOp.update))
+        jobId = bulkImportService.bulkLegacy(list, setupSyncJobArgs(DataOp.update))
         job = TestSyncJob.get(jobId)
 
         then:
@@ -173,7 +177,7 @@ class BulkImporterLegacySpec extends Specification implements GormHibernateTest 
 
         when: "bulk insert"
 
-        Long jobId = bulkImporter.bulkLegacy(list, setupSyncJobArgs())
+        Long jobId = bulkImportService.bulkLegacy(list, setupSyncJobArgs())
         def job = TestSyncJob.get(jobId)
 
         def results = parseJson(job.dataToString())
@@ -216,7 +220,7 @@ class BulkImporterLegacySpec extends Specification implements GormHibernateTest 
 
         when: "bulk insert"
 
-        Long jobId = bulkImporter.bulkLegacy(list, setupSyncJobArgs())
+        Long jobId = bulkImportService.bulkLegacy(list, setupSyncJobArgs())
         def job = TestSyncJob.get(jobId)
 
         then: "verify job"
@@ -249,7 +253,7 @@ class BulkImporterLegacySpec extends Specification implements GormHibernateTest 
         List<Map> list = KitchenSink.generateDataList(60) //this should trigger 6 batches of 10
 
         when: "bulk insert in multi batches"
-        Long jobId = bulkImporter.bulkLegacy(list, setupSyncJobArgs())
+        Long jobId = bulkImportService.bulkLegacy(list, setupSyncJobArgs())
         def job = TestSyncJob.findById(jobId)
 
         def results = parseJson(job.dataToString())
@@ -270,7 +274,7 @@ class BulkImporterLegacySpec extends Specification implements GormHibernateTest 
 
         when: "bulk insert 2 records"
         SyncJobArgs args = setupSyncJobArgs()
-        Long jobId = bulkImporter.bulkLegacy(data, args)
+        Long jobId = bulkImportService.bulkLegacy(data, args)
         def job = TestSyncJob.get(jobId)
 
 
@@ -347,14 +351,14 @@ class BulkImporterLegacySpec extends Specification implements GormHibernateTest 
 
     void "test empty data"() {
         when:
-        Long jobId = bulkImporter.bulkLegacy(null, setupSyncJobArgs())
+        Long jobId = bulkImportService.bulkLegacy(null, setupSyncJobArgs())
 
         then:
         DataProblemException ex = thrown()
         ex.code == 'error.data.emptyPayload'
 
         when:
-        jobId = bulkImporter.bulkLegacy([], setupSyncJobArgs())
+        jobId = bulkImportService.bulkLegacy([], setupSyncJobArgs())
 
         then:
         DataProblemException ex2 = thrown()

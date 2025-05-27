@@ -110,6 +110,11 @@ trait SyncJobEntity implements SourceTrait {
     Map<String, String> params
 
     /**
+     * SyncJobArgs
+     */
+    //SyncJobArgs jobArgs
+
+    /**
      * Job request body
      */
     // Map<String, Object> body

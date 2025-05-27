@@ -8,6 +8,7 @@ import groovy.transform.CompileDynamic
 
 import org.grails.datastore.mapping.config.MappingDefinition
 
+import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.RepoEntity
@@ -59,7 +60,8 @@ class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity, AuditStampTrait, Se
         orm {
             columns(
                 problems: property(type: JsonType, typeParams: [type: ArrayList]),
-                params: property(type: JsonType, typeParams: [type: Map])
+                params: property(type: JsonType, typeParams: [type: Map]),
+                //jobArgs: property(type: JsonType, typeParams: [type: SyncJobArgs])
             )
         }
     }

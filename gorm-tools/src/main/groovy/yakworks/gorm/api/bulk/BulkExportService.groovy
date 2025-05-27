@@ -172,6 +172,9 @@ class BulkExportService<D> {
         //XXX @SUD where does this come into play? why true
         args.parallel = true
 
+        //XXX do we really need this?
+        args.entityClass = entityClass
+
         //bulkexport always saves data in a file
         //args.saveDataAsFile = true
         args.dataFormat = SyncJobArgs.DataFormat.Payload

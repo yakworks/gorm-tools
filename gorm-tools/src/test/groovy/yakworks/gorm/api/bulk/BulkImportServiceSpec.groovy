@@ -46,10 +46,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
             parallel: false, async:false,
             source: "test", sourceId: "test-job", includes: ["id", "name", "ext.name"]
         ]
-        SyncJobEntity jobEnt = bulkImportService.queueImportJob(op, params, "test-job", dataList)
-        //flushAndClear()
-        SyncJobEntity jobEnt2 = bulkImportService.startJob(jobEnt.id)
-        //flushAndClear()
+        SyncJobEntity jobEnt = bulkImportService.queueAndRun(op, params, "test-job", dataList)
         jobEnt.id
     }
 

@@ -203,7 +203,9 @@ class SyncJobServiceTests extends Specification implements DomainIntTest {
         List payload = [1,2,3,4]
         SyncJobArgs syncJobArgs = new SyncJobArgs(
             sourceId: '123', source: 'some source', jobType: 'foo',
-            dataFormat: SyncJobArgs.DataFormat.Payload)
+            dataFormat: SyncJobArgs.DataFormat.Payload,
+            entityClass: Org
+        )
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, payload)
 
         def okResults = ApiResults.OK()

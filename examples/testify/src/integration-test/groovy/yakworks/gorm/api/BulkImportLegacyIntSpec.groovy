@@ -1,4 +1,4 @@
-package gorm.tools.repository
+package yakworks.gorm.api
 
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobState
@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+import yakworks.gorm.api.bulk.BulkImportService
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.rally.job.SyncJob
@@ -26,7 +27,7 @@ import static yakworks.json.groovy.JsonEngine.parseJson
 
 @Integration
 @Rollback
-class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest {
+class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
 
     JdbcTemplate jdbcTemplate
     OrgRepo orgRepo
@@ -38,6 +39,10 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
             Org.query(num:[$like:"testorg-%"]).deleteAll()
             OrgSource.where({ sourceId ==~ "testorg-%"}).deleteAll()
         }
+    }
+
+    public <D> BulkImportService<D> getBulkImportService(Class<D> entClass){
+        BulkImportService.lookup(entClass)
     }
 
     SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
@@ -58,7 +63,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         List<Map> jsonList = generateOrgData(3)
 
         when:
-        Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create(parallel: false, async:false))
+        Long jobId = getBulkImportService(Org).bulkLegacy(jsonList, SyncJobArgs.create(parallel: false, async:false))
         SyncJob job = getJob(jobId) //= SyncJob.repo.read(jobId)
         assert job.state == SyncJobState.Finished
         List json = parseJson(job.dataToString())
@@ -103,7 +108,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         // so that second pass uses original data
         list[5].num ="num1" //will fail (During flush) on this one as it already exists
 
-        Long jobId = kitchenSinkRepo.bulk(list, setupSyncJobArgs())
+        Long jobId = getBulkImportService(KitchenSink).bulkLegacy(list, setupSyncJobArgs())
         def job, dbData, successCount
 
         KitchenSink.withNewTransaction {
@@ -131,7 +136,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         List<Map> jsonList = generateOrgData(5)
 
         when:
-        Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create(parallel: false, async: false))
+        Long jobId = getBulkImportService(Org).bulkLegacy(jsonList, SyncJobArgs.create(parallel: false, async: false))
         SyncJob job = getJob(jobId) //SyncJob.get(jobId)
 
         then:
@@ -147,7 +152,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
             it["comments"] = "flubber${it.id}"
         }
 
-        jobId = orgRepo.bulk(jsonList, new SyncJobArgs(parallel: false, async: false).op(DataOp.update))
+        jobId = getBulkImportService(Org).bulkLegacy(jsonList, new SyncJobArgs(parallel: false, async: false).op(DataOp.update))
         job = getJob(jobId) //SyncJob.get(jobId)
         // flushAndClear()
 
@@ -181,7 +186,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
         //include field from org, here org would be a lazy association, and would fail when its property accessed during json building
         args.includes = ["id", "org.source.id"]
-        Long jobId = Location.repo.bulk(contactData, args)
+        Long jobId = getBulkImportService(Location).bulkLegacy(contactData, args)
 
         then:
         noExceptionThrown()
@@ -207,7 +212,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         jsonList[0].num = StringUtils.rightPad("ORG-1-", 110, "X")
 
         when:
-        Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create(parallel: false,  async: false))
+        Long jobId = getBulkImportService(Org).bulkLegacy(jsonList, SyncJobArgs.create(parallel: false,  async: false))
         SyncJob job = SyncJob.repo.getWithTrx(jobId)
         flush()
 
@@ -240,7 +245,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
         when: "bulk insert"
 
-        Long jobId = KitchenSink.repo.bulk(list, setupSyncJobArgs())
+        Long jobId = getBulkImportService(KitchenSink).bulkLegacy(list, setupSyncJobArgs())
         def job = SyncJob.repo.getWithTrx(jobId)
 
         def results = parseJson(job.dataToString())
@@ -276,7 +281,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         jsonList[1].num = "testorg-1"
 
         when:
-        Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create(async:false))
+        Long jobId = getBulkImportService(Org).bulkLegacy(jsonList, SyncJobArgs.create(async:false))
         SyncJob job = SyncJob.repo.getWithTrx(jobId)
 
         then:
@@ -327,7 +332,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         jsonList[3].num = "testorg-2" //this one should cause error when processing slice errors
 
         when:
-        Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create(async:false))
+        Long jobId = getBulkImportService(Org).bulkLegacy(jsonList, SyncJobArgs.create(async:false))
         SyncJob job = SyncJob.repo.getWithTrx(jobId)
 
         then:

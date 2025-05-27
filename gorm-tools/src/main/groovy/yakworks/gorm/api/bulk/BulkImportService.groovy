@@ -17,8 +17,10 @@ import gorm.tools.job.SyncJobState
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
+import gorm.tools.repository.bulk.BulkImporter
 import gorm.tools.repository.model.DataOp
 import gorm.tools.utils.ServiceLookup
+import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.commons.lang.EnumUtils
 import yakworks.gorm.api.IncludesConfig
@@ -47,7 +49,10 @@ class BulkImportService<D> {
     @Autowired
     CsvToMapTransformer csvToMapTransformer
 
-    @Autowired GormConfig gormConfig
+    @Autowired
+    GormConfig gormConfig
+
+    BulkImporter<D> bulkImporter
 
     Class<D> entityClass // the domain class this is for
 
@@ -59,7 +64,15 @@ class BulkImportService<D> {
         ServiceLookup.lookup(entityClass, BulkImportService<D>, "defaultBulkImportService")
     }
 
-    SyncJobEntity bulkImport(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
+    BulkImporter<D> getBulkImporter(){
+        if (!bulkImporter) {
+            this.bulkImporter = BulkImporter.lookup(getEntityClass())
+        }
+        return bulkImporter
+    }
+
+
+    SyncJobEntity process(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
         if(gormConfig.legacyBulk){
             return bulkImportLegacy(dataOp, dataList, qParams, sourceId)
         } else {
@@ -69,6 +82,7 @@ class BulkImportService<D> {
 
     SyncJobEntity bulkImportLegacy(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
         //if attachmentId then assume its a csv
+        //XXX we should not assume its CSV. Check dataFormat as well, we can have that default to CSV
         if(qParams.attachmentId) {
             //XXX We set savePayload to false by default for CSV since we already have the csv file as attachment?
             qParams.savePayload = false
@@ -82,9 +96,33 @@ class BulkImportService<D> {
         }
         SyncJobArgs syncJobArgs = setupSyncJobArgs(dataOp, qParams, sourceId)
         syncJobArgs.jobType = 'bulkImport'
-        Long jobId = getRepo().bulk(dataList, syncJobArgs)
+        Long jobId = bulkLegacy(dataList, syncJobArgs)
         SyncJobEntity job = syncJobService.getJob(jobId)
         return job
+    }
+
+    /**
+     * creates a supplier to wrap doBulkParallel and calls bulk
+     * if syncJobArgs.async = true will return right away
+     *
+     * @param dataList the list of data maps to create
+     * @param syncJobArgs the args object to pass on to doBulk
+     * @return Job id
+     */
+    Long bulkLegacy(List<Map> dataList, SyncJobArgs syncJobArgs) {
+        //If dataList is empty then error right away.
+        if(dataList == null || dataList.isEmpty()) throw DataProblem.of('error.data.emptyPayload').detail("Bulk Data is Empty").toException()
+
+        syncJobArgs.entityClass = getEntityClass()
+        if(!syncJobArgs.jobType) syncJobArgs.jobType = 'bulk.import'
+
+        SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
+        //XXX why are we setting session: true here? explain. should it be default?
+        //def asyncArgs = jobContext.args.asyncArgs.session(true)
+        // This is the promise call. Will return immediately if syncJobArgs.async=true
+        return syncJobService.runJob(
+            jobContext.args.asyncArgs, jobContext, () -> getBulkImporter().doBulkParallel(dataList, jobContext)
+        )
     }
 
     //WIP
@@ -123,10 +161,9 @@ class BulkImportService<D> {
         args.params['dataOp'] = dataOp.name()
         //make sure className is set to params
         args.params['entityClassName'] = getEntityClass().name
-        //XXX I dont thing we need this
-        args.entityClass = getEntityClass()
 
         //if attachmentId then assume its a csv
+        //XXX add check for dataFormat
         if(qParams.attachmentId) {
             args.payloadId = qParams.attachmentId as Long
         } else if(payloadBody){
@@ -135,6 +172,15 @@ class BulkImportService<D> {
             throw DataProblemCodes.EmptyPayload.get().toException()
         }
 
+        return syncJobService.queueJob(args)
+    }
+
+    /**
+     * Creates a bulk import job and puts in hazel queue
+     */
+    SyncJobEntity queueImportJob(SyncJobArgs args) {
+        args.jobType = 'bulk.import'
+        args.params['entityClassName'] = getEntityClass().name
         return syncJobService.queueJob(args)
     }
 
@@ -166,11 +212,21 @@ class BulkImportService<D> {
 
         SyncJobArgs syncJobArgs = setupSyncJobArgs(dataOp, qParams, job.sourceId)
         syncJobArgs.jobId = jobId
+
         SyncJobContext sctx = syncJobService.initContext(syncJobArgs, dataList)
 
-        Long jobIdent = getRepo().bulkImporter.bulkImport(dataList, sctx)
+        Long jobIdent = getBulkImporter().bulkImport(dataList, sctx)
 
         return syncJobService.getJob(jobIdent)
+    }
+
+    /**
+     * To be used for TESTING. Not meant for a production method.
+     * queue and start the job
+     */
+    SyncJobEntity queueAndRun(DataOp dataOp, Map qParams, String sourceId, List<Map> payloadBody){
+        SyncJobEntity jobEnt = queueImportJob(dataOp, qParams, sourceId, payloadBody)
+        return startJob(jobEnt.id)
     }
 
     /**
@@ -185,12 +241,6 @@ class BulkImportService<D> {
     List<Map> transformCsvToBulkList(Map gParams) {
         return getCsvToMapTransformer().process(gParams)
     }
-    //
-    // SyncJobEntity process(List<Map> dataList, SyncJobArgs syncJobArgs) {
-    //     Long jobId = getRepo().bulk(dataList, syncJobArgs)
-    //     SyncJobEntity job = syncJobService.getJob(jobId)
-    //     return job
-    // }
 
     /**
      * sets up the SyncJobArgs from whats passed in from params
@@ -205,8 +255,10 @@ class BulkImportService<D> {
         syncJobArgs.includes = bulkIncludes
         syncJobArgs.errorIncludes = bulkErrorIncludes
         syncJobArgs.sourceId = sourceId
+        //XXX do we need this for events?
+        syncJobArgs.entityClass = getEntityClass()
 
-        //for upsert they can pass in op=upsert to params.
+        // for upsert they can pass in op=upsert to params.
         // This is different than the dataOp arg in method here, which is going to either be add or update already
         // as its set because it either a POST or PUT call.
         DataOp paramsOp = EnumUtils.getEnumIgnoreCase(DataOp, params.op as String)

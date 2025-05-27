@@ -78,8 +78,6 @@ trait GormRepo<D> implements ApiCrudRepo<D>, ResolvableTypeProvider {
     //cached instance of the query for id to keep it fast
     KeyExistsQuery idExistsQuery
 
-    BulkImporter<D> bulkImporter
-
     /**
      * The gorm domain class. uses the {@link org.springframework.core.GenericTypeResolver} is not set during contruction
      */
@@ -95,13 +93,6 @@ trait GormRepo<D> implements ApiCrudRepo<D>, ResolvableTypeProvider {
             this.queryService = QueryServiceLookup.lookup(getEntityClass())
         }
         return this.queryService
-    }
-
-    BulkImporter<D> getBulkImporter(){
-        if (!bulkImporter) {
-            this.bulkImporter = ServiceLookup.lookup(getEntityClass(), BulkImporter<D>, "defaultBulkImporter")
-        }
-        return bulkImporter
     }
 
     @Override
@@ -320,9 +311,9 @@ trait GormRepo<D> implements ApiCrudRepo<D>, ResolvableTypeProvider {
         return EntityResult.of(instance).status(status)
     }
 
-    Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs) {
-        return getBulkImporter().bulkLegacy(dataList, syncJobArgs)
-    }
+    // Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs) {
+    //     return getBulkImporter().bulkLegacy(dataList, syncJobArgs)
+    // }
 
     /**
      * Uses the items in the data to find the entity.

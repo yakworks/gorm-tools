@@ -25,6 +25,7 @@ class SyncJobFinishedEvent<D> extends ApplicationEvent implements ResolvableType
         this.context = ctx
         this.jobId = ctx.jobId
         this.ok = ctx.ok.get()
+        assert ctx.args.entityClass
         this.entityClass = ctx.args.entityClass ?: Object //if no entityClass - eg for exportSync
     }
 

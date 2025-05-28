@@ -6,6 +6,9 @@ package gorm.tools.job
 
 import groovy.transform.CompileStatic
 
+import yakworks.commons.map.Maps
+import yakworks.meta.MetaUtils
+
 /**
  * Value Object are better than using a Map to store arguments and parameters.
  * This is used for Bulk operations.
@@ -60,4 +63,7 @@ class CoreSyncJobParams {
      */
     String q
 
+    Map asMap(){
+        Maps.prune(MetaUtils.getProperties(this))
+    }
 }

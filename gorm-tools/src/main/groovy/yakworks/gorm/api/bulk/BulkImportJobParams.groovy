@@ -100,7 +100,7 @@ class BulkImportJobParams extends CoreSyncJobParams{
         return bijParams
     }
 
-    Map asMap(){
-        Maps.prune(MetaUtils.getProperties(this))
-    }
+    // Map asMap(){
+    //     Maps.prune(MetaUtils.getProperties(this))
+    // }
 }

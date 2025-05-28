@@ -7,6 +7,8 @@ package yakworks.gorm.api.bulk
 import groovy.transform.CompileStatic
 
 import gorm.tools.job.CoreSyncJobParams
+import yakworks.commons.map.Maps
+import yakworks.meta.MetaUtils
 
 /**
  * Value Object are better than using a Map to store arguments and parameters.

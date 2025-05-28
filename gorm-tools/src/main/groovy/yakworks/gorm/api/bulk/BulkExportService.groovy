@@ -64,6 +64,15 @@ class BulkExportService<D> {
     }
 
     /**
+     * Creates a bulk export job and puts in hazel queue
+     */
+    //XXX Replace above with this one
+    SyncJobEntity queueExportJob(BulkExportJobParams jobParams) {
+        SyncJobArgs args = setupSyncJobArgs(jobParams.asMap(), jobParams.sourceId)
+        return syncJobService.queueJob(args)
+    }
+
+    /**
      * Starts a bulk import job
      */
     SyncJobEntity startJob(Long jobId) {

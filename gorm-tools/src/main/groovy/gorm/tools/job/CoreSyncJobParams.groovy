@@ -59,9 +59,30 @@ class CoreSyncJobParams {
     //String errorIncludes
 
     /**
-     * some syncjobs can involve a q mango query
+     * some syncjobs can involve a "q" mango query
      */
     String q
+
+
+    /**
+     * For dev, force how to store the payload (what was sent)
+     * FIXME I dont think we need this
+     */
+    //Boolean savePayload //= true
+
+    /**
+     * force payload to store as file instead of bytes
+     * Primarily used for dev/tests
+     */
+    Boolean savePayloadAsFile
+
+    /**
+     * resulting data (what is returned in response) is always saved but can force it to save to file instead of bytes in column
+     * Primarily used for dev/tests
+     */
+    Boolean saveDataAsFile //= false
+
+
 
     Map asMap(){
         Maps.prune(MetaUtils.getProperties(this))

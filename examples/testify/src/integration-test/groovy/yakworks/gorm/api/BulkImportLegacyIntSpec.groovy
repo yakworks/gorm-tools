@@ -46,11 +46,6 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
         BulkImportService.lookup(entClass)
     }
 
-    SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
-        return new SyncJobArgs(parallel: false, async:false, op: op, source: "test", sourceId: "test",
-            includes: ["id", "name", "ext.name"])
-    }
-
     BulkImportJobParams setupBulkImportParams(DataOp op = DataOp.add){
         return new BulkImportJobParams(
             op: op, parallel: false, async:false,

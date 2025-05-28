@@ -1,11 +1,10 @@
-package gorm.tools.job
+package yakworks.gorm.api.bulk
 
 import gorm.tools.repository.model.DataOp
 import spock.lang.Specification
 import yakworks.commons.beans.BeanTools
-import yakworks.gorm.api.bulk.BulkImportJobParams
 
-class BulkImportJobParamsSpec extends Specification  {
+class BulkJobParamsSpec extends Specification  {
 
     void "test with map"() {
         when: "simple"
@@ -38,7 +37,7 @@ class BulkImportJobParamsSpec extends Specification  {
         biParams.includes == ['a','b','c']
     }
 
-    void "test with BeanTools.bind"() {
+    void "test POC for BeanTools.bind - not working right"() {
         when:
         Map paramMap = [
             op: 'add',

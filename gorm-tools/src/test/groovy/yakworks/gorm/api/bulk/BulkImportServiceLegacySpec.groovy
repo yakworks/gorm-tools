@@ -13,6 +13,7 @@ import testing.TestSyncJobService
 import yakworks.api.problem.data.DataProblemException
 import yakworks.commons.map.LazyPathKeyMap
 import yakworks.gorm.config.AsyncConfig
+import yakworks.gorm.config.GormConfig
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.testing.gorm.model.SinkExt
@@ -27,6 +28,15 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
     @Autowired AsyncConfig asyncConfig
     @Autowired AsyncService asyncService
     @Autowired KitchenSinkRepo kitchenSinkRepo
+    @Autowired GormConfig gormConfig
+
+    void setup() {
+        gormConfig.legacyBulk = true
+    }
+
+    void cleanup() {
+        // gormConfig.legacyBulk = true
+    }
 
     BulkImportJobParams setupBulkImportParams(DataOp op = DataOp.add){
         return new BulkImportJobParams(
@@ -62,7 +72,7 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
         List list = KitchenSink.generateDataList(10)
 
         when: "bulk insert 20 records"
-        def job = bulkImportService.bulkImportLegacy(setupBulkImportParams(), list)
+        def job = bulkImportService.process(setupBulkImportParams(), list)
         List results = job.parseData()
 
         then: "verify job"
@@ -76,7 +86,7 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
 
         when: "bulk insert 20 records"
 
-        def job = bulkImportService.bulkImportLegacy(setupBulkImportParams(), list)
+        def job = bulkImportService.process(setupBulkImportParams(), list)
 
         then: "verify job"
 

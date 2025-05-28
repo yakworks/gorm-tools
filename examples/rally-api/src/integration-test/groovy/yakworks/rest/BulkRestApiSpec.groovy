@@ -60,7 +60,8 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         then:
         job != null
         job.data != null
-        job.payloadBytes == null
+        // we no longer have settign to disable payload saving
+        //job.payloadBytes == null
         job.state == SyncJobState.Finished
         job.sourceId == "POST /api/rally/org/bulk?jobSource=Oracle&savePayload=false"
         job.source == "Oracle"

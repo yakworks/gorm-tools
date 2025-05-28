@@ -79,6 +79,7 @@ class BulkImportService<D> {
         }
     }
 
+    @Deprecated
     SyncJobEntity bulkImportLegacy(BulkImportJobParams jobParams, List<Map> dataList){
         //if attachmentId then assume its a csv
         //XXX we should not assume its CSV. Check dataFormat as well, we can have that default to CSV
@@ -94,12 +95,12 @@ class BulkImportService<D> {
             // remove this else hack once this is done https://github.com/9ci/cust-rndc-ext/issues/215
             if(jobParams.async == null) jobParams.async = false
         }
+        //If dataList is empty then error right away.
+        if(dataList == null || dataList.isEmpty()) throw DataProblem.of('error.data.emptyPayload').detail("Bulk Data is Empty").toException()
+
         SyncJobArgs syncJobArgs = setupSyncJobArgs(jobParams)
         syncJobArgs.jobType = 'bulk.import'
         syncJobArgs.entityClass = getEntityClass()
-
-        //If dataList is empty then error right away.
-        if(dataList == null || dataList.isEmpty()) throw DataProblem.of('error.data.emptyPayload').detail("Bulk Data is Empty").toException()
 
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
         //XXX why are we setting session: true here? explain. should it be default?
@@ -110,19 +111,6 @@ class BulkImportService<D> {
         )
         SyncJobEntity job = syncJobService.getJob(jobId)
         return job
-    }
-
-    /**
-     * creates a supplier to wrap doBulkParallel and calls bulk
-     * if syncJobArgs.async = true will return right away
-     *
-     * @param dataList the list of data maps to create
-     * @param syncJobArgs the args object to pass on to doBulk
-     * @return Job id
-     */
-    @Deprecated
-    Long bulkLegacy(List<Map> dataList, SyncJobArgs syncJobArgs) {
-        return 1
     }
 
     //WIP
@@ -136,6 +124,8 @@ class BulkImportService<D> {
             //sleep first to give the job runner time to pick it up
             sleep(1000)
             //XXX new process loop and wait for job to finish
+            // should be on a timer loop coming from config.
+            // normaly the http timeout will be 60-120 seconds, so lets start with 90 seconds and time out.
             while(true){
                 job = syncJobService.getJob(jobId)
                 //not running and not queue
@@ -174,16 +164,6 @@ class BulkImportService<D> {
 
         return syncJobService.queueJob(args)
     }
-
-    /**
-     * Creates a bulk import job and puts in hazel queue
-     */
-    SyncJobEntity queueImportJob(SyncJobArgs args) {
-        args.jobType = 'bulk.import'
-        args.params['entityClassName'] = getEntityClass().name
-        return syncJobService.queueJob(args)
-    }
-
 
     /**
      * Starts a bulk import job

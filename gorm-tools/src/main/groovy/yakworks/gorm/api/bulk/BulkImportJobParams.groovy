@@ -9,8 +9,6 @@ import groovy.transform.CompileStatic
 import gorm.tools.databinding.BasicDataBinder
 import gorm.tools.job.CoreSyncJobParams
 import gorm.tools.repository.model.DataOp
-import yakworks.commons.map.Maps
-import yakworks.meta.MetaUtils
 
 /**
  * Value Object are better than using a Map to store arguments and parameters.
@@ -19,7 +17,7 @@ import yakworks.meta.MetaUtils
  * See BulkableRepo for its primary usage.
  */
 @CompileStatic
-class BulkImportJobParams extends CoreSyncJobParams{
+class BulkImportJobParams extends CoreSyncJobParams {
 
     /**
      * the operation to perform, Used in bulk and limited to add, update and upsert right now.
@@ -53,57 +51,10 @@ class BulkImportJobParams extends CoreSyncJobParams{
      */
     Integer controlCount
 
-    /**
-     * (For Master/Detail dataFormat=CSV) Header key field that links detail/lines detailLinkField (ArTranLines)
-     * to the header record (ArTran). Default is ‘source.sourceId’ but if you have underscores pass in ‘source_sourceId’
-     * (when data imported from the file)
-     */
-    String dataKeyField
-
-    /**
-     * (For Master/Detail dataFormat=CSV) The field in the header entity where the collection of lines goes.
-     * For ArTran it would be "lines" for example
-     */
-    String dataDetailField
-
-    /**
-     * (For Master/Detail dataFormat=CSV) Field that links back to the dataKeyField in the header file.
-     * ‘arTran.sourceId’ for example
-     */
-    String detailLinkField
-
-    /**
-     * (For Master/Detail CSV) The name of the detail lines file. Default is detail.csv
-     */
-    String detailFilename
-
-    /**
-     * For dev, force how to store the payload (what was sent)
-     * FIXME I dont think we need this
-     */
-    Boolean savePayload //= true
-
-    /**
-     * force payload to store as file instead of bytes
-     * FIXME I dont think we need this
-     */
-    Boolean savePayloadAsFile
-
-    /**
-     * resulting data (what is returned in response) is always saved but can force it to save to file instead of bytes in column
-     * FIXME I dont think we need this, let it do automatically
-     */
-    Boolean saveDataAsFile //= false
-
-
     static BulkImportJobParams withParams(Map params){
         BulkImportJobParams bijParams = new BulkImportJobParams()
         BasicDataBinder.bind(bijParams, params)
-        //BeanTools.bind(bijParams, params)
         return bijParams
     }
 
-    // Map asMap(){
-    //     Maps.prune(MetaUtils.getProperties(this))
-    // }
 }

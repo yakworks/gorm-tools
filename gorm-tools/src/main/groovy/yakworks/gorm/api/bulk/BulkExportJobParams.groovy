@@ -6,6 +6,7 @@ package yakworks.gorm.api.bulk
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.databinding.BasicDataBinder
 import gorm.tools.job.CoreSyncJobParams
 import yakworks.commons.map.Maps
 import yakworks.meta.MetaUtils
@@ -24,4 +25,10 @@ class BulkExportJobParams extends CoreSyncJobParams{
      */
     String dataFormat
 
+    static BulkExportJobParams withParams(Map params){
+        BulkExportJobParams bulkParams = new BulkExportJobParams()
+        BasicDataBinder.bind(bulkParams, params)
+        //BeanTools.bind(bijParams, params)
+        return bulkParams
+    }
 }

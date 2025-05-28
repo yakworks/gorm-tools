@@ -28,6 +28,7 @@ import yakworks.api.problem.Problem
 import yakworks.commons.lang.EnumUtils
 import yakworks.gorm.api.CrudApi
 import yakworks.gorm.api.IncludesProps
+import yakworks.gorm.api.bulk.BulkExportJobParams
 import yakworks.gorm.api.bulk.BulkImportJobParams
 
 import static gorm.tools.problem.ProblemHandler.isBrokenPipe
@@ -243,8 +244,9 @@ trait CrudApiController<D> extends RestApiController {
     def bulkExport() {
         try {
             Map qParams = getParamsMap()
-            //XXX @SUD We will disallow
-            SyncJobEntity job = getCrudApi().bulkExport(qParams,  requestToSourceId(request))
+            BulkExportJobParams jobParams = BulkExportJobParams.withParams(qParams)
+            jobParams.sourceId = requestToSourceId(request)
+            SyncJobEntity job = getCrudApi().bulkExport(jobParams)
             respondWith(job, [status: qParams.getBoolean('async') == false ? MULTI_STATUS : CREATED])
         } catch (Exception | AssertionError e) {
             respondWith(

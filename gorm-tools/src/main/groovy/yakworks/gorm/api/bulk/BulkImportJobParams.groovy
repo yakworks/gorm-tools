@@ -78,17 +78,20 @@ class BulkImportJobParams extends CoreSyncJobParams{
     String detailFilename
 
     /**
-     * force how to store the payload (what was sent)
+     * For dev, force how to store the payload (what was sent)
+     * FIXME I dont think we need this
      */
     Boolean savePayload //= true
 
     /**
      * force payload to store as file instead of bytes
+     * FIXME I dont think we need this
      */
     Boolean savePayloadAsFile
 
     /**
      * resulting data (what is returned in response) is always saved but can force it to save to file instead of bytes in column
+     * FIXME I dont think we need this, let it do automatically
      */
     Boolean saveDataAsFile //= false
 

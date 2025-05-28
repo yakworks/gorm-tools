@@ -4,8 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 
 import gorm.tools.async.AsyncService
-import gorm.tools.job.BulkImportJobParams
-import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobState
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.model.DataOp
@@ -15,7 +13,6 @@ import testing.TestSyncJobService
 import yakworks.api.problem.data.DataProblemException
 import yakworks.commons.map.LazyPathKeyMap
 import yakworks.gorm.config.AsyncConfig
-import yakworks.spring.AppCtx
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.testing.gorm.model.SinkExt

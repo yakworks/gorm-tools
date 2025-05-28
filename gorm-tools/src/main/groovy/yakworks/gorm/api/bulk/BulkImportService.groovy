@@ -9,7 +9,6 @@ import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
 
-import gorm.tools.job.BulkImportJobParams
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobEntity

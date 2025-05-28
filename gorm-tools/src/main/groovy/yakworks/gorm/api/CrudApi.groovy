@@ -7,10 +7,9 @@ package yakworks.gorm.api
 import groovy.transform.CompileStatic
 
 import gorm.tools.beans.Pager
-import gorm.tools.job.BulkImportJobParams
+import yakworks.gorm.api.bulk.BulkImportJobParams
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.model.ApiCrudRepo
-import gorm.tools.repository.model.DataOp
 import yakworks.api.problem.data.NotFoundProblem
 
 /**

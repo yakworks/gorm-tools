@@ -3,7 +3,7 @@ package gorm.tools.job
 import gorm.tools.repository.model.DataOp
 import spock.lang.Specification
 import yakworks.commons.beans.BeanTools
-import yakworks.commons.lang.EnumUtils
+import yakworks.gorm.api.bulk.BulkImportJobParams
 
 class BulkImportJobParamsSpec extends Specification  {
 

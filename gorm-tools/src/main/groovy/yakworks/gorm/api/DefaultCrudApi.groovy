@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
 import gorm.tools.beans.Pager
-import gorm.tools.job.BulkImportJobParams
+import yakworks.gorm.api.bulk.BulkImportJobParams
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.metamap.services.MetaMapService

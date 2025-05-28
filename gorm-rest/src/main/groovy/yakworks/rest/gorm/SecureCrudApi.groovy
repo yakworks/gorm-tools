@@ -8,9 +8,8 @@ import groovy.transform.CompileStatic
 
 import org.springframework.security.access.prepost.PreAuthorize
 
-import gorm.tools.job.BulkImportJobParams
+import yakworks.gorm.api.bulk.BulkImportJobParams
 import gorm.tools.job.SyncJobEntity
-import gorm.tools.repository.model.DataOp
 import yakworks.gorm.api.CrudApi
 
 @CompileStatic

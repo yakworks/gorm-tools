@@ -1,6 +1,6 @@
 package yakworks.gorm.api
 
-import gorm.tools.job.BulkImportJobParams
+import yakworks.gorm.api.bulk.BulkImportJobParams
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobState
 import gorm.tools.repository.model.DataOp

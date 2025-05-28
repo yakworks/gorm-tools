@@ -2,9 +2,11 @@
 * Copyright 2021 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.job
+package yakworks.gorm.api.bulk
 
 import groovy.transform.CompileStatic
+
+import gorm.tools.job.CoreSyncJobParams
 
 /**
  * Value Object are better than using a Map to store arguments and parameters.

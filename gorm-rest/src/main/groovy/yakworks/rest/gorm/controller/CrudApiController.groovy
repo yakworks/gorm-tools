@@ -19,7 +19,7 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.util.UriUtils
 
 import gorm.tools.beans.Pager
-import gorm.tools.job.BulkImportJobParams
+import yakworks.gorm.api.bulk.BulkImportJobParams
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.model.DataOp

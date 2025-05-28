@@ -19,12 +19,14 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.util.UriUtils
 
 import gorm.tools.beans.Pager
+import gorm.tools.job.BulkImportJobParams
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.model.DataOp
 import gorm.tools.utils.ServiceLookup
 import grails.web.Action
 import yakworks.api.problem.Problem
+import yakworks.commons.lang.EnumUtils
 import yakworks.gorm.api.CrudApi
 import yakworks.gorm.api.IncludesProps
 
@@ -274,12 +276,31 @@ trait CrudApiController<D> extends RestApiController {
     //     respondWith(job, [status: qParams.getBoolean('async') == false ? MULTI_STATUS : CREATED])
     // }
 
-    //XXX New bulkProcess
+    // void bulkImport(DataOp dataOp) {
+    //     List dataList = bodyAsList() as List<Map>
+    //     Map qParams = getParamsMap()
+    //     String sourceId = requestToSourceId(request)
+    //     SyncJobEntity job = getCrudApi().bulkImport(dataOp, dataList, qParams, sourceId)
+    //     //if its async=false then it will be the Finished job and equivalent to the GET on SyncJob, SO MULTI_STATUS
+    //     // if its not async, then its just returning the created Job and equivalent to the POST on SyncJob, so a CREATED status
+    //     respondWith(job, [status: qParams.getBoolean('async') == false ? MULTI_STATUS : CREATED])
+    // }
+
     void bulkImport(DataOp dataOp) {
         List dataList = bodyAsList() as List<Map>
         Map qParams = getParamsMap()
-        String sourceId = requestToSourceId(request)
-        SyncJobEntity job = getCrudApi().bulkImport(dataOp, dataList, qParams, sourceId)
+        BulkImportJobParams jobParams = BulkImportJobParams.withParams(qParams)
+        jobParams.sourceId = requestToSourceId(request)
+        jobParams.op = dataOp
+        // for upsert they can pass in op=upsert to params.
+        // This is different than the dataOp arg in method here, which is going to either be add or update already
+        // as its set because it either a POST or PUT call.
+        DataOp paramsOp = EnumUtils.getEnumIgnoreCase(DataOp, qParams.op as String)
+        if(paramsOp == DataOp.upsert) jobParams.op = paramsOp
+        //keeps it backwards compatible and set source to jobSource
+        if(qParams.jobSource != null) jobParams.source = qParams.jobSource
+
+        SyncJobEntity job = getCrudApi().bulkImport(jobParams, dataList)
         //if its async=false then it will be the Finished job and equivalent to the GET on SyncJob, SO MULTI_STATUS
         // if its not async, then its just returning the created Job and equivalent to the POST on SyncJob, so a CREATED status
         respondWith(job, [status: qParams.getBoolean('async') == false ? MULTI_STATUS : CREATED])

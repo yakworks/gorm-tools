@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
 import gorm.tools.beans.Pager
+import gorm.tools.job.BulkImportJobParams
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.metamap.services.MetaMapService
@@ -19,7 +20,6 @@ import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.ApiCrudRepo
-import gorm.tools.repository.model.DataOp
 import gorm.tools.repository.model.EntityResult
 import gorm.tools.transaction.TrxUtils
 import grails.gorm.transactions.Transactional
@@ -200,8 +200,8 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     }
 
     @Override
-    SyncJobEntity bulkImport(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
-        getBulkImportService().process(dataOp, dataList, qParams, sourceId)
+    SyncJobEntity bulkImport(BulkImportJobParams jobParams, List<Map> dataList){
+        getBulkImportService().process(jobParams, dataList)
     }
 
     SyncJobEntity bulkExport(Map params, String sourceId) {

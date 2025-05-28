@@ -1,5 +1,6 @@
 package yakworks.gorm.api
 
+import gorm.tools.job.BulkImportJobParams
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobState
 import gorm.tools.repository.model.DataOp
@@ -50,6 +51,14 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
             includes: ["id", "name", "ext.name"])
     }
 
+    BulkImportJobParams setupBulkImportParams(DataOp op = DataOp.add){
+        return new BulkImportJobParams(
+            op: op, parallel: false, async:false,
+            source: "test", sourceId: "test",
+            includes: ["id", "name", "ext.name"]
+        )
+    }
+
     SyncJob getJob(Long jobId){
         SyncJob.repo.clear() //make sure session doesn't have it cached
         return SyncJob.get(jobId)
@@ -63,8 +72,9 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
         List<Map> jsonList = generateOrgData(3)
 
         when:
-        Long jobId = getBulkImportService(Org).bulkLegacy(jsonList, SyncJobArgs.create(parallel: false, async:false))
-        SyncJob job = getJob(jobId) //= SyncJob.repo.read(jobId)
+        def impParams = new BulkImportJobParams(parallel: false, async:false, op: DataOp.add)
+        def job = getBulkImportService(Org).bulkImportLegacy(impParams, jsonList)
+
         assert job.state == SyncJobState.Finished
         List json = parseJson(job.dataToString())
 
@@ -108,11 +118,13 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
         // so that second pass uses original data
         list[5].num ="num1" //will fail (During flush) on this one as it already exists
 
-        Long jobId = getBulkImportService(KitchenSink).bulkLegacy(list, setupSyncJobArgs())
-        def job, dbData, successCount
+        //Long jobId = getBulkImportService(KitchenSink).bulkLegacy(list, setupSyncJobArgs())
+        def job = getBulkImportService(KitchenSink).bulkImportLegacy(setupBulkImportParams(), list)
+
+        def dbData, successCount
 
         KitchenSink.withNewTransaction {
-            job = SyncJob.get(jobId)
+            //job = SyncJob.get(jobId)
             dbData = KitchenSink.findAllWhere(comments: 'GoDogGo')
             successCount = KitchenSink.countByComments("GoDogGo") //All except 1 should have been inserted
         }
@@ -136,8 +148,8 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
         List<Map> jsonList = generateOrgData(5)
 
         when:
-        Long jobId = getBulkImportService(Org).bulkLegacy(jsonList, SyncJobArgs.create(parallel: false, async: false))
-        SyncJob job = getJob(jobId) //SyncJob.get(jobId)
+
+        def job = getBulkImportService(Org).bulkImportLegacy(setupBulkImportParams(), jsonList)
 
         then:
         noExceptionThrown()
@@ -152,9 +164,7 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
             it["comments"] = "flubber${it.id}"
         }
 
-        jobId = getBulkImportService(Org).bulkLegacy(jsonList, new SyncJobArgs(parallel: false, async: false).op(DataOp.update))
-        job = getJob(jobId) //SyncJob.get(jobId)
-        // flushAndClear()
+        job = getBulkImportService(Org).bulkImportLegacy(setupBulkImportParams(DataOp.update), jsonList)
 
         then:
         noExceptionThrown()
@@ -182,18 +192,13 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
         List<Map> contactData = [[org:[id: org.id], street1: "street1", street2: "street2", city: "city", state:"IN"]]
 
         when:
-        SyncJobArgs args = SyncJobArgs.create(parallel: false, async: false)
 
-        //include field from org, here org would be a lazy association, and would fail when its property accessed during json building
-        args.includes = ["id", "org.source.id"]
-        Long jobId = getBulkImportService(Location).bulkLegacy(contactData, args)
-
-        then:
-        noExceptionThrown()
-        jobId != null
-
-        when:
-        SyncJob job = SyncJob.get(jobId)
+        def impParams = new BulkImportJobParams(
+            parallel: false, async:false, op: DataOp.add,
+            //include field from org, here org would be a lazy association, and would fail when its property accessed during json building
+            includes: ["id", "org.source.id"]
+        )
+        def job = getBulkImportService(Location).bulkImportLegacy(impParams, contactData)
 
         then:
         job != null
@@ -212,9 +217,7 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
         jsonList[0].num = StringUtils.rightPad("ORG-1-", 110, "X")
 
         when:
-        Long jobId = getBulkImportService(Org).bulkLegacy(jsonList, SyncJobArgs.create(parallel: false,  async: false))
-        SyncJob job = SyncJob.repo.getWithTrx(jobId)
-        flush()
+        def job = getBulkImportService(Org).bulkImportLegacy(setupBulkImportParams(), jsonList)
 
         then:
         noExceptionThrown()
@@ -245,8 +248,7 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
 
         when: "bulk insert"
 
-        Long jobId = getBulkImportService(KitchenSink).bulkLegacy(list, setupSyncJobArgs())
-        def job = SyncJob.repo.getWithTrx(jobId)
+        def job = getBulkImportService(KitchenSink).bulkImportLegacy(setupBulkImportParams(), list)
 
         def results = parseJson(job.dataToString())
 
@@ -281,8 +283,13 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
         jsonList[1].num = "testorg-1"
 
         when:
-        Long jobId = getBulkImportService(Org).bulkLegacy(jsonList, SyncJobArgs.create(async:false))
-        SyncJob job = SyncJob.repo.getWithTrx(jobId)
+        def impParams = new BulkImportJobParams(
+            parallel: true, async:false, op: DataOp.add
+        )
+        def job = getBulkImportService(Org).bulkImportLegacy(impParams, jsonList)
+
+        // Long jobId = getBulkImportService(Org).bulkLegacy(jsonList, SyncJobArgs.create(async:false))
+        // def job = SyncJob.repo.getWithTrx(jobId)
 
         then:
         noExceptionThrown()
@@ -290,10 +297,14 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
 
         when: "verify json"
         List json = parseJson(job.dataToString())
+        List jsonSuccess = json.findAll({ it.ok == true})
+        List jsonFail = json.findAll({ it.ok == false})
 
         then:
-        json != null
-        json.findAll({ it.ok == true}).size() == 299
+        json.size() == 300
+        jsonSuccess.size() == 299
+        jsonFail.size() == 1
+
         OrgFlex.countByText1('goGoGadget') == 299
 
         when:
@@ -332,8 +343,10 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
         jsonList[3].num = "testorg-2" //this one should cause error when processing slice errors
 
         when:
-        Long jobId = getBulkImportService(Org).bulkLegacy(jsonList, SyncJobArgs.create(async:false))
-        SyncJob job = SyncJob.repo.getWithTrx(jobId)
+        def impParams = new BulkImportJobParams(
+            parallel: true, async:false, op: DataOp.add
+        )
+        def job = getBulkImportService(Org).bulkImportLegacy(impParams, jsonList)
 
         then:
         noExceptionThrown()

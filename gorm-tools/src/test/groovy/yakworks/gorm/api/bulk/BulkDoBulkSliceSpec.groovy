@@ -31,10 +31,8 @@ class BulkDoBulkSliceSpec extends Specification implements GormHibernateTest {
         return new SyncJobArgs(parallel: false, async:false, op: op, source: "test", sourceId: "test", includes: ["id", "name", "ext.name"])
     }
 
-    BulkImporter getBulkImporter(){
-        def bis = new BulkImporter(KitchenSink)
-        AppCtx.autowire(bis)
-        return bis
+    BulkImporter<KitchenSink> getBulkImporter(){
+        BulkImporter.lookup(KitchenSink)
     }
 
     void "success doBulk add"() {
@@ -134,7 +132,6 @@ class BulkDoBulkSliceSpec extends Specification implements GormHibernateTest {
         problem.violations[0].field == 'name'
         problem.violations[0].code == 'NotNull'
     }
-
 
     void "test bulk UPSERT"() {
         given:

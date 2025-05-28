@@ -7,6 +7,7 @@ package yakworks.gorm.api
 import groovy.transform.CompileStatic
 
 import gorm.tools.beans.Pager
+import gorm.tools.job.BulkImportJobParams
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.model.ApiCrudRepo
 import gorm.tools.repository.model.DataOp
@@ -97,18 +98,7 @@ interface CrudApi<D> {
      */
     Pager pickList(Map params, URI uri)
 
-    /**
-     * bulk operations on entity
-     *
-     * @param dataOp: the data operation
-     * @param dataList: the dataList to bulk update or insert
-     * @param params: query string params. Will be used to build SyncJobArgs
-     * @param sourceId: sourceId for the Job, controller uses JobUtils.requestToSourceId to set it.
-     * @return the created SyncJobEntity, normally async=true and syncJob.state will be 'Running'
-     */
-    //SyncJobEntity bulkLegacy(DataOp dataOp, List<Map> dataList, Map params, String sourceId)
-
-    SyncJobEntity bulkImport(DataOp dataOp, List<Map> dataList, Map params, String sourceId)
+    SyncJobEntity bulkImport(BulkImportJobParams jobParams, List<Map> dataList)
 
     SyncJobEntity bulkExport(Map params, String sourceId)
 

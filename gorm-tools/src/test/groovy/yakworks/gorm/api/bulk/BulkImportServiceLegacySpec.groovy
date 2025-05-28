@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 
 import gorm.tools.async.AsyncService
+import gorm.tools.job.BulkImportJobParams
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobState
 import gorm.tools.problem.ValidationProblem
@@ -30,17 +31,19 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
     @Autowired AsyncService asyncService
     @Autowired KitchenSinkRepo kitchenSinkRepo
 
-    SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
-        return new SyncJobArgs(
-            parallel: false, async:false, op: op, jobType: 'bulk.import',
-            source: "test", sourceId: "test", includes: ["id", "name", "ext.name"]
+    BulkImportJobParams setupBulkImportParams(DataOp op = DataOp.add){
+        return new BulkImportJobParams(
+            parallel: false,
+            //async:false,
+            op: op,
+            source: "test",
+            sourceId: "test",
+            includes: ["id", "name", "ext.name"]
         )
     }
 
-    BulkImporter getBulkImporter(){
-        def bis = new BulkImporter(KitchenSink)
-        AppCtx.autowire(bis)
-        return bis
+    BulkImporter<KitchenSink> getBulkImporter(){
+        BulkImporter.lookup(KitchenSink)
     }
 
     BulkImportService<KitchenSink> getBulkImportService(){
@@ -62,8 +65,7 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
         List list = KitchenSink.generateDataList(10)
 
         when: "bulk insert 20 records"
-        Long jobId = bulkImportService.bulkLegacy(list, setupSyncJobArgs())
-        def job = TestSyncJob.get(jobId)
+        def job = bulkImportService.bulkImportLegacy(setupBulkImportParams(), list)
         List results = job.parseData()
 
         then: "verify job"
@@ -77,9 +79,7 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
 
         when: "bulk insert 20 records"
 
-        Long jobId = bulkImportService.bulkLegacy(list, setupSyncJobArgs())
-        def job = TestSyncJob.get(jobId)
-
+        def job = bulkImportService.bulkImportLegacy(setupBulkImportParams(), list)
 
         then: "verify job"
 
@@ -137,8 +137,7 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
         List list = KitchenSink.generateDataList(10)
 
         when: "insert records"
-        Long jobId = bulkImportService.bulkLegacy(list, setupSyncJobArgs())
-        def job = TestSyncJob.get(jobId)
+        def job = bulkImportService.bulkImportLegacy(setupBulkImportParams(), list)
 
         then:
         job.state == SyncJobState.Finished
@@ -152,8 +151,7 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
             it.id = idx + 1
         }
 
-        jobId = bulkImportService.bulkLegacy(list, setupSyncJobArgs(DataOp.update))
-        job = TestSyncJob.get(jobId)
+        job = bulkImportService.bulkImportLegacy(setupBulkImportParams(DataOp.update), list)
 
         then:
         noExceptionThrown()
@@ -176,8 +174,7 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
 
         when: "bulk insert"
 
-        Long jobId = bulkImportService.bulkLegacy(list, setupSyncJobArgs())
-        def job = TestSyncJob.get(jobId)
+        def job = bulkImportService.bulkImportLegacy(setupBulkImportParams(), list)
 
         def results = parseJson(job.dataToString())
 
@@ -219,8 +216,7 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
 
         when: "bulk insert"
 
-        Long jobId = bulkImportService.bulkLegacy(list, setupSyncJobArgs())
-        def job = TestSyncJob.get(jobId)
+        def job = bulkImportService.bulkImportLegacy(setupBulkImportParams(), list)
 
         then: "verify job"
         job.ok == false
@@ -252,8 +248,7 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
         List<Map> list = KitchenSink.generateDataList(60) //this should trigger 6 batches of 10
 
         when: "bulk insert in multi batches"
-        Long jobId = bulkImportService.bulkLegacy(list, setupSyncJobArgs())
-        def job = TestSyncJob.findById(jobId)
+        def job = bulkImportService.bulkImportLegacy(setupBulkImportParams(), list)
 
         def results = parseJson(job.dataToString())
 
@@ -272,10 +267,7 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
         data << LazyPathKeyMap.of([num:'2', name:'Sink2', ext_name:'SinkExt2', bazMap_foo:'bar'], '_')
 
         when: "bulk insert 2 records"
-        SyncJobArgs args = setupSyncJobArgs()
-        Long jobId = bulkImportService.bulkLegacy(data, args)
-        def job = TestSyncJob.get(jobId)
-
+        def job = bulkImportService.bulkImportLegacy(setupBulkImportParams(), data)
 
         then: "verify job"
 
@@ -350,14 +342,14 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
 
     void "test empty data"() {
         when:
-        Long jobId = bulkImportService.bulkLegacy(null, setupSyncJobArgs())
+        def job = bulkImportService.bulkImportLegacy(setupBulkImportParams(), null)
 
         then:
         DataProblemException ex = thrown()
         ex.code == 'error.data.emptyPayload'
 
         when:
-        jobId = bulkImportService.bulkLegacy([], setupSyncJobArgs())
+        job = bulkImportService.bulkImportLegacy(setupBulkImportParams(), [])
 
         then:
         DataProblemException ex2 = thrown()

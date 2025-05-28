@@ -214,7 +214,7 @@ class BulkExportService<D> {
 
     @ReadOnly
     protected Integer getTotalCount(QueryArgs queryArgs) {
-       return getRepo().query(queryArgs).count() as Integer
+        return getRepo().query(queryArgs).count() as Integer
     }
 
 }

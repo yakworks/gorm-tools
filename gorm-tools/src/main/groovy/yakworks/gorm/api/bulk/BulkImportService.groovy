@@ -9,6 +9,7 @@ import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
 
+import gorm.tools.job.BulkImportJobParams
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobEntity
@@ -70,32 +71,44 @@ class BulkImportService<D> {
         return bulkImporter
     }
 
-
-    SyncJobEntity process(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
+    SyncJobEntity process(BulkImportJobParams jobParams, List<Map> dataList){
         if(gormConfig.legacyBulk){
-            return bulkImportLegacy(dataOp, dataList, qParams, sourceId)
-        } else {
-            return doBulkImport(dataOp, dataList, qParams, sourceId)
+            return bulkImportLegacy(jobParams, dataList)
+        }
+        else {
+            return bulkImport(jobParams, dataList)
         }
     }
 
-    SyncJobEntity bulkImportLegacy(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
+    SyncJobEntity bulkImportLegacy(BulkImportJobParams jobParams, List<Map> dataList){
         //if attachmentId then assume its a csv
         //XXX we should not assume its CSV. Check dataFormat as well, we can have that default to CSV
-        if(qParams.attachmentId) {
+        if(jobParams.attachmentId) {
             //XXX We set savePayload to false by default for CSV since we already have the csv file as attachment?
-            qParams.savePayload = false
+            //jobParams.savePayload = false
             //sets the datalist from the csv instead of body
             //Transform csv here, so bulk processing remains same, regardless the incoming payload is csv or json
-            dataList = transformCsvToBulkList(qParams)
+            dataList = transformCsvToBulkList(jobParams.asMap())
         } else {
             //XXX dirty ugly hack since we were not consistent and now need to do clean up
             // RNDC expects async to be false by default when its not CSV
-            if(!qParams.containsKey('async')) qParams['async'] = false
+            // remove this else hack once this is done https://github.com/9ci/cust-rndc-ext/issues/215
+            if(jobParams.async == null) jobParams.async = false
         }
-        SyncJobArgs syncJobArgs = setupSyncJobArgs(dataOp, qParams, sourceId)
-        syncJobArgs.jobType = 'bulkImport'
-        Long jobId = bulkLegacy(dataList, syncJobArgs)
+        SyncJobArgs syncJobArgs = setupSyncJobArgs(jobParams)
+        syncJobArgs.jobType = 'bulk.import'
+        syncJobArgs.entityClass = getEntityClass()
+
+        //If dataList is empty then error right away.
+        if(dataList == null || dataList.isEmpty()) throw DataProblem.of('error.data.emptyPayload').detail("Bulk Data is Empty").toException()
+
+        SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
+        //XXX why are we setting session: true here? explain. should it be default?
+        //def asyncArgs = jobContext.args.asyncArgs.session(true)
+        // This is the promise call. Will return immediately if syncJobArgs.async=true
+        Long jobId = syncJobService.runJob(
+            jobContext.args.asyncArgs, jobContext, () -> getBulkImporter().doBulkParallel(dataList, jobContext)
+        )
         SyncJobEntity job = syncJobService.getJob(jobId)
         return job
     }
@@ -108,30 +121,19 @@ class BulkImportService<D> {
      * @param syncJobArgs the args object to pass on to doBulk
      * @return Job id
      */
+    @Deprecated
     Long bulkLegacy(List<Map> dataList, SyncJobArgs syncJobArgs) {
-        //If dataList is empty then error right away.
-        if(dataList == null || dataList.isEmpty()) throw DataProblem.of('error.data.emptyPayload').detail("Bulk Data is Empty").toException()
-
-        syncJobArgs.entityClass = getEntityClass()
-        if(!syncJobArgs.jobType) syncJobArgs.jobType = 'bulk.import'
-
-        SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
-        //XXX why are we setting session: true here? explain. should it be default?
-        //def asyncArgs = jobContext.args.asyncArgs.session(true)
-        // This is the promise call. Will return immediately if syncJobArgs.async=true
-        return syncJobService.runJob(
-            jobContext.args.asyncArgs, jobContext, () -> getBulkImporter().doBulkParallel(dataList, jobContext)
-        )
+        return 1
     }
 
     //WIP
-    SyncJobEntity doBulkImport(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
+    SyncJobEntity bulkImport(BulkImportJobParams jobParams, List<Map> dataList){
 
         //submit the job
-        SyncJobEntity job = queueImportJob(dataOp, qParams, sourceId, dataList)
+        SyncJobEntity job = queueImportJob(jobParams.op, jobParams.asMap(), jobParams.sourceId, dataList)
         Long jobId = job.id
         //if not async then wait for it to finish
-        if(!qParams.getBoolean('async', true)){
+        if(!jobParams.async){
             //sleep first to give the job runner time to pick it up
             sleep(1000)
             //XXX new process loop and wait for job to finish
@@ -262,6 +264,25 @@ class BulkImportService<D> {
         // as its set because it either a POST or PUT call.
         DataOp paramsOp = EnumUtils.getEnumIgnoreCase(DataOp, params.op as String)
         if(paramsOp == DataOp.upsert) syncJobArgs.op = paramsOp
+
+        return syncJobArgs
+    }
+
+    /**
+     * sets up the SyncJobArgs from whats passed in from params
+     */
+    SyncJobArgs setupSyncJobArgs(BulkImportJobParams jobParams){
+        List bulkIncludes = jobParams.includes ?: includesConfig.findByKeys(getEntityClass(), [IncludesKey.bulk, IncludesKey.get])
+        //want the error includes to be blank if its not there
+        List bulkErrorIncludes = includesConfig.getByKey(getEntityClass(), 'bulkError') as List<String>
+
+        SyncJobArgs syncJobArgs = SyncJobArgs.withParams(jobParams.asMap())
+        syncJobArgs.op = jobParams.op
+        syncJobArgs.includes = bulkIncludes
+        syncJobArgs.errorIncludes = bulkErrorIncludes
+        syncJobArgs.sourceId = jobParams.sourceId
+        //XXX do we need this for events?
+        syncJobArgs.entityClass = getEntityClass()
 
         return syncJobArgs
     }

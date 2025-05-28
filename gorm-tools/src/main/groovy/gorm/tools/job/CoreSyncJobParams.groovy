@@ -6,9 +6,6 @@ package gorm.tools.job
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.mango.api.QueryArgs
-import gorm.tools.repository.model.DataOp
-
 /**
  * Value Object are better than using a Map to store arguments and parameters.
  * This is used for Bulk operations.
@@ -16,44 +13,17 @@ import gorm.tools.repository.model.DataOp
  * See BulkableRepo for its primary usage.
  */
 @CompileStatic
-class SyncJobParams {
+class CoreSyncJobParams {
 
     /**
-     * force how to store the payload (what was sent)
+     * You can specify consistent source name for the data, for example “Oracle ERP”, “Dynamics” etc…
      */
-    Boolean savePayload = true
+    String source
 
     /**
-     * force payload to store as file instead of bytes
+     * Usually set automatically and does not need to be filled
      */
-    Boolean savePayloadAsFile
-
-    /**
-     * resulting data (what is returned in response) is always saved but can force it to save to file instead of bytes in column
-     */
-    Boolean saveDataAsFile = false
-
-    /**
-     * the operation to perform, Used in bulk and limited to add, update and upsert right now.
-     */
-    DataOp op
-
-    /**
-     * extra params to pass into Job, such as source and sourceId. The endpoint the
-     * request came from will end up in sourceId
-     */
-    Map params = [:]
-
-    /**
-     * for results, list of fields to include for the SyncJob.data
-     */
-    List<String> includes = ['id']
-
-    /**
-     * List of keys to include from the data map that failed.
-     * default is null which means it returns the originalData that was submitted.
-     */
-    List<String> errorIncludes = null
+    String sourceId
 
     /**
      * Normally used for testing and debugging, or when encountering deadlocks.
@@ -68,19 +38,26 @@ class SyncJobParams {
      * Whether it should run in async background thread and return the job immediately.
      * Essentially makes the job a sort of Promise or Future.
      * when false (default) run in a standard blocking synchronous thread and return when job is done
+     * NOTE: Some SyncJobs only run as async=true, BulkExport for example.
      */
-    Boolean async = true
+    Boolean async
 
     /**
-     * When params include a mango query this is the QueryArgs that are created from it. Used for the ExportSyncArgs.
-     * FUTURE USE
+     * For results, comma seperated list of fields to include for the SyncJob.data
      */
-    QueryArgs queryArgs
+    List<String> includes // = ['id']
+    //String includes = 'id'
 
     /**
-     * The domain on which the bulk is being performed
-     * Used by event listeners to filter and process selectively
+     * List of keys to include from the data map that failed.
+     * default is null which means it returns the originalData that was submitted.
      */
-    String entityClassName
+    List<String> errorIncludes //= null
+    //String errorIncludes
+
+    /**
+     * some syncjobs can involve a q mango query
+     */
+    String q
 
 }

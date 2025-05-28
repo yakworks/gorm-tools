@@ -40,10 +40,8 @@ class BulkImporterSpec extends Specification implements GormHibernateTest {
         )
     }
 
-    BulkImporter getBulkImporter(){
-        def bis = new BulkImporter(KitchenSink)
-        AppCtx.autowire(bis)
-        return bis
+    BulkImporter<KitchenSink> getBulkImporter(){
+        BulkImporter.lookup(KitchenSink)
     }
 
     def "sanity check single validation"() {

@@ -15,14 +15,18 @@ class BasicDataBinderSpec extends Specification {
             bingo: 'was',
             bingo2: 'his',
             bingo3: 'nameOh',
+            num: '123',
+            bingos: 'was,his'
         ]
-        def basicDataBinder = new BasicDataBinder()
-        def obj = basicDataBinder.bind(new VanillaTarget(), params)
+        //def basicDataBinder = new BasicDataBinder()
+        def obj = BasicDataBinder.bind(new VanillaTarget(), params)
 
         then:
         obj.bingo == Bingo.WAS
         obj.bingo2 == Bingo.His
         obj.bingo3 == Bingo.NAME_oh
+        obj.num == 123
+        obj.bingos == [Bingo.WAS,Bingo.His]
     }
 
 }
@@ -33,6 +37,7 @@ class VanillaTarget {
     Bingo bingo2
     Bingo bingo3
     List<Bingo> bingos
+    Integer num
 
 }
 

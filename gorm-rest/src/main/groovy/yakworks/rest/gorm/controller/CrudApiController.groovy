@@ -19,7 +19,6 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.util.UriUtils
 
 import gorm.tools.beans.Pager
-import yakworks.gorm.api.bulk.BulkImportJobParams
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.model.DataOp
@@ -29,6 +28,7 @@ import yakworks.api.problem.Problem
 import yakworks.commons.lang.EnumUtils
 import yakworks.gorm.api.CrudApi
 import yakworks.gorm.api.IncludesProps
+import yakworks.gorm.api.bulk.BulkImportJobParams
 
 import static gorm.tools.problem.ProblemHandler.isBrokenPipe
 import static org.springframework.http.HttpStatus.CREATED

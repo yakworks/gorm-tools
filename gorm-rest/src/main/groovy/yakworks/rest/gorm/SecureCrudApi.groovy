@@ -8,9 +8,9 @@ import groovy.transform.CompileStatic
 
 import org.springframework.security.access.prepost.PreAuthorize
 
-import yakworks.gorm.api.bulk.BulkImportJobParams
 import gorm.tools.job.SyncJobEntity
 import yakworks.gorm.api.CrudApi
+import yakworks.gorm.api.bulk.BulkImportJobParams
 
 @CompileStatic
 class SecureCrudApi<D> implements CrudApi<D> {

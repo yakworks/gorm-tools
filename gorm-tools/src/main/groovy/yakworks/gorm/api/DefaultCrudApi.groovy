@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
 import gorm.tools.beans.Pager
-import yakworks.gorm.api.bulk.BulkImportJobParams
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.metamap.services.MetaMapService
@@ -24,7 +23,9 @@ import gorm.tools.repository.model.EntityResult
 import gorm.tools.transaction.TrxUtils
 import grails.gorm.transactions.Transactional
 import yakworks.api.problem.data.DataProblemException
+import yakworks.gorm.api.bulk.BulkExportJobParams
 import yakworks.gorm.api.bulk.BulkExportService
+import yakworks.gorm.api.bulk.BulkImportJobParams
 import yakworks.gorm.api.bulk.BulkImportService
 import yakworks.gorm.api.support.QueryArgsValidator
 import yakworks.gorm.config.QueryConfig
@@ -204,8 +205,9 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         getBulkImportService().process(jobParams, dataList)
     }
 
-    SyncJobEntity bulkExport(Map params, String sourceId) {
-        getBulkExportService().queueExportJob(params, sourceId)
+    @Override
+    SyncJobEntity bulkExport(BulkExportJobParams jobParams) {
+        getBulkExportService().queueExportJob(jobParams)
     }
 
     protected List<D> queryList(QueryArgs qargs) {

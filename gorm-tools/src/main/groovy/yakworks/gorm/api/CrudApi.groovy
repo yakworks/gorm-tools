@@ -7,10 +7,11 @@ package yakworks.gorm.api
 import groovy.transform.CompileStatic
 
 import gorm.tools.beans.Pager
-import yakworks.gorm.api.bulk.BulkImportJobParams
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.model.ApiCrudRepo
 import yakworks.api.problem.data.NotFoundProblem
+import yakworks.gorm.api.bulk.BulkExportJobParams
+import yakworks.gorm.api.bulk.BulkImportJobParams
 
 /**
  * CRUD api for rest repo
@@ -99,7 +100,7 @@ interface CrudApi<D> {
 
     SyncJobEntity bulkImport(BulkImportJobParams jobParams, List<Map> dataList)
 
-    SyncJobEntity bulkExport(Map params, String sourceId)
+    SyncJobEntity bulkExport(BulkExportJobParams jobParams)
 
     /**
      * Converts the instance to Map using the MetaMap wrapper with {@link gorm.tools.metamap.services.MetaMapService}.

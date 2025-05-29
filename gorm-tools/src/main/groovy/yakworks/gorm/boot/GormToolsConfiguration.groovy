@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.DependsOn
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Lazy
+import org.springframework.context.annotation.Scope
 import org.springframework.jdbc.core.JdbcTemplate
 
 import gorm.tools.async.AsyncService
@@ -39,15 +40,16 @@ import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.transaction.TrxService
 import gorm.tools.validation.RepoValidatorRegistry
 import yakworks.gorm.api.ApiConfig
+import yakworks.gorm.api.DefaultCrudApi
 import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.support.DefaultQueryArgsValidator
 import yakworks.gorm.api.support.QueryArgsValidator
-import yakworks.gorm.config.DefaultBulkConfiguration
+import yakworks.gorm.config.DefaultsApiConfiguration
 import yakworks.gorm.config.GormToolsPropertiesConfiguration
 
 @AutoConfiguration
 @Lazy
-@Import([DefaultCrudApiConfiguration, GormToolsPropertiesConfiguration, DefaultBulkConfiguration])
+@Import([DefaultsApiConfiguration, GormToolsPropertiesConfiguration])
 //Config Props AsyncConfig, GormConfig, IdGeneratorConfig, QueryConfig
 // @AutoConfigureBefore([HibernateJpaAutoConfiguration])
 // @AutoConfigureAfter(DataSourceAutoConfiguration)
@@ -151,10 +153,5 @@ class GormToolsConfiguration {
         new DefaultQueryArgsValidator()
     }
 
-    // @Bean
-    // @ConditionalOnMissingBean
-    // BulkExportSupport bulkExportService() {
-    //     return new BulkExportSupport()
-    // }
 
 }

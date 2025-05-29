@@ -48,11 +48,6 @@ class SyncJobArgs {
     Long payloadId
 
     /**
-     * force how to store the payload (what was sent)
-     */
-    Boolean savePayload = true
-
-    /**
      * force payload to store as file instead of bytes
      */
     Boolean savePayloadAsFile
@@ -200,15 +195,13 @@ class SyncJobArgs {
     // }
 
     static SyncJobArgs withParams(Map params){
-        SyncJobArgs syncJobArgs = new SyncJobArgs(params:params)
+        SyncJobArgs syncJobArgs = new SyncJobArgs(params: params)
         //parallel is NULL by default
         if(params.parallel != null) syncJobArgs.parallel = params.getBoolean('parallel')
 
         //when this is true then runs "non-blocking" in background and will job immediately with state=running
         syncJobArgs.async = params.getBoolean('async', true)
 
-        //save payload is true by default
-        if(params.savePayload != null) syncJobArgs.savePayload = params.getBoolean('savePayload')
         if(params.saveDataAsFile != null) syncJobArgs.saveDataAsFile = params.getBoolean('saveDataAsFile')
 
         syncJobArgs.sourceId = params.sourceId

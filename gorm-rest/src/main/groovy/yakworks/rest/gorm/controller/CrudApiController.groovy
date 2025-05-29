@@ -263,13 +263,11 @@ trait CrudApiController<D> extends RestApiController {
     //
     //     //if attachmentId then assume its a csv
     //     if(qParams.attachmentId) {
-    //         //XXX We set savePayload to false by default for CSV since we already have the csv file as attachment?
     //         qParams.savePayload = false
     //         //sets the datalist from the csv instead of body
     //         //Transform csv here, so bulk processing remains same, regardless the incoming payload is csv or json
     //         dataList = transformCsvToBulkList(qParams)
     //     } else {
-    //         //XXX dirty ugly hack since we were not consistent and now need to do clean up
     //         // RNDC expects async to be false by default when its not CSV
     //         if(!qParams.containsKey('async')) qParams['async'] = false
     //     }
@@ -278,28 +276,18 @@ trait CrudApiController<D> extends RestApiController {
     //     respondWith(job, [status: qParams.getBoolean('async') == false ? MULTI_STATUS : CREATED])
     // }
 
-    // void bulkImport(DataOp dataOp) {
-    //     List dataList = bodyAsList() as List<Map>
-    //     Map qParams = getParamsMap()
-    //     String sourceId = requestToSourceId(request)
-    //     SyncJobEntity job = getCrudApi().bulkImport(dataOp, dataList, qParams, sourceId)
-    //     //if its async=false then it will be the Finished job and equivalent to the GET on SyncJob, SO MULTI_STATUS
-    //     // if its not async, then its just returning the created Job and equivalent to the POST on SyncJob, so a CREATED status
-    //     respondWith(job, [status: qParams.getBoolean('async') == false ? MULTI_STATUS : CREATED])
-    // }
-
     void bulkImport(DataOp dataOp) {
         List dataList = bodyAsList() as List<Map>
         Map qParams = getParamsMap()
         BulkImportJobParams jobParams = BulkImportJobParams.withParams(qParams)
+        jobParams.queryParams = qParams //store the full params map
         jobParams.sourceId = requestToSourceId(request)
         jobParams.op = dataOp
-        // for upsert they can pass in op=upsert to params.
-        // This is different than the dataOp arg in method here, which is going to either be add or update already
-        // as its set because it either a POST or PUT call.
+        // replace when upsert is passed in op=upsert as query param. This is different than the dataOp arg in method here,
+        // which is going to either be "add" or "update" already as its comes from either a POST or PUT call.
         DataOp paramsOp = EnumUtils.getEnumIgnoreCase(DataOp, qParams.op as String)
         if(paramsOp == DataOp.upsert) jobParams.op = paramsOp
-        //keeps it backwards compatible and set source to jobSource
+        //keeps it backwards compatible and set source to jobSource if passed in.
         if(qParams.jobSource != null) jobParams.source = qParams.jobSource
 
         SyncJobEntity job = getCrudApi().bulkImport(jobParams, dataList)
@@ -345,7 +333,7 @@ trait CrudApiController<D> extends RestApiController {
     URI toURI(){
         String requri = request.requestURI
         //decode and re-encode as the HttpServletReq doesn't escape the $, but URI needs it escaped
-        String queryString = UriUtils.decode(request.queryString?:'', StandardCharsets.UTF_8)
+        String queryString = UriUtils.decode(request.queryString ?: '', StandardCharsets.UTF_8)
         log.debug "requri: $requri - queryString: $queryString"
         String encodedQueryString = UriUtils.encode(queryString, StandardCharsets.UTF_8)
         URI newUri = URI.create("${request.requestURL}?${encodedQueryString}")

@@ -20,13 +20,16 @@ class BulkJobParamsSpec extends Specification  {
         biParams.parallel == false
         biParams.attachmentId == 123
         biParams.op == DataOp.add
+        biParams.asMap() == [parallel: false, attachmentId: 123, op: DataOp.add]
 
         when: "simple"
         paramMap = [
             op: 'upsert',
             parallel: "True",
             async: "no",
-            includes: "a, b, c"
+            includes: "a, b, c",
+            foo: 1,
+            bar: 'baz'
         ]
         biParams = BulkImportJobParams.withParams(paramMap)
 
@@ -35,6 +38,8 @@ class BulkJobParamsSpec extends Specification  {
         biParams.async == false
         biParams.op == DataOp.upsert
         biParams.includes == ['a','b','c']
+        biParams.queryParams.foo == 1
+        biParams.queryParams.bar == 'baz'
     }
 
     void "test POC for BeanTools.bind - not working right"() {
@@ -61,18 +66,32 @@ class BulkJobParamsSpec extends Specification  {
             op: 'add',
             attachmentId: '123',
             parallel: "false",
-            includes: "a,b,c" // THIS DOES NOT WORK WITH Jackson Binder
+            includes: "a,b,c", // THIS DOES NOT WORK WITH Jackson Binder
+            foo: 1,
+            bar: 'baz'
         ]
         BulkImportJobParams biParams = BulkImportJobParams.withParams(paramMap)
         Map biMap = biParams.asMap()
 
         then:
-        biMap.keySet().size() == 4
+        biMap.keySet().size() == 6
         biMap.parallel == false
         biMap.attachmentId == 123
         biMap.op == DataOp.add
         biMap.includes == ['a','b','c']
+        biMap.foo == 1
+        biMap.bar == 'baz'
 
+        when: "put map back into BulkImportJobParams"
+        BulkImportJobParams biParams2 = BulkImportJobParams.withParams(paramMap)
+
+        then:
+        biParams2.parallel == false
+        biParams2.attachmentId == 123
+        biParams2.op == DataOp.add
+        biParams2.includes == ['a','b','c']
+        biParams2.queryParams.foo == 1
+        biParams2.queryParams.bar == 'baz'
     }
 
 

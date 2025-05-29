@@ -42,24 +42,25 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
     }
 
     Long bulkImport(List dataList, DataOp op = DataOp.add){
-        Map params = [
+        def bimpParams = new BulkImportJobParams( op: op,
             parallel: false, async:false,
             source: "test", sourceId: "test-job", includes: ["id", "name", "ext.name"]
-        ]
-        SyncJobEntity jobEnt = bulkImportService.queueAndRun(op, params, "test-job", dataList)
+        )
+        SyncJobEntity jobEnt = bulkImportService.queueAndRun(bimpParams, dataList)
         jobEnt.id
     }
 
     void "test queueImportJob with attachmentId"() {
-        setup:
-        gormConfig.legacyBulk = true
+        // setup:
+        // gormConfig.legacyBulk = true
 
         when:
-        SyncJobEntity jobEnt = bulkImportService.queueImportJob(
-            DataOp.add,
-            [q: [foo: 'bar'], attachmentId:1L ],
-            "test-job", []
+        def bimpParams = new BulkImportJobParams(
+            op: DataOp.add,
+            sourceId: 'test-job',
+            q: "{foo: 'bar'}", attachmentId: 1L
         )
+        SyncJobEntity jobEnt = bulkImportService.queueImportJob(bimpParams, [])
         flushAndClear()
         assert jobEnt.id
 
@@ -75,8 +76,8 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
 
         and: 'params have extra fields'
         params.attachmentId == 1
-        params.q == [foo: 'bar']
-        params.dataOp == 'add'
+        params.q == "{foo: 'bar'}" //[foo: 'bar']
+        params.op == 'add'
         params.entityClassName == 'yakworks.testing.gorm.model.KitchenSink'
 
 
@@ -88,11 +89,12 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
         List list = KitchenSink.generateDataList(10)
 
         when:
-        SyncJobEntity jobEnt = bulkImportService.queueImportJob(
-            DataOp.add,
-            [:],
-            "test-job", list
+        def bimpParams = new BulkImportJobParams(
+            op: DataOp.add,
+            sourceId: 'test-job'
         )
+        SyncJobEntity jobEnt = bulkImportService.queueImportJob(bimpParams, list)
+
         flushAndClear()
         assert jobEnt.id
 
@@ -106,7 +108,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
         payload.size() == list.size()
 
         and: 'params have extra fields'
-        params.dataOp == 'add'
+        params.op == 'add'
         params.entityClassName == 'yakworks.testing.gorm.model.KitchenSink'
 
 
@@ -306,8 +308,8 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
 
     void "test empty payload"() {
         when:
-        Map params = [:]
-        SyncJobEntity jobEnt = bulkImportService.queueImportJob(DataOp.add, params, "test-job", [])
+        def bimpParams = new BulkImportJobParams(op: DataOp.add, sourceId: 'test-job')
+        SyncJobEntity jobEnt = bulkImportService.queueImportJob(bimpParams, [])
 
         then:
         DataProblemException ex = thrown()

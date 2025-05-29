@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.event.EventListener
 
 import gorm.tools.job.SyncJobArgs
-import gorm.tools.job.SyncJobQueueEvent
+import gorm.tools.job.events.SyncJobQueueEvent
 import yakworks.gorm.config.GormConfig
 
 /**

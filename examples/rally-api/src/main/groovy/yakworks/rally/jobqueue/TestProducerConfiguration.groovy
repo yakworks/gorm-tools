@@ -15,8 +15,10 @@ import org.springframework.context.annotation.Lazy
 import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
 
+import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.model.DataOp
 import yakworks.gorm.api.bulk.BulkExportService
+import yakworks.gorm.api.bulk.BulkImportJobParams
 import yakworks.gorm.api.bulk.BulkImportService
 import yakworks.rally.job.SyncJob
 import yakworks.testing.gorm.model.KitchenSink
@@ -74,22 +76,23 @@ class TestProducerConfiguration {
     // }
 
     SyncJob submitImportJob(){
-        // return new SyncJob(
-        //     sourceType: SourceType.ERP, sourceId: 'ar/org',
-        //     jobType: 'bulk.import',
-        //     state: SyncJobState.Queued
-        // ).persist(flush:true)
-
         var bulkImportService = BulkImportService.lookup(KitchenSink)
 
         List dataList = KitchenSink.generateDataList(1000)
 
-        Map params = [
+        // Map params = [
+        //     parallel: false, async:false,
+        //     source: "test", sourceId: "test-job", includes: ["id", "name", "ext.name"]
+        // ]
+        // SyncJob jobEnt = (SyncJob)bulkImportService.queueImportJob(DataOp.add, params, "test-job", dataList)
+        def bimpParams = new BulkImportJobParams(
+            op: DataOp.add,
             parallel: false, async:false,
-            source: "test", sourceId: "test-job", includes: ["id", "name", "ext.name"]
-        ]
-        SyncJob jobEnt = (SyncJob)bulkImportService.queueImportJob(DataOp.add, params, "test-job", dataList)
-        return jobEnt
+            sourceId: 'test-job', includes: ["id", "name", "ext.name"]
+        )
+        var jobEnt = bulkImportService.queueImportJob(bimpParams, dataList)
+
+        return jobEnt as SyncJob
     }
 
     SyncJob submitExportJob(){

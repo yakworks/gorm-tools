@@ -63,13 +63,6 @@ class CoreSyncJobParams {
      */
     String q
 
-
-    /**
-     * For dev, force how to store the payload (what was sent)
-     * FIXME I dont think we need this
-     */
-    //Boolean savePayload //= true
-
     /**
      * force payload to store as file instead of bytes
      * Primarily used for dev/tests
@@ -82,9 +75,18 @@ class CoreSyncJobParams {
      */
     Boolean saveDataAsFile //= false
 
+    /**
+     * The full query params map that were passed into the call.
+     * Can be used to get any extra custom items that were pased in, such as we do with "apply" when calling arAdjust bulk.
+     */
+    Map<String, Object> queryParams
 
-
-    Map asMap(){
-        Maps.prune(MetaUtils.getProperties(this))
+    Map<String, Object> asMap(){
+        Map<String, Object> mapVals = Maps.prune(MetaUtils.getProperties(this))
+        mapVals.remove('queryParams')
+        //get any extra queryParams that are not in this object
+        Map extraParams = Maps.omit(queryParams, mapVals.keySet())
+        if(extraParams) mapVals.putAll(extraParams)
+        mapVals
     }
 }

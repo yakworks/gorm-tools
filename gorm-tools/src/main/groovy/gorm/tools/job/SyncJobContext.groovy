@@ -19,6 +19,7 @@ import groovy.util.logging.Slf4j
 
 import org.codehaus.groovy.runtime.StackTraceUtils
 
+import gorm.tools.job.events.SyncJobFinishedEvent
 import gorm.tools.utils.BenchmarkHelper
 import yakworks.api.ApiResults
 import yakworks.api.Result

@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.async.AsyncArgs
 import gorm.tools.async.AsyncService
+import gorm.tools.job.events.SyncJobQueueEvent
+import gorm.tools.job.events.SyncJobStateEvent
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.model.IdGeneratorRepo
@@ -75,20 +77,17 @@ abstract class SyncJobService<D> {
             jobType: args.jobType
         ] as Map<String,Object>
 
+        //if payloadId, then probably attachmentId with csv for example. Just store it and dont do payload conversion
         if(args.payloadId) {
-            //if payloadId, then probably attachmentId with csv for example. Just store it and dont do payload conversion
             data.payloadId = args.payloadId
         }
-        else if(args.payload){
-            //savePayload is true by default
-            if(args.savePayload){
-                if (args.isSavePayloadAsFile()) {
-                    data.payloadId = writePayloadFile(args.jobId, args.payload as Collection)
-                }
-                else {
-                    String res = JsonEngine.toJson(args.payload)
-                    data.payloadBytes = res.bytes
-                }
+        else if(args.payload) {
+            if (args.isSavePayloadAsFile()) {
+                data.payloadId = writePayloadFile(args.jobId, args.payload as Collection)
+            }
+            else {
+                String res = JsonEngine.toJson(args.payload)
+                data.payloadBytes = res.bytes
             }
         }
         //create is transactional
@@ -202,7 +201,7 @@ abstract class SyncJobService<D> {
     }
 
     /**
-     * when args.savePayload and args.savePayloadAsFile are true, this is called to save the payload to file
+     * when args.savePayloadAsFile are true, this is called to save the payload to file
      * @param payload the payload List or Map that was sent (will normally have been json when called via REST
      * @return the Attachment id.
      */

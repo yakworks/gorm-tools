@@ -14,17 +14,15 @@ class SyncJobArgsSpec extends Specification  {
         then:
         args.async //async by default
         args.parallel == null
-        args.savePayload
         !args.source
         !args.sourceId
 
         when: "explicitely provided"
-        args = SyncJobArgs.withParams([parallel:true, async:false, savePayload: false, source:"test", sourceId:"test"])
+        args = SyncJobArgs.withParams([parallel:true, async:false, source:"test", sourceId:"test"])
 
         then:
         args.parallel
         !args.async
-        !args.savePayload
         args.source == "test"
         args.sourceId == "test"
 

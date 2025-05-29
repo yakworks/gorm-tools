@@ -3,8 +3,8 @@ package yakworks.testify
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 
-import gorm.tools.job.SyncJobFinishedEvent
-import gorm.tools.job.SyncJobStateEvent
+import gorm.tools.job.events.SyncJobFinishedEvent
+import gorm.tools.job.events.SyncJobStateEvent
 import gorm.tools.repository.events.AfterBulkSaveEntityEvent
 import gorm.tools.repository.events.BeforeBulkSaveEntityEvent
 import gorm.tools.repository.model.DataOp

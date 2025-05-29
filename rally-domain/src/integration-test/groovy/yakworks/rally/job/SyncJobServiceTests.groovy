@@ -92,7 +92,6 @@ class SyncJobServiceTests extends Specification implements DomainIntTest {
         List payload = [1,2,3,4]
         SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', jobType: 'foo')
         syncJobArgs.entityClass = Org
-        syncJobArgs.savePayload = true
         //syncJobArgs.savePayloadAsFile = true
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, payload)
 

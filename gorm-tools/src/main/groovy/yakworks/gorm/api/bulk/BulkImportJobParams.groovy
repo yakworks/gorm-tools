@@ -35,7 +35,7 @@ class BulkImportJobParams extends CoreSyncJobParams {
     String dataFilename
 
     /**
-     * (For dataFormat=CSV having attachmentId) CSV header pathDelimiter.
+     * (For payloadFormat=CSV with attachmentId) CSV header pathDelimiter.
      * Default is ".", pass in "_" for underscore (this is path delimiter for header names, not csv delimiter)
      */
     String headerPathDelimiter
@@ -43,7 +43,9 @@ class BulkImportJobParams extends CoreSyncJobParams {
     /**
      * (When attachmentId is set) Format for the data. either CSV or JSON are currently supported.
      */
-    String dataFormat
+    PayloadFormat payloadFormat
+
+    static enum PayloadFormat { csv, json }
 
     /**
      * (When attachmentId is set) Control Count of lines or items in file.
@@ -51,9 +53,15 @@ class BulkImportJobParams extends CoreSyncJobParams {
      */
     Integer controlCount
 
+    /**
+     * The entity class name this is for
+     */
+    String entityClassName
+
     static BulkImportJobParams withParams(Map params){
         BulkImportJobParams bijParams = new BulkImportJobParams()
         BasicDataBinder.bind(bijParams, params)
+        bijParams.queryParams = params
         return bijParams
     }
 

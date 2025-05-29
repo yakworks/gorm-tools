@@ -5,6 +5,7 @@ import gorm.tools.repository.model.DataOp
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+import yakworks.gorm.api.bulk.BulkImportJobParams
 import yakworks.gorm.api.bulk.BulkImportService
 import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Org
@@ -28,11 +29,16 @@ class BulkApiSupportSpec extends Specification implements DomainIntTest {
     }
 
     void "test queueImportJob"() {
-        setup:
-        BulkImportService bs = BulkImportService.lookup(Org)
-
         when:
-        SyncJob job = bs.queueImportJob(DataOp.add, [q:[typeId: OrgType.Customer.id], attachmentId:1L], "test-job", [[num:"T1", name:"T1"]])
+        BulkImportService bs = BulkImportService.lookup(Org)
+        def bimpParams = new BulkImportJobParams( op: DataOp.add,
+            sourceId: 'test-job',
+            q: "{\"typeId\": ${OrgType.Customer.id}}",
+            attachmentId:1L
+        )
+        SyncJob job = bs.queueImportJob(bimpParams, [[num:"T1", name:"T1"]])
+
+        //SyncJob job = bs.queueImportJob(DataOp.add, [q:[typeId: OrgType.Customer.id], attachmentId:1L], "test-job", [[num:"T1", name:"T1"]])
         flushAndClear()
         assert job.id
         job = SyncJob.get(job.id)
@@ -43,7 +49,7 @@ class BulkApiSupportSpec extends Specification implements DomainIntTest {
         job.state == SyncJobState.Queued
         job.sourceId == 'test-job'
         job.params
-        job.params.q == [typeId: OrgType.Customer.id]
+        job.params.q == '{"typeId": 1}'
         job.payloadId
         job.payloadId == 1L
     }

@@ -1,6 +1,6 @@
 package yakworks.gorm.api.bulk
 
-
+import gorm.tools.beans.Pager
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobState
@@ -97,9 +97,13 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
         QueryArgs queryArgs = QueryArgs.of(
             q: '{"id":{"$gte":1}}'
         )
+        def syncjobArgs =  new SyncJobArgs(
+            sourceId: "test", includes: ["id", "name", "ext.name"],
+            queryArgs: queryArgs
+        )
 
         List dataList = []
-        bulkExportService.eachPage(queryArgs){ List dataPage ->
+        bulkExportService.eachPage(syncjobArgs){ List dataPage ->
             dataList.addAll(dataPage)
         }
 
@@ -117,14 +121,36 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
         sortedList.size() == 300
     }
 
+    void "test setupPager"() {
+        when:
+        QueryArgs queryArgs = QueryArgs.of(
+            q: '{"id":{"$gte":1}}'
+        )
+        def syncjobArgs =  new SyncJobArgs(
+            sourceId: "test", includes: ["id", "name", "ext.name"],
+            queryArgs: queryArgs
+        )
+
+        List dataList = []
+        Pager pager = bulkExportService.setupPager(syncjobArgs)
+
+        then:
+        pager
+        //XXX @SUD test whats important stuff here
+    }
+
     void "test eachPage with no data"() {
         when:
         QueryArgs queryArgs = QueryArgs.of(
             q: '{"id":{"$lt":1}}'
         )
+        def syncjobArgs =  new SyncJobArgs(
+            sourceId: "test", includes: ["id", "name", "ext.name"],
+            queryArgs: queryArgs
+        )
 
         List dataList = []
-        bulkExportService.eachPage(queryArgs){ List dataPage ->
+        bulkExportService.eachPage(syncjobArgs){ List dataPage ->
             dataList.addAll(dataPage)
         }
 

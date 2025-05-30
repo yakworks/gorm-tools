@@ -155,7 +155,7 @@ class BulkExportService<D> {
     protected void doBulkExport(SyncJobContext jobContext) {
         try {
             //paginate and fetch data list, update job results for each page of data.
-            eachPage(jobContext.args.queryArgs) { List pageData ->
+            eachPage(jobContext.args) { List pageData ->
                 //This closure is called for each page of data, this will be inside readonly TRX
                 //create metamap list with includes
                 MetaMapList entityMapList = metaMapService.createMetaMapList(pageData, jobContext.args.includes)
@@ -163,7 +163,7 @@ class BulkExportService<D> {
                 entityMapList.hydrate()
                 Result result = Result.OK().payload(entityMapList as List)
                 //update job with page data
-                //XXX @SUD we need to support the DataMimeTypes.csv too. 
+                //XXX @SUD we need to support the DataMimeTypes.csv too.
                 jobContext.updateJobResults(result, false, entityMapList.size())
             }
         } catch (Exception ex) {
@@ -172,28 +172,40 @@ class BulkExportService<D> {
         }
     }
 
-
     /**
      * Instead of loading all the data for bulkexport, it paginates and loads one page at a time
      */
     //XXX @SUD add tests for these, not reason not to be adding unit tests
-    protected void eachPage(QueryArgs queryArgs, Closure cl) {
-        Pager paginator = Pager.of(max:500) //XXX @SUD why 10? changed to 100, lets make it configurable
-        //count total records based on query args and build a paginator
-        paginator.recordCount = getTotalCount(queryArgs)
-
-        //XXX @SUD test should show it paging through, its not, same results are done over and over.
-        // you were not casting offset and max, so it return the fist pge over and over again
-        paginator.eachPage { page, max, offset ->
-            runPageQuery(queryArgs, Pager.of(max: max, page: page), cl)
+    protected void eachPage(SyncJobArgs args, Closure cl) {
+        Pager parentPager = setupPager(args)
+        QueryArgs queryArgs = args.queryArgs
+        parentPager.eachPage { page, max, offset ->
+            List listPage = runPageQuery(queryArgs, Pager.of(max: max, page: page))
+            cl.call(listPage)
             getRepo().flushAndClear()
         }
     }
 
+    /**
+     * setup pager and do args.saveDataAsFile
+     */
+    //XXX @SUD add tests
+    protected Pager setupPager(SyncJobArgs args) {
+        Pager paginator = Pager.of(max:500) //XXX @SUD why 10? changed to 100, lets make it configurable
+        //count total records based on query args and build a paginator
+        paginator.recordCount = getTotalCount(args.queryArgs)
+        //hack right here to set saveDataAsFile when over 1000
+        if(paginator.recordCount > 1000){
+            args.saveDataAsFile = true
+        }
+
+        return paginator
+    }
+
+    //XXX @SUD add unit test
     @ReadOnly
-    protected void runPageQuery(QueryArgs queryArgs, Pager pager, Closure cl) {
-        List pageData = getRepo().query(queryArgs).pagedList(pager)
-        cl.call(pageData)
+    protected List runPageQuery(QueryArgs queryArgs, Pager pager) {
+        return getRepo().query(queryArgs).pagedList(pager)
     }
 
     @ReadOnly

@@ -20,6 +20,7 @@ import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
+import gorm.tools.transaction.TrxService
 import gorm.tools.utils.ServiceLookup
 import grails.gorm.transactions.ReadOnly
 import yakworks.api.Result
@@ -38,12 +39,9 @@ class BulkExportService<D> {
     @Autowired MetaMapService metaMapService
     @Autowired ProblemHandler problemHandler
     @Autowired IncludesConfig includesConfig
+    @Autowired TrxService trxService
 
-    @Autowired CsvToMapTransformer csvToMapTransformer
-
-    Class<D> entityClass // the domain class this is for
-
-    boolean legacyBulk = true
+    Class<D> entityClass // the root domain class this is for
 
     BulkExportService(Class<D> entityClass){
         this.entityClass = entityClass
@@ -155,16 +153,11 @@ class BulkExportService<D> {
     protected void doBulkExport(SyncJobContext jobContext) {
         try {
             //paginate and fetch data list, update job results for each page of data.
-            eachPage(jobContext.args) { List pageData ->
-                //This closure is called for each page of data, this will be inside readonly TRX
-                //create metamap list with includes
-                MetaMapList entityMapList = metaMapService.createMetaMapList(pageData, jobContext.args.includes)
-                //hydrate it now so we dont later get the "could not initialize proxy - no Session" when converting to json
-                entityMapList.hydrate()
-                Result result = Result.OK().payload(entityMapList as List)
+            eachPage(jobContext.args) { MetaMapList pageData ->
+                Result result = Result.OK().payload(pageData as List)
                 //update job with page data
                 //XXX @SUD we need to support the DataMimeTypes.csv too.
-                jobContext.updateJobResults(result, false, entityMapList.size())
+                jobContext.updateJobResults(result, false, pageData.size())
             }
         } catch (Exception ex) {
             log.error("BulkExport unexpected exception", ex)
@@ -180,9 +173,8 @@ class BulkExportService<D> {
         Pager parentPager = setupPager(args)
         QueryArgs queryArgs = args.queryArgs
         parentPager.eachPage { page, max, offset ->
-            List listPage = runPageQuery(queryArgs, Pager.of(max: max, page: page))
-            cl.call(listPage)
-            getRepo().flushAndClear()
+            MetaMapList entityMapList = runPageQuery(args, Pager.of(max: max, page: page))
+            cl.call(entityMapList)
         }
     }
 
@@ -203,9 +195,21 @@ class BulkExportService<D> {
     }
 
     //XXX @SUD add unit test
+    /**
+     * run and call closure in Transaction.
+     *
+     */
     @ReadOnly
-    protected List runPageQuery(QueryArgs queryArgs, Pager pager) {
-        return getRepo().query(queryArgs).pagedList(pager)
+    protected MetaMapList runPageQuery(SyncJobArgs args, Pager pager) {
+        List listPage = getRepo().query(args.queryArgs).pagedList(pager)
+        //create metamap list with includes
+        MetaMapList entityMapList = metaMapService.createMetaMapList(listPage, args.includes)
+        //hydrate it now in transaction so we dont later get the "could not initialize proxy - no Session" when converting to json
+        entityMapList.hydrate()
+        //XXX @SUD not sure if this is needed, flush certainly is not, maybe just clear for memory
+        getRepo().flushAndClear()
+        return entityMapList
+
     }
 
     @ReadOnly

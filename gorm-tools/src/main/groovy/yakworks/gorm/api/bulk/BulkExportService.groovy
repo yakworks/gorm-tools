@@ -163,6 +163,7 @@ class BulkExportService<D> {
                 entityMapList.hydrate()
                 Result result = Result.OK().payload(entityMapList as List)
                 //update job with page data
+                //XXX @SUD we need to support the DataMimeTypes.csv too. 
                 jobContext.updateJobResults(result, false, entityMapList.size())
             }
         } catch (Exception ex) {

@@ -19,7 +19,7 @@ import yakworks.testing.gorm.integration.DomainIntTest
 
 // Use as a simple to test when trying to see why application context has problem on init
 @Integration
-@Ignore //XXX @SUD can we run a test pass with profile=ignite so this can run and pass?
+@Ignore
 //@Rollback
 class IgniteCacheSpec extends Specification implements DomainIntTest {
 

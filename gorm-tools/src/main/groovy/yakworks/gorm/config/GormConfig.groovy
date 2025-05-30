@@ -19,6 +19,9 @@ class GormConfig {
     /** whether to enable to hack that parses queryString if request.parameters is empty */
     boolean enableGrailsParams = true
 
+    /** use the legacy bulk import process */
+    boolean legacyBulk = true
+
     QueryConfig query = new QueryConfig()
 
     @Autowired

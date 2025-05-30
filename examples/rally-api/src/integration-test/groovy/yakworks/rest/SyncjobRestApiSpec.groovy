@@ -43,7 +43,9 @@ class SyncjobRestApiSpec extends Specification implements OkHttpRestTrait {
 
     @Transactional
     SyncJob createMockJob() {
-        SyncJob job = new SyncJob([sourceType: SourceType.ERP, sourceId: 'ar/org'])
+        SyncJob job = new SyncJob(
+            sourceType: SourceType.ERP, sourceId: 'ar/org', jobType: 'bulk.import'
+        )
         Map data = [test:"value"]
         job.dataBytes = JsonEngine.toJson(data).bytes
         job.ok = false

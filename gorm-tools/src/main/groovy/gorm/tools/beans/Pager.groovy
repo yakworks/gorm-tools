@@ -156,10 +156,10 @@ class Pager implements Serializable{
 
         (1..pageCount).each { Integer pageNum ->
             page = pageNum
-            offset = (max * (page - 1))
+            //offset = (max * (page - 1))
             try {
-                log.debug "Executing eachPage closer with [max:$max, offset:$offset]"
-                c.call(max, offset)
+                log.debug "Executing eachPage closer with [max:$max, offset:$offset, page: $pageNum]"
+                c.call(page, max, offset)
             } catch (e) {
                 log.error "Error encountered while calling closure in eachPage [max:$max, offset:$offset]}]", e
                 throw e

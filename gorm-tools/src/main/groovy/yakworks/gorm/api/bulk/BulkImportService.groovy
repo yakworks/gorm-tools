@@ -96,7 +96,7 @@ class BulkImportService<D> {
     /**
      * Starts a bulk import job
      */
-    SyncJobEntity startJob(Long jobId) {
+    SyncJobEntity runJob(Long jobId) {
         SyncJobEntity job = syncJobService.getJob(jobId)
         assert job.state == SyncJobState.Queued
         syncJobService.changeJobStatusToRunning(jobId)
@@ -189,7 +189,7 @@ class BulkImportService<D> {
      */
     SyncJobEntity queueAndRun(BulkImportJobParams jobParams, List<Map> payloadBody) {
         SyncJobEntity jobEnt = queueJob(jobParams, payloadBody)
-        return startJob(jobEnt.id)
+        return runJob(jobEnt.id)
     }
 
     /**

@@ -28,7 +28,7 @@ class DefaultBulkJobQueueListener {
         if(qe.jobType == 'bulk.import' && !gormConfig.legacyBulk){
             assert args.entityClass
             var bulkImportService = getBulkImportService(args.entityClass)
-            bulkImportService.startJob(qe.syncJob.id)
+            bulkImportService.runJob(qe.syncJob.id)
         }
     }
 

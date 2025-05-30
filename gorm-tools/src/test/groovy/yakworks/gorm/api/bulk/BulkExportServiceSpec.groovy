@@ -50,7 +50,7 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
 
         SyncJobEntity jobEnt = bulkExportService.queueJob(bexParams)
         //flushAndClear()
-        SyncJobEntity jobEnt2 = bulkExportService.startJob(jobEnt.id)
+        SyncJobEntity jobEnt2 = bulkExportService.runJob(jobEnt.id)
         //flushAndClear()
         jobEnt.id
     }

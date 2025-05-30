@@ -46,7 +46,7 @@ class QueuedJobRunner {
         String entityClassName = syncJob.params['entityClassName']
         Class<?> entityClass = ClassUtils.resolveClassName(entityClassName, null);
         var bulkImportService = BulkImportService.lookup(entityClass)
-        SyncJobEntity jobEnt2 = bulkImportService.startJob(syncJob.id)
+        SyncJobEntity jobEnt2 = bulkImportService.runJob(syncJob.id)
         //sleep for a couple seconds to simulate larger data
         //sleep(2000)
         KitchenSink.withTransaction {
@@ -58,7 +58,7 @@ class QueuedJobRunner {
         String entityClassName = syncJob.params['entityClassName']
         Class<?> entityClass = ClassUtils.resolveClassName(entityClassName, null);
         var bulkExportService = BulkExportService.lookup(entityClass)
-        syncJob = (SyncJob) bulkExportService.startJob(syncJob.id)
+        syncJob = (SyncJob) bulkExportService.runJob(syncJob.id)
         //debug some info
         //List dataList = syncJob.parseData()
         log.info("🟢 📤🌶    BULK EXPORT Completed: ${syncJob}, message: ${syncJob.message}")

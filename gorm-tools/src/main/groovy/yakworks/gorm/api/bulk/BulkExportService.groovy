@@ -21,7 +21,6 @@ import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
 import gorm.tools.utils.ServiceLookup
-import grails.core.GrailsApplication
 import grails.gorm.transactions.ReadOnly
 import yakworks.api.Result
 import yakworks.api.problem.data.DataProblem
@@ -66,7 +65,7 @@ class BulkExportService<D> {
     /**
      * Starts a bulk import job
      */
-    SyncJobEntity startJob(Long jobId) {
+    SyncJobEntity runJob(Long jobId) {
         SyncJobEntity job = syncJobService.getJob(jobId)
         assert job.state == SyncJobState.Queued
         syncJobService.changeJobStatusToRunning(jobId)

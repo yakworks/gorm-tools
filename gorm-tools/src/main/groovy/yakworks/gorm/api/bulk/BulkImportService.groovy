@@ -17,11 +17,9 @@ import gorm.tools.job.SyncJobState
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
-import gorm.tools.repository.model.DataOp
 import gorm.tools.utils.ServiceLookup
 import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemCodes
-import yakworks.commons.lang.EnumUtils
 import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.IncludesKey
 import yakworks.gorm.config.GormConfig
@@ -36,20 +34,15 @@ import yakworks.json.groovy.JsonEngine
 @CompileStatic
 class BulkImportService<D> {
 
-    @Autowired
-    SyncJobService syncJobService
+    @Autowired SyncJobService syncJobService
 
-    @Autowired
-    IncludesConfig includesConfig
+    @Autowired IncludesConfig includesConfig
 
-    @Autowired
-    ProblemHandler problemHandler
+    @Autowired ProblemHandler problemHandler
 
-    @Autowired
-    CsvToMapTransformer csvToMapTransformer
+    @Autowired CsvToMapTransformer csvToMapTransformer
 
-    @Autowired
-    GormConfig gormConfig
+    @Autowired GormConfig gormConfig
 
     BulkImporter<D> bulkImporter
 
@@ -79,8 +72,60 @@ class BulkImportService<D> {
         }
     }
 
+    /**
+     * Creates a bulk import job and puts in hazel queue
+     */
+    SyncJobEntity queueJob(BulkImportJobParams jobParams, List<Map> payloadBody) {
+        //set the entityClassName
+        jobParams.entityClassName = getEntityClass().name
+        SyncJobArgs args = setupSyncJobArgs(jobParams)
+
+        //if attachmentId then assume its a csv
+        if(jobParams.attachmentId) {
+            args.payloadId = jobParams.attachmentId
+            //XXX default payLoad format is CSV
+        } else if(payloadBody){
+            args.payload = payloadBody
+        } else {
+            throw DataProblemCodes.EmptyPayload.get().toException()
+        }
+
+        return syncJobService.queueJob(args)
+    }
+
+    /**
+     * Starts a bulk import job
+     */
+    SyncJobEntity startJob(Long jobId) {
+        SyncJobEntity job = syncJobService.getJob(jobId)
+        assert job.state == SyncJobState.Queued
+        syncJobService.changeJobStatusToRunning(jobId)
+
+        List<Map> dataList
+        BulkImportJobParams jobParams = BulkImportJobParams.withParams(job.params)
+        //XXX right now we assume its csv in zip but we should have more info stored to say that.
+        // Check the payloadFormat if its a zip to verify its CSV
+        if(jobParams.attachmentId) {
+            //sets the datalist from the csv instead of body
+            dataList = transformCsvToBulkList(jobParams.asMap())
+        }
+        //if no attachmentId was passed to params then get the payload
+        else if(job.payloadId || job.payloadBytes) {
+            dataList = JsonEngine.parseJson(job.payloadToString(), List<Map>)
+        }
+
+        SyncJobArgs syncJobArgs = setupSyncJobArgs(jobParams)
+        syncJobArgs.jobId = jobId
+
+        SyncJobContext sctx = syncJobService.initContext(syncJobArgs, dataList)
+
+        Long jobIdent = getBulkImporter().bulkImport(dataList, sctx)
+
+        return syncJobService.getJob(jobIdent)
+    }
+
     @Deprecated
-    SyncJobEntity bulkImportLegacy(BulkImportJobParams jobParams, List<Map> dataList){
+    protected SyncJobEntity bulkImportLegacy(BulkImportJobParams jobParams, List<Map> dataList){
         //if attachmentId then assume its a csv
         //XXX we should not assume its CSV. Check dataFormat as well, we can have that default to CSV
         if(jobParams.attachmentId) {
@@ -112,10 +157,10 @@ class BulkImportService<D> {
     }
 
     //WIP
-    SyncJobEntity bulkImport(BulkImportJobParams jobParams, List<Map> dataList){
+    protected SyncJobEntity bulkImport(BulkImportJobParams jobParams, List<Map> dataList){
 
         //submit the job
-        SyncJobEntity job = queueImportJob(jobParams, dataList)
+        SyncJobEntity job = queueJob(jobParams, dataList)
         Long jobId = job.id
         //if not async then wait for it to finish
         if(!jobParams.async){
@@ -137,65 +182,13 @@ class BulkImportService<D> {
         return job
     }
 
-    /**
-     * Creates a bulk import job and puts in hazel queue
-     */
-    SyncJobEntity queueImportJob(BulkImportJobParams jobParams, List<Map> payloadBody) {
-        //set the entityClassName
-        jobParams.entityClassName = getEntityClass().name
-        SyncJobArgs args = setupSyncJobArgs(jobParams)
-
-        //if attachmentId then assume its a csv
-        if(jobParams.attachmentId) {
-            args.payloadId = jobParams.attachmentId
-            //XXX default payLoad format is CSV
-        } else if(payloadBody){
-            args.payload = payloadBody
-        } else {
-            throw DataProblemCodes.EmptyPayload.get().toException()
-        }
-
-        return syncJobService.queueJob(args)
-    }
-
-    /**
-     * Starts a bulk import job
-     */
-    SyncJobEntity startJob(Long jobId) {
-        SyncJobEntity job = syncJobService.getJob(jobId)
-        assert job.state == SyncJobState.Queued
-
-        List<Map> dataList
-        BulkImportJobParams jobParams = BulkImportJobParams.withParams(job.params)
-        //Map qParams = job.params
-        //1. check payloadId and see if its a zip and csv
-        //XXX right now we assume its csv in zip but we should have more info stored to say that.
-        // Check the dataFormat if its a zip to verify its CSV
-        if(jobParams.attachmentId) {
-            //sets the datalist from the csv instead of body
-            dataList = transformCsvToBulkList(jobParams.asMap())
-        }
-        //if no attachmentId was passed to params then
-        else if(job.payloadId || job.payloadBytes) {
-            dataList = JsonEngine.parseJson(job.payloadToString(), List<Map>)
-        }
-
-        SyncJobArgs syncJobArgs = setupSyncJobArgs(jobParams)
-        syncJobArgs.jobId = jobId
-
-        SyncJobContext sctx = syncJobService.initContext(syncJobArgs, dataList)
-
-        Long jobIdent = getBulkImporter().bulkImport(dataList, sctx)
-
-        return syncJobService.getJob(jobIdent)
-    }
 
     /**
      * To be used for TESTING. Not meant for a production method.
      * queue and start the job
      */
     SyncJobEntity queueAndRun(BulkImportJobParams jobParams, List<Map> payloadBody) {
-        SyncJobEntity jobEnt = queueImportJob(jobParams, payloadBody)
+        SyncJobEntity jobEnt = queueJob(jobParams, payloadBody)
         return startJob(jobEnt.id)
     }
 
@@ -203,7 +196,7 @@ class BulkImportService<D> {
      * Changes job state to Running before starting bulk export job
      */
     //XXX @SUD incorporate this
-    void changeJobStatusToRunning(Serializable jobId) {
+    protected void changeJobStatusToRunning(Serializable jobId) {
         syncJobService.updateJob([id:jobId, state: SyncJobState.Running])
     }
 
@@ -213,32 +206,8 @@ class BulkImportService<D> {
     }
 
     /**
-     * sets up the SyncJobArgs from whats passed in from params
-     */
-    SyncJobArgs setupSyncJobArgs(DataOp dataOp, Map params, String sourceId){
-        List bulkIncludes = params.includes ? (List)params.includes : includesConfig.findByKeys(getEntityClass(), [IncludesKey.bulk, IncludesKey.get])
-        //want the error includes to be blank if its not there
-        List bulkErrorIncludes = includesConfig.getByKey(getEntityClass(), 'bulkError') as List<String>
-
-        SyncJobArgs syncJobArgs = SyncJobArgs.withParams(params)
-        syncJobArgs.op = dataOp
-        syncJobArgs.includes = bulkIncludes
-        syncJobArgs.errorIncludes = bulkErrorIncludes
-        syncJobArgs.sourceId = sourceId
-        //XXX do we need this for events?
-        syncJobArgs.entityClass = getEntityClass()
-
-        // for upsert they can pass in op=upsert to params.
-        // This is different than the dataOp arg in method here, which is going to either be add or update already
-        // as its set because it either a POST or PUT call.
-        DataOp paramsOp = EnumUtils.getEnumIgnoreCase(DataOp, params.op as String)
-        if(paramsOp == DataOp.upsert) syncJobArgs.op = paramsOp
-
-        return syncJobArgs
-    }
-
-    /**
-     * sets up the SyncJobArgs from whats passed in from params
+     * sets up the SyncJobArgs from whats passed in from params.
+     * NOTE: When queing job much of this is not needed but we keep one common method
      */
     SyncJobArgs setupSyncJobArgs(BulkImportJobParams jobParams){
         List bulkIncludes = jobParams.includes ?: includesConfig.findByKeys(getEntityClass(), [IncludesKey.bulk, IncludesKey.get])

@@ -16,10 +16,14 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
 import org.springframework.context.annotation.Profile
+import org.springframework.context.event.EventListener
 import org.springframework.scheduling.annotation.Scheduled
 
 import com.hazelcast.core.HazelcastInstance
+import gorm.tools.job.events.SyncJobQueueEvent
+import gorm.tools.repository.events.BeforeBulkSaveEntityEvent
 import yakworks.rally.job.SyncJob
+import yakworks.rally.orgs.model.Org
 
 /**
  * Spring config for Async related beans.
@@ -37,26 +41,6 @@ class SyncJobConsumerConfiguration {
    // @Autowired HazelcastInstance hazelcastInstance
 
     @Configuration
-    @Profile('ignite & !test')
-    @Lazy(true) //lazy false so that consumer bean gets registered
-    //@ConditionalOnProperty(value="app.mail.mailgun.enabled", havingValue = "true")
-    static class IgniteQueBeans {
-
-        @Bean(destroyMethod="") //empty detroy method is important or spring will clear it on other clusters if it shuts down
-        public BlockingQueue<SyncJob> syncJobQueue(Ignite igniteInstance) {
-            var colConfig = new CollectionConfiguration()
-            //colConfig.setCacheMode(CacheMode.REPLICATED)
-            colConfig.backups = 1
-
-            return igniteInstance.queue(QUE_NAME, // Queue name.
-                0, // Queue capacity. 0 for an unbounded queue.
-                colConfig //default config
-            )
-        }
-
-    }
-
-    @Configuration
     @Profile('hazel & !test')
     @Lazy(true) //lazy false so that consumer bean gets registered
     //@ConditionalOnProperty(value="app.mail.mailgun.enabled", havingValue = "true")
@@ -69,14 +53,28 @@ class SyncJobConsumerConfiguration {
 
     }
 
+    /**
+     * config for the listener and the consumer
+     * This section works regardless if its hazel or ignite
+     */
     @Configuration
     @Profile(['!test'])
     @Lazy(false) //lazy false so that consumer bean gets registered
-    //@ConditionalOnProperty(value="app.mail.mailgun.enabled", havingValue = "true")
-    static class IgniteSyncConsumerJobs {
+    //@ConditionalOnProperty(value="TBD", havingValue = "true")
+    static class SyncConsumerJobs {
 
         @Autowired BlockingQueue<SyncJob> syncJobQueue
         @Autowired QueuedJobRunner queuedJobRunner
+
+        /**
+         * Listen for SyncJobQueueEvent and offer/put it on the queue
+         * @param event
+         */
+        @EventListener
+        void syncJobQueueEventListener(SyncJobQueueEvent event) {
+            syncJobQueue.offer((SyncJob)event.syncJob)
+            log.info("⏱️📤   LISTENER Finished adding ${event.syncJob} to queue")
+        }
 
         //Spring will only run one of these at a time no matter how big the threadpool is.
         // so if this takes 5 seconds, the next one will run 2 seconds after its finished.
@@ -92,6 +90,30 @@ class SyncJobConsumerConfiguration {
             //sleep(5000)
             //throw new RuntimeException("ex test")
             //log.info("👾  Consumer2 Finished\n")
+        }
+
+    }
+
+
+    /**
+     * WIP POC for Ignite as alternative to HazelCast
+     */
+    @Configuration
+    @Profile('ignite & !test')
+    @Lazy(true) //lazy false so that consumer bean gets registered
+    //@ConditionalOnProperty(value="app.mail.mailgun.enabled", havingValue = "true")
+    static class IgniteQueBeans {
+
+        @Bean(destroyMethod="") //empty detroy method is important or spring will clear it on other clusters if it shuts down
+        public BlockingQueue<SyncJob> syncJobQueue(Ignite igniteInstance) {
+            var colConfig = new CollectionConfiguration()
+            //colConfig.setCacheMode(CacheMode.REPLICATED)
+            colConfig.backups = 1
+
+            return igniteInstance.queue(QUE_NAME, // Queue name.
+                0, // Queue capacity. 0 for an unbounded queue.
+                colConfig //default config
+            )
         }
 
     }

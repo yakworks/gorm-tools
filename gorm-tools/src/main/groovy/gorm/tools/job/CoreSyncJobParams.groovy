@@ -51,6 +51,8 @@ class CoreSyncJobParams {
     List<String> includes // = ['id']
     //String includes = 'id'
 
+    String includesKey // = ['id']
+
     /**
      * List of keys to include from the data map that failed.
      * default is null which means it returns the originalData that was submitted.

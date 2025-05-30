@@ -16,6 +16,11 @@ import yakworks.gorm.api.bulk.BulkImportService
 import yakworks.rally.job.SyncJob
 import yakworks.testing.gorm.model.KitchenSink
 
+/**
+ * POC Bean that runs the jobs.
+ * will be called from however we poll the queue.
+ * Currently this POC has job that fires every couple seconds that poll the queue
+ */
 @Component
 @Slf4j
 @CompileStatic
@@ -31,6 +36,9 @@ class QueuedJobRunner {
         else if (jobType == 'bulk.export'){
             runBulkExport(syncJob)
         }
+        else {
+            log.warn("jobType [$jobType] not inplemented")
+        }
 
     }
 
@@ -42,7 +50,7 @@ class QueuedJobRunner {
         //sleep for a couple seconds to simulate larger data
         //sleep(2000)
         KitchenSink.withTransaction {
-            log.info("🟢 🗂️🌶️    BULK IMPORT Completed: ${jobEnt2}, KitchenSink count: ${KitchenSink.count()}")
+            log.info("🟢 🗂️🌶️    BULK IMPORT Completed: ${jobEnt2}, KitchenSink total rows: ${KitchenSink.count()}")
         }
     }
 
@@ -52,7 +60,7 @@ class QueuedJobRunner {
         var bulkExportService = BulkExportService.lookup(entityClass)
         syncJob = (SyncJob) bulkExportService.startJob(syncJob.id)
         //debug some info
-        List dataList = syncJob.parseData()
-        log.info("🟢 📤🌶    BULK EXPORT Completed: ${syncJob}, List Size: ${dataList.size()}")
+        //List dataList = syncJob.parseData()
+        log.info("🟢 📤🌶    BULK EXPORT Completed: ${syncJob}, message: ${syncJob.message}")
     }
 }

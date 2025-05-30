@@ -90,10 +90,10 @@ class DefaultsApiConfiguration {
         return new BulkExportService(entityClass);
     }
 
-    @Bean
-    @ConditionalOnMissingBean
-    DefaultBulkJobQueueListener bulkJobQueueListener() {
-        return new DefaultBulkJobQueueListener()
-    }
+    // @Bean
+    // @ConditionalOnMissingBean
+    // DefaultBulkJobQueueListener bulkJobQueueListener() {
+    //     return new DefaultBulkJobQueueListener()
+    // }
 
 }

@@ -36,7 +36,7 @@ class BulkApiSupportSpec extends Specification implements DomainIntTest {
             q: "{\"typeId\": ${OrgType.Customer.id}}",
             attachmentId:1L
         )
-        SyncJob job = bs.queueImportJob(bimpParams, [[num:"T1", name:"T1"]])
+        SyncJob job = bs.queueJob(bimpParams, [[num:"T1", name:"T1"]])
 
         //SyncJob job = bs.queueImportJob(DataOp.add, [q:[typeId: OrgType.Customer.id], attachmentId:1L], "test-job", [[num:"T1", name:"T1"]])
         flushAndClear()

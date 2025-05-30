@@ -207,7 +207,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
 
     @Override
     SyncJobEntity bulkExport(BulkExportJobParams jobParams) {
-        getBulkExportService().queueExportJob(jobParams)
+        getBulkExportService().queueJob(jobParams)
     }
 
     protected List<D> queryList(QueryArgs qargs) {

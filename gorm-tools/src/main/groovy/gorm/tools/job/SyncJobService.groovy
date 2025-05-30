@@ -140,6 +140,13 @@ abstract class SyncJobService<D> {
     }
 
     /**
+     * Changes job state to Running before starting bulk export job
+     */
+    void changeJobStatusToRunning(Serializable jobId) {
+        updateJob([id:jobId, state: SyncJobState.Running])
+    }
+
+    /**
      * gets the job from the repo
      */
     SyncJobEntity getJob(Serializable id){

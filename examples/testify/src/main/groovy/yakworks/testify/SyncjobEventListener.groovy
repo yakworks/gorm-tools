@@ -9,6 +9,7 @@ import gorm.tools.repository.events.AfterBulkSaveEntityEvent
 import gorm.tools.repository.events.BeforeBulkSaveEntityEvent
 import gorm.tools.repository.model.DataOp
 import yakworks.api.OkResult
+import yakworks.gorm.api.bulk.BulkImportFinishedEvent
 import yakworks.rally.orgs.model.Org
 
 /**
@@ -30,7 +31,7 @@ class SyncjobEventListener {
     }
 
     @EventListener
-    void onBulk(SyncJobFinishedEvent<Org> event) {
+    void onBulk(BulkImportFinishedEvent<Org> event) {
         assert event.entityClass.isAssignableFrom(Org) //verify, tht listener is called for only org events based on generic
         if(event.context.args.op != DataOp.add) return
         event.context.results.list.each {
@@ -38,7 +39,7 @@ class SyncjobEventListener {
                 Long id = it.payload.id as Long
                 if (id != null) {
                     Org org = Org.get(id)
-                    org.comments = "${org.num}-SyncJobFinishedEvent"
+                    org.comments = "${org.num}-BulkImportFinishedEvent"
                     org.save(flush: true)
                 }
             }

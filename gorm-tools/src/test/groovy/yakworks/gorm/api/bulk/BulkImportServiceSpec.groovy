@@ -3,13 +3,10 @@ package yakworks.gorm.api.bulk
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 
-import gorm.tools.async.AsyncService
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
-import gorm.tools.job.SyncJobService
 import gorm.tools.job.SyncJobState
 import gorm.tools.repository.model.DataOp
-import gorm.tools.utils.ServiceLookup
 import spock.lang.Specification
 import testing.TestSyncJob
 import testing.TestSyncJobService
@@ -17,7 +14,6 @@ import yakworks.api.problem.data.DataProblemException
 import yakworks.gorm.config.AsyncConfig
 import yakworks.gorm.config.GormConfig
 import yakworks.testing.gorm.model.KitchenSink
-import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.testing.gorm.model.SinkExt
 import yakworks.testing.gorm.unit.GormHibernateTest
 
@@ -60,7 +56,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
             sourceId: 'test-job',
             q: "{foo: 'bar'}", attachmentId: 1L
         )
-        SyncJobEntity jobEnt = bulkImportService.queueImportJob(bimpParams, [])
+        SyncJobEntity jobEnt = bulkImportService.queueJob(bimpParams, [])
         flushAndClear()
         assert jobEnt.id
 
@@ -93,7 +89,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
             op: DataOp.add,
             sourceId: 'test-job'
         )
-        SyncJobEntity jobEnt = bulkImportService.queueImportJob(bimpParams, list)
+        SyncJobEntity jobEnt = bulkImportService.queueJob(bimpParams, list)
 
         flushAndClear()
         assert jobEnt.id
@@ -309,7 +305,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
     void "test empty payload"() {
         when:
         def bimpParams = new BulkImportJobParams(op: DataOp.add, sourceId: 'test-job')
-        SyncJobEntity jobEnt = bulkImportService.queueImportJob(bimpParams, [])
+        SyncJobEntity jobEnt = bulkImportService.queueJob(bimpParams, [])
 
         then:
         DataProblemException ex = thrown()

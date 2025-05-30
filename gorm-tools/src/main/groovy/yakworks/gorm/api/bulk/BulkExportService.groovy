@@ -27,7 +27,7 @@ import yakworks.api.Result
 import yakworks.api.problem.data.DataProblem
 import yakworks.commons.lang.Validate
 import yakworks.gorm.api.IncludesConfig
-import yakworks.gorm.api.IncludesKey
+import yakworks.gorm.api.IncludesProps
 import yakworks.meta.MetaMapList
 
 //XXX tests for all of this in BulkExportServiceSpec
@@ -36,7 +36,6 @@ import yakworks.meta.MetaMapList
 class BulkExportService<D> {
 
     @Autowired SyncJobService syncJobService
-    @Autowired GrailsApplication grailsApplication
     @Autowired MetaMapService metaMapService
     @Autowired ProblemHandler problemHandler
     @Autowired IncludesConfig includesConfig
@@ -58,17 +57,9 @@ class BulkExportService<D> {
     /**
      * Creates a bulk export job and puts in hazel queue
      */
-    SyncJobEntity queueExportJob(Map qParams, String sourceId) {
-        SyncJobArgs args = setupSyncJobArgs(qParams, sourceId)
-        return syncJobService.queueJob(args)
-    }
-
-    /**
-     * Creates a bulk export job and puts in hazel queue
-     */
-    //XXX Replace above with this one
-    SyncJobEntity queueExportJob(BulkExportJobParams jobParams) {
-        SyncJobArgs args = setupSyncJobArgs(jobParams.asMap(), jobParams.sourceId)
+    SyncJobEntity queueJob(BulkExportJobParams jobParams) {
+        jobParams.entityClassName = getEntityClass().name
+        SyncJobArgs args = setupSyncJobArgs(jobParams)
         return syncJobService.queueJob(args)
     }
 
@@ -78,11 +69,11 @@ class BulkExportService<D> {
     SyncJobEntity startJob(Long jobId) {
         SyncJobEntity job = syncJobService.getJob(jobId)
         assert job.state == SyncJobState.Queued
-        changeJobStatusToRunning(jobId)
+        syncJobService.changeJobStatusToRunning(jobId)
 
-        Map qParams = job.params
+        BulkExportJobParams jobParams = BulkExportJobParams.withParams(job.params)
 
-        SyncJobArgs syncJobArgs = buildSyncJobArgs(qParams, job.sourceId)
+        SyncJobArgs syncJobArgs = setupSyncJobArgs(jobParams)
         syncJobArgs.jobId = jobId
         SyncJobContext jobContext = syncJobService.initContext(syncJobArgs, null)
         bulkExport(jobContext)
@@ -91,23 +82,41 @@ class BulkExportService<D> {
     }
 
 
-    protected SyncJobArgs setupSyncJobArgs(Map qParams, String sourceId){
-        SyncJobArgs args = SyncJobArgs.withParams(qParams)
+    protected SyncJobArgs setupSyncJobArgs(BulkExportJobParams jobParams){
+        SyncJobArgs syncJobArgs = SyncJobArgs.withParams(jobParams.asMap())
 
         //make sure they passed in q or qsearch. queryArgs will have been populated if they did
-        if(!args.queryArgs) {
+        if(!syncJobArgs.queryArgs) {
             throw DataProblem.of('error.query.qRequired').detail("q criteria required").toException()
         }
-        //give it the bulkImport type
-        args.jobType = 'bulk.export'
         //do includes, one of the keys is required. This is not used on queue, only for run.
-        if(!qParams.includes && !qParams.includesKey) {
+        if(!jobParams.includes && !jobParams.includesKey) {
             throw DataProblem.ex("includes or includesKey are required params")
         }
+        //parse the params into the IncludesProps
+        var incProps = new IncludesProps(
+            includes: jobParams.includes, includesKey: jobParams.includesKey
+        )
+        //returns includes if thats passed in or looks up includeKey
+        syncJobArgs.includes = includesConfig.findIncludes(getEntityClass(), incProps)
 
-        args.sourceId = sourceId
-        args.params['entityClassName'] = getEntityClass().name
-        return args
+        //give it the bulkImport type
+        syncJobArgs.jobType = 'bulk.export'
+
+        syncJobArgs.sourceId = jobParams.sourceId
+
+        //XXX @SUD where does this come into play? why true
+        // args.async = true
+        // args.parallel = true
+
+        //XXX do we really need this?
+        syncJobArgs.entityClass = entityClass
+
+        //bulkexport always saves data in a file
+        //syncJobArgs.saveDataAsFile = true
+        syncJobArgs.dataFormat = SyncJobArgs.DataFormat.Payload
+
+        return syncJobArgs
     }
 
     /**
@@ -155,7 +164,7 @@ class BulkExportService<D> {
                 entityMapList.hydrate()
                 Result result = Result.OK().payload(entityMapList as List)
                 //update job with page data
-                jobContext.updateJobResults(result, false)
+                jobContext.updateJobResults(result, false, entityMapList.size())
             }
         } catch (Exception ex) {
             log.error("BulkExport unexpected exception", ex)
@@ -165,43 +174,9 @@ class BulkExportService<D> {
 
 
     /**
-     * Recreates SyncjobArgs from previously slaved Syncjob.
-     * Builds QueryArgs and includes from job payload
-     */
-    protected SyncJobArgs buildSyncJobArgs(Map qParams, String sourceId) {
-        SyncJobArgs args = SyncJobArgs.withParams(qParams)
-        if(!qParams.includes && !qParams.includesKey) {
-            throw DataProblem.ex("includes or includesKey are required params")
-        }
-        List bulkIncludes = includesConfig.getIncludes(qParams, [IncludesKey.list, IncludesKey.get], getEntityClass())
-        args.includes = bulkIncludes
-        args.sourceId = sourceId
-        //bulk export always runs async and parallel
-        args.async = true
-        //XXX @SUD where does this come into play? why true
-        args.parallel = true
-
-        //XXX do we really need this?
-        args.entityClass = entityClass
-
-        //bulkexport always saves data in a file
-        //args.saveDataAsFile = true
-        args.dataFormat = SyncJobArgs.DataFormat.Payload
-        return args
-    }
-
-    /**
-     * Changes job state to Running before starting bulk export job
-     */
-    protected void changeJobStatusToRunning(Serializable jobId) {
-        syncJobService.updateJob([id:jobId, state: SyncJobState.Running])
-    }
-
-    /**
      * Instead of loading all the data for bulkexport, it paginates and loads one page at a time
      */
     //XXX @SUD add tests for these, not reason not to be adding unit tests
-
     protected void eachPage(QueryArgs queryArgs, Closure cl) {
         Pager paginator = Pager.of(max:500) //XXX @SUD why 10? changed to 100, lets make it configurable
         //count total records based on query args and build a paginator

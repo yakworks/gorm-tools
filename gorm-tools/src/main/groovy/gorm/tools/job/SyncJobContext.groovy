@@ -26,6 +26,7 @@ import yakworks.api.Result
 import yakworks.api.ResultUtils
 import yakworks.api.problem.Problem
 import yakworks.commons.io.IOUtils
+import yakworks.gorm.api.bulk.BulkImportFinishedEvent
 import yakworks.json.groovy.JsonEngine
 import yakworks.message.spi.MsgService
 import yakworks.spring.AppCtx
@@ -128,7 +129,7 @@ class SyncJobContext {
      * @param startTimeMillis the start time in millis, used to deduce time elapsed
      * @param throwEx if false then only does log.error and will not throw on an exception so flow is not disrupted if this flakes out
      */
-    void updateJobResults(Result apiResults, boolean throwEx = true) {
+    void updateJobResults(Result apiResults, boolean throwEx = true, Integer sliceCount = null) {
         try {
 
             if(!apiResults.ok) {
@@ -139,6 +140,12 @@ class SyncJobContext {
             }
             //increment the processedCount
             int processedCnt = (apiResults instanceof ApiResults) ? apiResults.list.size() : 1
+            //if messageCoutn is passed in then use that for the messages
+            if(sliceCount){
+                processedCnt = sliceCount
+            } else {
+                processedCnt = (apiResults instanceof ApiResults) ? apiResults.list.size() : 1
+            }
             processedCount.addAndGet(processedCnt)
 
             String message = getJobUpdateMessage(apiResults.ok)
@@ -215,6 +222,11 @@ class SyncJobContext {
         SyncJobEntity entity = syncJobService.updateJob([id:jobId, ok:ok.get(), state: SyncJobState.Finished])
 
         AppCtx.publishEvent(SyncJobFinishedEvent.of(this))
+        //XXX temporarily fire here until the legacy way is removed, then should be in commented out section in finally of BulkImporter
+        if(args.jobType == 'bulk.import') {
+            BulkImportFinishedEvent<?> evt = new BulkImportFinishedEvent(this, args.entityClass)
+            AppCtx.publishEvent(evt)
+        }
         return entity
     }
 

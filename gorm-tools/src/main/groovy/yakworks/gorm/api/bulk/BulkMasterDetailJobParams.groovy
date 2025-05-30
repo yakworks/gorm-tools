@@ -7,8 +7,6 @@ package yakworks.gorm.api.bulk
 import groovy.transform.CompileStatic
 
 import gorm.tools.databinding.BasicDataBinder
-import gorm.tools.job.CoreSyncJobParams
-import gorm.tools.repository.model.DataOp
 
 /**
  * Used for multiple CSV files in zip.

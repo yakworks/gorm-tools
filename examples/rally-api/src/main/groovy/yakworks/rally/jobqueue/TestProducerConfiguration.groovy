@@ -15,8 +15,8 @@ import org.springframework.context.annotation.Lazy
 import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
 
-import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.model.DataOp
+import yakworks.gorm.api.bulk.BulkExportJobParams
 import yakworks.gorm.api.bulk.BulkExportService
 import yakworks.gorm.api.bulk.BulkImportJobParams
 import yakworks.gorm.api.bulk.BulkImportService
@@ -24,8 +24,7 @@ import yakworks.rally.job.SyncJob
 import yakworks.testing.gorm.model.KitchenSink
 
 /**
- * Spring config for Async related beans.
- * NOTE: @Lazy(false) to make sure Jobs are NOT Lazy, they need to be registered at init to get scheduled.
+ * POC Test Jobs that put things on the SyncJob queue
  */
 @Slf4j
 @Configuration @Lazy(false)
@@ -46,16 +45,18 @@ class TestProducerConfiguration {
         // add throws exception if not space
         // put will block until it can be added
         //IMPORT
-        (1..3).each {
+        (1..2).each {
             var job = submitImportJob()
-            syncJobQueue.offer(job)
-            log.info("⏱️🗂️ OFFER Finished adding IMPORT ${job.id} to queue\n")
+            //see the Listener in the consumer config
+            //syncJobQueue.offer(job)
+            log.info("⏱️🗂️ Finished submitImportJob")
         }
         //EXPORT
-        (1..3).each {
+        (1..2).each {
             var jobEx = submitExportJob()
-            syncJobQueue.offer(jobEx)
-            log.info("⏱️📤   OFFER Finished adding EXPORT ${jobEx.id} to queue\n")
+            //see the Listener in the consumer config
+            //syncJobQueue.offer(jobEx)
+            log.info("⏱️📤   Finished submitExportJob")
         }
         //sleep(10000)
         log.info(" END OFFER")
@@ -78,7 +79,9 @@ class TestProducerConfiguration {
     SyncJob submitImportJob(){
         var bulkImportService = BulkImportService.lookup(KitchenSink)
 
-        List dataList = KitchenSink.generateDataList(1000)
+        //pick random from either 999 or 10k so it checks both payloadId attachment and when under 1k stores in column
+        int dataSize = new Random().nextBoolean() ? 1000 : 10_000;
+        List dataList = KitchenSink.generateDataList(dataSize)
 
         // Map params = [
         //     parallel: false, async:false,
@@ -90,7 +93,7 @@ class TestProducerConfiguration {
             parallel: false, async:false,
             sourceId: 'test-job', includes: ["id", "name", "ext.name"]
         )
-        var jobEnt = bulkImportService.queueImportJob(bimpParams, dataList)
+        var jobEnt = bulkImportService.queueJob(bimpParams, dataList)
 
         return jobEnt as SyncJob
     }
@@ -98,11 +101,11 @@ class TestProducerConfiguration {
     SyncJob submitExportJob(){
         var bulkExportService = BulkExportService.lookup(KitchenSink)
 
-        Map params = [
+        BulkExportJobParams jobParams = new BulkExportJobParams(
             q: '{"id":{"$gte":1}}',
             sourceId: "test-job", includes: ["id", "name", "ext.name"]
-        ]
-        SyncJob jobEnt = (SyncJob)bulkExportService.queueExportJob(params, "test-job")
+        )
+        SyncJob jobEnt = (SyncJob)bulkExportService.queueJob(jobParams)
         return jobEnt
     }
 

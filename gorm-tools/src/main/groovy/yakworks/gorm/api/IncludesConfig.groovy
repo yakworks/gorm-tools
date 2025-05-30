@@ -39,12 +39,8 @@ class IncludesConfig {
     List<String> getIncludes(Map qParams, List fallbackIncludesKeys, Class entityClass) {
         //parse the params into the IncludesProps
         var incProps = IncludesProps.of(qParams).fallbackKeys(fallbackIncludesKeys)
-
-        //if includes was passed in, then it wins
-        if(incProps.includes) return incProps.includes
-
-        //otherwise search based on includesKey
-        List<String> incs = self.findIncludes(entityClass, incProps)
+        //returns includes if thats passed in or looks up includeKey
+        List<String> incs = findIncludes(entityClass, incProps)
         return incs
     }
 

@@ -9,6 +9,7 @@ import groovy.transform.CompileStatic
 import gorm.tools.databinding.BasicDataBinder
 import gorm.tools.job.CoreSyncJobParams
 import gorm.tools.repository.model.DataOp
+import yakworks.gorm.api.support.DataMimeTypes
 
 /**
  * Value Object are better than using a Map to store arguments and parameters.
@@ -43,9 +44,7 @@ class BulkImportJobParams extends CoreSyncJobParams {
     /**
      * (When attachmentId is set) Format for the data. either CSV or JSON are currently supported.
      */
-    PayloadFormat payloadFormat
-
-    static enum PayloadFormat { csv, json }
+    DataMimeTypes payloadFormat
 
     /**
      * (When attachmentId is set) Control Count of lines or items in file.

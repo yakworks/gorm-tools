@@ -1,20 +1,15 @@
 package yakworks.gorm.api.bulk
 
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobState
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.model.DataOp
-import gorm.tools.utils.BenchmarkHelper
 import spock.lang.Specification
 import testing.TestSyncJob
 import testing.TestSyncJobService
 import yakworks.api.problem.data.DataProblemException
-import yakworks.gorm.config.AsyncConfig
-import yakworks.gorm.config.GormConfig
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.SinkExt
 import yakworks.testing.gorm.model.SinkItem
@@ -43,13 +38,17 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
     }
 
     Long bulkExport(String q){
-        Map params = [
-            parallel: false, async:false,
-            source: "test", sourceId: "test-job", includes: "id,name,ext.name"
-        ]
-        params.q = q
+        // Map params = [
+        //     parallel: false, async:false,
+        //     source: "test", sourceId: "test-job", includes: "id,name,ext.name"
+        // ]
+        // params.q = q
+        BulkExportJobParams bexParams = new BulkExportJobParams(
+            sourceId: "test-job", includes: ['id','name','ext.name'],
+            q: q
+        )
 
-        SyncJobEntity jobEnt = bulkExportService.queueExportJob(params, "test-job")
+        SyncJobEntity jobEnt = bulkExportService.queueJob(bexParams)
         //flushAndClear()
         SyncJobEntity jobEnt2 = bulkExportService.startJob(jobEnt.id)
         //flushAndClear()
@@ -58,12 +57,12 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
 
     void "test queueExportJob"() {
         when:
-        SyncJobEntity jobEnt = bulkExportService.queueExportJob(
-            [
-                q: [foo: 'bar'],
-                includes: ["id", "name", "ext.name"]
-            ], //params
-            "test-job" //sourceId
+        SyncJobEntity jobEnt = bulkExportService.queueJob(
+            new BulkExportJobParams(
+                q: '{"foo": "bar"}',
+                includes: ["id", "name", "ext.name"],
+                sourceId: "test-job"
+            )
         )
         flushAndClear()
         assert jobEnt.id
@@ -78,7 +77,7 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
         job.sourceId == 'test-job'
 
         and: 'params have extra fields'
-        params.q == [foo: 'bar']
+        params.q == '{"foo": "bar"}'
         params.entityClassName == 'yakworks.testing.gorm.model.KitchenSink'
 
     }
@@ -86,7 +85,7 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
     void "test empty q param"() {
         when:
         Map params = [:]
-        SyncJobEntity jobEnt = bulkExportService.queueExportJob(params, "test-job")
+        SyncJobEntity jobEnt = bulkExportService.queueJob(new BulkExportJobParams())
 
         then:
         DataProblemException ex = thrown()

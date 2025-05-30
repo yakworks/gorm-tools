@@ -84,7 +84,7 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
         org != null
         org.comments != null
         //verify the SyncjobEventListener registered properly
-        org.comments == "testorg-1-SyncJobFinishedEvent"
+        org.comments == "testorg-1-BulkImportFinishedEvent"
         org.info != null
         //verify the SyncjobEventListener registered properly
         org.info.fax == "SyncJobStateEvent"

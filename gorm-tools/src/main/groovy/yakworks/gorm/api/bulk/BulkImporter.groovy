@@ -33,6 +33,7 @@ import yakworks.commons.lang.Validate
 import yakworks.commons.map.LazyPathKeyMap
 import yakworks.commons.map.Maps
 import yakworks.meta.MetaMap
+import yakworks.spring.AppCtx
 
 /**
  * Core functionality for slicing and insert/update or upsert a list of maps
@@ -94,6 +95,9 @@ class BulkImporter<D> {
         }
         finally {
             jobContext.finishJob()
+            //XXX temporarily comment out ntil the legacy way is removed
+            // BulkImportFinishedEvent<D> evt = new BulkImportFinishedEvent(jobContext, entityClass)
+            // AppCtx.publishEvent(evt)
         }
 
         return jobContext.jobId

@@ -4,6 +4,8 @@
 */
 package yakworks.rally.config
 
+import groovy.transform.CompileStatic
+
 import org.apache.ignite.Ignite
 import org.apache.ignite.IgniteSpring
 import org.apache.ignite.cache.spring.IgniteCacheManager
@@ -16,11 +18,14 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
 import org.springframework.context.annotation.Profile
 
-//@AutoConfiguration(after = org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration)
+/**
+ * Example for setting up Ignite as alternative to Hazelcast.
+ * Its a viable replacement except we would need to reproduce the spring-session (if we still need it)
+ */
 @Configuration(proxyBeanMethods = false)
 @Profile("ignite")
 @Lazy(false)
-//@CompileStatic
+@CompileStatic
 class IgniteConfiguration {
 
     @Autowired ApplicationContext applicationContext

@@ -8,8 +8,7 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.databinding.BasicDataBinder
 import gorm.tools.job.CoreSyncJobParams
-import yakworks.commons.map.Maps
-import yakworks.meta.MetaUtils
+import yakworks.gorm.api.support.DataMimeTypes
 
 /**
  * Value Object are better than using a Map to store arguments and parameters.
@@ -23,7 +22,13 @@ class BulkExportJobParams extends CoreSyncJobParams{
     /**
      * (When attachmentId is set) Format for the data. either CSV or JSON are currently supported.
      */
-    String dataFormat
+    //XXX @SUD make this work so it can ether be csv or json export
+    DataMimeTypes dataFormat = DataMimeTypes.json
+
+    /**
+     * The entity class name this is for
+     */
+    String entityClassName
 
     static BulkExportJobParams withParams(Map params){
         BulkExportJobParams bulkParams = new BulkExportJobParams()

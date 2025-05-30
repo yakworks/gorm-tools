@@ -14,7 +14,7 @@ import gorm.tools.job.events.SyncJobQueueEvent
 import yakworks.gorm.config.GormConfig
 
 /**
- * Default used for firing bulk jobs
+ * WIP to be used for tests instead of the Hazelcast queue
  */
 @CompileStatic
 class DefaultBulkJobQueueListener {

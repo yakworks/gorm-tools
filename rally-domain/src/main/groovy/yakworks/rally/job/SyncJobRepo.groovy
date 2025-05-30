@@ -14,6 +14,7 @@ import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
+import grails.gorm.transactions.ReadOnly
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.repo.AttachmentRepo
 
@@ -60,6 +61,7 @@ class SyncJobRepo extends LongIdGormRepo<SyncJob> {
         job.dataId ? attachmentRepo.get(job.dataId).getText() : getJsonString(job.dataBytes)
     }
 
+    @ReadOnly
     String payloadToString(SyncJob job){
         job.payloadId ? attachmentRepo.get(job.payloadId).getText() : getJsonString(job.payloadBytes)
     }

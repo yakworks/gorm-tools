@@ -193,28 +193,25 @@ start.rally-api2.ignite: # start.db
 ## start the rally-api example jar with hazel cast
 start.rally-api: # start.db
 	${gradlew} rally-api:assemble
-	cd examples/rally-api
 	java \
 	-server -Dserver.port=8083 \
 	-Dspring.profiles.active=production,local,server,hazel \
 	-Djava.net.preferIPv4Stack=true \
-	-Xmx2g -jar build/libs/rally-api.jar
+	-Xmx2g -jar examples/rally-api/build/libs/rally-api.jar
 
 start.rally-api2:
-	cd examples/rally-api
 	java \
 	-server -Dserver.port=8084 \
 	-Dspring.profiles.active=production,local,client,hazel  \
 	-Djava.net.preferIPv4Stack=true \
-	-Xmx2g -jar build/libs/rally-api.jar
+	-Xmx2g -jar examples/rally-api/build/libs/rally-api.jar
 
 start.rally-api3:
-	cd examples/rally-api
 	java \
 	-server -Dserver.port=8085 \
 	-Dspring.profiles.active=production,local,client,hazel  \
 	-Djava.net.preferIPv4Stack=true \
-	-Xmx2g -jar build/libs/rally-api.jar
+	-Xmx2g -jar examples/rally-api/build/libs/rally-api.jar
 
 ## start rcm-jobs, gradle rcm-jobs:bootRun
 run.rally-api: # start.db

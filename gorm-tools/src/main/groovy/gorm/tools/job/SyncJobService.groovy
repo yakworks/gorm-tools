@@ -51,12 +51,17 @@ abstract class SyncJobService<D> {
     /**
      * creates and saves the Job and returns the SyncJobContext with the jobId
      */
-    SyncJobContext initContext(SyncJobArgs args, Object payload){
-        SyncJobContext jobContext = SyncJobContext.of(args).syncJobService(this).payload(payload)
-        jobContext.setPayloadSize(payload)
+    SyncJobContext startJob(SyncJobEntity job, SyncJobArgs syncJobArgs){
+        assert job.state == SyncJobState.Queued
+        job = changeJobStatusToRunning(job.id)
+        assert job.state == SyncJobState.Running
+        //make sure args has jobId
+        syncJobArgs.jobId = job.id
 
+        SyncJobContext jobContext = SyncJobContext.of(syncJobArgs).syncJobService(this)
         jobContext.results = ApiResults.create()
         jobContext.startTime = System.currentTimeMillis()
+
         return jobContext
     }
 
@@ -112,9 +117,11 @@ abstract class SyncJobService<D> {
         //jobContext.createJob()
         SyncJobEntity syncJobEntity = queueJob(args, SyncJobState.Running)
 
-        SyncJobContext jobContext = SyncJobContext.of(args).syncJobService(this).payload(payload)
+        SyncJobContext jobContext = SyncJobContext.of(args).syncJobService(this)
+        //inititialize the ApiResults to be used in process
         jobContext.results = ApiResults.create()
         jobContext.startTime = System.currentTimeMillis()
+        if(payload instanceof Collection) jobContext.payloadSize = payload.size()
 
         AppCtx.publishEvent(SyncJobStateEvent.of(syncJobEntity.id, jobContext, syncJobEntity.state))
         return jobContext
@@ -142,7 +149,7 @@ abstract class SyncJobService<D> {
     /**
      * Changes job state to Running before starting bulk export job
      */
-    void changeJobStatusToRunning(Serializable jobId) {
+    SyncJobEntity changeJobStatusToRunning(Serializable jobId) {
         updateJob([id:jobId, state: SyncJobState.Running])
     }
 

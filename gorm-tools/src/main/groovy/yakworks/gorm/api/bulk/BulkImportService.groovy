@@ -22,6 +22,7 @@ import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.IncludesKey
+import yakworks.gorm.api.support.DataMimeTypes
 import yakworks.gorm.config.GormConfig
 import yakworks.json.groovy.JsonEngine
 
@@ -83,7 +84,6 @@ class BulkImportService<D> {
         //if attachmentId then assume its a csv
         if(jobParams.attachmentId) {
             args.payloadId = jobParams.attachmentId
-            //XXX default payLoad format is CSV
         } else if(payloadBody){
             args.payload = payloadBody
         } else {
@@ -97,37 +97,36 @@ class BulkImportService<D> {
      * Starts a bulk import job
      */
     SyncJobEntity runJob(Long jobId) {
+        assert jobId
         SyncJobEntity job = syncJobService.getJob(jobId)
-        assert job.state == SyncJobState.Queued
-        syncJobService.changeJobStatusToRunning(jobId)
-
-        List<Map> dataList
         BulkImportJobParams jobParams = BulkImportJobParams.withParams(job.params)
-        //XXX right now we assume its csv in zip but we should have more info stored to say that.
-        // Check the payloadFormat if its a zip to verify its CSV
+        SyncJobContext jobContext = syncJobService.startJob(job, setupSyncJobArgs(jobParams))
+
+        List<Map> payloadList
         if(jobParams.attachmentId) {
-            //sets the datalist from the csv instead of body
-            dataList = transformCsvToBulkList(jobParams.asMap())
+            //attachment will normally be a CSV as if they are doing json it can be passed into as the request body
+            if(!jobParams.payloadFormat || jobParams.payloadFormat == DataMimeTypes.csv){
+                //sets the datalist from the csv instead of body
+                payloadList = transformCsvToBulkList(jobParams.asMap())
+            } else if (jobParams.payloadFormat == DataMimeTypes.json) {
+                //FIXME finish this to allow passing a json file
+                throw new UnsupportedOperationException("json attachment not supported yet")
+            }
         }
-        //if no attachmentId was passed to params then get the payload
-        else if(job.payloadId || job.payloadBytes) {
-            dataList = JsonEngine.parseJson(job.payloadToString(), List<Map>)
+        else if(job.payloadId || job.payloadBytes) { //if no attachmentId was passed to params then get the payload
+            payloadList = JsonEngine.parseJson(job.payloadToString(), List<Map>)
         }
+        jobContext.args.payload(payloadList)
+        jobContext.payloadSize = payloadList.size()
 
-        SyncJobArgs syncJobArgs = setupSyncJobArgs(jobParams)
-        syncJobArgs.jobId = jobId
+        getBulkImporter().bulkImport(payloadList, jobContext)
 
-        SyncJobContext sctx = syncJobService.initContext(syncJobArgs, dataList)
-
-        Long jobIdent = getBulkImporter().bulkImport(dataList, sctx)
-
-        return syncJobService.getJob(jobIdent)
+        return syncJobService.getJob(jobId)
     }
 
     @Deprecated
     protected SyncJobEntity bulkImportLegacy(BulkImportJobParams jobParams, List<Map> dataList){
         //if attachmentId then assume its a csv
-        //XXX we should not assume its CSV. Check dataFormat as well, we can have that default to CSV
         if(jobParams.attachmentId) {
             //sets the datalist from the csv instead of body
             //Transform csv here, so bulk processing remains same, regardless the incoming payload is csv or json

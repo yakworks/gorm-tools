@@ -2,6 +2,7 @@ package yakworks.gorm.api.bulk
 
 import gorm.tools.beans.Pager
 import gorm.tools.job.SyncJobArgs
+import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobState
 import gorm.tools.mango.api.QueryArgs
@@ -101,9 +102,10 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
             sourceId: "test", includes: ["id", "name", "ext.name"],
             queryArgs: queryArgs
         )
+        var ctx = SyncJobContext.of(syncjobArgs)
 
         List dataList = []
-        bulkExportService.eachPage(syncjobArgs){ List dataPage ->
+        bulkExportService.eachPage(ctx){ List dataPage ->
             dataList.addAll(dataPage)
         }
 
@@ -124,19 +126,22 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
     void "test setupPager"() {
         when:
         QueryArgs queryArgs = QueryArgs.of(
-            q: '{"id":{"$gte":1}}'
+            q: '{"id":{"$lte":100}}'
         )
         def syncjobArgs =  new SyncJobArgs(
             sourceId: "test", includes: ["id", "name", "ext.name"],
             queryArgs: queryArgs
         )
+        var ctx = SyncJobContext.of(syncjobArgs)
 
-        List dataList = []
-        Pager pager = bulkExportService.setupPager(syncjobArgs)
+        Pager pager = bulkExportService.setupPager(ctx)
 
         then:
-        pager
-        //XXX @SUD test whats important stuff here
+        //XXX @SUD test whats important stuff here on pager and ctx
+        // also check that the saveDataAsFile got set for example
+        pager.recordCount == 100
+        //should have set the payloadSize too
+        ctx.payloadSize == 100
     }
 
     void "test eachPage with no data"() {
@@ -148,9 +153,10 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
             sourceId: "test", includes: ["id", "name", "ext.name"],
             queryArgs: queryArgs
         )
+        var ctx = SyncJobContext.of(syncjobArgs)
 
         List dataList = []
-        bulkExportService.eachPage(syncjobArgs){ List dataPage ->
+        bulkExportService.eachPage(ctx){ List dataPage ->
             dataList.addAll(dataPage)
         }
 

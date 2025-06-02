@@ -30,6 +30,7 @@ import yakworks.gorm.api.CrudApi
 import yakworks.gorm.api.IncludesProps
 import yakworks.gorm.api.bulk.BulkExportJobParams
 import yakworks.gorm.api.bulk.BulkImportJobParams
+import yakworks.gorm.api.support.DataMimeTypes
 
 import static gorm.tools.problem.ProblemHandler.isBrokenPipe
 import static org.springframework.http.HttpStatus.CREATED
@@ -279,14 +280,16 @@ trait CrudApiController<D> extends RestApiController {
     void bulkImport(DataOp dataOp) {
         List dataList = bodyAsList() as List<Map>
         Map qParams = getParamsMap()
+        //if op=upsert was passed in via params then leave it alone, if null then set to this method variable
+        if(!qParams.op)  qParams.op = dataOp
         BulkImportJobParams jobParams = BulkImportJobParams.withParams(qParams)
-        jobParams.queryParams = qParams //store the full params map
         jobParams.sourceId = requestToSourceId(request)
-        jobParams.op = dataOp
+
         // replace when upsert is passed in op=upsert as query param. This is different than the dataOp arg in method here,
         // which is going to either be "add" or "update" already as its comes from either a POST or PUT call.
-        DataOp paramsOp = EnumUtils.getEnumIgnoreCase(DataOp, qParams.op as String)
-        if(paramsOp == DataOp.upsert) jobParams.op = paramsOp
+        // DataOp paramsOp = EnumUtils.getEnumIgnoreCase(DataOp, qParams.op as String)
+        // if(paramsOp == DataOp.upsert) jobParams.op = paramsOp
+
         //keeps it backwards compatible and set source to jobSource if passed in.
         if(qParams.jobSource != null) jobParams.source = qParams.jobSource
 

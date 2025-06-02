@@ -34,7 +34,7 @@ import yakworks.spring.AppCtx
 import static gorm.tools.job.SyncJobArgs.DataFormat
 
 /**
- * Holds the basic state and primary action methods while running a Bulk job.
+ * Holds the basic state and primary action methods while running a SyncJoob.
  * Creates and updates the job status as it progresses and finalizes its results when finished.
  */
 @SuppressWarnings('Println')
@@ -63,8 +63,11 @@ class SyncJobContext {
     List<Problem> problems = [] as List<Problem>
 
     /** Payload input data used for job operations */
-    Object payload
+    Object getPayload(){
+        args.payload
+    }
 
+    /** Payload size used for progress messages*/
     int payloadSize
 
     AtomicInteger processedCount = new AtomicInteger()
@@ -83,7 +86,10 @@ class SyncJobContext {
         return sjc
     }
 
-    /** gets the jobId, stored in args. The job id gets populated once the job is created */
+    /**
+     * gets the jobId, stored in args.
+     * The job id gets populated once the job is created or startJob called
+     */
     Long getJobId(){ return args.jobId }
 
     /** create a job using the syncJobService.repo.create */
@@ -302,15 +308,6 @@ class SyncJobContext {
             log.debug(message)
         }
         return message
-    }
-
-    /**
-     * called from createJob to set the payloads size. which is used to decide whether its stored at file or in db as bytes.
-     */
-    protected void setPayloadSize(Object payload){
-        if(payload instanceof Collection){
-            this.payloadSize = payload.size()
-        }
     }
 
     /**

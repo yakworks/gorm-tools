@@ -26,14 +26,15 @@ class SyncJobEventsSpec extends Specification {
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, samplePaylod)
 
         then: "new item to payload should have been pushed by start listener"
-        jobContext.payload.size() == 5
-        jobContext.payload[4] == 5
+        jobContext.args.payload.size() == 5
+        jobContext.args.payload[4] == 5
 
         when:
         jobContext.finishJob()
 
         then: "one more item to listener should have been pushed"
-        jobContext.payload.size() == 6
-        jobContext.payload[5] == 6
+        jobContext.args.payload.size() == 6
+        jobContext.args.payload[5] == 6
+
     }
 }

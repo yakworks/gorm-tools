@@ -59,13 +59,13 @@ class SyncjobEventListener {
         }
     }
 
-    // @EventListener
-    // void withoutEntityClassStart(SyncJobStateEvent<Object> event) {
-    //     if(event.entityClass != Object) return //apply just for the event without entityClass
-    //     if(event.context.payload && event.context.payload instanceof Collection) {
-    //        event.context.payload << 5 //add a new item to payload which can be verified by test
-    //     }
-    // }
+     @EventListener
+     void withoutEntityClassStart(SyncJobStateEvent<Object> event) {
+         if(event.entityClass != Object) return //apply just for the event without entityClass
+         if(event.context.payload && event.context.payload instanceof Collection) {
+            event.context.payload << 5 //add a new item to payload which can be verified by test
+         }
+     }
 
     @EventListener
     void withoutEntityClassfinish(SyncJobFinishedEvent<Object> event) {

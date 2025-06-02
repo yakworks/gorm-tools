@@ -10,6 +10,7 @@ import spock.lang.Specification
 import testing.TestSyncJob
 import testing.TestSyncJobService
 import yakworks.api.problem.data.DataProblemException
+import yakworks.meta.MetaMapList
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.SinkExt
 import yakworks.testing.gorm.model.SinkItem
@@ -35,6 +36,27 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
 
     BulkExportService<KitchenSink> getBulkExportService(){
         BulkExportService.lookup(KitchenSink)
+    }
+
+    void "test setupSyncJobArgs"() {
+        given:
+        BulkExportJobParams jobParams = BulkExportJobParams.withParams([
+            sourceId: "test-job", includes: ['id','name','ext.name'],
+            q: '{"id":{"$gte":1}}'
+        ])
+
+        when:
+        SyncJobArgs jobArgs = bulkExportService.setupSyncJobArgs(jobParams)
+
+        then:
+        noExceptionThrown()
+        jobArgs
+        jobArgs.jobType == 'bulk.export'
+        jobArgs.sourceId == "test-job"
+        jobArgs.queryArgs
+        jobArgs.entityClass == KitchenSink
+        jobArgs.includes == ['id','name','ext.name']
+        jobArgs.dataFormat == SyncJobArgs.DataFormat.Payload
     }
 
     Long bulkExport(String q){
@@ -131,12 +153,13 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
             queryArgs: queryArgs
         )
 
-        List dataList = []
         Pager pager = bulkExportService.setupPager(syncjobArgs)
 
         then:
         pager
-        //XXX @SUD test whats important stuff here
+        pager.recordCount ==  KitchenSink.query(id:['$gte':1]).count()
+        pager.max == bulkExportService.pageSize
+        pager.offset == 0
     }
 
     void "test eachPage with no data"() {
@@ -156,6 +179,26 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
 
         then:
         dataList.size() == 0
+    }
+
+    void "runPageQuery"() {
+        setup:
+        QueryArgs queryArgs = QueryArgs.of(
+            q: '{"id":{"$gt":1}}'
+        )
+        def syncjobArgs =  new SyncJobArgs(
+            sourceId: "test", includes: ["id", "name", "ext.name"],
+            queryArgs: queryArgs
+        )
+        Pager pager = bulkExportService.setupPager(syncjobArgs)
+
+        when:
+        MetaMapList list = bulkExportService.runPageQuery(syncjobArgs, pager)
+
+        then:
+        list.totalCount == KitchenSink.query(id:['$gt':1]).count()
+        list
+        list[0].keySet().containsAll(['id', 'name', 'ext'])
     }
 
 
@@ -202,8 +245,6 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
         //results[0].data.id == 1
         sortedList[0].name == "Blue Cheese"
         sortedList[0].ext.name == "SinkExt1"
-
-
     }
 
 }

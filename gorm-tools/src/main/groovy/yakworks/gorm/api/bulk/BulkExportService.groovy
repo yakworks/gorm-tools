@@ -8,6 +8,7 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 
 import gorm.tools.beans.Pager
 import gorm.tools.job.SyncJobArgs
@@ -30,7 +31,6 @@ import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.IncludesProps
 import yakworks.meta.MetaMapList
 
-//XXX tests for all of this in BulkExportServiceSpec
 @CompileStatic
 @Slf4j
 class BulkExportService<D> {
@@ -40,6 +40,9 @@ class BulkExportService<D> {
     @Autowired ProblemHandler problemHandler
     @Autowired IncludesConfig includesConfig
     @Autowired TrxService trxService
+
+    @Value('${yakworks.bulk,export.pageSize:500}')
+    Integer pageSize
 
     Class<D> entityClass // the root domain class this is for
 
@@ -102,15 +105,8 @@ class BulkExportService<D> {
 
         syncJobArgs.sourceId = jobParams.sourceId
 
-        //XXX @SUD where does this come into play? why true
-        // args.async = true
-        // args.parallel = true
-
-        //XXX do we really need this?
         syncJobArgs.entityClass = entityClass
 
-        //bulkexport always saves data in a file
-        //syncJobArgs.saveDataAsFile = true
         syncJobArgs.dataFormat = SyncJobArgs.DataFormat.Payload
 
         return syncJobArgs
@@ -168,7 +164,6 @@ class BulkExportService<D> {
     /**
      * Instead of loading all the data for bulkexport, it paginates and loads one page at a time
      */
-    //XXX @SUD add tests for these, not reason not to be adding unit tests
     protected void eachPage(SyncJobArgs args, Closure cl) {
         Pager parentPager = setupPager(args)
         QueryArgs queryArgs = args.queryArgs
@@ -181,9 +176,8 @@ class BulkExportService<D> {
     /**
      * setup pager and do args.saveDataAsFile
      */
-    //XXX @SUD add tests
     protected Pager setupPager(SyncJobArgs args) {
-        Pager paginator = Pager.of(max:500) //XXX @SUD why 10? changed to 100, lets make it configurable
+        Pager paginator = Pager.of(max:pageSize)
         //count total records based on query args and build a paginator
         paginator.recordCount = getTotalCount(args.queryArgs)
         //hack right here to set saveDataAsFile when over 1000
@@ -194,7 +188,6 @@ class BulkExportService<D> {
         return paginator
     }
 
-    //XXX @SUD add unit test
     /**
      * run and call closure in Transaction.
      *
@@ -206,8 +199,7 @@ class BulkExportService<D> {
         MetaMapList entityMapList = metaMapService.createMetaMapList(listPage, args.includes)
         //hydrate it now in transaction so we dont later get the "could not initialize proxy - no Session" when converting to json
         entityMapList.hydrate()
-        //XXX @SUD not sure if this is needed, flush certainly is not, maybe just clear for memory
-        getRepo().flushAndClear()
+        getRepo().clear()
         return entityMapList
 
     }

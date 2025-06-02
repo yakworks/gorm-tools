@@ -30,4 +30,15 @@ class GormConfig {
     @Autowired
     IdGeneratorConfig idGenerator
 
+    BulkConfig bulk = new BulkConfig()
+
+    static class BulkConfig {
+
+        /** When doing large export this is the page size */
+        int exportPageSize = 500
+
+        /** The maximum number of records that can be exported */
+        int exportMax = 50000
+    }
+
 }

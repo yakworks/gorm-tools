@@ -194,7 +194,8 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
             sourceId: "test", includes: ["id", "name", "ext.name"],
             queryArgs: queryArgs
         )
-        Pager pager = bulkExportService.setupPager(syncjobArgs)
+        var ctx = SyncJobContext.of(syncjobArgs)
+        Pager pager = bulkExportService.setupPager(ctx)
 
         when:
         MetaMapList list = bulkExportService.runPageQuery(syncjobArgs, pager)

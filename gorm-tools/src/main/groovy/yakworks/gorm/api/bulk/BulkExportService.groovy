@@ -28,6 +28,7 @@ import yakworks.api.problem.data.DataProblem
 import yakworks.commons.lang.Validate
 import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.IncludesProps
+import yakworks.gorm.config.GormConfig
 import yakworks.meta.MetaMapList
 
 @CompileStatic
@@ -39,6 +40,7 @@ class BulkExportService<D> {
     @Autowired ProblemHandler problemHandler
     @Autowired IncludesConfig includesConfig
     @Autowired TrxService trxService
+    @Autowired GormConfig gormConfig
 
     @Value('${yakworks.bulk,export.pageSize:500}')
     Integer pageSize
@@ -177,7 +179,7 @@ class BulkExportService<D> {
      */
     //XXX @SUD add tests
     protected Pager setupPager(SyncJobContext jobContext) {
-        Pager paginator = Pager.of(max:500) //XXX @SUD why 10? changed to 100, lets make it configurable
+        Pager paginator = Pager.of(max:gormConfig.bulk.exportPageSize)
         //count total records based on query args and build a paginator
         paginator.recordCount = getTotalCount(jobContext.args.queryArgs)
         jobContext.payloadSize = paginator.recordCount

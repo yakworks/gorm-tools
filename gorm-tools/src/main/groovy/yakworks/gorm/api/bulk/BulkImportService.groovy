@@ -6,7 +6,6 @@ package yakworks.gorm.api.bulk
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.job.SyncJobArgs
@@ -145,8 +144,6 @@ class BulkImportService<D> {
         syncJobArgs.entityClass = getEntityClass()
 
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
-        //XXX why are we setting session: true here? explain. should it be default?
-        //def asyncArgs = jobContext.args.asyncArgs.session(true)
         // This is the promise call. Will return immediately if syncJobArgs.async=true
         Long jobId = syncJobService.runJob(
             jobContext.args.asyncArgs, jobContext, () -> getBulkImporter().doBulkParallel(dataList, jobContext)
@@ -163,6 +160,7 @@ class BulkImportService<D> {
         Long jobId = job.id
         //if not async then wait for it to finish
         if(!jobParams.async){
+            Long start = System.currentTimeMillis()
             //sleep first to give the job runner time to pick it up
             sleep(1000)
             //XXX new process loop and wait for job to finish
@@ -174,7 +172,14 @@ class BulkImportService<D> {
                 if(job.state != SyncJobState.Running && job.state != SyncJobState.Queued){
                     break
                 }
-                sleep(1000)
+
+                long elapsedTime = ((System.currentTimeMillis() - start) / 1000) as Long
+                if(elapsedTime >= gormConfig.bulk.asyncTimeout) {
+                    throw DataProblem.ex("Timeout has occurred while waiting for syncjob to finish").payload(jobId)
+                }
+                else {
+                    sleep(1000)
+                }
             }
         }
 
@@ -190,15 +195,6 @@ class BulkImportService<D> {
         SyncJobEntity jobEnt = queueJob(jobParams, payloadBody)
         return runJob(jobEnt.id)
     }
-
-    /**
-     * Changes job state to Running before starting bulk export job
-     */
-    //XXX @SUD incorporate this
-    protected void changeJobStatusToRunning(Serializable jobId) {
-        syncJobService.updateJob([id:jobId, state: SyncJobState.Running])
-    }
-
 
     List<Map> transformCsvToBulkList(Map gParams) {
         return getCsvToMapTransformer().process(gParams)

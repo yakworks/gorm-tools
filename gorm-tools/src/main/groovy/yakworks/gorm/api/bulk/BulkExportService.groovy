@@ -163,11 +163,9 @@ class BulkExportService<D> {
     /**
      * Instead of loading all the data for bulkexport, it paginates and loads one page at a time
      */
-    //XXX @SUD add tests for these, not reason not to be adding unit tests
     protected void eachPage(SyncJobContext jobContext, Closure cl) {
         SyncJobArgs args = jobContext.args
         Pager parentPager = setupPager(jobContext)
-        QueryArgs queryArgs = args.queryArgs
         parentPager.eachPage { page, max, offset ->
             MetaMapList entityMapList = runPageQuery(args, Pager.of(max: max, page: page))
             cl.call(entityMapList)
@@ -177,7 +175,6 @@ class BulkExportService<D> {
     /**
      * setup pager and do args.saveDataAsFile
      */
-    //XXX @SUD add tests
     protected Pager setupPager(SyncJobContext jobContext) {
         Pager paginator = Pager.of(max:gormConfig.bulk.exportPageSize)
         //count total records based on query args and build a paginator

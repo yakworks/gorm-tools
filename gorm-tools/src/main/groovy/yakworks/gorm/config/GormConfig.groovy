@@ -39,6 +39,13 @@ class GormConfig {
 
         /** The maximum number of records that can be exported */
         int exportMax = 50000
+
+        /**
+         * Timeout in seconds for bulk requests with async=false
+         * Request thread will be locked for maximum time configured, and job does not finish within the time,
+         * A timeout problem would be returned, but job will continue running.
+         */
+        int asyncTimeout = 90
     }
 
 }

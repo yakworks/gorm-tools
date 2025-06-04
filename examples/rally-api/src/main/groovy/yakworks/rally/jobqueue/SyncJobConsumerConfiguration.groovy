@@ -26,8 +26,7 @@ import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Org
 
 /**
- * Spring config for Async related beans.
- * NOTE: @Lazy(false) to make sure Jobs are NOT Lazy, they need to be registered at init to get scheduled.
+ * POC for SyncJobQueue
  */
 @Slf4j
 @Configuration

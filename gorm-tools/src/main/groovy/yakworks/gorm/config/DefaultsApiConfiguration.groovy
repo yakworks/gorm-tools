@@ -22,14 +22,13 @@ import yakworks.gorm.api.DefaultCrudApi
 import yakworks.gorm.api.bulk.BulkExportService
 import yakworks.gorm.api.bulk.BulkImportService
 import yakworks.gorm.api.bulk.BulkImporter
-import yakworks.gorm.api.bulk.DefaultBulkJobQueueListener
 
 @CompileStatic
 @Configuration @Lazy(false)
 class DefaultsApiConfiguration {
 
-    @Autowired
-    private ApplicationContext appCtx;
+    // @Autowired
+    // private ApplicationContext appCtx;
 
     /**
      * Factory function to return bean if one exists or create one with the defaultCrudApi prototype method

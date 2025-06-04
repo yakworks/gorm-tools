@@ -8,6 +8,7 @@ import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.event.EventListener
+import org.springframework.util.ClassUtils
 
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.events.SyncJobQueueEvent
@@ -23,11 +24,13 @@ class DefaultBulkJobQueueListener {
 
     @EventListener
     void syncJobQueueEvent(SyncJobQueueEvent qe) {
-        SyncJobArgs args = qe.syncJobArgs
+        //SyncJobArgs args = qe.syncJobArgs
 
-        if(qe.jobType == 'bulk.import' && !gormConfig.legacyBulk){
-            assert args.entityClass
-            var bulkImportService = getBulkImportService(args.entityClass)
+        if(qe.jobType == BulkImportJobParams.JOB_TYPE && !gormConfig.legacyBulk){
+            String entityClassName = qe.syncJob.params['entityClassName']
+            Class<?> entityClass = ClassUtils.resolveClassName(entityClassName, null);
+            //assert args.entityClass
+            var bulkImportService = getBulkImportService(entityClass)
             bulkImportService.runJob(qe.syncJob.id)
         }
     }

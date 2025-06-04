@@ -27,6 +27,7 @@ import yakworks.api.ResultUtils
 import yakworks.api.problem.Problem
 import yakworks.commons.io.IOUtils
 import yakworks.gorm.api.bulk.BulkImportFinishedEvent
+import yakworks.gorm.api.bulk.BulkImportJobParams
 import yakworks.json.groovy.JsonEngine
 import yakworks.message.spi.MsgService
 import yakworks.spring.AppCtx
@@ -229,7 +230,7 @@ class SyncJobContext {
 
         AppCtx.publishEvent(SyncJobFinishedEvent.of(this))
         //XXX temporarily fire here until the legacy way is removed, then should be in commented out section in finally of BulkImporter
-        if(args.jobType == 'bulk.import') {
+        if(args.jobType == BulkImportJobParams.JOB_TYPE) {
             BulkImportFinishedEvent<?> evt = new BulkImportFinishedEvent(this, args.entityClass)
             AppCtx.publishEvent(evt)
         }

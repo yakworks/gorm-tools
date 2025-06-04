@@ -170,7 +170,6 @@ class SyncJobArgs {
         if(this.savePayloadAsFile != null) return this.savePayloadAsFile
         // When collection then check size and set args
         return (payload instanceof Collection && ((Collection)payload).size() > 1000)
-
     }
 
     boolean isSaveDataAsFile(){
@@ -206,9 +205,12 @@ class SyncJobArgs {
 
         syncJobArgs.sourceId = params.sourceId
         //can use both jobSource and source to support backward compat, jobSource wins if both are set
+
         if(params.source != null) syncJobArgs.source = params.source
+        //Support legacy param if they pass jobSource it will win
         if(params.jobSource != null) syncJobArgs.source = params.jobSource
         if(params.jobType != null) syncJobArgs.jobType = params.jobType
+        if(params.op != null) syncJobArgs.op = EnumUtils.getEnumIgnoreCase(DataOp, params.op as String)
 
         //allow to specify the dataFormat
         if(params.dataFormat != null) syncJobArgs.dataFormat = EnumUtils.getEnumIgnoreCase(DataFormat, params.dataFormat as String)
@@ -223,6 +225,22 @@ class SyncJobArgs {
 
     AsyncArgs getAsyncArgs() {
         return new AsyncArgs(enabled: async)
+    }
+
+    /**
+     *  converts to data for queueing up (saving/creating) a SyncJob
+     *  Can probably get rid of this, used mostly for the old way of doing it with createJob.
+     */
+    Map<String, Object> asJobData(){
+        //make sure to use getters so overrides in super works
+        var dta = [
+            source: getSource(),
+            sourceId: getSourceId(),
+            params: getParams(),
+            jobType: getJobType()
+        ] as Map<String,Object>
+        if(getJobId()) dta['id'] = getJobId()
+        return dta
     }
 
 }

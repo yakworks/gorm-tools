@@ -19,6 +19,9 @@ import yakworks.gorm.api.support.DataMimeTypes
  */
 @CompileStatic
 class BulkImportJobParams extends CoreSyncJobParams {
+    public static final JOB_TYPE = 'bulk.import'
+
+    String jobType = JOB_TYPE
 
     /**
      * the operation to perform, Used in bulk and limited to add, update and upsert right now.
@@ -60,6 +63,7 @@ class BulkImportJobParams extends CoreSyncJobParams {
     static BulkImportJobParams withParams(Map params){
         BulkImportJobParams bijParams = new BulkImportJobParams()
         BasicDataBinder.bind(bijParams, params)
+        //save a full copy as is into the queryParams
         bijParams.queryParams = params
         return bijParams
     }

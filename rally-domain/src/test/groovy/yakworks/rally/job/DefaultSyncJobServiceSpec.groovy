@@ -42,47 +42,6 @@ class DefaultSyncJobServiceSpec extends Specification implements GormHibernateTe
         syncJobService.maintenanceProps.crons.size() == 2
     }
 
-    void "test queueJob"() {
-        when:
-        List payload = []
-        (1..1001).each {
-            payload << it
-        }
-
-        Map params = [
-            foo: 'bar', dataOp: 'add'
-        ]
-        SyncJobArgs syncJobArgs = SyncJobArgs.of(DataOp.add)
-            .source("Some_Source")
-            .sourceId('123')
-            .payload(payload)
-            .entityClass(Org)
-            .jobType('foo')
-            .params(params)
-
-        SyncJobEntity job = syncJobService.queueJob(syncJobArgs)
-        flushAndClear()
-
-        SyncJob syncJob = SyncJob.get(job.id)
-
-        then:
-        noExceptionThrown()
-        job.id
-        syncJob.state.name() == "Queued"
-        syncJob.jobType == 'foo'
-        syncJob.source == syncJobArgs.source
-        syncJob.sourceId == syncJobArgs.sourceId
-        syncJob.payloadId
-        Attachment.get(syncJob.payloadId).name.startsWith("Sync")
-        //check params
-        syncJob.params.keySet().size() == 2
-        syncJob.params['foo']
-        syncJob.params['dataOp'] == 'add'
-
-        cleanup:
-        Attachment.repo.removeById(syncJob.payloadId)
-    }
-
     void "test createJob"() {
         when:
         maintenanceProps.crons = []

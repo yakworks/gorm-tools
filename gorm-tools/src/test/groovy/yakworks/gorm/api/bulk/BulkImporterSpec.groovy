@@ -34,7 +34,7 @@ class BulkImporterSpec extends Specification implements GormHibernateTest {
 
     SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
         return new SyncJobArgs(
-            parallel: false, async: false, op: op, jobType: 'bulk.import',
+            parallel: false, async: false, op: op, jobType: BulkImportJobParams.JOB_TYPE,
             source: "test", sourceId: "test", includes: ["id", "name", "ext.name"],
             entityClass: KitchenSink
         )

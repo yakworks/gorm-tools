@@ -4,6 +4,8 @@
 */
 package yakworks.gorm.config
 
+import java.time.Duration
+
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
@@ -45,7 +47,7 @@ class GormConfig {
          * Request thread will be locked for maximum time configured, and job does not finish within the time,
          * A timeout problem would be returned, but job will continue running.
          */
-        int asyncTimeout = 90
+        Duration asyncTimeout = Duration.ofSeconds(90)
     }
 
 }

@@ -4,6 +4,9 @@
 */
 package yakworks.gorm.api.bulk
 
+import java.time.Duration
+import java.time.LocalDateTime
+
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
@@ -74,23 +77,34 @@ class BulkImportService<D> {
     }
 
     /**
-     * Creates a bulk import job and puts in hazel queue
+     * Creates a Syncjob and que it up
      */
     SyncJobEntity queueJob(BulkImportJobParams jobParams, List<Map> payloadBody) {
         //set the entityClassName
         jobParams.entityClassName = getEntityClass().name
-        SyncJobArgs args = setupSyncJobArgs(jobParams)
 
-        //if attachmentId then assume its a csv
+        Map data = jobParams.asJobData()
+
+        //if payloadId, then probably attachmentId with csv for example. Just store it and dont do payload conversion
         if(jobParams.attachmentId) {
-            args.payloadId = jobParams.attachmentId
-        } else if(payloadBody){
-            args.payload = payloadBody
+            data.payloadId = jobParams.attachmentId
+        }
+        else if(payloadBody){
+            if (jobParams.savePayloadAsFile || payloadBody.size() > 1000) {
+                //we need to create the jobId so associate the attachment
+                Long jobId = syncJobService.generateId()
+                data.id = jobId
+                data.payloadId = syncJobService.writePayloadFile(jobId, payloadBody)
+            }
+            else {
+                String res = JsonEngine.toJson(payloadBody)
+                data.payloadBytes = res.bytes
+            }
         } else {
             throw DataProblemCodes.EmptyPayload.get().toException()
         }
 
-        return syncJobService.queueJob(args)
+        return syncJobService.queueJob(data)
     }
 
     /**
@@ -138,11 +152,10 @@ class BulkImportService<D> {
             if(jobParams.async == null) jobParams.async = false
         }
         //If dataList is empty then error right away.
-        if(dataList == null || dataList.isEmpty()) throw DataProblem.of('error.data.emptyPayload').detail("Bulk Data is Empty").toException()
+        if(dataList == null || dataList.isEmpty())
+            throw DataProblem.of('error.data.emptyPayload').detail("Bulk Data is Empty").toException()
 
         SyncJobArgs syncJobArgs = setupSyncJobArgs(jobParams)
-        syncJobArgs.jobType = 'bulk.import'
-        syncJobArgs.entityClass = getEntityClass()
 
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
         // This is the promise call. Will return immediately if syncJobArgs.async=true
@@ -161,25 +174,27 @@ class BulkImportService<D> {
         Long jobId = job.id
         //if not async then wait for it to finish
         if(!jobParams.async){
-            Long start = System.currentTimeMillis()
-            //sleep first to give the job runner time to pick it up
+            var startTime = LocalDateTime.now()
+            //sleep for a second first to give the job runner time to pick it up
             sleep(1000)
-            //XXX new process loop and wait for job to finish
-            // should be on a timer loop coming from config.
-            // normaly the http timeout will be 60-120 seconds, so lets start with 90 seconds and time out.
             while(true){
                 job = syncJobService.getJob(jobId)
                 //not running and not queue
                 if(job.state != SyncJobState.Running && job.state != SyncJobState.Queued){
                     break
                 }
-
-                long elapsedTime = ((System.currentTimeMillis() - start) / 1000) as Long
-                if(elapsedTime >= gormConfig.bulk.asyncTimeout) {
-                    throw DataProblem.ex("Timeout has occurred while waiting for syncjob to finish").payload(jobId)
+                long elapsedSeconds = Duration.between(startTime, LocalDateTime.now()).toSeconds()
+                if(elapsedSeconds >= gormConfig.bulk.asyncTimeout.toSeconds()) {
+                    throw DataProblem.of('error.timeout')
+                        .detail(
+                            "Job is still running but request timeout has occurred. Do not re-run. Check job status on $jobId for current state"
+                        ).payload(jobId).toException()
                 }
                 else {
-                    sleep(1000)
+                    //sleep for a second for first 10 seconds.
+                    //then sleep for 5 seconds until time out occurs.
+                    long sleepTime = elapsedSeconds < 10 ? 1000 : 5000
+                    sleep(sleepTime)
                 }
             }
         }
@@ -203,7 +218,7 @@ class BulkImportService<D> {
 
     /**
      * sets up the SyncJobArgs from whats passed in from params.
-     * NOTE: When queing job much of this is not needed but we keep one common method
+     * NOTE: When queueing job much of this is not needed but we keep one common method
      */
     SyncJobArgs setupSyncJobArgs(BulkImportJobParams jobParams){
         List bulkIncludes = jobParams.includes ?: includesConfig.findByKeys(getEntityClass(), [IncludesKey.bulk, IncludesKey.get])
@@ -211,14 +226,10 @@ class BulkImportService<D> {
         List bulkErrorIncludes = includesConfig.getByKey(getEntityClass(), 'bulkError') as List<String>
 
         SyncJobArgs syncJobArgs = SyncJobArgs.withParams(jobParams.asMap())
-        syncJobArgs.op = jobParams.op
         syncJobArgs.includes = bulkIncludes
         syncJobArgs.errorIncludes = bulkErrorIncludes
-        syncJobArgs.sourceId = jobParams.sourceId
-        //XXX do we need this for events?
+        //used for events?
         syncJobArgs.entityClass = getEntityClass()
-        //give it the bulkImport type
-        syncJobArgs.jobType = 'bulk.import'
 
         return syncJobArgs
     }

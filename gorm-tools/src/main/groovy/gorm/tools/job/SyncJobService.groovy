@@ -11,6 +11,7 @@ import groovy.transform.CompileStatic
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.transaction.annotation.Propagation
 
 import gorm.tools.async.AsyncArgs
 import gorm.tools.async.AsyncService
@@ -18,8 +19,10 @@ import gorm.tools.job.events.SyncJobQueueEvent
 import gorm.tools.job.events.SyncJobStateEvent
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.transaction.TrxService
+import grails.gorm.transactions.Transactional
 import yakworks.api.ApiResults
 import yakworks.i18n.icu.ICUMessageSource
 import yakworks.json.groovy.JsonEngine
@@ -66,12 +69,49 @@ abstract class SyncJobService<D> {
     }
 
     /**
+     * Call repo create in new trx and fires SyncJobQueueEvent.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    SyncJobEntity queueJob(Map data){
+        if(!data.id) data.id = generateId()
+        if(!data.state) data.state = SyncJobState.Queued
+        SyncJobEntity jobEntity = getRepo().create(data, PersistArgs.of(flush: true, bindId: true)) as SyncJobEntity
+        //NOTE: The event listener is where its either picked up and run or it put on hazelcast queue to be picked up and run
+        AppCtx.publishEvent(new SyncJobQueueEvent(jobEntity))
+        return jobEntity
+    }
+
+    Long generateId(){
+        ((IdGeneratorRepo)getRepo()).generateId()
+    }
+    /**
+     * creates and saves a Running Job and returns the SyncJobContext with the jobId
+     */
+    @Deprecated //legacy
+    SyncJobContext createJob(SyncJobArgs args, Object payload){
+        //set the payload if not already
+        if(!args.payload) args.payload = payload
+        //jobContext.createJob()
+        SyncJobEntity syncJobEntity = queueJob(args, SyncJobState.Running)
+
+        SyncJobContext jobContext = SyncJobContext.of(args).syncJobService(this)
+        //inititialize the ApiResults to be used in process
+        jobContext.results = ApiResults.create()
+        jobContext.startTime = System.currentTimeMillis()
+        if(payload instanceof Collection) jobContext.payloadSize = payload.size()
+
+        AppCtx.publishEvent(SyncJobStateEvent.of(syncJobEntity.id, jobContext, syncJobEntity.state))
+        return jobContext
+    }
+
+    /**
      * Creates a SyncJob with SyncJobState.Queued and fires event.
      * @param args SyncJobArgs
      * @return the created SyncJobEntity
      */
+    @Deprecated
     SyncJobEntity queueJob(SyncJobArgs args, SyncJobState state = SyncJobState.Queued) {
-        args.jobId = ((IdGeneratorRepo)getRepo()).generateId()
+        args.jobId = generateId()
 
         Map data = [
             id: args.jobId,
@@ -96,35 +136,9 @@ abstract class SyncJobService<D> {
             }
         }
         //create is transactional
-        SyncJobEntity jobEntity
-
-        trxService.withNewTrx {
-            jobEntity = getRepo().create(data, [flush: true, bindId: true]) as SyncJobEntity
-        }
-        //NOTE: The event listener is where its either picked up and run or it put on hazelcast queue to be picked up and run
-        AppCtx.publishEvent(new SyncJobQueueEvent(jobEntity, args))
+        SyncJobEntity jobEntity = queueJob(data)
 
         return jobEntity
-    }
-
-
-    /**
-     * creates and saves a Running Job and returns the SyncJobContext with the jobId
-     */
-    SyncJobContext createJob(SyncJobArgs args, Object payload){
-        //set the payload if not already
-        if(!args.payload) args.payload = payload
-        //jobContext.createJob()
-        SyncJobEntity syncJobEntity = queueJob(args, SyncJobState.Running)
-
-        SyncJobContext jobContext = SyncJobContext.of(args).syncJobService(this)
-        //inititialize the ApiResults to be used in process
-        jobContext.results = ApiResults.create()
-        jobContext.startTime = System.currentTimeMillis()
-        if(payload instanceof Collection) jobContext.payloadSize = payload.size()
-
-        AppCtx.publishEvent(SyncJobStateEvent.of(syncJobEntity.id, jobContext, syncJobEntity.state))
-        return jobContext
     }
 
     /**
@@ -186,6 +200,7 @@ abstract class SyncJobService<D> {
      * @param runnable the runnable function to run
      * @return the job id from the jobContext.jobId
      */
+    @Deprecated
     Long runJob(AsyncArgs asyncArgs, SyncJobContext jobContext, Runnable runnable) {
         //process in async
         asyncService
@@ -219,7 +234,7 @@ abstract class SyncJobService<D> {
      * @param payload the payload List or Map that was sent (will normally have been json when called via REST
      * @return the Attachment id.
      */
-    protected Long writePayloadFile(Serializable jobId, Collection payload){
+    Long writePayloadFile(Serializable jobId, Collection payload){
         String filename = "SyncJobPayload_${jobId}_.json"
         Path path = createTempFile(filename)
         JsonStreaming.streamToFile(payload, path)

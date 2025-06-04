@@ -28,7 +28,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
 
     SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
         return new SyncJobArgs(
-            parallel: false, async:false, op: op, jobType: 'bulk.import',
+            parallel: false, async:false, op: op, jobType: BulkImportJobParams.JOB_TYPE,
             source: "test", sourceId: "test", includes: ["id", "name", "ext.name"]
         )
     }
@@ -65,7 +65,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
 
         then:
         noExceptionThrown()
-        job.jobType == 'bulk.import'
+        job.jobType == BulkImportJobParams.JOB_TYPE
         job.state == SyncJobState.Queued
         job.sourceId == 'test-job'
         job.payloadId == 1L

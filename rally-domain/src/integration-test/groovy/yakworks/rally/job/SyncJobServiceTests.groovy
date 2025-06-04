@@ -15,6 +15,7 @@ import spock.lang.Specification
 import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.api.problem.Problem
+import yakworks.gorm.api.bulk.BulkImportJobParams
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Org
 import yakworks.testing.gorm.integration.DomainIntTest
@@ -41,13 +42,15 @@ class SyncJobServiceTests extends Specification implements DomainIntTest {
         JsonException ex = thrown()
     }
 
-    void "test queueJob"() {
+    void "test queueJob with data"() {
         when:
-        SyncJobArgs syncJobArgs = new SyncJobArgs(
-            sourceId: '123', source: 'some source', payload: [1,2,3], jobType: 'bulk.import'
+        BulkImportJobParams bulkImportJobParams = BulkImportJobParams.withParams(
+            sourceId: '123', source: 'some source'
         )
-        syncJobArgs.entityClass = Org
-        SyncJobEntity job = syncJobService.queueJob(syncJobArgs)
+        def payload = [1,2,3]
+        bulkImportJobParams.entityClassName = Org.name
+        var jobData = bulkImportJobParams.asJobData()
+        SyncJobEntity job = syncJobService.queueJob(jobData)
         flushAndClear()
 
         job = SyncJob.get(job.id)
@@ -56,36 +59,9 @@ class SyncJobServiceTests extends Specification implements DomainIntTest {
         noExceptionThrown()
         job.id
         job.state == SyncJobState.Queued
+        //XXX @SUD test all the things here as well as params to make sure it saved properly
     }
 
-    void "test queueJob and save payload to file"() {
-        when:
-        List payload = []
-        (1..1001).each {
-            payload << it
-        }
-
-        SyncJobArgs syncJobArgs = new SyncJobArgs(
-            sourceId: '123', source: 'some source', payload: payload, jobType: 'bulk.import'
-        )
-        syncJobArgs.entityClass = Org
-        SyncJobEntity job = syncJobService.queueJob(syncJobArgs)
-        flushAndClear()
-
-        job = SyncJob.get(job.id)
-
-        then:
-        noExceptionThrown()
-        job.id
-        job.state == SyncJobState.Queued
-
-        and:"verify that payload is saved as file"
-        job.payloadId
-        Attachment.exists(job.payloadId)
-
-        cleanup:
-        if(job.payloadId) Attachment.repo.removeById(job.payloadId)
-    }
 
     void "test create job and save payload to file"() {
         when:

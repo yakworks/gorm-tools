@@ -18,11 +18,14 @@ import yakworks.gorm.api.support.DataMimeTypes
  */
 @CompileStatic
 class BulkExportJobParams extends CoreSyncJobParams{
+    public static final JOB_TYPE = 'bulk.export'
+
+    String jobType = JOB_TYPE
 
     /**
      * (When attachmentId is set) Format for the data. either CSV or JSON are currently supported.
      */
-    //XXX @SUD make this work so it can ether be csv or json export
+    //TODO @SUD make this work so it can ether be csv or json export
     DataMimeTypes dataMimeType = DataMimeTypes.json
 
     /**

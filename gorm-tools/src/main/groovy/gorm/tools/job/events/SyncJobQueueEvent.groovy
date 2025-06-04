@@ -22,11 +22,10 @@ class SyncJobQueueEvent extends ApplicationEvent { //implements ResolvableTypePr
     SyncJobArgs syncJobArgs
     //Class entityClass //domain class for which this sync job is
 
-    SyncJobQueueEvent(SyncJobEntity syncJob, SyncJobArgs syncJobArgs) {
+    SyncJobQueueEvent(SyncJobEntity syncJob) {
         super(syncJob)
         this.jobType = syncJob.jobType
         this.syncJob = syncJob
-        this.syncJobArgs = syncJobArgs
         //this.entityClass = entityClass ?: Object //if no entityClass - eg for exportSync
     }
 

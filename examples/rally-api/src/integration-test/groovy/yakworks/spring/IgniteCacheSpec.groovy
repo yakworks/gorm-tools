@@ -13,6 +13,8 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
 import spock.lang.Specification
+import yakworks.gorm.api.bulk.BulkImportJobParams
+import yakworks.gorm.api.bulk.BulkImportService
 import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Org
 import yakworks.testing.gorm.integration.DomainIntTest
@@ -38,11 +40,13 @@ class IgniteCacheSpec extends Specification implements DomainIntTest {
 
     void "try with gorm object"() {
         when:
-        SyncJobArgs syncJobArgs = new SyncJobArgs(
-            sourceId: '123', source: 'some source', payload: [1,2,3], jobType: 'bulk.import'
+        BulkImportJobParams bulkImportJobParams = BulkImportJobParams.withParams(
+            sourceId: '123', source: 'some source', payload: [1,2,3], jobType: BulkImportJobParams.JOB_TYPE
         )
-        syncJobArgs.entityClass = Org
-        SyncJobEntity job = syncJobService.queueJob(syncJobArgs)
+        def payload = [1,2,3]
+        bulkImportJobParams.entityClass = Org
+        var bulkImportService = BulkImportService.lookup(Org)
+        SyncJobEntity job = bulkImportService.queueJob(bulkImportJobParams, [1,2,3])
         var cache = igniteCacheManager.getCache("jobCache")
 
         cache.put(job.id, job)

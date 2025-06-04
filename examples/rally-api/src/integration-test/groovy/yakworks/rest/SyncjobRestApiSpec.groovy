@@ -5,6 +5,7 @@ import gorm.tools.model.SourceType
 import grails.gorm.transactions.Transactional
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+import yakworks.gorm.api.bulk.BulkImportJobParams
 import yakworks.json.groovy.JsonEngine
 import yakworks.rally.job.SyncJob
 import yakworks.rest.client.OkHttpRestTrait
@@ -44,7 +45,7 @@ class SyncjobRestApiSpec extends Specification implements OkHttpRestTrait {
     @Transactional
     SyncJob createMockJob() {
         SyncJob job = new SyncJob(
-            sourceType: SourceType.ERP, sourceId: 'ar/org', jobType: 'bulk.import'
+            sourceType: SourceType.ERP, sourceId: 'ar/org', jobType: BulkImportJobParams.JOB_TYPE
         )
         Map data = [test:"value"]
         job.dataBytes = JsonEngine.toJson(data).bytes

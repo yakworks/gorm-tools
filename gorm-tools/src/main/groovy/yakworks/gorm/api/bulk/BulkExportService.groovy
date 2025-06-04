@@ -56,13 +56,22 @@ class BulkExportService<D> {
     }
 
     /**
-     * Creates a bulk export job and puts in hazel queue
+     * Creates a Syncjob and que it up
      */
     SyncJobEntity queueJob(BulkExportJobParams jobParams) {
+        //make sure they passed in q or qsearch. queryArgs will have been populated if they did
+        if(!jobParams.q) {
+            throw DataProblem.of('error.query.qRequired').detail("q criteria required").toException()
+        }
+        //do includes, one of the keys is required. This is not used on queue, only for run.
+        if(!jobParams.includes && !jobParams.includesKey) {
+            throw DataProblem.ex("includes or includesKey are required params")
+        }
         jobParams.entityClassName = getEntityClass().name
-        SyncJobArgs args = setupSyncJobArgs(jobParams)
-        return syncJobService.queueJob(args)
+        Map data = jobParams.asJobData()
+        return syncJobService.queueJob(data)
     }
+
 
     /**
      * Starts a bulk import job
@@ -70,42 +79,26 @@ class BulkExportService<D> {
     SyncJobEntity runJob(Long jobId) {
         assert jobId
         SyncJobEntity job = syncJobService.getJob(jobId)
-
         BulkExportJobParams jobParams = BulkExportJobParams.withParams(job.params)
-
         SyncJobContext jobContext = syncJobService.startJob(job, setupSyncJobArgs(jobParams))
-
         bulkExport(jobContext)
-
         return syncJobService.getJob(jobId)
     }
 
 
     protected SyncJobArgs setupSyncJobArgs(BulkExportJobParams jobParams){
         SyncJobArgs syncJobArgs = SyncJobArgs.withParams(jobParams.asMap())
+        Validate.notEmpty(syncJobArgs.queryArgs) && Validate.isTrue(jobParams.includes || jobParams.includesKey)
 
-        //make sure they passed in q or qsearch. queryArgs will have been populated if they did
-        if(!syncJobArgs.queryArgs) {
-            throw DataProblem.of('error.query.qRequired').detail("q criteria required").toException()
-        }
-        //do includes, one of the keys is required. This is not used on queue, only for run.
-        if(!jobParams.includes && !jobParams.includesKey) {
-            throw DataProblem.ex("includes or includesKey are required params")
-        }
         //parse the params into the IncludesProps
         var incProps = new IncludesProps(
             includes: jobParams.includes, includesKey: jobParams.includesKey
         )
-        //returns includes if thats passed in or looks up includeKey
+        //returns includes if thats passed in or looks up based on includesKey
         syncJobArgs.includes = includesConfig.findIncludes(getEntityClass(), incProps)
-
-        //give it the bulkImport type
-        syncJobArgs.jobType = 'bulk.export'
-
-        syncJobArgs.sourceId = jobParams.sourceId
-
+        //used for events
         syncJobArgs.entityClass = entityClass
-
+        //force export to Payload on exports
         syncJobArgs.dataFormat = SyncJobArgs.DataFormat.Payload
 
         return syncJobArgs

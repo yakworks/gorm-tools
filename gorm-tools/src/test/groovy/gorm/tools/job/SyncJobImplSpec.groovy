@@ -8,6 +8,7 @@ package gorm.tools.job
 import gorm.tools.model.SourceType
 import spock.lang.Specification
 import testing.TestSyncJob
+import yakworks.gorm.api.bulk.BulkImportJobParams
 import yakworks.json.groovy.JsonEngine
 import yakworks.testing.gorm.unit.GormHibernateTest
 
@@ -17,7 +18,7 @@ class SyncJobImplSpec extends Specification  implements GormHibernateTest{
     void "sanity check validation with String as data"() {
         expect:
         TestSyncJob job = new TestSyncJob(
-            state: SyncJobState.Running, jobType: 'bulk.import',
+            state: SyncJobState.Running, jobType: BulkImportJobParams.JOB_TYPE,
             sourceType: SourceType.ERP, sourceId: 'ar/org'
         )
         job.validate()

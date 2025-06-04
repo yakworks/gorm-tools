@@ -216,7 +216,7 @@ start.rally-api3:
 ## start rcm-jobs, gradle rcm-jobs:bootRun
 run.rally-api: # start.db
 	${gradlew} rally-api:assemble
-	${gradlew} rally-api:bootRun --args='--server.port=8083 --spring.profiles.active=local,server'
+	${gradlew} rally-api:bootRun -Dgrails.env=server -Dspring.profiles.active=local,server  --args='--server.port=8083'
 
 run.rally-api2: # start.db
 	${gradlew} rally-api:bootRun --args='--server.port=8084 --spring.profiles.active=local,client -Dgrails.env=client'

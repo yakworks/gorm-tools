@@ -18,6 +18,8 @@ import yakworks.meta.MetaUtils
 @CompileStatic
 class CoreSyncJobParams {
 
+    String jobType
+
     /**
      * You can specify consistent source name for the data, for example “Oracle ERP”, “Dynamics” etc…
      */
@@ -78,17 +80,36 @@ class CoreSyncJobParams {
     Boolean saveDataAsFile //= false
 
     /**
-     * The full query params map that were passed into the call.
+     * The full query args/params map that were passed into the call.
      * Can be used to get any extra custom items that were pased in, such as we do with "apply" when calling arAdjust bulk.
      */
     Map<String, Object> queryParams
 
+    /**
+     * asMap used to store the params in SyncJob table as well as for converting to SyncJobArgs
+     */
     Map<String, Object> asMap(){
         Map<String, Object> mapVals = Maps.prune(MetaUtils.getProperties(this))
+        //dont include the full queryParams key
         mapVals.remove('queryParams')
-        //get any extra queryParams that are not in this object
-        Map extraParams = Maps.omit(queryParams, mapVals.keySet())
+        //get any extra queryParams that are not already keys in this object
+        // queryParams is a full map copy so remove the keys so we can merge whats left
+        Map extraParams = Maps.omit(getQueryParams(), mapVals.keySet())
+        //if there are any entries left then add them
         if(extraParams) mapVals.putAll(extraParams)
         mapVals
+    }
+
+    /**
+     *  converts to data for queueing up (saving/creating) a SyncJob
+     */
+    Map<String, Object> asJobData(){
+        //make sure to use getters so overrides in super works
+        return [
+            source: getSource(),
+            sourceId: getSourceId(),
+            params: asMap(),
+            jobType: getJobType()
+        ] as Map<String,Object>
     }
 }

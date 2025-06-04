@@ -20,7 +20,7 @@ class BulkJobParamsSpec extends Specification  {
         biParams.parallel == false
         biParams.attachmentId == 123
         biParams.op == DataOp.add
-        biParams.asMap() == [parallel: false, attachmentId: 123, op: DataOp.add]
+        biParams.asMap() == [parallel: false, attachmentId: 123, op: DataOp.add, jobType: 'bulk.import']
 
         when: "simple"
         paramMap = [
@@ -74,7 +74,7 @@ class BulkJobParamsSpec extends Specification  {
         Map biMap = biParams.asMap()
 
         then:
-        biMap.keySet().size() == 6
+        biMap.keySet().size() == 7 // [op, parallel, attachmentId, includes, jobType, foo, bar]
         biMap.parallel == false
         biMap.attachmentId == 123
         biMap.op == DataOp.add

@@ -98,7 +98,7 @@ interface CrudApi<D> {
      */
     Pager pickList(Map params, URI uri)
 
-    SyncJobEntity bulkImport(BulkImportJobParams jobParams, List<Map> dataList)
+    SyncJobEntity bulkImport(BulkImportJobParams jobParams, List<Map> bodyList)
 
     SyncJobEntity bulkExport(BulkExportJobParams jobParams)
 

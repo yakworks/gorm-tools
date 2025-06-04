@@ -25,7 +25,6 @@ import gorm.tools.transaction.TrxService
 import grails.gorm.transactions.Transactional
 import yakworks.api.ApiResults
 import yakworks.i18n.icu.ICUMessageSource
-import yakworks.json.groovy.JsonEngine
 import yakworks.json.groovy.JsonStreaming
 import yakworks.spring.AppCtx
 
@@ -52,7 +51,8 @@ abstract class SyncJobService<D> {
     abstract GormRepo<D> getRepo()
 
     /**
-     * creates and saves the Job and returns the SyncJobContext with the jobId
+     * Update state to RUNNING
+     * Initialize the SyncJobContext and return it
      */
     SyncJobContext startJob(SyncJobEntity job, SyncJobArgs syncJobArgs){
         assert job.state == SyncJobState.Queued
@@ -65,6 +65,7 @@ abstract class SyncJobService<D> {
         jobContext.results = ApiResults.create()
         jobContext.startTime = System.currentTimeMillis()
 
+        AppCtx.publishEvent(SyncJobStateEvent.of(job.id, jobContext, job.state))
         return jobContext
     }
 
@@ -91,73 +92,29 @@ abstract class SyncJobService<D> {
     SyncJobContext createJob(SyncJobArgs args, Object payload){
         //set the payload if not already
         if(!args.payload) args.payload = payload
-        //jobContext.createJob()
-        SyncJobEntity syncJobEntity = queueJob(args, SyncJobState.Running)
-
-        SyncJobContext jobContext = SyncJobContext.of(args).syncJobService(this)
-        //inititialize the ApiResults to be used in process
-        jobContext.results = ApiResults.create()
-        jobContext.startTime = System.currentTimeMillis()
+        // new way
+        var jobDta = args.asJobData()
+        SyncJobEntity syncJobEntity = queueJob(jobDta)
+        SyncJobContext jobContext = startJob(syncJobEntity, args)
+        //set payload size for messaging progress
         if(payload instanceof Collection) jobContext.payloadSize = payload.size()
 
-        AppCtx.publishEvent(SyncJobStateEvent.of(syncJobEntity.id, jobContext, syncJobEntity.state))
         return jobContext
-    }
-
-    /**
-     * Creates a SyncJob with SyncJobState.Queued and fires event.
-     * @param args SyncJobArgs
-     * @return the created SyncJobEntity
-     */
-    @Deprecated
-    SyncJobEntity queueJob(SyncJobArgs args, SyncJobState state = SyncJobState.Queued) {
-        args.jobId = generateId()
-
-        Map data = [
-            id: args.jobId,
-            source: args.source,
-            sourceId: args.sourceId,
-            state: state,
-            params: args.params,
-            jobType: args.jobType
-        ] as Map<String,Object>
-
-        //if payloadId, then probably attachmentId with csv for example. Just store it and dont do payload conversion
-        if(args.payloadId) {
-            data.payloadId = args.payloadId
-        }
-        else if(args.payload) {
-            if (args.isSavePayloadAsFile()) {
-                data.payloadId = writePayloadFile(args.jobId, args.payload as Collection)
-            }
-            else {
-                String res = JsonEngine.toJson(args.payload)
-                data.payloadBytes = res.bytes
-            }
-        }
-        //create is transactional
-        SyncJobEntity jobEntity = queueJob(data)
-
-        return jobEntity
     }
 
     /**
      * Calls the repo update wrapped in a new trx
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     SyncJobEntity updateJob(Map data){
-        SyncJobEntity sje
-        try{
-            //keep it in its own transaction so it doesn't depend on and existing. Should be on its own
-            trxService.withNewTrx {
-                //XXX @SUD not sure what this was for, seems dangerous to clear cache in middle of run
-                getRepo().clear() //clear so doesn't pull from cache and we dont get optimistic error
-                sje = getRepo().update(data, [flush: true]) as SyncJobEntity
-            }
+        try {
+            //XXX @SUD not sure what this was for, seems dangerous to clear cache in middle of run
+            getRepo().clear() //clear so doesn't pull from cache and we dont get optimistic error
+            return getRepo().update(data, [flush: true]) as SyncJobEntity
         } catch (e){
             LOG.error("Critical error updating SyncJob", e)
             throw e
         }
-        return sje
     }
 
     /**

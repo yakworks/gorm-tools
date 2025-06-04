@@ -15,6 +15,7 @@ import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp
 import yakworks.commons.lang.EnumUtils
+import yakworks.json.groovy.JsonEngine
 
 /**
  * Value Object are better than using a Map to store arguments and parameters.
@@ -239,7 +240,12 @@ class SyncJobArgs {
             params: getParams(),
             jobType: getJobType()
         ] as Map<String,Object>
+        //if its has id then pass it
         if(getJobId()) dta['id'] = getJobId()
+        //convet payload if its set
+        if(getPayload()){
+            dta.payloadBytes = JsonEngine.toJson(getPayload()).bytes
+        }
         return dta
     }
 

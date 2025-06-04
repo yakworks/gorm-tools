@@ -20,6 +20,7 @@ import gorm.tools.job.SyncJobState
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
+import gorm.tools.transaction.TrxService
 import gorm.tools.utils.ServiceLookup
 import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemCodes
@@ -67,12 +68,12 @@ class BulkImportService<D> {
         return bulkImporter
     }
 
-    SyncJobEntity process(BulkImportJobParams jobParams, List<Map> dataList){
+    SyncJobEntity process(BulkImportJobParams jobParams, List<Map> payloadList){
         if(gormConfig.legacyBulk){
-            return bulkImportLegacy(jobParams, dataList)
+            return bulkImportLegacy(jobParams, payloadList)
         }
         else {
-            return bulkImport(jobParams, dataList)
+            return bulkImport(jobParams, payloadList)
         }
     }
 
@@ -112,9 +113,20 @@ class BulkImportService<D> {
      */
     SyncJobEntity runJob(Long jobId) {
         assert jobId
+        SyncJobContext jobContext = runJobInit(jobId)
+
+        getBulkImporter().bulkImport(jobContext.args.payload as List<Map>, jobContext)
+
+        return syncJobService.getJob(jobId)
+    }
+
+    /**
+     * Starts a bulk import job
+     */
+    SyncJobContext runJobInit(Long jobId) {
+        assert jobId
         SyncJobEntity job = syncJobService.getJob(jobId)
         BulkImportJobParams jobParams = BulkImportJobParams.withParams(job.params)
-        SyncJobContext jobContext = syncJobService.startJob(job, setupSyncJobArgs(jobParams))
 
         List<Map> payloadList
         if(jobParams.attachmentId) {
@@ -130,47 +142,50 @@ class BulkImportService<D> {
         else if(job.payloadId || job.payloadBytes) { //if no attachmentId was passed to params then get the payload
             payloadList = JsonEngine.parseJson(job.payloadToString(), List<Map>)
         }
-        jobContext.args.payload(payloadList)
+        //setup the args and startJob
+        var sargs = setupSyncJobArgs(jobParams)
+        sargs.payload(payloadList)
+        SyncJobContext jobContext = syncJobService.startJob(job, sargs)
+
         jobContext.payloadSize = payloadList.size()
-
-        getBulkImporter().bulkImport(payloadList, jobContext)
-
-        return syncJobService.getJob(jobId)
+        return jobContext
     }
 
+    /**
+     * Old way.
+     * 1. queue the job
+     * 2. start the job
+     * 3. run the job, either async or not
+     */
     @Deprecated
-    protected SyncJobEntity bulkImportLegacy(BulkImportJobParams jobParams, List<Map> dataList){
+    protected SyncJobEntity bulkImportLegacy(BulkImportJobParams jobParams, List<Map> payloadList){
+        //submit the job
+        SyncJobEntity job = queueJob(jobParams, payloadList)
+        Long jobId = job.id
+
+        SyncJobContext jobContext = runJobInit(jobId)
         //if attachmentId then assume its a csv
-        if(jobParams.attachmentId) {
-            //sets the datalist from the csv instead of body
-            //Transform csv here, so bulk processing remains same, regardless the incoming payload is csv or json
-            dataList = transformCsvToBulkList(jobParams.asMap())
-        } else {
+        if(!jobParams.attachmentId) {
             //XXX dirty ugly hack since we were not consistent and now need to do clean up
             // RNDC expects async to be false by default when its not CSV
             // remove this else hack once this is done https://github.com/9ci/cust-rndc-ext/issues/215
-            if(jobParams.async == null) jobParams.async = false
+            if(jobParams.async == null) jobContext.args.async = false
         }
-        //If dataList is empty then error right away.
-        if(dataList == null || dataList.isEmpty())
-            throw DataProblem.of('error.data.emptyPayload').detail("Bulk Data is Empty").toException()
 
-        SyncJobArgs syncJobArgs = setupSyncJobArgs(jobParams)
-
-        SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
         // This is the promise call. Will return immediately if syncJobArgs.async=true
-        Long jobId = syncJobService.runJob(
-            jobContext.args.asyncArgs, jobContext, () -> getBulkImporter().doBulkParallel(dataList, jobContext)
+        syncJobService.runJob(jobContext.args.asyncArgs, jobContext,
+            () -> getBulkImporter().doBulkParallel(jobContext.args.payload as List<Map>, jobContext)
         )
-        SyncJobEntity job = syncJobService.getJob(jobId)
+        TrxService.bean().flushAndClear()
+        job = syncJobService.getJob(jobId)
         return job
     }
 
     //WIP
-    protected SyncJobEntity bulkImport(BulkImportJobParams jobParams, List<Map> dataList){
+    protected SyncJobEntity bulkImport(BulkImportJobParams jobParams, List<Map> payloadList){
 
         //submit the job
-        SyncJobEntity job = queueJob(jobParams, dataList)
+        SyncJobEntity job = queueJob(jobParams, payloadList)
         Long jobId = job.id
         //if not async then wait for it to finish
         if(!jobParams.async){

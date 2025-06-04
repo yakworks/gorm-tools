@@ -317,7 +317,8 @@ class BulkImportTests extends Specification implements DomainIntTest {
 
         then:
         noExceptionThrown()
-        job.data != null
+        job.state == SyncJobState.Finished
+        job.dataToString() != null
 
         when: "verify json"
         List json = parseJson(job.dataToString())
@@ -375,7 +376,7 @@ class BulkImportTests extends Specification implements DomainIntTest {
         then:
         noExceptionThrown()
         job.state == SyncJobState.Finished
-        job.data != null
+        job.dataToString() != null
 
         when: "verify json"
         List json = parseJson(job.dataToString())

@@ -201,8 +201,8 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     }
 
     @Override
-    SyncJobEntity bulkImport(BulkImportJobParams jobParams, List<Map> dataList){
-        getBulkImportService().process(jobParams, dataList)
+    SyncJobEntity bulkImport(BulkImportJobParams jobParams, List<Map> bodyList){
+        getBulkImportService().process(jobParams, bodyList)
     }
 
     @Override

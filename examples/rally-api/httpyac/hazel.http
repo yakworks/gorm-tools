@@ -7,10 +7,14 @@
 ### cluster state
 GET {{base_url}}/health/cluster-state
 
+### check ize
 GET {{base_url}}/health/cluster-size
 
+### node state
 GET {{base_url}}/health/node-state
 
+### maps
 GET {{base_url}}/rest/cluster
 
+### maps
 GET {{base_url}}/rest/maps/

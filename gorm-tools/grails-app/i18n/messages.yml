@@ -6,6 +6,7 @@ error:
   illegalArgument: Illegal Argument Exception
   notupdateable: '{name} can not be updated'
   unauthorized: 'Unauthorized'
+  timeout: 'Timeout has occurred during processing'
 
   # DATA
   data:

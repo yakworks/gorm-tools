@@ -24,12 +24,30 @@ class CacheListApiSpec extends Specification implements OkHttpRestTrait, WithTrx
         login()
     }
 
-    void "test list timeout"() {
+    void "test list timeout waits"() {
         when:
-        String listPath = "$path?qSearch=org&sleep=20"
+        String listPath = "$path?qSearch=org&sleep=4"
         //run first one
         enqueue("GET", listPath)
         sleep(100)
+        //default timeout in this app should be set to 5 seconds, so if it cant get a lock in that time should fail
+        //this one should timeout
+        Response resp = get(listPath)
+        Map body = bodyToMap(resp)
+
+        then:
+        body
+        body.page
+        resp.code() == HttpStatus.OK.value()
+    }
+
+    void "test list timeout 429"() {
+        when:
+        String listPath = "$path?qSearch=org1&sleep=10"
+        //run first one
+        enqueue("GET", listPath)
+        sleep(100)//sleep for a bit to simulate 2 successive calls coming in
+        //default timeout in this app should be set to 5 seconds, so if it cant get a lock in that time should fail
         //this one should timeout
         Response resp = get(listPath)
         Map body = bodyToMap(resp)

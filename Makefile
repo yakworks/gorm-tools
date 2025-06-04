@@ -150,7 +150,7 @@ test.benchmarks:
 	cd examples/benchmarks
 	java -server -Xmx3g -XX:MaxMetaspaceSize=256m \
 		-DmultiplyData=3 -Dgorm.tools.async.poolSize=4 -Djava.awt.headless=true \
-        -Dgrails.env=prod -jar build/libs/benchmarks.jar
+		-Dgrails.env=prod -jar build/libs/benchmarks.jar
 
 #		-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap \
 #		-XX:+UseConcMarkSweepGC -XX:+UseCMSInitiatingOccupancyOnly \
@@ -159,11 +159,70 @@ test.benchmarks:
 #		-XX:SurvivorRatio=8 \
 
 ## start the rally-api example jar
-start.rally-api: # start.db
+start.rally-api.ignite: # start.db
 	${gradlew} rally-api:assemble
 	cd examples/rally-api
-	java -server -Xmx2g -jar build/libs/rally-api.jar
+	java \
+	--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED \
+	--add-exports=java.base/sun.nio.ch=ALL-UNNAMED \
+	--add-exports=java.management/com.sun.jmx.mbeanserver=ALL-UNNAMED \
+	--add-exports=jdk.internal.jvmstat/sun.jvmstat.monitor=ALL-UNNAMED \
+	--add-exports=java.base/sun.reflect.generics.reflectiveObjects=ALL-UNNAMED \
+	--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED \
+	--illegal-access=permit \
+	-server -Dserver.port=8083 \
+	-Dspring.profiles.active=production,local,server,ignite \
+	-Djava.net.preferIPv4Stack=true \
+	-Xmx2g -jar build/libs/rally-api.jar
 
+start.rally-api2.ignite: # start.db
+	cd examples/rally-api
+	java \
+	--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED \
+	--add-exports=java.base/sun.nio.ch=ALL-UNNAMED \
+	--add-exports=java.management/com.sun.jmx.mbeanserver=ALL-UNNAMED \
+	--add-exports=jdk.internal.jvmstat/sun.jvmstat.monitor=ALL-UNNAMED \
+	--add-exports=java.base/sun.reflect.generics.reflectiveObjects=ALL-UNNAMED \
+	--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED \
+	--illegal-access=permit \
+	-server -Dserver.port=8084 \
+	-Dspring.profiles.active=production,local,client,ignite  \
+	-Djava.net.preferIPv4Stack=true \
+	-Xmx2g -jar build/libs/rally-api.jar
+
+## start the rally-api example jar with hazel cast
+start.rally-api: # start.db
+	${gradlew} rally-api:assemble
+	java \
+	-server -Dserver.port=8083 \
+	-Dspring.profiles.active=production,local,server,hazel \
+	-Djava.net.preferIPv4Stack=true \
+	-Xmx2g -jar examples/rally-api/build/libs/rally-api.jar
+
+start.rally-api2:
+	java \
+	-server -Dserver.port=8084 \
+	-Dspring.profiles.active=production,local,client,hazel  \
+	-Djava.net.preferIPv4Stack=true \
+	-Xmx2g -jar examples/rally-api/build/libs/rally-api.jar
+
+start.rally-api3:
+	java \
+	-server -Dserver.port=8085 \
+	-Dspring.profiles.active=production,local,client,hazel  \
+	-Djava.net.preferIPv4Stack=true \
+	-Xmx2g -jar examples/rally-api/build/libs/rally-api.jar
+
+## start rcm-jobs, gradle rcm-jobs:bootRun
+run.rally-api: # start.db
+	${gradlew} rally-api:assemble
+	${gradlew} rally-api:bootRun -Dgrails.env=server -Dspring.profiles.active=local,server  --args='--server.port=8083'
+
+run.rally-api2: # start.db
+	${gradlew} rally-api:bootRun --args='--server.port=8084 --spring.profiles.active=local,client -Dgrails.env=client'
+
+run.rally-api3: # start.db
+	${gradlew} rally-api:bootRun --args='--server.port=8085 --spring.profiles.active=local,client'
 
 # clones the api-docs branch or this project where we will publish/push
 # oapi.docs-clone:

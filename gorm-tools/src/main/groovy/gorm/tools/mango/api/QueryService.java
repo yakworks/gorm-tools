@@ -55,6 +55,6 @@ public interface QueryService<D> {
     /**
      * shortcut to call query and then list with the pager fields in params
      */
-    List pagedList(MangoDetachedCriteria criteria, Pager pager);
+    //List pagedList(MangoDetachedCriteria criteria, Pager pager);
 
 }

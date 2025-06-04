@@ -4,6 +4,7 @@
 */
 package gorm.tools.job
 
+
 import groovy.transform.CompileStatic
 
 import gorm.tools.model.SourceTrait
@@ -50,6 +51,13 @@ trait SyncJobEntity implements SourceTrait {
 
     public static int MAX_MEG_IN_BYTES = 1024 * 1024 * 10 //10 megabytes
 
+    abstract Long getId()
+
+    /**
+     * The name of the queue to add this to
+     */
+    String jobType
+
     /**
      * will be true if State.Finished without any issues, false if any problems ar in the results data
      */
@@ -58,7 +66,7 @@ trait SyncJobEntity implements SourceTrait {
     /**
      * the current state of the job.
      */
-    SyncJobState state = SyncJobState.Running
+    SyncJobState state //= SyncJobState.Running
 
     String message
 
@@ -97,6 +105,21 @@ trait SyncJobEntity implements SourceTrait {
     List problems
 
     /**
+     * Job request params
+     */
+    Map<String, String> params
+
+    /**
+     * SyncJobArgs
+     */
+    //SyncJobArgs jobArgs
+
+    /**
+     * Job request body
+     */
+    // Map<String, Object> body
+
+    /**
      * The data is a response of resources that were successfully and unsuccessfully updated or created after processing.
      * gets the data as byte array, either from attachment file or resultData byte array
      * If no data then returns string representation of json empty array which is '[]'
@@ -117,11 +140,12 @@ trait SyncJobEntity implements SourceTrait {
         state       : [d: 'State of the job', nullable: false],
         message     : [d: 'Status message or log', maxSize: 500],
         payloadId   : [d: 'If payload is stored as attahcment file this is the id', oapi: "NO"],
-        payloadBytes: [d      : 'Json payload data (stored as byte array) that is passed in, for example list of items to bulk create',
+        payloadBytes: [d: 'Json payload data (stored as byte array) that is passed in, for example list of items to bulk create',
                        maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
         dataId      : [d: 'If data is saved as attahchment file this is the id', oapi: "NO"],
         dataBytes   : [d: 'The result data stored as bytes', maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
         //errorBytes  : [d: 'The error data stored as bytes', maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
-        sourceId : [d: 'the unique id from the outside source for the scheduled job', nullable: true]
+        sourceId : [d: 'the unique id from the outside source for the scheduled job', nullable: true],
+        jobType : [d: 'The type indicator for the kind of job', nullable: false]
     ]
 }

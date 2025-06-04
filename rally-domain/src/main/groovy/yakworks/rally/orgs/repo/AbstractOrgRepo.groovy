@@ -228,6 +228,13 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
         if(!data) return
         //make sure params has org key
         data.orgId = org.getId()
+
+        //if org already has a location, then set the existing location's id if not provided
+        //so that upsert will update existing location and not try to create a new one.
+        if(org.location && !data['id']) {
+            data['id'] = org.location.id
+        }
+
         // if it had an op of remove then will return null and this set primary location to null
         org.location = locationRepo.upsert(data).entity
         return org.location

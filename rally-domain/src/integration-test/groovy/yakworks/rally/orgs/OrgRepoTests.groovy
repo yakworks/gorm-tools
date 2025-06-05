@@ -261,7 +261,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
             location: [
                 city: 'Denver',
                 street1: '1st'
-            ]
+            ],
         ]
         org = orgRepo.update(data)
         flush()
@@ -275,6 +275,27 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         org.location.street1 == "1st"
 
         and: "no new locations added"
+        countBefore == countAfter
+    }
+
+    void "should not create empty locations"() {
+        setup:
+        Org org = Org.get(11)
+        int countBefore = Location.count()
+
+        when:
+        Map data = [
+            id: org.id,
+            locations:[
+                [:]
+            ]
+        ]
+        orgRepo.update(data)
+        flushAndClear()
+        int countAfter = Location.count()
+
+        then: "no new location should be added"
+        noExceptionThrown()
         countBefore == countAfter
     }
 

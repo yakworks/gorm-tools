@@ -382,8 +382,8 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
         body.name == '9Galt'
 
         and:
-        countBefore = countAfter
-        existing.id = updated.id
+        countBefore == countAfter
+        existing.id == updated.id
         updated.city == "test"
     }
 

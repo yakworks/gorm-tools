@@ -151,6 +151,7 @@ abstract class AbstractOrgRepo extends LongIdGormRepo<Org> {
      */
     void persistToManyWithOrgId(Org org, GormRepo assocRepo, List<Map> assocList){
         if(!assocList) return
+        //remove, if there are any empty maps.
         assocList = assocList.findAll { Map it -> it.size() > 0}
         assocList.each { it['orgId'] = org.getId()}
         assocRepo.createOrUpdate(assocList)

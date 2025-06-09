@@ -144,7 +144,6 @@ class BulkExportService<D> {
             eachPage(jobContext) { MetaMapList pageData ->
                 Result result = Result.OK().payload(pageData as List)
                 //update job with page data
-                //XXX @SUD we need to support the DataMimeTypes.csv too.
                 jobContext.updateJobResults(result, false, pageData.size())
             }
         } catch (Exception ex) {

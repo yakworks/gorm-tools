@@ -38,14 +38,21 @@ class CSVMapWriter {
      * otherwise it creates the header using the the data in the first item of collection.
      */
     CSVMapWriter createHeader(Collection<Map> dataList){
+        setupHeaders(dataList)
+        writeHeader(headers)
+        return this
+    }
+
+    /**
+     * Setup but dont write headers
+     */
+    CSVMapWriter setupHeaders(Collection<Map> dataList){
         if(dataList instanceof MetaMapList && dataList.metaEntity){
             headers = dataList.metaEntity.flattenProps()
-            writeHeader(headers)
         } else {
             Map<String, Object> firstRow = dataList[0] as Map<String, Object>
             Map flatRow = MapFlattener.of(firstRow).convertObjectToString(false).flatten()
             headers = flatRow.keySet()
-            writeHeader(headers)
         }
         return this
     }

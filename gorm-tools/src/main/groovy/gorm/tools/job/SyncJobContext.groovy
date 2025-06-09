@@ -210,11 +210,14 @@ class SyncJobContext {
         Map data = [id: jobId] as Map<String, Object>
         if(args.isSaveDataAsFile()){
             // if saveDataAsFile then it will have been writing out the data results as it goes
-            //close out the file
-            dataPath.withWriterAppend { wr ->
-                wr.write('\n]\n')
+            //close out the file for JSON
+            if(args.dataFormat == DataMimeTypes.json) {
+                dataPath.withWriterAppend { wr ->
+                    wr.write('\n]\n')
+                }
             }
-            data['dataId'] = syncJobService.createAttachment(dataPath, "SyncJobData_${jobId}.json")
+            String ext = args.dataFormat as String
+            data['dataId'] = syncJobService.createAttachment(dataPath, "SyncJobData_${jobId}.${ext}")
         } else {
             // if NOT saveDataAsFile then we need to write out the results to dataBytes since results have not been written out yet.
             List<Map> renderResults = transformResults(results)
@@ -323,7 +326,13 @@ class SyncJobContext {
     protected void updateJob(Result currentResults, Map data){
         syncJobService.updateJob(data)
         // append json to dataFile
-        if(currentResults) appendDataResults(currentResults)
+        if(currentResults) {
+            if(args.dataFormat == DataMimeTypes.json) {
+                appendDataResults(currentResults)
+            } else if(args.dataFormat == DataMimeTypes.csv){
+                appendCsv(currentResults)
+            }
+        }
     }
 
     /**
@@ -368,15 +377,16 @@ class SyncJobContext {
         def writer = dataPath.newWriter(true)
         CSVMapWriter csvWriter = CSVMapWriter.of(writer)
         def dataList = transformResults(currentResults)
-        dataList.each {
-            //if its first time then write the headers
-            if(isFirstWrite){
-                csvWriter.createHeader(dataList)
-            }
-            csvWriter.writeCsv(dataList)
-            isFirstWrite = false  //set to false once 1st recod is written with a comma ","
+        if(isFirstWrite){
+            csvWriter.createHeader(dataList)
+        } else {
+            //csvHeader needs to have headers setup to write.
+            csvWriter.setupHeaders(dataList)
         }
-        IOUtils.flushAndClose(writer)
+        csvWriter.writeCsv(dataList)
+        //isFirstWrite = false  //set to false once 1st recod is written with a comma ","
+        csvWriter.flush()
+        writer.close()
     }
 
     /**

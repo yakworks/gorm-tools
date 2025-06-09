@@ -10,7 +10,7 @@ import gorm.tools.utils.BenchmarkHelper
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport
-import yakworks.etl.csv.CSVMapWriter
+import yakworks.csv.CSVMapWriter
 import yakworks.etl.excel.ExcelBuilder
 import yakworks.json.groovy.JsonEngineTrait
 import yakworks.meta.MetaMapList
@@ -98,7 +98,7 @@ class ExportBenchmarkSpecs extends Specification implements GormHibernateTest, J
     @CompileStatic
     void writeCsv(Writer writer, MetaMapList mapList){
         def csvMapWriter = CSVMapWriter.of(writer)
-        csvMapWriter.writeCsv(mapList as Collection<Map>)
+        csvMapWriter.createHeader(mapList as Collection<Map>).writeCsv(mapList as Collection<Map>)
 
     }
 
@@ -109,6 +109,7 @@ class ExportBenchmarkSpecs extends Specification implements GormHibernateTest, J
         prjPath.withOutputStream { os ->
             eb = ExcelBuilder.of(os)
                 .build()
+                .createHeader(mapList as List<Map>)
                 .writeData(mapList as List<Map>)
                 .writeOutAndClose()
         }

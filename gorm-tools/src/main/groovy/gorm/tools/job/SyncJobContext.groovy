@@ -26,8 +26,10 @@ import yakworks.api.Result
 import yakworks.api.ResultUtils
 import yakworks.api.problem.Problem
 import yakworks.commons.io.IOUtils
+import yakworks.csv.CSVMapWriter
 import yakworks.gorm.api.bulk.BulkImportFinishedEvent
 import yakworks.gorm.api.bulk.BulkImportJobParams
+import yakworks.gorm.api.support.DataMimeTypes
 import yakworks.json.groovy.JsonEngine
 import yakworks.message.spi.MsgService
 import yakworks.spring.AppCtx
@@ -75,6 +77,8 @@ class SyncJobContext {
     AtomicInteger problemCount = new AtomicInteger()
 
     Path dataPath
+
+
 
     Closure transformResultsClosure
 
@@ -210,7 +214,7 @@ class SyncJobContext {
             dataPath.withWriterAppend { wr ->
                 wr.write('\n]\n')
             }
-            data['dataId'] = syncJobService.createAttachment(dataPath, "SyncJobData_${jobId}_.json")
+            data['dataId'] = syncJobService.createAttachment(dataPath, "SyncJobData_${jobId}.json")
         } else {
             // if NOT saveDataAsFile then we need to write out the results to dataBytes since results have not been written out yet.
             List<Map> renderResults = transformResults(results)
@@ -332,7 +336,7 @@ class SyncJobContext {
             boolean isFirstWrite = false
             if(!dataPath) {
                 isFirstWrite = true // its first time writing
-                initJsonDataFile()
+                initDataFile()
             }
             def writer = dataPath.newWriter(true)
             def sjb = new StreamingJsonBuilder(writer, JsonEngine.generator)
@@ -352,14 +356,41 @@ class SyncJobContext {
     }
 
     /**
+     * Append the results. called from updateJob
+     * @param currentResults the results to append, normally will be an ApiResults but can be any Problem or Result
+     */
+    protected void appendCsv(Result currentResults){
+        boolean isFirstWrite = false
+        if(!dataPath) {
+            isFirstWrite = true // its first time writing
+            initDataFile()
+        }
+        def writer = dataPath.newWriter(true)
+        CSVMapWriter csvWriter = CSVMapWriter.of(writer)
+        def dataList = transformResults(currentResults)
+        dataList.each {
+            //if its first time then write the headers
+            if(isFirstWrite){
+                csvWriter.createHeader(dataList)
+            }
+            csvWriter.writeCsv(dataList)
+            isFirstWrite = false  //set to false once 1st recod is written with a comma ","
+        }
+        IOUtils.flushAndClose(writer)
+    }
+
+    /**
      * when args.saveDataAsFile = true, this is called to initialize the datafile
      */
-    protected void initJsonDataFile() {
-        String filename = "SyncJobData_${jobId}_.json"
+    protected void initDataFile() {
+        String ext = args.dataFormat as String
+        String filename = "SyncJobData_${jobId}_.${ext}"
         dataPath = syncJobService.createTempFile(filename)
-        //init with the opening brace
-        dataPath.withWriter { wr ->
-            wr.write('[\n')
+        if(args.dataFormat == DataMimeTypes.json){
+            //init with the opening brace for JSON
+            dataPath.withWriter { wr ->
+                wr.write('[\n')
+            }
         }
     }
 

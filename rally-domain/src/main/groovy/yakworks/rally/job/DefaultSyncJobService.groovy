@@ -59,7 +59,11 @@ class DefaultSyncJobService extends SyncJobService<SyncJob> {
 
     @Override
     Long createAttachment(Path sourcePath, String name) {
-        Attachment attachment = attachmentRepo.create(sourcePath, name)
+        Map data = [
+            tempFileName: sourcePath.fileName.toString(),
+            name: name
+        ]
+        Attachment attachment = attachmentRepo.create(data)
         return attachment.id
     }
 

@@ -92,7 +92,8 @@ class BulkImportTests extends Specification implements DomainIntTest {
         job.payloadId
         Attachment.get(job.payloadId).name.startsWith("Sync")
         //check params
-        job.params.keySet().size() == 5 //[sourceId, entityClassName, jobType, source, foo]
+        job.params.keySet().size() == 6 //[sourceId, dataFormat, entityClassName, jobType, source, foo]
+
         job.params['foo']
 
         cleanup:

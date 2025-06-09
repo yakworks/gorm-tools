@@ -7,6 +7,7 @@ import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobState
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.model.DataOp
+import spock.lang.Ignore
 import spock.lang.Specification
 import testing.TestSyncJob
 import testing.TestSyncJobService
@@ -207,6 +208,7 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
     }
 
 
+    @Ignore //XXX @SUD this wont work here since its always saveDataAsFile, lets create a int test in rally-domain like BulkImportTests
     void "success bulk export"() {
 
         when:

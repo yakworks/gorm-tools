@@ -44,7 +44,8 @@ class XlsxPagerRenderer implements XlsRendererTrait<Pager> {
             //look in config and match whats there if not specified
             ExcelBuilderSupport.useIncludesConfig(eb, apiConfig, dataList, entityClassName)
         }
-        eb.writeData(dataList as List<Map>)
+        eb.createHeader(dataList)
+            .writeData(dataList)
         try {
             eb.writeOut()
             context.setStatus(HttpStatus.OK)

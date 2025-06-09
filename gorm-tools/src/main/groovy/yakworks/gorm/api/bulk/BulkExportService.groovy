@@ -174,9 +174,11 @@ class BulkExportService<D> {
         paginator.recordCount = getTotalCount(jobContext.args.queryArgs)
         jobContext.payloadSize = paginator.recordCount
         //hack right here to set saveDataAsFile when over 1000
-        if(paginator.recordCount > 1000){
-            jobContext.args.saveDataAsFile = true
-        }
+        // if(paginator.recordCount > 1000){
+        //     jobContext.args.saveDataAsFile = true
+        // }
+        //So CSV will work we always just do saveDataAsFile=true
+        jobContext.args.saveDataAsFile = true
 
         return paginator
     }

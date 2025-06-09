@@ -3,6 +3,7 @@ package yakworks.gorm.api.bulk
 import gorm.tools.repository.model.DataOp
 import spock.lang.Specification
 import yakworks.commons.beans.BeanTools
+import yakworks.gorm.api.support.DataMimeTypes
 
 class BulkJobParamsSpec extends Specification  {
 
@@ -20,7 +21,7 @@ class BulkJobParamsSpec extends Specification  {
         biParams.parallel == false
         biParams.attachmentId == 123
         biParams.op == DataOp.add
-        biParams.asMap() == [parallel: false, attachmentId: 123, op: DataOp.add, jobType: 'bulk.import']
+        biParams.asMap() == [parallel: false, attachmentId: 123, op: DataOp.add, dataFormat: DataMimeTypes.json, jobType: 'bulk.import']
 
         when: "simple"
         paramMap = [
@@ -74,7 +75,7 @@ class BulkJobParamsSpec extends Specification  {
         Map biMap = biParams.asMap()
 
         then:
-        biMap.keySet().size() == 7 // [op, parallel, attachmentId, includes, jobType, foo, bar]
+        biMap.keySet().size() == 8 // [op, parallel, dataFormat, attachmentId, includes, jobType, foo, bar]
         biMap.parallel == false
         biMap.attachmentId == 123
         biMap.op == DataOp.add

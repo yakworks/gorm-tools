@@ -15,6 +15,7 @@ import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp
 import yakworks.commons.lang.EnumUtils
+import yakworks.gorm.api.support.DataMimeTypes
 import yakworks.json.groovy.JsonEngine
 
 /**
@@ -72,6 +73,11 @@ class SyncJobArgs {
 
     @CompileStatic
     static enum DataLayout { Result, Payload }
+
+    /**
+     * (When attachmentId is set) Format for the data. either CSV or JSON are currently supported.
+     */
+    DataMimeTypes dataFormat = DataMimeTypes.json
 
     /**
      * the operation to perform, Used in bulk and limited to add, update and upsert right now.
@@ -212,6 +218,7 @@ class SyncJobArgs {
         if(params.jobSource != null) syncJobArgs.source = params.jobSource
         if(params.jobType != null) syncJobArgs.jobType = params.jobType
         if(params.op != null) syncJobArgs.op = EnumUtils.getEnumIgnoreCase(DataOp, params.op as String)
+        if(params.dataFormat != null) syncJobArgs.dataFormat = EnumUtils.getEnumIgnoreCase(DataMimeTypes, params.dataFormat as String)
 
         //allow to specify the dataLayout
         if(params.dataLayout != null) syncJobArgs.dataLayout = EnumUtils.getEnumIgnoreCase(DataLayout, params.dataLayout as String)

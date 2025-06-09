@@ -23,12 +23,6 @@ class BulkExportJobParams extends CoreSyncJobParams{
     String jobType = JOB_TYPE
 
     /**
-     * (When attachmentId is set) Format for the data. either CSV or JSON are currently supported.
-     */
-    //XXX @SUD make this work so it can ether be csv or json export
-    DataMimeTypes dataFormat = DataMimeTypes.json
-
-    /**
      * The entity class name this is for
      */
     String entityClassName

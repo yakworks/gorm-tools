@@ -7,6 +7,7 @@ package gorm.tools.job
 import groovy.transform.CompileStatic
 
 import yakworks.commons.map.Maps
+import yakworks.gorm.api.support.DataMimeTypes
 import yakworks.meta.MetaUtils
 
 /**
@@ -78,6 +79,11 @@ class CoreSyncJobParams {
      * Primarily used for dev/tests
      */
     Boolean saveDataAsFile //= false
+
+    /**
+     * (When attachmentId is set) Format for the data. either CSV or JSON are currently supported.
+     */
+    DataMimeTypes dataFormat = DataMimeTypes.json
 
     /**
      * The full query args/params map that were passed into the call.

@@ -2,12 +2,10 @@
 * Copyright 2021 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.etl.csv
+package yakworks.csv
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
-
-import org.apache.commons.beanutils.PropertyUtils
 
 import com.opencsv.CSVWriter
 import yakworks.commons.beans.PropertyTools
@@ -39,7 +37,7 @@ class CSVMapWriter {
      * If dataList is a MetaMapList then it will use its metaEntity to get the headers.
      * otherwise it creates the header using the the data in the first item of collection.
      */
-    void createHeader(Collection<Map> dataList){
+    CSVMapWriter createHeader(Collection<Map> dataList){
         if(dataList instanceof MetaMapList && dataList.metaEntity){
             headers = dataList.metaEntity.flattenProps()
             writeHeader(headers)
@@ -49,12 +47,10 @@ class CSVMapWriter {
             headers = flatRow.keySet()
             writeHeader(headers)
         }
+        return this
     }
 
-    void writeCsv(Collection<Map> dataList){
-
-        createHeader(dataList)
-
+    CSVMapWriter writeCsv(Collection<Map> dataList){
         dataList.eachWithIndex{ row, int i->
             List vals1 = collectVals(row as Map, headers)
             writeCollection(vals1)
@@ -64,6 +60,7 @@ class CSVMapWriter {
                 csvWriter.flush()
             }
         }
+        return this
     }
 
     List collectVals(Map map, Set<String> headers) {

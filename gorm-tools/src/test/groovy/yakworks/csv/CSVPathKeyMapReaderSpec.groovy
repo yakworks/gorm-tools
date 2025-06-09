@@ -1,4 +1,4 @@
-package yakworks.etl.csv
+package yakworks.csv
 
 import spock.lang.Shared
 import spock.lang.Specification

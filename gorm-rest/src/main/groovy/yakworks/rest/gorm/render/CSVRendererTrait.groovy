@@ -9,7 +9,7 @@ import groovy.transform.CompileStatic
 import grails.rest.render.RenderContext
 import grails.util.GrailsWebUtil
 import grails.web.mime.MimeType
-import yakworks.etl.csv.CSVMapWriter
+import yakworks.csv.CSVMapWriter
 
 /**
  * Commons helpers for CSV Rendering

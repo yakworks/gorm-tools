@@ -16,6 +16,7 @@ error:
     empty: Empty Data
     bindId: Id was passed in the data but bindId argument was false. Set bindId=true or remove the id property
     emptyPayload: Expected payload is null or empty, No operation performed.
+    csv: CSV Data Problem
 
   query:
     invalid: Invalid Query

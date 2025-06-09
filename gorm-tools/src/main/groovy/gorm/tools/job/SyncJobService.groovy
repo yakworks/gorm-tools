@@ -56,7 +56,7 @@ abstract class SyncJobService<D> {
      */
     SyncJobContext startJob(SyncJobEntity job, SyncJobArgs syncJobArgs){
         assert job.state == SyncJobState.Queued
-        job = changeJobStatusToRunning(job.id)
+        job = changeJobStatus(job.id, SyncJobState.Running)
         assert job.state == SyncJobState.Running
         //make sure args has jobId
         syncJobArgs.jobId = job.id
@@ -120,8 +120,8 @@ abstract class SyncJobService<D> {
     /**
      * Changes job state to Running before starting bulk export job
      */
-    SyncJobEntity changeJobStatusToRunning(Serializable jobId) {
-        updateJob([id:jobId, state: SyncJobState.Running])
+    SyncJobEntity changeJobStatus(Serializable jobId, SyncJobState syncJobState) {
+        updateJob([id:jobId, state: syncJobState])
     }
 
     /**

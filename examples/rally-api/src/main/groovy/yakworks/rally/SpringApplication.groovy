@@ -25,8 +25,8 @@ import grails.boot.config.GrailsAutoConfiguration
 import grails.util.BuildSettings
 import yakworks.rally.config.AsyncConfiguration
 import yakworks.rally.config.CacheMgrConfiguration
+import yakworks.rally.config.ParamsFixWebMvcConfiguration
 import yakworks.rally.config.RallyApiSpringConfiguration
-import yakworks.rally.config.WebMvcConfiguration
 import yakworks.rest.gorm.RestApiFromConfig
 
 /**
@@ -40,7 +40,7 @@ import yakworks.rest.gorm.RestApiFromConfig
 @EnableAutoConfiguration(
     exclude = [DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class]
 )
-@Import([RallyApiSpringConfiguration, WebMvcConfiguration, CacheMgrConfiguration, AsyncConfiguration])
+@Import([RallyApiSpringConfiguration, ParamsFixWebMvcConfiguration, CacheMgrConfiguration, AsyncConfiguration])
 //@SpringBootApplication
 @CompileStatic
 class SpringApplication extends GrailsAutoConfiguration {

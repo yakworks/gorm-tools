@@ -11,22 +11,16 @@ import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Propagation
 
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
-import gorm.tools.job.SyncJobState
-import gorm.tools.job.events.SyncJobQueueEvent
 import gorm.tools.repository.GormRepo
-import gorm.tools.repository.PersistArgs
-import grails.gorm.transactions.Transactional
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.config.MaintenanceProps
-import yakworks.spring.AppCtx
 
 @Lazy @Service('syncJobService')
 @CompileStatic

@@ -24,6 +24,7 @@ import gorm.tools.repository.RepoLookup
 import gorm.tools.transaction.TrxService
 import gorm.tools.utils.ServiceLookup
 import yakworks.api.problem.Problem
+import yakworks.api.problem.ThrowableProblem
 import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.api.problem.data.DataProblemException
@@ -258,8 +259,9 @@ class BulkImportService<D> {
     protected List<Map> transformCsvToBulkList(SyncJobEntity job, Map gParams) {
         try {
             return getCsvToMapTransformer().process(gParams)
-        } catch(e){
-            throw DataProblem.of(e).msg("error.data.csv").payload(job.id).toException()
+        } catch(ex){
+            if(ex instanceof ThrowableProblem) throw ex
+            throw DataProblem.of(ex).msg("error.data.csv").payload(job.id).toException()
         }
     }
 

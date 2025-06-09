@@ -2,18 +2,15 @@ package yakworks.rally.job
 
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
-import gorm.tools.job.SyncJobService
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import groovy.json.JsonException
 import groovy.json.JsonSlurper
 
-import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.api.problem.Problem
-import yakworks.json.groovy.JsonEngine
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Org
@@ -151,12 +148,12 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
 
     }
 
-    def "test finish job dataFormat is Payload"() {
+    def "test finish job dataLayout is Payload"() {
         given:
         List payload = [1,2,3,4]
         SyncJobArgs syncJobArgs = new SyncJobArgs(
             sourceId: '123', source: 'some source', jobType: 'foo',
-            dataFormat: SyncJobArgs.DataFormat.Payload,
+            dataLayout: SyncJobArgs.DataLayout.Payload,
             entityClass: Org
         )
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, payload)

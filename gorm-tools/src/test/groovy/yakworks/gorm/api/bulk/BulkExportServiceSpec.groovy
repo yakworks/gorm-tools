@@ -57,7 +57,7 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
         jobArgs.queryArgs
         jobArgs.entityClass == KitchenSink
         jobArgs.includes == ['id','name','ext.name']
-        jobArgs.dataFormat == SyncJobArgs.DataFormat.Payload
+        jobArgs.dataLayout == SyncJobArgs.DataLayout.Payload
     }
 
     Long bulkExport(String q){

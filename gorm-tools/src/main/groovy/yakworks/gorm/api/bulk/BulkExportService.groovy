@@ -99,7 +99,7 @@ class BulkExportService<D> {
         //used for events
         syncJobArgs.entityClass = entityClass
         //force export to Payload on exports
-        syncJobArgs.dataFormat = SyncJobArgs.DataFormat.Payload
+        syncJobArgs.dataLayout = SyncJobArgs.DataLayout.Payload
 
         return syncJobArgs
     }

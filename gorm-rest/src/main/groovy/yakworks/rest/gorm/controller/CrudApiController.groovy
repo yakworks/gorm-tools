@@ -30,7 +30,6 @@ import yakworks.gorm.api.CrudApi
 import yakworks.gorm.api.IncludesProps
 import yakworks.gorm.api.bulk.BulkExportJobParams
 import yakworks.gorm.api.bulk.BulkImportJobParams
-import yakworks.gorm.api.support.DataMimeTypes
 
 import static gorm.tools.problem.ProblemHandler.isBrokenPipe
 import static org.springframework.http.HttpStatus.CREATED

@@ -32,7 +32,7 @@ import yakworks.json.groovy.JsonEngine
 import yakworks.message.spi.MsgService
 import yakworks.spring.AppCtx
 
-import static gorm.tools.job.SyncJobArgs.DataFormat
+import static gorm.tools.job.SyncJobArgs.DataLayout
 
 /**
  * Holds the basic state and primary action methods while running a SyncJoob.
@@ -60,7 +60,7 @@ class SyncJobContext {
     /** The master results object */
     ApiResults results
 
-    /** The problems will be populated if dataFormat="payload", then this will be where they are stored */
+    /** The problems will be populated if dataLayout="payload", then this will be where they are stored */
     List<Problem> problems = [] as List<Problem>
 
     /** Payload input data used for job operations */
@@ -216,8 +216,8 @@ class SyncJobContext {
             List<Map> renderResults = transformResults(results)
             data.dataBytes = JsonEngine.toJson(renderResults).bytes
         }
-        //if dataFormat is payload then we need to save the problems.
-        if(args.dataFormat == DataFormat.Payload && problems.size() > 0) {
+        //if dataLayout is payload then we need to save the problems.
+        if(args.dataLayout == DataLayout.Payload && problems.size() > 0) {
             //data.errorBytes = JsonEngine.toJson(problems).bytes
             data.problems = problems*.asMap()
         }
@@ -248,7 +248,7 @@ class SyncJobContext {
             return transformResultsClosure.call(resultToTransform) as List<Map>
         }
         List<Result> resultList = (resultToTransform instanceof ApiResults) ? resultToTransform.list : [ resultToTransform ]
-        List<Map> ret = args.dataFormat == DataFormat.Payload ? transformResultPayloads(resultList) : transformResultToMap(resultList)
+        List<Map> ret = args.dataLayout == DataLayout.Payload ? transformResultPayloads(resultList) : transformResultToMap(resultList)
         return ret
     }
 

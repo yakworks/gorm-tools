@@ -17,7 +17,7 @@ import gorm.tools.databinding.BasicDataBinder
 class BulkMasterDetailJobParams extends BulkImportJobParams {
 
     /**
-     * (For Master/Detail dataFormat=CSV)
+     * (For Master/Detail payloadFormat=CSV)
      * Header key field that links detail/lines detailLinkField (ArTranLines)
      * to the header record (ArTran). Default is ‘source.sourceId’ but if you have underscores pass in ‘source_sourceId’
      * (when data imported from the file)
@@ -25,14 +25,14 @@ class BulkMasterDetailJobParams extends BulkImportJobParams {
     String dataKeyField
 
     /**
-     * (For Master/Detail dataFormat=CSV)
+     * (For Master/Detail payloadFormat=CSV)
      * The field in the header entity where the collection of lines goes.
      * For ArTran it would be "lines" for example
      */
     String dataDetailField
 
     /**
-     * (For Master/Detail dataFormat=CSV)
+     * (For Master/Detail payloadFormat=CSV)
      * Field that links back to the dataKeyField in the header file.
      * ‘arTran.sourceId’ for example
      */

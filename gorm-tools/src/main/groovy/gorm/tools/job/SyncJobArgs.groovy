@@ -59,19 +59,19 @@ class SyncJobArgs {
     Boolean saveDataAsFile = false
 
     /**
-     * If dataFormat=Payload then data is just a json list or map, and errors will be in the problems field. Bulk uses this way.
-     * If dataFormat=Result then errors are mixed in and the syncJob.data is just a rendered list of the Result or Problem objects.
-     * When dataFormat=Payload then the rendering of the data is only list of whats in each results payload.
-     * as opposed to a list of Results objects when dataFormat=Result
-     * For example if processing export then instead of getting syncJob.data as a list of results objects it will be a list of what
+     * If dataLayout=Payload then data is just a json list or map, and errors will be in the problems field. Bulk uses this way.
+     * If dataLayout=Result then errors are mixed in and the syncJob.data is just a rendered list of the Result or Problem objects.
+     * When dataLayout=Payload then the rendering of the data is only list of whats in each results payload.
+     * as opposed to a list of Results objects when dataLayout=Result
+     * For example if processing import then instead of getting syncJob.data as a list of results objects it will be a list of what
      * the requested export is, such as Invoices. would look as if the call was made to the rest endpoint for a list synchronously
      * Since data can only support a list of entities then any issues or errors get stored in the separate problems field,
-     * syncjob.errorBytes will be populated with error results
+     * syncjob.problems will be populated with error results
      */
-    DataFormat dataFormat = DataFormat.Result
+    DataLayout dataLayout = DataLayout.Result
 
     @CompileStatic
-    static enum DataFormat { Result, Payload }
+    static enum DataLayout { Result, Payload }
 
     /**
      * the operation to perform, Used in bulk and limited to add, update and upsert right now.
@@ -213,8 +213,8 @@ class SyncJobArgs {
         if(params.jobType != null) syncJobArgs.jobType = params.jobType
         if(params.op != null) syncJobArgs.op = EnumUtils.getEnumIgnoreCase(DataOp, params.op as String)
 
-        //allow to specify the dataFormat
-        if(params.dataFormat != null) syncJobArgs.dataFormat = EnumUtils.getEnumIgnoreCase(DataFormat, params.dataFormat as String)
+        //allow to specify the dataLayout
+        if(params.dataLayout != null) syncJobArgs.dataLayout = EnumUtils.getEnumIgnoreCase(DataLayout, params.dataLayout as String)
 
         //setup queryArgs
         if(params.containsKey("q") || params.containsKey("qSearch") ) {

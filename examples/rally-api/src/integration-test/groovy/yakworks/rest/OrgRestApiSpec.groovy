@@ -2,6 +2,7 @@ package yakworks.rest
 
 import gorm.tools.transaction.WithTrx
 import grails.gorm.transactions.Rollback
+import grails.gorm.transactions.Transactional
 import okhttp3.Request
 import okhttp3.RequestBody
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus
 
 import spock.lang.Ignore
 import spock.lang.IgnoreRest
+import yakworks.rally.orgs.model.Location
 import yakworks.rest.client.OkAuth
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
@@ -362,17 +364,27 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
         body.errors[0].message == 'must not be null'
     }
 
+    @Transactional
     void "testing put"() {
-        when:
-        Response resp = put(path, [name: "9Galt"], 67)
+        setup:
+        int countBefore = Location.count()
+        Location existing = Org.get(67).location
 
+        when:
+        Response resp = put(path, [name: "9Galt", location:[city:"test"], locations:[[:]]], 67)
         Map body = bodyToMap(resp)
+        Location updated = Org.get(67).location
+        int countAfter = Location.count()
 
         then:
         resp.code() == HttpStatus.OK.value()
         body.id
         body.name == '9Galt'
 
+        and:
+        countBefore == countAfter
+        existing.id == updated.id
+        updated.city == "test"
     }
 
     void "test post with tags"() {

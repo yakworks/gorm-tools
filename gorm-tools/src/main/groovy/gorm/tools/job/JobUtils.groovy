@@ -9,38 +9,66 @@ package gorm.tools.job
 import groovy.json.JsonOutput
 import groovy.transform.CompileStatic
 
+import com.fasterxml.jackson.databind.util.RawValue
+import yakworks.etl.DataMimeTypes
+
 /**
  * Misc static helpers for SynJobs/ApiJobs
  */
 @CompileStatic
 class JobUtils {
 
-    @Deprecated //removed the servlet api dependency
     static String requestToSourceId(Object req){
         String sourceId = "${req['method']} ${req['requestURI']}"
         if(req['queryString']) sourceId = "${sourceId}?${req['queryString']}"
         return sourceId
     }
 
-    static JsonOutput.JsonUnescaped getRowJobData(SyncJobEntity job) {
-        // gets the raw json string and use the unescaped to it just dumps it to writer without any round robin conversion
-        String jobData = job.dataToString()
-        return JsonOutput.unescaped(jobData)
+    // static JsonOutput.JsonUnescaped getRowJobData(SyncJobEntity job) {
+    //     // gets the raw json string and use the unescaped to it just dumps it to writer without any round robin conversion
+    //     String jobData = job.dataToString()
+    //     return JsonOutput.unescaped(jobData)
+    // }
+
+    /**
+     * Use for the Grails controllers that use the Groovy JSON engine.
+     */
+    static Map jobToMapGroovy(SyncJobEntity job){
+        Map resp = commonJobToMap(job)
+
+        //include job data if job is finished
+        if(job.isFinshedAndJson()) {
+            resp['data'] =  JsonOutput.unescaped(job.dataToString())
+        }
+        return resp
     }
 
-    //static helper as its used both here and also in the SyncJobRenderer
-    static Map convertToMap(SyncJobEntity job){
-        JsonOutput.JsonUnescaped rawDataJson = getRowJobData(job)
+    /**
+     * Use for the Spring controllers that use the Jackson JSON engine.
+     */
+    static Map jobToMapJackson(SyncJobEntity job){
+        Map resp = commonJobToMap(job)
 
+        //include job data if job is finished
+        if(job.isFinshedAndJson()){
+            resp['data'] =  new RawValue(job.dataToString())
+        }
+        return resp
+    }
+
+    static Map commonJobToMap(SyncJobEntity job){
         Map map = [
             id: job['id'],
             ok: job.ok,
             state: job.state.name(),
+            jobType: job.jobType,
             message: job.message,
             source: job.source,
             sourceId: job.sourceId,
-            data: rawDataJson
-        ]
+            dataFormat: job.dataFormat.name(),
+            dataId: job.dataId,
+            payloadId: job.payloadId
+        ] as Map<String, Object>
 
         if(job.problems) {
             map['problems'] = job.problems

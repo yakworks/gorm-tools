@@ -58,8 +58,8 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         SyncJob job = SyncJob.repo.get(body.id as Long)
 
         then:
-        job != null
-        job.data != null
+        job
+        job.dataToString()
         // we no longer have settign to disable payload saving
         //job.payloadBytes == null
         job.state == SyncJobState.Finished
@@ -102,7 +102,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         body.ok == false
         body.state == 'Finished'
         job.id
-        job.data != null
+        job.dataToString()
 
         when:
         List json = parseJson(job.dataToString())
@@ -131,7 +131,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         body.ok == false
         body.state == 'Finished'
         job.id
-        job.data != null
+        job.dataToString()
 
         when:
         List json = parseJson(job.dataToString())

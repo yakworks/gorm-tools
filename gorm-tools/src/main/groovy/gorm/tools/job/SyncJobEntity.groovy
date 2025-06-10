@@ -8,6 +8,7 @@ package gorm.tools.job
 import groovy.transform.CompileStatic
 
 import gorm.tools.model.SourceTrait
+import yakworks.etl.DataMimeTypes
 
 /*
 transform example when in a job
@@ -80,17 +81,15 @@ trait SyncJobEntity implements SourceTrait {
      */
     byte[] payloadBytes
 
-    // /**
-    //  * gets the payloadData as byte array, either from attachment file or payloadBytes byte array
-    //  */
-    // abstract byte[] getPayloadData()
-
     /**
      * if data is stored as an attachment then this will be the id
      */
     Long dataId
 
-    // abstract byte[] getData()
+    /**
+     * What format the data is in
+     */
+    DataMimeTypes dataFormat
 
     /**
      * if the resultData is stored in the column this will be populated
@@ -100,24 +99,12 @@ trait SyncJobEntity implements SourceTrait {
     /**
      * if the errors are stored in the column this will be populated
      */
-    //byte[] problemsBytes
-
     List problems
 
     /**
      * Job request params
      */
     Map<String, String> params
-
-    /**
-     * SyncJobArgs
-     */
-    //SyncJobArgs jobArgs
-
-    /**
-     * Job request body
-     */
-    // Map<String, Object> body
 
     /**
      * The data is a response of resources that were successfully and unsuccessfully updated or created after processing.
@@ -136,12 +123,17 @@ trait SyncJobEntity implements SourceTrait {
     //     return problemsBytes ? new String(problemsBytes, "UTF-8") : '[]'
     // }
 
+    boolean isFinshedAndJson(){
+        return (this.state == SyncJobState.Finished && this.dataFormat == DataMimeTypes.json)
+    }
+
     static constraintsMap = [
         state       : [d: 'State of the job', nullable: false],
         message     : [d: 'Status message or log', maxSize: 500],
         payloadId   : [d: 'If payload is stored as attahcment file this is the id', oapi: "NO"],
         payloadBytes: [d: 'Json payload data (stored as byte array) that is passed in, for example list of items to bulk create',
                        maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
+        dataFormat : [d: 'The format the data is in, csv or json'],
         dataId      : [d: 'If data is saved as attahchment file this is the id', oapi: "NO"],
         dataBytes   : [d: 'The result data stored as bytes', maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
         //errorBytes  : [d: 'The error data stored as bytes', maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],

@@ -30,12 +30,20 @@ import static yakworks.json.groovy.JsonEngine.parseJson
 @GrailsCompileStatic
 class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity, AuditStampTrait, Serializable {
 
+    /**
+     * NOTE: Here only so we can add to constraintsMap for docs
+     */
     byte[] getData(){
-        getRepo().getData(this)
+        null
+        //getRepo().getData(this)
     }
 
+    /**
+     * NOTE: Here only so we can add to constraintsMap for docs
+     */
     byte[] getPayload(){
-        getRepo().getPayload(this)
+        null
+        //getRepo().getPayload(this)
     }
 
     @Override

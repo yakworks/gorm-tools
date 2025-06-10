@@ -7,7 +7,7 @@ package gorm.tools.job
 import groovy.transform.CompileStatic
 
 import yakworks.commons.map.Maps
-import yakworks.gorm.api.support.DataMimeTypes
+import yakworks.etl.DataMimeTypes
 import yakworks.meta.MetaUtils
 
 /**
@@ -115,7 +115,8 @@ class CoreSyncJobParams {
             source: getSource(),
             sourceId: getSourceId(),
             params: asMap(),
-            jobType: getJobType()
+            jobType: getJobType(),
+            dataFormat: getDataFormat()
         ] as Map<String,Object>
     }
 }

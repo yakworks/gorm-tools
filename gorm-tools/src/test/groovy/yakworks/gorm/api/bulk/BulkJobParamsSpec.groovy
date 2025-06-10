@@ -3,7 +3,7 @@ package yakworks.gorm.api.bulk
 import gorm.tools.repository.model.DataOp
 import spock.lang.Specification
 import yakworks.commons.beans.BeanTools
-import yakworks.gorm.api.support.DataMimeTypes
+import yakworks.etl.DataMimeTypes
 
 class BulkJobParamsSpec extends Specification  {
 

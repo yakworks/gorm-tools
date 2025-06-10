@@ -19,6 +19,7 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.util.UriUtils
 
 import gorm.tools.beans.Pager
+import gorm.tools.job.JobUtils
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.model.DataOp
@@ -247,7 +248,8 @@ trait CrudApiController<D> extends RestApiController {
             BulkExportJobParams jobParams = BulkExportJobParams.withParams(qParams)
             jobParams.sourceId = requestToSourceId(request)
             SyncJobEntity job = getCrudApi().bulkExport(jobParams)
-            respondWith(job, [status: qParams.getBoolean('async') == false ? MULTI_STATUS : CREATED])
+            Map jobMap = JobUtils.jobToMapGroovy(job)
+            respondWith(jobMap, [status: qParams.getBoolean('async') == false ? MULTI_STATUS : CREATED])
         } catch (Exception | AssertionError e) {
             respondWith(
                 BulkExceptionHandler.of(getEntityClass(), problemHandler).handleBulkOperationException(request, e)
@@ -293,9 +295,10 @@ trait CrudApiController<D> extends RestApiController {
         if(qParams.jobSource != null) jobParams.source = qParams.jobSource
 
         SyncJobEntity job = getCrudApi().bulkImport(jobParams, dataList)
+        Map jobMap = JobUtils.jobToMapGroovy(job)
         //if its async=false then it will be the Finished job and equivalent to the GET on SyncJob, SO MULTI_STATUS
         // if its not async, then its just returning the created Job and equivalent to the POST on SyncJob, so a CREATED status
-        respondWith(job, [status: qParams.getBoolean('async') == false ? MULTI_STATUS : CREATED])
+        respondWith(jobMap, [status: qParams.getBoolean('async') == false ? MULTI_STATUS : CREATED])
     }
 
     String requestToSourceId(HttpServletRequest req){

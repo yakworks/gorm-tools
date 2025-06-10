@@ -9,7 +9,7 @@ import groovy.transform.CompileStatic
 import gorm.tools.databinding.BasicDataBinder
 import gorm.tools.job.CoreSyncJobParams
 import gorm.tools.repository.model.DataOp
-import yakworks.gorm.api.support.DataMimeTypes
+import yakworks.etl.DataMimeTypes
 
 /**
  * Value Object are better than using a Map to store arguments and parameters.

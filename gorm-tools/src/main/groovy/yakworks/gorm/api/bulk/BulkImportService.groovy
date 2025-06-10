@@ -29,9 +29,9 @@ import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.api.problem.data.DataProblemException
 import yakworks.api.problem.data.DataProblemTrait
+import yakworks.etl.DataMimeTypes
 import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.IncludesKey
-import yakworks.gorm.api.support.DataMimeTypes
 import yakworks.gorm.config.GormConfig
 import yakworks.json.groovy.JsonEngine
 

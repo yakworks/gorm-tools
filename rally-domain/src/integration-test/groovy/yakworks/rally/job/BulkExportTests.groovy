@@ -1,21 +1,18 @@
 package yakworks.rally.job
 
-import gorm.tools.beans.Pager
+
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobState
 import gorm.tools.mango.api.QueryArgs
-import gorm.tools.repository.model.DataOp
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.api.problem.data.DataProblemException
 import yakworks.gorm.api.bulk.BulkExportJobParams
 import yakworks.gorm.api.bulk.BulkExportService
-import yakworks.gorm.api.bulk.BulkImportJobParams
-import yakworks.gorm.api.support.DataMimeTypes
-import yakworks.meta.MetaMapList
+import yakworks.etl.DataMimeTypes
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Org
 import yakworks.testing.gorm.integration.DomainIntTest
@@ -232,27 +229,26 @@ class BulkExportTests extends Specification implements DomainIntTest  {
         //def job = SyncJob.get(jobId)
 
         then: "verify job"
-
-        job != null
-        //job.source == "test"
+        //job.dataFormat == DataMimeTypes.csv
         job.sourceId == "test-job"
-        //job.payloadBytes != null
-        //job.dataBytes != null
         job.state == SyncJobState.Finished
 
         when: "verify job.data (job results)"
         String dataString = job.dataToString()
         //List results = parseJson(dataString, List)
         List csvList = dataString.readLines()
+        def attachment = Attachment.get(job.dataId)
 
         then:
         csvList.size() == 1001 //1000 rows plus header
         csvList[0] == '"id","name","ext.name"'
         // csvList[1] == '"1","Org1","1-800-1"'
         csvList[1000] == '"1000","Squash","SinkExt1000"'
+        attachment.extension == 'csv'
+        attachment.mimeType == 'text/csv'
+
 
         cleanup:
-        def attachment = Attachment.get(job.dataId)
         attachment.remove()
         KitchenSink.list().each{
             it.remove()

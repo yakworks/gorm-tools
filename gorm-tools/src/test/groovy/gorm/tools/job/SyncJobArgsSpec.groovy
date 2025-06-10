@@ -3,6 +3,7 @@ package gorm.tools.job
 import gorm.tools.repository.model.DataOp
 import spock.lang.Specification
 import yakworks.commons.lang.EnumUtils
+import yakworks.etl.DataMimeTypes
 
 class SyncJobArgsSpec extends Specification  {
 
@@ -17,13 +18,14 @@ class SyncJobArgsSpec extends Specification  {
         !args.sourceId
 
         when: "explicitely provided"
-        args = SyncJobArgs.withParams([parallel:true, async:false, source:"test", sourceId:"test"])
+        args = SyncJobArgs.withParams([parallel:true, async:false, source:"test", sourceId:"test", dataFormat: 'csv'])
 
         then:
         args.parallel
         !args.async
         args.source == "test"
         args.sourceId == "test"
+        args.dataFormat == DataMimeTypes.csv
 
         when: "make sure the others work"
         args = SyncJobArgs.withParams([async:false, jobSource: "foo", dataLayout: "payload"])

@@ -10,7 +10,6 @@ import gorm.tools.utils.BenchmarkHelper
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport
-import yakworks.csv.CSVMapWriter
 import yakworks.etl.excel.ExcelBuilder
 import yakworks.json.groovy.JsonEngineTrait
 import yakworks.meta.MetaMapList

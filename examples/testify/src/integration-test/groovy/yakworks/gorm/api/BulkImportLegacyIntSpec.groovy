@@ -148,7 +148,7 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
 
         then:
         noExceptionThrown()
-        job.data != null
+        job.dataToString()
 
         when: "bulk update"
         def results = parseJson(job.dataToString())
@@ -216,7 +216,7 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
 
         then:
         noExceptionThrown()
-        job.data != null
+        job.dataToString()
 
         when:
         List json = parseJson(job.dataToString())
@@ -288,7 +288,7 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
 
         then:
         noExceptionThrown()
-        job.data != null
+        job.dataToString()
 
         when: "verify json"
         List json = parseJson(job.dataToString())
@@ -346,7 +346,7 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
         then:
         noExceptionThrown()
         job.state == SyncJobState.Finished
-        job.data != null
+        job.dataToString()
 
         when: "verify json"
         List json = parseJson(job.dataToString())

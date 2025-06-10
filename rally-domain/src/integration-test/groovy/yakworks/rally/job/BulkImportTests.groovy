@@ -178,7 +178,7 @@ class BulkImportTests extends Specification implements DomainIntTest {
 
         then:
         noExceptionThrown()
-        job.data != null
+        job.dataToString()
 
         when: "bulk update"
         def results = parseJson(job.dataToString())
@@ -246,7 +246,7 @@ class BulkImportTests extends Specification implements DomainIntTest {
 
         then:
         noExceptionThrown()
-        job.data != null
+        job.dataToString()
 
         when:
         List json = parseJson(job.dataToString())

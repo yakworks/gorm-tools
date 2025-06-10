@@ -45,7 +45,7 @@ class GormRestGrailsPlugin extends Plugin {
         apiResultsRenderer(ApiResultsRenderer)
         problemRenderer(ProblemRenderer)
         pagerRenderer(PagerRenderer)
-        syncJobRenderer(SyncJobRenderer)
+        //syncJobRenderer(SyncJobRenderer)
 
         csvPagerRenderer(CSVPagerRenderer)
         xlsxPagerRenderer(XlsxPagerRenderer)

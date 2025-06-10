@@ -15,7 +15,7 @@ import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp
 import yakworks.commons.lang.EnumUtils
-import yakworks.gorm.api.support.DataMimeTypes
+import yakworks.etl.DataMimeTypes
 import yakworks.json.groovy.JsonEngine
 
 /**
@@ -245,7 +245,8 @@ class SyncJobArgs {
             source: getSource(),
             sourceId: getSourceId(),
             params: getParams(),
-            jobType: getJobType()
+            jobType: getJobType(),
+            dataFormat: getDataFormat()
         ] as Map<String,Object>
         //if its has id then pass it
         if(getJobId()) dta['id'] = getJobId()

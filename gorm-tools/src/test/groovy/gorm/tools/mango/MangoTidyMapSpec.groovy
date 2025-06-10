@@ -152,6 +152,74 @@ class MangoTidyMapSpec extends Specification {
         ]
     }
 
+    void "test like with star *"() {
+        when: 'its already in $ilike'
+        def mmap = tidy([
+            name: ['$ilike': "Name*"]
+        ])
+
+        then: 'it gets replaced with %'
+        mmap == [name: ['$ilike': "Name%"]]
+
+        when: 'its already in $like'
+        mmap = tidy([
+            name: ['$like': "*ame*"]
+        ])
+
+        then: 'it gets replaced with %'
+        mmap == [name: ['$like': "%ame%"]]
+
+        when:
+        mmap = tidy([
+            'foo.name': "Name*"
+        ])
+
+        then:
+        mmap == [foo: [name: ['$ilike': "Name%"]]]
+
+        when:
+        mmap = tidy(
+            [foo:
+                 [name: "Name*"]
+            ])
+
+        then:
+        mmap == [foo: [name: ['$ilike': "Name%"]]]
+
+        when: "wrapped in a not"
+        mmap = tidy([
+            '$not':[
+                'foo':[
+                    name: "Name*"
+                ]
+            ]
+        ])
+
+        then: "converts it to a list"
+        mmap == [
+            '$not': [ //list
+                      [foo: [name: ['$ilike': "Name%"]]]
+            ]
+        ]
+
+        when: "wrapped in a not shortcut"
+        mmap = tidy([
+            '$not':[
+                'foo.name': "Name*",
+                'buzz.boo': "bar*"
+            ]
+        ])
+
+        then: "converts it to a list of maps"
+        mmap == [
+            '$not': [
+                [foo: [name: ['$ilike': "Name%"]]],
+                [buzz: [boo: ['$ilike': 'bar%']]]
+            ]
+        ]
+    }
+
+
     void "test not simple"() {
         when: 'the $not is a simple map'
         def mmap = tidy([
@@ -452,11 +520,11 @@ class MangoTidyMapSpec extends Specification {
 
         when:
         mmap = tidy([
-            'foo.name.$like': "Name"
+            'foo.name.$like': "Name*"
         ])
 
         then:
-        mmap == [foo: [name: ['$like': "Name"]]]
+        mmap == [foo: [name: ['$like': "Name%"]]]
 
         when:
         mmap = tidy([
@@ -535,7 +603,7 @@ class MangoTidyMapSpec extends Specification {
         mmap = tidy([
             '$not':[
                 '$exists': crit,
-                'name': 'org4%'
+                'name': 'org4*'
             ]
         ])
 

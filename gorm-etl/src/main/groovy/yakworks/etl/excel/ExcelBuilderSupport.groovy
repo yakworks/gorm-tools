@@ -60,13 +60,13 @@ class ExcelBuilderSupport {
         if(colModel){
             colModel.each {
                 if(!it.hidden) {
-                    //if it contains id, its the old grid config, where id=field name and name=label
+                    //if it contains id, its the new grid config, where id=field name and name=label
                     String columnName, label
                     if(it['id']) {
                         columnName = it['id'] as String
                         label = it['name'] as String
                     } else {
-                        //new grid, where name=fieldname and label=label
+                        //old jquery jqGrid config new grid, where name=fieldname and label=label
                         columnName = it['name'] as String
                         label = it['label'] as String
                     }

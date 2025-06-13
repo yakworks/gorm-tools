@@ -104,9 +104,14 @@ class MangoTidyMap {
                 toMangoOperator(val as Map, result[key] as Map)
             }
             else {
-                if (key.toString().startsWith('$')) {
+                //if its a like then replace star
+                if ((key.toString() == '$ilike' || key.toString() == '$like') && val instanceof String ){
+                    result[key] = val.endsWith("*") ? val.replace('*', '%') : val
+                }
+                else if (key.toString().startsWith('$')) {
                     result[key] = val
-                } //if we already have Mango method
+                }
+                //if we already have Mango method
                 else if (val instanceof List) {
                     List valAsList = val as List
                     // for handling case {customer: [{id:1}, {id:2}]}, transforms to {customer:{id:{'$in': [1,2]}}}

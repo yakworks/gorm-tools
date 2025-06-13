@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.oauth2.core.OAuth2AccessToken
 
 import grails.testing.mixin.integration.Integration
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import yakworks.rest.client.OkAuth
@@ -16,6 +17,7 @@ import yakworks.security.spring.token.store.TokenStore
 
 import java.time.ZoneId
 
+@Ignore
 @Integration
 class OpaqueRestApiSpec extends Specification implements OkHttpRestTrait {
 

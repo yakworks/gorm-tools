@@ -244,6 +244,61 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         org.location.city == 'Denver'
     }
 
+    void "update existing primary location"() {
+        setup:
+        Org org = Org.get(11)
+
+        expect:
+        org
+        org.location
+
+        int countBefore = Location.count()
+
+        when:
+        Location existingLocation = org.location
+        Map data = [
+            id: org.id,
+            location: [
+                city: 'Denver',
+                street1: '1st'
+            ],
+        ]
+        org = orgRepo.update(data)
+        flush()
+        int countAfter = Location.count()
+
+        then: "existing primary location should have been updated"
+        noExceptionThrown()
+        org.location
+        org.location.id == existingLocation.id
+        org.location.city == "Denver"
+        org.location.street1 == "1st"
+
+        and: "no new locations added"
+        countBefore == countAfter
+    }
+
+    void "should not create empty locations"() {
+        setup:
+        Org org = Org.get(11)
+        int countBefore = Location.count()
+
+        when:
+        Map data = [
+            id: org.id,
+            locations:[
+                [:]
+            ]
+        ]
+        orgRepo.update(data)
+        flushAndClear()
+        int countAfter = Location.count()
+
+        then: "no new location should be added"
+        noExceptionThrown()
+        countBefore == countAfter
+    }
+
     void "test insert with orgmembers"() {
         given:
         OrgDimensionTesting.setDimensions(['Branch', 'Division', 'Business'])

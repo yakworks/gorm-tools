@@ -108,8 +108,9 @@ class RallyApiSpringConfiguration {
 
         http.oauth2Login(withDefaults())
 
-        //tokenLegacy for using username/password json in api/login, forwards to api/tokenLegacy which saves random string in db as token
-        DefaultSecurityConfiguration.addJsonAuthenticationFilter(http, tokenStore)
+        // Legacy tokenLegacy for using username/password json in api/login, forwards to api/tokenLegacy which saves random string in db as token
+        // DefaultSecurityConfiguration.addJsonAuthenticationFilter(http, tokenStore)
+
         //enables jwt and oauth
         DefaultSecurityConfiguration.applyOauthJwt(http)
 

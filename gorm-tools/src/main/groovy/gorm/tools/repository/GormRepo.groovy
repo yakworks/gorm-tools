@@ -478,12 +478,15 @@ trait GormRepo<D> implements ApiCrudRepo<D>, ResolvableTypeProvider {
 
     /**
      * wraps get in a trx, usefull for testing. NOT a read only trx like read as that messes with dirty tracking
+     * Throws NotFoundExeption if null
      * @param id the id to get
      * @return the retrieved entity
      */
     D getWithTrx(Serializable id) {
         withTrx {
-            return (D)gormStaticApi().get(id)
+            var instance = (D)gormStaticApi().get(id)
+            RepoUtil.checkFound(instance, id, getEntityClass().simpleName)
+            return instance
         }
     }
 

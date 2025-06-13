@@ -8,13 +8,13 @@ api:
         bulkError: ['num', 'name']
       gridOptions:
         colModel:
-          - {name: id, width: 10, hidden: true }
-          - {name: num, label: Num, width: 40, formatter: editActionLink}
-          - {name: name, label: Name, width: 80}
-          - {name: type.name, label: Type, width: 40}
-          - {name: calc.totalDue, label: TotalDue, width: 40, formatter: currency}
-          - {name: flex.text1, width: 40} #A column without label, should not fail, and would use name as header, both in grid and in xslx export
-          - {id: flex.text2, label: Text 2} #use id instead of name, excel builder should work with either of them
+          - {id: id, width: 10, hidden: true }
+          - {id: num, name: Num, width: 40, formatter: editActionLink}
+          - {id: name, name: Name, width: 80}
+          - {id: type.name, name: Type, width: 40}
+          - {id: calc.totalDue, name: TotalDue, width: 40, formatter: currency}
+          - {id: flex.text1, width: 40} #A column without label, should not fail, and would use name as header, both in grid and in xslx export
+          - {id: flex.text2, name: Text 2} #use id instead of name, excel builder should work with either of them
         # shrinkToFit: true
         contextMenu: true
 

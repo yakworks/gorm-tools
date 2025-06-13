@@ -1,3 +1,24 @@
+### v7.3.87
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.86...v7.3.87)
+- release [link](https://github.com/yakworks/gorm-tools/commit/38d9b2d7f0b44678a40c70dc2422ce69ad32f5e1)
+- Merge pull request #909 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/fda65ad79e09c5d4d55f0538089e3529b5b698aa)
+- Xsl export Fix, support id,name 0r name,label (#908) [link](https://github.com/yakworks/gorm-tools/commit/c5f76bcf023be9e5690c272e8d5f887b047b76fa)
+- remove DefaultSecurityConfiguration.addJsonAuthenticationFilter (#907) [link](https://github.com/yakworks/gorm-tools/commit/6a47ce43a8f29e79a732591f6ee80f6bd795c3f5)
+- fixes https://github.com/9ci/domain9/issues/3191 (#906) [link](https://github.com/yakworks/gorm-tools/commit/3e6d5241a5c6460bf70dd2d3c327d11b1547f3b4)
+- org update : Do not create empty locations (#905) [link](https://github.com/yakworks/gorm-tools/commit/aa4fb3b6a84e118cf453cf5e54bb4fd7152d7e6f)
+- Fix : Update org's primary location : Dont create new (#904) [link](https://github.com/yakworks/gorm-tools/commit/5cc5d161dc004e854a7f58e866486f85eede6fdc)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/9d9798adc1e8994e4efb5fb1b0d5ddcdbcf37b6d)
+- merge master [link](https://github.com/yakworks/gorm-tools/commit/5a5e50fd5f9f5e9e94138141ad7c4df801a8cf6b)
+- merge master [link](https://github.com/yakworks/gorm-tools/commit/f5a4a1e974dbfae515739c9651bcf7340405fb68)
+- vGroovyCommons=3.17 [link](https://github.com/yakworks/gorm-tools/commit/1f2bce5bc4dea2e63b6c393745ceb87da16e2b1c)
+- disable SecureCrudApi for now [link](https://github.com/yakworks/gorm-tools/commit/e74cf163f009a9c69821677df5e9c93232d9a711)
+- diable secureCrudApi for now (#891) [link](https://github.com/yakworks/gorm-tools/commit/71747e1a00a33bda4630669047af8cab271149e0)
+- Bulk export (#877) [link](https://github.com/yakworks/gorm-tools/commit/06ce6d3d529c431bdd10bae12cad14c71fa0c6d8)
+-  Read only users - Secure CrudApi (#873) [link](https://github.com/yakworks/gorm-tools/commit/45811cf970d1f2d95ac00a4e36e9e6785f7e8e98)
+- move AppTimeZone to yakworks commons (#888) [link](https://github.com/yakworks/gorm-tools/commit/0a46d2fd5edc0e93d596dd9cfd0e5be2275e0c6c)
+- Support name or id in gridOpts.colModel for excel export (#870) [link](https://github.com/yakworks/gorm-tools/commit/de2f1b3ac1ef58f2f40ecd08e319e80ca72ad273)
+
 ### v7.3.86
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.85...v7.3.86)

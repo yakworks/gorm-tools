@@ -19,7 +19,7 @@ class ExcelExportSpec extends Specification implements OkHttpRestTrait, WithTrx 
         login()
     }
 
-    void "test xlsx"() {
+    void "test xlsx org with id,name"() {
         when:
         Response resp = get("${path}?q=*&format=xlsx")
 
@@ -32,7 +32,23 @@ class ExcelExportSpec extends Specification implements OkHttpRestTrait, WithTrx 
 
         then: "column name should have been resolved from grid col model"
         headers
-        //flex.text1 does not have a label, so it would have used getNaturalTitle on name
         headers.containsAll(['Num', 'Name', 'Type', 'TotalDue', 'Flex Text1', "Text 2"])
+    }
+
+    void "test xlsx contact with name and label"() {
+        when:
+        Response resp = get("/api/rally/contact?q=*&format=xlsx")
+
+        then:
+        resp.code() == HttpStatus.OK.value()
+
+        when: "verify excel file"
+        XSSFWorkbook workbook = new XSSFWorkbook(resp.body().byteStream())
+        List<String> headers = getHeader(workbook)
+
+        then: "column name should have been resolved from grid col model"
+        headers
+        //flex.text1 has name and label
+        headers.containsAll(['Name', 'Email', 'Email Type', 'Phone Type', "Is Primary"])
     }
 }

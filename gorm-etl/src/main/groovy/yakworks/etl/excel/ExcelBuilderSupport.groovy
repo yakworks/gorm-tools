@@ -60,12 +60,18 @@ class ExcelBuilderSupport {
         if(colModel){
             colModel.each {
                 if(!it.hidden) {
-                    //colModel need to specify at least field name or id, name/id is the name of domain field,
-                    //label is optional, if provided it would be used for xls header
-
-                    String columnName = it['name'] ?: it['id']
+                    //if it contains id, its the new grid config, where id=field name and name=label
+                    String columnName, label
+                    if(it['id']) {
+                        columnName = it['id'] as String
+                        label = it['name'] as String
+                    } else {
+                        //old jquery jqGrid config new grid, where name=fieldname and label=label
+                        columnName = it['name'] as String
+                        label = it['label'] as String
+                    }
                     Validate.notEmpty(columnName, "name  or id is required for columns in gridOptions.colMode")
-                    colMap[columnName] = it.label as String
+                    colMap[columnName] = label as String
                 }
             }
         }

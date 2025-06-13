@@ -32,6 +32,18 @@ class IncludesConfig {
         AppCtx.get('includesConfig', this)
     }
 
+    /**
+     * Gets the includes/includesKey from the qParams or from the fallbackKeys
+     * @return the list of fields in our mango format.
+     */
+    List<String> getIncludes(Map qParams, List fallbackIncludesKeys, Class entityClass) {
+        //parse the params into the IncludesProps
+        var incProps = IncludesProps.of(qParams).fallbackKeys(fallbackIncludesKeys)
+        //returns includes if thats passed in or looks up includeKey
+        List<String> incs = findIncludes(entityClass, incProps)
+        return incs
+    }
+
     @Cacheable(cacheNames="includesConfig.includesByClass",key="{#entityClass}")
     Map getIncludesMap(Class entityClass){
         Map includesMap = getClassStaticIncludes(entityClass)

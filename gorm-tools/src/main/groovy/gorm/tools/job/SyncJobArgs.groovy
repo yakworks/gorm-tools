@@ -15,6 +15,8 @@ import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp
 import yakworks.commons.lang.EnumUtils
+import yakworks.etl.DataMimeTypes
+import yakworks.json.groovy.JsonEngine
 
 /**
  * Value Object are better than using a Map to store arguments and parameters.
@@ -27,16 +29,15 @@ import yakworks.commons.lang.EnumUtils
 @ToString(includeNames = true, includes = ['jobId', 'op', 'source', 'sourceId', 'async'])
 @CompileStatic
 class SyncJobArgs {
-    public static final DATA_FORMAT_RESULT = "result"
-    public static final DATA_FORMAT_PAYLOAD = "payload"
 
     SyncJobArgs() { this([:])}
-
-    SyncJobService syncJobService //reference to the syncJobService
 
     String source
 
     String sourceId
+
+    /** the type of the SyncJob, used for queue and to switch on routing to run */
+    String jobType
 
     /**
      * Payload input data used for job operations
@@ -44,14 +45,14 @@ class SyncJobArgs {
     Object payload
 
     /**
-     * force how to store the payload (what was sent)
+     * if attachment already created, this is the attachmentId
      */
-    Boolean savePayload = true
+    Long payloadId
 
     /**
      * force payload to store as file instead of bytes
      */
-    Boolean savePayloadAsFile = false
+    Boolean savePayloadAsFile
 
     /**
      * resulting data (what is returned in response) is always saved but can force it to save to file instead of bytes in column
@@ -59,22 +60,27 @@ class SyncJobArgs {
     Boolean saveDataAsFile = false
 
     /**
-     * If dataFormat=Payload then errors should be stored separate from result data.
-     * If dataFormat=Result then errors are mixed in and the syncJob.data is just a rendered list of the results.
-     * When dataFormat=Payload then the rendering of the data is only list of whats in each results payload.
-     * as opposed to a list of Results objects when dataFormat=Result
-     * For example if processing export then instead of getting syncJob.data as a list of results objects it will be a list of what
+     * If dataLayout=Payload then data is just a json list or map, and errors will be in the problems field. Bulk uses this way.
+     * If dataLayout=Result then errors are mixed in and the syncJob.data is just a rendered list of the Result or Problem objects.
+     * When dataLayout=Payload then the rendering of the data is only list of whats in each results payload.
+     * as opposed to a list of Results objects when dataLayout=Result
+     * For example if processing import then instead of getting syncJob.data as a list of results objects it will be a list of what
      * the requested export is, such as Invoices. would look as if the call was made to the rest endpoint for a list synchronously
-     * Since data can only support a list of entities then any issues or errors get stored in a separate errors field,
-     * syncjob.errorBytes will be populated with error results
+     * Since data can only support a list of entities then any issues or errors get stored in the separate problems field,
+     * syncjob.problems will be populated with error results
      */
-    DataFormat dataFormat = DataFormat.Result
+    DataLayout dataLayout = DataLayout.Result
 
     @CompileStatic
-    static enum DataFormat { Result, Payload }
+    static enum DataLayout { Result, Payload }
 
     /**
-     * the operation to perform, Used in bulk and limited to add and update right now.
+     * (When attachmentId is set) Format for the data. either CSV or JSON are currently supported.
+     */
+    DataMimeTypes dataFormat = DataMimeTypes.json
+
+    /**
+     * the operation to perform, Used in bulk and limited to add, update and upsert right now.
      */
     DataOp op
 
@@ -102,13 +108,14 @@ class SyncJobArgs {
      * the job will halt when it hits 100 errors
      * this setting ignored if transactional=true
      */
-    int errorThreshold = 0
+    //TODO not implemented yet
+    // int errorThreshold = 0
 
     /**
      * if true then the bulk operation is all or nothing, meaning 1 error and it will roll back.
      * TODO not implemented yet
      */
-    boolean transactional = false
+    // boolean transactional = false
 
     /**
      * Normally used for testing and debugging, or when encountering deadlocks.
@@ -128,6 +135,7 @@ class SyncJobArgs {
 
     /**
      * the args, such as flush:true etc.., to pass down to the repo methods
+     * Helpful for bindId when bulk importing rows that have id already.
      */
     Map persistArgs
 
@@ -157,17 +165,25 @@ class SyncJobArgs {
     Class entityClass
 
     //reference back to the SyncJobContext built from these args.
-    SyncJobContext context
-
-    /**
-     * SyncJobState to use when creating new job.
-     * Default is Running. But Queued can be used for jobs which are scheduled to run later, eg BulkExport.
-     */
-    SyncJobState jobState = SyncJobState.Running
+    //SyncJobContext context
 
     /** helper to return true if op=DataOp.add */
     boolean isCreate(){
         op == DataOp.add
+    }
+
+    boolean isSavePayloadAsFile(){
+        //if its set then use it
+        if(this.savePayloadAsFile != null) return this.savePayloadAsFile
+        // When collection then check size and set args
+        return (payload instanceof Collection && ((Collection)payload).size() > 1000)
+    }
+
+    boolean isSaveDataAsFile(){
+        //if its set then use it
+        if(this.saveDataAsFile != null) return this.saveDataAsFile
+        // Base it on the payload, if its big then assume data will be too.
+        return (payload instanceof Collection && ((Collection)payload).size() > 1000)
     }
 
     static SyncJobArgs of(DataOp dataOp){
@@ -179,30 +195,33 @@ class SyncJobArgs {
         new SyncJobArgs(args)
     }
 
-    static SyncJobArgs update(Map args = [:]){
-        args.op = DataOp.update
-        new SyncJobArgs(args)
-    }
+    // static SyncJobArgs update(Map args = [:]){
+    //     args.op = DataOp.update
+    //     new SyncJobArgs(args)
+    // }
 
     static SyncJobArgs withParams(Map params){
-        SyncJobArgs syncJobArgs = new SyncJobArgs(params:params)
+        SyncJobArgs syncJobArgs = new SyncJobArgs(params: params)
         //parallel is NULL by default
         if(params.parallel != null) syncJobArgs.parallel = params.getBoolean('parallel')
 
         //when this is true then runs "non-blocking" in background and will job immediately with state=running
         syncJobArgs.async = params.getBoolean('async', true)
 
-        //save payload is true by default
-        if(params.savePayload != null) syncJobArgs.savePayload = params.getBoolean('savePayload')
         if(params.saveDataAsFile != null) syncJobArgs.saveDataAsFile = params.getBoolean('saveDataAsFile')
 
         syncJobArgs.sourceId = params.sourceId
         //can use both jobSource and source to support backward compat, jobSource wins if both are set
-        if(params.source != null) syncJobArgs.source = params.source
-        if(params.jobSource != null) syncJobArgs.source = params.jobSource
 
-        //allow to specify the dataFormat
-        if(params.dataFormat != null) syncJobArgs.dataFormat = EnumUtils.getEnumIgnoreCase(DataFormat, params.dataFormat as String)
+        if(params.source != null) syncJobArgs.source = params.source
+        //Support legacy param if they pass jobSource it will win
+        if(params.jobSource != null) syncJobArgs.source = params.jobSource
+        if(params.jobType != null) syncJobArgs.jobType = params.jobType
+        if(params.op != null) syncJobArgs.op = EnumUtils.getEnumIgnoreCase(DataOp, params.op as String)
+        if(params.dataFormat != null) syncJobArgs.dataFormat = EnumUtils.getEnumIgnoreCase(DataMimeTypes, params.dataFormat as String)
+
+        //allow to specify the dataLayout
+        if(params.dataLayout != null) syncJobArgs.dataLayout = EnumUtils.getEnumIgnoreCase(DataLayout, params.dataLayout as String)
 
         //setup queryArgs
         if(params.containsKey("q") || params.containsKey("qSearch") ) {
@@ -214,6 +233,28 @@ class SyncJobArgs {
 
     AsyncArgs getAsyncArgs() {
         return new AsyncArgs(enabled: async)
+    }
+
+    /**
+     *  converts to data for queueing up (saving/creating) a SyncJob
+     *  Can probably get rid of this, used mostly for the old way of doing it with createJob.
+     */
+    Map<String, Object> asJobData(){
+        //make sure to use getters so overrides in super works
+        var dta = [
+            source: getSource(),
+            sourceId: getSourceId(),
+            params: getParams(),
+            jobType: getJobType(),
+            dataFormat: getDataFormat()
+        ] as Map<String,Object>
+        //if its has id then pass it
+        if(getJobId()) dta['id'] = getJobId()
+        //convet payload if its set
+        if(getPayload()){
+            dta.payloadBytes = JsonEngine.toJson(getPayload()).bytes
+        }
+        return dta
     }
 
 }

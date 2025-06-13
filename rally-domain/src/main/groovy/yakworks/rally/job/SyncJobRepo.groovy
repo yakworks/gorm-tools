@@ -14,6 +14,7 @@ import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
+import grails.gorm.transactions.ReadOnly
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.repo.AttachmentRepo
 
@@ -38,28 +39,29 @@ class SyncJobRepo extends LongIdGormRepo<SyncJob> {
     }
 
 
-    byte[] getData(SyncJob job){
-        if(job.dataId){
-            def istream = attachmentRepo.get(job.dataId).inputStream
-            return FileCopyUtils.copyToByteArray(istream)
-        } else {
-            return job.dataBytes
-        }
-    }
-
-    byte[] getPayload(SyncJob job){
-        if(job.payloadId){
-            def istream = attachmentRepo.get(job.payloadId).inputStream
-            return FileCopyUtils.copyToByteArray(istream)
-        } else {
-            return job.payloadBytes
-        }
-    }
+    // byte[] getData(SyncJob job){
+    //     if(job.dataId){
+    //         def istream = attachmentRepo.get(job.dataId).inputStream
+    //         return FileCopyUtils.copyToByteArray(istream)
+    //     } else {
+    //         return job.dataBytes
+    //     }
+    // }
+    //
+    // byte[] getPayload(SyncJob job){
+    //     if(job.payloadId){
+    //         def istream = attachmentRepo.get(job.payloadId).inputStream
+    //         return FileCopyUtils.copyToByteArray(istream)
+    //     } else {
+    //         return job.payloadBytes
+    //     }
+    // }
 
     String dataToString(SyncJob job){
         job.dataId ? attachmentRepo.get(job.dataId).getText() : getJsonString(job.dataBytes)
     }
 
+    @ReadOnly
     String payloadToString(SyncJob job){
         job.payloadId ? attachmentRepo.get(job.payloadId).getText() : getJsonString(job.payloadBytes)
     }

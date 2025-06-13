@@ -554,7 +554,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         branch != null
 
         when:
-        Long orgId = 1111
+        Long orgId = 9991111
 
         Map params = TestDataJson.buildMap(Org) << [id: orgId, name: 'name', num: 'foo', type: 'Customer', member: [branch: [id: branch.id ]]]
         def org = Org.repo.create(params, [bindId: true])

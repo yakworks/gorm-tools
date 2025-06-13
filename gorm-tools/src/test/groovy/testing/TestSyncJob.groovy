@@ -26,6 +26,11 @@ class TestSyncJob implements RepoEntity<TestSyncJob>, SyncJobEntity {
         parseJson(dataToString(), clazz)
     }
 
+    //parseJson
+    <T> T parsePayload(Class<T> clazz = List){
+        parseJson(payloadToString(), clazz)
+    }
+
     @Override
     String dataToString(){
         def dta = dataBytes
@@ -46,7 +51,8 @@ class TestSyncJob implements RepoEntity<TestSyncJob>, SyncJobEntity {
         columns(
             payloadBytes: property(sqlType: 'BLOB'),
             dataBytes: property(sqlType: 'BLOB'),
-            problems: property(type: JsonType, typeParams: [type: ArrayList])
+            problems: property(type: JsonType, typeParams: [type: ArrayList]),
+            params: property(type: JsonType, typeParams: [type: Map])
         )
     }
 }

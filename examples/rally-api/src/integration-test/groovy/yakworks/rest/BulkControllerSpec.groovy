@@ -76,7 +76,7 @@ class BulkControllerSpec extends RestIntTest implements SecuritySpecHelper {
 
         then:
         job.id
-        job.data != null
+        job.dataToString()
     }
 
 }

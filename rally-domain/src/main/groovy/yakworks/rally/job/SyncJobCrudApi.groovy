@@ -6,12 +6,15 @@ package yakworks.rally.job
 
 import javax.servlet.http.HttpServletRequest
 
+import groovy.json.JsonOutput
 import groovy.transform.CompileStatic
 
 import org.springframework.stereotype.Component
 
 import gorm.tools.job.JobUtils
+import gorm.tools.job.SyncJobState
 import yakworks.commons.map.Maps
+import yakworks.etl.DataMimeTypes
 import yakworks.gorm.api.DefaultCrudApi
 
 /**
@@ -29,12 +32,14 @@ class SyncJobCrudApi extends DefaultCrudApi<SyncJob> {
     Map entityToMap(SyncJob job, List<String> includes){
         //clone metamap, SomeHow trying to put a new entry in MetaMap throws UnSupportedOperationException
         Map response = Maps.clone(super.entityToMap(job, includes))
-        response.put("data", JobUtils.getRowJobData(job))
+        if(job.isFinshedAndJson()) {
+            response.put("data", JsonOutput.unescaped(job.dataToString()))
+        }
         return response
     }
 
-    static String requestToSourceId(HttpServletRequest req){
-        JobUtils.requestToSourceId(req)
-    }
+    // static String requestToSourceId(HttpServletRequest req){
+    //     JobUtils.requestToSourceId(req)
+    // }
 
 }

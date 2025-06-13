@@ -24,7 +24,12 @@ class UserInfoExt {
     @NullCheck
     static Org getOrg(UserInfo userInfo){
         Validate.notNull(userInfo.orgId, "userInfo.orgId is null for user:[id:${userInfo.id}, username: ${userInfo.username}]")
-        return Org.repo.getWithTrx(userInfo.orgId)
+        try {
+            return Org.repo.getWithTrx(userInfo.orgId)
+        } catch(e) {
+            return null
+        }
+
     }
 
     static boolean isCustomer(UserInfo self){

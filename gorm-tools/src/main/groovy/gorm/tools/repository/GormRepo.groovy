@@ -456,11 +456,22 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
      * @throws NotFoundProblem.Exception if its not found
      * @throws ValidationProblem.Exception if the versions mismatch
      */
-    D get(Serializable id, Long version) {
-        D entity = get(id)
-        RepoUtil.checkFound(entity, id, getEntityClass().name)
-        if (version != null) RepoUtil.checkVersion(entity, version)
-        return entity
+    // D get(Serializable id, Long version) {
+    //     D entity = get(id)
+    //     RepoUtil.checkFound(entity, id, getEntityClass().name)
+    //     if (version != null) RepoUtil.checkVersion(entity, version)
+    //     return entity
+    // }
+
+    /**
+     * simple call to the gormStaticApi get, not in a trx to avoid overhead
+     *
+     * @param id required, the id to get
+     * @return the retrieved entity
+     */
+    @Override
+    D get(Serializable id) {
+        (D)gormStaticApi().get(id)
     }
 
     /**
@@ -469,8 +480,9 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
      * @param id required, the id to get
      * @return the retrieved entity
      */
-    D get(Serializable id) {
-        (D)gormStaticApi().get(id)
+    @Override
+    List<D> getAll(List ids) {
+        gormStaticApi().getAll(ids as Serializable[])
     }
 
     /**
@@ -682,6 +694,7 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
         (GormInstanceApi<D>)GormEnhancer.findInstanceApi(getEntityClass())
     }
 
+    @Override
     GormStaticApi<D> gormStaticApi() {
         (GormStaticApi<D>)GormEnhancer.findStaticApi(getEntityClass())
     }
@@ -689,6 +702,4 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
     GormValidationApi gormValidationApi() {
         GormEnhancer.findValidationApi(getEntityClass())
     }
-
-
 }

@@ -5,6 +5,8 @@
 package gorm.tools.mango
 
 import org.springframework.beans.factory.annotation.Autowired
+import spock.lang.IgnoreRest
+import spock.lang.Issue
 import spock.lang.Specification
 import testing.Address
 import testing.AddyNested
@@ -192,6 +194,7 @@ class DefaultMangoQuerySpec extends Specification implements GormHibernateTest {
         ex.detail.contains("Text 'xxx' could not be parsed")
     }
 
+    @Issue("#3227")
     void "query fails with class cast exception"() {
         when:
         Cust.query("location":[[address:['add 1']]]).list()
@@ -200,6 +203,18 @@ class DefaultMangoQuerySpec extends Specification implements GormHibernateTest {
         DataProblemException ex = thrown()
         ex.code == 'error.query.invalid'
         ex.detail.contains "java.util.ArrayList cannot be cast to class java.lang.String"
+    }
+
+
+    @Issue("#3189")
+    void "no converters found"() {
+        when:
+        Cust.query("location":"add 1").list()
+
+        then:
+        DataProblemException ex = thrown()
+        ex.code == 'error.query.invalid'
+        ex.detail.contains "No converter found capable of converting from type [java.lang.String] to type [testing.Address]"
     }
 
 }

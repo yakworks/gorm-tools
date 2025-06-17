@@ -192,4 +192,14 @@ class DefaultMangoQuerySpec extends Specification implements GormHibernateTest {
         ex.detail.contains("Text 'xxx' could not be parsed")
     }
 
+    void "query fails with class cast exception"() {
+        when:
+        Cust.query("location":[[address:['add 1']]]).list()
+
+        then:
+        DataProblemException ex = thrown()
+        ex.code == 'error.query.invalid'
+        ex.detail.contains "java.util.ArrayList cannot be cast to class java.lang.String"
+    }
+
 }

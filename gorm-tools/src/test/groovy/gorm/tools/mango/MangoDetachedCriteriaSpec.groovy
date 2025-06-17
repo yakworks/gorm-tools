@@ -1,9 +1,6 @@
 package gorm.tools.mango
 
-
-import gorm.tools.mango.jpql.JpqlQueryBuilder
 import spock.lang.Specification
-import testing.Cust
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.unit.GormHibernateTest
 

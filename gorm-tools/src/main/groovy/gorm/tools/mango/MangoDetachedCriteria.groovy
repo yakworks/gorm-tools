@@ -264,7 +264,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
                 }
                 return query.list()
             }
-        } catch (IllegalArgumentException | QueryException ex) {
+        } catch (IllegalArgumentException | QueryException | ClassCastException ex) {
             //Hibernate throws IllegalArgumentException when Antlr fails to parse query
             //and throws QueryException when hibernate fails to execute query
             throw toDataProblem(ex)
@@ -319,9 +319,10 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         try {
             def list = hq.list(queryInfo.query, queryInfo.paramMap, args)
             return list as List<Map>
-        } catch (IllegalArgumentException | QueryException ex) {
+        } catch (IllegalArgumentException | QueryException | ClassCastException ex) {
             //Hibernate throws IllegalArgumentException when Antlr fails to parse query
             //and throws QueryException when hibernate fails to execute query
+            //of cast exception, if type of value doesnt match field type
             throw toDataProblem(ex)
         }
     }

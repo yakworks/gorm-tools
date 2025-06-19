@@ -235,7 +235,6 @@ class BulkImportService<D> {
     /**
      * gets the payload data for job based on params.
      */
-    //XXX @SUD add tests for this. should test failures as well
     protected List<Map> getPayloadData(SyncJobEntity job, BulkImportJobParams jobParams){
         List<Map> payloadList
 

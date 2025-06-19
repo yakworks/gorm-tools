@@ -99,6 +99,17 @@ class MangoTidyMapSpec extends Specification {
             ]
         ]
 
+        when:
+        mmap = tidy([
+            "num": ['num1', 'num2']
+        ])
+
+        then:
+        mmap == [
+            num: [
+                    '$in': ['num1', 'num2']
+            ]
+        ]
     }
 
     void "test like"() {

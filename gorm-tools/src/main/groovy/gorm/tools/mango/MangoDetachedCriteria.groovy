@@ -24,7 +24,7 @@ import org.grails.datastore.mapping.query.api.QueryArgumentsAware
 import org.grails.datastore.mapping.query.api.QueryableCriteria
 import org.grails.orm.hibernate.AbstractHibernateSession
 import org.hibernate.QueryException
-import org.springframework.beans.factory.NoSuchBeanDefinitionException
+import org.springframework.core.convert.ConverterNotFoundException
 
 import gorm.tools.beans.Pager
 import gorm.tools.mango.api.QueryArgs
@@ -39,7 +39,6 @@ import yakworks.api.problem.ThrowableProblem
 import yakworks.api.problem.data.DataProblem
 import yakworks.commons.lang.NameUtils
 import yakworks.gorm.config.GormConfig
-import yakworks.spring.AppCtx
 
 /**
  * This is here to make it easier to build criteria with domain bean paths
@@ -264,9 +263,13 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
                 }
                 return query.list()
             }
-        } catch (IllegalArgumentException | QueryException ex) {
+        } catch (IllegalArgumentException | QueryException | ClassCastException | ConverterNotFoundException ex) {
             //Hibernate throws IllegalArgumentException when Antlr fails to parse query
-            //and throws QueryException when hibernate fails to execute query
+            //QueryException when hibernate fails to execute query
+            //ClassCast exception, when the value type doesnt match the field type
+            //ConverterNotFoundException when trying to convert string to an association type, etc
+            //We catch individual exceptions instead of a catch all RuntimeException, so that when some thing fails
+            //it will be logged and we can see, or else, it will come to notice only when api user's report why some queries arent working.
             throw toDataProblem(ex)
         }
     }
@@ -319,9 +322,13 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         try {
             def list = hq.list(queryInfo.query, queryInfo.paramMap, args)
             return list as List<Map>
-        } catch (IllegalArgumentException | QueryException ex) {
+        } catch (IllegalArgumentException | QueryException | ClassCastException | ConverterNotFoundException ex) {
             //Hibernate throws IllegalArgumentException when Antlr fails to parse query
-            //and throws QueryException when hibernate fails to execute query
+            //QueryException when hibernate fails to execute query
+            //ClassCast exception, when the value type doesnt match the field type
+            //ConverterNotFoundException when trying to convert string to an association type, etc
+            //We catch individual exceptions instead of a catch all RuntimeException, so that when some thing fails
+            //it will be logged and we can see, or else, it will come to notice only when api user's report why some queries arent working.
             throw toDataProblem(ex)
         }
     }

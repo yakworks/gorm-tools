@@ -11,6 +11,7 @@ import spock.lang.Specification
 import testing.TestSyncJob
 import testing.TestSyncJobService
 import yakworks.api.problem.data.DataProblemException
+import yakworks.etl.DataMimeTypes
 import yakworks.gorm.config.AsyncConfig
 import yakworks.gorm.config.GormConfig
 import yakworks.testing.gorm.model.KitchenSink
@@ -106,8 +107,6 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
         and: 'params have extra fields'
         params.op == 'add'
         params.entityClassName == 'yakworks.testing.gorm.model.KitchenSink'
-
-
     }
 
     void "success bulk insert"() {
@@ -310,5 +309,73 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
         then:
         DataProblemException ex = thrown()
         ex.code == 'error.data.emptyPayload'
+    }
+
+    void "test getPayloadData"() {
+        setup:
+        List list = KitchenSink.generateDataList(10)
+
+        def bimpParams = new BulkImportJobParams(
+            op: DataOp.add,
+            sourceId: 'test-job'
+        )
+
+        when:
+        SyncJobEntity jobEnt = bulkImportService.queueJob(bimpParams, list)
+        flushAndClear()
+
+        then:
+        jobEnt.id
+
+        when:
+        SyncJobEntity job =  TestSyncJob.get(jobEnt.id)
+        BulkImportJobParams jobParams = BulkImportJobParams.withParams(job.params)
+
+        List<Map> data = bulkImportService.getPayloadData(jobEnt, jobParams)
+
+        then:
+        data
+        data.size() == 10
+    }
+
+    void "test getPayloadData with attachment payload"() {
+        setup:
+        BulkImportService service = bulkImportService
+        List list = KitchenSink.generateDataList(10)
+        def bimpParams = new BulkImportJobParams(
+            op: DataOp.add,
+            sourceId: 'test-job',
+            payloadFormat: DataMimeTypes.csv,
+            attachmentId: 100L
+        )
+
+       CsvToMapTransformer csvToMapTransformer = Mock()
+
+        when:
+        service.csvToMapTransformer = csvToMapTransformer
+        SyncJobEntity jobEnt = service.queueJob(bimpParams, list)
+        flushAndClear()
+
+        then:
+        jobEnt.id
+
+        when:
+        SyncJobEntity job =  TestSyncJob.get(jobEnt.id)
+        BulkImportJobParams jobParams = BulkImportJobParams.withParams(job.params)
+
+        List<Map> data = service.getPayloadData(jobEnt, jobParams)
+
+        then:
+        1 * csvToMapTransformer.process(_) >> [[test:"data"]]
+        data
+        data.size() == 1
+
+        when: "payloadFormat json with attachment is not supported"
+        jobParams.payloadFormat = DataMimeTypes.json
+        service.getPayloadData(jobEnt, jobParams)
+
+        then:
+        DataProblemException ex = thrown()
+        ex.detail == 'JSON attachment not yet supported'
     }
 }

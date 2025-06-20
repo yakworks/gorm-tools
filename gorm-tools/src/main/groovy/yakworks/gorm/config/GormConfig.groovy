@@ -4,6 +4,8 @@
 */
 package yakworks.gorm.config
 
+import java.time.Duration
+
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,6 +21,9 @@ class GormConfig {
     /** whether to enable to hack that parses queryString if request.parameters is empty */
     boolean enableGrailsParams = true
 
+    /** use the legacy bulk import process */
+    boolean legacyBulk = true
+
     QueryConfig query = new QueryConfig()
 
     @Autowired
@@ -26,5 +31,23 @@ class GormConfig {
 
     @Autowired
     IdGeneratorConfig idGenerator
+
+    BulkConfig bulk = new BulkConfig()
+
+    static class BulkConfig {
+
+        /** When doing large export this is the page size */
+        int exportPageSize = 500
+
+        /** The maximum number of records that can be exported */
+        int exportMax = 50000
+
+        /**
+         * Timeout in seconds for bulk requests with async=false
+         * Request thread will be locked for maximum time configured, and job does not finish within the time,
+         * A timeout problem would be returned, but job will continue running.
+         */
+        Duration asyncTimeout = Duration.ofSeconds(90)
+    }
 
 }

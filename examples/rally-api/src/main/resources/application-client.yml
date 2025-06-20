@@ -1,0 +1,3 @@
+dataSource:
+  dbCreate:
+  url: jdbc:h2:tcp://localhost:9090/mem:devDb

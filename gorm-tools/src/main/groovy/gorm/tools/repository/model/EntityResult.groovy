@@ -12,16 +12,14 @@ import yakworks.api.ResultTrait
 /**
  * Entity result that allows the instance and some info about its status.
  * Used in upsert for example so we can know if the resulting entity was inserted or updated.
+ * When Update is called then - statusCode = HttpStatus.OK.code
+ * When Insert is called then - statusCode = HttpStatus.CREATED.code
  */
 @CompileStatic
 class EntityResult<D> implements ResultTrait<EntityResult<D>>, Serializable {
     //the entity this is for
     D entity
 
-    /**
-     * New result
-     * @param isSynchronized defaults to true to create the data list as synchronizedList
-     */
     EntityResult(D entity){
         this.entity = entity
         this.payload = entity

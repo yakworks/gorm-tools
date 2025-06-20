@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service
 
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
+import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
 import gorm.tools.repository.GormRepo
 import yakworks.rally.attachment.AttachmentSupport
@@ -35,6 +36,12 @@ class DefaultSyncJobService extends SyncJobService<SyncJob> {
     @Autowired AttachmentSupport attachmentSupport
 
     @Override
+    SyncJobEntity queueJob(Map data){
+        MaintWindowUtil.check(maintenanceProps)
+        super.queueJob(data)
+    }
+
+    @Override
     SyncJobContext createJob(SyncJobArgs args, Object payload){
         MaintWindowUtil.check(maintenanceProps)
         super.createJob(args, payload)
@@ -52,7 +59,11 @@ class DefaultSyncJobService extends SyncJobService<SyncJob> {
 
     @Override
     Long createAttachment(Path sourcePath, String name) {
-        Attachment attachment = attachmentRepo.create(sourcePath, name)
+        Map data = [
+            tempFileName: sourcePath.fileName.toString(),
+            name: name
+        ]
+        Attachment attachment = attachmentRepo.create(data)
         return attachment.id
     }
 

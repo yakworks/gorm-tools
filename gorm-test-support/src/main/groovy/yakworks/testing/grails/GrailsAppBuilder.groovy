@@ -88,7 +88,7 @@ class GrailsAppBuilder extends GrailsApplicationBuilder {
                 .addPropertyValue("requiredParameterValue", "false")
                 .getBeanDefinition())
 
-        //refresh striggers the context build, all the spring bean closures with run at this point.
+        //refresh triggers the context build, all the spring bean closures with run at this point.
         context.refresh()
         context.registerShutdownHook()
         context

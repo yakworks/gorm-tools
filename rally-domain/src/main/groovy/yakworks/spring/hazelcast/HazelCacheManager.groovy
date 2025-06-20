@@ -44,7 +44,7 @@ public class HazelCacheManager extends HazelcastCacheManager {
         super(hazelcastInstance);
     }
 
-    //complete replacment since we do so much work. now way to extend it since we replace with HazelCache.
+    //complete replacment since we do so much work. no way to extend it since we replace with HazelCache.
     //we add the lockTimeout
     @Override
     public Cache getCache(String name) {

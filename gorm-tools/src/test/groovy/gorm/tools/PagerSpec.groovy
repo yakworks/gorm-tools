@@ -85,15 +85,17 @@ class PagerSpec extends Specification implements GormHibernateTest{
         List pages = []
 
         when:
-        paginator.eachPage { def max, def offset ->
-            pages << [max: max, offset: offset]
+        paginator.eachPage { page, max, offset ->
+            pages << Pager.of(page:page, max:max)
         }
 
         then:
         10 == pages.size()
         10 == pages[0].max
+        1 == pages[0].page
         0 == pages[0].offset
         90 == pages[9].offset
         10 == pages[9].max
+        10 == pages[9].page
     }
 }

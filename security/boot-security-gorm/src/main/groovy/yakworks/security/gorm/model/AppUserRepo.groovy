@@ -4,6 +4,7 @@
 */
 package yakworks.security.gorm.model
 
+import java.time.LocalDateTime
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -19,17 +20,17 @@ import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
+import gorm.tools.repository.model.LongIdGormRepo
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 import yakworks.api.problem.data.DataProblemCodes
+import yakworks.security.PasswordConfig
 
 @GormRepository
 @GrailsCompileStatic
-class AppUserRepo implements GormRepo<AppUser> {
-    /** dependency injection for the password encoder */
-    @Autowired
-    PasswordEncoder passwordEncoder
-    // SecService secService
+class AppUserRepo extends LongIdGormRepo<AppUser> {
+    @Autowired PasswordEncoder passwordEncoder
+    @Autowired PasswordConfig passwordConfig
 
     //cached instance of the query for id to keep it fast
     KeyExistsQuery usernameExistsQuery
@@ -52,7 +53,7 @@ class AppUserRepo implements GormRepo<AppUser> {
      */
     @Override
     AppUser doUpdate(Map data, PersistArgs args) {
-        AppUser user = GormRepo.super.doUpdate(data, args)
+        AppUser user = super.doUpdate(data, args)
         if(data['roles']) setUserRoles(user.id, data['roles'] as List)
         return user
     }
@@ -76,20 +77,22 @@ class AppUserRepo implements GormRepo<AppUser> {
         }
     }
 
+
     /**
      * before persist, do the password encoding
      */
     @RepoListener
     void beforePersist(AppUser user, BeforePersistEvent e) {
-        if(user.password) {
-            user.passwordHash = encodePassword(user.password)
-        }
         if(user.isNew()) {
+            if(!user.id) generateId(user)
             //we check when new to avoid unique index error.
             if(exists(user.username)){
                 throw DataProblemCodes.UniqueConstraint.get()
                     .detail("Violates unique constraint [username: ${user.username}]").toException()
             }
+        }
+        if(user.password) {
+            updatePassword(user, user.password)
         }
     }
 
@@ -97,7 +100,6 @@ class AppUserRepo implements GormRepo<AppUser> {
         if( !usernameExistsQuery ) usernameExistsQuery = KeyExistsQuery.of(getEntityClass()).keyName('username')
         return usernameExistsQuery.exists(username)
     }
-
 
     /**
      * Sets up password and roles fields for a given User entity. Updates the dependent Contact entity.
@@ -198,6 +200,26 @@ class AppUserRepo implements GormRepo<AppUser> {
                 SecRoleUser.create(user, SecRole.load(id) as SecRole)
             }
         }
-
     }
+
+
+    /**
+     * Updates user's password, resets password changed date, and expired flag.
+     * Creates password history if enabled
+     */
+    void updatePassword(AppUser user, String password) {
+        String hashed = encodePassword(password)
+        if(user.passwordHash == hashed) {
+            //its same password
+            return
+        } else {
+            user.passwordHash = hashed
+            user.passwordChangedDate = LocalDateTime.now()
+            user.passwordExpired = false
+            if(passwordConfig.historyEnabled) {
+                SecPasswordHistory.create(user, user.passwordHash)
+            }
+        }
+    }
+
 }

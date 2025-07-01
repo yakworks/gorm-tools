@@ -1,0 +1,189 @@
+package yakworks.security.gorm
+
+import gorm.tools.problem.ValidationProblem
+import org.apache.commons.lang3.RandomStringUtils
+import yakworks.security.PasswordConfig
+import yakworks.security.gorm.model.AppUser
+import yakworks.api.problem.Problem
+import yakworks.security.gorm.model.SecPasswordHistory
+import yakworks.security.services.PasswordValidator
+import yakworks.testing.gorm.unit.GormHibernateTest
+import yakworks.testing.gorm.unit.SecurityTest
+import spock.lang.Specification
+
+import javax.inject.Inject
+import java.time.LocalDate
+
+class PasswordSpec extends Specification implements  GormHibernateTest, SecurityTest {
+    static entityClasses = [AppUser, SecPasswordHistory]
+    static List springBeans = [PasswordConfig, AppUserPasswordValidator]
+
+    @Inject PasswordConfig passwordConfig
+    @Inject AppUserPasswordValidator passwordValidator
+
+    void setup() {
+        new AppUser(name: "admin", username:"admin", email:"admin@9ci.com", password: "test").persist()
+    }
+
+    String genRandomEmail(){
+        String ename = RandomStringUtils.randomAlphabetic(10)
+        return "${ename}@baz.com"
+    }
+
+    // @Override
+    Map buildMap(Map args) {
+        args.get('save', false)
+        args.email = genRandomEmail()
+        args.name = "test-user-${System.currentTimeMillis()}"
+        args.username = "some_login_123"
+        args
+    }
+
+    void "sanity check"() {
+        expect:
+        passwordConfig
+    }
+
+    void "update password"() {
+        setup:
+        Map data = buildMap([password:"test"])
+
+        when: "create"
+        AppUser user = AppUser.create(data)
+        user.persist(flush: true)
+
+        then:
+        user.passwordHash
+
+        when: "update"
+        String oldHash = user.passwordHash
+        user = AppUser.update(id:user.id, newPassword:"newp", repassword:"newp")
+        flush()
+
+        then:
+        oldHash != user.passwordHash
+        user.passwordChangedDate.toLocalDate() == LocalDate.now()
+
+        and:
+        SecPasswordHistory.query(user:user).count() == 0
+    }
+
+    void "test password history"() {
+        setup:
+        passwordConfig.historyEnabled = true
+        Map data = buildMap([password:"test"])
+
+        when: "create"
+        AppUser user = AppUser.create(data)
+        user.persist(flush: true)
+
+        then:
+        SecPasswordHistory.query(user:user).count() == 1
+
+        when:
+        AppUser.update(id:user.id, newPassword:"newp2", repassword:"newp2")
+        flush()
+
+        then:
+        SecPasswordHistory.query(user:user).count() == 2
+
+        cleanup:
+        passwordConfig.historyEnabled = false
+    }
+
+    void "password exists in history"() {
+        setup:
+        passwordConfig.historyEnabled = true
+        Map data = buildMap([password:"test"])
+
+        when: "create"
+        AppUser user = AppUser.create(data)
+
+        then:
+        noExceptionThrown()
+
+        when: "not in history"
+        AppUser.update(id:user.id, newPassword:"newp3", repassword:"newp3")
+        flush()
+
+        then:
+        noExceptionThrown()
+
+        when: "in history"
+        AppUser.update(id:user.id, newPassword:"newp2", repassword:"newp2")
+        flush()
+
+        then:
+        ValidationProblem.Exception ex = thrown()
+
+        cleanup:
+        passwordConfig.historyEnabled = true
+    }
+
+    void test_validate() {
+        setup:
+        PasswordValidator validator = new PasswordValidator(passwordConfig: passwordConfig)
+
+        when: "password length"
+        passwordConfig.minLength = 4
+        Problem problem = validator.validate( "123", "123")
+
+        then:
+        problem.violations.find{ it.code == "security.validation.password.minlength" }
+
+        when: "password match"
+        passwordConfig.minLength = 3
+        problem = validator.validate("123", "1234")
+
+        then:
+        problem.violations.find{ it.code == "security.validation.password.match" }
+
+        when: "require lowercase"
+        passwordConfig.minLength = 4
+        passwordConfig.mustContainLowercaseLetter = true
+        problem = validator.validate("ABCD", "ABCD")
+
+        then:
+        problem.violations.find{ it.code == "security.validation.password.mustcontain.lowercase" }
+
+        when: "require uppercase"
+        passwordConfig.minLength = 4
+        passwordConfig.mustContainUppercaseLetter = true
+        problem = validator.validate("abcd", "abcd")
+
+        then:
+        problem.violations.find{ it.code == "security.validation.password.mustcontain.uppercase" }
+
+        when: "require numbers"
+        passwordConfig.minLength = 4
+        passwordConfig.mustContainNumbers = true
+        problem = validator.validate("abcD", "abcD")
+
+        then:
+        problem.violations.find{ it.code == "security.validation.password.mustcontain.numbers" }
+
+
+        when: "require symbol"
+        passwordConfig.minLength = 4
+        passwordConfig.mustContainSymbols = true
+        problem = validator.validate("ab1D", "ab1D")
+
+        then:
+        problem.violations.find{ it.code == "security.validation.password.mustcontain.symbol" }
+
+        when: "all good"
+        passwordConfig.minLength = 4
+        passwordConfig.mustContainSymbols = true
+        def result = validator.validate("ab1D#", "ab1D#")
+
+        then:
+        result.ok == true
+
+        cleanup:
+        passwordConfig.minLength = 4
+        passwordConfig.mustContainLowercaseLetter = false
+        passwordConfig.mustContainUppercaseLetter = false
+        passwordConfig.mustContainSymbols = false
+        passwordConfig.mustContainNumbers = false
+    }
+}

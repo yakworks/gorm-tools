@@ -9,6 +9,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 import com.nimbusds.jwt.proc.JWTClaimsSetAwareJWSKeySelector;
 import com.nimbusds.jwt.proc.JWTProcessor;
+import yakworks.security.PasswordConfig;
 import yakworks.security.spring.token.JwtProperties;
 import yakworks.security.spring.token.TokenController;
 import yakworks.security.spring.token.generator.JwtTokenExchanger;
@@ -34,7 +35,7 @@ import org.springframework.security.oauth2.jwt.*;
 
 @Configuration @Lazy
 @ConditionalOnClass(OAuth2Token.class)
-@EnableConfigurationProperties({JwtProperties.class})
+@EnableConfigurationProperties({JwtProperties.class, PasswordConfig.class})
 public class JwtConfiguration {
 
     @Bean @ConditionalOnMissingBean

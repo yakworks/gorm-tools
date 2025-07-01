@@ -6,23 +6,25 @@ package yakworks.security.gorm.model
 
 import java.time.LocalDateTime
 
-import groovy.transform.CompileDynamic
-
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
 import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 
 @Entity
-@CompileDynamic
-class SecPasswordHistory {
-    static belongsTo = [user: AppUser]
+@GrailsCompileStatic
+class SecPasswordHistory implements RepoEntity<SecPasswordHistory>, Serializable {
+
+    AppUser user
+    Long userId
     String password
 
     LocalDateTime dateCreated
 
     static constraints = {
-        user nullable: false
+        userId nullable: false
+        user nullable:true
         password nullable: false
         dateCreated nullable: true
     }
@@ -30,7 +32,7 @@ class SecPasswordHistory {
     static mapping = orm {
         version false
         columns(
-            user: property(column:'userId', updateable: false),
+            user: property(column:'userId', updateable: false, insertable: false),
             password: property(updateable: false )
         )
     }
@@ -48,11 +50,11 @@ class SecPasswordHistory {
      */
     static SecPasswordHistory create(AppUser user, String passwordHash) {
         Integer historyLength = 10//AppParam.value('passwordHistoryLength').toInteger()
-        if (SecPasswordHistory.countByUser(user) >= historyLength) {
+        if (SecPasswordHistory.query(userId:user.id).count() >= historyLength) {
             SecPasswordHistory lastRecord = SecPasswordHistory.list(max: 1, sort: 'dateCreated', order: 'asc')[0]
             lastRecord.delete()
         }
-        SecPasswordHistory passwordHistory = new SecPasswordHistory(user: user, password: passwordHash)
+        SecPasswordHistory passwordHistory = new SecPasswordHistory(userId: user.id, password: passwordHash)
         passwordHistory.save(flush: false)
         return passwordHistory
     }

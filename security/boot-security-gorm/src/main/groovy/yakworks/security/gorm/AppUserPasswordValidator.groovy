@@ -24,22 +24,21 @@ import yakworks.security.services.PasswordValidator
 @CompileStatic
 class AppUserPasswordValidator extends PasswordValidator {
 
-    @Override
-    Result validate(String pass, String passConfirm) {
+    Result validate(AppUser user, String pass, String passConfirm) {
         def res = super.validate(pass, passConfirm)
-        if(!res.ok) return res
+        if (!res.ok) return res
 
         List problemKeys = [] as List<MsgKey>
 
-        // TODO
-        // if (passwordHistoryEnabled && passwordExistInHistory(user, pass)) {
-        //     problemKeys << Msg.key("security.validation.password.minlength", [value: passwordHistoryLength])
-        // }
 
-        if(problemKeys){
+        if (!user.isNew() && passwordConfig.historyEnabled && passwordExistInHistory(user.id, pass)) {
+            problemKeys << Msg.key("security.validation.password.existsinhistory", [value: passwordConfig.historyLength])
+        }
+
+        if (problemKeys) {
             return Problem.of('security.validation.password.error').addViolations(problemKeys)
         } else {
-            return  Result.OK()
+            return Result.OK()
         }
     }
 
@@ -51,8 +50,7 @@ class AppUserPasswordValidator extends PasswordValidator {
     @CompileDynamic
     @Transactional(readOnly = true)
     boolean passwordExistInHistory(Serializable id, String password) {
-        AppUser user = AppUser.get(id)
-        List<SecPasswordHistory> passwordHistoryList = SecPasswordHistory.findAllByUser(user)
+        List<SecPasswordHistory> passwordHistoryList = SecPasswordHistory.query(userId: id).list()
         passwordHistoryList.any { passwordEncoder.matches(it.password, password) }
     }
 
@@ -65,9 +63,9 @@ class AppUserPasswordValidator extends PasswordValidator {
     boolean isPasswordExpired(Serializable id) {
         AppUser user = AppUser.get(id)
         //can always force a password change by setting passwordExpired field to true
-        if(user.passwordExpired) return true
-        if (passwordExpiryEnabled) {
-            LocalDate expireDate = user.passwordChangedDate?.plusDays(passwordExpireDays).toLocalDate()
+        if (user.passwordExpired) return true
+        if (passwordConfig.expiryEnabled) {
+            LocalDate expireDate = user.passwordChangedDate?.plusDays(passwordConfig.passwordExpireDays).toLocalDate()
             //check if user's password has expired
             if (!expireDate || LocalDate.now() >= expireDate) {
                 return true

@@ -32,6 +32,7 @@ import org.springframework.security.web.SecurityFilterChain
 import yakworks.openapi.gorm.OpenApiGenerator
 import yakworks.rally.RallyConfiguration
 import yakworks.rest.grails.AppInfoBuilder
+import yakworks.security.gorm.AppUserPasswordValidator
 import yakworks.security.services.PasswordValidator
 import yakworks.security.spring.DefaultSecurityConfiguration
 import yakworks.security.spring.token.CookieAuthSuccessHandler
@@ -57,5 +58,13 @@ class RallyApiSpringConfig {
     @Bean
     AppInfoBuilder appInfoBuilder() {
         return new AppInfoBuilder()
+    }
+
+    /**
+     * Overrides default password validator from DefaultSecurityConfiguration
+     */
+    @Bean
+    public PasswordValidator passwordValidator() {
+        return new AppUserPasswordValidator()
     }
 }

@@ -2,12 +2,16 @@ package yakworks.security.audit
 
 import gorm.tools.utils.GormMetaUtils
 import spock.lang.Specification
+import yakworks.security.PasswordConfig
 import yakworks.security.gorm.model.AppUser
+import yakworks.security.services.PasswordValidator
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
 class AuditStampAnnSpec extends Specification implements GormHibernateTest, SecurityTest {
+
     static List entityClasses = [StampedEntity, StampedNoConstraintsClosure, AppUser]
+    static List springBeans = [PasswordConfig, PasswordValidator]
 
 
     void "did it get the audit stamp fields"() {

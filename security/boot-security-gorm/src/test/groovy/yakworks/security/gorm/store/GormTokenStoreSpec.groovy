@@ -1,5 +1,7 @@
 package yakworks.security.gorm.store
 
+import yakworks.security.PasswordConfig
+
 import java.time.Instant
 
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,6 +20,7 @@ import yakworks.testing.gorm.unit.SecurityTest
 
 class GormTokenStoreSpec extends Specification implements GormHibernateTest, SecurityTest  {
     static List entityClasses = [AppUserToken, AppUser, SecRole, SecRoleUser]
+    static List springBeans = [PasswordConfig, PasswordValidator]
 
     @Autowired GormTokenStore tokenStore
 

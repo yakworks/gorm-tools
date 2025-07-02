@@ -12,6 +12,7 @@ import yakworks.security.gorm.model.SecLoginHistory
 import yakworks.security.gorm.model.SecPasswordHistory
 import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRoleUser
+import yakworks.security.services.PasswordValidator
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
@@ -20,7 +21,7 @@ import java.time.LocalDate
 
 class AppUserSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [AppUser, SecRole, SecRoleUser, SecPasswordHistory]
-    static List springBeans = [PasswordConfig]
+    static List springBeans = [PasswordConfig, PasswordValidator]
 
     @Inject PasswordConfig passwordConfig
 

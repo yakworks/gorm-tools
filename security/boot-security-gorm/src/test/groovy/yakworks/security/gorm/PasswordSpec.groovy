@@ -68,7 +68,7 @@ class PasswordSpec extends Specification implements  GormHibernateTest, Security
         SecPasswordHistory.query(user:user).count() == 0
     }
 
-    void "test password history"() {
+    void "test password history is created"() {
         setup:
         passwordConfig.historyEnabled = true
         Map data = buildMap([password:"test"])
@@ -110,11 +110,13 @@ class PasswordSpec extends Specification implements  GormHibernateTest, Security
         noExceptionThrown()
 
         when: "in history"
-        AppUser.update(id:user.id, newPassword:"newp2", repassword:"newp2")
+        AppUser.update(id:user.id, newPassword:"test", repassword:"test")
         flush()
 
         then:
         ValidationProblem.Exception ex = thrown()
+        ex.violations.size() == 1
+        ex.violations.find { it.code == 'security.validation.password.existsinhistory'}
 
         cleanup:
         passwordConfig.historyEnabled = true
@@ -126,22 +128,15 @@ class PasswordSpec extends Specification implements  GormHibernateTest, Security
 
         when: "password length"
         passwordConfig.minLength = 4
-        Problem problem = validator.validate( "123", "123")
+        Problem problem = validator.validate( "123")
 
         then:
         problem.violations.find{ it.code == "security.validation.password.minlength" }
 
-        when: "password match"
-        passwordConfig.minLength = 3
-        problem = validator.validate("123", "1234")
-
-        then:
-        problem.violations.find{ it.code == "security.validation.password.match" }
-
         when: "require lowercase"
         passwordConfig.minLength = 4
         passwordConfig.mustContainLowercaseLetter = true
-        problem = validator.validate("ABCD", "ABCD")
+        problem = validator.validate("ABCD")
 
         then:
         problem.violations.find{ it.code == "security.validation.password.mustcontain.lowercase" }
@@ -149,7 +144,7 @@ class PasswordSpec extends Specification implements  GormHibernateTest, Security
         when: "require uppercase"
         passwordConfig.minLength = 4
         passwordConfig.mustContainUppercaseLetter = true
-        problem = validator.validate("abcd", "abcd")
+        problem = validator.validate("abcd")
 
         then:
         problem.violations.find{ it.code == "security.validation.password.mustcontain.uppercase" }
@@ -157,7 +152,7 @@ class PasswordSpec extends Specification implements  GormHibernateTest, Security
         when: "require numbers"
         passwordConfig.minLength = 4
         passwordConfig.mustContainNumbers = true
-        problem = validator.validate("abcD", "abcD")
+        problem = validator.validate("abcD")
 
         then:
         problem.violations.find{ it.code == "security.validation.password.mustcontain.numbers" }
@@ -166,7 +161,7 @@ class PasswordSpec extends Specification implements  GormHibernateTest, Security
         when: "require symbol"
         passwordConfig.minLength = 4
         passwordConfig.mustContainSymbols = true
-        problem = validator.validate("ab1D", "ab1D")
+        problem = validator.validate("ab1D")
 
         then:
         problem.violations.find{ it.code == "security.validation.password.mustcontain.symbol" }
@@ -174,7 +169,7 @@ class PasswordSpec extends Specification implements  GormHibernateTest, Security
         when: "all good"
         passwordConfig.minLength = 4
         passwordConfig.mustContainSymbols = true
-        def result = validator.validate("ab1D#", "ab1D#")
+        def result = validator.validate("ab1D#")
 
         then:
         result.ok == true

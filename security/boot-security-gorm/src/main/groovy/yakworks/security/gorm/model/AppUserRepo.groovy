@@ -13,7 +13,6 @@ import org.springframework.validation.Errors
 import gorm.tools.databinding.BindAction
 import gorm.tools.mango.jpql.KeyExistsQuery
 import gorm.tools.problem.ValidationProblem
-import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.events.AfterBindEvent
@@ -23,14 +22,18 @@ import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
+import yakworks.api.Result
+import yakworks.api.problem.Problem
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.security.PasswordConfig
+import yakworks.security.gorm.AppUserPasswordValidator
 
 @GormRepository
 @GrailsCompileStatic
 class AppUserRepo extends LongIdGormRepo<AppUser> {
     @Autowired PasswordEncoder passwordEncoder
     @Autowired PasswordConfig passwordConfig
+    @Autowired AppUserPasswordValidator passwordValidator
 
     //cached instance of the query for id to keep it fast
     KeyExistsQuery usernameExistsQuery
@@ -84,6 +87,7 @@ class AppUserRepo extends LongIdGormRepo<AppUser> {
     @RepoListener
     void beforePersist(AppUser user, BeforePersistEvent e) {
         if(user.isNew()) {
+            //generateid, so that later it can be used for SecPasswordHistory, if required
             if(!user.id) generateId(user)
             //we check when new to avoid unique index error.
             if(exists(user.username)){
@@ -209,16 +213,28 @@ class AppUserRepo extends LongIdGormRepo<AppUser> {
      */
     void updatePassword(AppUser user, String password) {
         String hashed = encodePassword(password)
-        if(user.passwordHash == hashed) {
-            //its same password
-            return
+        if (user.passwordHash == hashed) return
+
+        Result valid
+        if (user.isNew()) {
+            //its new user, dont need to check in password history etc, just validate password
+            valid = passwordValidator.validate(password)
         } else {
+            //its password change for existing user, will need to check password history etc.
+            valid = passwordValidator.validate(user.id, password)
+        }
+
+        if (valid.ok) {
             user.passwordHash = hashed
             user.passwordChangedDate = LocalDateTime.now()
             user.passwordExpired = false
-            if(passwordConfig.historyEnabled) {
+            if (passwordConfig.historyEnabled) {
                 SecPasswordHistory.create(user, user.passwordHash)
             }
+        } else {
+            ValidationProblem problem = ValidationProblem.ofEntity(user)
+            problem.violations(((Problem) valid).violations)
+            throw problem.toException()
         }
     }
 

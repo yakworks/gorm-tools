@@ -23,14 +23,10 @@ class PasswordValidator {
     @Inject PasswordConfig passwordConfig
 
     @SuppressWarnings(['IfStatementCouldBeTernary'])
-    Result validate(String pass, String passConfirm) {
+    Result validate(String pass) {
         List problemKeys = [] as List<MsgKey>
         if (!pass || (pass.length() < passwordConfig.minLength)) {
             problemKeys << Msg.key("security.validation.password.minlength", [min: passwordConfig.minLength])
-        }
-
-        if (passConfirm != pass) {
-            problemKeys << Msg.key("security.validation.password.match")
         }
 
         if (passwordConfig.mustContainLowercaseLetter && !(pass =~ /^.*[a-z].*$/)) {
@@ -54,6 +50,14 @@ class PasswordValidator {
         } else {
             return  Result.OK()
         }
+    }
+
+    /**
+     * For user specific password validation, which can incorporate user's password history etc.
+     * The defalt implementation just validates the password. Subclasses can override to hook up passwordhistory etc
+     */
+    Result validate(Serializable userId, String pass) {
+        return validate(pass)
     }
 
     /**

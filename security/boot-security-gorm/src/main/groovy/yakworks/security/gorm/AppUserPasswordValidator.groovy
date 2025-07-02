@@ -19,19 +19,19 @@ import yakworks.security.gorm.model.SecPasswordHistory
 import yakworks.security.services.PasswordValidator
 
 /**
- * Older password validation for ApUser and SecPasswordHistory.
+ * Password validation for ApUser and SecPasswordHistory.
  */
 @CompileStatic
 class AppUserPasswordValidator extends PasswordValidator {
 
-    Result validate(AppUser user, String pass, String passConfirm) {
-        def res = super.validate(pass, passConfirm)
+    @Override
+    Result validate(Serializable userId, String pass) {
+        def res = super.validate(pass)
         if (!res.ok) return res
 
         List problemKeys = [] as List<MsgKey>
 
-
-        if (!user.isNew() && passwordConfig.historyEnabled && passwordExistInHistory(user.id, pass)) {
+        if (passwordConfig.historyEnabled && passwordExistInHistory(userId, pass)) {
             problemKeys << Msg.key("security.validation.password.existsinhistory", [value: passwordConfig.historyLength])
         }
 

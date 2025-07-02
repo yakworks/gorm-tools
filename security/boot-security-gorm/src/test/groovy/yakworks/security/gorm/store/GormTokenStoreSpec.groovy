@@ -20,13 +20,13 @@ import yakworks.testing.gorm.unit.SecurityTest
 
 class GormTokenStoreSpec extends Specification implements GormHibernateTest, SecurityTest  {
     static List entityClasses = [AppUserToken, AppUser, SecRole, SecRoleUser]
-    static List springBeans = [PasswordConfig, PasswordValidator]
 
     @Autowired GormTokenStore tokenStore
 
     Closure doWithGormBeans() { { ->
         tokenStore(GormTokenStore)
         userDetailsService(AppUserDetailsService)
+        passwordConfig(PasswordConfig)
         passwordValidator(PasswordValidator)
     }}
 

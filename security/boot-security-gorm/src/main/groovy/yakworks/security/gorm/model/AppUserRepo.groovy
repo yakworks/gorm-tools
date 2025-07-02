@@ -38,6 +38,8 @@ class AppUserRepo extends LongIdGormRepo<AppUser> {
     //cached instance of the query for id to keep it fast
     KeyExistsQuery usernameExistsQuery
 
+    String idGeneratorKey = "Users.id"  // override so it doesn;t use Batch.id
+
     /**
      * overrides the bindAndCreate method vs events
      * as its more clear whats going on than trying to do role logic with events

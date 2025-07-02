@@ -32,6 +32,7 @@ import org.springframework.security.web.SecurityFilterChain
 import yakworks.openapi.gorm.OpenApiGenerator
 import yakworks.rally.RallyConfiguration
 import yakworks.rest.grails.AppInfoBuilder
+import yakworks.security.services.PasswordValidator
 import yakworks.security.spring.DefaultSecurityConfiguration
 import yakworks.security.spring.token.CookieAuthSuccessHandler
 import yakworks.security.spring.token.CookieUrlTokenSuccessHandler

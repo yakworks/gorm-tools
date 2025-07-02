@@ -15,7 +15,7 @@ class PasswordConfig {
     int passwordExpireDays = 90
     boolean expiryEnabled = false
     int warnDays = 30
-    int minLength = 4
+    int minLength = 3
     boolean mustContainNumbers = false
     boolean mustContainSymbols = false
     boolean mustContainUppercaseLetter = false

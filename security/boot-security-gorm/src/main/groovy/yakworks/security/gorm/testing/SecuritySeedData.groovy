@@ -29,20 +29,20 @@ class SecuritySeedData {
         admin.addRole(Roles.MANAGER, true)
 
         AppUser custUser = new AppUser([
-            id: 2L, username: "cust", email: "cust@yak.com", password:"1234", orgId: 2
+            id: 2L, username: "cust", email: "cust@yak.com", password:"123", orgId: 2
         ]).persist()
         assert custUser.id == 2
 
         custUser.addRole(Roles.CUSTOMER, true)
 
         AppUser noRoleUser = AppUser.repo.create(
-            [id: 3L, username: "noroles", email: "noroles@yak.com", password:"1234", orgId: 3],
+            [id: 3L, username: "noroles", email: "noroles@yak.com", password:"123", orgId: 3],
             [bindId: true]
         )
         assert noRoleUser.id == 3
 
         AppUser readonlyUser = new AppUser([
-            id: 4L, username: "readonly", email: "readonly@yak.com", password:"1234", orgId: 2
+            id: 4L, username: "readonly", email: "readonly@yak.com", password:"123", orgId: 2
         ]).persist()
         assert readonlyUser.id == 4
         readonlyUser.addRole(Roles.READ_ONLY, true)

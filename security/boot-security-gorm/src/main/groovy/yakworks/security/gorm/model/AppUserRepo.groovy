@@ -26,14 +26,14 @@ import yakworks.api.Result
 import yakworks.api.problem.Problem
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.security.PasswordConfig
-import yakworks.security.gorm.AppUserPasswordValidator
+import yakworks.security.services.PasswordValidator
 
 @GormRepository
 @GrailsCompileStatic
 class AppUserRepo extends LongIdGormRepo<AppUser> {
     @Autowired PasswordEncoder passwordEncoder
     @Autowired PasswordConfig passwordConfig
-    @Autowired AppUserPasswordValidator passwordValidator
+    @Autowired PasswordValidator passwordValidator
 
     //cached instance of the query for id to keep it fast
     KeyExistsQuery usernameExistsQuery

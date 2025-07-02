@@ -12,8 +12,7 @@ class AuditStampAnnSpec extends Specification implements GormHibernateTest, Secu
 
     static List entityClasses = [StampedEntity, StampedNoConstraintsClosure, AppUser]
     static List springBeans = [PasswordConfig, PasswordValidator]
-
-
+    
     void "did it get the audit stamp fields"() {
         when:
         def con = build(StampedEntity)
@@ -93,7 +92,6 @@ class AuditStampAnnSpec extends Specification implements GormHibernateTest, Secu
     def "test create"() {
         when:
         Long id = StampedEntity.create([name: "Wyatt Oil"]).id
-        //flushAndClear()
 
         then:
         def o = StampedEntity.get(id)

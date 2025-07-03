@@ -65,7 +65,7 @@ class PasswordSpec extends Specification implements  GormHibernateTest, Security
         user.passwordChangedDate.toLocalDate() == LocalDate.now()
 
         and:
-        SecPasswordHistory.query(user:user).count() == 0
+        SecPasswordHistory.query(userId:user.id).count() == 0
     }
 
     void "test password history is created"() {
@@ -78,14 +78,14 @@ class PasswordSpec extends Specification implements  GormHibernateTest, Security
         user.persist(flush: true)
 
         then:
-        SecPasswordHistory.query(user:user).count() == 1
+        SecPasswordHistory.query(userId:user.id).count() == 1
 
         when:
         AppUser.update(id:user.id, newPassword:"newp2", repassword:"newp2")
         flush()
 
         then:
-        SecPasswordHistory.query(user:user).count() == 2
+        SecPasswordHistory.query(userId:user.id).count() == 2
 
         cleanup:
         passwordConfig.historyEnabled = false

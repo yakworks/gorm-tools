@@ -231,7 +231,7 @@ class AppUserRepo extends LongIdGormRepo<AppUser> {
             user.passwordChangedDate = LocalDateTime.now()
             user.passwordExpired = false
             if (passwordConfig.historyEnabled) {
-                SecPasswordHistory.create(user, user.passwordHash)
+                SecPasswordHistory.repo.create(user.id, user.passwordHash)
             }
         } else {
             ValidationProblem problem = ValidationProblem.ofEntity(user)

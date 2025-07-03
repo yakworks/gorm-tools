@@ -21,5 +21,5 @@ class PasswordConfig {
     boolean mustContainUppercaseLetter = false
     boolean mustContainLowercaseLetter = false
     boolean historyEnabled = false
-    boolean historyLength = 4
+    int historyLength = 4
 }

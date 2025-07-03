@@ -51,7 +51,7 @@ class AppUserPasswordValidator extends PasswordValidator {
     @Transactional(readOnly = true)
     boolean passwordExistInHistory(Serializable id, String password) {
         List<SecPasswordHistory> passwordHistoryList = SecPasswordHistory.query(userId: id).list()
-        passwordHistoryList.any { passwordEncoder.matches(it.password, password) }
+        passwordHistoryList.any { passwordEncoder.matches(password, it.password) }
     }
 
     /**

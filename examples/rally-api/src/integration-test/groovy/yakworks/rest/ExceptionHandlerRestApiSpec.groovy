@@ -3,6 +3,7 @@ package yakworks.rest
 import gorm.tools.transaction.WithTrx
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import yakworks.rest.client.OkHttpRestTrait
@@ -14,6 +15,22 @@ class ExceptionHandlerRestApiSpec extends Specification implements OkHttpRestTra
 
     def setup(){
         login()
+    }
+
+    //FIXME @SUD - 404 doesnot return our standard json response
+    //currently its being handled by spring's "BasicErrorController"
+    @Ignore
+    void "error 404"() {
+        when:
+        Response resp = get("/api/security-tests/unknown")
+        Map body = bodyToMap(resp)
+
+        then:
+        body
+        body.stats == 404
+        body.code == 'error.notFound'
+        body.title
+        body.detail
     }
 
     //This would be handled by error.hbs,

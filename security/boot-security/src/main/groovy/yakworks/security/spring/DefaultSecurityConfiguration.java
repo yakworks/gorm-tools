@@ -1,8 +1,10 @@
 package yakworks.security.spring;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import yakworks.security.PasswordConfig;
 import yakworks.security.SecService;
 import yakworks.security.services.PasswordValidator;
 import yakworks.security.spring.token.CookieAuthSuccessHandler;
@@ -39,6 +41,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration @Lazy
 @Import({JwtConfiguration.class})
+@EnableConfigurationProperties({PasswordConfig.class})
 public class DefaultSecurityConfiguration {
 
     //@Autowired(required = false) TokenStore tokenStore;

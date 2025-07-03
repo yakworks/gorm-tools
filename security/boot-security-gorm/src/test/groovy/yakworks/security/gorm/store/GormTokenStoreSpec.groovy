@@ -1,5 +1,7 @@
 package yakworks.security.gorm.store
 
+import yakworks.security.PasswordConfig
+
 import java.time.Instant
 
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,6 +26,7 @@ class GormTokenStoreSpec extends Specification implements GormHibernateTest, Sec
     Closure doWithGormBeans() { { ->
         tokenStore(GormTokenStore)
         userDetailsService(AppUserDetailsService)
+        passwordConfig(PasswordConfig)
         passwordValidator(PasswordValidator)
     }}
 

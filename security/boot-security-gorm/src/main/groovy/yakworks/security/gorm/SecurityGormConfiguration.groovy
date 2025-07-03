@@ -15,15 +15,15 @@ import org.springframework.context.annotation.Lazy
 import org.springframework.security.core.userdetails.UserDetailsService
 
 import yakworks.gorm.api.support.QueryArgsValidator
+import yakworks.security.PasswordConfig
 import yakworks.security.gorm.api.UserQueryArgsValidator
 import yakworks.security.gorm.api.UserSecurityConfig
 import yakworks.security.gorm.store.GormTokenStore
-import yakworks.security.spring.token.JwtProperties
 import yakworks.security.spring.token.store.TokenStore
 
 @ComponentScan('yakworks.security.gorm.model') //here to pick up the Repos
 @Configuration //(proxyBeanMethods = false)
-@EnableConfigurationProperties([UserSecurityConfig])
+@EnableConfigurationProperties([UserSecurityConfig, PasswordConfig])
 @Lazy
 @CompileStatic
 class SecurityGormConfiguration {

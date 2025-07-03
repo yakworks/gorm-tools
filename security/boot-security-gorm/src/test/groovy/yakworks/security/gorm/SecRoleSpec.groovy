@@ -3,15 +3,18 @@ package yakworks.security.gorm
 import org.apache.commons.lang3.RandomStringUtils
 
 import spock.lang.Specification
+import yakworks.security.PasswordConfig
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRoleUser
+import yakworks.security.services.PasswordValidator
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
 class SecRoleSpec extends Specification implements GormHibernateTest, SecurityTest {
 
     static List entityClasses = [AppUser, SecRole, SecRoleUser]
+    static List springBeans = [PasswordConfig, PasswordValidator]
 
     String genRandomEmail(){
         String ename = RandomStringUtils.randomAlphabetic(10)

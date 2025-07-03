@@ -160,7 +160,6 @@ class AppUser implements UserInfo, AuditStampTrait, RepoEntity<AppUser>, Seriali
         throw new UnsupportedOperationException("Not yet supported here")
     }
 
-
     SecRoleUser addRole(String roleCode, boolean flushAfterPersist) {
         getRepo().addUserRole(this, roleCode, flushAfterPersist)
     }

@@ -3,7 +3,6 @@ package yakworks.rest
 import org.springframework.http.HttpStatus
 
 import grails.testing.mixin.integration.Integration
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 
 import yakworks.rest.client.OkHttpRestTrait

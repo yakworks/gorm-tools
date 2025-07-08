@@ -16,6 +16,8 @@ import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemException
 import yakworks.commons.map.Maps
 import yakworks.gorm.api.DefaultCrudApi
+import yakworks.gorm.api.bulk.BulkExportJobParams
+import yakworks.gorm.api.bulk.BulkImportJobParams
 
 /**
  * Used by CrudApiController for rest api.
@@ -47,7 +49,12 @@ class SyncJobCrudApi extends DefaultCrudApi<SyncJob> {
     }
 
     @Override
-    SyncJobEntity bulk(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId) {
+    SyncJobEntity bulkImport(BulkImportJobParams jobParams, List<Map> bodyList){
+        throw notSupported("bulk")
+    }
+
+    @Override
+    SyncJobEntity bulkExport(BulkExportJobParams jobParams) {
         throw notSupported("bulk")
     }
 

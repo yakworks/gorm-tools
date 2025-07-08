@@ -23,6 +23,8 @@ import yakworks.openapi.gorm.OpenApiGenerator
 import yakworks.rally.RallyConfiguration
 import yakworks.rally.api.TestTimeoutQueryArgsValidator
 import yakworks.rest.grails.AppInfoBuilder
+import yakworks.security.gorm.AppUserPasswordValidator
+import yakworks.security.services.PasswordValidator
 import yakworks.security.spring.DefaultSecurityConfiguration
 import yakworks.security.spring.token.CookieAuthSuccessHandler
 import yakworks.security.spring.token.CookieUrlTokenSuccessHandler
@@ -134,6 +136,11 @@ class RallyApiSpringConfiguration {
     @Bean
     QueryArgsValidator queryArgsValidator() {
         return new TestTimeoutQueryArgsValidator()
+    }
+
+    @Bean
+    PasswordValidator passwordValidator() {
+        return new AppUserPasswordValidator()
     }
 
     // @Bean @Lazy(false)

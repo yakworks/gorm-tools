@@ -212,6 +212,7 @@ class AppUserRepo extends LongIdGormRepo<AppUser> {
     /**
      * Updates user's password, Creates password history if enabled.
      */
+    //XXX @SUD this needs a good test.
     void updatePassword(AppUser user, String password) {
         String hashed = encodePassword(password)
         if (user.passwordHash == hashed) return

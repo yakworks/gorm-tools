@@ -30,6 +30,9 @@ class UserRestApiSpec extends Specification implements OkHttpRestTrait {
     //     token
     // }
 
+    //XXX @SUD add test here to make sure user can be created without password
+
+
     void "test get to make sure display false dont get returned"() {
         when:
         def resp = get("$endpoint/1")

@@ -9,26 +9,20 @@ import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties
-import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import org.springframework.context.annotation.Lazy
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
 
 import yakworks.gorm.api.support.QueryArgsValidator
 import yakworks.openapi.gorm.OpenApiGenerator
 import yakworks.rally.RallyConfiguration
 import yakworks.rally.api.TestTimeoutQueryArgsValidator
 import yakworks.rest.grails.AppInfoBuilder
-import yakworks.security.gorm.AppUserPasswordValidator
-import yakworks.security.services.PasswordValidator
 import yakworks.security.spring.DefaultSecurityConfiguration
 import yakworks.security.spring.token.CookieAuthSuccessHandler
 import yakworks.security.spring.token.CookieUrlTokenSuccessHandler
@@ -139,11 +133,6 @@ class RallyApiSpringConfig {
     @Bean
     QueryArgsValidator queryArgsValidator() {
         return new TestTimeoutQueryArgsValidator()
-    }
-
-    @Bean
-    PasswordValidator passwordValidator() {
-        return new AppUserPasswordValidator()
     }
 
     // @Bean @Lazy(false)

@@ -17,31 +17,14 @@ package yakworks.rally.api
 
 import groovy.transform.CompileStatic
 
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Lazy
-import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.web.SecurityFilterChain
 
-import yakworks.openapi.gorm.OpenApiGenerator
 import yakworks.rally.RallyConfiguration
 import yakworks.rest.grails.AppInfoBuilder
-import yakworks.security.gorm.AppUserPasswordValidator
-import yakworks.security.services.PasswordValidator
-import yakworks.security.spring.DefaultSecurityConfiguration
-import yakworks.security.spring.token.CookieAuthSuccessHandler
-import yakworks.security.spring.token.CookieUrlTokenSuccessHandler
-import yakworks.security.spring.token.TokenUtils
-import yakworks.security.spring.token.generator.JwtTokenGenerator
-import yakworks.security.spring.token.store.TokenStore
-
-import static org.springframework.security.config.Customizer.withDefaults
 
 /**
  * An example of explicitly configuring Spring Security with the defaults.
@@ -60,11 +43,4 @@ class RallyApiSpringConfig {
         return new AppInfoBuilder()
     }
 
-    /**
-     * Overrides default password validator from DefaultSecurityConfiguration
-     */
-    @Bean
-    public PasswordValidator passwordValidator() {
-        return new AppUserPasswordValidator()
-    }
 }

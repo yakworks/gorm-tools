@@ -6,14 +6,12 @@ package yakworks.security.gorm
 
 import java.time.LocalDate
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import grails.gorm.transactions.Transactional
 import yakworks.api.Result
 import yakworks.api.problem.Problem
 import yakworks.message.Msg
-import yakworks.message.MsgKey
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecPasswordHistory
 import yakworks.security.services.PasswordValidator
@@ -27,31 +25,31 @@ class AppUserPasswordValidator extends PasswordValidator {
     @Override
     Result validate(Serializable userId, String pass) {
         def res = super.validate(pass)
-        if (!res.ok) return res
+        if (!res.ok) return res //return fast if ok
 
-        List problemKeys = [] as List<MsgKey>
-
-        if (passwordConfig.historyEnabled && passwordExistInHistory(userId, pass)) {
-            problemKeys << Msg.key("security.validation.password.existsinhistory", [value: passwordConfig.historyLength])
+        if (passwordExistInHistory(userId, pass)) {
+            var msgKey= Msg.key("security.validation.password.existsinhistory", [value: passwordConfig.historyLength])
+            return Problem.of('security.validation.password.error').addViolations([msgKey])
         }
-
-        if (problemKeys) {
-            return Problem.of('security.validation.password.error').addViolations(problemKeys)
-        } else {
-            return Result.OK()
-        }
+        //return ok if its all good
+        return res
     }
 
     /**
      * Check if the password exists in user's password history
-     * NOT USED RIGHT NOW, KEPT FOR REF
+     *
+     * @param id AppUser.id
+     * @param password what to check
+     * @return true if it exists, false if not enabled or does not exist
      */
     @Override
-    @CompileDynamic
     @Transactional(readOnly = true)
     boolean passwordExistInHistory(Serializable id, String password) {
-        List<SecPasswordHistory> passwordHistoryList = SecPasswordHistory.query(userId: id).list()
-        passwordHistoryList.any { passwordEncoder.matches(password, it.password) }
+        if (passwordConfig.historyEnabled) {
+            List<SecPasswordHistory> passwordHistoryList = SecPasswordHistory.query(userId: id).list()
+            return passwordHistoryList.any { passwordEncoder.matches(password, it.password) }
+        }
+        return false
     }
 
     /**
@@ -59,6 +57,7 @@ class AppUserPasswordValidator extends PasswordValidator {
      * it adds the expireDays to see if we are under that date
      * @param user is optional, will look in the security context if not passed in
      */
+    //XXX @SUD add tests for this. Logic in last if seems off to me.
     @Override
     boolean isPasswordExpired(Serializable id) {
         AppUser user = AppUser.get(id)

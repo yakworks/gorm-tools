@@ -12,6 +12,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(prefix="yakworks.security.password")
 class PasswordConfig {
 
+    //XXX @SUD add javadocs to each of these. All our ConfigurationProperties classes should have good docs.
     int passwordExpireDays = 90
     boolean expiryEnabled = false
     int warnDays = 30

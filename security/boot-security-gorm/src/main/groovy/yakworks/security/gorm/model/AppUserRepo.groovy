@@ -33,7 +33,7 @@ import yakworks.security.services.PasswordValidator
 class AppUserRepo extends LongIdGormRepo<AppUser> {
     @Autowired PasswordEncoder passwordEncoder
     @Autowired PasswordConfig passwordConfig
-    @Autowired PasswordValidator passwordValidator
+    @Autowired PasswordValidator passwordValidator //AppUserPasswordValidator
 
     //cached instance of the query for id to keep it fast
     KeyExistsQuery usernameExistsQuery
@@ -212,7 +212,7 @@ class AppUserRepo extends LongIdGormRepo<AppUser> {
     /**
      * Updates user's password, Creates password history if enabled.
      */
-    //XXX @SUD this needs a good test.
+    //XXX @SUD lets add a good test.
     void updatePassword(AppUser user, String password) {
         String hashed = encodePassword(password)
         if (user.passwordHash == hashed) return

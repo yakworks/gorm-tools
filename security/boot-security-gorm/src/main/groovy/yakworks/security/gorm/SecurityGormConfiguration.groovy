@@ -19,6 +19,7 @@ import yakworks.security.PasswordConfig
 import yakworks.security.gorm.api.UserQueryArgsValidator
 import yakworks.security.gorm.api.UserSecurityConfig
 import yakworks.security.gorm.store.GormTokenStore
+import yakworks.security.services.PasswordValidator
 import yakworks.security.spring.token.store.TokenStore
 
 @ComponentScan('yakworks.security.gorm.model') //here to pick up the Repos
@@ -59,5 +60,10 @@ class SecurityGormConfiguration {
     @Bean
     QueryArgsValidator queryArgsValidator(){
         new UserQueryArgsValidator()
+    }
+
+    @Bean
+    PasswordValidator passwordValidator() {
+        return new AppUserPasswordValidator()
     }
 }

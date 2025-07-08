@@ -37,13 +37,11 @@ import yakworks.rally.orgs.repo.ContactRepo
 import yakworks.rally.orgs.repo.OrgRepo
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
-import yakworks.security.PasswordConfig
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRolePermission
 import yakworks.security.gorm.model.SecRoleUser
 import yakworks.security.gorm.testing.SecuritySeedData
-import yakworks.security.services.PasswordValidator
 import yakworks.spring.AppCtx
 
 @SuppressWarnings('BuilderMethodWithSideEffects')
@@ -63,8 +61,7 @@ class RallySeed {
         ] as List<Class<?>>
     }
 
-    //extra spring beans when orgMember and orgDimensionService is being used.
-    static List springBeanList = [OrgProps, OrgDimensionService, OrgService, ActivityQuery, PasswordValidator, PasswordConfig]
+    static List springBeanList = [OrgProps, OrgDimensionService, OrgService, ActivityQuery]
 
     // see good explanation of thread safe static instance stratgey https://stackoverflow.com/a/16106598/6500859
     @SuppressWarnings('UnusedPrivateField')

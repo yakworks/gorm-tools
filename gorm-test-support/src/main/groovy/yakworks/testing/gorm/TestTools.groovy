@@ -19,7 +19,7 @@ import org.springframework.core.env.ConfigurableEnvironment
  * @since 6.1
  */
 @CompileStatic
-@SuppressWarnings(['ClassForName','MethodParameterTypeRequired'])
+@SuppressWarnings(['ClassForName', 'MethodParameterTypeRequired'])
 class TestTools {
 
     static void addEnvConverters(ConfigurableEnvironment env){

@@ -214,7 +214,7 @@ class AppUserRepo extends LongIdGormRepo<AppUser> {
      */
     void updatePassword(AppUser user, String password) {
         String hashed = encodePassword(password)
-        if (user.passwordHash == hashed) return
+        if (user.passwordHash == hashed) return //no change so just exit fast
 
         Result valid
         if (user.isNew()) {

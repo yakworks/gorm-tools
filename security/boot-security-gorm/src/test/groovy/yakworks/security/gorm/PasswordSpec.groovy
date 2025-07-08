@@ -1,22 +1,23 @@
 package yakworks.security.gorm
 
-import gorm.tools.problem.ValidationProblem
+import java.time.LocalDate
+import javax.inject.Inject
+
 import org.apache.commons.lang3.RandomStringUtils
+
+import gorm.tools.problem.ValidationProblem
+import spock.lang.Specification
+import yakworks.api.problem.Problem
 import yakworks.security.PasswordConfig
 import yakworks.security.gorm.model.AppUser
-import yakworks.api.problem.Problem
 import yakworks.security.gorm.model.SecPasswordHistory
 import yakworks.security.services.PasswordValidator
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
-import spock.lang.Specification
-
-import javax.inject.Inject
-import java.time.LocalDate
 
 class PasswordSpec extends Specification implements  GormHibernateTest, SecurityTest {
     static entityClasses = [AppUser, SecPasswordHistory]
-    static List springBeans = [PasswordConfig, AppUserPasswordValidator]
+    //static List springBeans = [PasswordConfig, AppUserPasswordValidator]
 
     @Inject PasswordConfig passwordConfig
     @Inject AppUserPasswordValidator passwordValidator

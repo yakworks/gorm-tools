@@ -6,58 +6,34 @@ package yakworks.security.gorm.model
 
 import java.time.LocalDateTime
 
-import groovy.transform.CompileDynamic
-
+import gorm.tools.repository.RepoLookup
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
 import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 
 @Entity
-@CompileDynamic
-class SecPasswordHistory {
-    static belongsTo = [user: AppUser]
+@GrailsCompileStatic
+class SecPasswordHistory implements RepoEntity<SecPasswordHistory>, Serializable {
+
+    Long userId
     String password
 
     LocalDateTime dateCreated
 
-    static constraints = {
-        user nullable: false
-        password nullable: false
-        dateCreated nullable: true
-    }
-
     static mapping = orm {
         version false
         columns(
-            user: property(column:'userId', updateable: false),
+            userId: property(updateable: false),
             password: property(updateable: false )
         )
     }
 
-    // static mapping = {
-    //     version false
-    //     user column: "userId"
-    //     password updateable: false
-    //     user updateable: false
-    //     dateCreated column: "dateCreated"
-    // }
+    static constraintsMap = [
+        userId:[ d: "User Id", nullable: false],
+        password:[ d: "Password hash", nullable: false]
+    ]
 
-    /**
-     * Creates new password history for given user. Will remove the oldest entry if the number of history records goes more thn MAX_HISTORY
-     */
-    static SecPasswordHistory create(AppUser user, String passwordHash) {
-        Integer historyLength = 10//AppParam.value('passwordHistoryLength').toInteger()
-        if (SecPasswordHistory.countByUser(user) >= historyLength) {
-            SecPasswordHistory lastRecord = SecPasswordHistory.list(max: 1, sort: 'dateCreated', order: 'asc')[0]
-            lastRecord.delete()
-        }
-        SecPasswordHistory passwordHistory = new SecPasswordHistory(user: user, password: passwordHash)
-        passwordHistory.save(flush: false)
-        return passwordHistory
-    }
-
-    static List<SecPasswordHistory> findAllByUser(AppUser user){
-        SecPasswordHistory.findAllByUser(user)
-    }
+    static SecPasswordHistoryRepo getRepo() { RepoLookup.findRepo(this) as SecPasswordHistoryRepo }
 }

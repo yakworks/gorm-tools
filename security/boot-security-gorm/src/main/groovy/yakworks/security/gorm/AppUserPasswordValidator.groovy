@@ -5,6 +5,7 @@
 package yakworks.security.gorm
 
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 import groovy.transform.CompileStatic
 
@@ -55,18 +56,28 @@ class AppUserPasswordValidator extends PasswordValidator {
     /**
      * checks if password is expired. first checks the passwordExpired field and then if expireEnabled
      * it adds the expireDays to see if we are under that date
+     *
      * @param user is optional, will look in the security context if not passed in
      */
-    //XXX @SUD add tests for this. Logic in last if seems off to me.
     @Override
     boolean isPasswordExpired(Serializable id) {
         AppUser user = AppUser.get(id)
+
+        //if user without password
+        if(user.passwordHash == null) return false
+
         //can always force a password change by setting passwordExpired field to true
         if (user.passwordExpired) return true
+
         if (passwordConfig.expiryEnabled) {
-            LocalDate expireDate = user.passwordChangedDate?.plusDays(passwordConfig.passwordExpireDays).toLocalDate()
-            //check if user's password has expired
-            if (!expireDate || LocalDate.now() >= expireDate) {
+
+            //ideally all user should have passwordChangedDate, it gets set initially when user is created and keeps getting updated
+            //but if null for some old users, thn expire it.
+            if(user.passwordChangedDate == null) return true
+
+            //see if lastChangeDate + passwordExpireDays < today - thn password has already expired
+            LocalDateTime expiresOnDate = user.passwordChangedDate.plusDays(passwordConfig.passwordExpireDays)
+            if (expiresOnDate.toLocalDate() < LocalDate.now()) {
                 return true
             }
         }

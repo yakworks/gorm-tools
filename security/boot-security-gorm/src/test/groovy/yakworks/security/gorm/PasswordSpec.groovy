@@ -15,9 +15,10 @@ import yakworks.security.services.PasswordValidator
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
+import java.time.LocalDateTime
+
 class PasswordSpec extends Specification implements  GormHibernateTest, SecurityTest {
     static entityClasses = [AppUser, SecPasswordHistory]
-    //static List springBeans = [PasswordConfig, AppUserPasswordValidator]
 
     @Inject PasswordConfig passwordConfig
     @Inject AppUserPasswordValidator passwordValidator
@@ -43,6 +44,7 @@ class PasswordSpec extends Specification implements  GormHibernateTest, Security
     void "sanity check"() {
         expect:
         passwordConfig
+        passwordValidator
     }
 
     void "update password"() {
@@ -181,5 +183,46 @@ class PasswordSpec extends Specification implements  GormHibernateTest, Security
         passwordConfig.mustContainUppercaseLetter = false
         passwordConfig.mustContainSymbols = false
         passwordConfig.mustContainNumbers = false
+    }
+
+    void "test isPasswordExpired"() {
+        setup:
+        passwordConfig.expiryEnabled = true
+        passwordConfig.passwordExpireDays = 10
+
+        Map data = buildMap([password:"test"])
+
+        when: "create"
+        AppUser user = AppUser.create(data)
+
+        then:
+        user
+        user.passwordChangedDate
+        user.passwordChangedDate.toLocalDate() == LocalDate.now()
+
+        and:
+        !passwordValidator.isPasswordExpired(user.id)
+
+        when: "its expiry date"
+        user.passwordChangedDate = LocalDateTime.now().minusDays(10)
+        user.persist()
+
+        then:
+        !passwordValidator.isPasswordExpired(user.id)
+
+        when: "its expired"
+        user.passwordChangedDate = LocalDateTime.now().minusDays(11)
+        user.persist(flush:true)
+
+        then:
+        passwordValidator.isPasswordExpired(user.id)
+
+        when: "no password, does not expire"
+        user.passwordHash = null
+        user.passwordChangedDate = LocalDateTime.now().minusDays(11)
+        user.persist()
+
+        then:
+        !passwordValidator.isPasswordExpired(user.id)
     }
 }

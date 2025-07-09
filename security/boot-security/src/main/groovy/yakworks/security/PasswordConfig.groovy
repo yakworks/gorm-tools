@@ -12,15 +12,48 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(prefix="yakworks.security.password")
 class PasswordConfig {
 
-    //XXX @SUD add javadocs to each of these. All our ConfigurationProperties classes should have good docs.
-    int passwordExpireDays = 90
+    /**
+     * If passwords expiry is enabled
+     */
     boolean expiryEnabled = false
-    int warnDays = 30
+
+    /**
+     * The days after last password change date when password would expire
+     */
+    int passwordExpireDays = 90
+
+    /**
+     * Minimum password length
+     */
     int minLength = 3
+
+    /**
+     * If password must contains numbers
+     */
     boolean mustContainNumbers = false
+
+    /**
+     * If password must contains symbols
+     */
     boolean mustContainSymbols = false
+
+    /**
+     * If password must contains upper case letters
+     */
     boolean mustContainUppercaseLetter = false
+
+    /**
+     * If password must contains lower case letters
+     */
     boolean mustContainLowercaseLetter = false
+
+    /**
+     * If password history is enabled
+     */
     boolean historyEnabled = false
+
+    /**
+     * Number of password change history records which would be kept and checked against.
+     */
     int historyLength = 4
 }

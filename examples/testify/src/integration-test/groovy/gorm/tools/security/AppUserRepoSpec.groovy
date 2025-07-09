@@ -1,8 +1,11 @@
 package gorm.tools.security
 
+import gorm.tools.problem.ValidationProblem
 import org.springframework.security.crypto.password.PasswordEncoder
 import yakworks.api.problem.data.DataProblemException
+import yakworks.security.PasswordConfig
 import yakworks.security.Roles
+import yakworks.security.gorm.model.SecPasswordHistoryRepo
 import yakworks.security.gorm.model.SecRoleUser
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.AppUserRepo
@@ -12,11 +15,16 @@ import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
 import spock.lang.Specification
 
+import javax.inject.Inject
+
 @Integration
 @Rollback
 class AppUserRepoSpec extends Specification implements DataIntegrationTest, SecuritySpecHelper {
+
     AppUserRepo appUserRepo
+    SecPasswordHistoryRepo secPasswordHistoryRepo
     PasswordEncoder passwordEncoder
+    @Inject PasswordConfig passwordConfig
 
     Map getUserParams(Map params = [:]){
         Map baseParams = [
@@ -81,7 +89,7 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
     }
 
     /*see SecuritySeedData*/
-    def "test create with roles obj"() {
+    void "test create with roles obj"() {
         when:
         // use objects that may get passed in from json in this format
         def params = getUserParams([
@@ -101,7 +109,7 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
     }
 
 
-    def "test updating roles"() {
+    void "test updating roles"() {
 
         when: "current admin has 2 roles 1,3"
         assert SecRoleUser.getByUser(1)*.role.id == [1, 3]
@@ -135,7 +143,7 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         SecRoleUser.findAllByUser(AppUser.get(1))*.role.id == [1L]
     }
 
-    def "remove roles when user is removed"() {
+    void "remove roles when user is removed"() {
         setup:
         Map params = getUserParams([roles: ["ADMIN", "MANAGER"]])
         AppUser user = AppUser.create(params)
@@ -153,7 +161,7 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         !SecRoleUser.get(3, user.id)
     }
 
-    def testRemove() {
+    void testRemove() {
         setup:
         AppUser user = appUserRepo.create(getUserParams())
 
@@ -165,6 +173,44 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
 
         then:
         AppUser.get(user.id) == null
+    }
+
+    void "test updatePassword"() {
+        setup:
+        passwordConfig.historyEnabled = true
+        passwordConfig.mustContainUppercaseLetter = true
+        AppUser user = AppUser.get(1L)
+
+        expect:
+        user
+
+        when: "same password, nothing changed"
+        appUserRepo.updatePassword(user, '123')
+
+        then: "no history created"
+        noExceptionThrown()
+        !secPasswordHistoryRepo.findAllByUser(user.id)
+
+        when: "pwd validation fails"
+        appUserRepo.updatePassword(user, 'test')
+
+        then: "no history created"
+        ValidationProblem.Exception ex = thrown()
+        ex.violations.size() == 1
+        ex.violations[0].code == 'security.validation.password.mustcontain.uppercase'
+
+        and: "history not created"
+        !secPasswordHistoryRepo.findAllByUser(user.id)
+
+        when: "all good"
+        appUserRepo.updatePassword(user, 'Xtest')
+        flush()
+
+        then:
+        noExceptionThrown()
+
+        and: "history created"
+        secPasswordHistoryRepo.findAllByUser(user.id).size() == 1
     }
 
     /** printDiffs prints the pertinent params and final data for the test for debugging purposes. */

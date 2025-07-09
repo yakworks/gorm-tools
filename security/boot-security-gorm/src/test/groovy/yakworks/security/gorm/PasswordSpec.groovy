@@ -204,6 +204,8 @@ class PasswordSpec extends Specification implements  GormHibernateTest, Security
         !passwordValidator.isPasswordExpired(user.id)
 
         when: "its expiry date"
+        //set pwd to null, so it doesnt try to update it again, we are interested in expiry only
+        user.password = null
         user.passwordChangedDate = LocalDateTime.now().minusDays(10)
         user.persist()
 

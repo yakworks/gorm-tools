@@ -4,6 +4,8 @@
 */
 package yakworks.security.gorm.model
 
+import yakworks.commons.lang.Validate
+
 import java.time.LocalDateTime
 
 import org.springframework.beans.factory.annotation.Autowired
@@ -215,6 +217,7 @@ class AppUserRepo extends LongIdGormRepo<AppUser> {
      */
     void updatePassword(AppUser user, String password) {
         //no change, its same password, just exit fast
+        Validate.notEmpty(password)
         if (passwordEncoder.matches(password, user.passwordHash)) return
 
         String hashed = encodePassword(password)

@@ -4,8 +4,6 @@
 */
 package yakworks.security.gorm.model
 
-import yakworks.commons.lang.Validate
-
 import java.time.LocalDateTime
 
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,6 +25,7 @@ import grails.gorm.transactions.Transactional
 import yakworks.api.Result
 import yakworks.api.problem.Problem
 import yakworks.api.problem.data.DataProblemCodes
+import yakworks.commons.lang.Validate
 import yakworks.security.PasswordConfig
 import yakworks.security.services.PasswordValidator
 

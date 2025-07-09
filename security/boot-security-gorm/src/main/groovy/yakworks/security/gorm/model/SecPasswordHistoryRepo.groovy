@@ -24,7 +24,6 @@ class SecPasswordHistoryRepo extends LongIdGormRepo<SecPasswordHistory> {
     @Inject PasswordConfig passwordConfig
 
     /**
-     *
      * Creates password history for user,
      * Will keep only `passwordConfig.historyLength` records and deletes older if there are more
      */

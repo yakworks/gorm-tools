@@ -23,12 +23,65 @@ class UserRestApiSpec extends Specification implements OkHttpRestTrait {
         login()
     }
 
-    // void "test OkHttpRestTrait login"() {
-    //     when:
-    //     String token = login('admin', '123')
-    //     then:
-    //     token
-    // }
+    void "user can be created without password"() {
+        when:
+        def resp = post(endpoint, [username:"test", email:"test@9ci.com"])
+
+        then:
+        resp.code() == HttpStatus.CREATED.value()
+
+        when:
+        def body = bodyToMap(resp)
+
+        then:
+        body
+        body.id
+        body.username == "test"
+
+        when:
+        AppUser user = AppUser.repo.getWithTrx(body.id as Long)
+
+        then:
+        !user.passwordHash
+        !user.passwordChangedDate
+
+        cleanup:
+        if(user) {
+            AppUser.withNewTransaction {
+                AppUser.repo.removeById(user.id)
+            }
+        }
+    }
+
+    void "create with password"() {
+        when:
+        def resp = post(endpoint, [username:"test", password:'test', email:"test@9ci.com"])
+
+        then:
+        resp.code() == HttpStatus.CREATED.value()
+
+        when:
+        def body = bodyToMap(resp)
+
+        then:
+        body
+        body.id
+        body.username == "test"
+
+        when:
+        AppUser user = AppUser.repo.getWithTrx(body.id as Long)
+
+        then:
+        user.passwordHash
+        user.passwordChangedDate
+
+        cleanup:
+        if(user) {
+            AppUser.withNewTransaction {
+                AppUser.repo.removeById(user.id)
+            }
+        }
+    }
 
     void "test get to make sure display false dont get returned"() {
         when:

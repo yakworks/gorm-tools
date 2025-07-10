@@ -21,7 +21,7 @@ import java.time.LocalDate
 
 class AppUserSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [AppUser, SecRole, SecRoleUser, SecPasswordHistory]
-    static List springBeans = [PasswordConfig, PasswordValidator]
+    //static List springBeans = [PasswordConfig]
 
     @Inject PasswordConfig passwordConfig
 
@@ -83,6 +83,17 @@ class AppUserSpec extends Specification implements GormHibernateTest, SecurityTe
     //     assert entity.persist(flush: true)
     //     return get(entity.id)
     // }
+
+    def "create user"(){
+        when:
+        AppUser user = new AppUser(id: 1, orgId: 1, username: "admin", email: "admin@9ci.com", password: "123Foo")
+        user.persist(flush: true)
+
+        then:
+        user.id == 1
+        user.passwordHash
+        user.passwordChangedDate
+    }
 
     void "did it get the audit stamp fields"() {
         when:

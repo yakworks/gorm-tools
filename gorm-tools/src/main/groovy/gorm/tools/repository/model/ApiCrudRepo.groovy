@@ -98,9 +98,18 @@ interface ApiCrudRepo<D> {
      * @param checkAndThrow if true then checks if found and throws NotFoundProblem.Exception if not
      * @return the retrieved entity
      */
+    @Deprecated
     default D get(Serializable id, boolean checkAndThrow) {
+        return checkAndThrow ? getNotNull(id) : get(id)
+    }
+
+    /**
+     * Get entity and throw NotFoundProblem.Exception if its null
+     * Uses RepoUtil.checkFound
+     */
+    default D getNotNull(Serializable id) {
         D entity = get(id)
-        if(checkAndThrow) RepoUtil.checkFound(entity, id, getEntityClass().name)
+        RepoUtil.checkFound(entity, id, getEntityClass().name)
         return entity
     }
 

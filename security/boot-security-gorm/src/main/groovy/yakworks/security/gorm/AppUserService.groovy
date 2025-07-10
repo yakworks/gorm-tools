@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import grails.gorm.transactions.Transactional
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecLoginHistory
-import yakworks.security.gorm.model.SecPasswordHistory
 import yakworks.security.services.PasswordValidator
 import yakworks.security.user.CurrentUser
 

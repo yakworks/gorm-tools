@@ -25,4 +25,7 @@ import yakworks.security.spring.DefaultSecurityConfiguration
 class RallyConfiguration {
     //@Entity scan packages to include in additions to this Application class's package
     public static final List<String> entityScanPackages = ['yakworks.security.gorm', 'yakworks.rally']
+
+
+
 }

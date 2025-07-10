@@ -63,6 +63,29 @@ class GormRepoSpec extends Specification implements GormHibernateTest {
         ks.name == newOrg.name
     }
 
+    def "test getNotNull"() {
+        setup:
+        KitchenSink ks = build(KitchenSink)
+
+        when:
+        KitchenSink newOrg = KitchenSink.repo.getNotNull(ks.id)
+
+        then:
+        newOrg
+
+        when:
+        newOrg = KitchenSink.repo.getNotNull(-99999)
+
+        then:
+        NotFoundProblem.Exception ex = thrown()
+
+        when:
+        KitchenSink.getNotNull(-99999)
+
+        then:
+        NotFoundProblem.Exception ex2 = thrown()
+    }
+
     def "test get with version"() {
         when:
         KitchenSink sink = build(KitchenSink)//new Org(name: "get_test_version").save()

@@ -12,7 +12,6 @@ import yakworks.commons.beans.PropertyTools
 import yakworks.spring.AppCtx
 import yakworks.testing.gorm.support.BaseRepoEntityUnitTest
 import yakworks.testing.gorm.support.RepoBuildDataTest
-import yakworks.testing.gorm.support.RepoTestDataBuilder
 import yakworks.testing.grails.GrailsAppUnitTest
 
 /**

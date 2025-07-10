@@ -8,10 +8,12 @@ import groovy.transform.CompileDynamic
 
 import org.springframework.security.crypto.password.NoOpPasswordEncoder
 
+import yakworks.security.PasswordConfig
 import yakworks.security.audit.AuditStampBeforeValidateListener
 import yakworks.security.audit.AuditStampPersistenceEventListener
 import yakworks.security.audit.AuditStampSupport
 import yakworks.security.audit.DefaultAuditUserResolver
+import yakworks.security.gorm.AppUserPasswordValidator
 import yakworks.security.user.CurrentUserHolder
 import yakworks.testing.gorm.CurrentTestUser
 import yakworks.testing.gorm.TestingSecService
@@ -29,6 +31,8 @@ trait SecurityTest {
     Closure doWithSecurityBeans() {
         { ->
             passwordEncoder(NoOpPasswordEncoder)
+            passwordConfig(PasswordConfig)
+            passwordValidator(AppUserPasswordValidator)
             currentUserHolder(CurrentUserHolder)
             currentUser(CurrentTestUser)
             secService(TestingSecService)

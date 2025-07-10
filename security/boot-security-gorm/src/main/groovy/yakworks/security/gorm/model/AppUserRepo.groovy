@@ -25,6 +25,7 @@ import grails.gorm.transactions.Transactional
 import yakworks.api.Result
 import yakworks.api.problem.Problem
 import yakworks.api.problem.data.DataProblemCodes
+import yakworks.commons.lang.Validate
 import yakworks.security.PasswordConfig
 import yakworks.security.services.PasswordValidator
 
@@ -34,6 +35,7 @@ class AppUserRepo extends LongIdGormRepo<AppUser> {
     @Autowired PasswordEncoder passwordEncoder
     @Autowired PasswordConfig passwordConfig
     @Autowired PasswordValidator passwordValidator
+
 
     //cached instance of the query for id to keep it fast
     KeyExistsQuery usernameExistsQuery
@@ -213,8 +215,11 @@ class AppUserRepo extends LongIdGormRepo<AppUser> {
      * Updates user's password, Creates password history if enabled.
      */
     void updatePassword(AppUser user, String password) {
+        //no change, its same password, just exit fast
+        Validate.notEmpty(password)
+        if (passwordEncoder.matches(password, user.passwordHash)) return
+
         String hashed = encodePassword(password)
-        if (user.passwordHash == hashed) return
 
         Result valid
         if (user.isNew()) {

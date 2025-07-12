@@ -8,19 +8,26 @@ import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
+import gorm.tools.job.SyncJobEntity
+import gorm.tools.repository.model.DataOp
 import spock.lang.Specification
 import yakworks.api.problem.ThrowableProblem
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.config.JobProps
 import yakworks.rally.config.MaintenanceProps
+import yakworks.rally.orgs.model.Org
+import yakworks.rally.tag.model.TagLink
+import yakworks.spring.AppResourceLoader
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
 class DefaultSyncJobServiceSpec extends Specification implements GormHibernateTest, SecurityTest {
-    static entityClasses = [SyncJob, Attachment]
+    static entityClasses = [SyncJob, Attachment, AttachmentLink, TagLink]
     static springBeans = [
         AttachmentSupport,
+        AppResourceLoader,
         MaintenanceProps,
         JobProps,
         DefaultSyncJobService
@@ -38,7 +45,9 @@ class DefaultSyncJobServiceSpec extends Specification implements GormHibernateTe
     void "test createJob"() {
         when:
         maintenanceProps.crons = []
-        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source')
+        SyncJobArgs syncJobArgs = new SyncJobArgs(
+            sourceId: '123', source: 'some source', jobType: 'foo'
+        )
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, [])
         then:
         noExceptionThrown()

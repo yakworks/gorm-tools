@@ -28,7 +28,6 @@ import gorm.tools.mango.jpql.KeyExistsQuery
 import gorm.tools.model.Lookupable
 import gorm.tools.model.Persistable
 import gorm.tools.problem.ValidationProblem
-import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.ApiCrudRepo
@@ -51,7 +50,7 @@ import yakworks.commons.lang.ClassUtils
  */
 @SuppressWarnings(['EmptyMethod', 'MethodCount'])
 @CompileStatic
-trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProvider {
+trait GormRepo<D> implements ApiCrudRepo<D>, ResolvableTypeProvider {
 
     @Autowired EntityMapBinder entityMapBinder
 
@@ -308,6 +307,10 @@ trait GormRepo<D> implements ApiCrudRepo<D>, BulkableRepo<D>, ResolvableTypeProv
         // Result.OK().status(status).payload(instance)
         return EntityResult.of(instance).status(status)
     }
+
+    // Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs) {
+    //     return getBulkImporter().bulkLegacy(dataList, syncJobArgs)
+    // }
 
     /**
      * Uses the items in the data to find the entity.

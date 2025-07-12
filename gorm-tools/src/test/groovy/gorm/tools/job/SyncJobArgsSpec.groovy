@@ -2,8 +2,8 @@ package gorm.tools.job
 
 import gorm.tools.repository.model.DataOp
 import spock.lang.Specification
-import testing.TestSyncJobService
 import yakworks.commons.lang.EnumUtils
+import yakworks.etl.DataMimeTypes
 
 class SyncJobArgsSpec extends Specification  {
 
@@ -14,28 +14,27 @@ class SyncJobArgsSpec extends Specification  {
         then:
         args.async //async by default
         args.parallel == null
-        args.savePayload
         !args.source
         !args.sourceId
 
         when: "explicitely provided"
-        args = SyncJobArgs.withParams([parallel:true, async:false, savePayload: false, source:"test", sourceId:"test"])
+        args = SyncJobArgs.withParams([parallel:true, async:false, source:"test", sourceId:"test", dataFormat: 'csv'])
 
         then:
         args.parallel
         !args.async
-        !args.savePayload
         args.source == "test"
         args.sourceId == "test"
+        args.dataFormat == DataMimeTypes.csv
 
         when: "make sure the others work"
-        args = SyncJobArgs.withParams([async:false, jobSource: "foo", dataFormat: "payload"])
+        args = SyncJobArgs.withParams([async:false, jobSource: "foo", dataLayout: "payload"])
 
         then:
         !args.async
         args.source == "foo"
         !args.sourceId
-        args.dataFormat == SyncJobArgs.DataFormat.Payload
+        args.dataLayout == SyncJobArgs.DataLayout.Payload
     }
 
     void "test enum"() {
@@ -46,4 +45,32 @@ class SyncJobArgsSpec extends Specification  {
         expect:
         dfoo == null
     }
+
+    void "test groovy as for enum casting"() {
+        when:
+        String addVal = 'add'
+        DataOp addOp = addVal as DataOp
+
+        String nullVal
+        DataOp nullOp = EnumUtils.getEnumIgnoreCase(DataOp, nullVal)
+
+        then:
+        !nullOp
+        addOp == DataOp.add
+
+        when: "bad val"
+        String fooVal = 'foo'
+        DataOp fooOp = fooVal as DataOp
+
+        then:
+        thrown(IllegalArgumentException)
+
+        when: "EnumUtils does not throw"
+        fooOp = EnumUtils.getEnumIgnoreCase(DataOp, nullVal)
+
+        then:
+        !fooOp
+
+    }
+
 }

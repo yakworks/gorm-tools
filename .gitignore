@@ -159,3 +159,5 @@ Session.vim
 api-docs/dist
 api-docs/node_modules
 .build-cache
+/examples/rally-api/ignite
+/ignite

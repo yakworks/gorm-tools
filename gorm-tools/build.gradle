@@ -16,6 +16,9 @@ dependencies {
   // TODO use this standard for json converters
   // api "jakarta.json.bind:jakarta.json.bind-api:2.0.0"
 
+  //CSV
+  api "com.opencsv:opencsv:$vOpenCsv"
+
   //GRAILS
   api "org.grails:grails-databinding:$grailsVersion"
 

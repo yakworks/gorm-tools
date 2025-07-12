@@ -7,7 +7,7 @@ package yakworks.gorm.api.bulk
 import groovy.transform.CompileStatic
 
 import gorm.tools.databinding.BasicDataBinder
-import gorm.tools.job.CoreSyncJobParams
+import gorm.tools.job.SyncJobParams
 
 /**
  * Value Object are better than using a Map to store arguments and parameters.
@@ -16,7 +16,7 @@ import gorm.tools.job.CoreSyncJobParams
  * See BulkableRepo for its primary usage.
  */
 @CompileStatic
-class BulkExportJobParams extends CoreSyncJobParams{
+class BulkExportJobParams extends SyncJobParams{
     public static final JOB_TYPE = 'bulk.export'
 
     String jobType = JOB_TYPE

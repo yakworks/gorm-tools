@@ -8,7 +8,6 @@ import groovy.transform.CompileDynamic
 
 import org.grails.datastore.mapping.config.MappingDefinition
 
-import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.RepoEntity

@@ -87,6 +87,7 @@ abstract class SyncJobService<D> {
     }
     /**
      * creates and saves a Running Job and returns the SyncJobContext with the jobId
+     * @deprecated used for legacy bulk, use {@link #queueJob()} in future.
      */
     @Deprecated //legacy
     SyncJobContext createJob(SyncJobArgs args, Object payload){
@@ -183,7 +184,20 @@ abstract class SyncJobService<D> {
      * @return the job id from the jobContext.jobId
      */
     Long runJob(SyncJobContext jobContext, Runnable runnable) {
-        return runJob(jobContext.args.asyncArgs, jobContext, runnable)
+        AsyncArgs asyncArgs = jobContext.args.asyncArgs
+        //process in async
+        asyncService
+            .supplyAsync (asyncArgs, () -> runnable.run()) //FIXME we really should be using runAsync as we do nothing with what the supplier returns
+            .whenComplete { res, ex ->
+                if (ex) {
+                    //ideally should not happen as the pattern here is that all exceptions should be handled in supplierFunc
+                    LOG.error("Unhandled exception while running job")
+                    jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
+                }
+                jobContext.finishJob()
+            }
+
+        return jobContext.jobId
     }
 
     /**

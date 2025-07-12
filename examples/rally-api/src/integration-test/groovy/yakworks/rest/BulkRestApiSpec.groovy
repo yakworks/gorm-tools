@@ -20,7 +20,7 @@ import static yakworks.json.groovy.JsonEngine.parseJson
 @Rollback
 class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
 
-    String path = "/api/rally/org/bulk?jobSource=Oracle"
+    String path = "/api/rally/org/bulk?jobSource=Oracle&async=false"
 
     def setup(){
         login()
@@ -43,7 +43,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         body.ok == true
         body.state == "Finished"
         body.source == "Oracle" //should have been picked from query string
-        body.sourceId == "POST /api/rally/org/bulk?jobSource=Oracle"
+        body.sourceId == "POST /api/rally/org/bulk?jobSource=Oracle&async=false"
         body.data != null
         body.data.size() == 3
         body.data[0].data.id != null
@@ -63,7 +63,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         // we no longer have settign to disable payload saving
         //job.payloadBytes == null
         job.state == SyncJobState.Finished
-        job.sourceId == "POST /api/rally/org/bulk?jobSource=Oracle"
+        job.sourceId == "POST /api/rally/org/bulk?jobSource=Oracle&async=false"
         job.source == "Oracle"
 
         /*payload disabled
@@ -194,7 +194,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         body.ok == false //has one failure
         body.state == "Finished"
         body.source == "Oracle" //should have been picked from query string
-        body.sourceId == "POST /api/rally/org/bulk?jobSource=Oracle&op=upsert"
+        body.sourceId == "POST /api/rally/org/bulk?jobSource=Oracle&async=false&op=upsert"
         resp.code() == HttpStatus.MULTI_STATUS.value()
         body.data.size() == 5
 

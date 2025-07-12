@@ -179,16 +179,8 @@ class BulkImportService<D> {
         if(!jobContext.ok.get()) {
             throw (jobContext.problems[0] as DataProblemTrait).toException()
         }
-        //if attachmentId then assume its a csv
-        if(!jobParams.attachmentId) {
-            // dirty ugly hack since we were not consistent and now need to do clean up
-            // RNDC expects async to be false by default when its not CSV
-            // remove this else hack once this is done https://github.com/9ci/cust-rndc-ext/issues/215
-            if(jobParams.async == null) jobContext.args.async = false
-        }
-
         // This is the promise call. Will return immediately if syncJobArgs.async=true
-        syncJobService.runJob(jobContext.args.asyncArgs, jobContext,
+        syncJobService.runJob(jobContext,
             () -> getBulkImporter().doBulkParallel(jobContext.args.payload as List<Map>, jobContext)
         )
         TrxService.bean().flushAndClear()

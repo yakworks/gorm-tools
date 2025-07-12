@@ -5,6 +5,8 @@
 package gorm.tools.job
 
 import groovy.transform.CompileStatic
+import groovy.transform.builder.Builder
+import groovy.transform.builder.SimpleStrategy
 
 import yakworks.commons.map.Maps
 import yakworks.etl.DataMimeTypes
@@ -12,13 +14,15 @@ import yakworks.meta.MetaUtils
 
 /**
  * Value Object are better than using a Map to store arguments and parameters.
- * This is used for Bulk operations.
- * Created at the start of the process, in controller this is created from the params passed the action
- * See BulkableRepo for its primary usage.
+ * This is the base class, see BulkImportJobParams and BulkExportJobParams for implementaiton versions
  */
+@Builder(builderStrategy= SimpleStrategy, prefix="")
 @CompileStatic
-class CoreSyncJobParams {
+class SyncJobParams {
 
+    /**
+     * Job Type key
+     */
     String jobType
 
     /**
@@ -51,10 +55,12 @@ class CoreSyncJobParams {
     /**
      * For results, comma seperated list of fields to include for the SyncJob.data
      */
-    List<String> includes // = ['id']
-    //String includes = 'id'
+    List<String> includes //= ['id']
 
-    String includesKey // = ['id']
+    /**
+     * can pass in the key to look up form our includes
+     */
+    String includesKey
 
     /**
      * List of keys to include from the data map that failed.

@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils
 import org.springframework.http.HttpStatus
 import org.springframework.jdbc.core.JdbcTemplate
 
-import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobState
 import gorm.tools.repository.model.DataOp

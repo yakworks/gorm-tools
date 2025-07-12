@@ -78,8 +78,6 @@ class SyncJobContext {
 
     Path dataPath
 
-
-
     Closure transformResultsClosure
 
     SyncJobContext() { this([:])}

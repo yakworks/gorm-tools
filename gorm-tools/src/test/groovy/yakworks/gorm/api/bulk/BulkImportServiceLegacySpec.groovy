@@ -41,7 +41,7 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
     BulkImportJobParams setupBulkImportParams(DataOp op = DataOp.add){
         return new BulkImportJobParams(
             parallel: false,
-            //async:false,
+            async:false,
             op: op,
             source: "test",
             sourceId: "test",

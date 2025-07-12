@@ -19,7 +19,7 @@ import grails.rest.render.RenderContext
  * @author Joshua Burnett (@basejump)
  * @since 7.0.8
  */
-//NOT ENABLED
+//******** NOT ENABLED *******
 @Slf4j
 @CompileStatic
 class SyncJobRenderer implements JsonRendererTrait<SyncJobEntity> {

@@ -7,7 +7,7 @@ package yakworks.gorm.api.bulk
 import groovy.transform.CompileStatic
 
 import gorm.tools.databinding.BasicDataBinder
-import gorm.tools.job.CoreSyncJobParams
+import gorm.tools.job.SyncJobParams
 import gorm.tools.repository.model.DataOp
 import yakworks.etl.DataMimeTypes
 
@@ -18,7 +18,7 @@ import yakworks.etl.DataMimeTypes
  * See BulkableRepo for its primary usage.
  */
 @CompileStatic
-class BulkImportJobParams extends CoreSyncJobParams {
+class BulkImportJobParams extends SyncJobParams {
     public static final JOB_TYPE = 'bulk.import'
 
     String jobType = JOB_TYPE

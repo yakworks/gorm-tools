@@ -7,6 +7,15 @@ import yakworks.etl.DataMimeTypes
 
 class SyncJobArgsSpec extends Specification  {
 
+    void "test MapConstructor"() {
+        when: "defaults"
+        SyncJobArgs args = new SyncJobArgs(queryParams: [foo: 'bar'])
+
+        then:
+        args.queryParams == [foo: 'bar']
+
+    }
+
     void "test withParams"() {
         when: "defaults"
         SyncJobArgs args = SyncJobArgs.withParams([:])
@@ -70,6 +79,19 @@ class SyncJobArgsSpec extends Specification  {
 
         then:
         !fooOp
+
+    }
+
+    void "test builder"() {
+        when: "defaults"
+        SyncJobArgs args = SyncJobArgs.withParams([foo: 'bar'])
+            .includes(['id'])
+            .sourceId("test")
+
+        then:
+        args.queryParams == [foo: 'bar']
+        args.includes == ['id']
+        args.sourceId == "test"
 
     }
 

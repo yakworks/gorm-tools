@@ -175,13 +175,13 @@ class BulkImportService<D> {
         Long jobId = job.id
 
         SyncJobContext jobContext = runJobInit(jobId)
-        //XXX the old way was to throw and exception when CSV parsing failed that got rendered as Problem in response
+        //the old way was to throw an exception when CSV parsing failed that got rendered as Problem in response
         if(!jobContext.ok.get()) {
             throw (jobContext.problems[0] as DataProblemTrait).toException()
         }
         //if attachmentId then assume its a csv
         if(!jobParams.attachmentId) {
-            //XXX dirty ugly hack since we were not consistent and now need to do clean up
+            // dirty ugly hack since we were not consistent and now need to do clean up
             // RNDC expects async to be false by default when its not CSV
             // remove this else hack once this is done https://github.com/9ci/cust-rndc-ext/issues/215
             if(jobParams.async == null) jobContext.args.async = false

@@ -207,7 +207,7 @@ class BulkImportTests extends Specification implements DomainIntTest {
         def job = getBulkImportService(Org).bulkImportLegacy(impParams, jsonList)
 
         assert job.state == SyncJobState.Finished
-        List json = parseJson(job.dataToString())
+        List json = job.dataList
 
         then:
         json
@@ -278,7 +278,7 @@ class BulkImportTests extends Specification implements DomainIntTest {
         job.dataToString()
 
         when: "bulk update"
-        def results = parseJson(job.dataToString())
+        def results = job.dataList
         // assert results[0].data == jsonList
         //update jsonList to prepare for a bulUpdate
         jsonList.eachWithIndex { it, idx ->
@@ -327,7 +327,7 @@ class BulkImportTests extends Specification implements DomainIntTest {
         job.state == SyncJobState.Finished
 
         when:
-        List json = parseJson(job.dataToString())
+        List json = job.dataList
 
         then:
         json != null
@@ -346,8 +346,8 @@ class BulkImportTests extends Specification implements DomainIntTest {
         job.dataToString()
 
         when:
-        List json = parseJson(job.dataToString())
-        List requestData = parseJson(job.payloadToString())
+        List json = job.dataList
+        List requestData = job.payloadList
 
         then:
         json != null
@@ -372,7 +372,7 @@ class BulkImportTests extends Specification implements DomainIntTest {
 
         def job = getBulkImportService(KitchenSink).bulkImportLegacy(setupBulkImportParams(), list)
 
-        def results = parseJson(job.dataToString())
+        def results = job.dataList
 
         then:
         job.ok == false
@@ -419,7 +419,7 @@ class BulkImportTests extends Specification implements DomainIntTest {
         job.dataToString() != null
 
         when: "verify json"
-        List json = parseJson(job.dataToString())
+        List json = job.dataList
         List jsonSuccess = json.findAll({ it.ok == true})
         List jsonFail = json.findAll({ it.ok == false})
 
@@ -477,7 +477,7 @@ class BulkImportTests extends Specification implements DomainIntTest {
         job.dataToString() != null
 
         when: "verify json"
-        List json = parseJson(job.dataToString())
+        List json = job.dataList
 
         then:
         json != null

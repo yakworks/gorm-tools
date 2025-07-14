@@ -32,6 +32,7 @@ class SyncJobServiceTests extends Specification implements DomainIntTest {
     SyncJobContext createJob(){
         def samplePaylod = [1,2,3,4]
         SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', jobType: 'foo')
+        syncJobArgs.dataLayout = DataLayout.Result
         //syncJobArgs.entityClass = Org
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, samplePaylod)
     }
@@ -178,7 +179,7 @@ class SyncJobServiceTests extends Specification implements DomainIntTest {
         List payload = [1,2,3,4]
         SyncJobArgs syncJobArgs = new SyncJobArgs(
             sourceId: '123', source: 'some source', jobType: 'foo',
-            dataLayout: DataLayout.Payload,
+            dataLayout: DataLayout.List,
             //entityClass: Org
         )
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, payload)
@@ -197,7 +198,7 @@ class SyncJobServiceTests extends Specification implements DomainIntTest {
         then:
         SyncJob job = SyncJob.get(jobContext.jobId)
         //job.errorBytes
-        List jsonData = parseJson(job.dataToString())
+        List jsonData = job.dataList
 
 
         jsonData.size() == 2

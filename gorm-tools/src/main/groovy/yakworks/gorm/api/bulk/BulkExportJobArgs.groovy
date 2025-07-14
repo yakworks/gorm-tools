@@ -7,13 +7,12 @@ package yakworks.gorm.api.bulk
 import groovy.transform.CompileStatic
 
 import gorm.tools.databinding.BasicDataBinder
+import gorm.tools.job.DataLayout
 import gorm.tools.job.SyncJobArgs
+import gorm.tools.mango.api.QueryArgs
 
 /**
- * Value Object are better than using a Map to store arguments and parameters.
- * This is used for Bulk operations.
- * Created at the start of the process, in controller this is created from the params passed the action
- * See BulkableRepo for its primary usage.
+ * Bulk Export Args
  */
 @CompileStatic
 class BulkExportJobArgs extends SyncJobArgs {
@@ -26,10 +25,16 @@ class BulkExportJobArgs extends SyncJobArgs {
      */
     String entityClassName
 
-    static BulkExportJobArgs withParams(Map params){
-        BulkExportJobArgs bulkParams = new BulkExportJobArgs()
-        BasicDataBinder.bind(bulkParams, params)
+    Class entityClass
+
+    static BulkExportJobArgs fromParams(Map params){
+        BulkExportJobArgs bulkArgs = new BulkExportJobArgs()
+        BasicDataBinder.bind(bulkArgs, params)
         //BeanTools.bind(bijParams, params)
-        return bulkParams
+        //setup queryArgs
+        if(params.containsKey("q") || params.containsKey("qSearch") ) {
+            bulkArgs.queryArgs = QueryArgs.of(params)
+        }
+        return bulkArgs
     }
 }

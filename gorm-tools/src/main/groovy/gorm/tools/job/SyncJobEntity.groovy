@@ -10,6 +10,8 @@ import groovy.transform.CompileStatic
 import gorm.tools.model.SourceTrait
 import yakworks.etl.DataMimeTypes
 
+import static yakworks.json.groovy.JsonEngine.parseJson
+
 /*
 transform example when in a job
 {
@@ -127,6 +129,16 @@ trait SyncJobEntity implements SourceTrait {
         return payloadBytes ? new String(payloadBytes, "UTF-8") : '[]'
     }
 
+    //parseJson, for testing,  dont use to render
+    List getDataList(){
+        parseJson(dataToString(), List)
+    }
+
+    //parseJson, for testing, dont use to render
+    List getPayloadList(){
+        parseJson(payloadToString(), List)
+    }
+
     // String problemsToString() {
     //     return problemsBytes ? new String(problemsBytes, "UTF-8") : '[]'
     // }
@@ -148,4 +160,6 @@ trait SyncJobEntity implements SourceTrait {
         sourceId : [d: 'the unique id from the outside source for the scheduled job', nullable: true],
         jobType : [d: 'The type indicator for the kind of job', nullable: false]
     ]
+
+
 }

@@ -58,7 +58,7 @@ class SyncJobContext {
     /** The master results object */
     ApiResults results
 
-    /** The problems will be populated if dataLayout="payload", then this will be where they are stored */
+    /** The problems will be populated if dataLayout="List or Map", then this will be where they are stored */
     List<Problem> problems = [] as List<Problem>
 
     /** Payload input data used for job operations */
@@ -90,42 +90,6 @@ class SyncJobContext {
      * The job id gets populated once the job is created or startJob called
      */
     Long getJobId(){ return args.jobId }
-
-    /** create a job using the syncJobService.repo.create */
-    // SyncJobContext createJob(){
-    //     Validate.notNull(payload)
-    //     //get jobId early so it can be used, might not need this anymore
-    //     args.jobId = ((IdGeneratorRepo)syncJobService.repo).generateId()
-    //     setPayloadSize(payload)
-    //
-    //     Map data = [
-    //         id: args.jobId, source: args.source, sourceId: args.sourceId,
-    //         state: args.jobState, payload: payload
-    //     ] as Map<String,Object>
-    //
-    //     if(payload instanceof Collection && payload.size() > 1000) {
-    //         args.savePayloadAsFile = true
-    //         args.saveDataAsFile = true
-    //     }
-    //
-    //     if(args.savePayload){
-    //         if (payload && args.savePayloadAsFile) {
-    //             data.payloadId = writePayloadFile(payload as Collection)
-    //         }
-    //         else {
-    //             String res = JsonEngine.toJson(payload)
-    //             data.payloadBytes = res.bytes
-    //         }
-    //     }
-    //
-    //     //the call to this createJob method is already wrapped in a new trx
-    //     def jobEntity = syncJobService.repo.create(data, [flush: true, bindId: true]) as SyncJobEntity
-    //
-    //     //inititialize the ApiResults to be used in process
-    //     results = ApiResults.create()
-    //
-    //     return this
-    // }
 
     /**
      * Update the job results with the current progress info
@@ -217,8 +181,8 @@ class SyncJobContext {
             List<Map> renderResults = transformResults(results)
             data.dataBytes = JsonEngine.toJson(renderResults).bytes
         }
-        //if dataLayout is payload then we need to save the problems.
-        if(args.dataLayout == DataLayout.Payload && problems.size() > 0) {
+        //if dataLayout is List then we need to save the problems.
+        if(args.dataLayout == DataLayout.List && problems.size() > 0) {
             //data.errorBytes = JsonEngine.toJson(problems).bytes
             data.problems = problems*.asMap()
         }
@@ -244,7 +208,7 @@ class SyncJobContext {
             return transformResultsClosure.call(resultToTransform) as List<Map>
         }
         List<Result> resultList = (resultToTransform instanceof ApiResults) ? resultToTransform.list : [ resultToTransform ]
-        List<Map> ret = args.dataLayout == DataLayout.Payload ? transformResultPayloads(resultList) : transformResultToMap(resultList)
+        List<Map> ret = args.dataLayout == DataLayout.List ? transformResultPayloads(resultList) : transformResultToMap(resultList)
         return ret
     }
 

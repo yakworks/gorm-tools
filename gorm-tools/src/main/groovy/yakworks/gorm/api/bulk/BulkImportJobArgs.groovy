@@ -8,6 +8,7 @@ import groovy.transform.CompileStatic
 import groovy.transform.ToString
 
 import gorm.tools.databinding.BasicDataBinder
+import gorm.tools.job.DataLayout
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp
@@ -23,6 +24,9 @@ class BulkImportJobArgs extends SyncJobArgs {
     public static final JOB_TYPE = 'bulk.import'
 
     String jobType = JOB_TYPE
+
+    //override default
+    DataLayout dataLayout = DataLayout.Result
 
     /**
      * the operation to perform, Used in bulk and limited to add, update and upsert right now.

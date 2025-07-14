@@ -38,15 +38,18 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
         BulkExportService.lookup(KitchenSink)
     }
 
-    void "test setupSyncJobArgs"() {
+    void "test setupJobArgs"() {
         given:
-        BulkExportJobArgs jobParams = BulkExportJobArgs.withParams([
-            sourceId: "test-job", includes: ['id','name','ext.name'],
-            q: '{"id":{"$gte":1}}'
-        ])
+        SyncJobEntity jobEnt = bulkExportService.queueJob(
+            new BulkExportJobArgs(
+                q: '{"foo": "bar"}',
+                includes: ["id", "name", "ext.name"],
+                sourceId: "test-job"
+            )
+        )
 
         when:
-        SyncJobArgs jobArgs = bulkExportService.setupJobArgs(jobParams)
+        BulkExportJobArgs jobArgs = bulkExportService.setupJobArgs(jobEnt)
 
         then:
         noExceptionThrown()
@@ -54,10 +57,9 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
         jobArgs.jobType == BulkExportJobArgs.JOB_TYPE
         jobArgs.sourceId == "test-job"
         jobArgs.queryArgs
-        //XXX
-        //jobArgs.entityClass == KitchenSink
+        jobArgs.entityClass == KitchenSink
         jobArgs.includes == ['id','name','ext.name']
-        jobArgs.dataLayout == DataLayout.Payload
+        jobArgs.dataLayout == DataLayout.List
     }
 
     Long bulkExport(String q){

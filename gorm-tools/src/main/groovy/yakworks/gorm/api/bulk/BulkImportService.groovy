@@ -99,8 +99,6 @@ class BulkImportService<D> {
                 jobParams.payloadId = syncJobService.writePayloadFile(jobParams.jobId, payloadBody)
             }
             else {
-                // String res = JsonEngine.toJson(payloadBody)
-                // data.payloadBytes = res.bytes
                 jobParams.payload = payloadBody
             }
         } else {

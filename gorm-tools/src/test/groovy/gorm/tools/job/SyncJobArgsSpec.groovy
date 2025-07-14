@@ -37,13 +37,13 @@ class SyncJobArgsSpec extends Specification  {
         args.dataFormat == DataMimeTypes.csv
 
         when: "make sure the others work"
-        args = SyncJobArgs.withParams([async:false, jobSource: "foo", dataLayout: "payload"])
+        args = SyncJobArgs.withParams([async:false, jobSource: "foo", dataLayout: "result"])
 
         then:
         !args.async
         args.source == "foo"
         !args.sourceId
-        args.dataLayout == DataLayout.Payload
+        args.dataLayout == DataLayout.Result
     }
 
     void "test enum"() {

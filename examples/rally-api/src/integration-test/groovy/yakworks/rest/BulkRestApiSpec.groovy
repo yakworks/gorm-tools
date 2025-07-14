@@ -105,7 +105,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         job.dataToString()
 
         when:
-        List json = parseJson(job.dataToString())
+        List json = job.dataList
         List requestData = parseJson(job.payloadToString())
 
         then:
@@ -134,8 +134,8 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         job.dataToString()
 
         when:
-        List json = parseJson(job.dataToString())
-        List requestData = parseJson(job.payloadToString())
+        List json = job.dataList
+        List requestData = job.payloadList
 
         then:
         json != null

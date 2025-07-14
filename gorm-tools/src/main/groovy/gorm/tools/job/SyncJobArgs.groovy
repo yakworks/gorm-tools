@@ -110,7 +110,7 @@ class SyncJobArgs {
     DataMimeTypes dataFormat = DataMimeTypes.json
 
     /**
-     * If dataLayout=Payload then data is just a json list or map as the data it, and errors will be in the problems field.
+     * If dataLayout=List then data is just a json list or map as the data it, and errors will be in the problems field.
      * BulkExport uses Payload for example.
      * dataLayout=Payload IS the recomended way.
      * If dataLayout=Result then data is a list of Result/Problem objects.
@@ -123,7 +123,7 @@ class SyncJobArgs {
      * Since data can only support a list of entities then any issues or errors get stored in the separate problems field,
      * syncjob.problems will be populated with error results
      */
-    DataLayout dataLayout = DataLayout.Result
+    DataLayout dataLayout = DataLayout.List
 
     /**
      * Payload input data used for job operations

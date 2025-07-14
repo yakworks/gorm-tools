@@ -244,7 +244,7 @@ trait CrudApiController<D> extends RestApiController {
     def bulkExport() {
         try {
             Map qParams = getParamsMap()
-            BulkExportJobArgs jobParams = BulkExportJobArgs.withParams(qParams)
+            BulkExportJobArgs jobParams = BulkExportJobArgs.fromParams(qParams)
             jobParams.sourceId = requestToSourceId(request)
             SyncJobEntity job = getCrudApi().bulkExport(jobParams)
             Map jobMap = JobUtils.jobToMapGroovy(job)

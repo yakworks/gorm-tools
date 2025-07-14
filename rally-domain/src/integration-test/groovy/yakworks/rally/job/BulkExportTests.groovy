@@ -28,15 +28,18 @@ class BulkExportTests extends Specification implements DomainIntTest  {
         BulkExportService.lookup(Org)
     }
 
-    void "test setupSyncJobArgs"() {
+    void "test setupJobArgs"() {
         given:
-        BulkExportJobArgs jobParams = BulkExportJobArgs.withParams([
-            sourceId: "test-job", includes: ['id','name','info.phone'],
-            q: '{"id":{"$gte":1}}'
-        ])
+        SyncJobEntity jobEnt = bulkExportService.queueJob(
+            new BulkExportJobArgs(
+                q: '{"foo": "bar"}',
+                includes: ["id", "name", "info.phone"],
+                sourceId: "test-job"
+            )
+        )
 
         when:
-        SyncJobArgs jobArgs = bulkExportService.setupJobArgs(jobParams)
+        BulkExportJobArgs jobArgs = bulkExportService.setupJobArgs(jobEnt)
 
         then:
         noExceptionThrown()
@@ -47,7 +50,7 @@ class BulkExportTests extends Specification implements DomainIntTest  {
         //XXX
         //jobArgs.entityClass == Org
         jobArgs.includes == ['id','name','info.phone']
-        jobArgs.dataLayout == DataLayout.Payload
+        jobArgs.dataLayout == DataLayout.List
     }
 
     Long bulkExport(String q){
@@ -145,7 +148,7 @@ class BulkExportTests extends Specification implements DomainIntTest  {
 
         when: "verify job.data (job results)"
         def dataString = job.dataToString()
-        List results = parseJson(dataString, List)
+        List results = job.dataList
 
         then:
         dataString.startsWith('[\n{') //sanity check

@@ -141,7 +141,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
 
         when: "verify job.data (job results)"
         def dataString = job.dataToString()
-        List results = parseJson(dataString, List)
+        List results = job.dataList
 
         then:
         dataString.startsWith('[{') //sanity check
@@ -217,7 +217,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
         Long jobId = bulkImport(list)
         def job = TestSyncJob.get(jobId)
 
-        def results = parseJson(job.dataToString())
+        def results = job.dataList
 
         then:
         job.ok == false
@@ -264,7 +264,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
         job.ok == false
 
         when: "verify job.data"
-        def results = parseJson(job.dataToString())
+        def results = job.dataList
 
         then:
         results != null
@@ -292,7 +292,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
 
         def job = TestSyncJob.get(jobId)
 
-        def results = parseJson(job.dataToString())
+        def results = job.dataList
 
         then: "just 60 should have been inserted, not the entire list twice"
         results.size() == 60

@@ -4,6 +4,7 @@
 */
 package yakworks.rally.job
 
+import gorm.tools.job.SyncJobState
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.model.SourceType
@@ -30,7 +31,12 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
 
     void "sanity check validation with String as data"() {
         expect:
-        SyncJob job = new SyncJob([sourceType: SourceType.ERP, sourceId: 'ar/org'])
+        SyncJob job = new SyncJob(
+            sourceType: SourceType.ERP,
+            sourceId: 'ar/org',
+            state: SyncJobState.Running,
+            jobType: 'bulk'
+        )
         job.validate()
         job.persist()
     }
@@ -47,7 +53,11 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
         def sourceId = "api/ar/org"
         def source = "Oracle"
         def sourceType = SourceType.RestApi
-        def job = SyncJob.repo.create(payloadBytes:dataList.toString().bytes, source:source, sourceType: sourceType, sourceId:sourceId)
+        def job = SyncJob.repo.create(
+            state: SyncJobState.Running, jobType: 'bulk',
+            payloadBytes:dataList.toString().bytes,
+            source:source, sourceType: sourceType, sourceId:sourceId
+        )
 
         then:
         job
@@ -57,7 +67,10 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
     void "check that problems save properly"() {
         when:
         // def errorList = ["ok":false,"tile":"bad stuff here"]
-        def job = new SyncJob(problems: [["ok":false,"title":"error"]]).persist()
+        def job = new SyncJob(
+            state: SyncJobState.Running, jobType: 'bulk',
+            problems: [["ok":false,"title":"error"]]
+        ).persist()
         def jobId = job.id
         // job.problems = [["ok":false,"title":"error"]]
         // job.persist(flush:true)
@@ -72,9 +85,27 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
         job1.problems[0].title == "error"
     }
 
+    void "check params are persisted"() {
+        setup:
+        Map params = [q:[amount:['$gt':100.00]], async:true, parallel:true]
+        Map data = [sourceType: SourceType.ERP, sourceId: 'ar/org', state: SyncJobState.Queued, params:params, jobType: 'bulk']
+
+        when:
+        SyncJob job = SyncJob.repo.create(data)
+        flushAndClear()
+        job.refresh()
+
+        then:
+        noExceptionThrown()
+        job
+        job.params
+        job.params.q == [amount:['$gt':100.00]]
+
+    }
+
     void "problems update"() {
         when:
-        def job = new SyncJob().persist()
+        def job = new SyncJob(state: SyncJobState.Running, jobType: 'bulk').persist()
         def jobId = job.id
         flushAndClear()
         SyncJob.repo.update([id: jobId, problems: [["ok":false,"title":"error"]]])
@@ -94,7 +125,35 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
         def res = JsonEngine.toJson(["One", "Two", "Three"])
 
         when:
-        SyncJob job = new SyncJob(sourceType: SourceType.ERP, sourceId: 'ar/org', payloadBytes: res.bytes)
+        SyncJob job = new SyncJob(
+            state: SyncJobState.Running, jobType: 'bulk',
+            sourceType: SourceType.ERP, sourceId: 'ar/org',
+            payloadBytes: res.bytes
+        )
+        def jobId = job.persist().id
+
+        then: "get jobId"
+        jobId
+
+        when: "query the db for job we can read the data"
+        SyncJob j = SyncJob.get(jobId)
+
+        then:
+        j
+        res.bytes == j.payloadBytes
+        res == j.payloadToString()
+    }
+
+    void "check the syncJob args"() {
+        setup:
+        def res = JsonEngine.toJson(["One", "Two", "Three"])
+
+        when:
+        SyncJob job = new SyncJob(
+            state: SyncJobState.Running, jobType: 'bulk',
+            sourceType: SourceType.ERP, sourceId: 'ar/org',
+            payloadBytes: res.bytes
+        )
         def jobId = job.persist().id
 
         then: "get jobId"

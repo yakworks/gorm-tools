@@ -6,8 +6,8 @@ package gorm.tools.repository.events
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.job.SyncJobArgs
 import gorm.tools.repository.GormRepo
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 
 /**
  * For bulk processing this is fired before each individual item is created or updated.
@@ -17,9 +17,9 @@ import gorm.tools.repository.GormRepo
 @CompileStatic
 class BeforeBulkSaveEntityEvent<D> extends RepositoryEvent<D> {
 
-    SyncJobArgs syncJobArgs
+    BulkImportJobArgs syncJobArgs
 
-    BeforeBulkSaveEntityEvent(GormRepo<D> repo, Map data, SyncJobArgs syncJobArgs) {
+    BeforeBulkSaveEntityEvent(GormRepo<D> repo, Map data, BulkImportJobArgs syncJobArgs) {
         super(repo, RepositoryEventType.BeforeBulkSaveEntity.eventKey)
         this.data = data
         this.syncJobArgs = syncJobArgs

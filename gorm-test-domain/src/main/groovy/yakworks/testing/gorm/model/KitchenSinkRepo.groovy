@@ -16,6 +16,7 @@ import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforeBulkSaveEntityEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.RepoListener
+import gorm.tools.repository.model.DataOp
 import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.validation.Rejector
 import grails.gorm.transactions.Transactional
@@ -82,7 +83,7 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
 
     @RepoListener
     void beforeBulkSaveEntity(BeforeBulkSaveEntityEvent e) {
-        if (e.syncJobArgs.isCreate()) {
+        if (e.syncJobArgs.op == DataOp.add) {
             e.data['createdByJobId'] = e.syncJobArgs.jobId
         }
     }
@@ -158,6 +159,9 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
         return data
     }
 
+    /**
+     * Generates a list of maps for import tests
+     */
     List<Map> generateDataList(int numRecords, Map extraData = [:]) {
         _faker = new Faker(new Random(0))
         List<Map> list = []

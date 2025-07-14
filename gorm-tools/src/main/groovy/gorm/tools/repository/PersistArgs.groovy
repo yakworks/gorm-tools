@@ -6,6 +6,7 @@ package gorm.tools.repository
 
 import groovy.transform.AutoClone
 import groovy.transform.CompileStatic
+import groovy.transform.EqualsAndHashCode
 import groovy.transform.MapConstructor
 import groovy.transform.ToString
 import groovy.transform.builder.Builder
@@ -22,6 +23,7 @@ import yakworks.commons.map.Maps
 @MapConstructor
 @ToString
 @AutoClone
+@EqualsAndHashCode
 @CompileStatic
 class PersistArgs {
 
@@ -133,6 +135,7 @@ class PersistArgs {
             super.asType(clazz)
         }
     }
+
 
 
 }

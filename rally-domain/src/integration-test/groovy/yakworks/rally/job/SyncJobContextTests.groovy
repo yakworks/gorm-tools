@@ -1,22 +1,19 @@
 package yakworks.rally.job
 
+import gorm.tools.job.DataLayout
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
-import gorm.tools.job.SyncJobService
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import groovy.json.JsonException
 import groovy.json.JsonSlurper
 
-import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.api.problem.Problem
-import yakworks.json.groovy.JsonEngine
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.attachment.model.Attachment
-import yakworks.rally.orgs.model.Org
 
 import static yakworks.json.groovy.JsonEngine.parseJson
 
@@ -28,8 +25,8 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
 
     SyncJobContext createJob(){
         def samplePaylod = [1,2,3,4]
-        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source')
-        syncJobArgs.entityClass = Org
+        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', jobType: 'foo')
+        syncJobArgs.dataLayout = DataLayout.Result
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, samplePaylod)
     }
 
@@ -44,10 +41,8 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
     void "test create job and save payload to file"() {
         when:
         List payload = [1,2,3,4]
-        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source')
-        syncJobArgs.entityClass = Org
-        syncJobArgs.savePayload = true
-        syncJobArgs.savePayloadAsFile = true
+        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', jobType: 'foo')
+        //syncJobArgs.savePayloadAsFile = true
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, payload)
 
         then:
@@ -152,10 +147,13 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
 
     }
 
-    def "test finish job dataFormat is Payload"() {
+    def "test finish job dataLayout is Payload"() {
         given:
         List payload = [1,2,3,4]
-        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', dataFormat: SyncJobArgs.DataFormat.Payload)
+        SyncJobArgs syncJobArgs = new SyncJobArgs(
+            sourceId: '123', source: 'some source', jobType: 'foo',
+            dataLayout: DataLayout.List
+        )
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, payload)
 
         def okResults = ApiResults.OK()
@@ -172,7 +170,7 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         then:
         SyncJob job = SyncJob.get(jobContext.jobId)
         //job.errorBytes
-        List jsonData = parseJson(job.dataToString())
+        List jsonData = job.dataList
 
 
         jsonData.size() == 2

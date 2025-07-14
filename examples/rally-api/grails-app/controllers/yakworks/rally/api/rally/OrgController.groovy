@@ -6,12 +6,10 @@ package yakworks.rally.api.rally
 
 import groovy.transform.CompileStatic
 
-import yakworks.api.problem.data.DataProblem
 import yakworks.rally.orgs.model.Org
 import yakworks.rest.gorm.controller.CrudApiController
 
 import static org.springframework.http.HttpStatus.CREATED
-import static org.springframework.http.HttpStatus.OK
 
 @CompileStatic
 class OrgController implements CrudApiController<Org> {

@@ -4,20 +4,19 @@
 */
 package yakworks.rally.job
 
-import javax.servlet.http.HttpServletRequest
-
+import groovy.json.JsonOutput
 import groovy.transform.CompileStatic
 
 import org.springframework.stereotype.Component
 
-import gorm.tools.job.JobUtils
 import gorm.tools.job.SyncJobEntity
-import gorm.tools.repository.model.DataOp
 import yakworks.api.HttpStatus
 import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemException
 import yakworks.commons.map.Maps
 import yakworks.gorm.api.DefaultCrudApi
+import yakworks.gorm.api.bulk.BulkExportJobArgs
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 
 /**
  * Used by CrudApiController for rest api.
@@ -49,7 +48,12 @@ class SyncJobCrudApi extends DefaultCrudApi<SyncJob> {
     }
 
     @Override
-    SyncJobEntity bulk(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId) {
+    SyncJobEntity bulkImport(BulkImportJobArgs jobParams, List<Map> bodyList){
+        throw notSupported("bulk")
+    }
+
+    @Override
+    SyncJobEntity bulkExport(BulkExportJobArgs jobParams) {
         throw notSupported("bulk")
     }
 
@@ -62,12 +66,14 @@ class SyncJobCrudApi extends DefaultCrudApi<SyncJob> {
     Map entityToMap(SyncJob job, List<String> includes){
         //clone metamap, SomeHow trying to put a new entry in MetaMap throws UnSupportedOperationException
         Map response = Maps.clone(super.entityToMap(job, includes))
-        response.put("data", JobUtils.getRowJobData(job))
+        if(job.isFinshedAndJson()) {
+            response.put("data", JsonOutput.unescaped(job.dataToString()))
+        }
         return response
     }
 
-    static String requestToSourceId(HttpServletRequest req){
-        JobUtils.requestToSourceId(req)
-    }
+    // static String requestToSourceId(HttpServletRequest req){
+    //     JobUtils.requestToSourceId(req)
+    // }
 
 }

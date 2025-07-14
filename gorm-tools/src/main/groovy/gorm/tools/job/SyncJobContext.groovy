@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import groovy.json.StreamingJsonBuilder
 import groovy.transform.CompileStatic
 import groovy.transform.MapConstructor
+import groovy.transform.Synchronized
 import groovy.transform.ToString
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
@@ -18,23 +19,21 @@ import groovy.util.logging.Slf4j
 
 import org.codehaus.groovy.runtime.StackTraceUtils
 
-import gorm.tools.repository.model.IdGeneratorRepo
+import gorm.tools.job.events.SyncJobFinishedEvent
 import gorm.tools.utils.BenchmarkHelper
 import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.api.ResultUtils
 import yakworks.api.problem.Problem
 import yakworks.commons.io.IOUtils
-import yakworks.commons.lang.Validate
+import yakworks.etl.CSVMapWriter
+import yakworks.etl.DataMimeTypes
 import yakworks.json.groovy.JsonEngine
-import yakworks.json.groovy.JsonStreaming
 import yakworks.message.spi.MsgService
 import yakworks.spring.AppCtx
 
-import static gorm.tools.job.SyncJobArgs.DataFormat
-
 /**
- * Holds the basic state and primary action methods for a Bulk job.
+ * Holds the basic state and primary action methods while running a SyncJoob.
  * Creates and updates the job status as it progresses and finalizes its results when finished.
  */
 @SuppressWarnings('Println')
@@ -59,12 +58,15 @@ class SyncJobContext {
     /** The master results object */
     ApiResults results
 
-    /** The problems will be populated if dataFormat="payload", then this will be where they are stored */
+    /** The problems will be populated if dataLayout="List or Map", then this will be where they are stored */
     List<Problem> problems = [] as List<Problem>
 
     /** Payload input data used for job operations */
-    Object payload
+    Object getPayload(){
+        args.payload
+    }
 
+    /** Payload size used for progress messages*/
     int payloadSize
 
     AtomicInteger processedCount = new AtomicInteger()
@@ -79,48 +81,15 @@ class SyncJobContext {
     /** creates a context from the SynJobArgs and assign a back reference to this in SyncJobArgs. */
     static SyncJobContext of(SyncJobArgs args){
         def sjc = new SyncJobContext(args: args)
-        args.context = sjc
+        //args.context = sjc
         return sjc
     }
 
-    /** gets the jobId, stored in args. The job id gets populated once the job is created */
+    /**
+     * gets the jobId, stored in args.
+     * The job id gets populated once the job is created or startJob called
+     */
     Long getJobId(){ return args.jobId }
-
-    /** create a job using the syncJobService.repo.create */
-    SyncJobContext createJob(){
-        Validate.notNull(payload)
-        //get jobId early so it can be used, might not need this anymore
-        args.jobId = ((IdGeneratorRepo)syncJobService.repo).generateId()
-        setPayloadSize(payload)
-
-        Map data = [
-            id: args.jobId, source: args.source, sourceId: args.sourceId,
-            state: args.jobState, payload: payload
-        ] as Map<String,Object>
-
-        if(payload instanceof Collection && payload.size() > 1000) {
-            args.savePayloadAsFile = true
-            args.saveDataAsFile = true
-        }
-
-        if(args.savePayload){
-            if (payload && args.savePayloadAsFile) {
-                data.payloadId = writePayloadFile(payload as Collection)
-            }
-            else {
-                String res = JsonEngine.toJson(payload)
-                data.payloadBytes = res.bytes
-            }
-        }
-
-        //the call to this createJob method is already wrapped in a new trx
-        def jobEntity = syncJobService.repo.create(data, [flush: true, bindId: true]) as SyncJobEntity
-
-        //inititialize the ApiResults to be used in process
-        results = ApiResults.create()
-
-        return this
-    }
 
     /**
      * Update the job results with the current progress info
@@ -129,7 +98,7 @@ class SyncJobContext {
      * @param startTimeMillis the start time in millis, used to deduce time elapsed
      * @param throwEx if false then only does log.error and will not throw on an exception so flow is not disrupted if this flakes out
      */
-    void updateJobResults(Result apiResults, boolean throwEx = true) {
+    void updateJobResults(Result apiResults, boolean throwEx = true, Integer sliceCount = null) {
         try {
 
             if(!apiResults.ok) {
@@ -140,6 +109,12 @@ class SyncJobContext {
             }
             //increment the processedCount
             int processedCnt = (apiResults instanceof ApiResults) ? apiResults.list.size() : 1
+            //if messageCoutn is passed in then use that for the messages
+            if(sliceCount){
+                processedCnt = sliceCount
+            } else {
+                processedCnt = (apiResults instanceof ApiResults) ? apiResults.list.size() : 1
+            }
             processedCount.addAndGet(processedCnt)
 
             String message = getJobUpdateMessage(apiResults.ok)
@@ -191,20 +166,23 @@ class SyncJobContext {
      */
     SyncJobEntity finishJob() {
         Map data = [id: jobId] as Map<String, Object>
-        if(args.saveDataAsFile){
+        if(args.shouldSaveDataAsFile()){
             // if saveDataAsFile then it will have been writing out the data results as it goes
-            //close out the file
-            dataPath.withWriterAppend { wr ->
-                wr.write('\n]\n')
+            //close out the file for JSON
+            if(args.dataFormat == DataMimeTypes.json) {
+                dataPath.withWriterAppend { wr ->
+                    wr.write('\n]\n')
+                }
             }
-            data['dataId'] = syncJobService.createAttachment(dataPath, "SyncJobData_${jobId}_.json")
+            String ext = args.dataFormat as String
+            data['dataId'] = syncJobService.createAttachment(dataPath, "SyncJobData_${jobId}.${ext}")
         } else {
             // if NOT saveDataAsFile then we need to write out the results to dataBytes since results have not been written out yet.
             List<Map> renderResults = transformResults(results)
             data.dataBytes = JsonEngine.toJson(renderResults).bytes
         }
-        //if dataFormat is payload then we need to save the problems.
-        if(args.dataFormat == DataFormat.Payload && problems.size() > 0) {
+        //if dataLayout is List then we need to save the problems.
+        if(args.dataLayout == DataLayout.List && problems.size() > 0) {
             //data.errorBytes = JsonEngine.toJson(problems).bytes
             data.problems = problems*.asMap()
         }
@@ -230,7 +208,7 @@ class SyncJobContext {
             return transformResultsClosure.call(resultToTransform) as List<Map>
         }
         List<Result> resultList = (resultToTransform instanceof ApiResults) ? resultToTransform.list : [ resultToTransform ]
-        List<Map> ret = args.dataFormat == DataFormat.Payload ? transformResultPayloads(resultList) : transformResultToMap(resultList)
+        List<Map> ret = args.dataLayout == DataLayout.List ? transformResultPayloads(resultList) : transformResultToMap(resultList)
         return ret
     }
 
@@ -265,7 +243,11 @@ class SyncJobContext {
             if (r instanceof Problem) {
                 problems.add(r)
             } else {
-                resMapList.add( r.payload as Map)
+                if(r.payload instanceof List){
+                    resMapList.addAll( r.payload as List<Map> )
+                } else { //assume its a map
+                    resMapList.add( r.payload as Map)
+                }
             }
         }
         return resMapList
@@ -290,24 +272,19 @@ class SyncJobContext {
     }
 
     /**
-     * called from createJob to set the payloads size. which is used to decide whether its stored at file or in db as bytes.
-     */
-    protected void setPayloadSize(Object payload){
-        if(payload instanceof Collection){
-            this.payloadSize = payload.size()
-        }
-    }
-
-    /**
      * Update the job with status on whats been processed and append the json data
      * @param currentResults the results to append, normally will be an ApiResults but can be any Problem or Result
      */
+    @Synchronized //sync to only one thread for the SyncJob can update at a time
     protected void updateJob(Result currentResults, Map data){
-        //sync to only one thread for the SyncJob can update at a time
-        synchronized ("SyncJob${jobId}".toString().intern()) {
-            syncJobService.updateJob(data)
-            // append json to dataFile
-            if(currentResults) appendDataResults(currentResults)
+        syncJobService.updateJob(data)
+        // append json to dataFile
+        if(currentResults) {
+            if(args.dataFormat == DataMimeTypes.json) {
+                appendDataResults(currentResults)
+            } else if(args.dataFormat == DataMimeTypes.csv){
+                appendCsv(currentResults)
+            }
         }
     }
 
@@ -316,11 +293,12 @@ class SyncJobContext {
      * @param currentResults the results to append, normally will be an ApiResults but can be any Problem or Result
      */
     protected void appendDataResults(Result currentResults){
-        if(args.saveDataAsFile){
+        //if isSaveDataAsFile then write out the results now
+        if(args.shouldSaveDataAsFile()){
             boolean isFirstWrite = false
             if(!dataPath) {
                 isFirstWrite = true // its first time writing
-                initJsonDataFile()
+                initDataFile()
             }
             def writer = dataPath.newWriter(true)
             def sjb = new StreamingJsonBuilder(writer, JsonEngine.generator)
@@ -333,33 +311,50 @@ class SyncJobContext {
             }
             IOUtils.flushAndClose(writer)
         } else {
+            //if not save to file then saves it in memory and will write it out to the prop at finish
             results.merge currentResults
         }
 
     }
 
     /**
-     * when args.saveDataAsFile = true, this is called to initialize the datafile
+     * Append the results. called from updateJob
+     * @param currentResults the results to append, normally will be an ApiResults but can be any Problem or Result
      */
-    protected void initJsonDataFile() {
-        String filename = "SyncJobData_${jobId}_.json"
-        dataPath = syncJobService.createTempFile(filename)
-        //init with the opening brace
-        dataPath.withWriter { wr ->
-            wr.write('[\n')
+    protected void appendCsv(Result currentResults){
+        boolean isFirstWrite = false
+        if(!dataPath) {
+            isFirstWrite = true // its first time writing
+            initDataFile()
         }
+        def writer = dataPath.newWriter(true)
+        CSVMapWriter csvWriter = CSVMapWriter.of(writer)
+        def dataList = transformResults(currentResults)
+        if(isFirstWrite){
+            csvWriter.createHeader(dataList)
+        } else {
+            //csvHeader needs to have headers setup to write.
+            csvWriter.setupHeaders(dataList)
+        }
+        csvWriter.writeCsv(dataList)
+        //isFirstWrite = false  //set to false once 1st recod is written with a comma ","
+        csvWriter.flush()
+        writer.close()
     }
 
     /**
-     * when args.savePayload and args.savePayloadAsFile are true, this is called to save the payload to file
-     * @param payload the payload List or Map that was sent (will normally have been json when called via REST
-     * @return the Attachment id.
+     * when args.saveDataAsFile = true, this is called to initialize the datafile
      */
-    protected Long writePayloadFile(Collection payload){
-        String filename = "SyncJobPayload_${jobId}_.json"
-        Path path = syncJobService.createTempFile(filename)
-        JsonStreaming.streamToFile(payload, path)
-        return syncJobService.createAttachment(path, filename)
+    protected void initDataFile() {
+        String ext = args.dataFormat as String
+        String filename = "SyncJobData_${jobId}_.${ext}"
+        dataPath = syncJobService.createTempFile(filename)
+        if(args.dataFormat == DataMimeTypes.json){
+            //init with the opening brace for JSON
+            dataPath.withWriter { wr ->
+                wr.write('[\n')
+            }
+        }
     }
 
     /**

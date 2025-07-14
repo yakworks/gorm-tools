@@ -56,10 +56,10 @@ class NewMangoQuery extends DefaultQueryService<MangoThing> {
         new MangoDetachedCriteria(MangoThing).build { eq "id", 2 }
     }
 
-    @Override
-    List pagedList(MangoDetachedCriteria criteria, Pager pager) {
-        criteria.list(max: pager.max, offset: pager.offset)
-    }
+    // @Override
+    // List pagedList(MangoDetachedCriteria criteria, Pager pager) {
+    //     criteria.list(max: pager.max, offset: pager.offset)
+    // }
 
 }
 

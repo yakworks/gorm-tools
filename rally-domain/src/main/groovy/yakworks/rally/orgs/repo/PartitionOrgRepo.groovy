@@ -75,4 +75,5 @@ class PartitionOrgRepo extends LongIdGormRepo<PartitionOrg> {
             query(id: org.id).updateAll(num: org.num, name: org.name)
         }
     }
+
 }

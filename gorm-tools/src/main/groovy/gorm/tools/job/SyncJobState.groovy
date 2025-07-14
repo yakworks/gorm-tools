@@ -15,6 +15,10 @@ enum SyncJobState {
     WTF  // WORK THAT FAILED -- was running or queued and we had to change state to something becasue it's not running
 
     boolean isComplete(){
-        this == Finished || this == Cancelled
+        this == Finished || this == Cancelled || this == WTF
+    }
+
+    boolean isFinished(){
+        this == Finished
     }
 }

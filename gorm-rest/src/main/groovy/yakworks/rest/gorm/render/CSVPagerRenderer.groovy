@@ -26,7 +26,7 @@ class CSVPagerRenderer implements CSVRendererTrait<Pager> {
     void render(Pager pager, RenderContext context) {
         setContentType(context)
         setContentDisposition(context)
-        csvWriter(context).writeCsv(pager.data)
+        csvWriter(context).createHeader(pager.data).writeCsv(pager.data)
     }
 
     //TODO should we set the file name?

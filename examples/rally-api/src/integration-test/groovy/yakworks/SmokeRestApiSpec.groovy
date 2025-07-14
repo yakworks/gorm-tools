@@ -1,6 +1,8 @@
 package yakworks
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.support.DefaultDataBinderFactory
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
@@ -11,6 +13,8 @@ import yakworks.rest.client.OkHttpRestTrait
 @Integration //
 @Rollback
 class SmokeRestApiSpec extends Specification implements OkHttpRestTrait {
+
+    //@Autowired DefaultDataBinderFactory defaultDataBinderFactory
 
     String path = "/api/rally"
 
@@ -43,6 +47,7 @@ class SmokeRestApiSpec extends Specification implements OkHttpRestTrait {
 
     void "get smoke test model"() {
         when:
+        //assert defaultDataBinderFactory
         Response resp = get("$path/smoke/model?foo=buzz&bar=baz")
 
         then:

@@ -151,7 +151,6 @@ class ExcelBuilder {
      */
     ExcelBuilder writeData(Collection<Map> dataList){
         // BenchmarkHelper.startTime()
-        createHeader(dataList)
 
         int rowIdx = 1 //start at 1 as row 0 is header
         dataList.eachWithIndex{ Map rowData, int i ->

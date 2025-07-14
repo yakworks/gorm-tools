@@ -4,9 +4,13 @@
 */
 package gorm.tools.job
 
+
 import groovy.transform.CompileStatic
 
 import gorm.tools.model.SourceTrait
+import yakworks.etl.DataMimeTypes
+
+import static yakworks.json.groovy.JsonEngine.parseJson
 
 /*
 transform example when in a job
@@ -50,6 +54,13 @@ trait SyncJobEntity implements SourceTrait {
 
     public static int MAX_MEG_IN_BYTES = 1024 * 1024 * 10 //10 megabytes
 
+    abstract Long getId()
+
+    /**
+     * The name of the queue to add this to
+     */
+    String jobType
+
     /**
      * will be true if State.Finished without any issues, false if any problems ar in the results data
      */
@@ -58,7 +69,7 @@ trait SyncJobEntity implements SourceTrait {
     /**
      * the current state of the job.
      */
-    SyncJobState state = SyncJobState.Running
+    SyncJobState state //= SyncJobState.Running
 
     String message
 
@@ -72,17 +83,23 @@ trait SyncJobEntity implements SourceTrait {
      */
     byte[] payloadBytes
 
-    // /**
-    //  * gets the payloadData as byte array, either from attachment file or payloadBytes byte array
-    //  */
-    // abstract byte[] getPayloadData()
-
     /**
      * if data is stored as an attachment then this will be the id
      */
     Long dataId
 
-    // abstract byte[] getData()
+    /**
+     * What format the data is in, CSV or JSON
+     */
+    DataMimeTypes dataFormat
+
+    /**
+     * What layout the data is in
+     * Result = its a list of Result/Problem objects?
+     * Payload = its the json data as is, any errors are in the problem field.
+     * List = its the json data as is, any errors are in the problem field.
+     */
+    //DataLayout dataLayout
 
     /**
      * if the resultData is stored in the column this will be populated
@@ -92,9 +109,12 @@ trait SyncJobEntity implements SourceTrait {
     /**
      * if the errors are stored in the column this will be populated
      */
-    //byte[] problemsBytes
-
     List problems
+
+    /**
+     * Full job request params
+     */
+    Map<String, Object> params
 
     /**
      * The data is a response of resources that were successfully and unsuccessfully updated or created after processing.
@@ -109,19 +129,37 @@ trait SyncJobEntity implements SourceTrait {
         return payloadBytes ? new String(payloadBytes, "UTF-8") : '[]'
     }
 
+    //parseJson, for testing,  dont use to render
+    List getDataList(){
+        parseJson(dataToString(), List)
+    }
+
+    //parseJson, for testing, dont use to render
+    List getPayloadList(){
+        parseJson(payloadToString(), List)
+    }
+
     // String problemsToString() {
     //     return problemsBytes ? new String(problemsBytes, "UTF-8") : '[]'
     // }
+
+    boolean isFinshedAndJson(){
+        return (this.state == SyncJobState.Finished && this.dataFormat == DataMimeTypes.json)
+    }
 
     static constraintsMap = [
         state       : [d: 'State of the job', nullable: false],
         message     : [d: 'Status message or log', maxSize: 500],
         payloadId   : [d: 'If payload is stored as attahcment file this is the id', oapi: "NO"],
-        payloadBytes: [d      : 'Json payload data (stored as byte array) that is passed in, for example list of items to bulk create',
+        payloadBytes: [d: 'Json payload data (stored as byte array) that is passed in, for example list of items to bulk create',
                        maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
+        dataFormat : [d: 'The format the data is in, csv or json'],
         dataId      : [d: 'If data is saved as attahchment file this is the id', oapi: "NO"],
         dataBytes   : [d: 'The result data stored as bytes', maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
         //errorBytes  : [d: 'The error data stored as bytes', maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
-        sourceId : [d: 'the unique id from the outside source for the scheduled job', nullable: true]
+        sourceId : [d: 'the unique id from the outside source for the scheduled job', nullable: true],
+        jobType : [d: 'The type indicator for the kind of job', nullable: false]
     ]
+
+
 }

@@ -6,7 +6,6 @@ package gorm.tools.repository.model
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.job.SyncJobArgs
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.api.QueryService
@@ -14,6 +13,7 @@ import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.RepoUtil
 import yakworks.api.problem.data.NotFoundProblem
+
 //NOTE: No Grail-Gorm dependencies here
 
 /**
@@ -150,7 +150,7 @@ interface ApiCrudRepo<D> {
      * @param syncJobArgs the args object to pass on to doBulk
      * @return Job id
      */
-    Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs)
+    // Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs)
     //--------------------Mango Query -------------------
 
     /**

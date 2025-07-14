@@ -15,8 +15,10 @@ import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp
 import yakworks.commons.lang.EnumUtils
+import yakworks.commons.map.Maps
 import yakworks.etl.DataMimeTypes
 import yakworks.json.groovy.JsonEngine
+import yakworks.meta.MetaUtils
 
 /**
  * Value Object are better than using a Map to store arguments and parameters.
@@ -24,24 +26,96 @@ import yakworks.json.groovy.JsonEngine
  * Created at the start of the process, in controller this is created from the params passed the action
  */
 @Builder(builderStrategy= SimpleStrategy, prefix="")
-@MapConstructor(includeSuperProperties = true)
-@ToString(includeSuperProperties =true, includeNames = true, includes = ['jobId', 'jobType', 'op', 'source', 'sourceId'])
+@MapConstructor
+@ToString(includeNames = true, includes = ['jobId', 'jobType', 'source', 'sourceId'])
 @CompileStatic
-class SyncJobArgs extends SyncJobParams {
+class SyncJobArgs {
 
     SyncJobArgs() { this([:])}
 
     /**
-     * When params include a mango query this is the QueryArgs that are created from it. Used for the ExportSyncArgs.
-     * Used for filtering in various jobs, BulkExport in gorm-tools for example usage
+     * The job id, will get populated when the job is created, normally from the syncJobContext.
      */
-    QueryArgs queryArgs
-
-    //************* Override *************
+    Long jobId
 
     /**
-     * If dataLayout=Payload then data is just a json list or map, and errors will be in the problems field. Bulk uses this way.
-     * If dataLayout=Result then errors are mixed in and the syncJob.data is just a rendered list of the Result or Problem objects.
+     * Job Type key
+     */
+    String jobType
+
+    /**
+     * You can specify consistent source name for the data, for example “Oracle ERP”, “Dynamics” etc…
+     */
+    String source
+
+    /**
+     * Usually set automatically and does not need to be filled
+     */
+    String sourceId
+
+    /**
+     * Normally used for testing and debugging, or when encountering deadlocks.
+     * Allows to override and turn off the AsyncArgs.enabled passed to ParallelTools
+     * When the processes slices it will parallelize and run them async. If false then will not run in parallel and will be single threaded
+     * NOTE: This is null by default and should not default to true/false, when it gets set to AsyncArgs.enabled if thats null
+     * then it will use the system/config defaults from gorm.tools.async.enabled
+     */
+    Boolean parallel //keep NULL by default
+
+    /**
+     * Whether it should run in async background thread and return the job immediately.
+     * Essentially makes the job a sort of Promise or Future.
+     * when false (default) run in a standard blocking synchronous thread and return when job is done
+     * NOTE: Some SyncJobs only run as async=true, BulkExport for example.
+     */
+    Boolean async
+
+    /**
+     * For results, comma seperated list of fields to include for the SyncJob.data
+     */
+    List<String> includes //= ['id']
+
+    /**
+     * can pass in the key to look up form our includes
+     */
+    String includesKey
+
+    /**
+     * List of keys to include from the data map that failed.
+     * default is null which means it returns the originalData that was submitted.
+     */
+    List<String> errorIncludes //= null
+    //String errorIncludes
+
+    /**
+     * some syncjobs can involve a "q" mango query
+     */
+    String q
+
+    /**
+     * force payload to store as file instead of bytes
+     * Primarily used for dev/tests
+     */
+    Boolean savePayloadAsFile
+
+    /**
+     * resulting data (what is returned in response) is always saved but can force it to save to file instead of bytes in column
+     * Primarily used for dev/tests
+     */
+    Boolean saveDataAsFile //= false
+
+    /**
+     * (When attachmentId is set) Format for the data. either CSV or JSON are currently supported.
+     */
+    DataMimeTypes dataFormat = DataMimeTypes.json
+
+    /**
+     * If dataLayout=Payload then data is just a json list or map as the data it, and errors will be in the problems field.
+     * BulkExport uses Payload for example.
+     * dataLayout=Payload IS the recomended way.
+     * If dataLayout=Result then data is a list of Result/Problem objects.
+     * Errors are mixed in and the syncJob.data is just a rendered list of the Result or Problem objects.
+     * BulkImport uses Payload for example. This is considered deprecated.
      * When dataLayout=Payload then the rendering of the data is only list of whats in each results payload.
      * as opposed to a list of Results objects when dataLayout=Result
      * For example if processing import then instead of getting syncJob.data as a list of results objects it will be a list of what
@@ -51,13 +125,10 @@ class SyncJobArgs extends SyncJobParams {
      */
     DataLayout dataLayout = DataLayout.Result
 
-    @CompileStatic
-    static enum DataLayout { Result, Payload }
-
     /**
      * Payload input data used for job operations
      */
-    Object payload
+    Object payload //transient in asMap
 
     /**
      * if attachment already created, this is the attachmentId
@@ -65,44 +136,36 @@ class SyncJobArgs extends SyncJobParams {
     Long payloadId
 
     /**
+     * The full query args/params map that were passed into the call.
+     * Constructed and cached here in the withParams method
+     * Can be used to get any extra custom items that were pased in, such as we do with "apply" when calling arAdjust bulk.
+     */
+    Map<String, Object> queryParams
+
+    /**
+     * When params include a mango query this is the QueryArgs that are created from it. Used for the ExportSyncArgs.
+     * Used for filtering in various jobs, BulkExport in gorm-tools for example usage
+     */
+    QueryArgs queryArgs //transient in asMap
+
+    /**
      * the operation to perform, Used in bulk and limited to add, update and upsert right now.
      */
-    DataOp op
+    // DataOp op
 
     /**
      * the args, such as flush:true etc.., to pass down to the repo methods
      * Helpful for bindId when bulk importing rows that have id already.
      */
-    Map persistArgs
-
-    /**
-     * returns new PersistArgs instance on each call.
-     * GormRepo make changes as it goes so we dont want the same one going through multiple cylces
-     */
-    PersistArgs getPersistArgs() {
-        return this.persistArgs ? PersistArgs.of(this.persistArgs) : new PersistArgs()
-    }
-
-    /**
-     * The job id, will get populated when the job is created, normally from the syncJobContext.
-     */
-    Long jobId
+    //PersistArgs persistArgs //= PersistArgs.defaults()
 
     /**
      * The domain on which the bulk is being performed
      * Used by event listeners to filter and process selectively
+     * FIXME only needed for BulkImport legacy to set calss on the BulkImportFinishedEvent, once we are doing new way we can remove this
      */
-    Class entityClass
+    // Class entityClass
 
-    //reference back to the SyncJobContext built from these args.
-    //SyncJobContext context
-
-    /** helper to return true if op=DataOp.add */
-    boolean isCreate(){
-        op == DataOp.add
-    }
-
-    @Override
     // Boolean isSavePayloadAsFile(){
     //     //if its set then use it
     //     if(super.savePayloadAsFile != null) return super.savePayloadAsFile
@@ -110,27 +173,12 @@ class SyncJobArgs extends SyncJobParams {
     //     return (payload instanceof Collection && ((Collection)payload).size() > 1000)
     // }
 
-    @Override
-    Boolean isSaveDataAsFile(){
+    Boolean shouldSaveDataAsFile(){
         //if its set then use it
         if(this.saveDataAsFile != null) return this.saveDataAsFile
         // Base it on the payload, if its big then assume data will be too.
         return (payload instanceof Collection && ((Collection)payload).size() > 1000)
     }
-
-    static SyncJobArgs of(DataOp dataOp){
-        new SyncJobArgs(op: dataOp)
-    }
-
-    static SyncJobArgs create(Map args = [:]){
-        args.op = DataOp.add
-        new SyncJobArgs(args)
-    }
-
-    // static SyncJobArgs update(Map args = [:]){
-    //     args.op = DataOp.update
-    //     new SyncJobArgs(args)
-    // }
 
     static SyncJobArgs withParams(Map params){
         SyncJobArgs syncJobArgs = new SyncJobArgs(queryParams: params)
@@ -149,7 +197,7 @@ class SyncJobArgs extends SyncJobParams {
         //Support legacy param if they pass jobSource it will win
         if(params.jobSource != null) syncJobArgs.source = params.jobSource
         if(params.jobType != null) syncJobArgs.jobType = params.jobType
-        if(params.op != null) syncJobArgs.op = EnumUtils.getEnumIgnoreCase(DataOp, params.op as String)
+        //if(params.op != null) syncJobArgs.op = EnumUtils.getEnumIgnoreCase(DataOp, params.op as String)
         if(params.dataFormat != null) syncJobArgs.dataFormat = EnumUtils.getEnumIgnoreCase(DataMimeTypes, params.dataFormat as String)
 
         //allow to specify the dataLayout
@@ -171,23 +219,43 @@ class SyncJobArgs extends SyncJobParams {
      *  converts to data for queueing up (saving/creating) a SyncJob
      *  Can probably get rid of this, used mostly for the old way of doing it with createJob.
      */
-    @Override
-    Map<String, Object> asJobData(){
-        //make sure to use getters so overrides in super works
-        var dta = [
-            source: getSource(),
-            sourceId: getSourceId(),
-            params: getQueryParams(),
-            jobType: getJobType(),
-            dataFormat: getDataFormat()
-        ] as Map<String,Object>
-        //if its has id then pass it
-        if(getJobId()) dta['id'] = getJobId()
-        //convet payload if its set
-        if(getPayload()){
-            dta.payloadBytes = JsonEngine.toJson(getPayload()).bytes
+    // Map<String, Object> asJobData(){
+    //     //make sure to use getters so overrides in super works
+    //     var dta = [
+    //         source: getSource(),
+    //         sourceId: getSourceId(),
+    //         //params: getQueryParams(),
+    //         params: asMap(),
+    //         jobType: getJobType(),
+    //         dataFormat: getDataFormat(),
+    //         dataLayout: getDataLayout()
+    //     ] as Map<String,Object>
+    //     //if its has id then pass it
+    //     if(getJobId()) dta['id'] = getJobId()
+    //     //convet payload if its set
+    //     if(getPayload()){
+    //         dta.payloadBytes = JsonEngine.toJson(getPayload()).bytes
+    //     }
+    //     return dta
+    // }
+
+    /**
+     * asMap used to store the params in SyncJob table
+     */
+    Map<String, Object> asMap(){
+        //excludes
+        // entityClass, asyncArgs, queryArgs
+        Map<String, Object> mapVals = Maps.prune(MetaUtils.getProperties(this))
+        //dont include the full queryParams key
+        ['jobId', 'entityClass', 'asyncArgs', 'queryArgs', 'queryParams', 'payload'].each {
+            mapVals.remove(it)
         }
-        return dta
+        //get any extra queryParams that are not already keys in this object
+        // queryParams is a full map copy so remove the keys so we can merge whats left
+        Map extraParams = Maps.omit(getQueryParams(), mapVals.keySet())
+        //if there are any entries left then add them
+        if(extraParams) mapVals.putAll(extraParams)
+        mapVals
     }
 
     /**

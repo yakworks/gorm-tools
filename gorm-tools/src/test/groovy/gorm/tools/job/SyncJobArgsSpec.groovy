@@ -43,7 +43,7 @@ class SyncJobArgsSpec extends Specification  {
         !args.async
         args.source == "foo"
         !args.sourceId
-        args.dataLayout == SyncJobArgs.DataLayout.Payload
+        args.dataLayout == DataLayout.Payload
     }
 
     void "test enum"() {

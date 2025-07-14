@@ -16,9 +16,9 @@ import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
 
 import gorm.tools.repository.model.DataOp
-import yakworks.gorm.api.bulk.BulkExportJobParams
+import yakworks.gorm.api.bulk.BulkExportJobArgs
 import yakworks.gorm.api.bulk.BulkExportService
-import yakworks.gorm.api.bulk.BulkImportJobParams
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 import yakworks.gorm.api.bulk.BulkImportService
 import yakworks.rally.job.SyncJob
 import yakworks.testing.gorm.model.KitchenSink
@@ -88,7 +88,7 @@ class TestProducerConfiguration {
         //     source: "test", sourceId: "test-job", includes: ["id", "name", "ext.name"]
         // ]
         // SyncJob jobEnt = (SyncJob)bulkImportService.queueImportJob(DataOp.add, params, "test-job", dataList)
-        def bimpParams = new BulkImportJobParams(
+        def bimpParams = new BulkImportJobArgs(
             op: DataOp.add,
             parallel: false, async:false,
             sourceId: 'test-job', includes: ["id", "name", "ext.name"]
@@ -101,7 +101,7 @@ class TestProducerConfiguration {
     SyncJob submitExportJob(){
         var bulkExportService = BulkExportService.lookup(KitchenSink)
 
-        BulkExportJobParams jobParams = new BulkExportJobParams(
+        BulkExportJobArgs jobParams = new BulkExportJobArgs(
             q: '{"id":{"$gte":1}}',
             sourceId: "test-job", includes: ["id", "name", "ext.name"]
         )

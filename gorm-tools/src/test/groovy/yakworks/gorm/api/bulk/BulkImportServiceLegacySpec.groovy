@@ -38,8 +38,8 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
         // gormConfig.legacyBulk = true
     }
 
-    BulkImportJobParams setupBulkImportParams(DataOp op = DataOp.add){
-        return new BulkImportJobParams(
+    BulkImportJobArgs setupBulkImportParams(DataOp op = DataOp.add){
+        return new BulkImportJobArgs(
             parallel: false,
             async:false,
             op: op,
@@ -192,7 +192,7 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
         results.size() == 20
 
         and: "verify successfull results"
-        results.findAll({ it.ok == true}).size() == 19
+        results.findAll{ it.ok }.size() == 19
         results[0].ok == true
 
         and: "Verify failed record"

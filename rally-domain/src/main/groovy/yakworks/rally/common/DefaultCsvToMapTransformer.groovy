@@ -14,11 +14,12 @@ import org.springframework.stereotype.Service
 import yakworks.commons.io.ZipUtils
 import yakworks.commons.lang.Validate
 import yakworks.etl.CSVPathKeyMapReader
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 import yakworks.gorm.api.bulk.CsvToMapTransformer
 import yakworks.rally.attachment.model.Attachment
 
 /**
- * Read CSV from attachment with CSVPathKeyMapReader and transforms to List of maps
+ * Read CSV from Attachment with CSVPathKeyMapReader and transforms to List of maps
  */
 @Service @Lazy
 @Slf4j
@@ -35,7 +36,7 @@ class DefaultCsvToMapTransformer implements CsvToMapTransformer {
      *
      * @return List<Map>
      */
-    List<Map> process(Map params) {
+    List<Map> process(BulkImportJobArgs params) {
         Long attachmentId = params.attachmentId as Long
         String dataFilename = params.dataFilename ?: "data.csv"
         String headerPathDelimiter = params.headerPathDelimiter ?: "."

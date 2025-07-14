@@ -19,11 +19,12 @@ import gorm.tools.job.events.SyncJobQueueEvent
 import gorm.tools.job.events.SyncJobStateEvent
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
-import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.transaction.TrxService
 import grails.gorm.transactions.Transactional
 import yakworks.api.ApiResults
+import yakworks.gorm.api.bulk.BulkImportFinishedEvent
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 import yakworks.i18n.icu.ICUMessageSource
 import yakworks.json.groovy.JsonStreaming
 import yakworks.spring.AppCtx
@@ -54,7 +55,7 @@ abstract class SyncJobService<D> {
      * Update state to RUNNING
      * Initialize the SyncJobContext and return it
      */
-    SyncJobContext startJob(SyncJobEntity job, SyncJobArgs syncJobArgs){
+    SyncJobContext startJobInit(SyncJobEntity job, SyncJobArgs syncJobArgs){
         assert job.state == SyncJobState.Queued
         job = changeJobStatus(job.id, SyncJobState.Running)
         assert job.state == SyncJobState.Running
@@ -72,12 +73,22 @@ abstract class SyncJobService<D> {
     /**
      * Call repo create in new trx and fires SyncJobQueueEvent.
      */
+    // @Transactional(propagation = Propagation.REQUIRES_NEW)
+    // SyncJobEntity queueJob(Map data){
+    //     if(!data.id) data.id = generateId()
+    //     if(!data.state) data.state = SyncJobState.Queued
+    //     SyncJobEntity jobEntity = getRepo().create(data, PersistArgs.of(flush: true, bindId: true)) as SyncJobEntity
+    //     //NOTE: The event listener is where its either picked up and run or it put on hazelcast queue to be picked up and run
+    //     AppCtx.publishEvent(new SyncJobQueueEvent(jobEntity))
+    //     return jobEntity
+    // }
+
+    /**
+     * Call repo create in new trx and fires SyncJobQueueEvent.
+     */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    SyncJobEntity queueJob(Map data){
-        if(!data.id) data.id = generateId()
-        if(!data.state) data.state = SyncJobState.Queued
-        SyncJobEntity jobEntity = getRepo().create(data, PersistArgs.of(flush: true, bindId: true)) as SyncJobEntity
-        //NOTE: The event listener is where its either picked up and run or it put on hazelcast queue to be picked up and run
+    SyncJobEntity queueJob(SyncJobArgs syncJobArgs){
+        SyncJobEntity jobEntity = createSyncJob(syncJobArgs) as SyncJobEntity
         AppCtx.publishEvent(new SyncJobQueueEvent(jobEntity))
         return jobEntity
     }
@@ -87,16 +98,16 @@ abstract class SyncJobService<D> {
     }
     /**
      * creates and saves a Running Job and returns the SyncJobContext with the jobId
-     * @deprecated used for legacy bulk, use {@link #queueJob()} in future.
+     * @deprecated used for legacy bulk, use {@link #queueJob(SyncJobArgs)} or {@link #createSyncJob(SyncJobArgs)}  in future.
      */
     @Deprecated //legacy
     SyncJobContext createJob(SyncJobArgs args, Object payload){
         //set the payload if not already
         if(!args.payload) args.payload = payload
         // new way
-        var jobDta = args.asJobData()
-        SyncJobEntity syncJobEntity = queueJob(jobDta)
-        SyncJobContext jobContext = startJob(syncJobEntity, args)
+        //var jobDta = args.asJobData()
+        SyncJobEntity syncJobEntity = queueJob(args)
+        SyncJobContext jobContext = startJobInit(syncJobEntity, args)
         //set payload size for messaging progress
         if(payload instanceof Collection) jobContext.payloadSize = payload.size()
 
@@ -150,30 +161,7 @@ abstract class SyncJobService<D> {
      */
     abstract Long createAttachment(Path path, String name)
 
-    /**
-     * Standard pattern to run a function asynchrons (assuming asyncArgs is setup that way).
-     * Will call the finish job when its done.  Supplier can be anything really.
-     * @param asyncArgs the async args to pass to supplyAsync
-     * @param jobContext the active jobContext
-     * @param runnable the runnable function to run
-     * @return the job id from the jobContext.jobId
-     */
-    @Deprecated
-    Long runJob(AsyncArgs asyncArgs, SyncJobContext jobContext, Runnable runnable) {
-        //process in async
-        asyncService
-            .supplyAsync (asyncArgs, () -> runnable.run()) //FIXME we really should be using runAsync as we do nothing with what the supplier returns
-            .whenComplete { res, ex ->
-                if (ex) {
-                    //ideally should not happen as the pattern here is that all exceptions should be handled in supplierFunc
-                    LOG.error("Unhandled exception while running job")
-                    jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
-                }
-                jobContext.finishJob()
-            }
-
-        return jobContext.jobId
-    }
+    abstract D createSyncJob(SyncJobArgs syncJobArgs)
 
     /**
      * Standard pattern to run a function asynchrons (assuming asyncArgs is setup that way).
@@ -195,6 +183,12 @@ abstract class SyncJobService<D> {
                     jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
                 }
                 jobContext.finishJob()
+                //FIXME here until we refactor this legacy way out
+                if(jobContext.args.jobType == BulkImportJobArgs.JOB_TYPE) {
+                    BulkImportJobArgs impJobArgs = (BulkImportJobArgs)jobContext.args
+                    BulkImportFinishedEvent<?> evt = new BulkImportFinishedEvent(jobContext, impJobArgs, impJobArgs.entityClass)
+                    AppCtx.publishEvent(evt)
+                }
             }
 
         return jobContext.jobId

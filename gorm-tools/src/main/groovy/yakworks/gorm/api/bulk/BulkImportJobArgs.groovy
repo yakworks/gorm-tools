@@ -5,20 +5,21 @@
 package yakworks.gorm.api.bulk
 
 import groovy.transform.CompileStatic
+import groovy.transform.ToString
 
 import gorm.tools.databinding.BasicDataBinder
-import gorm.tools.job.SyncJobParams
+import gorm.tools.job.SyncJobArgs
+import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp
 import yakworks.etl.DataMimeTypes
 
 /**
- * Value Object are better than using a Map to store arguments and parameters.
- * This is used for Bulk operations.
- * Created at the start of the process, in controller this is created from the params passed the action
- * See BulkableRepo for its primary usage.
+ * DTO for the BulkImport process
  */
+@ToString(includeSuperProperties = true, includeNames = true,
+    includes = ['jobType', 'jobId', 'jobType', 'op', 'source', 'sourceId', 'entityClassName'])
 @CompileStatic
-class BulkImportJobParams extends SyncJobParams {
+class BulkImportJobArgs extends SyncJobArgs {
     public static final JOB_TYPE = 'bulk.import'
 
     String jobType = JOB_TYPE
@@ -60,10 +61,46 @@ class BulkImportJobParams extends SyncJobParams {
      */
     String entityClassName
 
-    static BulkImportJobParams withParams(Map params){
-        BulkImportJobParams bijParams = new BulkImportJobParams()
+    Class entityClass
+
+    /**
+     * the args, such as flush:true etc.., to pass down to the repo methods
+     * Helpful for bindId when bulk importing rows that have id already.
+     */
+    PersistArgs persistArgs
+
+    /**
+     * (For Master/Detail payloadFormat=CSV)
+     * Header key field that links detail/lines detailLinkField (ArTranLines)
+     * to the header record (ArTran). Default is ‘source.sourceId’ but if you have underscores pass in ‘source_sourceId’
+     * (when data imported from the file)
+     */
+    String dataKeyField
+
+    /**
+     * (For Master/Detail payloadFormat=CSV)
+     * The field in the header entity where the collection of lines goes.
+     * For ArTran it would be "lines" for example
+     */
+    String dataDetailField
+
+    /**
+     * (For Master/Detail payloadFormat=CSV)
+     * Field that links back to the dataKeyField in the header file.
+     * ‘arTran.sourceId’ for example
+     */
+    String detailLinkField
+
+    /**
+     * (For Master/Detail CSV)
+     * The name of the detail/lines file in the zip. Default is detail.csv?
+     */
+    String detailFilename
+
+    static BulkImportJobArgs fromParams(Map params){
+        BulkImportJobArgs bijParams = new BulkImportJobArgs()
         BasicDataBinder.bind(bijParams, params)
-        //save a full copy as is into the queryParams
+        //put a full copy as is into the queryParams
         bijParams.queryParams = params
         return bijParams
     }

@@ -4,13 +4,10 @@
 */
 package gorm.tools.job
 
-//import javax.servlet.http.HttpServletRequest
-
 import groovy.json.JsonOutput
 import groovy.transform.CompileStatic
 
 import com.fasterxml.jackson.databind.util.RawValue
-import yakworks.etl.DataMimeTypes
 
 /**
  * Misc static helpers for SynJobs/ApiJobs

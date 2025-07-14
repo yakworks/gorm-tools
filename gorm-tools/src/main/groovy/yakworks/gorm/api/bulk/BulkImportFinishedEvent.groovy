@@ -22,14 +22,16 @@ class BulkImportFinishedEvent<D> extends ApplicationEvent implements ResolvableT
     Long jobId
     Boolean ok
     SyncJobContext context
+    BulkImportJobArgs jobArgs
     Class<D> entityClass
 
-    BulkImportFinishedEvent(SyncJobContext ctx, Class<D> entityClass) {
+    BulkImportFinishedEvent(SyncJobContext ctx, BulkImportJobArgs bulkImportJobArgs, Class<D> entityClass) {
         super(ctx)
         this.context = ctx
         this.jobId = ctx.jobId
+        this.jobArgs = bulkImportJobArgs
         this.ok = ctx.ok.get()
-        assert ctx.args.entityClass
+        assert bulkImportJobArgs.entityClass
         this.entityClass = entityClass
     }
 

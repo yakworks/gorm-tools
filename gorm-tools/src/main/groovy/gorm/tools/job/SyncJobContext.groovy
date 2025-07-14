@@ -28,13 +28,9 @@ import yakworks.api.problem.Problem
 import yakworks.commons.io.IOUtils
 import yakworks.etl.CSVMapWriter
 import yakworks.etl.DataMimeTypes
-import yakworks.gorm.api.bulk.BulkImportFinishedEvent
-import yakworks.gorm.api.bulk.BulkImportJobParams
 import yakworks.json.groovy.JsonEngine
 import yakworks.message.spi.MsgService
 import yakworks.spring.AppCtx
-
-import static gorm.tools.job.SyncJobArgs.DataLayout
 
 /**
  * Holds the basic state and primary action methods while running a SyncJoob.
@@ -206,7 +202,7 @@ class SyncJobContext {
      */
     SyncJobEntity finishJob() {
         Map data = [id: jobId] as Map<String, Object>
-        if(args.isSaveDataAsFile()){
+        if(args.shouldSaveDataAsFile()){
             // if saveDataAsFile then it will have been writing out the data results as it goes
             //close out the file for JSON
             if(args.dataFormat == DataMimeTypes.json) {
@@ -234,11 +230,6 @@ class SyncJobContext {
         SyncJobEntity entity = syncJobService.updateJob([id:jobId, ok:ok.get(), state: SyncJobState.Finished])
 
         AppCtx.publishEvent(SyncJobFinishedEvent.of(this))
-        //XXX temporarily fire here until the legacy way is removed, then should be in commented out section in finally of BulkImporter
-        if(args.jobType == BulkImportJobParams.JOB_TYPE) {
-            BulkImportFinishedEvent<?> evt = new BulkImportFinishedEvent(this, args.entityClass)
-            AppCtx.publishEvent(evt)
-        }
         return entity
     }
 
@@ -339,7 +330,7 @@ class SyncJobContext {
      */
     protected void appendDataResults(Result currentResults){
         //if isSaveDataAsFile then write out the results now
-        if(args.isSaveDataAsFile()){
+        if(args.shouldSaveDataAsFile()){
             boolean isFirstWrite = false
             if(!dataPath) {
                 isFirstWrite = true // its first time writing

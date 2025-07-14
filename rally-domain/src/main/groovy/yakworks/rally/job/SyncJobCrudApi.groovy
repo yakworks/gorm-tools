@@ -10,14 +10,13 @@ import groovy.transform.CompileStatic
 import org.springframework.stereotype.Component
 
 import gorm.tools.job.SyncJobEntity
-import gorm.tools.repository.model.DataOp
 import yakworks.api.HttpStatus
 import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemException
 import yakworks.commons.map.Maps
 import yakworks.gorm.api.DefaultCrudApi
-import yakworks.gorm.api.bulk.BulkExportJobParams
-import yakworks.gorm.api.bulk.BulkImportJobParams
+import yakworks.gorm.api.bulk.BulkExportJobArgs
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 
 /**
  * Used by CrudApiController for rest api.
@@ -49,12 +48,12 @@ class SyncJobCrudApi extends DefaultCrudApi<SyncJob> {
     }
 
     @Override
-    SyncJobEntity bulkImport(BulkImportJobParams jobParams, List<Map> bodyList){
+    SyncJobEntity bulkImport(BulkImportJobArgs jobParams, List<Map> bodyList){
         throw notSupported("bulk")
     }
 
     @Override
-    SyncJobEntity bulkExport(BulkExportJobParams jobParams) {
+    SyncJobEntity bulkExport(BulkExportJobArgs jobParams) {
         throw notSupported("bulk")
     }
 

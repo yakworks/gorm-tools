@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils
 import org.springframework.http.HttpStatus
 import org.springframework.jdbc.core.JdbcTemplate
 
+import gorm.tools.job.DataLayout
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobState
 import gorm.tools.repository.model.DataOp
@@ -11,7 +12,8 @@ import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import yakworks.gorm.api.bulk.BulkImportJobParams
+import yakworks.etl.DataMimeTypes
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 import yakworks.gorm.api.bulk.BulkImportService
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Location
@@ -46,8 +48,8 @@ class BulkImportTests extends Specification implements DomainIntTest {
         BulkImportService.lookup(entClass)
     }
 
-    BulkImportJobParams setupBulkImportParams(DataOp op = DataOp.add){
-        return new BulkImportJobParams(
+    BulkImportJobArgs setupBulkImportParams(DataOp op = DataOp.add){
+        return new BulkImportJobArgs(
             op: op, parallel: false, async:false,
             source: "test", sourceId: "test",
             includes: ["id", "name", "ext.name"]
@@ -62,20 +64,27 @@ class BulkImportTests extends Specification implements DomainIntTest {
         // }
     }
 
-    void "test queueJob and save payload to file"() {
+    void "test queueJob and save payload to file large payload"() {
         when:
         List payload = []
+        //puts it past the 1000 count so will get saved as attachment and have a payloadId
         (1..1001).each {
             payload << it
         }
 
 
-        BulkImportJobParams bulkImportJobParams = BulkImportJobParams.withParams(
-            sourceId: '123', source: 'some source', 'foo': 'bar'
+        BulkImportJobArgs bulkImportJobArgs = BulkImportJobArgs.fromParams(
+            sourceId: '123', source: 'some source',
+            'foo': 'bar'
         )
-        bulkImportJobParams.entityClassName = Org.name
+        bulkImportJobArgs.entityClassName = Org.name
         var bulkImportService = BulkImportService.lookup(Org)
-        SyncJobEntity job = bulkImportService.queueJob(bulkImportJobParams, payload)
+        SyncJobEntity job = bulkImportService.queueJob(bulkImportJobArgs, payload)
+
+        then:
+        noExceptionThrown()
+
+        when:
         flushAndClear()
 
         job = SyncJob.get(job.id)
@@ -91,7 +100,8 @@ class BulkImportTests extends Specification implements DomainIntTest {
         job.payloadId
         Attachment.get(job.payloadId).name.startsWith("Sync")
         //check params
-        job.params.keySet().size() == 6 //[sourceId, dataFormat, entityClassName, jobType, source, foo]
+       //Keys [sourceId, dataFormat, dataLayout, payloadId, entityClassName, jobType, source, foo]
+        job.params.keySet() == ['jobType', 'source', 'sourceId', 'dataFormat', 'entityClassName', 'payloadId', 'dataLayout', 'foo'] as Set
 
         job.params['foo']
 
@@ -99,12 +109,100 @@ class BulkImportTests extends Specification implements DomainIntTest {
         if(job.payloadId) Attachment.repo.removeById(job.payloadId)
     }
 
+    void "test queueJob with attachment id"() {
+        when:
+
+        BulkImportJobArgs bulkImportJobArgs = BulkImportJobArgs.fromParams(
+            sourceId: '123', source: 'some source',
+            attachmentId: 123,
+            'foo': 'bar'
+        )
+
+        var bulkImportService = BulkImportService.lookup(Org)
+        SyncJobEntity job = bulkImportService.queueJob(bulkImportJobArgs, null)
+        flushAndClear()
+
+        then:
+        noExceptionThrown()
+
+        when:
+        job = SyncJob.get(job.id)
+
+        then:
+        noExceptionThrown()
+        job.id
+        job.state == SyncJobState.Queued
+        job.id
+        job.jobType == 'bulk.import'
+        job.source == 'some source'
+        job.sourceId == '123'
+        job.payloadId == 123
+
+        //check params
+        //Keys [sourceId, dataFormat, dataLayout, payloadId, entityClassName, jobType, source, foo]
+        job.params.keySet() == [
+            'jobType', 'source', 'sourceId', 'dataFormat', 'entityClassName', 'payloadId', 'attachmentId',
+            'dataLayout', 'foo'
+        ] as Set
+
+        job.params['foo']
+
+    }
+
+    void "test BulkImportJobArgs from SyncJob"() {
+        when:
+
+        BulkImportJobArgs bulkImportJobArgs = BulkImportJobArgs.fromParams(
+            sourceId: '123', source: 'some source',
+            attachmentId: 123,
+            headerPathDelimiter: '_',
+            'foo': 'bar'
+        )
+
+        var bulkImportService = BulkImportService.lookup(Org)
+        SyncJobEntity job = bulkImportService.queueJob(bulkImportJobArgs, null)
+        flushAndClear()
+
+        then:
+        noExceptionThrown()
+
+        when:
+        job = SyncJob.get(job.id)
+        BulkImportJobArgs jobArgs = bulkImportService.setupJobArgs(job)
+
+        then:
+        noExceptionThrown()
+        jobArgs.jobId == job.id
+        jobArgs.jobType == 'bulk.import'
+        jobArgs.source == 'some source'
+        jobArgs.sourceId == '123'
+        jobArgs.payloadId == 123
+        jobArgs.attachmentId == 123
+        jobArgs.headerPathDelimiter == '_'
+        jobArgs.entityClassName == 'yakworks.rally.orgs.model.Org'
+        jobArgs.entityClass == Org
+        jobArgs.queryParams['foo'] == 'bar'
+        jobArgs.includes == ['*']
+        jobArgs.dataFormat == DataMimeTypes.json
+        jobArgs.dataLayout == DataLayout.Result
+
+        //check jobArgs.queryParams
+        //Keys [sourceId, dataFormat, dataLayout, payloadId, entityClassName, jobType, source, foo]
+        jobArgs.queryParams.keySet() == [
+            'jobType', 'source', 'sourceId', 'dataFormat', 'entityClassName', 'payloadId', 'attachmentId',
+            'dataLayout', 'headerPathDelimiter', 'foo'
+        ] as Set
+        //
+        // job.params['foo']
+
+    }
+
     void "sanity check bulk create"() {
         given:
         List<Map> jsonList = generateOrgData(3)
 
         when:
-        def impParams = new BulkImportJobParams(parallel: false, async:false, op: DataOp.add)
+        def impParams = new BulkImportJobArgs(parallel: false, async:false, op: DataOp.add)
         //XXX @SUD make all the tests in this class work with new way
         def job = getBulkImportService(Org).bulkImportLegacy(impParams, jsonList)
 
@@ -217,7 +315,7 @@ class BulkImportTests extends Specification implements DomainIntTest {
 
         when:
 
-        def impParams = new BulkImportJobParams(
+        def impParams = new BulkImportJobArgs(
             parallel: false, async:false, op: DataOp.add,
             //include field from org, here org would be a lazy association, and would fail when its property accessed during json building
             includes: ["id", "org.source.id"]
@@ -307,7 +405,7 @@ class BulkImportTests extends Specification implements DomainIntTest {
         jsonList[1].num = "testorg-1"
 
         when:
-        def impParams = new BulkImportJobParams(
+        def impParams = new BulkImportJobArgs(
             parallel: true, async:false, op: DataOp.add
         )
         def job = getBulkImportService(Org).bulkImportLegacy(impParams, jsonList)
@@ -368,7 +466,7 @@ class BulkImportTests extends Specification implements DomainIntTest {
         jsonList[3].num = "testorg-2" //this one should cause error when processing slice errors
 
         when:
-        def impParams = new BulkImportJobParams(
+        def impParams = new BulkImportJobArgs(
             parallel: true, async:false, op: DataOp.add
         )
         def job = getBulkImportService(Org).bulkImportLegacy(impParams, jsonList)

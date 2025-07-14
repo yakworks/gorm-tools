@@ -14,11 +14,16 @@ import yakworks.meta.MetaUtils
 
 /**
  * Value Object are better than using a Map to store arguments and parameters.
- * This is the base class, see BulkImportJobParams and BulkExportJobParams for implementaiton versions
+ * This is the base class, see BulkImportJobArgs and BulkExportJobParams for implementaiton versions
  */
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @CompileStatic
 class SyncJobParams {
+
+    /**
+     * The job id, will get populated when the job is created, normally from the syncJobContext.
+     */
+    Long jobId
 
     /**
      * Job Type key
@@ -90,6 +95,27 @@ class SyncJobParams {
      * (When attachmentId is set) Format for the data. either CSV or JSON are currently supported.
      */
     DataMimeTypes dataFormat = DataMimeTypes.json
+
+    /**
+     * If dataLayout=Payload then data is just a json list or map as the data it, and errors will be in the problems field.
+     * BulkExport uses Payload for example.
+     * dataLayout=Payload IS the recomended way.
+     * If dataLayout=Result then data is a list of Result/Problem objects.
+     * Errors are mixed in and the syncJob.data is just a rendered list of the Result or Problem objects.
+     * BulkImport uses Payload for example. This is considered deprecated.
+     * When dataLayout=Payload then the rendering of the data is only list of whats in each results payload.
+     * as opposed to a list of Results objects when dataLayout=Result
+     * For example if processing import then instead of getting syncJob.data as a list of results objects it will be a list of what
+     * the requested export is, such as Invoices. would look as if the call was made to the rest endpoint for a list synchronously
+     * Since data can only support a list of entities then any issues or errors get stored in the separate problems field,
+     * syncjob.problems will be populated with error results
+     */
+    DataLayout dataLayout = DataLayout.Result
+
+    /**
+     * Payload input data used for job operations
+     */
+    Object payload
 
     /**
      * The full query args/params map that were passed into the call.

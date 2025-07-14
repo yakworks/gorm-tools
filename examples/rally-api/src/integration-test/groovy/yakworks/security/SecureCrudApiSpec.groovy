@@ -5,7 +5,7 @@ import javax.inject.Inject
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.AuthenticationException
 
-import yakworks.gorm.api.bulk.BulkImportJobParams
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 import gorm.tools.repository.model.DataOp
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
@@ -62,7 +62,7 @@ class SecureCrudApiSpec extends Specification {
         ex = thrown()
 
         when:
-        BulkImportJobParams biParams = new BulkImportJobParams(op: DataOp.update, sourceId: "Test")
+        BulkImportJobArgs biParams = new BulkImportJobArgs(op: DataOp.update, sourceId: "Test")
         orgSecureCrudApi.bulkImport(biParams, [orgData])
 
         then:
@@ -102,7 +102,7 @@ class SecureCrudApiSpec extends Specification {
         ex.message == 'Access Denied'
 
         when:
-        BulkImportJobParams biParams = new BulkImportJobParams(op: DataOp.update, sourceId: "Test")
+        BulkImportJobArgs biParams = new BulkImportJobArgs(op: DataOp.update, sourceId: "Test")
         orgSecureCrudApi.bulkImport(biParams, [orgData])
 
         then:

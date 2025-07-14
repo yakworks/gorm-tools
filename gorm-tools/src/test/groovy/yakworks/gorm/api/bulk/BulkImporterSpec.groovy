@@ -5,7 +5,6 @@ import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobService
 import yakworks.api.problem.data.DataProblemException
 import yakworks.gorm.config.AsyncConfig
-import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobState
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.model.DataOp
@@ -15,7 +14,6 @@ import spock.lang.Specification
 import testing.TestSyncJob
 import testing.TestSyncJobService
 import yakworks.commons.map.LazyPathKeyMap
-import yakworks.spring.AppCtx
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.testing.gorm.model.SinkExt
@@ -32,9 +30,10 @@ class BulkImporterSpec extends Specification implements GormHibernateTest {
     @Autowired KitchenSinkRepo kitchenSinkRepo
     @Autowired SyncJobService syncJobService
 
-    SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
-        return new SyncJobArgs(
-            parallel: false, async: false, op: op, jobType: BulkImportJobParams.JOB_TYPE,
+
+    BulkImportJobArgs setupJobArgs(DataOp op = DataOp.add){
+        return new BulkImportJobArgs(
+            parallel: false, async: false, op: op, jobType: BulkImportJobArgs.JOB_TYPE,
             source: "test", sourceId: "test", includes: ["id", "name", "ext.name"],
             entityClass: KitchenSink
         )
@@ -55,7 +54,7 @@ class BulkImporterSpec extends Specification implements GormHibernateTest {
     }
 
     SyncJobContext syncJobContext(List dataList, DataOp op = DataOp.add){
-        return  syncJobService.createJob(setupSyncJobArgs(op), dataList)
+        return  syncJobService.createJob(setupJobArgs(op), dataList)
     }
 
     Long bulkImport(List dataList, DataOp op = DataOp.add){

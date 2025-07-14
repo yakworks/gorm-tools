@@ -23,9 +23,9 @@ import gorm.tools.repository.model.EntityResult
 import gorm.tools.transaction.TrxUtils
 import grails.gorm.transactions.Transactional
 import yakworks.api.problem.data.DataProblemException
-import yakworks.gorm.api.bulk.BulkExportJobParams
+import yakworks.gorm.api.bulk.BulkExportJobArgs
 import yakworks.gorm.api.bulk.BulkExportService
-import yakworks.gorm.api.bulk.BulkImportJobParams
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 import yakworks.gorm.api.bulk.BulkImportService
 import yakworks.gorm.api.support.QueryArgsValidator
 import yakworks.gorm.config.QueryConfig
@@ -201,12 +201,12 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     }
 
     @Override
-    SyncJobEntity bulkImport(BulkImportJobParams jobParams, List<Map> bodyList){
+    SyncJobEntity bulkImport(BulkImportJobArgs jobParams, List<Map> bodyList){
         getBulkImportService().process(jobParams, bodyList)
     }
 
     @Override
-    SyncJobEntity bulkExport(BulkExportJobParams jobParams) {
+    SyncJobEntity bulkExport(BulkExportJobArgs jobParams) {
         getBulkExportService().queueJob(jobParams)
     }
 

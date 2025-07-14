@@ -29,7 +29,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
 
     SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
         return new SyncJobArgs(
-            parallel: false, async:false, op: op, jobType: BulkImportJobParams.JOB_TYPE,
+            parallel: false, async:false, op: op, jobType: BulkImportJobArgs.JOB_TYPE,
             source: "test", sourceId: "test", includes: ["id", "name", "ext.name"]
         )
     }
@@ -39,7 +39,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
     }
 
     Long bulkImport(List dataList, DataOp op = DataOp.add){
-        def bimpParams = new BulkImportJobParams( op: op,
+        def bimpParams = new BulkImportJobArgs( op: op,
             parallel: false, async:false,
             source: "test", sourceId: "test-job", includes: ["id", "name", "ext.name"]
         )
@@ -52,7 +52,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
         // gormConfig.legacyBulk = true
 
         when:
-        def bimpParams = new BulkImportJobParams(
+        def bimpParams = new BulkImportJobArgs(
             op: DataOp.add,
             sourceId: 'test-job',
             q: "{foo: 'bar'}", attachmentId: 1L
@@ -66,7 +66,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
 
         then:
         noExceptionThrown()
-        job.jobType == BulkImportJobParams.JOB_TYPE
+        job.jobType == BulkImportJobArgs.JOB_TYPE
         job.state == SyncJobState.Queued
         job.sourceId == 'test-job'
         job.payloadId == 1L
@@ -86,7 +86,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
         List list = KitchenSink.generateDataList(10)
 
         when:
-        def bimpParams = new BulkImportJobParams(
+        def bimpParams = new BulkImportJobArgs(
             op: DataOp.add,
             sourceId: 'test-job'
         )
@@ -303,7 +303,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
 
     void "test empty payload"() {
         when:
-        def bimpParams = new BulkImportJobParams(op: DataOp.add, sourceId: 'test-job')
+        def bimpParams = new BulkImportJobArgs(op: DataOp.add, sourceId: 'test-job')
         SyncJobEntity jobEnt = bulkImportService.queueJob(bimpParams, [])
 
         then:
@@ -315,7 +315,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
         setup:
         List list = KitchenSink.generateDataList(10)
 
-        def bimpParams = new BulkImportJobParams(
+        def bimpParams = new BulkImportJobArgs(
             op: DataOp.add,
             sourceId: 'test-job'
         )
@@ -329,7 +329,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
 
         when:
         SyncJobEntity job =  TestSyncJob.get(jobEnt.id)
-        BulkImportJobParams jobParams = BulkImportJobParams.withParams(job.params)
+        BulkImportJobArgs jobParams = BulkImportJobArgs.fromParams(job.params)
 
         List<Map> data = bulkImportService.getPayloadData(jobEnt, jobParams)
 
@@ -342,14 +342,14 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
         setup:
         BulkImportService service = bulkImportService
         List list = KitchenSink.generateDataList(10)
-        def bimpParams = new BulkImportJobParams(
+        def bimpParams = new BulkImportJobArgs(
             op: DataOp.add,
             sourceId: 'test-job',
             payloadFormat: DataMimeTypes.csv,
             attachmentId: 100L
         )
 
-       CsvToMapTransformer csvToMapTransformer = Mock()
+        CsvToMapTransformer csvToMapTransformer = Mock()
 
         when:
         service.csvToMapTransformer = csvToMapTransformer
@@ -361,7 +361,7 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
 
         when:
         SyncJobEntity job =  TestSyncJob.get(jobEnt.id)
-        BulkImportJobParams jobParams = BulkImportJobParams.withParams(job.params)
+        BulkImportJobArgs jobParams = BulkImportJobArgs.fromParams(job.params)
 
         List<Map> data = service.getPayloadData(jobEnt, jobParams)
 

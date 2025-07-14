@@ -1,5 +1,6 @@
 package yakworks.rally.job
 
+import gorm.tools.job.DataLayout
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import grails.gorm.transactions.Rollback
@@ -26,7 +27,6 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
     SyncJobContext createJob(){
         def samplePaylod = [1,2,3,4]
         SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', jobType: 'foo')
-        syncJobArgs.entityClass = Org
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, samplePaylod)
     }
 
@@ -42,7 +42,6 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         when:
         List payload = [1,2,3,4]
         SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', jobType: 'foo')
-        syncJobArgs.entityClass = Org
         //syncJobArgs.savePayloadAsFile = true
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, payload)
 
@@ -153,8 +152,7 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         List payload = [1,2,3,4]
         SyncJobArgs syncJobArgs = new SyncJobArgs(
             sourceId: '123', source: 'some source', jobType: 'foo',
-            dataLayout: SyncJobArgs.DataLayout.Payload,
-            entityClass: Org
+            dataLayout: DataLayout.Payload
         )
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, payload)
 

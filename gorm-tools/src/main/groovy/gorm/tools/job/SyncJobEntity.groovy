@@ -87,9 +87,17 @@ trait SyncJobEntity implements SourceTrait {
     Long dataId
 
     /**
-     * What format the data is in
+     * What format the data is in, CSV or JSON
      */
     DataMimeTypes dataFormat
+
+    /**
+     * What layout the data is in
+     * Result = its a list of Result/Problem objects?
+     * Payload = its the json data as is, any errors are in the problem field.
+     * List = its the json data as is, any errors are in the problem field.
+     */
+    //DataLayout dataLayout
 
     /**
      * if the resultData is stored in the column this will be populated
@@ -102,9 +110,9 @@ trait SyncJobEntity implements SourceTrait {
     List problems
 
     /**
-     * Job request params
+     * Full job request params
      */
-    Map<String, String> params
+    Map<String, Object> params
 
     /**
      * The data is a response of resources that were successfully and unsuccessfully updated or created after processing.

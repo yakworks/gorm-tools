@@ -4,13 +4,11 @@ import groovy.json.JsonOutput
 
 import com.fasterxml.jackson.databind.util.RawValue
 import gorm.tools.model.SourceType
-import gorm.tools.repository.model.DataOp
 import spock.lang.Specification
 import testing.TestSyncJob
-import yakworks.commons.lang.EnumUtils
 import yakworks.commons.map.Maps
 import yakworks.etl.DataMimeTypes
-import yakworks.gorm.api.bulk.BulkImportJobParams
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 import yakworks.json.groovy.JsonEngine
 import yakworks.testing.rest.MockRestRequest
 
@@ -22,7 +20,7 @@ class JobUtilsSpec extends Specification  {
             ok: true,
             message: 'foo',
             state: SyncJobState.Finished,
-            jobType: BulkImportJobParams.JOB_TYPE,
+            jobType: BulkImportJobArgs.JOB_TYPE,
             sourceType: SourceType.ERP,
             sourceId: 'ar/org',
             source: 'ERP',

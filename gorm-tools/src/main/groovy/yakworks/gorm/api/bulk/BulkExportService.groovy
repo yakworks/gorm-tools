@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 
 import gorm.tools.beans.Pager
+import gorm.tools.job.DataLayout
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobEntity
@@ -58,7 +59,7 @@ class BulkExportService<D> {
     /**
      * Creates a Syncjob and que it up
      */
-    SyncJobEntity queueJob(BulkExportJobParams jobParams) {
+    SyncJobEntity queueJob(BulkExportJobArgs jobParams) {
         //make sure they passed in q or qsearch. queryArgs will have been populated if they did
         if(!jobParams.q) {
             throw DataProblem.of('error.query.qRequired').detail("q criteria required").toException()
@@ -68,8 +69,7 @@ class BulkExportService<D> {
             throw DataProblem.ex("includes or includesKey are required params")
         }
         jobParams.entityClassName = getEntityClass().name
-        Map data = jobParams.asJobData()
-        return syncJobService.queueJob(data)
+        return syncJobService.queueJob(jobParams)
     }
 
 
@@ -79,14 +79,14 @@ class BulkExportService<D> {
     SyncJobEntity runJob(Long jobId) {
         assert jobId
         SyncJobEntity job = syncJobService.getJob(jobId)
-        BulkExportJobParams jobParams = BulkExportJobParams.withParams(job.params)
-        SyncJobContext jobContext = syncJobService.startJob(job, setupSyncJobArgs(jobParams))
+        BulkExportJobArgs jobParams = BulkExportJobArgs.withParams(job.params)
+        SyncJobContext jobContext = syncJobService.startJobInit(job, setupJobArgs(jobParams))
         bulkExport(jobContext)
         return syncJobService.getJob(jobId)
     }
 
-
-    protected SyncJobArgs setupSyncJobArgs(BulkExportJobParams jobParams){
+    //XXX change to how its done in bulkImport
+    protected SyncJobArgs setupJobArgs(BulkExportJobArgs jobParams){
         SyncJobArgs syncJobArgs = SyncJobArgs.withParams(jobParams.asMap())
         Validate.notEmpty(syncJobArgs.queryArgs) && Validate.isTrue(jobParams.includes || jobParams.includesKey)
 
@@ -97,9 +97,9 @@ class BulkExportService<D> {
         //returns includes if thats passed in or looks up based on includesKey
         syncJobArgs.includes = includesConfig.findIncludes(getEntityClass(), incProps)
         //used for events
-        syncJobArgs.entityClass = entityClass
+        //syncJobArgs.entityClass = entityClass
         //force export to Payload on exports
-        syncJobArgs.dataLayout = SyncJobArgs.DataLayout.Payload
+        syncJobArgs.dataLayout = DataLayout.Payload
 
         return syncJobArgs
     }

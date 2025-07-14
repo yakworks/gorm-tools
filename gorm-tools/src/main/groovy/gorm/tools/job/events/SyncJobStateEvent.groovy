@@ -20,18 +20,17 @@ import yakworks.commons.lang.Validate
  * @param <D> the entity class this is for
  */
 @CompileStatic
-class SyncJobStateEvent<D> extends ApplicationEvent implements ResolvableTypeProvider {
+class SyncJobStateEvent extends ApplicationEvent { //implements ResolvableTypeProvider {
 
     Long jobId
     SyncJobState state
     SyncJobContext context
-    Class entityClass //domain class for which this sync job is
 
     SyncJobStateEvent(Long jobId, SyncJobContext ctx, SyncJobState state) {
         super(ctx)
         this.context = ctx
         this.jobId = ctx.jobId
-        this.entityClass = ctx.args.entityClass ?: Object //if no entityClass - eg for exportSync
+        //this.entityClass = ctx.args.entityClass ?: Object //if no entityClass - eg for exportSync
     }
 
     static SyncJobStateEvent of(Long jobId, SyncJobContext ctx, SyncJobState state) {
@@ -39,8 +38,8 @@ class SyncJobStateEvent<D> extends ApplicationEvent implements ResolvableTypePro
         return new SyncJobStateEvent(jobId, ctx, state)
     }
 
-    @Override
-    ResolvableType getResolvableType() {
-        return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forClass(entityClass))
-    }
+    // @Override
+    // ResolvableType getResolvableType() {
+    //     return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forClass(entityClass))
+    // }
 }

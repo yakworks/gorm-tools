@@ -14,7 +14,7 @@ import gorm.tools.databinding.BasicDataBinder
  * For example, Invoices Header in data.csv and the lines for the invoice in the detail.csv
  */
 @CompileStatic
-class BulkMasterDetailJobParams extends BulkImportJobParams {
+class BulkMasterDetailJobParams extends BulkImportJobArgs {
 
     /**
      * (For Master/Detail payloadFormat=CSV)

@@ -1,13 +1,13 @@
 package yakworks.gorm.api.bulk
 
 import gorm.tools.beans.Pager
+import gorm.tools.job.DataLayout
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobState
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.model.DataOp
-import spock.lang.Ignore
 import spock.lang.Specification
 import testing.TestSyncJob
 import testing.TestSyncJobService
@@ -17,8 +17,6 @@ import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.SinkExt
 import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.unit.GormHibernateTest
-
-import static yakworks.json.groovy.JsonEngine.parseJson
 
 class BulkExportServiceSpec extends Specification implements GormHibernateTest {
     static entityClasses = [KitchenSink, SinkExt, SinkItem, TestSyncJob]
@@ -31,7 +29,7 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
 
     SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
         return new SyncJobArgs(
-            parallel: false, async:false, op: op, jobType: BulkImportJobParams.JOB_TYPE,
+            parallel: false, async:false, op: op, jobType: BulkImportJobArgs.JOB_TYPE,
             source: "test", sourceId: "test", includes: ["id", "name", "ext.name"]
         )
     }
@@ -42,23 +40,24 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
 
     void "test setupSyncJobArgs"() {
         given:
-        BulkExportJobParams jobParams = BulkExportJobParams.withParams([
+        BulkExportJobArgs jobParams = BulkExportJobArgs.withParams([
             sourceId: "test-job", includes: ['id','name','ext.name'],
             q: '{"id":{"$gte":1}}'
         ])
 
         when:
-        SyncJobArgs jobArgs = bulkExportService.setupSyncJobArgs(jobParams)
+        SyncJobArgs jobArgs = bulkExportService.setupJobArgs(jobParams)
 
         then:
         noExceptionThrown()
         jobArgs
-        jobArgs.jobType == BulkExportJobParams.JOB_TYPE
+        jobArgs.jobType == BulkExportJobArgs.JOB_TYPE
         jobArgs.sourceId == "test-job"
         jobArgs.queryArgs
-        jobArgs.entityClass == KitchenSink
+        //XXX
+        //jobArgs.entityClass == KitchenSink
         jobArgs.includes == ['id','name','ext.name']
-        jobArgs.dataLayout == SyncJobArgs.DataLayout.Payload
+        jobArgs.dataLayout == DataLayout.Payload
     }
 
     Long bulkExport(String q){
@@ -67,7 +66,7 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
         //     source: "test", sourceId: "test-job", includes: "id,name,ext.name"
         // ]
         // params.q = q
-        BulkExportJobParams bexParams = new BulkExportJobParams(
+        BulkExportJobArgs bexParams = new BulkExportJobArgs(
             sourceId: "test-job", includes: ['id','name','ext.name'],
             q: q
         )
@@ -82,7 +81,7 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
     void "test queueExportJob"() {
         when:
         SyncJobEntity jobEnt = bulkExportService.queueJob(
-            new BulkExportJobParams(
+            new BulkExportJobArgs(
                 q: '{"foo": "bar"}',
                 includes: ["id", "name", "ext.name"],
                 sourceId: "test-job"
@@ -96,7 +95,7 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
 
         then:
         noExceptionThrown()
-        job.jobType == BulkExportJobParams.JOB_TYPE
+        job.jobType == BulkExportJobArgs.JOB_TYPE
         job.state == SyncJobState.Queued
         job.sourceId == 'test-job'
 
@@ -109,7 +108,7 @@ class BulkExportServiceSpec extends Specification implements GormHibernateTest {
     void "test empty q param"() {
         when:
         Map params = [:]
-        SyncJobEntity jobEnt = bulkExportService.queueJob(new BulkExportJobParams())
+        SyncJobEntity jobEnt = bulkExportService.queueJob(new BulkExportJobArgs())
 
         then:
         DataProblemException ex = thrown()

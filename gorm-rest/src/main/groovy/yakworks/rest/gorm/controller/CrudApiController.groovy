@@ -26,11 +26,10 @@ import gorm.tools.repository.model.DataOp
 import gorm.tools.utils.ServiceLookup
 import grails.web.Action
 import yakworks.api.problem.Problem
-import yakworks.commons.lang.EnumUtils
 import yakworks.gorm.api.CrudApi
 import yakworks.gorm.api.IncludesProps
-import yakworks.gorm.api.bulk.BulkExportJobParams
-import yakworks.gorm.api.bulk.BulkImportJobParams
+import yakworks.gorm.api.bulk.BulkExportJobArgs
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 
 import static gorm.tools.problem.ProblemHandler.isBrokenPipe
 import static org.springframework.http.HttpStatus.CREATED
@@ -245,7 +244,7 @@ trait CrudApiController<D> extends RestApiController {
     def bulkExport() {
         try {
             Map qParams = getParamsMap()
-            BulkExportJobParams jobParams = BulkExportJobParams.withParams(qParams)
+            BulkExportJobArgs jobParams = BulkExportJobArgs.withParams(qParams)
             jobParams.sourceId = requestToSourceId(request)
             SyncJobEntity job = getCrudApi().bulkExport(jobParams)
             Map jobMap = JobUtils.jobToMapGroovy(job)
@@ -283,7 +282,7 @@ trait CrudApiController<D> extends RestApiController {
         Map qParams = getParamsMap()
         //if op=upsert was passed in via params then leave it alone, if null then set to this method variable
         if(!qParams.op)  qParams.op = dataOp
-        BulkImportJobParams jobParams = BulkImportJobParams.withParams(qParams)
+        BulkImportJobArgs jobParams = BulkImportJobArgs.fromParams(qParams)
         jobParams.sourceId = requestToSourceId(request)
 
         // replace when upsert is passed in op=upsert as query param. This is different than the dataOp arg in method here,

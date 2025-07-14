@@ -7,6 +7,15 @@ import yakworks.etl.DataMimeTypes
 
 class SyncJobArgsSpec extends Specification  {
 
+    void "test MapConstructor"() {
+        when: "defaults"
+        SyncJobArgs args = new SyncJobArgs(queryParams: [foo: 'bar'])
+
+        then:
+        args.queryParams == [foo: 'bar']
+
+    }
+
     void "test withParams"() {
         when: "defaults"
         SyncJobArgs args = SyncJobArgs.withParams([:])
@@ -28,13 +37,13 @@ class SyncJobArgsSpec extends Specification  {
         args.dataFormat == DataMimeTypes.csv
 
         when: "make sure the others work"
-        args = SyncJobArgs.withParams([async:false, jobSource: "foo", dataLayout: "payload"])
+        args = SyncJobArgs.withParams([async:false, jobSource: "foo", dataLayout: "result"])
 
         then:
         !args.async
         args.source == "foo"
         !args.sourceId
-        args.dataLayout == SyncJobArgs.DataLayout.Payload
+        args.dataLayout == DataLayout.Result
     }
 
     void "test enum"() {
@@ -70,6 +79,19 @@ class SyncJobArgsSpec extends Specification  {
 
         then:
         !fooOp
+
+    }
+
+    void "test builder"() {
+        when: "defaults"
+        SyncJobArgs args = SyncJobArgs.withParams([foo: 'bar'])
+            .includes(['id'])
+            .sourceId("test")
+
+        then:
+        args.queryParams == [foo: 'bar']
+        args.includes == ['id']
+        args.sourceId == "test"
 
     }
 

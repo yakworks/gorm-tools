@@ -1,5 +1,6 @@
 package yakworks.rally.job
 
+import gorm.tools.job.DataLayout
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import grails.gorm.transactions.Rollback
@@ -13,7 +14,6 @@ import yakworks.api.Result
 import yakworks.api.problem.Problem
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.attachment.model.Attachment
-import yakworks.rally.orgs.model.Org
 
 import static yakworks.json.groovy.JsonEngine.parseJson
 
@@ -26,7 +26,7 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
     SyncJobContext createJob(){
         def samplePaylod = [1,2,3,4]
         SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', jobType: 'foo')
-        syncJobArgs.entityClass = Org
+        syncJobArgs.dataLayout = DataLayout.Result
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, samplePaylod)
     }
 
@@ -42,7 +42,6 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         when:
         List payload = [1,2,3,4]
         SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', jobType: 'foo')
-        syncJobArgs.entityClass = Org
         //syncJobArgs.savePayloadAsFile = true
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, payload)
 
@@ -153,8 +152,7 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         List payload = [1,2,3,4]
         SyncJobArgs syncJobArgs = new SyncJobArgs(
             sourceId: '123', source: 'some source', jobType: 'foo',
-            dataLayout: SyncJobArgs.DataLayout.Payload,
-            entityClass: Org
+            dataLayout: DataLayout.List
         )
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, payload)
 
@@ -172,7 +170,7 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         then:
         SyncJob job = SyncJob.get(jobContext.jobId)
         //job.errorBytes
-        List jsonData = parseJson(job.dataToString())
+        List jsonData = job.dataList
 
 
         jsonData.size() == 2

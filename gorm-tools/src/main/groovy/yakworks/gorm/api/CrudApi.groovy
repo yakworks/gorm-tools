@@ -10,8 +10,8 @@ import gorm.tools.beans.Pager
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.model.ApiCrudRepo
 import yakworks.api.problem.data.NotFoundProblem
-import yakworks.gorm.api.bulk.BulkExportJobParams
-import yakworks.gorm.api.bulk.BulkImportJobParams
+import yakworks.gorm.api.bulk.BulkExportJobArgs
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 
 /**
  * CRUD api for rest repo
@@ -98,9 +98,9 @@ interface CrudApi<D> {
      */
     Pager pickList(Map params, URI uri)
 
-    SyncJobEntity bulkImport(BulkImportJobParams jobParams, List<Map> bodyList)
+    SyncJobEntity bulkImport(BulkImportJobArgs jobParams, List<Map> bodyList)
 
-    SyncJobEntity bulkExport(BulkExportJobParams jobParams)
+    SyncJobEntity bulkExport(BulkExportJobArgs jobParams)
 
     /**
      * Converts the instance to Map using the MetaMap wrapper with {@link gorm.tools.metamap.services.MetaMapService}.

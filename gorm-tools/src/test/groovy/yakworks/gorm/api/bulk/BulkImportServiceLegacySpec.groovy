@@ -38,10 +38,10 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
         // gormConfig.legacyBulk = true
     }
 
-    BulkImportJobParams setupBulkImportParams(DataOp op = DataOp.add){
-        return new BulkImportJobParams(
+    BulkImportJobArgs setupBulkImportParams(DataOp op = DataOp.add){
+        return new BulkImportJobArgs(
             parallel: false,
-            //async:false,
+            async:false,
             op: op,
             source: "test",
             sourceId: "test",
@@ -111,7 +111,7 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
 
         when: "verify job.data (job results)"
         def dataString = job.dataToString()
-        List results = parseJson(dataString, List)
+        List results = job.dataList
 
         then:
         dataString.startsWith('[{') //sanity check
@@ -183,7 +183,7 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
 
         def job = bulkImportService.bulkImportLegacy(setupBulkImportParams(), list)
 
-        def results = parseJson(job.dataToString())
+        def results = job.dataList
 
         then:
         job.ok == false
@@ -192,7 +192,7 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
         results.size() == 20
 
         and: "verify successfull results"
-        results.findAll({ it.ok == true}).size() == 19
+        results.findAll{ it.ok }.size() == 19
         results[0].ok == true
 
         and: "Verify failed record"
@@ -229,7 +229,7 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
         job.ok == false
 
         when: "verify job.data"
-        def results = parseJson(job.dataToString())
+        def results = job.dataList
 
         then:
         results != null
@@ -257,7 +257,7 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
         when: "bulk insert in multi batches"
         def job = bulkImportService.bulkImportLegacy(setupBulkImportParams(), list)
 
-        def results = parseJson(job.dataToString())
+        def results = job.dataList
 
         then: "just 60 should have been inserted, not the entire list twice"
         results.size() == 60
@@ -298,7 +298,7 @@ class BulkImportServiceLegacySpec extends Specification implements GormHibernate
 
         when: "verify job.data (job results)"
         def dataString = job.dataToString()
-        List results = parseJson(dataString, List)
+        List results = job.dataList
 
         then:
         dataString.startsWith('[{') //sanity check

@@ -1,5 +1,6 @@
 package yakworks.rally.job
 
+import gorm.tools.job.DataLayout
 import gorm.tools.job.SyncJobState
 import groovy.json.JsonException
 import groovy.json.JsonSlurper
@@ -15,7 +16,7 @@ import spock.lang.Specification
 import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.api.problem.Problem
-import yakworks.gorm.api.bulk.BulkImportJobParams
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Org
 import yakworks.testing.gorm.integration.DomainIntTest
@@ -31,7 +32,8 @@ class SyncJobServiceTests extends Specification implements DomainIntTest {
     SyncJobContext createJob(){
         def samplePaylod = [1,2,3,4]
         SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', jobType: 'foo')
-        syncJobArgs.entityClass = Org
+        syncJobArgs.dataLayout = DataLayout.Result
+        //syncJobArgs.entityClass = Org
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, samplePaylod)
     }
 
@@ -44,13 +46,12 @@ class SyncJobServiceTests extends Specification implements DomainIntTest {
 
     void "test queueJob with data"() {
         when:
-        BulkImportJobParams bulkImportJobParams = BulkImportJobParams.withParams(
+        BulkImportJobArgs bulkImportJobArgs = BulkImportJobArgs.fromParams(
             sourceId: '123', source: 'some source'
         )
         def payload = [1,2,3]
-        bulkImportJobParams.entityClassName = Org.name
-        var jobData = bulkImportJobParams.asJobData()
-        SyncJobEntity job = syncJobService.queueJob(jobData)
+        bulkImportJobArgs.entityClassName = Org.name
+        SyncJobEntity job = syncJobService.queueJob(bulkImportJobArgs)
         flushAndClear()
 
         job = SyncJob.get(job.id)
@@ -67,7 +68,7 @@ class SyncJobServiceTests extends Specification implements DomainIntTest {
         when:
         List payload = [1,2,3,4]
         SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', jobType: 'foo')
-        syncJobArgs.entityClass = Org
+        //syncJobArgs.entityClass = Org
         //syncJobArgs.savePayloadAsFile = true
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, payload)
 
@@ -178,8 +179,8 @@ class SyncJobServiceTests extends Specification implements DomainIntTest {
         List payload = [1,2,3,4]
         SyncJobArgs syncJobArgs = new SyncJobArgs(
             sourceId: '123', source: 'some source', jobType: 'foo',
-            dataLayout: SyncJobArgs.DataLayout.Payload,
-            entityClass: Org
+            dataLayout: DataLayout.List,
+            //entityClass: Org
         )
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, payload)
 
@@ -197,7 +198,7 @@ class SyncJobServiceTests extends Specification implements DomainIntTest {
         then:
         SyncJob job = SyncJob.get(jobContext.jobId)
         //job.errorBytes
-        List jsonData = parseJson(job.dataToString())
+        List jsonData = job.dataList
 
 
         jsonData.size() == 2

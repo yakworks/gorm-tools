@@ -1,28 +1,27 @@
 package yakworks.gorm.api
 
-import yakworks.gorm.api.bulk.BulkImportJobParams
-import gorm.tools.job.SyncJobArgs
-import gorm.tools.job.SyncJobState
-import gorm.tools.repository.model.DataOp
-import grails.gorm.transactions.NotTransactional
 import org.apache.commons.lang3.StringUtils
 import org.springframework.http.HttpStatus
 import org.springframework.jdbc.core.JdbcTemplate
 
+import gorm.tools.job.SyncJobState
+import gorm.tools.repository.model.DataOp
+import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 import yakworks.gorm.api.bulk.BulkImportService
-import yakworks.testing.gorm.model.KitchenSink
-import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.rally.job.SyncJob
-import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgFlex
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.repo.OrgRepo
+import yakworks.testing.gorm.integration.DomainIntTest
+import yakworks.testing.gorm.model.KitchenSink
+import yakworks.testing.gorm.model.KitchenSinkRepo
 
 import static yakworks.json.groovy.JsonEngine.parseJson
 
@@ -46,8 +45,8 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
         BulkImportService.lookup(entClass)
     }
 
-    BulkImportJobParams setupBulkImportParams(DataOp op = DataOp.add){
-        return new BulkImportJobParams(
+    BulkImportJobArgs setupBulkImportParams(DataOp op = DataOp.add){
+        return new BulkImportJobArgs(
             op: op, parallel: false, async:false,
             source: "test", sourceId: "test",
             includes: ["id", "name", "ext.name"]
@@ -62,12 +61,13 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
         // }
     }
 
-    void "sanity check bulk create"() {
+    void "test events and listeners"() {
+        //tests whats setup in the SyncjobEventListener
         given:
         List<Map> jsonList = generateOrgData(3)
 
         when:
-        def impParams = new BulkImportJobParams(parallel: false, async:false, op: DataOp.add)
+        def impParams = new BulkImportJobArgs(parallel: false, async:false, op: DataOp.add)
         def job = getBulkImportService(Org).bulkImportLegacy(impParams, jsonList)
 
         assert job.state == SyncJobState.Finished
@@ -86,8 +86,10 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
         //verify the SyncjobEventListener registered properly
         org.comments == "testorg-1-BulkImportFinishedEvent"
         org.info != null
+
         //verify the SyncjobEventListener registered properly
-        org.info.fax == "SyncJobStateEvent"
+        //org.info.fax == "SyncJobStateEvent"
+
         //verify the Before and AfterCreateOrUpdate
         org.flex.text9 == 'from before'
         org.flex.text10 == 'from after'
@@ -188,7 +190,7 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
 
         when:
 
-        def impParams = new BulkImportJobParams(
+        def impParams = new BulkImportJobArgs(
             parallel: false, async:false, op: DataOp.add,
             //include field from org, here org would be a lazy association, and would fail when its property accessed during json building
             includes: ["id", "org.source.id"]
@@ -278,7 +280,7 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
         jsonList[1].num = "testorg-1"
 
         when:
-        def impParams = new BulkImportJobParams(
+        def impParams = new BulkImportJobArgs(
             parallel: true, async:false, op: DataOp.add
         )
         def job = getBulkImportService(Org).bulkImportLegacy(impParams, jsonList)
@@ -338,7 +340,7 @@ class BulkImportLegacyIntSpec extends Specification implements DomainIntTest {
         jsonList[3].num = "testorg-2" //this one should cause error when processing slice errors
 
         when:
-        def impParams = new BulkImportJobParams(
+        def impParams = new BulkImportJobArgs(
             parallel: true, async:false, op: DataOp.add
         )
         def job = getBulkImportService(Org).bulkImportLegacy(impParams, jsonList)

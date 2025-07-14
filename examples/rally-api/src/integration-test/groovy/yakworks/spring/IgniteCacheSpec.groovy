@@ -5,15 +5,12 @@ import org.apache.ignite.IgniteCache
 import org.apache.ignite.cache.spring.IgniteCacheManager
 import org.springframework.beans.factory.annotation.Autowired
 
-import com.hazelcast.core.HazelcastInstance
-import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
-import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.gorm.api.bulk.BulkImportJobParams
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 import yakworks.gorm.api.bulk.BulkImportService
 import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Org
@@ -40,13 +37,13 @@ class IgniteCacheSpec extends Specification implements DomainIntTest {
 
     void "try with gorm object"() {
         when:
-        BulkImportJobParams bulkImportJobParams = BulkImportJobParams.withParams(
-            sourceId: '123', source: 'some source', payload: [1,2,3], jobType: BulkImportJobParams.JOB_TYPE
+        BulkImportJobArgs bulkImportJobArgs = BulkImportJobArgs.fromParams(
+            sourceId: '123', source: 'some source', payload: [1,2,3], jobType: BulkImportJobArgs.JOB_TYPE
         )
         def payload = [1,2,3]
-        bulkImportJobParams.entityClass = Org
+        bulkImportJobArgs.entityClass = Org
         var bulkImportService = BulkImportService.lookup(Org)
-        SyncJobEntity job = bulkImportService.queueJob(bulkImportJobParams, [1,2,3])
+        SyncJobEntity job = bulkImportService.queueJob(bulkImportJobArgs, [1,2,3])
         var cache = igniteCacheManager.getCache("jobCache")
 
         cache.put(job.id, job)

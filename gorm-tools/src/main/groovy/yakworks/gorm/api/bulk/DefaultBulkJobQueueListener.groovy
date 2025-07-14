@@ -10,12 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.event.EventListener
 import org.springframework.util.ClassUtils
 
-import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.events.SyncJobQueueEvent
 import yakworks.gorm.config.GormConfig
 
 /**
  * WIP to be used for tests instead of the Hazelcast queue
+ * NOT USED
  */
 @CompileStatic
 class DefaultBulkJobQueueListener {
@@ -26,7 +26,7 @@ class DefaultBulkJobQueueListener {
     void syncJobQueueEvent(SyncJobQueueEvent qe) {
         //SyncJobArgs args = qe.syncJobArgs
 
-        if(qe.jobType == BulkImportJobParams.JOB_TYPE && !gormConfig.legacyBulk){
+        if(qe.jobType == BulkImportJobArgs.JOB_TYPE && !gormConfig.legacyBulk){
             String entityClassName = qe.syncJob.params['entityClassName']
             Class<?> entityClass = ClassUtils.resolveClassName(entityClassName, null);
             //assert args.entityClass

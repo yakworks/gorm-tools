@@ -46,32 +46,22 @@ class SyncjobEventListener {
         }
     }
 
-    @EventListener
-    void beforeBulk(SyncJobStateEvent<Org> event) {
-        assert event.entityClass.isAssignableFrom(Org)
-        if(event.context.args.op != DataOp.add) return
-        if(event.context.payload && event.context.payload instanceof Collection) {
-            event.context.payload.each {
-                if(it['info']) {
-                    it['info'].fax = "SyncJobStateEvent"
-                }
-            }
-        }
-    }
-
      @EventListener
-     void withoutEntityClassStart(SyncJobStateEvent<Object> event) {
-         if(event.entityClass != Object) return //apply just for the event without entityClass
-         if(event.context.payload && event.context.payload instanceof Collection) {
-            event.context.payload << 5 //add a new item to payload which can be verified by test
+     void withoutEntityClassStart(SyncJobStateEvent event) {
+
+         if(event.context.args.jobType == 'event.test.job') {
+             if(event.context.payload && event.context.payload instanceof Collection) {
+                 event.context.payload << 5 //add a new item to payload which can be verified by test
+             }
          }
      }
 
     @EventListener
-    void withoutEntityClassfinish(SyncJobFinishedEvent<Object> event) {
-        if(event.entityClass != Object) return
-        if(event.context.payload && event.context.payload instanceof Collection) {
-            event.context.payload << 6
+    void withoutEntityClassfinish(SyncJobFinishedEvent event) {
+        if(event.context.args.jobType == 'event.test.job') {
+            if (event.context.payload && event.context.payload instanceof Collection) {
+                event.context.payload << 6
+            }
         }
     }
 }

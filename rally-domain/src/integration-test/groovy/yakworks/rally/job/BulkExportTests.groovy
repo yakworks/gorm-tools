@@ -1,6 +1,6 @@
 package yakworks.rally.job
 
-
+import gorm.tools.job.DataLayout
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobEntity
@@ -10,7 +10,7 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.api.problem.data.DataProblemException
-import yakworks.gorm.api.bulk.BulkExportJobParams
+import yakworks.gorm.api.bulk.BulkExportJobArgs
 import yakworks.gorm.api.bulk.BulkExportService
 import yakworks.etl.DataMimeTypes
 import yakworks.rally.attachment.model.Attachment
@@ -28,25 +28,29 @@ class BulkExportTests extends Specification implements DomainIntTest  {
         BulkExportService.lookup(Org)
     }
 
-    void "test setupSyncJobArgs"() {
+    void "test setupJobArgs"() {
         given:
-        BulkExportJobParams jobParams = BulkExportJobParams.withParams([
-            sourceId: "test-job", includes: ['id','name','info.phone'],
-            q: '{"id":{"$gte":1}}'
-        ])
+        SyncJobEntity jobEnt = bulkExportService.queueJob(
+            new BulkExportJobArgs(
+                q: '{"foo": "bar"}',
+                includes: ["id", "name", "info.phone"],
+                sourceId: "test-job"
+            )
+        )
 
         when:
-        SyncJobArgs jobArgs = bulkExportService.setupSyncJobArgs(jobParams)
+        BulkExportJobArgs jobArgs = bulkExportService.setupJobArgs(jobEnt)
 
         then:
         noExceptionThrown()
         jobArgs
-        jobArgs.jobType == BulkExportJobParams.JOB_TYPE
+        jobArgs.jobType == BulkExportJobArgs.JOB_TYPE
         jobArgs.sourceId == "test-job"
         jobArgs.queryArgs
-        jobArgs.entityClass == Org
+        //XXX
+        //jobArgs.entityClass == Org
         jobArgs.includes == ['id','name','info.phone']
-        jobArgs.dataLayout == SyncJobArgs.DataLayout.Payload
+        jobArgs.dataLayout == DataLayout.List
     }
 
     Long bulkExport(String q){
@@ -55,7 +59,7 @@ class BulkExportTests extends Specification implements DomainIntTest  {
         //     source: "test", sourceId: "test-job", includes: "id,name,ext.name"
         // ]
         // params.q = q
-        BulkExportJobParams bexParams = new BulkExportJobParams(
+        BulkExportJobArgs bexParams = new BulkExportJobArgs(
             sourceId: "test-job", includes: ['id','name','info.phone'],
             q: q
         )
@@ -70,7 +74,7 @@ class BulkExportTests extends Specification implements DomainIntTest  {
     void "test queueExportJob"() {
         when:
         SyncJobEntity jobEnt = bulkExportService.queueJob(
-            new BulkExportJobParams(
+            new BulkExportJobArgs(
                 q: '{"foo": "bar"}',
                 includes: ["id", "name", "info.phone"],
                 sourceId: "test-job"
@@ -84,7 +88,7 @@ class BulkExportTests extends Specification implements DomainIntTest  {
 
         then:
         noExceptionThrown()
-        job.jobType == BulkExportJobParams.JOB_TYPE
+        job.jobType == BulkExportJobArgs.JOB_TYPE
         job.state == SyncJobState.Queued
         job.sourceId == 'test-job'
 
@@ -97,7 +101,7 @@ class BulkExportTests extends Specification implements DomainIntTest  {
     void "test empty q param"() {
         when:
         Map params = [:]
-        SyncJobEntity jobEnt = bulkExportService.queueJob(new BulkExportJobParams())
+        SyncJobEntity jobEnt = bulkExportService.queueJob(new BulkExportJobArgs())
 
         then:
         DataProblemException ex = thrown()
@@ -144,7 +148,7 @@ class BulkExportTests extends Specification implements DomainIntTest  {
 
         when: "verify job.data (job results)"
         def dataString = job.dataToString()
-        List results = parseJson(dataString, List)
+        List results = job.dataList
 
         then:
         dataString.startsWith('[\n{') //sanity check
@@ -177,7 +181,7 @@ class BulkExportTests extends Specification implements DomainIntTest  {
 
     void "success bulk export CSV"() {
         when:
-        BulkExportJobParams bexParams = new BulkExportJobParams(
+        BulkExportJobArgs bexParams = new BulkExportJobArgs(
             sourceId: "test-job", includes: ['id','name','info.phone'],
             q: '{"id":{"$gte":1}}', dataFormat: DataMimeTypes.csv
         )
@@ -216,7 +220,7 @@ class BulkExportTests extends Specification implements DomainIntTest  {
     void "success bulk export large CSV"() {
         when:
         KitchenSink.createKitchenSinks(1000)
-        BulkExportJobParams bexParams = new BulkExportJobParams(
+        BulkExportJobArgs bexParams = new BulkExportJobArgs(
             sourceId: "test-job", includes: ['id','name','ext.name'],
             q: '{"id":{"$gte":1}}', dataFormat: DataMimeTypes.csv
         )

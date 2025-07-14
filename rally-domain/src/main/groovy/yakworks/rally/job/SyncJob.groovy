@@ -8,7 +8,6 @@ import groovy.transform.CompileDynamic
 
 import org.grails.datastore.mapping.config.MappingDefinition
 
-import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.RepoEntity
@@ -33,7 +32,7 @@ class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity, AuditStampTrait, Se
     /**
      * NOTE: Here only so we can add to constraintsMap for docs
      */
-    byte[] getData(){
+    Object getData(){
         null
         //getRepo().getData(this)
     }
@@ -41,7 +40,7 @@ class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity, AuditStampTrait, Se
     /**
      * NOTE: Here only so we can add to constraintsMap for docs
      */
-    byte[] getPayload(){
+    Object getPayload(){
         null
         //getRepo().getPayload(this)
     }
@@ -79,13 +78,4 @@ class SyncJob implements RepoEntity<SyncJob>, SyncJobEntity, AuditStampTrait, Se
         data: [d: 'The result data json, will normally be an array with items for errors.', oapi: [type: 'object']]
     ]
 
-        //parseJson
-    public <T> T parseData(Class<T> clazz = List){
-        parseJson(dataToString(), clazz)
-    }
-
-        //parseJson
-    public <T> T parsePayload(Class<T> clazz = List){
-        parseJson(payloadToString(), clazz)
-    }
 }

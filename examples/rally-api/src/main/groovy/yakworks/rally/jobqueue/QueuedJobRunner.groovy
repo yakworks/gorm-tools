@@ -11,9 +11,9 @@ import org.springframework.stereotype.Component
 import org.springframework.util.ClassUtils
 
 import gorm.tools.job.SyncJobEntity
-import yakworks.gorm.api.bulk.BulkExportJobParams
+import yakworks.gorm.api.bulk.BulkExportJobArgs
 import yakworks.gorm.api.bulk.BulkExportService
-import yakworks.gorm.api.bulk.BulkImportJobParams
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 import yakworks.gorm.api.bulk.BulkImportService
 import yakworks.rally.job.SyncJob
 import yakworks.testing.gorm.model.KitchenSink
@@ -32,10 +32,10 @@ class QueuedJobRunner {
         //sleep(2000)
         String jobType = syncJob.jobType
         log.info("⚙️📡    runJob called with jobType: $jobType - $syncJob")
-        if(jobType == BulkImportJobParams.JOB_TYPE){
+        if(jobType == BulkImportJobArgs.JOB_TYPE){
             runBulkImport(syncJob)
         }
-        else if (jobType == BulkExportJobParams.JOB_TYPE){
+        else if (jobType == BulkExportJobArgs.JOB_TYPE){
             runBulkExport(syncJob)
         }
         else {

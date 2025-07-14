@@ -20,7 +20,7 @@ class SyncJobEventsSpec extends Specification {
     void "test job events without an entity class"() {
         setup:
         def samplePaylod = [1,2,3,4]
-        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', jobType: 'test.job')
+        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', jobType: 'event.test.job')
 
         when: "without entityClass"
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, samplePaylod)

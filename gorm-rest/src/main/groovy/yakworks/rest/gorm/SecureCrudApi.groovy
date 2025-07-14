@@ -10,7 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 
 import gorm.tools.job.SyncJobEntity
 import yakworks.gorm.api.CrudApi
-import yakworks.gorm.api.bulk.BulkImportJobParams
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 
 @CompileStatic
 class SecureCrudApi<D> implements CrudApi<D> {
@@ -48,7 +48,7 @@ class SecureCrudApi<D> implements CrudApi<D> {
 
     @Override
     @PreAuthorize("!hasRole('ROLE_READ_ONLY')")
-    SyncJobEntity bulkImport(BulkImportJobParams jobParams, List<Map> dataList){
+    SyncJobEntity bulkImport(BulkImportJobArgs jobParams, List<Map> dataList){
         defaultCrudApi.bulkImport(jobParams, dataList)
     }
 

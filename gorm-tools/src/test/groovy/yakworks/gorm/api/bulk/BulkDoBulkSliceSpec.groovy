@@ -2,15 +2,14 @@ package yakworks.gorm.api.bulk
 
 import org.springframework.beans.factory.annotation.Autowired
 
-import gorm.tools.job.SyncJobArgs
 import gorm.tools.problem.ValidationProblem
+import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp
 import spock.lang.Specification
 import testing.TestSyncJob
 import yakworks.api.ApiResults
 import yakworks.api.HttpStatus
 import yakworks.api.OkResult
-import yakworks.spring.AppCtx
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.testing.gorm.model.SinkExt
@@ -27,8 +26,15 @@ class BulkDoBulkSliceSpec extends Specification implements GormHibernateTest {
 
     @Autowired KitchenSinkRepo kitchenSinkRepo
 
-    SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
-        return new SyncJobArgs(parallel: false, async:false, op: op, source: "test", sourceId: "test", includes: ["id", "name", "ext.name"])
+    BulkImportJobArgs setupJobArgs(DataOp op = DataOp.add){
+        return new BulkImportJobArgs(
+            parallel: false,
+            async:false,
+            op: op,
+            source: "test",
+            sourceId: "test",
+            includes: ["id", "name", "ext.name"]
+        )
     }
 
     BulkImporter<KitchenSink> getBulkImporter(){
@@ -38,7 +44,7 @@ class BulkDoBulkSliceSpec extends Specification implements GormHibernateTest {
     void "success doBulk add"() {
         given:
         List list = KitchenSink.generateDataList(100)
-        def syncArgs = setupSyncJobArgs()
+        def syncArgs = setupJobArgs()
 
         when: "doBulk insert records"
         ApiResults res = bulkImporter.doBulkSlice(list, syncArgs)
@@ -85,7 +91,7 @@ class BulkDoBulkSliceSpec extends Specification implements GormHibernateTest {
         List updateList = KitchenSink.list().collect {
             [id: it.id, name: "new${it.id}"]
         }
-        def syncArgs = setupSyncJobArgs(DataOp.update)
+        def syncArgs = setupJobArgs(DataOp.update)
 
         when: "doBulk update records"
         ApiResults res = bulkImporter.doBulkSlice(updateList, syncArgs)
@@ -108,7 +114,7 @@ class BulkDoBulkSliceSpec extends Specification implements GormHibernateTest {
     void "test failures and errors insert"() {
         given:
         List list = KitchenSink.generateDataList(3)
-        def syncArgs = setupSyncJobArgs()
+        def syncArgs = setupJobArgs()
 
         and: "bad record with null name"
         list[1].name = null
@@ -149,9 +155,9 @@ class BulkDoBulkSliceSpec extends Specification implements GormHibernateTest {
             )
         }
 
-        def syncArgs = setupSyncJobArgs(DataOp.upsert)
+        def syncArgs = setupJobArgs(DataOp.upsert)
         //set bindId so it will work with ids in the find which normally throws error, just like insert
-        syncArgs.persistArgs(bindId: true)
+        syncArgs.persistArgs = PersistArgs.withBindId()
 
         when: "doBulk UPSERT records"
         ApiResults res = bulkImporter.doBulkSlice(upsertList, syncArgs)

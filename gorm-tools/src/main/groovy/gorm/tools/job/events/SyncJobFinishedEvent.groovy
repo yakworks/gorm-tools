@@ -14,12 +14,12 @@ import gorm.tools.job.SyncJobContext
 import yakworks.commons.lang.Validate
 
 @CompileStatic
-class SyncJobFinishedEvent<D> extends ApplicationEvent implements ResolvableTypeProvider   {
+class SyncJobFinishedEvent extends ApplicationEvent { //implements ResolvableTypeProvider   {
 
     Long jobId
     Boolean ok
     SyncJobContext context
-    Class entityClass
+    //Class entityClass
 
     SyncJobFinishedEvent(SyncJobContext ctx) {
         super(ctx)
@@ -27,7 +27,7 @@ class SyncJobFinishedEvent<D> extends ApplicationEvent implements ResolvableType
         this.jobId = ctx.jobId
         this.ok = ctx.ok.get()
         //assert ctx.args.entityClass
-        this.entityClass = ctx.args.entityClass ?: Object //if no entityClass - eg for exportSync
+        //this.entityClass = ctx.args.entityClass ?: Object //if no entityClass - eg for exportSync
     }
 
     static SyncJobFinishedEvent of(SyncJobContext ctx){
@@ -35,8 +35,8 @@ class SyncJobFinishedEvent<D> extends ApplicationEvent implements ResolvableType
         return new SyncJobFinishedEvent(ctx)
     }
 
-    @Override
-    ResolvableType getResolvableType() {
-        return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forClass(entityClass))
-    }
+    // @Override
+    // ResolvableType getResolvableType() {
+    //     return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forClass(entityClass))
+    // }
 }

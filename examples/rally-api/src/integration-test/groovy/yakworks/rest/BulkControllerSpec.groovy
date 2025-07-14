@@ -34,7 +34,7 @@ class BulkControllerSpec extends RestIntTest implements SecuritySpecHelper {
         request.method = "POST"
         //sourceId is built from these so pop to test
         request.requestURI = '/api/rally/org/bulk'
-        request.queryString = 'jobSource=Oracle'
+        request.queryString = 'jobSource=Oracle&async=false'
 
         controller.params.jobSource = "Oracle"
         controller.bulkCreate()

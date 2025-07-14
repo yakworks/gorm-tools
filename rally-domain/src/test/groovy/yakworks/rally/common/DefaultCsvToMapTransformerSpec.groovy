@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
 import yakworks.commons.io.ZipUtils
 import yakworks.commons.util.BuildSupport
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
@@ -51,7 +52,9 @@ class DefaultCsvToMapTransformerSpec extends Specification implements DataRepoTe
         attachment.resource.exists()
 
         when:
-        List<Map> rows = csvToMapTransformer.process([attachmentId:attachment.id, dataFilename:"contact.csv"])
+        List<Map> rows = csvToMapTransformer.process(
+            new BulkImportJobArgs(attachmentId:attachment.id, dataFilename:"contact.csv")
+        )
 
         then:
         noExceptionThrown()
@@ -78,7 +81,7 @@ class DefaultCsvToMapTransformerSpec extends Specification implements DataRepoTe
         attachment.resource.exists()
 
         when:
-        List<Map> rows = csvToMapTransformer.process([attachmentId:attachment.id])
+        List<Map> rows = csvToMapTransformer.process(new BulkImportJobArgs(attachmentId:attachment.id))
 
         then:
         noExceptionThrown()
@@ -97,7 +100,7 @@ class DefaultCsvToMapTransformerSpec extends Specification implements DataRepoTe
         def csvFile = BuildSupport.rootProjectPath.resolve("examples/resources/csv/contact-bad.csv")
         Map params = [name: csvFile.fileName.toString(), sourcePath: csvFile]
         Attachment attachment = Attachment.create(params)
-        List<Map> rows = csvToMapTransformer.process([attachmentId:attachment.id])
+        List<Map> rows = csvToMapTransformer.process(new BulkImportJobArgs(attachmentId:attachment.id))
 
         then:
         IOException ex = thrown()

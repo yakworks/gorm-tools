@@ -20,11 +20,11 @@ import org.springframework.validation.DataBinder
 @CompileStatic
 class BasicDataBinder {
 
-    ConversionService conversionService
-
-    BasicDataBinder(){
-        conversionService = new RelaxedConversionService(new DefaultConversionService())
-    }
+    // ConversionService conversionService
+    //
+    // BasicDataBinder(){
+    //     conversionService = new RelaxedConversionService(new DefaultConversionService())
+    // }
 
     public static <T> T bind(T obj, Map data){
         return bind(obj, new MutablePropertyValues(data))

@@ -10,13 +10,9 @@ interface CsvToMapTransformer {
     /**
      * Reads CSV rows into maps
      *
-     * @param params map with
-     *  - attachmentId
-     *  - dataFilename : name of csv file inside zip
-     *  - headerPathDelimiter : Header delimeter
-     *  - any other parameter required by the implementation
+     * @param bulkImportJobArgs the args with the specs for the CSV file
      *
      * @return List<Map>
      */
-    List<Map> process(Map params)
+    List<Map> process(BulkImportJobArgs bulkImportJobArgs)
 }

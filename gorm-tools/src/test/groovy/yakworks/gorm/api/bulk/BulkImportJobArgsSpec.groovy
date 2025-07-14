@@ -1,27 +1,37 @@
 package yakworks.gorm.api.bulk
 
+import gorm.tools.job.DataLayout
 import gorm.tools.repository.model.DataOp
 import spock.lang.Specification
 import yakworks.commons.beans.BeanTools
 import yakworks.etl.DataMimeTypes
 
-class BulkJobParamsSpec extends Specification  {
+class BulkImportJobArgsSpec extends Specification  {
 
     void "test with map"() {
         when: "simple"
         Map paramMap = [
+            source: 'foo',
             op: 'add',
-            attachmentId: '123',
-            parallel: "False"
+            parallel: "False",
+            attachmentId: '123'
         ]
-        BulkImportJobParams biParams = BulkImportJobParams.withParams(paramMap)
+        BulkImportJobArgs biParams = BulkImportJobArgs.fromParams(paramMap)
 
         then:
         //biParams.async //async by default
         biParams.parallel == false
         biParams.attachmentId == 123
         biParams.op == DataOp.add
-        biParams.asMap() == [parallel: false, attachmentId: 123, op: DataOp.add, dataFormat: DataMimeTypes.json, jobType: 'bulk.import']
+        biParams.asMap() == [
+            source: 'foo',
+            op: DataOp.add,
+            parallel: false,
+            attachmentId: 123,
+            dataLayout: DataLayout.Result,
+            dataFormat: DataMimeTypes.json,
+            jobType: 'bulk.import'
+        ]
 
         when: "simple"
         paramMap = [
@@ -32,7 +42,7 @@ class BulkJobParamsSpec extends Specification  {
             foo: 1,
             bar: 'baz'
         ]
-        biParams = BulkImportJobParams.withParams(paramMap)
+        biParams = BulkImportJobArgs.fromParams(paramMap)
 
         then:
         biParams.parallel == true
@@ -51,7 +61,7 @@ class BulkJobParamsSpec extends Specification  {
             parallel: "false",
             //includes: "a,b,c" // THIS DOES NOT WORK WITH Jackson Binder
         ]
-        BulkImportJobParams biParams = BeanTools.bind(paramMap, BulkImportJobParams)
+        BulkImportJobArgs biParams = BeanTools.bind(paramMap, BulkImportJobArgs)
 
         then:
         biParams.parallel == false
@@ -67,15 +77,15 @@ class BulkJobParamsSpec extends Specification  {
             op: 'add',
             attachmentId: '123',
             parallel: "false",
-            includes: "a,b,c", // THIS DOES NOT WORK WITH Jackson Binder
+            includes: "a, b ,c", // THIS DOES NOT WORK WITH Jackson Binder
             foo: 1,
             bar: 'baz'
         ]
-        BulkImportJobParams biParams = BulkImportJobParams.withParams(paramMap)
+        BulkImportJobArgs biParams = BulkImportJobArgs.fromParams(paramMap)
         Map biMap = biParams.asMap()
 
         then:
-        biMap.keySet().size() == 8 // [op, parallel, dataFormat, attachmentId, includes, jobType, foo, bar]
+        biMap.keySet().size() == 9 // [op, parallel, dataFormat, dataLayout, attachmentId, includes, jobType, foo, bar]
         biMap.parallel == false
         biMap.attachmentId == 123
         biMap.op == DataOp.add
@@ -83,8 +93,8 @@ class BulkJobParamsSpec extends Specification  {
         biMap.foo == 1
         biMap.bar == 'baz'
 
-        when: "put map back into BulkImportJobParams"
-        BulkImportJobParams biParams2 = BulkImportJobParams.withParams(paramMap)
+        when: "put map back into bulkImportJobArgs"
+        BulkImportJobArgs biParams2 = BulkImportJobArgs.fromParams(paramMap)
 
         then:
         biParams2.parallel == false

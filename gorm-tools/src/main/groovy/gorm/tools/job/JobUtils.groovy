@@ -4,13 +4,10 @@
 */
 package gorm.tools.job
 
-//import javax.servlet.http.HttpServletRequest
-
 import groovy.json.JsonOutput
 import groovy.transform.CompileStatic
 
 import com.fasterxml.jackson.databind.util.RawValue
-import yakworks.etl.DataMimeTypes
 
 /**
  * Misc static helpers for SynJobs/ApiJobs
@@ -32,6 +29,8 @@ class JobUtils {
 
     /**
      * Use for the Grails controllers that use the Groovy JSON engine.
+     * Using special for Groovy vs Jackson so we can send the parser specific unescaped json string in data
+     * which for Groovy is the JsonUnescaped class.
      */
     static Map jobToMapGroovy(SyncJobEntity job){
         Map resp = commonJobToMap(job)
@@ -45,6 +44,8 @@ class JobUtils {
 
     /**
      * Use for the Spring controllers that use the Jackson JSON engine.
+     * Using special for Groovy vs Jackson so we can send the parser specific unescaped json string in data,
+     * which for jackson is the RawValue class
      */
     static Map jobToMapJackson(SyncJobEntity job){
         Map resp = commonJobToMap(job)

@@ -13,7 +13,6 @@ import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
 
-import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
@@ -36,9 +35,7 @@ import yakworks.gorm.config.GormConfig
 import yakworks.json.groovy.JsonEngine
 
 /**
- * Helper for getting things setup for bulk calls
- *
- * @author Joshua Burnett (@basejump)
+ * Runs the bulk import jobs
  */
 @Slf4j
 @CompileStatic
@@ -73,7 +70,7 @@ class BulkImportService<D> {
         return bulkImporter
     }
 
-    SyncJobEntity process(BulkImportJobParams jobParams, List<Map> payloadList){
+    SyncJobEntity process(BulkImportJobArgs jobParams, List<Map> payloadList){
         if(gormConfig.legacyBulk){
             return bulkImportLegacy(jobParams, payloadList)
         }
@@ -83,34 +80,32 @@ class BulkImportService<D> {
     }
 
     /**
-     * Creates a Syncjob and que it up
+     * Creates a SyncJob and queue it up
      */
-    SyncJobEntity queueJob(BulkImportJobParams jobParams, List<Map> payloadBody) {
+    SyncJobEntity queueJob(BulkImportJobArgs jobParams, List<Map> payloadBody) {
         //set the entityClassName
         jobParams.entityClassName = getEntityClass().name
 
-        Map data = jobParams.asJobData()
+        //Map data = jobParams.asJobData()
 
         //if payloadId, then probably attachmentId with csv for example. Just store it and dont do payload conversion
         if(jobParams.attachmentId) {
-            data.payloadId = jobParams.attachmentId
+            jobParams.payloadId = jobParams.attachmentId
         }
         else if(payloadBody){
             if (jobParams.savePayloadAsFile || payloadBody.size() > 1000) {
-                //we need to create the jobId so associate the attachment
-                Long jobId = syncJobService.generateId()
-                data.id = jobId
-                data.payloadId = syncJobService.writePayloadFile(jobId, payloadBody)
+                //we need to create the jobId to associate the attachment
+                jobParams.jobId = syncJobService.generateId()
+                jobParams.payloadId = syncJobService.writePayloadFile(jobParams.jobId, payloadBody)
             }
             else {
-                String res = JsonEngine.toJson(payloadBody)
-                data.payloadBytes = res.bytes
+                jobParams.payload = payloadBody
             }
         } else {
             throw DataProblemCodes.EmptyPayload.get().toException()
         }
 
-        return syncJobService.queueJob(data)
+        return syncJobService.queueJob(jobParams)
     }
 
     /**
@@ -131,7 +126,7 @@ class BulkImportService<D> {
      * To be used for TESTING. Not meant for a production method.
      * queue and start the job
      */
-    SyncJobEntity queueAndRun(BulkImportJobParams jobParams, List<Map> payloadBody) {
+    SyncJobEntity queueAndRun(BulkImportJobArgs jobParams, List<Map> payloadBody) {
         SyncJobEntity jobEnt = queueJob(jobParams, payloadBody)
         return runJob(jobEnt.id)
     }
@@ -142,7 +137,7 @@ class BulkImportService<D> {
     protected SyncJobContext runJobInit(Long jobId) {
         assert jobId
         SyncJobEntity job = syncJobService.getJob(jobId)
-        BulkImportJobParams jobParams = BulkImportJobParams.withParams(job.params)
+        BulkImportJobArgs jobParams = BulkImportJobArgs.fromParams(job.params)
 
         List<Map> payloadList
         try {
@@ -154,9 +149,10 @@ class BulkImportService<D> {
         }
 
         //setup the args and startJob
-        var sargs = setupSyncJobArgs(jobParams)
+        //var sargs = setupSyncJobArgs(jobParams)
+        var sargs = setupJobArgs(job)
         sargs.payload(payloadList)
-        SyncJobContext jobContext = syncJobService.startJob(job, sargs)
+        SyncJobContext jobContext = syncJobService.startJobInit(job, sargs)
 
         jobContext.payloadSize = payloadList.size()
         return jobContext
@@ -169,26 +165,18 @@ class BulkImportService<D> {
      * 3. run the job, either async or not
      */
     @Deprecated
-    protected SyncJobEntity bulkImportLegacy(BulkImportJobParams jobParams, List<Map> payloadList){
+    protected SyncJobEntity bulkImportLegacy(BulkImportJobArgs jobParams, List<Map> payloadList){
         //submit the job
         SyncJobEntity job = queueJob(jobParams, payloadList)
         Long jobId = job.id
 
         SyncJobContext jobContext = runJobInit(jobId)
-        //the old way was to throw an exception when CSV parsing failed that got rendered as Problem in response
+        //NOTE: the old way was to throw an exception when CSV parsing failed that got rendered as Problem in response
         if(!jobContext.ok.get()) {
             throw (jobContext.problems[0] as DataProblemTrait).toException()
         }
-        //if attachmentId then assume its a csv
-        if(!jobParams.attachmentId) {
-            // dirty ugly hack since we were not consistent and now need to do clean up
-            // RNDC expects async to be false by default when its not CSV
-            // remove this else hack once this is done https://github.com/9ci/cust-rndc-ext/issues/215
-            if(jobParams.async == null) jobContext.args.async = false
-        }
-
         // This is the promise call. Will return immediately if syncJobArgs.async=true
-        syncJobService.runJob(jobContext.args.asyncArgs, jobContext,
+        syncJobService.runJob(jobContext,
             () -> getBulkImporter().doBulkParallel(jobContext.args.payload as List<Map>, jobContext)
         )
         TrxService.bean().flushAndClear()
@@ -196,8 +184,7 @@ class BulkImportService<D> {
         return job
     }
 
-    //WIP
-    protected SyncJobEntity bulkImport(BulkImportJobParams jobParams, List<Map> payloadList){
+    protected SyncJobEntity bulkImport(BulkImportJobArgs jobParams, List<Map> payloadList){
 
         //submit the job
         SyncJobEntity job = queueJob(jobParams, payloadList)
@@ -235,14 +222,14 @@ class BulkImportService<D> {
     /**
      * gets the payload data for job based on params.
      */
-    protected List<Map> getPayloadData(SyncJobEntity job, BulkImportJobParams jobParams){
+    protected List<Map> getPayloadData(SyncJobEntity job, BulkImportJobArgs jobParams){
         List<Map> payloadList
 
         if(jobParams.attachmentId) {
             //attachment will normally be a CSV as if they are doing json it can be passed into as the request body
             if(!jobParams.payloadFormat || jobParams.payloadFormat == DataMimeTypes.csv){
                 //sets the datalist from the csv instead of body
-                payloadList = transformCsvToBulkList(job, jobParams.asMap())
+                payloadList = transformCsvToBulkList(job, jobParams)
             } else if (jobParams.payloadFormat == DataMimeTypes.json) {
                 //FIXME finish this to allow passing a json file
                 throw DataProblem.ex("JSON attachment not yet supported").payload(job.id)
@@ -255,9 +242,14 @@ class BulkImportService<D> {
         return payloadList
     }
 
-    protected List<Map> transformCsvToBulkList(SyncJobEntity job, Map gParams) {
+    /**
+     * calls the CsvToMapTransformer process.
+     * Will throw DataProblem if not successful.
+     * @return the list of Maps to process
+     */
+    protected List<Map> transformCsvToBulkList(SyncJobEntity job, BulkImportJobArgs jobArgs) {
         try {
-            return getCsvToMapTransformer().process(gParams)
+            return getCsvToMapTransformer().process(jobArgs)
         } catch(ex){
             if(ex instanceof ThrowableProblem) throw ex
             throw DataProblem.of(ex).msg("error.data.csv").payload(job.id).toException()
@@ -276,18 +268,20 @@ class BulkImportService<D> {
      * sets up the SyncJobArgs from whats passed in from params.
      * NOTE: When queueing job much of this is not needed but we keep one common method
      */
-    protected SyncJobArgs setupSyncJobArgs(BulkImportJobParams jobParams){
-        List bulkIncludes = jobParams.includes ?: includesConfig.findByKeys(getEntityClass(), [IncludesKey.bulk, IncludesKey.get])
+    protected BulkImportJobArgs setupJobArgs(SyncJobEntity job){
+        BulkImportJobArgs jobArgs = BulkImportJobArgs.fromParams(job.params)
+        jobArgs.jobId = job.id
+
+        List bulkIncludes = jobArgs.includes ?: includesConfig.findByKeys(getEntityClass(), [IncludesKey.bulk, IncludesKey.get])
         //want the error includes to be blank if its not there
         List bulkErrorIncludes = includesConfig.getByKey(getEntityClass(), 'bulkError') as List<String>
 
-        SyncJobArgs syncJobArgs = SyncJobArgs.withParams(jobParams.asMap())
-        syncJobArgs.includes = bulkIncludes
-        syncJobArgs.errorIncludes = bulkErrorIncludes
+        jobArgs.includes = bulkIncludes
+        jobArgs.errorIncludes = bulkErrorIncludes
         //used for events?
-        syncJobArgs.entityClass = getEntityClass()
+        jobArgs.entityClass = getEntityClass()
 
-        return syncJobArgs
+        return jobArgs
     }
 
     GormRepo<D> getRepo() {

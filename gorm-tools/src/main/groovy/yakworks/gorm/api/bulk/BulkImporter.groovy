@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Qualifier
 
 import gorm.tools.async.AsyncArgs
 import gorm.tools.async.ParallelTools
-import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
@@ -95,9 +94,9 @@ class BulkImporter<D> {
         }
         finally {
             jobContext.finishJob()
-            //XXX temporarily comment out ntil the legacy way is removed
-            // BulkImportFinishedEvent<D> evt = new BulkImportFinishedEvent(jobContext, entityClass)
-            // AppCtx.publishEvent(evt)
+            //fire finished event
+            BulkImportFinishedEvent<D> evt = new BulkImportFinishedEvent(jobContext, (BulkImportJobArgs)jobContext.args, entityClass)
+            AppCtx.publishEvent(evt)
         }
 
         return jobContext.jobId
@@ -105,15 +104,15 @@ class BulkImporter<D> {
 
     void doBulkParallel(List<Map> dataList, SyncJobContext jobContext){
         List<Collection<Map>> sliceErrors = Collections.synchronizedList([] as List<Collection<Map>> )
-
+        BulkImportJobArgs jobArgs = (BulkImportJobArgs)jobContext.args
         AsyncArgs pconfig = AsyncArgs.of(getRepo().getDatastore())
-        pconfig.enabled = jobContext.args.parallel //same as above, ability to override through params
+        pconfig.enabled = jobArgs.parallel //same as above, ability to override through params
         // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
         parallelTools.eachSlice(pconfig, dataList) { dataSlice ->
             ApiResults results
             try {
                 getRepo().withTrx {
-                    results = doBulkSlice((List<Map>) dataSlice, jobContext.args)
+                    results = doBulkSlice((List<Map>) dataSlice, jobArgs)
                 }
                 if(results?.ok) jobContext.updateJobResults(results, false)
                 // ((List<Map>) dataSlice)*.clear() //clear out so mem can be garbage collected
@@ -128,10 +127,10 @@ class BulkImporter<D> {
         // this time run each item in the slice in its own transaction
         if(sliceErrors.size()) {
             AsyncArgs asynArgsNoTrx = AsyncArgs.of(getRepo().getDatastore())
-            asynArgsNoTrx.enabled = jobContext.args.parallel
+            asynArgsNoTrx.enabled = jobArgs.parallel
             parallelTools.each(asynArgsNoTrx, sliceErrors) { dataSlice ->
                 try {
-                    ApiResults results = doBulkSlice((List<Map>) dataSlice, jobContext.args, true)
+                    ApiResults results = doBulkSlice((List<Map>) dataSlice, jobArgs, true)
                     jobContext.updateJobResults(results, false)
                 } catch(Exception ex) {
                     //log.error("BulkableRepo unexpected exception", ex)
@@ -155,17 +154,17 @@ class BulkImporter<D> {
      *        also, if true then this method will try not to throw an exception and
      *        it will collect the errors in the results.
      */
-    protected ApiResults doBulkSlice(List<Map> dataList, SyncJobArgs syncJobArgs, boolean transactionPerItem = false){
+    protected ApiResults doBulkSlice(List<Map> dataList, BulkImportJobArgs jobArgs, boolean transactionPerItem = false){
         // println "will do ${dataList.size()}"
         ApiResults results = ApiResults.create(false)
         for (Map item : dataList) {
             try {
-                EntityResult<Map> entResult = bulkSaveEntity(item, syncJobArgs, transactionPerItem)
+                EntityResult<Map> entResult = bulkSaveEntity(item, jobArgs, transactionPerItem)
                 results << Result.OK().payload(entResult.entity).status(entResult.status)
             } catch(Exception e) {
                 // if trx by item then collect the exceptions, otherwise throw so it can rollback
                 if(transactionPerItem){
-                    results << problemHandler.handleException(e).payload(buildErrorMap(item, syncJobArgs.errorIncludes))
+                    results << problemHandler.handleException(e).payload(buildErrorMap(item, jobArgs.errorIncludes))
                 } else {
                     getRepo().clear() //clear cache on error since wont hit below
                     throw e
@@ -191,7 +190,7 @@ class BulkImporter<D> {
      * @return the EntityResult with the data map as entity after being run through buildSuccessMap
      *         using the includes in the syncJobArgs
      */
-    protected EntityResult<Map> bulkSaveEntity(Map data, SyncJobArgs syncJobArgs, boolean transactional) {
+    protected EntityResult<Map> bulkSaveEntity(Map data, BulkImportJobArgs jobArgs, boolean transactional) {
         //need to copy the incoming map, as during create(), repos may remove entries from the data map
         //or it can create circular references - eg org.contact.org - which would result in Stackoverflow when converting to json
         Map dataClone
@@ -203,10 +202,10 @@ class BulkImporter<D> {
         }
 
         def closure = {
-            doBeforeBulkSaveEntity(dataClone, syncJobArgs)
-            PersistArgs pargs = syncJobArgs.persistArgs
+            doBeforeBulkSaveEntity(dataClone, jobArgs)
+            PersistArgs pargs = jobArgs.persistArgs ? jobArgs.persistArgs.clone() : PersistArgs.of()
             D entityInstance
-            DataOp op = syncJobArgs.op
+            DataOp op = jobArgs.op
             int statusCode
             if(op == DataOp.add) { // create
                 entityInstance = getRepo().doCreate(dataClone, pargs)
@@ -221,8 +220,8 @@ class BulkImporter<D> {
             } else {
                 throw new UnsupportedOperationException("DataOp $op not supported")
             }
-            doAfterBulkSaveEntity(entityInstance, dataClone, syncJobArgs)
-            Map successMap = buildSuccessMap(entityInstance, syncJobArgs.includes)
+            doAfterBulkSaveEntity(entityInstance, dataClone, jobArgs)
+            Map successMap = buildSuccessMap(entityInstance, jobArgs.includes)
             return EntityResult.of(successMap).status(statusCode)
         } as Closure<EntityResult<Map>>
 
@@ -263,16 +262,16 @@ class BulkImporter<D> {
      * Gives an oportunity to modify the data with any special changes needed in a bulk op.
      * will be inside the trx if one is created, so can throw an error if needing to reject the save.
      */
-    protected void doBeforeBulkSaveEntity(Map data, SyncJobArgs syncJobArgs) {
-        BeforeBulkSaveEntityEvent<D> event = new BeforeBulkSaveEntityEvent<D>(getRepo(), data, syncJobArgs)
+    protected void doBeforeBulkSaveEntity(Map data, BulkImportJobArgs jobArgs) {
+        BeforeBulkSaveEntityEvent<D> event = new BeforeBulkSaveEntityEvent<D>(getRepo(), data, jobArgs)
         repoEventPublisher.publishEvents(getRepo(), event, [event] as Object[])
     }
 
     /**
      * Called after the doupdate or create has been called for each item.
      */
-    protected void doAfterBulkSaveEntity(D entity, Map data, SyncJobArgs syncJobArgs) {
-        AfterBulkSaveEntityEvent<D> event = new AfterBulkSaveEntityEvent<D>(getRepo(), entity, data, syncJobArgs)
+    protected void doAfterBulkSaveEntity(D entity, Map data, BulkImportJobArgs jobArgs) {
+        AfterBulkSaveEntityEvent<D> event = new AfterBulkSaveEntityEvent<D>(getRepo(), entity, data, jobArgs)
         repoEventPublisher.publishEvents(getRepo() , event, [event] as Object[])
     }
 

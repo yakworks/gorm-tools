@@ -1,11 +1,11 @@
-package gorm.tools.api.support
+package yakworks.gorm.api
 
 import gorm.tools.job.SyncJobState
 import gorm.tools.repository.model.DataOp
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import yakworks.gorm.api.bulk.BulkImportJobParams
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 import yakworks.gorm.api.bulk.BulkImportService
 import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Org
@@ -15,7 +15,7 @@ import yakworks.testing.gorm.model.KitchenSink
 
 @Integration
 @Rollback
-class BulkApiSupportSpec extends Specification implements DomainIntTest {
+class BulkImportServiceTest extends Specification implements DomainIntTest {
 
     void "sanity check"() {
         when:
@@ -31,7 +31,7 @@ class BulkApiSupportSpec extends Specification implements DomainIntTest {
     void "test queueImportJob"() {
         when:
         BulkImportService bs = BulkImportService.lookup(Org)
-        def bimpParams = new BulkImportJobParams( op: DataOp.add,
+        def bimpParams = new BulkImportJobArgs( op: DataOp.add,
             sourceId: 'test-job',
             q: "{\"typeId\": ${OrgType.Customer.id}}",
             attachmentId:1L

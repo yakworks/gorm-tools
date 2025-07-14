@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 
 import gorm.tools.beans.Pager
+import gorm.tools.job.DataLayout
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobEntity
@@ -27,10 +28,15 @@ import yakworks.api.Result
 import yakworks.api.problem.data.DataProblem
 import yakworks.commons.lang.Validate
 import yakworks.gorm.api.IncludesConfig
+import yakworks.gorm.api.IncludesKey
 import yakworks.gorm.api.IncludesProps
 import yakworks.gorm.config.GormConfig
 import yakworks.meta.MetaMapList
 
+/**
+ * Manages the bulk export process for entities
+ * @param <D> the entity class this service instance is for
+ */
 @CompileStatic
 @Slf4j
 class BulkExportService<D> {
@@ -56,9 +62,9 @@ class BulkExportService<D> {
     }
 
     /**
-     * Creates a Syncjob and que it up
+     * Creates a Syncjob and mark it as queued
      */
-    SyncJobEntity queueJob(BulkExportJobParams jobParams) {
+    SyncJobEntity queueJob(BulkExportJobArgs jobParams) {
         //make sure they passed in q or qsearch. queryArgs will have been populated if they did
         if(!jobParams.q) {
             throw DataProblem.of('error.query.qRequired').detail("q criteria required").toException()
@@ -68,8 +74,7 @@ class BulkExportService<D> {
             throw DataProblem.ex("includes or includesKey are required params")
         }
         jobParams.entityClassName = getEntityClass().name
-        Map data = jobParams.asJobData()
-        return syncJobService.queueJob(data)
+        return syncJobService.queueJob(jobParams)
     }
 
 
@@ -79,35 +84,36 @@ class BulkExportService<D> {
     SyncJobEntity runJob(Long jobId) {
         assert jobId
         SyncJobEntity job = syncJobService.getJob(jobId)
-        BulkExportJobParams jobParams = BulkExportJobParams.withParams(job.params)
-        SyncJobContext jobContext = syncJobService.startJob(job, setupSyncJobArgs(jobParams))
+        BulkExportJobArgs jobParams = setupJobArgs(job)
+        SyncJobContext jobContext = syncJobService.startJobInit(job, jobParams)
         bulkExport(jobContext)
         return syncJobService.getJob(jobId)
     }
 
+    /**
+     * sets up the BulkExportJobArgs from the job
+     */
+    protected BulkExportJobArgs setupJobArgs(SyncJobEntity job){
+        BulkExportJobArgs jobArgs = BulkExportJobArgs.fromParams(job.params)
+        jobArgs.jobId = job.id
 
-    protected SyncJobArgs setupSyncJobArgs(BulkExportJobParams jobParams){
-        SyncJobArgs syncJobArgs = SyncJobArgs.withParams(jobParams.asMap())
-        Validate.notEmpty(syncJobArgs.queryArgs) && Validate.isTrue(jobParams.includes || jobParams.includesKey)
+        Validate.notEmpty(jobArgs.queryArgs) && Validate.isTrue(jobArgs.includes || jobArgs.includesKey)
 
         //parse the params into the IncludesProps
         var incProps = new IncludesProps(
-            includes: jobParams.includes, includesKey: jobParams.includesKey
+            includes: jobArgs.includes, includesKey: jobArgs.includesKey
         )
         //returns includes if thats passed in or looks up based on includesKey
-        syncJobArgs.includes = includesConfig.findIncludes(getEntityClass(), incProps)
+        jobArgs.includes = includesConfig.findIncludes(getEntityClass(), incProps)
         //used for events
-        syncJobArgs.entityClass = entityClass
-        //force export to Payload on exports
-        syncJobArgs.dataLayout = SyncJobArgs.DataLayout.Payload
+        jobArgs.entityClass = getEntityClass()
 
-        return syncJobArgs
+        return jobArgs
     }
 
     /**
-     * wrap doBulkParallel and calls bulk
+     * wrap doBulkExport and calls finishJob when done
      *
-     * @param dataList the list of data maps to create
      * @param jobContext the jobContext for the job
      * @return the id, just whats in jobContext
      */
@@ -135,9 +141,8 @@ class BulkExportService<D> {
     }
 
     /**
-     * Run bulk export job
+     * pages through and writes data
      */
-
     protected void doBulkExport(SyncJobContext jobContext) {
         try {
             //paginate and fetch data list, update job results for each page of data.
@@ -165,17 +170,13 @@ class BulkExportService<D> {
     }
 
     /**
-     * setup pager and do args.saveDataAsFile
+     * setup pager from thejobContext
      */
     protected Pager setupPager(SyncJobContext jobContext) {
         Pager paginator = Pager.of(max:gormConfig.bulk.exportPageSize)
         //count total records based on query args and build a paginator
         paginator.recordCount = getTotalCount(jobContext.args.queryArgs)
         jobContext.payloadSize = paginator.recordCount
-        //hack right here to set saveDataAsFile when over 1000
-        // if(paginator.recordCount > 1000){
-        //     jobContext.args.saveDataAsFile = true
-        // }
         //So CSV will work we always just do saveDataAsFile=true
         jobContext.args.saveDataAsFile = true
 
@@ -183,8 +184,7 @@ class BulkExportService<D> {
     }
 
     /**
-     * run and call closure in Transaction.
-     *
+     * run query and return MetaMapList
      */
     @ReadOnly
     protected MetaMapList runPageQuery(SyncJobArgs args, Pager pager) {

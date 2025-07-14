@@ -13,8 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
 import org.springframework.context.annotation.Profile
+import org.springframework.context.event.EventListener
 import org.springframework.scheduling.annotation.Scheduled
 
+import gorm.tools.job.events.SyncJobQueueEvent
 import gorm.tools.repository.model.DataOp
 import yakworks.gorm.api.bulk.BulkExportJobArgs
 import yakworks.gorm.api.bulk.BulkExportService
@@ -28,11 +30,21 @@ import yakworks.testing.gorm.model.KitchenSink
  */
 @Slf4j
 @Configuration @Lazy(false)
-@Profile("server")
+@Profile("(hazel | ignite) & server")
 @CompileStatic
 class TestProducerConfiguration {
 
     @Autowired BlockingQueue<SyncJob> syncJobQueue
+
+    /**
+     * Listen for SyncJobQueueEvent and offer/put it on the queue
+     * @param event
+     */
+    @EventListener
+    void syncJobQueueEventListener(SyncJobQueueEvent event) {
+        syncJobQueue.offer((SyncJob)event.syncJob)
+        log.info("⏱️📤   LISTENER Finished adding ${event.syncJob} to queue")
+    }
 
     /**
      * Sticks stuff in the queue every 2 seconds
@@ -90,7 +102,7 @@ class TestProducerConfiguration {
         // SyncJob jobEnt = (SyncJob)bulkImportService.queueImportJob(DataOp.add, params, "test-job", dataList)
         def bimpParams = new BulkImportJobArgs(
             op: DataOp.add,
-            parallel: false, async:false,
+            parallel: false, async: false,
             sourceId: 'test-job', includes: ["id", "name", "ext.name"]
         )
         var jobEnt = bulkImportService.queueJob(bimpParams, dataList)

@@ -28,6 +28,7 @@ import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemCodes
 import yakworks.api.problem.data.DataProblemException
 import yakworks.api.problem.data.DataProblemTrait
+import yakworks.commons.lang.Validate
 import yakworks.etl.DataMimeTypes
 import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.IncludesKey
@@ -135,7 +136,7 @@ class BulkImportService<D> {
      * Starts a bulk import job
      */
     protected SyncJobContext runJobInit(Long jobId) {
-        assert jobId
+        Validate.notNull(jobId)
         SyncJobEntity job = syncJobService.getJob(jobId)
         BulkImportJobArgs jobParams = BulkImportJobArgs.fromParams(job.params)
 

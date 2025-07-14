@@ -4,9 +4,13 @@
 */
 package yakworks.rally.jobqueue
 
+import java.util.concurrent.Future
+
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.springframework.scheduling.annotation.Async
+import org.springframework.scheduling.annotation.AsyncResult
 import org.springframework.stereotype.Component
 import org.springframework.util.ClassUtils
 
@@ -28,7 +32,9 @@ import yakworks.testing.gorm.model.KitchenSink
 @CompileStatic
 class QueuedJobRunner {
 
-    void runJob(SyncJob syncJob){
+
+    @Async
+    Future<Void> runJob(SyncJob syncJob){
         //sleep(2000)
         String jobType = syncJob.jobType
         log.info("⚙️📡    runJob called with jobType: $jobType - $syncJob")
@@ -41,7 +47,7 @@ class QueuedJobRunner {
         else {
             log.warn("jobType [$jobType] not inplemented")
         }
-
+        return new AsyncResult(null)
     }
 
     void runBulkImport(SyncJob syncJob){

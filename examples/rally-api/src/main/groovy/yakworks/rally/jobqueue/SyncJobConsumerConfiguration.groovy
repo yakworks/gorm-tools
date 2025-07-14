@@ -5,6 +5,8 @@
 package yakworks.rally.jobqueue
 
 import java.util.concurrent.BlockingQueue
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.Future
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -41,7 +43,7 @@ class SyncJobConsumerConfiguration {
 
     @Configuration
     @Profile('hazel & !test')
-    @Lazy(true) //lazy false so that consumer bean gets registered
+    @Lazy(false) //lazy false so that consumer bean gets registered
     //@ConditionalOnProperty(value="app.mail.mailgun.enabled", havingValue = "true")
     static class HazelQueBeans {
 
@@ -57,7 +59,7 @@ class SyncJobConsumerConfiguration {
      * This section works regardless if its hazel or ignite
      */
     @Configuration
-    @Profile(['!test'])
+    @Profile(['(hazel | ignite) & !test'])
     @Lazy(false) //lazy false so that consumer bean gets registered
     //@ConditionalOnProperty(value="TBD", havingValue = "true")
     static class SyncConsumerJobs {
@@ -65,27 +67,34 @@ class SyncJobConsumerConfiguration {
         @Autowired BlockingQueue<SyncJob> syncJobQueue
         @Autowired QueuedJobRunner queuedJobRunner
 
-        /**
-         * Listen for SyncJobQueueEvent and offer/put it on the queue
-         * @param event
-         */
-        @EventListener
-        void syncJobQueueEventListener(SyncJobQueueEvent event) {
-            syncJobQueue.offer((SyncJob)event.syncJob)
-            log.info("⏱️📤   LISTENER Finished adding ${event.syncJob} to queue")
-        }
-
         //Spring will only run one of these at a time no matter how big the threadpool is.
         // so if this takes 5 seconds, the next one will run 2 seconds after its finished.
         @Scheduled(fixedDelay = 2000L)
-        public void consumerJob2() {
+        public void consumerSyncJob() {
+            //number of jobs to try and pull at a time
+            int jobsToPoll = 2
+            Collection<Future> results = []
             //log.info("👾  Consumer Job Running ")
-            var job = syncJobQueue.poll() //getJobQueue().poll() //syncJobQueue.poll()
-            // process event
-            if (job != null) {
-                //log.info("🤡  Consumer2 Found one consumerJob poller::: Processing {} ", job);
-                queuedJobRunner.runJob(job)
+            (1..jobsToPoll).each{
+                var job = syncJobQueue.poll()
+                if (job != null){
+                    results << queuedJobRunner.runJob(job)
+                }
             }
+            //now wait for each to finish
+            for(Future result : results){
+                try {
+                    result.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    log.error("Unexpected Job Failure", e)
+                }
+            }
+            //getJobQueue().poll() //syncJobQueue.poll()
+            // process event
+            // if (job != null) {
+            //     //log.info("🤡  Consumer2 Found one consumerJob poller::: Processing {} ", job);
+            //     queuedJobRunner.runJob(job)
+            // }
             //sleep(5000)
             //throw new RuntimeException("ex test")
             //log.info("👾  Consumer2 Finished\n")

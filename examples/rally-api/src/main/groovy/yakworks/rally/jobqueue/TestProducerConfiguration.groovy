@@ -4,6 +4,7 @@
 */
 package yakworks.rally.jobqueue
 
+import java.security.SecureRandom
 import java.util.concurrent.BlockingQueue
 
 import groovy.transform.CompileStatic
@@ -38,7 +39,6 @@ class TestProducerConfiguration {
 
     /**
      * Listen for SyncJobQueueEvent and offer/put it on the queue
-     * @param event
      */
     @EventListener
     void syncJobQueueEventListener(SyncJobQueueEvent event) {
@@ -92,7 +92,7 @@ class TestProducerConfiguration {
         var bulkImportService = BulkImportService.lookup(KitchenSink)
 
         //pick random from either 999 or 10k so it checks both payloadId attachment and when under 1k stores in column
-        int dataSize = new Random().nextBoolean() ? 1000 : 10_000;
+        int dataSize = new SecureRandom().nextBoolean() ? 1000 : 10_000;
         List dataList = KitchenSink.generateDataList(dataSize)
 
         // Map params = [

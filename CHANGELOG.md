@@ -1,3 +1,19 @@
+### v7.3.89
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.87...v7.3.89)
+- update for new sonatype https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/#configuring-your-plugin [link](https://github.com/yakworks/gorm-tools/commit/c5248e4d19babe3e799a3f718291a64689e5398e)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/706c32b75dd727edf66a57306627cbdd3e62a07d)
+- Merge pull request #923 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/9928f44184569c76cc29aa4014ed379615a5d6a5)
+- SyncJob submit refactor (#889) [link](https://github.com/yakworks/gorm-tools/commit/c0f24ccf35157cfbd74ff6d86cbf1afb56309cb9)
+- adds the getNotNull method to repo and domain [link](https://github.com/yakworks/gorm-tools/commit/cd623f9035daaefb8a1c8a6bddd4c132b18c2121)
+- Security tripx (#919) [link](https://github.com/yakworks/gorm-tools/commit/2bd092c2dc074c9c53dbf6972597457b732ba398)
+- add PasswordConfig and PasswordValidator to SecurityTest Trait for unit tests (#920) [link](https://github.com/yakworks/gorm-tools/commit/20426d9866ac786ec26959e7db906ab466cece77)
+- add AppUserPasswordValidator Bean [link](https://github.com/yakworks/gorm-tools/commit/707088c4f5f5fb399eb3d1c5a9e89f204443bd8e)
+- Password validation & history (#914) [link](https://github.com/yakworks/gorm-tools/commit/76ae9f8f859f8fc4f8e080d730f6bd100902c7f3)
+- Disable create/update/upsert/bulk ops on Syncjob endpoint (#912) [link](https://github.com/yakworks/gorm-tools/commit/bed087665938defc850abcb969ab8a1d0ff918c9)
+- Handle query exception (#911) [link](https://github.com/yakworks/gorm-tools/commit/a1ba228a14a94ff0d67dd3d4fc86f06aaed47d3e)
+- add get with variable to do check (#910) [link](https://github.com/yakworks/gorm-tools/commit/ff4d127762a05ec822c534b5d3fed4675bfcd090)
+
 ### v7.3.87
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.86...v7.3.87)

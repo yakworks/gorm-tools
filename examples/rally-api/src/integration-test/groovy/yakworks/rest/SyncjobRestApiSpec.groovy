@@ -5,6 +5,8 @@ import gorm.tools.model.SourceType
 import grails.gorm.transactions.Transactional
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+import yakworks.etl.DataMimeTypes
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 import yakworks.json.groovy.JsonEngine
 import yakworks.rally.job.SyncJob
 import yakworks.rest.client.OkHttpRestTrait
@@ -41,9 +43,43 @@ class SyncjobRestApiSpec extends Specification implements OkHttpRestTrait {
         if(body && body.id) removeJob(body.id as Long)
     }
 
+    void "ops not supported"() {
+        when:
+        def resp = post(endpoint, [sourceId:"123"])
+        def custBody = bodyToMap(resp)
+
+        then: "Verify cust tags created"
+        resp.code() == 403
+        custBody
+        custBody.detail.contains "Syncjob does not support operation 'create'"
+
+        when:
+        resp = put(endpoint + "/1", [sourceId:"123"])
+        custBody = bodyToMap(resp)
+
+        then: "Verify cust tags created"
+        resp.code() == 403
+        custBody
+        custBody.detail.contains "Syncjob does not support operation 'update'"
+
+        when:
+        resp = delete(endpoint + "/1")
+        custBody = bodyToMap(resp)
+
+        then: "Verify cust tags created"
+        resp.code() == 403
+        custBody
+        custBody.detail.contains "Syncjob does not support operation 'delete'"
+    }
+
     @Transactional
     SyncJob createMockJob() {
-        SyncJob job = new SyncJob([sourceType: SourceType.ERP, sourceId: 'ar/org'])
+        SyncJob job = new SyncJob(
+            sourceType: SourceType.ERP,
+            sourceId: 'ar/org',
+            jobType: BulkImportJobArgs.JOB_TYPE,
+            dataFormat: DataMimeTypes.json
+        )
         Map data = [test:"value"]
         job.dataBytes = JsonEngine.toJson(data).bytes
         job.ok = false

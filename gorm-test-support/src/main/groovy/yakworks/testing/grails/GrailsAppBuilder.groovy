@@ -7,7 +7,6 @@ package yakworks.testing.grails
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import org.grails.config.PropertySourcesConfig
 import org.grails.spring.context.support.GrailsPlaceholderConfigurer
 import org.grails.spring.context.support.MapBasedSmartPropertyOverrideConfigurer
 import org.grails.testing.GrailsApplicationBuilder
@@ -52,9 +51,9 @@ class GrailsAppBuilder extends GrailsApplicationBuilder {
     @CompileStatic
     static class NotRequiredAutowiredAnnotationBeanPostProcessor extends AutowiredAnnotationBeanPostProcessor{
 
-        NotRequiredAutowiredAnnotationBeanPostProcessor() {
-            super()
-        }
+        // NotRequiredAutowiredAnnotationBeanPostProcessor() {
+        //     super()
+        // }
 
         @Override
         protected boolean determineRequiredStatus(AnnotationAttributes ann) {
@@ -88,7 +87,7 @@ class GrailsAppBuilder extends GrailsApplicationBuilder {
                 .addPropertyValue("requiredParameterValue", "false")
                 .getBeanDefinition())
 
-        //refresh striggers the context build, all the spring bean closures with run at this point.
+        //refresh triggers the context build, all the spring bean closures with run at this point.
         context.refresh()
         context.registerShutdownHook()
         context

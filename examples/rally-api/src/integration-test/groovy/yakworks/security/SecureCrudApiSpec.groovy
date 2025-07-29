@@ -1,20 +1,20 @@
 package yakworks.security
 
-import gorm.tools.repository.model.DataOp
-import gorm.tools.utils.ServiceLookup
-import grails.testing.mixin.integration.Integration
+import javax.inject.Inject
+
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.AuthenticationException
+
+import yakworks.gorm.api.bulk.BulkImportJobArgs
+import gorm.tools.repository.model.DataOp
+import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.gorm.api.DefaultCrudApi
 import yakworks.rally.api.OrgCrudApi
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rest.gorm.SecureCrudApi
-import yakworks.gorm.api.CrudApi
 import yakworks.spring.AppCtx
-
-import javax.inject.Inject
 
 @Integration
 class SecureCrudApiSpec extends Specification {
@@ -62,7 +62,8 @@ class SecureCrudApiSpec extends Specification {
         ex = thrown()
 
         when:
-        orgSecureCrudApi.bulk(DataOp.update, [orgData], [:], "Test")
+        BulkImportJobArgs biParams = new BulkImportJobArgs(op: DataOp.update, sourceId: "Test")
+        orgSecureCrudApi.bulkImport(biParams, [orgData])
 
         then:
         ex = thrown()
@@ -101,7 +102,8 @@ class SecureCrudApiSpec extends Specification {
         ex.message == 'Access Denied'
 
         when:
-        orgSecureCrudApi.bulk(DataOp.update, [orgData], [:], "Test")
+        BulkImportJobArgs biParams = new BulkImportJobArgs(op: DataOp.update, sourceId: "Test")
+        orgSecureCrudApi.bulkImport(biParams, [orgData])
 
         then:
         ex = thrown()

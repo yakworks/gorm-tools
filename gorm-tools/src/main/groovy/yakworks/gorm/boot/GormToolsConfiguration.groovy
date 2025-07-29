@@ -34,7 +34,6 @@ import gorm.tools.mango.QuickSearchSupport
 import gorm.tools.metamap.services.MetaEntityService
 import gorm.tools.metamap.services.MetaMapService
 import gorm.tools.problem.ProblemHandler
-import gorm.tools.repository.bulk.BulkExportService
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.transaction.TrxService
@@ -43,11 +42,13 @@ import yakworks.gorm.api.ApiConfig
 import yakworks.gorm.api.IncludesConfig
 import yakworks.gorm.api.support.DefaultQueryArgsValidator
 import yakworks.gorm.api.support.QueryArgsValidator
+import yakworks.gorm.config.DefaultsApiConfiguration
 import yakworks.gorm.config.GormToolsPropertiesConfiguration
 
 @AutoConfiguration
 @Lazy
-@Import([DefaultCrudApiConfiguration, GormToolsPropertiesConfiguration]) //Config Props AsyncConfig, GormConfig, IdGeneratorConfig, QueryConfig
+@Import([DefaultsApiConfiguration, GormToolsPropertiesConfiguration])
+//Config Props AsyncConfig, GormConfig, IdGeneratorConfig, QueryConfig
 // @AutoConfigureBefore([HibernateJpaAutoConfiguration])
 // @AutoConfigureAfter(DataSourceAutoConfiguration)
 @CompileStatic
@@ -150,10 +151,5 @@ class GormToolsConfiguration {
         new DefaultQueryArgsValidator()
     }
 
-    @Bean
-    @ConditionalOnMissingBean
-    BulkExportService bulkExportService() {
-        return new BulkExportService()
-    }
 
 }

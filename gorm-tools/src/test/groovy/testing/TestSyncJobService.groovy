@@ -6,10 +6,18 @@ import java.nio.file.Paths
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.job.SyncJobArgs
+import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
+import gorm.tools.job.SyncJobState
 import gorm.tools.repository.GormRepo
 import yakworks.commons.util.BuildSupport
+import yakworks.json.groovy.JsonEngine
 
+/**
+ * NOTE: this is here just to get test passing.
+ * The main logic is in the DefaultSyncService in rally
+ */
 @CompileStatic
 class TestSyncJobService extends SyncJobService<TestSyncJob> {
 
@@ -17,6 +25,14 @@ class TestSyncJobService extends SyncJobService<TestSyncJob> {
     GormRepo<TestSyncJob> getRepo(){
         return TestSyncJob.repo
     }
+
+    /**
+     * In test we queue it and run it at same time
+     */
+    // @Override
+    // SyncJobEntity queueJob(SyncJobArgs args, SyncJobState state = SyncJobState.Queued) {
+    //     SyncJobEntity sje = super.queueJob(args, state)
+    // }
 
     @Override
     Path createTempFile(String filename){
@@ -32,4 +48,27 @@ class TestSyncJobService extends SyncJobService<TestSyncJob> {
         return 1
     }
 
+    @Override
+    TestSyncJob createSyncJob(SyncJobArgs args){
+        TestSyncJob syncJob = new TestSyncJob(
+            id: args.jobId,
+            jobType: args.jobType,
+            sourceId: args.sourceId,
+            source: args.source,
+            state: SyncJobState.Queued,
+            params: args.asMap(),
+            dataFormat: args.dataFormat,
+            //dataLayout: args.dataLayout
+        )
+        //if payloadId, then probably attachmentId with csv for example. Just store it and dont do payload conversion
+        if(args.payloadId) {
+            syncJob.payloadId = args.payloadId
+        }
+        else if(args.payload){
+            String res = JsonEngine.toJson(args.payload)
+            syncJob.payloadBytes = res.bytes
+        }
+        syncJob.persist(flush: true)
+        return syncJob
+    }
 }

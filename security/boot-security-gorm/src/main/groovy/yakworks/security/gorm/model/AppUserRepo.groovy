@@ -4,6 +4,7 @@
 */
 package yakworks.security.gorm.model
 
+import java.time.LocalDateTime
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -12,27 +13,34 @@ import org.springframework.validation.Errors
 import gorm.tools.databinding.BindAction
 import gorm.tools.mango.jpql.KeyExistsQuery
 import gorm.tools.problem.ValidationProblem
-import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
+import gorm.tools.repository.model.LongIdGormRepo
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
+import yakworks.api.Result
+import yakworks.api.problem.Problem
 import yakworks.api.problem.data.DataProblemCodes
+import yakworks.commons.lang.Validate
+import yakworks.security.PasswordConfig
+import yakworks.security.services.PasswordValidator
 
 @GormRepository
 @GrailsCompileStatic
-class AppUserRepo implements GormRepo<AppUser> {
-    /** dependency injection for the password encoder */
-    @Autowired
-    PasswordEncoder passwordEncoder
-    // SecService secService
+class AppUserRepo extends LongIdGormRepo<AppUser> {
+    @Autowired PasswordEncoder passwordEncoder
+    @Autowired PasswordConfig passwordConfig
+    @Autowired PasswordValidator passwordValidator
+
 
     //cached instance of the query for id to keep it fast
     KeyExistsQuery usernameExistsQuery
+
+    String idGeneratorKey = "Users.id"  // override so it doesn;t use Batch.id
 
     /**
      * overrides the bindAndCreate method vs events
@@ -52,7 +60,7 @@ class AppUserRepo implements GormRepo<AppUser> {
      */
     @Override
     AppUser doUpdate(Map data, PersistArgs args) {
-        AppUser user = GormRepo.super.doUpdate(data, args)
+        AppUser user = super.doUpdate(data, args)
         if(data['roles']) setUserRoles(user.id, data['roles'] as List)
         return user
     }
@@ -76,20 +84,23 @@ class AppUserRepo implements GormRepo<AppUser> {
         }
     }
 
+
     /**
      * before persist, do the password encoding
      */
     @RepoListener
     void beforePersist(AppUser user, BeforePersistEvent e) {
-        if(user.password) {
-            user.passwordHash = encodePassword(user.password)
-        }
         if(user.isNew()) {
+            //generateid, so that later it can be used for SecPasswordHistory, if required
+            if(!user.id) generateId(user)
             //we check when new to avoid unique index error.
             if(exists(user.username)){
                 throw DataProblemCodes.UniqueConstraint.get()
                     .detail("Violates unique constraint [username: ${user.username}]").toException()
             }
+        }
+        if(user.password) {
+            updatePassword(user, user.password)
         }
     }
 
@@ -97,7 +108,6 @@ class AppUserRepo implements GormRepo<AppUser> {
         if( !usernameExistsQuery ) usernameExistsQuery = KeyExistsQuery.of(getEntityClass()).keyName('username')
         return usernameExistsQuery.exists(username)
     }
-
 
     /**
      * Sets up password and roles fields for a given User entity. Updates the dependent Contact entity.
@@ -198,6 +208,40 @@ class AppUserRepo implements GormRepo<AppUser> {
                 SecRoleUser.create(user, SecRole.load(id) as SecRole)
             }
         }
-
     }
+
+
+    /**
+     * Updates user's password, Creates password history if enabled.
+     */
+    void updatePassword(AppUser user, String password) {
+        //no change, its same password, just exit fast
+        Validate.notEmpty(password)
+        if (passwordEncoder.matches(password, user.passwordHash)) return
+
+        String hashed = encodePassword(password)
+
+        Result valid
+        if (user.isNew()) {
+            //its new user, dont need to check in password history etc, just validate password
+            valid = passwordValidator.validate(password)
+        } else {
+            //its password change for existing user, will need to check password history etc.
+            valid = passwordValidator.validate(user.id, password)
+        }
+
+        if (valid.ok) {
+            user.passwordHash = hashed
+            user.passwordChangedDate = LocalDateTime.now()
+            user.passwordExpired = false
+            if (passwordConfig.historyEnabled) {
+                SecPasswordHistory.repo.create(user.id, user.passwordHash)
+            }
+        } else {
+            ValidationProblem problem = ValidationProblem.ofEntity(user)
+            problem.violations(((Problem) valid).violations)
+            throw problem.toException()
+        }
+    }
+
 }

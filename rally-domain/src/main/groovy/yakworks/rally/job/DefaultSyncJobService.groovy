@@ -14,8 +14,11 @@ import org.springframework.stereotype.Service
 
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
+import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
+import gorm.tools.job.SyncJobState
 import gorm.tools.repository.GormRepo
+import yakworks.json.groovy.JsonEngine
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.repo.AttachmentRepo
@@ -33,6 +36,18 @@ class DefaultSyncJobService extends SyncJobService<SyncJob> {
     @Autowired AttachmentRepo attachmentRepo
 
     @Autowired AttachmentSupport attachmentSupport
+
+    // @Override
+    // SyncJobEntity queueJob(Map data){
+    //     MaintWindowUtil.check(maintenanceProps)
+    //     super.queueJob(data)
+    // }
+
+    @Override
+    SyncJobEntity queueJob(SyncJobArgs args){
+        MaintWindowUtil.check(maintenanceProps)
+        super.queueJob(args)
+    }
 
     @Override
     SyncJobContext createJob(SyncJobArgs args, Object payload){
@@ -52,9 +67,44 @@ class DefaultSyncJobService extends SyncJobService<SyncJob> {
 
     @Override
     Long createAttachment(Path sourcePath, String name) {
-        Attachment attachment = attachmentRepo.create(sourcePath, name)
+        Map data = [
+            tempFileName: sourcePath.fileName.toString(),
+            name: name
+        ]
+        Attachment attachment = attachmentRepo.create(data)
         return attachment.id
     }
 
+    // SyncJob saveSyncJob(SyncJobArgs syncJobDto){
+    //     new SyncJob(
+    //         id: syncJobDto.jobId,
+    //         jobType: syncJobDto.jobType,
+    //
+    //     )
+    // }
+
+    @Override
+    SyncJob createSyncJob(SyncJobArgs args){
+        SyncJob syncJob = new SyncJob(
+            id: args.jobId,
+            jobType: args.jobType,
+            sourceId: args.sourceId,
+            source: args.source,
+            state: SyncJobState.Queued,
+            params: args.asMap(),
+            dataFormat: args.dataFormat,
+            //dataLayout: args.dataLayout
+        )
+        //if payloadId, then probably attachmentId with csv for example. Just store it and dont do payload conversion
+        if(args.payloadId) {
+            syncJob.payloadId = args.payloadId
+        }
+        else if(args.payload){
+            String res = JsonEngine.toJson(args.payload)
+            syncJob.payloadBytes = res.bytes
+        }
+        syncJob.persist(flush: true)
+        return syncJob
+    }
 
 }

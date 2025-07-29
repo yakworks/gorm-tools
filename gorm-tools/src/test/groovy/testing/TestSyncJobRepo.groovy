@@ -6,16 +6,24 @@ package testing
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.job.SyncJobState
 import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.BeforeBindEvent
+import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
+import yakworks.api.problem.data.DataProblemCodes
 import yakworks.json.groovy.JsonEngine
 
 @GormRepository
 @CompileStatic
 class TestSyncJobRepo extends LongIdGormRepo<TestSyncJob> {
+
+    @RepoListener
+    void beforePersist(TestSyncJob job, BeforePersistEvent e) {
+        if(!job.state) job.state = SyncJobState.Running
+    }
 
     @RepoListener
     void beforeBind(TestSyncJob job, Map data, BeforeBindEvent be) {
@@ -27,5 +35,6 @@ class TestSyncJobRepo extends LongIdGormRepo<TestSyncJob> {
             }
         }
     }
+
 
 }

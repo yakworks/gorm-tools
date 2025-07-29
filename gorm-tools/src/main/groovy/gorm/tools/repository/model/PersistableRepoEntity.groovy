@@ -81,6 +81,12 @@ trait PersistableRepoEntity<D, ID> extends GormEntity<D> implements Persistable<
     }
 
     /**
+     * Retrieves and object from the datastore. eg. Book.get(1)
+     */
+    static D getNotNull(Serializable id) {
+        getRepo().getNotNull(id)
+    }
+    /**
      * default constraints static that calls apiConstraints(delegate)
      */
     @CompileDynamic

@@ -8,6 +8,7 @@ import groovy.transform.CompileStatic
 
 import org.springframework.beans.MutablePropertyValues
 import org.springframework.beans.PropertyValues
+import org.springframework.boot.convert.ApplicationConversionService
 import org.springframework.core.convert.ConversionService
 import org.springframework.core.convert.support.DefaultConversionService
 import org.springframework.validation.DataBinder
@@ -19,19 +20,20 @@ import org.springframework.validation.DataBinder
 @CompileStatic
 class BasicDataBinder {
 
-    ConversionService conversionService
+    // ConversionService conversionService
+    //
+    // BasicDataBinder(){
+    //     conversionService = new RelaxedConversionService(new DefaultConversionService())
+    // }
 
-    BasicDataBinder(){
-        conversionService = new RelaxedConversionService(new DefaultConversionService())
-    }
-
-    public <T> T bind(T obj, Map data){
+    public static <T> T bind(T obj, Map data){
         return bind(obj, new MutablePropertyValues(data))
     }
 
-    public <T> T bind(T obj, PropertyValues propVals){
+    public static <T> T bind(T obj, PropertyValues propVals){
         DataBinder binder = new DataBinder(obj)
-        binder.conversionService = conversionService
+        //binder.conversionService = conversionService
+        binder.conversionService = ApplicationConversionService.getSharedInstance()
         binder.bind(propVals)
         return obj
     }

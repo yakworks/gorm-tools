@@ -6,7 +6,6 @@ package gorm.tools.repository.model
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.job.SyncJobArgs
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.api.QueryService
@@ -14,6 +13,8 @@ import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.RepoUtil
 import yakworks.api.problem.data.NotFoundProblem
+
+//NOTE: No Grail-Gorm dependencies here
 
 /**
  * CRUD api for rest repo
@@ -92,6 +93,36 @@ interface ApiCrudRepo<D> {
     D get(Serializable id)
 
     /**
+     * simple call to the gormStaticApi get, throws NotFoundProblem.Exception if checkAndThrow true
+     *
+     * @param id required, the id to get
+     * @param checkAndThrow if true then checks if found and throws NotFoundProblem.Exception if not
+     * @return the retrieved entity
+     */
+    @Deprecated
+    default D get(Serializable id, boolean checkAndThrow) {
+        return checkAndThrow ? getNotNull(id) : get(id)
+    }
+
+    /**
+     * Get entity and throw NotFoundProblem.Exception if its null
+     * Uses RepoUtil.checkFound
+     */
+    default D getNotNull(Serializable id) {
+        D entity = get(id)
+        RepoUtil.checkFound(entity, id, getEntityClass().name)
+        return entity
+    }
+
+    /**
+     * simple call to the gormStaticApi get, not in a trx to avoid overhead
+     *
+     * @param id required, the id to get
+     * @return the retrieved entity
+     */
+    List<D> getAll(List ids)
+
+    /**
      * read only get
      *
      * @param id required, the id to get
@@ -100,8 +131,8 @@ interface ApiCrudRepo<D> {
     D read(Serializable id)
 
     /**
-     * load without hydrating.
-     *
+     * load without hydrating
+     *x
      * @param id required, the id to get
      * @return the retrieved entity
      */
@@ -119,7 +150,7 @@ interface ApiCrudRepo<D> {
      * @param syncJobArgs the args object to pass on to doBulk
      * @return Job id
      */
-    Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs)
+    // Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs)
     //--------------------Mango Query -------------------
 
     /**
@@ -154,4 +185,8 @@ interface ApiCrudRepo<D> {
     default MangoDetachedCriteria<D> query(Map params) {
         query(QueryArgs.of(params), null)
     }
+
+    // default GormStaticApi<D> gormStaticApi() {
+    //     (GormStaticApi<D>) GormEnhancer.findStaticApi(getEntityClass())
+    // }
 }

@@ -172,12 +172,6 @@ class RepoEntityValidator extends PersistentEntityValidator {
 
     /**
      * Cascades validation to a one-to-one or many-to-one property.
-     *
-     * @param errors The Errors instance
-     * @param bean The original BeanWrapper
-     * @param associatedObject The associated object's current value
-     * @param association The GrailsDomainClassProperty instance
-     * @param propertyName The name of the property
      */
     @SuppressWarnings("rawtypes")
     @Override

@@ -6,7 +6,6 @@ package yakworks.rest.gorm.controller
 
 import java.net.http.HttpRequest
 import java.nio.charset.StandardCharsets
-import java.util.function.Function
 import javax.persistence.LockTimeoutException
 import javax.servlet.http.HttpServletRequest
 
@@ -14,23 +13,23 @@ import groovy.transform.CompileStatic
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.util.UriUtils
 
 import gorm.tools.beans.Pager
+import gorm.tools.job.JobUtils
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.model.DataOp
 import gorm.tools.utils.ServiceLookup
 import grails.web.Action
 import yakworks.api.problem.Problem
-import yakworks.etl.csv.CsvToMapTransformer
 import yakworks.gorm.api.CrudApi
 import yakworks.gorm.api.IncludesProps
-import yakworks.spring.AppCtx
+import yakworks.gorm.api.bulk.BulkExportJobArgs
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 
 import static gorm.tools.problem.ProblemHandler.isBrokenPipe
 import static org.springframework.http.HttpStatus.CREATED
@@ -64,8 +63,8 @@ trait CrudApiController<D> extends RestApiController {
     //@Autowired(required = false)
     CrudApi<D> crudApi
 
-    @Autowired
-    CsvToMapTransformer csvToMapTransformer
+    // @Autowired
+    // CsvToMapTransformer csvToMapTransformer
 
     //Kept for reference, see comments in DefaultCrudApiConfiguration
     // @Autowired
@@ -101,18 +100,6 @@ trait CrudApiController<D> extends RestApiController {
 
             this.crudApi = ServiceLookup.lookup(getEntityClass(), CrudApi<D>, "defaultCrudApi")
 
-            //this.crudApi = crudApiFactory.apply(getEntityClass())
-            //this.crudApi = crudApiClosure.call(getEntityClass()) as CrudApi<D>
-            // try {
-            //     // var rt = ResolvableType.forClassWithGenerics(CrudApi, getEntityClass())
-            //     // var ctx = AppCtx.ctx
-            //     // var names = ctx.getBeanNamesForType(rt)
-            //     //check if concrete crudApi bean is setup, wont return nul since it will try the prototype
-            //     this.crudApi = crudApiProvider.getObject()
-            // } catch(UnsatisfiedDependencyException ex){
-            //     //will throw error if not as it tried to call the prototype defaultCrudApi() with no args, so call it now with args
-            //     this.crudApi = crudApiProvider.getObject(getEntityClass())
-            // }
         }
         return crudApi
     }
@@ -233,7 +220,7 @@ trait CrudApiController<D> extends RestApiController {
     @Action
     def bulkCreate() {
         try {
-            bulkProcess(DataOp.add)
+            bulkImport(DataOp.add)
         } catch (Exception | AssertionError e) {
             respondWith(
                 BulkExceptionHandler.of(getEntityClass(), problemHandler).handleBulkOperationException(request, e)
@@ -245,7 +232,7 @@ trait CrudApiController<D> extends RestApiController {
     @Action
     def bulkUpdate() {
         try {
-            bulkProcess(DataOp.update)
+            bulkImport(DataOp.update)
         } catch (Exception | AssertionError e) {
             respondWith(
                 BulkExceptionHandler.of(getEntityClass(), problemHandler).handleBulkOperationException(request, e)
@@ -257,8 +244,11 @@ trait CrudApiController<D> extends RestApiController {
     def bulkExport() {
         try {
             Map qParams = getParamsMap()
-            SyncJobEntity job = getCrudApi().bulkExport(qParams,  requestToSourceId(request))
-            respondWith(job, [status: MULTI_STATUS])
+            BulkExportJobArgs jobParams = BulkExportJobArgs.fromParams(qParams)
+            jobParams.sourceId = requestToSourceId(request)
+            SyncJobEntity job = getCrudApi().bulkExport(jobParams)
+            Map jobMap = JobUtils.jobToMapGroovy(job)
+            respondWith(jobMap, [status: qParams.getBoolean('async') == false ? MULTI_STATUS : CREATED])
         } catch (Exception | AssertionError e) {
             respondWith(
                 BulkExceptionHandler.of(getEntityClass(), problemHandler).handleBulkOperationException(request, e)
@@ -266,26 +256,48 @@ trait CrudApiController<D> extends RestApiController {
         }
     }
 
-    void bulkProcess(DataOp dataOp) {
+    // void bulkLegacy(DataOp dataOp) {
+    //     List dataList = bodyAsList() as List<Map>
+    //     Map qParams = getParamsMap()
+    //
+    //     String sourceId = requestToSourceId(request)
+    //
+    //     //if attachmentId then assume its a csv
+    //     if(qParams.attachmentId) {
+    //         qParams.savePayload = false
+    //         //sets the datalist from the csv instead of body
+    //         //Transform csv here, so bulk processing remains same, regardless the incoming payload is csv or json
+    //         dataList = transformCsvToBulkList(qParams)
+    //     } else {
+    //         // RNDC expects async to be false by default when its not CSV
+    //         if(!qParams.containsKey('async')) qParams['async'] = false
+    //     }
+    //
+    //     SyncJobEntity job = getCrudApi().bulkLegacy(dataOp, dataList, qParams, sourceId)
+    //     respondWith(job, [status: qParams.getBoolean('async') == false ? MULTI_STATUS : CREATED])
+    // }
+
+    void bulkImport(DataOp dataOp) {
         List dataList = bodyAsList() as List<Map>
         Map qParams = getParamsMap()
+        //if op=upsert was passed in via params then leave it alone, if null then set to this method variable
+        if(!qParams.op)  qParams.op = dataOp
+        BulkImportJobArgs jobParams = BulkImportJobArgs.fromParams(qParams)
+        jobParams.sourceId = requestToSourceId(request)
 
-        String sourceId = requestToSourceId(request)
+        // replace when upsert is passed in op=upsert as query param. This is different than the dataOp arg in method here,
+        // which is going to either be "add" or "update" already as its comes from either a POST or PUT call.
+        // DataOp paramsOp = EnumUtils.getEnumIgnoreCase(DataOp, qParams.op as String)
+        // if(paramsOp == DataOp.upsert) jobParams.op = paramsOp
 
-        //if attachmentId then assume its a csv
-        if(qParams.attachmentId) {
-            // We set savePayload to false by default for CSV since we already have the csv file as attachment?
-            qParams.savePayload = false
-            //sets the datalist from the csv instead of body
-            dataList = transformCsvToBulkList(qParams)
-        } else {
-            //XXX dirty ugly hack since we were not consistent and now need to do clean up
-            // RNDC expects async to be false by default when its not CSV
-            if(!qParams.containsKey('async')) qParams['async'] = false
-        }
+        //keeps it backwards compatible and set source to jobSource if passed in.
+        if(qParams.jobSource != null) jobParams.source = qParams.jobSource
 
-        SyncJobEntity job = getCrudApi().bulk(dataOp, dataList, qParams, sourceId)
-        respondWith(job, [status: MULTI_STATUS])
+        SyncJobEntity job = getCrudApi().bulkImport(jobParams, dataList)
+        Map jobMap = JobUtils.jobToMapGroovy(job)
+        //if its async=false then it will be the Finished job and equivalent to the GET on SyncJob, SO MULTI_STATUS
+        // if its not async, then its just returning the created Job and equivalent to the POST on SyncJob, so a CREATED status
+        respondWith(jobMap, [status: qParams.getBoolean('async') == false ? MULTI_STATUS : CREATED])
     }
 
     String requestToSourceId(HttpServletRequest req){
@@ -308,9 +320,9 @@ trait CrudApiController<D> extends RestApiController {
      * @param syncJobArgs the syncJobArgs that is setup, important to have params on it
      * @return the jobId
      */
-    List<Map> transformCsvToBulkList(Map gParams) {
-        return getCsvToMapTransformer().process(gParams)
-    }
+    // List<Map> transformCsvToBulkList(Map gParams) {
+    //     return getCsvToMapTransformer().process(gParams)
+    // }
 
     /**
      * Helper method to convert entity instance to map and respond
@@ -325,7 +337,7 @@ trait CrudApiController<D> extends RestApiController {
     URI toURI(){
         String requri = request.requestURI
         //decode and re-encode as the HttpServletReq doesn't escape the $, but URI needs it escaped
-        String queryString = UriUtils.decode(request.queryString?:'', StandardCharsets.UTF_8)
+        String queryString = UriUtils.decode(request.queryString ?: '', StandardCharsets.UTF_8)
         log.debug "requri: $requri - queryString: $queryString"
         String encodedQueryString = UriUtils.encode(queryString, StandardCharsets.UTF_8)
         URI newUri = URI.create("${request.requestURL}?${encodedQueryString}")

@@ -21,16 +21,12 @@ class SecuritySeedData {
 
     static void createAppUsers(){
 
-        AppUser admin = new AppUser([
-            id: 1L, username: "admin", email: "admin@yak.com", password:"123", orgId: 2
-        ]).persist()
+        AppUser admin = new AppUser([id: 1L, username: "admin", email: "admin@yak.com", password:"123", orgId: 2]).persist()
 
         admin.addRole(Roles.ADMIN, true)
         admin.addRole(Roles.MANAGER, true)
 
-        AppUser custUser = new AppUser([
-            id: 2L, username: "cust", email: "cust@yak.com", password:"123", orgId: 2
-        ]).persist()
+        AppUser custUser = new AppUser([id: 2L, username: "cust", email: "cust@yak.com", password:"123", orgId: 2]).persist()
         assert custUser.id == 2
 
         custUser.addRole(Roles.CUSTOMER, true)
@@ -41,9 +37,7 @@ class SecuritySeedData {
         )
         assert noRoleUser.id == 3
 
-        AppUser readonlyUser = new AppUser([
-            id: 4L, username: "readonly", email: "readonly@yak.com", password:"123", orgId: 2
-        ]).persist()
+        AppUser readonlyUser = new AppUser([id: 4L, username: "readonly", email: "readonly@yak.com", password:"123", orgId: 2]).persist()
         assert readonlyUser.id == 4
         readonlyUser.addRole(Roles.READ_ONLY, true)
 

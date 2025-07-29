@@ -4,13 +4,13 @@
 <hazelcast xmlns="http://www.hazelcast.com/schema/config"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://www.hazelcast.com/schema/config
-           http://www.hazelcast.com/schema/config/hazelcast-config-5.1.xsd">
+           http://www.hazelcast.com/schema/config/hazelcast-config-5.3.xsd">
 
 <!--
     The name of the cluster. All members of a single cluster must have the same cluster name
     configured and a client connecting to this cluster must use it as well.
 -->
-  <cluster-name>dev</cluster-name>
+  <cluster-name>spring-hazel-cluster</cluster-name>
   <instance-name>hz-member-1</instance-name>
 
   <network>

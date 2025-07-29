@@ -7,6 +7,7 @@ package yakworks.rally.seed
 import java.time.LocalDate
 
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -45,6 +46,7 @@ import yakworks.security.gorm.testing.SecuritySeedData
 import yakworks.spring.AppCtx
 
 @SuppressWarnings('BuilderMethodWithSideEffects')
+@Slf4j
 @CompileStatic
 class RallySeed {
 
@@ -61,8 +63,7 @@ class RallySeed {
         ] as List<Class<?>>
     }
 
-    //extra spring beans when orgMember and orgDimensionService is being used.
-    static List springBeanList = [OrgProps, OrgDimensionService, OrgService, ActivityQuery ]
+    static List springBeanList = [OrgProps, OrgDimensionService, OrgService, ActivityQuery]
 
     // see good explanation of thread safe static instance stratgey https://stackoverflow.com/a/16106598/6500859
     @SuppressWarnings('UnusedPrivateField')
@@ -80,6 +81,7 @@ class RallySeed {
     }
 
     static fullMonty(int count = 100){
+        log.info("🌮🚀🎯🔥   SEED fullMonty with count: $count ")
         RallySeed rallySeed = getInstance()
         rallySeed.buildAppUsers()
         rallySeed.createOrgTypeSetups()

@@ -13,6 +13,7 @@ import grails.gorm.transactions.Transactional
 import yakworks.api.Result
 import yakworks.api.problem.Problem
 import yakworks.message.Msg
+import yakworks.message.MsgKey
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecPasswordHistory
 import yakworks.security.services.PasswordValidator
@@ -30,7 +31,7 @@ class AppUserPasswordValidator extends PasswordValidator {
 
         if (passwordExistInHistory(userId, pass)) {
             var msgKey= Msg.key("security.validation.password.existsinhistory", [value: passwordConfig.historyLength])
-            return Problem.of('security.validation.password.error').addViolations([msgKey])
+            return addViolations(Problem.of('security.validation.password.error'), [msgKey] as List<MsgKey>)
         }
         //return ok if its all good
         return res

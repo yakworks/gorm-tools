@@ -26,6 +26,7 @@ class ViolationConverter implements JsonGenerator.Converter {
     @Override
     Object convert(Object value, String key) {
         def v = (Violation)value
+        //TODO the asMap in commons should really be doing this but until we modify we do it here. 
         //if it has a msgKey and message is empty, then lookup message for code
         if(v.msg && !v.message){
             v = ViolationFieldError.of(

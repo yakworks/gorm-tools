@@ -11,9 +11,13 @@ import groovy.transform.CompileStatic
 import org.springframework.security.crypto.password.PasswordEncoder
 
 import yakworks.api.Result
+import yakworks.api.problem.GenericProblem
 import yakworks.api.problem.Problem
+import yakworks.api.problem.ViolationFieldError
 import yakworks.message.Msg
 import yakworks.message.MsgKey
+import yakworks.message.MsgServiceRegistry
+import yakworks.message.spi.MsgService
 import yakworks.security.PasswordConfig
 
 @CompileStatic
@@ -46,7 +50,8 @@ class PasswordValidator {
         }
 
         if(problemKeys){
-            return Problem.of('security.validation.password.error').addViolations(problemKeys)
+            //Problem.of('security.validation.password.error').addViolations(problemKeys)
+            return addViolations(Problem.of('security.validation.password.error'), problemKeys)
         } else {
             return  Result.OK()
         }
@@ -75,4 +80,18 @@ class PasswordValidator {
     boolean isPasswordExpired(Serializable id) {
         return false
     }
+
+    /**
+     * Need to set code/msg explicitely on ViolationFieldError if we are adding violations
+     * For regular field errors, ProblemHandler does this by calling ValidationProblem.transateErrorsToViolations
+     */
+    protected Problem addViolations(Problem p, List<MsgKey> errs) {
+        MsgService msgService = MsgServiceRegistry.service
+        for(MsgKey k : errs) {
+            String msg = msgService.get(k)
+            p.violations.add(ViolationFieldError.of(k.code, msg))
+        }
+        return p
+    }
+
 }

@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus
 
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-
+import yakworks.message.MsgServiceRegistry
 import yakworks.rest.client.OkHttpRestTrait
 import yakworks.security.PasswordConfig
 import yakworks.security.gorm.model.AppUser
@@ -22,6 +22,7 @@ class UserRestApiSpec extends Specification implements OkHttpRestTrait {
     def setup(){
         login()
     }
+
 
     void "user can be created without password"() {
         when:
@@ -101,6 +102,9 @@ class UserRestApiSpec extends Specification implements OkHttpRestTrait {
         passwordConfig.minLength = 4
         passwordConfig.mustContainUppercaseLetter = true
 
+        expect:
+        MsgServiceRegistry.service.get("security.validation.password.mustcontain.lowercase") != null
+
         when:
         def resp = put("$endpoint/1", [newPassword:"12x", repassword:"12x"])
         Map body = bodyToMap(resp)
@@ -111,6 +115,8 @@ class UserRestApiSpec extends Specification implements OkHttpRestTrait {
         body.title == 'AppUser Validation Error(s)'
         body.errors.size() == 2
         body.errors[0].code == 'security.validation.password.minlength'
+        body.errors[0].message
+        body.errors[0].message.contains "Password must be minimum 4 character long"
         body.errors[1].code == 'security.validation.password.mustcontain.uppercase'
 
         cleanup:

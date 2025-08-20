@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import grails.gorm.transactions.Transactional
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecLoginHistory
-import yakworks.security.gorm.model.SecPasswordHistory
 import yakworks.security.services.PasswordValidator
 import yakworks.security.user.CurrentUser
 
@@ -59,22 +58,8 @@ class AppUserService {
     }
 
     Integer remainingDaysForPasswordExpiry(AppUser u) {
-        LocalDateTime pExpire = u.passwordChangedDate.plusDays(passwordValidator.passwordExpireDays)
+        LocalDateTime pExpire = u.passwordChangedDate.plusDays(passwordValidator.passwordConfig.passwordExpireDays)
         return Duration.between(LocalDateTime.now(), pExpire).toDays().toInteger()
-    }
-
-    /**
-     * Update user's password and creates a password history record
-     */
-    void updatePassword(AppUser user, String newPwd) {
-        user.password = newPwd //must be hased password
-        user.passwordExpired = false
-        user.passwordChangedDate = LocalDateTime.now()
-        user.save()
-
-        if (passwordValidator.passwordHistoryEnabled) {
-            SecPasswordHistory.create(user, newPwd)
-        }
     }
 
     /**

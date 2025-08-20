@@ -18,7 +18,6 @@ import yakworks.commons.map.Maps
 import yakworks.gorm.api.DefaultCrudApi
 import yakworks.gorm.api.IncludesKey
 import yakworks.rally.orgs.model.Org
-import yakworks.rest.gorm.SecureCrudApi
 import yakworks.security.user.CurrentUser
 
 @Slf4j
@@ -41,9 +40,10 @@ class OrgCrudApi extends DefaultCrudApi<Org> {
     //, cacheManager = "hazelCacheManager"
     String cacheName = 'WTF'
 
+    //NOTE: change to hazelCacheManager to test that one.
     @Cacheable(
         value='crudApi:list',
-        cacheManager = "hazelCacheManager",
+        cacheManager = "gridCacheManager",
         key="{@currentUser.getUserId(), #qParams.toString(), #root.target.entityClass.simpleName}",
         sync=true
     )
@@ -57,7 +57,7 @@ class OrgCrudApi extends DefaultCrudApi<Org> {
 
     @Cacheable(
         value='crudApi:list',
-        cacheManager = "hazelCacheManager",
+        cacheManager = "gridCacheManager",
         key="{@currentUser.getUserId(), #qParams.toString(), #root.target.entityClass.simpleName}",
         sync=true
     )

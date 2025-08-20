@@ -1,0 +1,365 @@
+package yakworks.gorm.api.bulk
+
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
+
+import gorm.tools.async.AsyncService
+import gorm.tools.job.SyncJobState
+import gorm.tools.problem.ValidationProblem
+import gorm.tools.repository.model.DataOp
+import spock.lang.Specification
+import testing.TestSyncJob
+import testing.TestSyncJobService
+import yakworks.api.problem.data.DataProblemException
+import yakworks.commons.map.LazyPathKeyMap
+import yakworks.gorm.config.AsyncConfig
+import yakworks.gorm.config.GormConfig
+import yakworks.testing.gorm.model.KitchenSink
+import yakworks.testing.gorm.model.KitchenSinkRepo
+import yakworks.testing.gorm.model.SinkExt
+import yakworks.testing.gorm.unit.GormHibernateTest
+
+import static yakworks.json.groovy.JsonEngine.parseJson
+
+class BulkImportServiceLegacySpec extends Specification implements GormHibernateTest {
+    static entityClasses = [KitchenSink, SinkExt, TestSyncJob]
+    static springBeans = [TestSyncJobService]
+
+    @Autowired AsyncConfig asyncConfig
+    @Autowired AsyncService asyncService
+    @Autowired KitchenSinkRepo kitchenSinkRepo
+    @Autowired GormConfig gormConfig
+
+    void setup() {
+        gormConfig.legacyBulk = true
+    }
+
+    void cleanup() {
+        // gormConfig.legacyBulk = true
+    }
+
+    BulkImportJobArgs setupBulkImportParams(DataOp op = DataOp.add){
+        return new BulkImportJobArgs(
+            parallel: false,
+            async:false,
+            op: op,
+            source: "test",
+            sourceId: "test",
+            includes: ["id", "name", "ext.name"]
+        )
+    }
+
+    BulkImporter<KitchenSink> getBulkImporter(){
+        BulkImporter.lookup(KitchenSink)
+    }
+
+    BulkImportService<KitchenSink> getBulkImportService(){
+        BulkImportService.lookup(KitchenSink)
+    }
+
+    def "sanity check single validation"() {
+        when:
+        def ksdata = KitchenSink.repo.generateData(1)
+        ksdata.ext.name = ''
+        KitchenSink.create(ksdata)
+
+        then:
+        thrown(ValidationProblem.Exception)
+    }
+
+    void "simple bulk insert"() {
+        given:
+        List list = KitchenSink.generateDataList(10)
+
+        when: "bulk insert 20 records"
+        def job = bulkImportService.process(setupBulkImportParams(), list)
+        List results = job.parseData()
+
+        then: "verify job"
+        job.state == SyncJobState.Finished
+        results[0].ok
+    }
+
+    void "success bulk insert"() {
+        given:
+        List list = KitchenSink.generateDataList(300)
+
+        when: "bulk insert 20 records"
+
+        def job = bulkImportService.process(setupBulkImportParams(), list)
+
+        then: "verify job"
+
+        job != null
+        job.source == "test"
+        job.sourceId == "test"
+        job.payloadBytes != null
+        job.dataBytes != null
+        job.state == SyncJobState.Finished
+
+        when: "Verify payload"
+        def payload = parseJson(job.payloadToString())
+
+        then:
+        payload != null
+        payload instanceof List
+        payload.size() == 300
+        payload[0].name == "Blue Cheese"
+        payload[0].ext.name == "SinkExt1"
+        //sanity check
+        payload[9].name == "Oranges"
+
+        when: "verify job.data (job results)"
+        def dataString = job.dataToString()
+        List results = job.dataList
+
+        then:
+        dataString.startsWith('[{') //sanity check
+        results != null
+        results instanceof List
+        results.size() == 300
+        results[0].ok == true
+        results[0].status == HttpStatus.CREATED.value()
+        results[10].ok == true
+
+        and: "verify includes"
+        results[0].data.size() == 3 //id, project name, nested name
+        //results[0].data.id == 1
+        results[0].data.name == "Blue Cheese"
+        results[0].data.ext.name == "SinkExt1"
+
+        and: "Verify database records"
+        def bcks = KitchenSink.findByName("Blue Cheese")
+        bcks
+        bcks.ext.name == "SinkExt1"
+
+        KitchenSink.count() == 300
+
+        and: "make sure beforeBulk event updated job id"
+        bcks.createdByJobId
+        // KitchenSink.findByName("Oranges")
+    }
+
+    void "test bulk update"() {
+        List list = KitchenSink.generateDataList(10)
+
+        when: "insert records"
+        def job = bulkImportService.bulkImportLegacy(setupBulkImportParams(), list)
+
+        then:
+        job.state == SyncJobState.Finished
+
+        and: "Verify db records"
+        KitchenSink.count() == 10
+
+        when: "Bulk update"
+        list.eachWithIndex {it, idx ->
+            it.name = "updated-${idx + 1}"
+            it.id = idx + 1
+        }
+
+        job = bulkImportService.bulkImportLegacy(setupBulkImportParams(DataOp.update), list)
+
+        then:
+        noExceptionThrown()
+        job != null
+        job.dataToString() != '[]'
+        job.state == SyncJobState.Finished
+
+        and: "Verify db records"
+        KitchenSink.count() == 10
+
+    }
+
+    void "test failures and errors"() {
+        given:
+        List list = KitchenSink.generateDataList(20)
+
+        and: "Add a bad records"
+        list[1].ext.name = null
+        // list[19].ext.name = null
+
+        when: "bulk insert"
+
+        def job = bulkImportService.bulkImportLegacy(setupBulkImportParams(), list)
+
+        def results = job.dataList
+
+        then:
+        job.ok == false
+        results != null
+        results instanceof List
+        results.size() == 20
+
+        and: "verify successfull results"
+        results.findAll{ it.ok }.size() == 19
+        results[0].ok == true
+
+        and: "Verify failed record"
+        results[1].ok == false
+        results[1].data != null
+        results[1].data.ext.name == null
+        results[1].status == HttpStatus.UNPROCESSABLE_ENTITY.value()
+
+        //results[9].title != null
+        results[1].errors.size() == 1
+        results[1].errors[0].field == "ext.name"
+        //results[9].errors[0].message == ""
+
+        // results[19].errors.size() == 1
+        // results[19].errors[0].field == "ext.name"
+        //results[19].errors[0].field == "name"
+    }
+
+    void "test failures and errors with customer and source"() {
+        given:
+        List list = KitchenSink.generateDataList(3)
+
+        and: "Add few bad records"
+        list[1].source = ['sourceId': '123']
+        list[1].customer = ['sourceId': 'cust123']
+        list[1].name = null
+
+
+        when: "bulk insert"
+
+        def job = bulkImportService.bulkImportLegacy(setupBulkImportParams(), list)
+
+        then: "verify job"
+        job.ok == false
+
+        when: "verify job.data"
+        def results = job.dataList
+
+        then:
+        results != null
+        results instanceof List
+        results.size() == 3
+
+        and: "verify successfull results"
+        results.findAll({ it.ok == true}).size() == 2
+        results[0].ok == true
+
+        and: "Verify failed records"
+        results[1].ok == false
+        results[1].data != null
+        results[1].data.name == null
+        results[1].data.source.sourceId == "123"
+        results[1].data.customer.sourceId == "cust123"
+        results[1].status == HttpStatus.UNPROCESSABLE_ENTITY.value()
+    }
+
+    void "test batching"() {
+        setup: "Set batchSize of 10 to trigger batching/slicing"
+        asyncConfig.sliceSize = 10
+        List<Map> list = KitchenSink.generateDataList(60) //this should trigger 6 batches of 10
+
+        when: "bulk insert in multi batches"
+        def job = bulkImportService.bulkImportLegacy(setupBulkImportParams(), list)
+
+        def results = job.dataList
+
+        then: "just 60 should have been inserted, not the entire list twice"
+        results.size() == 60
+
+        cleanup:
+        asyncConfig.sliceSize = 50
+    }
+
+    void "success bulk insert with csv using usePathKeyMap"() {
+        given:
+        List data = [] as List<Map>
+
+        data << LazyPathKeyMap.of([num:'1', name:'Sink1', ext_name:'SinkExt1', bazMap_foo:'bar'], '_')
+        data << LazyPathKeyMap.of([num:'2', name:'Sink2', ext_name:'SinkExt2', bazMap_foo:'bar'], '_')
+
+        when: "bulk insert 2 records"
+        def job = bulkImportService.bulkImportLegacy(setupBulkImportParams(), data)
+
+        then: "verify job"
+
+        job != null
+        job.source == "test"
+        job.sourceId == "test"
+        job.payloadBytes != null
+        job.dataBytes != null
+        job.state == SyncJobState.Finished
+
+        when: "Verify job.payload (incoming json)"
+        def payload = parseJson(job.payloadToString())
+
+        then:
+        payload != null
+        payload instanceof List
+        payload.size() == 2
+        //        payload[0].name == "Sink1"
+        //        payload[0].ext.name == "SinkExt1"
+        //        payload[1].name == "Sink2"
+
+        when: "verify job.data (job results)"
+        def dataString = job.dataToString()
+        List results = job.dataList
+
+        then:
+        dataString.startsWith('[{') //sanity check
+        results != null
+        results instanceof List
+        results.size() == 2
+        results[0].ok == true
+        results[0].status == HttpStatus.CREATED.value()
+        results[1].ok == true
+
+        and: "verify includes"
+        results[0].data.size() == 3 //id, project name, nested name
+        //results[0].data.id == 1
+        results[0].data.name == "Sink1"
+        results[0].data.ext.name == "SinkExt1"
+
+        and: "Verify database records"
+        KitchenSink.count() == 2
+        KitchenSink.withSession {
+            assert KitchenSink.findByName("Sink1") != null
+            assert KitchenSink.findByName("Sink1").ext.name == "SinkExt1"
+            true
+        }
+    }
+
+    void "test buildErrorMap"() {
+        setup:
+        Map data = [name:"cust-1", num:"cust-1", id:1]
+
+        expect: "when no includes"
+        bulkImporter.buildErrorMap(data, null) == data
+
+        and: "when includes provided"
+        bulkImporter.buildErrorMap(data, ["id", "num"]) == [id:1, num: "cust-1"]
+    }
+
+    void "test buildSuccessMap"() {
+        setup:
+        KitchenSink kitchenSink = new KitchenSink(name: "name", secret: "secret", ext: new SinkExt(name:"ext-name", textMax: "test"))
+
+        when: "when includes provided"
+        Map result = bulkImporter.buildSuccessMap(kitchenSink, ["name", "ext.name"])
+
+        then:
+        result.size() == 2
+        result == [name: "name", ext:[name: "ext-name"]]
+    }
+
+    void "test empty data"() {
+        when:
+        def job = bulkImportService.bulkImportLegacy(setupBulkImportParams(), null)
+
+        then:
+        DataProblemException ex = thrown()
+        ex.code == 'error.data.emptyPayload'
+
+        when:
+        job = bulkImportService.bulkImportLegacy(setupBulkImportParams(), [])
+
+        then:
+        DataProblemException ex2 = thrown()
+        ex2.code == 'error.data.emptyPayload'
+    }
+}

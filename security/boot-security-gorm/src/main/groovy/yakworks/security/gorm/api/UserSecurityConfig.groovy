@@ -7,11 +7,9 @@ package yakworks.security.gorm.api
 import groovy.transform.CompileStatic
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.context.annotation.Configuration
 
 import yakworks.gorm.config.QueryConfig
 import yakworks.security.user.CurrentUser
-
 
 @CompileStatic
 @ConfigurationProperties(prefix="app.security")

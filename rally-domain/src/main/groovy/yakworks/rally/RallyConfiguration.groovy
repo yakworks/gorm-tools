@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Lazy
 import yakworks.rally.mail.MailSpringConfig
 import yakworks.security.audit.AuditStampConfiguration
 import yakworks.security.gorm.SecurityGormConfiguration
-import yakworks.security.gorm.api.UserSecurityConfig
 import yakworks.security.spring.DefaultSecurityConfiguration
 
 @Configuration @Lazy
@@ -26,4 +25,7 @@ import yakworks.security.spring.DefaultSecurityConfiguration
 class RallyConfiguration {
     //@Entity scan packages to include in additions to this Application class's package
     public static final List<String> entityScanPackages = ['yakworks.security.gorm', 'yakworks.rally']
+
+
+
 }

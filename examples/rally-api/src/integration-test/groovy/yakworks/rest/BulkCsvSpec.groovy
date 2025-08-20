@@ -214,4 +214,36 @@ class BulkCsvSpec  extends RestIntTest implements SecuritySpecHelper {
             if(body.id) SyncJob.repo.removeById(body.id as Long) //syncjob is created in new transaction
         }
     }
+
+    void "test bad CSV"() {
+
+        when: "create attachment"
+        def csvFile = BuildSupport.rootProjectPath.resolve("examples/resources/csv/contact-bad.csv")
+        Attachment attachment
+        Attachment.withNewTransaction {
+            attachment = Attachment.create([name: csvFile.fileName.toString(), sourcePath: csvFile])
+        }
+        TrxUtils.flush()
+        controller.params.attachmentId = attachment.id
+        controller.params['async'] = false //disable promise for test
+        controller.params['saveDataAsFile'] = true //write to file
+
+        controller.bulkCreate()
+        Map body = response.bodyToMap()
+
+        then:
+        response.status == 400
+
+        body.ok == false
+        body.code == 'error.data.csv'
+        body.title == "CSV Data Problem"
+        body.detail.contains "Error on record number 2"
+
+        cleanup: "cleanup db"
+        //attachmentRepo.removeById(attachment.id)
+        Attachment.withNewTransaction {
+            if(attachment) attachment.remove()
+            //if(body.id) SyncJob.repo.removeById(body.id as Long) //syncjob is created in new transaction
+        }
+    }
 }

@@ -6,7 +6,6 @@ package gorm.tools.repository.model
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.job.SyncJobArgs
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.api.QueryService
@@ -14,6 +13,7 @@ import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.RepoUtil
 import yakworks.api.problem.data.NotFoundProblem
+
 //NOTE: No Grail-Gorm dependencies here
 
 /**
@@ -99,9 +99,18 @@ interface ApiCrudRepo<D> {
      * @param checkAndThrow if true then checks if found and throws NotFoundProblem.Exception if not
      * @return the retrieved entity
      */
+    @Deprecated
     default D get(Serializable id, boolean checkAndThrow) {
+        return checkAndThrow ? getNotNull(id) : get(id)
+    }
+
+    /**
+     * Get entity and throw NotFoundProblem.Exception if its null
+     * Uses RepoUtil.checkFound
+     */
+    default D getNotNull(Serializable id) {
         D entity = get(id)
-        if(checkAndThrow) RepoUtil.checkFound(entity, id, getEntityClass().name)
+        RepoUtil.checkFound(entity, id, getEntityClass().name)
         return entity
     }
 
@@ -141,7 +150,7 @@ interface ApiCrudRepo<D> {
      * @param syncJobArgs the args object to pass on to doBulk
      * @return Job id
      */
-    Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs)
+    // Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs)
     //--------------------Mango Query -------------------
 
     /**

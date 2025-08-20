@@ -61,7 +61,7 @@ class ReadonlyRestApiSpec extends Specification implements OkHttpRestTrait {
 
     void "bulk"() {
         when:
-        def resp = post(path+"/bulk?jobSource=Oracle&savePayload=false",  [data])
+        def resp = post(path+"/bulk?jobSource=Oracle",  [data])
 
         then:
         assertAccessDenied(resp)

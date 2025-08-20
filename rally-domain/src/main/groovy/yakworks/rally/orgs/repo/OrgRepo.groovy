@@ -7,12 +7,10 @@ package yakworks.rally.orgs.repo
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.validation.Errors
 
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
-import gorm.tools.mango.api.QueryService
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
 import yakworks.rally.orgs.model.Org

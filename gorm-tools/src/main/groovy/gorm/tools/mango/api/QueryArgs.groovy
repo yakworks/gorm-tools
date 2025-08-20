@@ -59,7 +59,7 @@ class QueryArgs {
     // Closure closure
 
     /**
-     * The HttpRequest if there is one. Can be used for logging and can use uri.query for cache key
+     * The URI if there is one. Can be used for logging and can use uri.query for cache key
      * not required and wont be set for internal usage
      */
     URI uri

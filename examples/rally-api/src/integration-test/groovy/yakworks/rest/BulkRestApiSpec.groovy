@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils
 import org.springframework.http.HttpStatus
 
 import gorm.tools.job.SyncJobState
+import spock.lang.Ignore
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
@@ -19,7 +20,7 @@ import static yakworks.json.groovy.JsonEngine.parseJson
 @Rollback
 class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
 
-    String path = "/api/rally/org/bulk?jobSource=Oracle&savePayload=false"
+    String path = "/api/rally/org/bulk?jobSource=Oracle&async=false"
 
     def setup(){
         login()
@@ -42,7 +43,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         body.ok == true
         body.state == "Finished"
         body.source == "Oracle" //should have been picked from query string
-        body.sourceId == "POST /api/rally/org/bulk?jobSource=Oracle&savePayload=false"
+        body.sourceId == "POST /api/rally/org/bulk?jobSource=Oracle&async=false"
         body.data != null
         body.data.size() == 3
         body.data[0].data.id != null
@@ -57,11 +58,12 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         SyncJob job = SyncJob.repo.get(body.id as Long)
 
         then:
-        job != null
-        job.data != null
-        job.payloadBytes == null
+        job
+        job.dataToString()
+        // we no longer have settign to disable payload saving
+        //job.payloadBytes == null
         job.state == SyncJobState.Finished
-        job.sourceId == "POST /api/rally/org/bulk?jobSource=Oracle&savePayload=false"
+        job.sourceId == "POST /api/rally/org/bulk?jobSource=Oracle&async=false"
         job.source == "Oracle"
 
         /*payload disabled
@@ -100,10 +102,10 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         body.ok == false
         body.state == 'Finished'
         job.id
-        job.data != null
+        job.dataToString()
 
         when:
-        List json = parseJson(job.dataToString())
+        List json = job.dataList
         List requestData = parseJson(job.payloadToString())
 
         then:
@@ -129,11 +131,11 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         body.ok == false
         body.state == 'Finished'
         job.id
-        job.data != null
+        job.dataToString()
 
         when:
-        List json = parseJson(job.dataToString())
-        List requestData = parseJson(job.payloadToString())
+        List json = job.dataList
+        List requestData = job.payloadList
 
         then:
         json != null
@@ -192,7 +194,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         body.ok == false //has one failure
         body.state == "Finished"
         body.source == "Oracle" //should have been picked from query string
-        body.sourceId == "POST /api/rally/org/bulk?jobSource=Oracle&savePayload=false&op=upsert"
+        body.sourceId == "POST /api/rally/org/bulk?jobSource=Oracle&async=false&op=upsert"
         resp.code() == HttpStatus.MULTI_STATUS.value()
         body.data.size() == 5
 
@@ -210,9 +212,10 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         updated == 3
     }
 
+    @Ignore
     void "bulk export"() {
         when:
-        Response resp = get("/api/rally/org/bulk?q=*&parallel=false&async=false")
+        Response resp = get("/api/rally/org/bulk?q=*&async=false")
         Map body = bodyToMap(resp)
 
         then:

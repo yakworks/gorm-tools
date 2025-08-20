@@ -4,18 +4,23 @@
 */
 package gorm.tools.job
 
+
 import gorm.tools.model.SourceType
 import spock.lang.Specification
 import testing.TestSyncJob
+import yakworks.gorm.api.bulk.BulkImportJobArgs
 import yakworks.json.groovy.JsonEngine
-import yakworks.testing.gorm.unit.DataRepoTest
+import yakworks.testing.gorm.unit.GormHibernateTest
 
-class SyncJobImplSpec extends Specification  implements DataRepoTest  {
+class SyncJobImplSpec extends Specification  implements GormHibernateTest{
     static List entityClasses = [TestSyncJob]
 
     void "sanity check validation with String as data"() {
         expect:
-        TestSyncJob job = new TestSyncJob(sourceType: SourceType.ERP, sourceId: 'ar/org')
+        TestSyncJob job = new TestSyncJob(
+            state: SyncJobState.Running, jobType: BulkImportJobArgs.JOB_TYPE,
+            sourceType: SourceType.ERP, sourceId: 'ar/org'
+        )
         job.validate()
         job.persist()
     }
@@ -25,7 +30,10 @@ class SyncJobImplSpec extends Specification  implements DataRepoTest  {
         String res = JsonEngine.toJson(["One", "Two", "Three"])
 
         when:
-        TestSyncJob job = new TestSyncJob(sourceType: SourceType.ERP, sourceId: 'ar/org', payloadBytes: res.bytes)
+        TestSyncJob job = new TestSyncJob(
+            sourceType: SourceType.ERP, jobType: 'bulk',
+            sourceId: 'ar/org', payloadBytes: res.bytes
+        )
         def jobId = job.persist().id
 
         then: "get jobId"

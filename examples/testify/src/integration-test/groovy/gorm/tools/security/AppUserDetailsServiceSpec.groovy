@@ -19,6 +19,11 @@ class AppUserDetailsServiceSpec extends Specification implements DataIntegration
     AppUserDetailsService userDetailsService
     PasswordValidator passwordValidator
 
+    void "sanityt check"() {
+        expect:
+        passwordValidator
+    }
+
     void testLoadUserByUsername() {
         when:
         AppUser.repo.create([username:"karen", password:"karen", repassword:"karen", email:"karen@9ci.com"])

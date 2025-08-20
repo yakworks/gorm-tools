@@ -19,6 +19,7 @@ import grails.rest.render.RenderContext
  * @author Joshua Burnett (@basejump)
  * @since 7.0.8
  */
+//******** NOT ENABLED *******
 @Slf4j
 @CompileStatic
 class SyncJobRenderer implements JsonRendererTrait<SyncJobEntity> {
@@ -29,7 +30,7 @@ class SyncJobRenderer implements JsonRendererTrait<SyncJobEntity> {
     void render(SyncJobEntity job, RenderContext context) {
         setContentType(context)
 
-        Map response = JobUtils.convertToMap(job)
+        Map response = JobUtils.jobToMapGroovy(job)
 
         jsonBuilder(context).call(response)
     }

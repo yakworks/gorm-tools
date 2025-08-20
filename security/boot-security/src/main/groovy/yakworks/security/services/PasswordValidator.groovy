@@ -8,73 +8,40 @@ import javax.inject.Inject
 
 import groovy.transform.CompileStatic
 
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.password.PasswordEncoder
 
 import yakworks.api.Result
 import yakworks.api.problem.Problem
 import yakworks.message.Msg
 import yakworks.message.MsgKey
+import yakworks.security.PasswordConfig
 
 @CompileStatic
 class PasswordValidator {
 
     @Inject PasswordEncoder passwordEncoder
-
-    @Value('${yakworks.security.password.expireDays:90}')
-    int passwordExpireDays
-
-    @Value('${yakworks.security.password.expireEnabled:false}')
-    boolean passwordExpiryEnabled
-
-    @Value('${yakworks.security.password.warnDays:30}')
-    int passwordWarnDays
-
-    @Value('${yakworks.security.password.minLength:4}')
-    Integer passwordMinLength
-
-    @Value('${yakworks.security.password.mustContainNumbers:false}')
-    boolean passwordMustContainNumbers
-
-    @Value('${yakworks.security.password.mustContainSymbols:false}')
-    boolean passwordMustContainSymbols
-
-    @Value('${yakworks.security.password.mustContainUpperaseLetter:false}')
-    boolean passwordMustContainUpperaseLetter
-
-    @Value('${yakworks.security.password.password.mustContainLowercaseLetter:false}')
-    boolean passwordMustContainLowercaseLetter
-
-    @Value('${yakworks.security.password.historyEnabled:false}')
-    boolean passwordHistoryEnabled
-
-    @Value('${yakworks.security.password.historyLength:4}')
-    int passwordHistoryLength
+    @Inject PasswordConfig passwordConfig
 
     @SuppressWarnings(['IfStatementCouldBeTernary'])
-    Result validate(String pass, String passConfirm) {
+    Result validate(String pass) {
         List problemKeys = [] as List<MsgKey>
-        if (!pass || (pass.length() < passwordMinLength)) {
-            problemKeys << Msg.key("security.validation.password.minlength", [min: passwordMinLength])
+        if (!pass || (pass.length() < passwordConfig.minLength)) {
+            problemKeys << Msg.key("security.validation.password.minlength", [min: passwordConfig.minLength])
         }
 
-        if (passConfirm != pass) {
-            problemKeys << Msg.key("security.validation.password.match")
-        }
-
-        if (passwordMustContainLowercaseLetter && !(pass =~ /^.*[a-z].*$/)) {
+        if (passwordConfig.mustContainLowercaseLetter && !(pass =~ /^.*[a-z].*$/)) {
             problemKeys << Msg.key("security.validation.password.mustcontain.lowercase")
         }
 
-        if (passwordMustContainUpperaseLetter && !(pass =~ /^.*[A-Z].*$/)) {
+        if (passwordConfig.mustContainUppercaseLetter && !(pass =~ /^.*[A-Z].*$/)) {
             problemKeys << Msg.key("security.validation.password.mustcontain.uppercase")
         }
 
-        if (passwordMustContainNumbers && !(pass =~ /^.*[0-9].*$/)) {
+        if (passwordConfig.mustContainNumbers && !(pass =~ /^.*[0-9].*$/)) {
             problemKeys << Msg.key("security.validation.password.mustcontain.numbers")
         }
 
-        if (passwordMustContainSymbols && !(pass =~ /^.*\W.*$/)) {
+        if (passwordConfig.mustContainSymbols && !(pass =~ /^.*\W.*$/)) {
             problemKeys << Msg.key("security.validation.password.mustcontain.symbol")
         }
 
@@ -83,6 +50,14 @@ class PasswordValidator {
         } else {
             return  Result.OK()
         }
+    }
+
+    /**
+     * For user specific password validation, which can incorporate user's password history etc.
+     * The defalt implementation just validates the password. Subclasses can override to hook up passwordhistory etc
+     */
+    Result validate(Serializable userId, String pass) {
+        return validate(pass)
     }
 
     /**

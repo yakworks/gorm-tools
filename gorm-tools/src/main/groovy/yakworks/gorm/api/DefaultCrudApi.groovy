@@ -4,7 +4,6 @@
 */
 package yakworks.gorm.api
 
-
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
 import gorm.tools.beans.Pager
-import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.metamap.services.MetaMapService
@@ -21,12 +19,14 @@ import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.ApiCrudRepo
-import gorm.tools.repository.model.DataOp
 import gorm.tools.repository.model.EntityResult
 import gorm.tools.transaction.TrxUtils
 import grails.gorm.transactions.Transactional
 import yakworks.api.problem.data.DataProblemException
-import yakworks.gorm.api.support.BulkApiSupport
+import yakworks.gorm.api.bulk.BulkExportJobArgs
+import yakworks.gorm.api.bulk.BulkExportService
+import yakworks.gorm.api.bulk.BulkImportJobArgs
+import yakworks.gorm.api.bulk.BulkImportService
 import yakworks.gorm.api.support.QueryArgsValidator
 import yakworks.gorm.config.QueryConfig
 import yakworks.meta.MetaMap
@@ -54,8 +54,10 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     @Autowired QueryConfig queryConfig
 
     /** Not required but if an BulkSupport bean is setup then it will get get used */
-    @Autowired(required = false)
-    BulkApiSupport<D> bulkApiSupport
+    protected BulkExportService<D> bulkExportService
+
+    /** Not required but if an BulkSupport bean is setup then it will get get used */
+    protected BulkImportService<D> bulkImportService
 
     DefaultCrudApi(Class<D> entityClass){
         this.entityClass = entityClass
@@ -88,9 +90,16 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         RepoLookup.findRepo(getEntityClass())
     }
 
-    BulkApiSupport<D> getBulkApiSupport(){
-        if (!bulkApiSupport) this.bulkApiSupport = BulkApiSupport.of(getEntityClass())
-        return bulkApiSupport
+    BulkImportService<D> getBulkImportService(){
+        if (!this.bulkImportService)
+            this.bulkImportService = BulkImportService.lookup(getEntityClass())
+        return bulkImportService
+    }
+
+    BulkExportService<D> getBulkExportService(){
+        if (!bulkExportService)
+            this.bulkExportService = BulkExportService.lookup(getEntityClass())
+        return bulkExportService
     }
 
     /**
@@ -192,14 +201,13 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     }
 
     @Override
-    SyncJobEntity bulk(DataOp dataOp, List<Map> dataList, Map qParams, String sourceId){
-        SyncJobArgs syncJobArgs = getBulkApiSupport().setupSyncJobArgs(dataOp, qParams, sourceId)
-        SyncJobEntity job = getBulkApiSupport().process(dataList, syncJobArgs)
-        return job
+    SyncJobEntity bulkImport(BulkImportJobArgs jobParams, List<Map> bodyList){
+        getBulkImportService().process(jobParams, bodyList)
     }
 
-    SyncJobEntity bulkExport(Map params, String sourceId) {
-        return getBulkApiSupport().processBulkExport(params, sourceId)
+    @Override
+    SyncJobEntity bulkExport(BulkExportJobArgs jobParams) {
+        getBulkExportService().queueJob(jobParams)
     }
 
     protected List<D> queryList(QueryArgs qargs) {
@@ -232,15 +240,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
      * @return the list of fields in our mango format.
      */
     protected List<String> getIncludes(Map qParams, List fallbackIncludesKeys) {
-        //parse the params into the IncludesProps
-        var incProps = IncludesProps.of(qParams).fallbackKeys(fallbackIncludesKeys)
-
-        //if includes was passed in, then it wins
-        if(incProps.includes) return incProps.includes
-
-        //otherwise search based on includesKey
-        List<String> incs = includesConfig.findIncludes(getEntityClass(), incProps)
-        return incs
+        includesConfig.getIncludes(qParams, fallbackIncludesKeys, getEntityClass())
     }
 
     protected QueryArgs createQueryArgs(Pager pager, Map qParams, URI uri) {

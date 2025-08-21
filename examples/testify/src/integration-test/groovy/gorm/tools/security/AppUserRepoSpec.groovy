@@ -198,6 +198,8 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         ValidationProblem.Exception ex = thrown()
         ex.violations.size() == 1
         ex.violations[0].code == 'security.validation.password.mustcontain.uppercase'
+        //happens in ViolatinConverter
+        //ex.violations[0].message == "Password must contain a uppercase lettere"
 
         and: "history not created"
         !secPasswordHistoryRepo.findAllByUser(user.id)

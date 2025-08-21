@@ -22,27 +22,48 @@ class PasswordValidator {
     @Inject PasswordEncoder passwordEncoder
     @Inject PasswordConfig passwordConfig
 
+    /*
+    security.validation.password.error=password validation failed
+security.validation.password.existsinhistory=Password must be different from the last {value} passwords
+
+     */
     @SuppressWarnings(['IfStatementCouldBeTernary'])
     Result validate(String pass) {
         List problemKeys = [] as List<MsgKey>
         if (!pass || (pass.length() < passwordConfig.minLength)) {
-            problemKeys << Msg.key("security.validation.password.minlength", [min: passwordConfig.minLength])
+
+            problemKeys.add(
+                Msg.key("security.validation.password.minlength", [min: passwordConfig.minLength])
+                    .fallbackMessage("Password must be minimum ${passwordConfig.minLength} characters long")
+            )
         }
 
         if (passwordConfig.mustContainLowercaseLetter && !(pass =~ /^.*[a-z].*$/)) {
-            problemKeys << Msg.key("security.validation.password.mustcontain.lowercase")
+            problemKeys.add(
+                Msg.key("security.validation.password.mustcontain.lowercase")
+                    .fallbackMessage("Password must contain a lower case letter")
+            )
         }
 
         if (passwordConfig.mustContainUppercaseLetter && !(pass =~ /^.*[A-Z].*$/)) {
-            problemKeys << Msg.key("security.validation.password.mustcontain.uppercase")
+            problemKeys.add(
+                Msg.key("security.validation.password.mustcontain.uppercase")
+                    .fallbackMessage("Password must contain a uppercase letter")
+            )
         }
 
         if (passwordConfig.mustContainNumbers && !(pass =~ /^.*[0-9].*$/)) {
-            problemKeys << Msg.key("security.validation.password.mustcontain.numbers")
+            problemKeys.add(
+                Msg.key("security.validation.password.mustcontain.numbers")
+                    .fallbackMessage("Password must contain a number")
+            )
         }
 
         if (passwordConfig.mustContainSymbols && !(pass =~ /^.*\W.*$/)) {
-            problemKeys << Msg.key("security.validation.password.mustcontain.symbol")
+            problemKeys.add(
+                Msg.key("security.validation.password.mustcontain.symbol")
+                    .fallbackMessage("Password must contain a symbol")
+            )
         }
 
         if(problemKeys){

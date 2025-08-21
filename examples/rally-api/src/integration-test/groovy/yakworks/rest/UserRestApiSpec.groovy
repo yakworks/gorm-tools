@@ -111,9 +111,9 @@ class UserRestApiSpec extends Specification implements OkHttpRestTrait {
         body.title == 'AppUser Validation Error(s)'
         body.errors.size() == 2
         body.errors[0].code == 'security.validation.password.minlength'
-        body.errors[0].message == 'password must be minimum 4 characters long'
+        body.errors[0].message == 'Password must be minimum 4 characters long'
         body.errors[1].code == 'security.validation.password.mustcontain.uppercase'
-        body.errors[1].message == 'Password must contain uppercase letters'
+        body.errors[1].message == 'Password must contain a uppercase letter'
 
         cleanup:
         passwordConfig.minLength = 3

@@ -11,6 +11,7 @@ import yakworks.api.problem.Violation
 import yakworks.api.problem.ViolationFieldError
 import yakworks.message.MsgServiceRegistry
 import yakworks.message.spi.MsgService
+import yakworks.spring.AppCtx
 
 /**
  * Groovy json converter for Violation
@@ -29,9 +30,10 @@ class ViolationConverter implements JsonGenerator.Converter {
         //TODO the asMap in commons should really be doing this but until we modify we do it here.
         //if it has a msgKey and message is empty, then lookup message for code
         if(v.msg && !v.message){
+            MsgService msgService = AppCtx.get("messageSource", MsgService)
             v = ViolationFieldError.of(
                 v.code,
-                MsgServiceRegistry.service.get(v.msg) ?: ""
+                msgService.get(v.msg) ?: ""
             ).field(v.field)
         }
         return v.asMap()

@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 
 import yakworks.api.Result
 import yakworks.api.problem.Problem
+import yakworks.api.problem.ViolationFieldError
 import yakworks.message.Msg
 import yakworks.message.MsgKey
 import yakworks.security.PasswordConfig
@@ -67,7 +68,10 @@ security.validation.password.existsinhistory=Password must be different from the
         }
 
         if(problemKeys){
-            return Problem.of('security.validation.password.error').addViolations(problemKeys)
+            var vs = problemKeys.collect { ViolationFieldError.of(it).field('password')  }
+            var prob = Problem.of('security.validation.password.error')
+            prob.violations(vs)
+            return prob
         } else {
             return  Result.OK()
         }

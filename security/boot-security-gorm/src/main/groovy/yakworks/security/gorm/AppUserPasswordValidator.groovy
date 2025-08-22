@@ -30,6 +30,7 @@ class AppUserPasswordValidator extends PasswordValidator {
 
         if (passwordExistInHistory(userId, pass)) {
             var msgKey= Msg.key("security.validation.password.existsinhistory", [value: passwordConfig.historyLength])
+            msgKey.fallbackMessage("Password already exists in recent history")
             return Problem.of('security.validation.password.error').addViolations([msgKey])
         }
         //return ok if its all good

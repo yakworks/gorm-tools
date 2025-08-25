@@ -1,22 +1,10 @@
 package yakworks.rest
 
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.springframework.http.HttpStatus
-
 import gorm.tools.transaction.WithTrx
-import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import okhttp3.HttpUrl
-import okhttp3.Request
-import okhttp3.RequestBody
 import okhttp3.Response
 import spock.lang.Specification
-import yakworks.rally.orgs.model.Contact
-import yakworks.rally.orgs.model.Org
-import yakworks.rally.tag.model.Tag
 import yakworks.rest.client.OkHttpRestTrait
-
-import static yakworks.etl.excel.ExcelUtils.getHeader
 
 @Integration
 class ExceptionHandlerRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
@@ -63,5 +51,17 @@ class ExceptionHandlerRestApiSpec extends Specification implements OkHttpRestTra
         body.status == 500
         body.code == "error.unexpected"
         body.detail.contains('nested exception is Assertion failed')
+    }
+
+    void "request method not supported - login"() {
+        when:
+        Response resp = get("/api/oauth/token")
+        Map body = bodyToMap(resp)
+
+        then:
+        body
+        body.containsKey('ok')
+        !body.ok
+        body.code
     }
 }

@@ -39,6 +39,10 @@ class JobUtils {
         if(job.isFinshedAndJson()) {
             resp['data'] =  JsonOutput.unescaped(job.dataToString())
         }
+        //include problems by default if its not ok.
+        if(!job.ok && job.state == SyncJobState.Finished) {
+            resp['problems'] =  job.problems
+        }
         return resp
     }
 

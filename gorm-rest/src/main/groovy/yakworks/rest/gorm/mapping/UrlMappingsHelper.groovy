@@ -6,6 +6,9 @@ package yakworks.rest.gorm.mapping
 
 import groovy.transform.CompileDynamic
 
+/**
+ * NOT USED, Left here for reference
+ */
 @SuppressWarnings(['Indentation', 'UnnecessarySelfAssignment'])
 @CompileDynamic
 class UrlMappingsHelper {

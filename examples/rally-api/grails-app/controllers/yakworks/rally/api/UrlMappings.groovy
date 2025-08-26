@@ -19,8 +19,12 @@ class UrlMappings {
         //for functional error tests
         "/security-tests/$action"(controller: 'securityTests')
 
+        get "/rally/syncJob/${id}/data"(controller: 'syncJob', action: 'data')
+        get "/rally/syncJob/${id}/payload"(controller: 'syncJob', action: 'payload')
+        get "/rally/syncJob/${id}/problems"(controller: 'syncJob', action: 'problems')
+
         RepoApiMappingsService repoApiMappingsService = getApplicationContext().getBean('repoApiMappingsService', RepoApiMappingsService)
-        // repoApiMappingsService.createMappings(delegate)
+        //repoApiMappingsService.createMappings(delegate)
 
         //creates nested /rally/org/$orgId/contact....
         repoApiMappingsService.createNestedMappings('rally', 'org', 'orgId', 'contact', delegate)

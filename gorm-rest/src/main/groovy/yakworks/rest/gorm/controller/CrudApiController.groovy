@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets
 import javax.persistence.LockTimeoutException
 import javax.servlet.http.HttpServletRequest
 
+import groovy.json.JsonOutput
 import groovy.transform.CompileStatic
 
 import org.slf4j.Logger
@@ -248,7 +249,7 @@ trait CrudApiController<D> extends RestApiController {
             jobParams.sourceId = requestToSourceId(request)
             SyncJobEntity job = getCrudApi().bulkExport(jobParams)
             Map jobMap = JobUtils.jobToMapGroovy(job)
-            respondWith(jobMap, [status: qParams.getBoolean('async') == false ? MULTI_STATUS : CREATED])
+            respondWith(jobMap, [status: jobParams.async ? CREATED : MULTI_STATUS])
         } catch (Exception | AssertionError e) {
             respondWith(
                 BulkExceptionHandler.of(getEntityClass(), problemHandler).handleBulkOperationException(request, e)
@@ -295,9 +296,18 @@ trait CrudApiController<D> extends RestApiController {
 
         SyncJobEntity job = getCrudApi().bulkImport(jobParams, dataList)
         Map jobMap = JobUtils.jobToMapGroovy(job)
+        //include job data if job is finished
+        if(!jobParams.async && job.isFinshedAndJson()) {
+            jobMap['data'] =  JsonOutput.unescaped(job.dataToString())
+            println "dataBytes"
+            println job.dataBytes
+            println "dataId"
+            println job.dataId
+            println jobMap['data']
+        }
         //if its async=false then it will be the Finished job and equivalent to the GET on SyncJob, SO MULTI_STATUS
         // if its not async, then its just returning the created Job and equivalent to the POST on SyncJob, so a CREATED status
-        respondWith(jobMap, [status: qParams.getBoolean('async') == false ? MULTI_STATUS : CREATED])
+        respondWith(jobMap, [status: jobParams.async ? CREATED : MULTI_STATUS])
     }
 
     String requestToSourceId(HttpServletRequest req){

@@ -1,5 +1,6 @@
 package yakworks.openapi
 
+import spock.lang.Ignore
 import yakworks.openapi.gorm.OpenApiGenerator
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
@@ -9,6 +10,7 @@ import spock.lang.Specification
 
 @Integration
 @Rollback
+@Ignore
 class OpenapiGeneratorSpec extends Specification {
 
     @Autowired

@@ -10,6 +10,9 @@ import spock.lang.Specification
 
 @Integration
 @Rollback
+//XXX @SUD see if you can see why this is breaking the binding
+//if we enable this test then it seems to do something to the dataBytes in SyncJob that has display:false set
+// if this test runs first, then the BulkRestApiSpec fails since the SyncJobService no longer updates the dataBytes. Its weird. 
 @Ignore
 class OpenapiGeneratorSpec extends Specification {
 

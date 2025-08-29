@@ -152,10 +152,10 @@ trait SyncJobEntity implements SourceTrait {
         message     : [d: 'Status message or log', maxSize: 500],
         payloadId   : [d: 'If payload is stored as attahcment file this is the id', oapi: "NO"],
         payloadBytes: [d: 'Json payload data (stored as byte array) that is passed in, for example list of items to bulk create',
-                       maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
+                       maxSize: MAX_MEG_IN_BYTES, oapi: "NO", display: false],
         dataFormat : [d: 'The format the data is in, csv or json'],
         dataId      : [d: 'If data is saved as attahchment file this is the id', oapi: "NO"],
-        dataBytes   : [d: 'The result data stored as bytes', maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
+        dataBytes   : [d: 'The result data stored as bytes', maxSize: MAX_MEG_IN_BYTES, oapi: "NO", display: false],
         //errorBytes  : [d: 'The error data stored as bytes', maxSize: MAX_MEG_IN_BYTES, oapi: "NO"],
         sourceId : [d: 'the unique id from the outside source for the scheduled job', nullable: true],
         jobType : [d: 'The type indicator for the kind of job', nullable: false]

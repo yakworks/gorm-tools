@@ -68,7 +68,7 @@ class SyncJobArgs {
      * when false (default) run in a standard blocking synchronous thread and return when job is done
      * NOTE: Some SyncJobs only run as async=true, BulkExport for example.
      */
-    Boolean async
+    Boolean async = false
 
     /**
      * For results, comma seperated list of fields to include for the SyncJob.data

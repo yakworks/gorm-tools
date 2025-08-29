@@ -27,6 +27,7 @@ class SyncJobRenderer implements JsonRendererTrait<SyncJobEntity> {
     //this is also done in
     @Override
     @CompileDynamic
+    //******** NOT ENABLED *******
     void render(SyncJobEntity job, RenderContext context) {
         setContentType(context)
 

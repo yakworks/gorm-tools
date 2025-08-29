@@ -65,10 +65,11 @@ class SyncJobArgs {
     /**
      * Whether it should run in async background thread and return the job immediately.
      * Essentially makes the job a sort of Promise or Future.
-     * when false (default) run in a standard blocking synchronous thread and return when job is done
+     * when true (default) run in a queueud background thread and return job right away.
+     * when false run in a standard blocking synchronous thread and return when job is done
      * NOTE: Some SyncJobs only run as async=true, BulkExport for example.
      */
-    Boolean async = false
+    Boolean async = true
 
     /**
      * For results, comma seperated list of fields to include for the SyncJob.data

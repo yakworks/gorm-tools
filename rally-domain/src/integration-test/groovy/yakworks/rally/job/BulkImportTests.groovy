@@ -101,7 +101,7 @@ class BulkImportTests extends Specification implements DomainIntTest {
         Attachment.get(job.payloadId).name.startsWith("Sync")
         //check params
        //Keys [sourceId, dataFormat, dataLayout, payloadId, entityClassName, jobType, source, foo]
-        job.params.keySet() == ['jobType', 'source', 'sourceId', 'dataFormat', 'entityClassName', 'payloadId', 'dataLayout', 'foo'] as Set
+        job.params.keySet() == ['jobType', 'source', 'sourceId', 'dataFormat', 'entityClassName', 'payloadId', 'dataLayout', 'foo', 'async'] as Set
 
         job.params['foo']
 
@@ -142,7 +142,7 @@ class BulkImportTests extends Specification implements DomainIntTest {
         //Keys [sourceId, dataFormat, dataLayout, payloadId, entityClassName, jobType, source, foo]
         job.params.keySet() == [
             'jobType', 'source', 'sourceId', 'dataFormat', 'entityClassName', 'payloadId', 'attachmentId',
-            'dataLayout', 'foo'
+            'dataLayout', 'foo', 'async'
         ] as Set
 
         job.params['foo']
@@ -189,7 +189,7 @@ class BulkImportTests extends Specification implements DomainIntTest {
         //check jobArgs.queryParams
         //Keys [sourceId, dataFormat, dataLayout, payloadId, entityClassName, jobType, source, foo]
         jobArgs.queryParams.keySet() == [
-            'jobType', 'source', 'sourceId', 'dataFormat', 'entityClassName', 'payloadId', 'attachmentId',
+            'jobType', 'source', 'sourceId', 'async', 'dataFormat', 'entityClassName', 'payloadId', 'attachmentId',
             'dataLayout', 'headerPathDelimiter', 'foo'
         ] as Set
         //

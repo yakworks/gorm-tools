@@ -53,12 +53,19 @@ class HelloSecurityConfiguration {
     @Autowired(required = false) TokenStore tokenStore;
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    WildcardAuthorizationManager wildcardAuthorizationManager() {
+        return new WildcardAuthorizationManager()
+    }
+
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http, WildcardAuthorizationManager wildcardAuthorizationManager) throws Exception {
         // DefaultSecurityConfiguration.applyBasicDefaults(http)
         http
             .authorizeHttpRequests((authorize) -> authorize
                 .requestMatchers("/actuator/**", "/resources/**", "/about").permitAll()
+                .requestMatchers("/api/**").access(wildcardAuthorizationManager)             
                 .anyRequest().authenticated()
+
             )
             // enable basic auth
             .httpBasic(withDefaults())

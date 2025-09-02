@@ -53,8 +53,6 @@ class WildcardAuthorizationManager implements AuthorizationManager<RequestAuthor
         // Normalize: /api/ar/autocash/123 → ar:autocash:read
         def segments = path.tokenize('/')
         if (segments.size() >= 2 && segments[0] == 'api') {
-            String domain = segments[1]
-            String resource = segments[2]
 
             String action
             switch (method) {

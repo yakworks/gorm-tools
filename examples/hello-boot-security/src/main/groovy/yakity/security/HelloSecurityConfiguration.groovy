@@ -63,7 +63,7 @@ class HelloSecurityConfiguration {
         http
             .authorizeHttpRequests((authorize) -> authorize
                 .requestMatchers("/actuator/**", "/resources/**", "/about").permitAll()
-                .requestMatchers("/api/**").access(wildcardAuthorizationManager)             
+                .requestMatchers("/api/**").access(wildcardAuthorizationManager)
                 .anyRequest().authenticated()
 
             )

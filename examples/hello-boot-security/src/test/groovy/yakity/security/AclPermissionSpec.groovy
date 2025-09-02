@@ -44,6 +44,17 @@ class AclPermissionSpec extends Specification {
         this.mockMvc.perform(delete( "/api/acl/test/1")).andExpect(status().isUnauthorized())
     }
 
+    //user has acl:foo:* but not acl:test:*
+    @WithMockUser(authorities = ['acl:foo:*'])
+    void "should be forbidden"() {
+        expect:
+        // status.value(), result.getResponse().getStatus());
+        this.mockMvc.perform(get("/api/acl/test/1")).andExpect(status().isForbidden())
+        this.mockMvc.perform(post( "/api/acl/test/")).andExpect(status().isForbidden())
+        this.mockMvc.perform(put( "/api/acl/test/")).andExpect(status().isForbidden())
+        this.mockMvc.perform(delete( "/api/acl/test/1")).andExpect(status().isForbidden())
+    }
+
     @WithMockUser(authorities = ['acl:test:read'])
     void "read check"() {
         expect:

@@ -7,6 +7,7 @@ import spock.lang.Specification
 import yakworks.security.Roles
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
+import yakworks.security.gorm.model.SecRolePermission
 import yakworks.security.gorm.model.SecRoleUser
 import yakworks.security.spring.user.SpringUser
 import yakworks.security.user.BasicUserInfo
@@ -14,7 +15,7 @@ import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
 class SpringUserSpec extends Specification implements GormHibernateTest, SecurityTest {
-    static List entityClasses = [AppUser, SecRole, SecRoleUser]
+    static List entityClasses = [AppUser, SecRole, SecRoleUser, SecRolePermission]
 
     String genRandomEmail(){
         String ename = RandomStringUtils.randomAlphabetic(10)

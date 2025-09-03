@@ -12,8 +12,9 @@ import org.springframework.security.core.userdetails.UserDetails
 
 import yakworks.commons.model.Named
 import yakworks.security.user.UserInfo
-import static yakworks.security.spring.user.SpringUserUtils.rolesToAuthorities
+
 import static yakworks.security.spring.user.SpringUserUtils.permissionsToAuthorities
+import static yakworks.security.spring.user.SpringUserUtils.rolesToAuthorities
 
 /**
  * Marries UserDetails and UserInfo

@@ -20,6 +20,10 @@ class JwtDecodeSpec extends Specification implements OkHttpRestTrait {
 
     String endpoint = "/api/validate"
 
+    void cleanupSpec() {
+        OkAuth.TOKEN = null
+    }
+
     void "test ES256_DEFAULT_JWT"() {
         setup:
         OkAuth.TOKEN = ES256_DEFAULT_JWT

@@ -1,13 +1,17 @@
-package yakity.security
+/*
+* Copyright 2025 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
+* You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+*/
+package yakworks.security.spring
 
 import java.util.function.Supplier
 import javax.servlet.http.HttpServletRequest
 
-import org.grails.io.support.AntPathMatcher
 import org.springframework.security.authorization.AuthorizationDecision
 import org.springframework.security.authorization.AuthorizationManager
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext
+import org.springframework.util.AntPathMatcher
 
 class WildcardAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext> {
 

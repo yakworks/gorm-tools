@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetails
 
 import yakworks.commons.model.Named
 import yakworks.security.user.UserInfo
+import static yakworks.security.spring.user.SpringUserUtils.rolesToAuthorities
+import static yakworks.security.spring.user.SpringUserUtils.permissionsToAuthorities
 
 /**
  * Marries UserDetails and UserInfo
@@ -63,7 +65,10 @@ trait SpringUserInfo implements UserDetails, Named, UserInfo {
 
     @Override
     Collection<? extends GrantedAuthority> getAuthorities(){
-        return SpringUserUtils.rolesToAuthorities(roles)
+        List<GrantedAuthority> authorities = []
+        authorities.addAll(rolesToAuthorities(roles))
+        authorities.addAll(permissionsToAuthorities(permissions))
+        return authorities as Set<GrantedAuthority>
     }
 
     /** merges only a subset of the data */

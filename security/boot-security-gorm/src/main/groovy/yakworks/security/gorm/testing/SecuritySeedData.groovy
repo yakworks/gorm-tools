@@ -10,6 +10,7 @@ import yakworks.security.Roles
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRolePermission
+import yakworks.security.gorm.model.SecUserPermission
 
 @CompileStatic
 class SecuritySeedData {
@@ -61,7 +62,8 @@ class SecuritySeedData {
 
     static void adminPermissions(SecRole role){
 
-        ['rally:org:*',
+        [ "**",
+          'rally:org:*',
          'rally:activityNote:*',
          'rally:company:list,get,post',
          'rally:orgTypeSetup:list,get,post',

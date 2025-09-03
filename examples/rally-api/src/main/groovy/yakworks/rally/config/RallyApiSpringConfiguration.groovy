@@ -24,6 +24,7 @@ import yakworks.rally.RallyConfiguration
 import yakworks.rally.api.TestTimeoutQueryArgsValidator
 import yakworks.rest.grails.AppInfoBuilder
 import yakworks.security.spring.DefaultSecurityConfiguration
+import yakworks.security.spring.WildcardAuthorizationManager
 import yakworks.security.spring.token.CookieAuthSuccessHandler
 import yakworks.security.spring.token.CookieUrlTokenSuccessHandler
 import yakworks.security.spring.token.TokenUtils
@@ -31,7 +32,7 @@ import yakworks.security.spring.token.generator.JwtTokenGenerator
 import yakworks.security.spring.token.store.TokenStore
 
 import static org.springframework.security.config.Customizer.withDefaults
-
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher
 /**
  * An example of explicitly configuring Spring Security with the defaults.
  */
@@ -56,7 +57,7 @@ class RallyApiSpringConfiguration {
     @Autowired TokenStore tokenStore
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, WildcardAuthorizationManager wildcardAuthorizationManager) throws Exception {
         //var sth = new SubjectThreadState(null);
         //defaults permit all
         List permitAllMatchers = [
@@ -67,6 +68,7 @@ class RallyApiSpringConfiguration {
             "/security-tests/**",
             "/login*",
             "/token",
+            '/oauth/token',
             "/about",
             "/rally/smoke/**"
         ]
@@ -81,7 +83,8 @@ class RallyApiSpringConfiguration {
                 .requestMatchers("/security-tests/error401").authenticated()
                 .requestMatchers("/security-tests/error403").hasRole("SUPER_DUPER")
                 .requestMatchers(permitAllMatchers as String[]).permitAll()
-                .anyRequest().authenticated()
+                .requestMatchers("/validate").authenticated()
+                .anyRequest().access(wildcardAuthorizationManager)
             )
             // http basic auth
             .httpBasic(withDefaults())
@@ -134,6 +137,11 @@ class RallyApiSpringConfiguration {
     @Bean
     QueryArgsValidator queryArgsValidator() {
         return new TestTimeoutQueryArgsValidator()
+    }
+
+    @Bean
+    WildcardAuthorizationManager wildcardAuthorizationManager() {
+        return new WildcardAuthorizationManager()
     }
 
     // @Bean @Lazy(false)

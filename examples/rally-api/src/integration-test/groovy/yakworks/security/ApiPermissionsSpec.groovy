@@ -94,4 +94,36 @@ class ApiPermissionsSpec extends Specification implements OkHttpRestTrait {
         cleanup:
         OkAuth.TOKEN = null
     }
+
+    void "readonly permission"() {
+        setup:
+        login("readonly", "123")
+
+        when: "READ"
+        Response resp = get("$path/1")
+
+        then:
+        resp.code() == HttpStatus.OK.value()
+
+        when: "POST"
+        resp = post(path, [num:'ptest', name:'ptest', type: "Customer"])
+
+        then: "FORBIDDEN"
+        resp.code() == HttpStatus.FORBIDDEN.value()
+
+        when: "PUT"
+        resp = put(path + "/1", [name:"ptest2"])
+
+        then: "FORBIDDEN"
+        resp.code() == HttpStatus.FORBIDDEN.value()
+
+        when: "DELETE"
+        resp = delete(path, 1)
+
+        then:
+        resp.code() == HttpStatus.FORBIDDEN.value()
+
+        cleanup:
+        OkAuth.TOKEN = null
+    }
 }

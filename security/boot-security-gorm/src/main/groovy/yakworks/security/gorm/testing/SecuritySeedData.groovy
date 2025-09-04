@@ -52,12 +52,16 @@ class SecuritySeedData {
         SecRole mgr = new SecRole(id: 3L, code: Roles.MANAGER).persist()
         SecRole custRole = new SecRole(id: 5L, code: Roles.CUSTOMER).persist()
         SecRole readonly = new SecRole(id: 6L, code: Roles.READ_ONLY).persist()
-        // SecRole foo = new SecRole(id: (Long)6, code: "FOO").persist()
 
         //add permissions
         adminPermissions(admin)
         custPermissions(custRole)
+        readOnlyPermissions(readonly)
         SecRole.repo.flush()
+    }
+
+    static void readOnlyPermissions(SecRole role) {
+        SecRolePermission.create(role, "rally:**:read")
     }
 
     static void adminPermissions(SecRole role){

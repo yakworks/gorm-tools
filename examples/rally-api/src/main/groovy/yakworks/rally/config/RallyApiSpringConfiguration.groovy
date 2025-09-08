@@ -113,6 +113,7 @@ class RallyApiSpringConfiguration {
 
         //enables jwt and oauth
         DefaultSecurityConfiguration.applyOauthJwt(http)
+        DefaultSecurityConfiguration.addOpaqueTokenSupport(http, tokenStore)
 
         return http.build()
     }

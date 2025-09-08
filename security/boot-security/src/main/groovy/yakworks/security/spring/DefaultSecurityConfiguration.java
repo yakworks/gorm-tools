@@ -49,6 +49,7 @@ public class DefaultSecurityConfiguration {
     @Value("${app.security.frontendCallbackUrl:'/'}")
     String frontendCallbackUrl;
 
+
     /**
      * Helper to set up HttpSecurity builder with default requestMatchers and forms.
      * NOTE: this is more of an example and common place for smoke test apps to use.
@@ -108,9 +109,13 @@ public class DefaultSecurityConfiguration {
         jsonUnameFilter.setAuthenticationSuccessHandler(new ForwardAuthenticationSuccessHandler("/tokenLegacy"));
         jsonUnameFilter.setAuthenticationManager(ctx.getBean(AuthenticationManager.class));
         http.addFilterAfter(jsonUnameFilter, BasicAuthenticationFilter.class);
+    }
 
-        //adds the OpaqueTokenStoreAuthProvider that will look for Bearer tokens that start with opq_ prefix
-        // will look them up in tokenStore (DB).
+    /**
+     * Adds the OpaqueTokenStoreAuthProvider that will look for Bearer tokens that start with opq_ prefix
+     * will look them up in tokenStore (DB).
+     */
+    public static void addOpaqueTokenSupport(HttpSecurity http, TokenStore tokenStore) {
         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.authenticationProvider(new OpaqueTokenStoreAuthProvider(tokenStore));
     }

@@ -12,6 +12,7 @@ import gorm.tools.job.DataLayout
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp
+import yakworks.commons.map.Maps
 import yakworks.etl.DataMimeTypes
 
 /**
@@ -102,10 +103,14 @@ class BulkImportJobArgs extends SyncJobArgs {
     String detailFilename
 
     static BulkImportJobArgs fromParams(Map params){
+        Map p = Maps.clone(params)
+        //remove the controller and action so we have less noise
+        p.remove("controller")
+        p.remove("action")
         BulkImportJobArgs bijParams = new BulkImportJobArgs()
-        BasicDataBinder.bind(bijParams, params)
+        BasicDataBinder.bind(bijParams, p)
         //put a full copy as is into the queryParams
-        bijParams.queryParams = params
+        bijParams.queryParams = p
         return bijParams
     }
 

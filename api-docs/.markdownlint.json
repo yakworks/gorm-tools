@@ -1,5 +1,18 @@
+
 {
-    "line-length": false,
-    "list-marker-space": false,
-    "no-inline-html": false
+  "op": "add",
+  "async": true,
+  "source": "DAL",
+  "jobType": "bulk.import",
+  "sourceId": "POST /api/ar/tran/bulk?async=true&detailLinkField=arTran_sourceId&headerPathDelimiter=_&attachmentId=953210&jobSource=DAL",
+  "jobSource": "DAL",
+  "payloadId": 953210,
+  "payloadFormat": "csv",
+  "payloadFileName": "foo.zip",
+  "dataFormat": "json",
+  "dataLayout": "Result",
+  "attachmentId": 953210,
+  "detailLinkField": "arTran_sourceId",
+  "entityClassName": "nine.ar.tran.model.ArTran",
+  "headerPathDelimiter": "_"
 }

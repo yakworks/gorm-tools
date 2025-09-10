@@ -92,7 +92,7 @@ class DefaultSyncJobService extends SyncJobService<SyncJob> {
             source: args.source,
             state: SyncJobState.Queued,
             params: args.asMap(),
-            dataFormat: args.dataFormat,
+            dataFormat: args.dataFormat
             //dataLayout: args.dataLayout
         )
         //if payloadId, then probably attachmentId with csv for example. Just store it and dont do payload conversion

@@ -101,7 +101,10 @@ class BulkImportTests extends Specification implements DomainIntTest {
         Attachment.get(job.payloadId).name.startsWith("Sync")
         //check params
        //Keys [sourceId, dataFormat, dataLayout, payloadId, entityClassName, jobType, source, foo]
-        job.params.keySet() == ['jobType', 'source', 'sourceId', 'dataFormat', 'entityClassName', 'payloadId', 'dataLayout', 'foo', 'async'] as Set
+        job.params.keySet() == [
+            'jobType', 'source', 'sourceId', 'dataFormat', 'payloadFormat', 'entityClassName',
+            'payloadId', 'dataLayout', 'foo', 'async'
+        ] as Set
 
         job.params['foo']
 
@@ -141,8 +144,17 @@ class BulkImportTests extends Specification implements DomainIntTest {
         //check params
         //Keys [sourceId, dataFormat, dataLayout, payloadId, entityClassName, jobType, source, foo]
         job.params.keySet() == [
-            'jobType', 'source', 'sourceId', 'dataFormat', 'entityClassName', 'payloadId', 'attachmentId',
-            'dataLayout', 'foo', 'async'
+            'jobType',
+            'source',
+            'sourceId',
+            'dataFormat',
+            'dataLayout',
+            'payloadId',
+            'payloadFormat',
+            'entityClassName',
+            'attachmentId',
+            'async',
+            'foo',
         ] as Set
 
         job.params['foo']
@@ -153,7 +165,8 @@ class BulkImportTests extends Specification implements DomainIntTest {
         when:
 
         BulkImportJobArgs bulkImportJobArgs = BulkImportJobArgs.fromParams(
-            sourceId: '123', source: 'some source',
+            sourceId: '123',
+            source: 'some source',
             attachmentId: 123,
             headerPathDelimiter: '_',
             'foo': 'bar'
@@ -189,7 +202,9 @@ class BulkImportTests extends Specification implements DomainIntTest {
         //check jobArgs.queryParams
         //Keys [sourceId, dataFormat, dataLayout, payloadId, entityClassName, jobType, source, foo]
         jobArgs.queryParams.keySet() == [
-            'jobType', 'source', 'sourceId', 'async', 'dataFormat', 'entityClassName', 'payloadId', 'attachmentId',
+            'jobType', 'source', 'sourceId', 'async',
+            'dataFormat', 'payloadFormat',
+            'entityClassName', 'payloadId', 'attachmentId',
             'dataLayout', 'headerPathDelimiter', 'foo'
         ] as Set
         //

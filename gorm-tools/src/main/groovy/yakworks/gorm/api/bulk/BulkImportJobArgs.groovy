@@ -42,7 +42,7 @@ class BulkImportJobArgs extends SyncJobArgs {
     /**
      * (when attachmentId is set) the name of the payload file in the zip, defaults to data.csv
      */
-    String dataFilename
+    String payloadFilename
 
     /**
      * (For payloadFormat=CSV with attachmentId) CSV header pathDelimiter.
@@ -51,7 +51,7 @@ class BulkImportJobArgs extends SyncJobArgs {
     String headerPathDelimiter
 
     /**
-     * (When attachmentId is set) Format for the data. either CSV or JSON are currently supported.
+     * (When attachmentId/payloadId is set) Format for the data. either CSV or JSON are currently supported.
      */
     DataMimeTypes payloadFormat
 
@@ -111,6 +111,8 @@ class BulkImportJobArgs extends SyncJobArgs {
         BasicDataBinder.bind(bijParams, p)
         //put a full copy as is into the queryParams
         bijParams.queryParams = p
+        //XXX remove this once we know its not being used
+        if(params.dataFilename) bijParams.payloadFilename = params.dataFilename
         return bijParams
     }
 

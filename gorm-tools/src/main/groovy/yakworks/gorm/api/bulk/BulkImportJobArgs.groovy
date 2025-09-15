@@ -40,7 +40,7 @@ class BulkImportJobArgs extends SyncJobArgs {
     Long attachmentId
 
     /**
-     * (when attachmentId is set) the name of the data file in the zip, defaults to data.csv
+     * (when attachmentId is set) the name of the payload file in the zip, defaults to data.csv
      */
     String dataFilename
 

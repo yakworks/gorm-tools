@@ -100,7 +100,7 @@ class SyncJobArgs {
     Boolean saveDataAsFile //= false
 
     /**
-     * (When attachmentId is set) Format for the data. either CSV or JSON are currently supported.
+     * (When dataId is set) Format for the data. either CSV or JSON are currently supported.
      */
     DataMimeTypes dataFormat = DataMimeTypes.json
 

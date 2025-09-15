@@ -31,19 +31,19 @@ class DefaultCsvToMapTransformer implements CsvToMapTransformer {
      *
      * @param params map with
      *  - attachmentId
-     *  - dataFilename : name of csv file inside zip
+     *  - payloadFilename : name of csv file inside zip
      *  - headerPathDelimiter : Header delimeter
      *
      * @return List<Map>
      */
     List<Map> process(BulkImportJobArgs params) {
         Long attachmentId = params.attachmentId as Long
-        String dataFilename = params.dataFilename ?: "data.csv"
+        String payloadFilename = params.payloadFilename ?: "data.csv"
         String headerPathDelimiter = params.headerPathDelimiter ?: "."
 
         List<Map> rows
         //try-with-resources so it automatically closes and cleans up after itself
-        try (InputStream ins = getInputStream(attachmentId, dataFilename)) {
+        try (InputStream ins = getInputStream(attachmentId, payloadFilename)) {
             rows = processRows(ins, headerPathDelimiter) as List<Map>
         }
         return rows
@@ -52,17 +52,17 @@ class DefaultCsvToMapTransformer implements CsvToMapTransformer {
     /**
      * returns the InputStream for the attachment depending on whether its a zip or not
      */
-    InputStream getInputStream(Long attachmentId, String dataFileName){
+    InputStream getInputStream(Long attachmentId, String payloadFilename){
         Attachment attachment = Attachment.get(attachmentId)
         Validate.notNull(attachment, "Attachment not found : ${attachmentId}")
         Resource res = attachment.resource
         Validate.notNull(res)
         File file = res.file
         InputStream ins
-        //if its a zip then get the file specified in dataFilename
+        //if its a zip then get the file specified in payloadFilename
         if(attachment.extension == 'zip') {
-            ins = ZipUtils.getZipEntryInputStream(file, dataFileName)
-            Validate.notNull(ins, "$dataFileName not found in zip")
+            ins = ZipUtils.getZipEntryInputStream(file, payloadFilename)
+            Validate.notNull(ins, "$payloadFilename not found in zip")
         } else {
             ins = file.newInputStream()
         }

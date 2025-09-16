@@ -21,6 +21,7 @@ executors:
     docker:
       - image: yakworks/bullseye:jdk11
 
+
 commands:
   restore_gradle_cache:
     description: "Common pattern for gradle cache"
@@ -116,7 +117,16 @@ jobs:
             -x testify:check -x benchmarks:check -x rally-api:check
 
       - run: make gradle.merge-test-results
-      - store_test_results: { path: build/test-results/ }
+      - store_test_results:
+          path: gorm-audit/build/test-results/
+      - store_test_results:
+          path: gorm-etl/build/test-results/
+      - store_test_results:
+          path: gorm-openapi/build/test-results/
+      - store_test_results:
+          path: gorm-rest/build/test-results/
+      - store_test_results:
+          path: gorm-tools/build/test-results/
       - store_artifacts:
           path: build/reports/
 
@@ -142,9 +152,12 @@ jobs:
       - restore_gradle_cache
       - attach_workspace:
           at: .
-      - run: ./gradlew rally-api:check testify:check hello-boot-security:check --parallel
+      # failing test when trying to run in parralel
+#      - run: ./gradlew rally-api:check
+      - run: ./gradlew testify:check hello-boot-security:check --parallel
+      - run: ./gradlew rally-api:check
       - run: make gradle.merge-test-results
-      - store_test_results: { path: build/test-results/ }
+      - store_test_results: { path: rally-api/build/test-results/ }
       - store_artifacts:
           path: build/reports/
           destination: reports

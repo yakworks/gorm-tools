@@ -23,7 +23,7 @@ class SyncjobRestApiSpec extends Specification implements OkHttpRestTrait {
     void "test GET"() {
         when:
         SyncJob job = createMockJob()
-        def resp = get(endpoint+"/${job.id}")
+        def resp = get(endpoint+"/${job.id}?includes=*,data")
         def body = bodyToMap(resp)
 
         then:
@@ -38,9 +38,25 @@ class SyncjobRestApiSpec extends Specification implements OkHttpRestTrait {
         body.problems
         body.problems[0].ok == false
         body.problems[0].title == "error"
+        !body.dataBytes
+        !body.payloadBytes
 
         cleanup:
         if(body && body.id) removeJob(body.id as Long)
+    }
+
+    void "test GET data"() {
+        when:
+        SyncJob job = createMockJob()
+        def resp = get(endpoint+"/${job.id}/data")
+        def data = bodyToMap(resp)
+
+        then:
+        data
+        data.test == "value"
+
+        cleanup:
+        removeJob(job.id as Long)
     }
 
     void "ops not supported"() {

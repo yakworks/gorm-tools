@@ -27,6 +27,7 @@ class BulkImportJobArgsSpec extends Specification  {
             source: 'foo',
             op: DataOp.add,
             parallel: false,
+            async: true,
             attachmentId: 123,
             dataLayout: DataLayout.Result,
             dataFormat: DataMimeTypes.json,
@@ -85,13 +86,14 @@ class BulkImportJobArgsSpec extends Specification  {
         Map biMap = biParams.asMap()
 
         then:
-        biMap.keySet().size() == 9 // [op, parallel, dataFormat, dataLayout, attachmentId, includes, jobType, foo, bar]
+        biMap.keySet().size() == 10 // [op, parallel, dataFormat, dataLayout, attachmentId, includes, jobType, foo, bar]
         biMap.parallel == false
         biMap.attachmentId == 123
         biMap.op == DataOp.add
         biMap.includes == ['a','b','c']
         biMap.foo == 1
         biMap.bar == 'baz'
+        biMap.async == true
 
         when: "put map back into bulkImportJobArgs"
         BulkImportJobArgs biParams2 = BulkImportJobArgs.fromParams(paramMap)

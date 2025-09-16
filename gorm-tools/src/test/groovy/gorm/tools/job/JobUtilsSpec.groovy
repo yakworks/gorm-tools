@@ -4,6 +4,7 @@ import groovy.json.JsonOutput
 
 import com.fasterxml.jackson.databind.util.RawValue
 import gorm.tools.model.SourceType
+import spock.lang.Ignore
 import spock.lang.Specification
 import testing.TestSyncJob
 import yakworks.commons.map.Maps
@@ -44,7 +45,7 @@ class JobUtilsSpec extends Specification  {
     void "test jobToMapGroovy"() {
         when:
         def job = mockTestJob()
-        def map = JobUtils.jobToMapGroovy(job)
+        def map = JobUtils.jobToMapGroovy(job, false)
 
         then:
         map.data.toString() == JsonOutput.unescaped(job.dataToString()).toString()

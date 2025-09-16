@@ -13,6 +13,7 @@ group = "org.yakworks"
 // apply plugin: "io.github.gradle-nexus.publish-plugin"
 
 if(!isSnapshot) {
+  // see https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/#getting-started-for-nexus-repository-manager-2-api-plugins
   nexusPublishing {
     repositories {
       sonatype {

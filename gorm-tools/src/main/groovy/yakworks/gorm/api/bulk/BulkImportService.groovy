@@ -92,9 +92,14 @@ class BulkImportService<D> {
         //if payloadId, then probably attachmentId with csv for example. Just store it and dont do payload conversion
         if(jobParams.attachmentId) {
             jobParams.payloadId = jobParams.attachmentId
+            //XXX RNDC should be passing this in and this should not default like this
+            // if it has an attachmentId then assume its a csv if not passed
+            jobParams.payloadFormat ?= DataMimeTypes.csv
         }
         else if(payloadBody){
-            if (jobParams.savePayloadAsFile || payloadBody.size() > 1000) {
+            //if its a body then its been passed in as json
+            jobParams.payloadFormat = DataMimeTypes.json
+            if (payloadBody.size() > 1000) {
                 //we need to create the jobId to associate the attachment
                 jobParams.jobId = syncJobService.generateId()
                 jobParams.payloadId = syncJobService.writePayloadFile(jobParams.jobId, payloadBody)
@@ -103,6 +108,7 @@ class BulkImportService<D> {
                 jobParams.payload = payloadBody
             }
         } else {
+            //has to have something in the payload
             throw DataProblemCodes.EmptyPayload.get().toException()
         }
 
@@ -226,18 +232,19 @@ class BulkImportService<D> {
     protected List<Map> getPayloadData(SyncJobEntity job, BulkImportJobArgs jobParams){
         List<Map> payloadList
 
-        if(jobParams.attachmentId) {
+        //if its a csv then its going to have an attachment, passing csv go json body is not supported
+        if(jobParams.payloadFormat == DataMimeTypes.csv) {
             //attachment will normally be a CSV as if they are doing json it can be passed into as the request body
-            if(!jobParams.payloadFormat || jobParams.payloadFormat == DataMimeTypes.csv){
-                //sets the datalist from the csv instead of body
-                payloadList = transformCsvToBulkList(job, jobParams)
-            } else if (jobParams.payloadFormat == DataMimeTypes.json) {
-                //FIXME finish this to allow passing a json file
-                throw DataProblem.ex("JSON attachment not yet supported").payload(job.id)
-            }
+            //sets the datalist from the csv instead of body
+            payloadList = transformCsvToBulkList(job, jobParams)
         }
-        else if(job.payloadId || job.payloadBytes) { //if no attachmentId was passed to params then get the payload
+        //if not csv then its json and should have a
+        else if(job.payloadId || job.payloadBytes) {
             payloadList = JsonEngine.parseJson(job.payloadToString(), List<Map>)
+        }
+        else {
+            //SHOULD Never happen as it should have thrown error in the queueJob
+            throw DataProblem.ex("JSON attachment not yet supported").payload(job.id)
         }
 
         return payloadList

@@ -370,12 +370,12 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
         data
         data.size() == 1
 
-        when: "payloadFormat json with attachment is not supported"
-        jobParams.payloadFormat = DataMimeTypes.json
-        service.getPayloadData(jobEnt, jobParams)
-
-        then:
-        DataProblemException ex = thrown()
-        ex.detail == 'JSON attachment not yet supported'
+        // when: "payloadFormat json with attachment is not supported"
+        // jobParams.payloadFormat = DataMimeTypes.json
+        // service.getPayloadData(jobEnt, jobParams)
+        //
+        // then:
+        // DataProblemException ex = thrown()
+        // ex.detail == 'JSON attachment not yet supported'
     }
 }

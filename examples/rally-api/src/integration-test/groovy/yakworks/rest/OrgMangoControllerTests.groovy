@@ -17,11 +17,11 @@ class OrgMangoControllerTests extends RestIntTest {
         controllerName = 'OrgController'
     }
 
-    void "list mango sum groupby"() {
+    void "list mango sum groupby with count"() {
         when:
         request.addParameters(
             q:"*",
-            projections:'calc.totalDue:"sum",type:"group"',
+            projections:'calc.totalDue:"sum",type:"group","id as count":"count"',
             sort:'calc_totalDue_sum:asc'
         )
         controller.list()
@@ -34,6 +34,11 @@ class OrgMangoControllerTests extends RestIntTest {
         data[0].type.name == 'Client'
         data[0]['calc']['totalDue'] < data[1]['calc']['totalDue']
         data[1]['calc']['totalDue'] < data[2]['calc']['totalDue']
+        //tests counts
+        //client
+        data[0]['count'] == 1
+        //customer
+        data[4]['count'] == 91
     }
 
     void "list mango full monty"() {

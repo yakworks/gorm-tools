@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils
 import org.springframework.http.HttpStatus
 
 import gorm.tools.job.SyncJobState
-import spock.lang.Ignore
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
@@ -19,6 +18,9 @@ import static yakworks.json.groovy.JsonEngine.parseJson
 @Integration
 @Rollback
 class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
+
+    //queue is not configured for test env yet
+    //@Autowired BlockingQueue<SyncJob> syncJobQueue
 
     String path = "/api/rally/org/bulk?jobSource=Oracle&async=false"
 
@@ -212,10 +214,9 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         updated == 3
     }
 
-    @Ignore
     void "bulk export"() {
         when:
-        Response resp = get("/api/rally/org/bulk?q=*&async=false")
+        Response resp = get("/api/rally/org/bulk?q=*&includesKey=uiGET")
         Map body = bodyToMap(resp)
 
         then:
@@ -223,5 +224,8 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         body.id
         body.state == SyncJobState.Queued.name()
         body.sourceId
+
+        //and: "verify job has been put in queue"
+        //syncJobQueue.size() == 1
     }
 }

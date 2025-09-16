@@ -10,15 +10,19 @@ class WilcardPermissionSpec extends Specification {
     def "playground"() {
         when:
         //this is what our code would check against
-        def permCheck = new WildcardPermission("rally:org:read");
+        def permCheck = new WildcardPermission("rally:org:update");
+
         //these are what a user role would have setup
         def rolePerm1 = new WildcardPermission("rally:org:*");
-        def rolePerm2 = new WildcardPermission("rally:org:read");
-        def rolePerm3 = new WildcardPermission("rally:*:*");
-        def rolePerm4 = new WildcardPermission("rally:*");
-        def rolePerm5 = new WildcardPermission("rally:*:read");
-        //should fail
-        def rolePerm6 = new WildcardPermission("rally:*:create");
+        def rolePerm2 = new WildcardPermission("rally:*:*");
+        def rolePerm3 = new WildcardPermission("rally:*");
+        def rolePerm4 = new WildcardPermission("rally:org:update");
+        def rolePerm5 = new WildcardPermission("rally:*:update");
+        def rolePerm6 = new WildcardPermission("rally:org:read,update");
+
+        //should reject
+        def rolePerm7 = new WildcardPermission("rally:org:create");
+        def rolePerm8 = new WildcardPermission("rally:*:create");
 
         then:
         rolePerm1.implies(permCheck)
@@ -26,8 +30,10 @@ class WilcardPermissionSpec extends Specification {
         rolePerm3.implies(permCheck)
         rolePerm4.implies(permCheck)
         rolePerm5.implies(permCheck)
+        rolePerm6.implies(permCheck)
         //not allowed
-        !rolePerm6.implies(permCheck)
+        !rolePerm7.implies(permCheck)
+        !rolePerm8.implies(permCheck)
     }
 
 }

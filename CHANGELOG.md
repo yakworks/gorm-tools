@@ -1,3 +1,8 @@
+### v7.3.93
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.92...v7.3.93)
+- fix SyncJobCrudApi too so data always shows [link](https://github.com/yakworks/gorm-tools/commit/450ce87b35243cad83497da04aea1d70a48e80c6)
+
 ### v7.3.92
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.91...v7.3.92)

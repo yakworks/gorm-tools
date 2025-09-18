@@ -40,7 +40,7 @@ class JobUtils {
             resp['problems'] =  job.problems
         }
         //include job data if job is finished and its json and its async=false
-        if(!async && job.isFinshedAndJson()) {
+        if(job.isFinshedAndJson()) {
             resp['data'] =  JsonOutput.unescaped(job.dataToString())
         }
         return resp

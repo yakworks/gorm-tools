@@ -2,7 +2,7 @@ package yakworks.security.shiro
 
 
 import org.apache.shiro.authz.permission.WildcardPermission
-
+import spock.lang.Ignore
 import spock.lang.Specification
 
 class WilcardPermissionSpec extends Specification {
@@ -13,6 +13,7 @@ class WilcardPermissionSpec extends Specification {
         def permCheck = new WildcardPermission("rally:org:update");
         def permCheckOnItem = new WildcardPermission("rally:org:1:update")
         def permCheckOnRpc = new WildcardPermission("rally:org:rpc:rpc1")
+
 
         //these are what a user role would have setup
         def superAdmin = new WildcardPermission("*")
@@ -55,6 +56,24 @@ class WilcardPermissionSpec extends Specification {
         superAdmin.implies(permCheckOnRpc)
         rolePerm1.implies(permCheckOnRpc)
         !rolePerm4.implies(permCheckOnRpc)
+    }
+
+    @Ignore
+    void "mulesoft example"() {
+        /**
+         *  ar:customer:* - will cover bulk
+         *  ar:tran:create,read,update
+         *  ar:tran:bulk:* - url = PUT /ar/tran/bulk
+         *  ar:tran:rpc:imageUrl
+         *  can do every thing else with AR
+         *  cant do glVoid
+         *  ar:bankAccount:read   (bankaccounts woulld be readonly)
+         *
+         *  autocash:batch:*
+         *  autocash:payment:*
+         *  autocash:paymentDetail:*
+         */
+        true
     }
 
 }

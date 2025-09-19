@@ -16,6 +16,7 @@ class WildcardAuthorizationManagerSpec extends Specification {
         manager.mapToPermission(mockRequest("POST", "/api/rally/org")) == "rally:org:create"
         manager.mapToPermission(mockRequest("PUT", "/api/rally/org/1")) == "rally:org:1:update"
         manager.mapToPermission(mockRequest("DELETE", "/api/rally/org/1")) == "rally:org:1:delete"
+        manager.mapToPermission(mockRequest("DELETE", "/api/rally/org/1")) == "rally:org:1:delete"
     }
 
     void "test mapToPermission rpc"() {

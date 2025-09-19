@@ -15,6 +15,7 @@ class WilcardPermissionSpec extends Specification {
         def permCheckOnRpc = new WildcardPermission("rally:org:rpc:rpc1")
 
         //these are what a user role would have setup
+        def superAdmin = new WildcardPermission("*")
         def rolePerm1 = new WildcardPermission("rally:org:*")
         def rolePerm2 = new WildcardPermission("rally:*:*")
         def rolePerm3 = new WildcardPermission("rally:*")
@@ -27,6 +28,7 @@ class WilcardPermissionSpec extends Specification {
         def rolePerm8 = new WildcardPermission("rally:*:create")
 
         then:
+        superAdmin.implies(permCheck)
         rolePerm1.implies(permCheck)
         rolePerm2.implies(permCheck)
         rolePerm3.implies(permCheck)
@@ -38,6 +40,7 @@ class WilcardPermissionSpec extends Specification {
         !rolePerm8.implies(permCheck)
 
         and:
+        superAdmin.implies(permCheckOnItem)
         rolePerm1.implies(permCheckOnItem)
         rolePerm2.implies(permCheckOnItem)
         rolePerm3.implies(permCheckOnItem)
@@ -49,6 +52,7 @@ class WilcardPermissionSpec extends Specification {
         !rolePerm6.implies(permCheckOnItem)
 
         and: "Verify rpc"
+        superAdmin.implies(permCheckOnRpc)
         rolePerm1.implies(permCheckOnRpc)
         !rolePerm4.implies(permCheckOnRpc)
     }

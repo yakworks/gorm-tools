@@ -1,11 +1,15 @@
 package yakworks.security
 
+import gorm.tools.transaction.TrxUtils
+import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
 import org.springframework.http.HttpStatus
 import spock.lang.Specification
 import yakworks.rest.client.OkAuth
 import yakworks.rest.client.OkHttpRestTrait
+import yakworks.security.gorm.model.SecRole
+import yakworks.security.gorm.model.SecRolePermission
 
 @Integration
 class ApiPermissionsSpec extends Specification implements OkHttpRestTrait {
@@ -95,6 +99,7 @@ class ApiPermissionsSpec extends Specification implements OkHttpRestTrait {
         OkAuth.TOKEN = null
     }
 
+
     void "readonly permission"() {
         setup:
         login("readonly", "123")
@@ -125,5 +130,65 @@ class ApiPermissionsSpec extends Specification implements OkHttpRestTrait {
 
         cleanup:
         OkAuth.TOKEN = null
+    }
+
+    void "test rpc permission - allowed to admin"() {
+        setup: "login as admin, it has all the permissions"
+        login("admin", "123")
+
+        when: "GET"
+        Response resp = post("$path/rpc?op=rpc1", [:])
+
+        then:
+        resp.code() == HttpStatus.OK.value()
+
+        when:
+        Map body = bodyToMap(resp)
+
+        then:
+        body.ok
+        body.rpc == "rpc1"
+
+        cleanup:
+        OkAuth.TOKEN = null
+    }
+
+    @Rollback
+    void "test rpc permission - selected allowed"() {
+        setup: "admin has all the permissions"
+        SecRole cust = SecRole.query(code:Roles.CUSTOMER).get()
+
+        expect:
+        cust
+
+        when: "Add permission to do op=rpc1 only"
+        SecRolePermission.withNewTransaction {
+            SecRolePermission.create(cust, "rally:org:rpc:rpc1")
+        }
+        TrxUtils.flush()
+
+        login("cust", "123")
+
+        and: "op=rpc1 allowed"
+        Response resp = post("$path/rpc?op=rpc1", [:])
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code() == HttpStatus.OK.value()
+        body.ok
+        body.rpc == "rpc1"
+
+        when: "op=rpc2"
+        resp = post("$path/rpc?op=rpc2", [:])
+
+        then: "rpc2 not allowed"
+        resp.code() == HttpStatus.FORBIDDEN.value()
+
+        cleanup:
+        OkAuth.TOKEN = null
+
+        SecRolePermission.withNewTransaction {
+            SecRolePermission.query(role:cust, permission:"rally:org:rpc:rpc1").deleteAll()
+        }
     }
 }

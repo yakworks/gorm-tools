@@ -6,6 +6,7 @@ import yakworks.api.problem.data.DataProblemException
 import yakworks.security.PasswordConfig
 import yakworks.security.Roles
 import yakworks.security.gorm.model.SecPasswordHistoryRepo
+import yakworks.security.gorm.model.SecRolePermission
 import yakworks.security.gorm.model.SecRoleUser
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.AppUserRepo
@@ -74,7 +75,7 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         noExceptionThrown()
     }
 
-    def "test create with roles ids"() {
+    void "test create with roles ids"() {
         when:
         // should convert the strings to long
         Map params = getUserParams([roles: [Roles.ADMIN, "MANAGER"]])
@@ -86,6 +87,14 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         user.username == 'galt'
         SecRoleUser.findAllByUser(user)*.role.id == [1L, 3L]
 
+        appUserRepo.getRoles(user).size() == 2
+
+        when: "verify permissions"
+        Set perms = appUserRepo.getPermissions(user)
+
+        then:
+        perms.size()
+        perms.size() == SecRolePermission.query("role.code":['$in':[Roles.ADMIN, "MANAGER"]]).countDistinct("permission").get()
     }
 
     /*see SecuritySeedData*/

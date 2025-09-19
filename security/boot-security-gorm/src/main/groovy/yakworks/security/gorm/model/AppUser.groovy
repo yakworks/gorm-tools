@@ -155,9 +155,18 @@ class AppUser implements UserInfo, AuditStampTrait, RepoEntity<AppUser>, Seriali
         throw new UnsupportedOperationException("Not yet supported here")
     }
 
-    @Override //UserInfo
+    @Override
     Set getPermissions() {
-        throw new UnsupportedOperationException("Not yet supported here")
+        return SecRolePermission.executeQuery(
+            """
+              select p.permission
+                    from SecRolePermission p
+                    join p.role r
+                    join SecRoleUser sru on sru.role = r
+                    join sru.user u
+                    where u.id = :uid
+            """,
+            [uid: this.id] ) as Set
     }
 
     SecRoleUser addRole(String roleCode, boolean flushAfterPersist) {

@@ -37,11 +37,12 @@ class SpringUser implements SpringUserInfo {
 
 
     static SpringUser of(UserInfo userInfo){
-        def roles = (userInfo.roles ?: []) as List<String>
-        return SpringUser.of(userInfo, roles)
+        Set<String> roles = (userInfo.roles ?: []) as Set<String>
+        Set<String> permissions = (userInfo.permissions ?: []) as Set<String>
+        return SpringUser.of(userInfo, roles, permissions)
     }
 
-    static SpringUser of(UserInfo userInfo, Collection<String> roles){
+    static SpringUser of(UserInfo userInfo, Collection<String> roles, Collection<String> permissions = []){
         // password is required so make sure its filled even if its OAuth or ldap
         String passwordHash = userInfo.passwordHash ?: "N/A"
         def spu = new SpringUser(
@@ -50,6 +51,7 @@ class SpringUser implements SpringUserInfo {
             enabled: userInfo.enabled
         )
         spu.roles = roles as Set<String>
+        spu.permissions = permissions as Set<String>
         spu.merge(userInfo)
         return spu
     }

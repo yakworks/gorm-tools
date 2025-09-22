@@ -7,22 +7,24 @@ import javax.servlet.http.HttpServletRequest
 
 class WildcardAuthorizationManagerSpec extends Specification {
 
-    void "test mapToPermission crud"() {
-        setup:
-        WildcardAuthorizationManager manager = new WildcardAuthorizationManager()
+    WildcardAuthorizationManager manager = new WildcardAuthorizationManager()
 
+    void "test mapToPermission crud"() {
         expect:
         manager.mapToPermission(mockRequest("GET", "/api/rally/org")) == "rally:org:read"
         manager.mapToPermission(mockRequest("POST", "/api/rally/org")) == "rally:org:create"
-        manager.mapToPermission(mockRequest("PUT", "/api/rally/org/1")) == "rally:org:1:update"
-        manager.mapToPermission(mockRequest("DELETE", "/api/rally/org/1")) == "rally:org:1:delete"
-        manager.mapToPermission(mockRequest("DELETE", "/api/rally/org/1")) == "rally:org:1:delete"
+        manager.mapToPermission(mockRequest("PUT", "/api/rally/org")) == "rally:org:update"
+        manager.mapToPermission(mockRequest("PUT", "/api/rally/org/1")) == "rally:org:update"
+        manager.mapToPermission(mockRequest("DELETE", "/api/rally/org/1")) == "rally:org:delete"
+        manager.mapToPermission(mockRequest("DELETE", "/api/rally/org")) == "rally:org:delete"
+    }
+
+    void "bulk permissions"() {
+        manager.mapToPermission(mockRequest("GET", "/api/rally/org/bulk")) == "rally:org:bulk:read"
+        manager.mapToPermission(mockRequest("PUT", "/api/rally/org/bulk")) == "rally:org:bulk:update"
     }
 
     void "test mapToPermission rpc"() {
-        setup:
-        WildcardAuthorizationManager manager = new WildcardAuthorizationManager()
-
         expect:
         manager.mapToPermission(mockRequest("GET", "/api/rally/org/rpc", [op:"rpc1"])) == "rally:org:rpc:rpc1"
     }

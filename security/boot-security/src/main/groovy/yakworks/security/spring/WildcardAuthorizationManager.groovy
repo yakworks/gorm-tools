@@ -74,8 +74,14 @@ class WildcardAuthorizationManager implements AuthorizationManager<RequestAuthor
      */
     //FIXME - Cache
     protected String buildPermission(String path, String op) {
-        def segments = path.tokenize('/')
+        List<String> segments = path.tokenize('/')
         if (segments.size() >= 2 && segments[0] == 'api') {
+
+            //if its a put or delete request, and last part is number, eg PUT /api/ar/tran/1
+            //then remove the last part (id) to build a permission like ar:tran:read, isntead of ar:tran:1:read
+            if(op in ['update', 'delete'] && segments[-1].isNumber()) {
+                segments.removeAt(segments.size() - 1) //removes last item
+            }
             segments << op
             //join all parts except api, so it becomes "autocash:payment:read" for GET /api/autocash/payment
             return segments[1..-1].join(":")

@@ -316,7 +316,7 @@ trait CrudApiController<D> extends RestApiController {
      * 2. Call POST /api/upload?name=myZip.zip, take attachmentId from the result
      * 3. Call POST /api/rally/<domain>/bulk with query params:
      *  - attachmentId=<attachment-id>
-     *  - dataFilename= -- pass in data.csv and detail.csv as default of parameter for file names
+     *  - payloadFilename= -- pass in data.csv and detail.csv as default of parameter for file names
      *  - headerPathDelimiter -- default is '.', pass in '_' for underscore (this is path delimiter for header names, not csv delimiter)
      * @param syncJobArgs the syncJobArgs that is setup, important to have params on it
      * @return the jobId

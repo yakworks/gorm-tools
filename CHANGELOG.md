@@ -1,3 +1,35 @@
+### v7.3.93
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.92...v7.3.93)
+- fix SyncJobCrudApi too so data always shows [link](https://github.com/yakworks/gorm-tools/commit/450ce87b35243cad83497da04aea1d70a48e80c6)
+
+### v7.3.92
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.91...v7.3.92)
+- hot fix to always show data on jobToMapGroovy [link](https://github.com/yakworks/gorm-tools/commit/70eae57d3b785397f46e579436f924b36337d45f)
+
+### v7.3.91
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.89...v7.3.91)
+- release vGroovyCommons=3.18 [link](https://github.com/yakworks/gorm-tools/commit/402c0a895b88200f465c3c2184b11f7a1b13f759)
+- change test that restricted on bad date from today 9/16/2025 [link](https://github.com/yakworks/gorm-tools/commit/32c8a94537aac8dfa9b33cd91b0c9c15b2ddf281)
+- release [link](https://github.com/yakworks/gorm-tools/commit/565e2feb2f6199b437a8fb61cf277d1f83e96bbc)
+- Merge pull request #927 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/01daa2553e6bafcc5465a5abe9a62662f4d0e29f)
+- Bulk import args (#939) [link](https://github.com/yakworks/gorm-tools/commit/c3cdaac14b10b7f5f61ce8580d855de0cb246556)
+- fix lint [link](https://github.com/yakworks/gorm-tools/commit/e6b4f7bc6dee7c6a56be18bc9b334c61ee2b099a)
+- make payloadFormat consistent [link](https://github.com/yakworks/gorm-tools/commit/dcc6ba6d2ae82bbf951e8f9aa7d6a81b277e3415)
+- Syncjob map fix (#937) [link](https://github.com/yakworks/gorm-tools/commit/779e58b52b5935401fc5590c0ebbbb13400c2f2d)
+- Add Opaque token support (#936) [link](https://github.com/yakworks/gorm-tools/commit/b3edc069a7e40420329592be5a2de652a053470a)
+- doing syncjob so data does not show by default (#931) [link](https://github.com/yakworks/gorm-tools/commit/c536f60472ccd638195cf7624e3832348427b444)
+- Add sanity check test for Bulk export end point (#930) [link](https://github.com/yakworks/gorm-tools/commit/849e5674be1fcb6442ca4f1a6e5583ae4d2a0bda)
+- add passwrod fields [link](https://github.com/yakworks/gorm-tools/commit/4f3cc07b2c57f65bc21fdffb3544a53e7a177501)
+- remove ViolationConverter, the AsMap from commons picks it up, also add fallbackMessages instead of message.propteries (#929) [link](https://github.com/yakworks/gorm-tools/commit/0744fbd9ddadec58cb7f751db64aefdf1c9aa330)
+- Merge branch 'dev' of https://github.com/yakworks/gorm-tools into dev [link](https://github.com/yakworks/gorm-tools/commit/5ffa5f3a9e961f1c77ccb33b7d5e4165dbc58d24)
+- add projection count tests [link](https://github.com/yakworks/gorm-tools/commit/393d29a0f28e46d444a6798e6a2fd6f2337faaa5)
+- try using bean instead (#928) [link](https://github.com/yakworks/gorm-tools/commit/799bffcebfcca354491e25f108253329144af8d0)
+- Password error and Violation rendering.  (#925) [link](https://github.com/yakworks/gorm-tools/commit/d551c556a058719322b91d473d6d4e8932fd82cc)
+- add link [link](https://github.com/yakworks/gorm-tools/commit/1737a6e550127438a4cf26e4617a11ac3f0d7af2)
+
 ### v7.3.89
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.87...v7.3.89)

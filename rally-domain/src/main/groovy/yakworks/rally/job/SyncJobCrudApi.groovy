@@ -67,12 +67,12 @@ class SyncJobCrudApi extends DefaultCrudApi<SyncJob> {
     Map entityToMap(SyncJob job, List<String> includes){
         //clone metamap, SomeHow trying to put a new entry in MetaMap throws UnSupportedOperationException
         Map response = Maps.clone(super.entityToMap(job, includes))
-        // if(job.isFinshedAndJson()) {
-        //     response.put("data", JsonOutput.unescaped(job.dataToString()))
-        // }
-        if(includes.contains('data')) {
+        if(job.isFinshedAndJson()) {
             response.put("data", JsonOutput.unescaped(job.dataToString()))
         }
+        // if(includes.contains('data')) {
+        //     response.put("data", JsonOutput.unescaped(job.dataToString()))
+        // }
         //include problems by default if its not ok.
         if(!job.ok && job.state == SyncJobState.Finished) {
             response.put("problems", job.problems)

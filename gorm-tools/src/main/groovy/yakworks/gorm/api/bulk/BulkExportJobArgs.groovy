@@ -10,6 +10,7 @@ import gorm.tools.databinding.BasicDataBinder
 import gorm.tools.job.DataLayout
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.mango.api.QueryArgs
+import yakworks.commons.map.Maps
 
 /**
  * Bulk Export Args
@@ -28,12 +29,16 @@ class BulkExportJobArgs extends SyncJobArgs {
     Class entityClass
 
     static BulkExportJobArgs fromParams(Map params){
+        Map p = Maps.clone(params)
+        //remove the controller and action so we have less noise
+        p.remove("controller")
+        p.remove("action")
         BulkExportJobArgs bulkArgs = new BulkExportJobArgs()
-        BasicDataBinder.bind(bulkArgs, params)
+        BasicDataBinder.bind(bulkArgs, p)
         //BeanTools.bind(bijParams, params)
         //setup queryArgs
-        if(params.containsKey("q") || params.containsKey("qSearch") ) {
-            bulkArgs.queryArgs = QueryArgs.of(params)
+        if(p.containsKey("q") || p.containsKey("qSearch") ) {
+            bulkArgs.queryArgs = QueryArgs.of(p)
         }
         return bulkArgs
     }

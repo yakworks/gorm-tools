@@ -136,7 +136,7 @@ class ContactTagTests extends Specification implements DomainIntTest {
                 //[name: 'foo']
                 //['$exists': TagLink.repo.buildExistsCriteria([9,10], Contact, 'contact_.id')]
             ],
-            "editedDate": ['$lte': "2025-09-16"]
+            "editedDate": ['$lte': "2040-09-16"]
         ])
 
         def qlist = criteria.list()
@@ -164,7 +164,7 @@ class ContactTagTests extends Specification implements DomainIntTest {
             p3: 'Contact',
             p4: 9,
             p5: 10,
-            p6: LocalDateTime.parse('2025-09-16T00:00')
+            p6: LocalDateTime.parse('2040-09-16T00:00')
         ]
 
         when:

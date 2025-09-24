@@ -12,9 +12,11 @@ import org.springframework.util.FileCopyUtils
 import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.BeforeBindEvent
+import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import grails.gorm.transactions.ReadOnly
+import yakworks.api.problem.data.DataProblemCodes
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.repo.AttachmentRepo
 
@@ -22,8 +24,7 @@ import yakworks.rally.attachment.repo.AttachmentRepo
 @CompileStatic
 class SyncJobRepo extends LongIdGormRepo<SyncJob> {
 
-    @Autowired
-    AttachmentSupport attachmentSupport
+    @Autowired AttachmentSupport attachmentSupport
 
     @Autowired
     AttachmentRepo attachmentRepo
@@ -36,6 +37,18 @@ class SyncJobRepo extends LongIdGormRepo<SyncJob> {
         }
         //bind doesnt seem to work on the problems list so manaully set it here
         if(data.problems)  job.problems = data.problems as List
+    }
+
+    @RepoListener
+    void beforeRemove(SyncJob syncJob, BeforeRemoveEvent event) {
+        //Remove data and payload attachments
+        if(syncJob.dataId) {
+            attachmentRepo.removeById(syncJob.dataId)
+        }
+
+        if(syncJob.payloadId) {
+            attachmentRepo.removeById(syncJob.payloadId)
+        }
     }
 
 

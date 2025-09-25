@@ -11,7 +11,6 @@ import yakworks.commons.io.ZipUtils
 import yakworks.commons.util.BuildSupport
 
 import yakworks.rally.attachment.model.Attachment
-import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Contact
 import yakworks.rest.gorm.controller.CrudApiController
@@ -22,7 +21,6 @@ import yakworks.testing.rest.RestIntTest
 class BulkCsvSpec  extends RestIntTest implements SecuritySpecHelper {
 
     CrudApiController<Contact> controller
-    AttachmentRepo attachmentRepo
 
     void setup() {
         controllerName = 'ContactController'
@@ -91,10 +89,8 @@ class BulkCsvSpec  extends RestIntTest implements SecuritySpecHelper {
         syncJob.dataId != null //should have been set for bulk csv.
 
         cleanup: "cleanup db"
-        attachmentRepo.removeById(syncJob.dataId as Long)
+        if(body.id) SyncJob.repo.removeById(body.id as Long)
         Attachment.withNewTransaction {
-            if(attachment) attachment.remove()
-            if(body.id) SyncJob.repo.removeById(body.id as Long) //syncjob is created in new transaction
             Contact.findAllByNumLike("bulk_").each {
                 it.remove()
             }
@@ -155,16 +151,13 @@ class BulkCsvSpec  extends RestIntTest implements SecuritySpecHelper {
         syncJob.dataId != null //should have been set for bulk csv.
 
         cleanup: "cleanup db"
-        attachmentRepo.removeById(syncJob.dataId as Long)
+        if(body.id) SyncJob.repo.removeById(body.id as Long)
         Attachment.withNewTransaction {
-            if(attachment) attachment.remove()
-            if(body.id) SyncJob.repo.removeById(body.id as Long) //syncjob is created in new transaction
             Contact.findAllByNumLike("bulk_").each {
                 it.remove()
             }
         }
     }
-
 
     void "test bulk update with csv"() {
 
@@ -209,10 +202,7 @@ class BulkCsvSpec  extends RestIntTest implements SecuritySpecHelper {
         c11.lastName == "test" //should have been updated
 
         cleanup: "cleanup db"
-        Attachment.withNewTransaction {
-            if(attachment) attachment.remove()
-            if(body.id) SyncJob.repo.removeById(body.id as Long) //syncjob is created in new transaction
-        }
+        if(body.id) SyncJob.repo.removeById(body.id as Long)
     }
 
     void "test bad CSV"() {
@@ -240,7 +230,6 @@ class BulkCsvSpec  extends RestIntTest implements SecuritySpecHelper {
         body.detail.contains "Error on record number 2"
 
         cleanup: "cleanup db"
-        //attachmentRepo.removeById(attachment.id)
         Attachment.withNewTransaction {
             if(attachment) attachment.remove()
             //if(body.id) SyncJob.repo.removeById(body.id as Long) //syncjob is created in new transaction

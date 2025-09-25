@@ -7,7 +7,6 @@ package yakworks.rally.job
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.util.FileCopyUtils
 
 import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepository
@@ -16,7 +15,6 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import grails.gorm.transactions.ReadOnly
-import yakworks.api.problem.data.DataProblemCodes
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.repo.AttachmentRepo
 

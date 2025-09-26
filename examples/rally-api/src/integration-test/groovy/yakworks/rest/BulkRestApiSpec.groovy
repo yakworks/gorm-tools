@@ -160,6 +160,13 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         json[1].data.name ==  "Foox2"
         json[1].data.source.sourceId ==  "Foox2"
 
+        when: "verify problems"
+        List problems = SyncJob.repo.getProblems(job)
+
+        then: "should pickup problems from data"
+        problems.size() == 1
+        problems[0].data.num == "Foox2"
+
         delete("/api/rally/org", json.data[1].id)
     }
 

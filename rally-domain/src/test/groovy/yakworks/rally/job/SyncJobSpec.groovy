@@ -118,7 +118,26 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
         job1.problems.size() == 1
         job1.problems[0].ok == false
         job1.problems[0].title == "error"
+
+        and: "get problems"
+        SyncJob.repo.getProblems(job).size() == 1
     }
+
+    void "test get problems"() {
+        setup: "job 1 has problems, job2 has problems and data mixed"
+        def job1 = new SyncJob(state: SyncJobState.Running, jobType: 'bulk').persist()
+        SyncJob.repo.update([id: job1.id, problems: [["ok":false,"title":"error"]]])
+
+        def job2 = new SyncJob(state: SyncJobState.Running, jobType: 'bulk').persist()
+        def dataBytes = JsonEngine.toJson([[ok:false, tital:"test error"], [ok:true, data:[[id:1]]]]).bytes
+        SyncJob.repo.update([id: job2.id, dataBytes: [["ok":false,"title":"error"]]])
+        flush()
+
+        expect:
+        SyncJob.repo.getProblems(job1).size() == 1
+        SyncJob.repo.getProblems(job2).size() == 1
+    }
+
 
     void "convert json to byte array"() {
         setup:

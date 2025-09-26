@@ -130,7 +130,7 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
 
         def job2 = new SyncJob(state: SyncJobState.Running, jobType: 'bulk').persist()
         def dataBytes = JsonEngine.toJson([[ok:false, tital:"test error"], [ok:true, data:[[id:1]]]]).bytes
-        SyncJob.repo.update([id: job2.id, dataBytes: [["ok":false,"title":"error"]]])
+        SyncJob.repo.update([id: job2.id, dataBytes: dataBytes])
         flush()
 
         expect:

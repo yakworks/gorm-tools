@@ -165,7 +165,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
 
         then: "should pickup problems from data"
         problems.size() == 1
-        problems[0].data.num == "Foox2"
+        problems[0].data.name == "Foox1"
 
         delete("/api/rally/org", json.data[1].id)
     }

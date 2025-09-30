@@ -61,7 +61,7 @@ class SecuritySeedData {
     }
 
     static void readOnlyPermissions(SecRole role) {
-        SecRolePermission.create(role, "rally:*:*:read")
+        SecRolePermission.create(role, "rally:*:read")
     }
 
     static void adminPermissions(SecRole role){

@@ -22,13 +22,16 @@ class PermissionsAuthorizationManager implements AuthorizationManager<RequestAut
     @Value('${app.security.permissions.enabled:true}')
     boolean permissionsEnabled
 
+    @Value('${app.security.enabled:true}')
+    boolean securityEnabled
+
     @Override
     AuthorizationDecision check(Supplier<Authentication> authenticationSupplier, RequestAuthorizationContext context) {
         Authentication authentication = authenticationSupplier.get()
         HttpServletRequest request = context.getRequest()
 
         //if its not enabled then always return true
-        if(!permissionsEnabled){
+        if(!securityEnabled || !permissionsEnabled){
             return new AuthorizationDecision(true)
         }
 

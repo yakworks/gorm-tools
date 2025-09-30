@@ -23,7 +23,7 @@ class SyncjobRestApiSpec extends Specification implements OkHttpRestTrait {
     void "test GET"() {
         when:
         SyncJob job = createMockJob()
-        def resp = get(endpoint+"/${job.id}?includes=*,data")
+        def resp = get(endpoint+"/${job.id}?includes=*")
         def body = bodyToMap(resp)
 
         then:

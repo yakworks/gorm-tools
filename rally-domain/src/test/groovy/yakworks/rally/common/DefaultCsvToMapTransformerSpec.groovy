@@ -53,7 +53,7 @@ class DefaultCsvToMapTransformerSpec extends Specification implements DataRepoTe
 
         when:
         List<Map> rows = csvToMapTransformer.process(
-            new BulkImportJobArgs(attachmentId:attachment.id, dataFilename:"contact.csv")
+            new BulkImportJobArgs(attachmentId:attachment.id, payloadFilename:"contact.csv")
         )
 
         then:

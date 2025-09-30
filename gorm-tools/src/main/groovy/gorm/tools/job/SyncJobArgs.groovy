@@ -65,10 +65,11 @@ class SyncJobArgs {
     /**
      * Whether it should run in async background thread and return the job immediately.
      * Essentially makes the job a sort of Promise or Future.
-     * when false (default) run in a standard blocking synchronous thread and return when job is done
+     * when true (default) run in a queueud background thread and return job right away.
+     * when false run in a standard blocking synchronous thread and return when job is done
      * NOTE: Some SyncJobs only run as async=true, BulkExport for example.
      */
-    Boolean async
+    Boolean async = true
 
     /**
      * For results, comma seperated list of fields to include for the SyncJob.data
@@ -93,19 +94,13 @@ class SyncJobArgs {
     String q
 
     /**
-     * force payload to store as file instead of bytes
-     * Primarily used for dev/tests
-     */
-    Boolean savePayloadAsFile
-
-    /**
      * resulting data (what is returned in response) is always saved but can force it to save to file instead of bytes in column
      * Primarily used for dev/tests
      */
     Boolean saveDataAsFile //= false
 
     /**
-     * (When attachmentId is set) Format for the data. either CSV or JSON are currently supported.
+     * (When dataId is set) Format for the data. either CSV or JSON are currently supported.
      */
     DataMimeTypes dataFormat = DataMimeTypes.json
 
@@ -165,13 +160,6 @@ class SyncJobArgs {
      * FIXME only needed for BulkImport legacy to set calss on the BulkImportFinishedEvent, once we are doing new way we can remove this
      */
     // Class entityClass
-
-    // Boolean isSavePayloadAsFile(){
-    //     //if its set then use it
-    //     if(super.savePayloadAsFile != null) return super.savePayloadAsFile
-    //     // When collection then check size and set args
-    //     return (payload instanceof Collection && ((Collection)payload).size() > 1000)
-    // }
 
     Boolean shouldSaveDataAsFile(){
         //if its set then use it

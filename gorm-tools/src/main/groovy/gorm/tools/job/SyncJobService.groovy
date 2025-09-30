@@ -195,7 +195,7 @@ abstract class SyncJobService<D> {
     }
 
     /**
-     * when args.savePayloadAsFile are true, this is called to save the payload to file
+     * Saves the payload to file, will be called when size > 1000
      * @param payload the payload List or Map that was sent (will normally have been json when called via REST
      * @return the Attachment id.
      */

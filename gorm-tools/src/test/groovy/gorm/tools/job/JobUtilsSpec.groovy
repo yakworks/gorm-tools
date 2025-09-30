@@ -42,11 +42,10 @@ class JobUtilsSpec extends Specification  {
 
     }
 
-    @Ignore
     void "test jobToMapGroovy"() {
         when:
         def job = mockTestJob()
-        def map = JobUtils.jobToMapGroovy(job)
+        def map = JobUtils.jobToMapGroovy(job, false)
 
         then:
         map.data.toString() == JsonOutput.unescaped(job.dataToString()).toString()

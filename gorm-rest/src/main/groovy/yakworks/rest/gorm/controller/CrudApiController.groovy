@@ -248,7 +248,7 @@ trait CrudApiController<D> extends RestApiController {
             BulkExportJobArgs jobParams = BulkExportJobArgs.fromParams(qParams)
             jobParams.sourceId = requestToSourceId(request)
             SyncJobEntity job = getCrudApi().bulkExport(jobParams)
-            Map jobMap = JobUtils.jobToMapGroovy(job)
+            Map jobMap = JobUtils.jobToMapGroovy(job, jobParams.async)
             respondWith(jobMap, [status: jobParams.async ? CREATED : MULTI_STATUS])
         } catch (Exception | AssertionError e) {
             respondWith(
@@ -295,11 +295,7 @@ trait CrudApiController<D> extends RestApiController {
         if(qParams.jobSource != null) jobParams.source = qParams.jobSource
 
         SyncJobEntity job = getCrudApi().bulkImport(jobParams, dataList)
-        Map jobMap = JobUtils.jobToMapGroovy(job)
-        //include job data if job is finished, usaed for testing
-        if(!jobParams.async && job.isFinshedAndJson()) {
-            jobMap['data'] =  JsonOutput.unescaped(job.dataToString())
-        }
+        Map jobMap = JobUtils.jobToMapGroovy(job, jobParams.async)
         //if its async=false then it will be the Finished job and equivalent to the GET on SyncJob, SO MULTI_STATUS
         // if its not async, then its just returning the created Job and equivalent to the POST on SyncJob, so a CREATED status
         respondWith(jobMap, [status: jobParams.async ? CREATED : MULTI_STATUS])
@@ -320,7 +316,7 @@ trait CrudApiController<D> extends RestApiController {
      * 2. Call POST /api/upload?name=myZip.zip, take attachmentId from the result
      * 3. Call POST /api/rally/<domain>/bulk with query params:
      *  - attachmentId=<attachment-id>
-     *  - dataFilename= -- pass in data.csv and detail.csv as default of parameter for file names
+     *  - payloadFilename= -- pass in data.csv and detail.csv as default of parameter for file names
      *  - headerPathDelimiter -- default is '.', pass in '_' for underscore (this is path delimiter for header names, not csv delimiter)
      * @param syncJobArgs the syncJobArgs that is setup, important to have params on it
      * @return the jobId

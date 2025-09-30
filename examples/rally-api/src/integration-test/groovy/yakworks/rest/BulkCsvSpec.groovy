@@ -57,7 +57,7 @@ class BulkCsvSpec  extends RestIntTest implements SecuritySpecHelper {
         when:
         controller.params.attachmentId = attachment.id
         controller.params['async'] = false //disable promise for test
-        controller.params['dataFilename'] = "contact.csv"
+        controller.params['payloadFilename'] = "contact.csv"
         controller.params['saveDataAsFile'] = true //write to file
 
         controller.bulkCreate()

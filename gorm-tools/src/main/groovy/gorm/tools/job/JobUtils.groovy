@@ -32,12 +32,16 @@ class JobUtils {
      * Using special for Groovy vs Jackson so we can send the parser specific unescaped json string in data
      * which for Groovy is the JsonUnescaped class.
      */
-    static Map jobToMapGroovy(SyncJobEntity job){
+    static Map jobToMapGroovy(SyncJobEntity job, boolean async = true){
         Map resp = commonJobToMap(job)
 
         //include problems by default if its not ok.
         if(!job.ok && job.state == SyncJobState.Finished) {
             resp['problems'] =  job.problems
+        }
+        //include job data if job is finished and its json and its async=false
+        if(job.isFinshedAndJson()) {
+            resp['data'] =  JsonOutput.unescaped(job.dataToString())
         }
         return resp
     }

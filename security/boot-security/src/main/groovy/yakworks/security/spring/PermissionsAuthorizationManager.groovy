@@ -92,10 +92,14 @@ class PermissionsAuthorizationManager implements AuthorizationManager<RequestAut
         List<String> segments = path.tokenize('/')
         if (segments.size() >= 2 && segments[0] == 'api') {
 
-            //if its a put or delete request, and last part is number, eg PUT /api/ar/tran/1
+            //if its a put or delete request, and last part is number or UUID, eg PUT /api/ar/tran/1
             //then remove the last part (id) to build a permission like ar:tran:read, isntead of ar:tran:1:read
-            //XXX @SUD needs fix to handle uuid IDs
-            if(op in ['update', 'delete', 'read'] && segments[-1].isNumber()) {
+            //FIXME hack for now but we should really base this on what is being done now to do the URLMapping.
+            // then we can just use the controller and action
+            String lastSegment = segments[-1]
+            if(op in ['update', 'delete', 'read'] && (lastSegment.isNumber() || isUUID(lastSegment)) ) {
+                //XXX @SUD this is hacky, why are you using the removeAt groovy instead of just java remove?
+                // or just use groovy removeLast
                 segments.removeAt(segments.size() - 1) //removes last item
             }
             segments << op
@@ -104,6 +108,12 @@ class PermissionsAuthorizationManager implements AuthorizationManager<RequestAut
         } else {
             return null
         }
+    }
+
+    protected boolean isUUID(String uidStr) {
+        //def uidStr = '148f5327-b297-44bc-8ccc-46f8fd4c32e6'
+        def matcher = uidStr =~ /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
+        return matcher.matches()
     }
 
     /**

@@ -33,6 +33,15 @@ class PermissionsAuthorizationManagerSpec extends Specification {
         manager.mapToPermission(mockRequest("GET", "/api/rally/org/rpc", [op:"rpc1"])) == "rally:org:rpc:rpc1"
     }
 
+    void "test isUUID"() {
+        expect:
+        !manager.isUUID('foo')
+        !manager.isUUID('123')
+        !manager.isUUID('1edca10c-0e0f-67e9')
+        manager.isUUID('1edca10c-0e0f-67e9-b1f6-757c83c39281')
+        manager.isUUID(UUID.randomUUID().toString() )
+    }
+
     HttpServletRequest mockRequest(String method, String path, Map params = null) {
         MockHttpServletRequest request = new MockHttpServletRequest()
         request.setMethod(method)

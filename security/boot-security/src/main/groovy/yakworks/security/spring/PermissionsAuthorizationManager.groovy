@@ -91,7 +91,8 @@ class PermissionsAuthorizationManager implements AuthorizationManager<RequestAut
 
             //if its a put or delete request, and last part is number, eg PUT /api/ar/tran/1
             //then remove the last part (id) to build a permission like ar:tran:read, isntead of ar:tran:1:read
-            if(op in ['update', 'delete'] && segments[-1].isNumber()) {
+            //XXX @SUD needs fix to handle uuid IDs
+            if(op in ['update', 'delete', 'read'] && segments[-1].isNumber()) {
                 segments.removeAt(segments.size() - 1) //removes last item
             }
             segments << op

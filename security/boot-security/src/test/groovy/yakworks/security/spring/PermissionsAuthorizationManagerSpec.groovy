@@ -12,9 +12,13 @@ class PermissionsAuthorizationManagerSpec extends Specification {
     void "test mapToPermission crud"() {
         expect:
         manager.mapToPermission(mockRequest("GET", "/api/rally/org")) == "rally:org:read"
+        manager.mapToPermission(mockRequest("GET", "/api/rally/org/1")) == "rally:org:read"
+
         manager.mapToPermission(mockRequest("POST", "/api/rally/org")) == "rally:org:create"
+
         manager.mapToPermission(mockRequest("PUT", "/api/rally/org")) == "rally:org:update"
         manager.mapToPermission(mockRequest("PUT", "/api/rally/org/1")) == "rally:org:update"
+
         manager.mapToPermission(mockRequest("DELETE", "/api/rally/org/1")) == "rally:org:delete"
         manager.mapToPermission(mockRequest("DELETE", "/api/rally/org")) == "rally:org:delete"
     }

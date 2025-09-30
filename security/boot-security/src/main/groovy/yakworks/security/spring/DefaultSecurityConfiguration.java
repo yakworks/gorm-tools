@@ -253,4 +253,10 @@ public class DefaultSecurityConfiguration {
     public StoreTokenGenerator storeTokenGenerator() {
         return new StoreTokenGenerator();
     }
+
+    @Bean //FIXME should it have @ConditionalOnMissingBean or will that scramble the pick up when spring sec already has one
+    PermissionsAuthorizationManager permissionsAuthorizationManager() {
+        return new PermissionsAuthorizationManager();
+    }
+
 }

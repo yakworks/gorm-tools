@@ -28,7 +28,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain
 
 import yakworks.security.spring.DefaultSecurityConfiguration
-import yakworks.security.spring.WildcardAuthorizationManager
+import yakworks.security.spring.PermissionsAuthorizationManager
 import yakworks.security.spring.token.store.TokenStore
 
 import static org.springframework.security.config.Customizer.withDefaults
@@ -49,17 +49,12 @@ class HelloSecurityConfiguration {
     @Autowired(required = false) TokenStore tokenStore;
 
     @Bean
-    WildcardAuthorizationManager wildcardAuthorizationManager() {
-        return new WildcardAuthorizationManager()
-    }
-
-    @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, WildcardAuthorizationManager wildcardAuthorizationManager) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, PermissionsAuthorizationManager permissionsAuthorizationManager) throws Exception {
         // DefaultSecurityConfiguration.applyBasicDefaults(http)
         http
             .authorizeHttpRequests((authorize) -> authorize
                 .requestMatchers("/actuator/**", "/resources/**", "/about").permitAll()
-                .requestMatchers("/api/**").access(wildcardAuthorizationManager)
+                .requestMatchers("/api/**").access(permissionsAuthorizationManager)
                 .anyRequest().authenticated()
 
             )

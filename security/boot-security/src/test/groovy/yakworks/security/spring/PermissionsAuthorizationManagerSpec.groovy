@@ -5,9 +5,9 @@ import spock.lang.Specification
 
 import javax.servlet.http.HttpServletRequest
 
-class WildcardAuthorizationManagerSpec extends Specification {
+class PermissionsAuthorizationManagerSpec extends Specification {
 
-    WildcardAuthorizationManager manager = new WildcardAuthorizationManager()
+    PermissionsAuthorizationManager manager = new PermissionsAuthorizationManager()
 
     void "test mapToPermission crud"() {
         expect:

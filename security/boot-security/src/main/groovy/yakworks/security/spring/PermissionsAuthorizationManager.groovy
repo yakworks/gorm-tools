@@ -8,17 +8,29 @@ import java.util.function.Supplier
 import javax.servlet.http.HttpServletRequest
 
 import org.apache.shiro.authz.permission.WildcardPermission
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authorization.AuthorizationDecision
 import org.springframework.security.authorization.AuthorizationManager
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext
 
-class WildcardAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext> {
+/**
+ * AuthorizationManager that uses Shiro permissions to check the URL path against Wilcard permissions
+ */
+class PermissionsAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext> {
+
+    @Value('${app.security.permissions.enabled:true}')
+    boolean permissionsEnabled
 
     @Override
     AuthorizationDecision check(Supplier<Authentication> authenticationSupplier, RequestAuthorizationContext context) {
         Authentication authentication = authenticationSupplier.get()
         HttpServletRequest request = context.getRequest()
+
+        //if its not enabled then always return true
+        if(!permissionsEnabled){
+            return new AuthorizationDecision(true)
+        }
 
         if (!authentication?.isAuthenticated()) {
             return new AuthorizationDecision(false)

@@ -2,19 +2,14 @@ package yakworks.rally.orgs
 
 import java.time.LocalDateTime
 
-import org.hibernate.engine.jdbc.internal.BasicFormatterImpl
-
 import gorm.tools.mango.jpql.JpqlQueryBuilder
 import gorm.tools.mango.jpql.JpqlQueryInfo
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import yakworks.rally.orgs.model.Org
-import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.tag.model.TagLink
 import yakworks.testing.gorm.integration.DomainIntTest
 import yakworks.rally.orgs.model.Contact
-import yakworks.rally.orgs.repo.ContactRepo
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.repo.TagLinkRepo
 
@@ -25,7 +20,6 @@ import static gorm.tools.mango.jpql.JpqlCompareUtils.formatAndStrip
 @Rollback
 class ContactTagTests extends Specification implements DomainIntTest {
 
-    ContactRepo contactRepo
     TagLinkRepo tagLinkRepo
 
     boolean compareQuery(String hql, String expected){
@@ -128,6 +122,8 @@ class ContactTagTests extends Specification implements DomainIntTest {
         when:
         addTagsForSearch()
 
+        String date = LocalDateTime.now().plusDays(1).format('yyyy-MM-dd')
+
         def criteria = Contact.query([
             name: ['$like': "John4%"],
             '$not':[
@@ -174,7 +170,6 @@ class ContactTagTests extends Specification implements DomainIntTest {
 
         then:
         res.size() == 10
-
     }
 
     String strip(String val){

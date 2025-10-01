@@ -75,6 +75,15 @@ final class SpringUserUtils {
         return grantedAuthorities;
     }
 
+
+        static List<GrantedAuthority> permissionsToAuthorities(Collection<String> permissions) {
+        List<GrantedAuthority> grantedAuthorities = new ArrayList<>(permissions.size());
+        for (String authority : permissions) {
+            grantedAuthorities.add( new SimpleGrantedAuthority(authority) );
+        }
+        return grantedAuthorities;
+    }
+
     static SpringUserInfo buildSpringUser(String username, String pwd, List roles, Long id, Long orgId){
         def u = new BasicUserInfo(username: username, passwordHash: pwd, roles: roles as Set, id: id, orgId: orgId)
         SpringUser.of(u)

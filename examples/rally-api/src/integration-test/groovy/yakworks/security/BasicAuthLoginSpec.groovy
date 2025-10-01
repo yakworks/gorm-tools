@@ -7,7 +7,7 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.Response
 import spock.lang.Specification
-
+import yakworks.rest.client.OkAuth
 import yakworks.rest.client.OkHttpRestTrait
 
 /**
@@ -44,6 +44,9 @@ class BasicAuthLoginSpec extends Specification implements OkHttpRestTrait {
         then:
         body.access_token
         //body.access_token == "foo"
+
+        cleanup:
+        OkAuth.TOKEN = null
     }
 
     void "login with username case doesnt match"() {
@@ -53,5 +56,8 @@ class BasicAuthLoginSpec extends Specification implements OkHttpRestTrait {
 
         then:
         body.access_token
+
+        cleanup:
+        OkAuth.TOKEN = null
     }
 }

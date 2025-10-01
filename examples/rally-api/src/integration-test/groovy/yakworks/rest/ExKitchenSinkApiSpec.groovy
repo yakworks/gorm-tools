@@ -1,8 +1,6 @@
 package yakworks.rest
 
 import org.springframework.http.HttpStatus
-
-
 import yakworks.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
@@ -15,7 +13,7 @@ class ExKitchenSinkApiSpec extends Specification implements OkHttpRestTrait {
 
     String path = "/api/kitchen"
 
-    def setup(){
+    void setup(){
         login()
     }
 
@@ -31,7 +29,6 @@ class ExKitchenSinkApiSpec extends Specification implements OkHttpRestTrait {
         // bodyText == "123"
         body.id
         body.name == 'Sink1'
-
     }
 
     void "testing post"() {
@@ -49,7 +46,6 @@ class ExKitchenSinkApiSpec extends Specification implements OkHttpRestTrait {
 
     void "post with bindId"() {
         when:
-
         Response resp = post(path + "?bindId=true", [num: "foobie123", name: "foobie", id:9999])
         Map body = bodyToMap(resp)
 

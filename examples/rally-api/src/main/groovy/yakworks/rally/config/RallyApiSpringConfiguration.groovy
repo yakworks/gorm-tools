@@ -24,6 +24,7 @@ import yakworks.rally.RallyConfiguration
 import yakworks.rally.api.TestTimeoutQueryArgsValidator
 import yakworks.rest.grails.AppInfoBuilder
 import yakworks.security.spring.DefaultSecurityConfiguration
+import yakworks.security.spring.PermissionsAuthorizationManager
 import yakworks.security.spring.token.CookieAuthSuccessHandler
 import yakworks.security.spring.token.CookieUrlTokenSuccessHandler
 import yakworks.security.spring.token.TokenUtils
@@ -56,7 +57,7 @@ class RallyApiSpringConfiguration {
     @Autowired TokenStore tokenStore
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, PermissionsAuthorizationManager permissionsAuthorizationManager) throws Exception {
         //var sth = new SubjectThreadState(null);
         //defaults permit all
         List permitAllMatchers = [
@@ -67,6 +68,7 @@ class RallyApiSpringConfiguration {
             "/security-tests/**",
             "/login*",
             "/token",
+            '/oauth/token',
             "/about",
             "/rally/smoke/**"
         ]
@@ -81,7 +83,8 @@ class RallyApiSpringConfiguration {
                 .requestMatchers("/security-tests/error401").authenticated()
                 .requestMatchers("/security-tests/error403").hasRole("SUPER_DUPER")
                 .requestMatchers(permitAllMatchers as String[]).permitAll()
-                .anyRequest().authenticated()
+                .requestMatchers("/validate").authenticated()
+                .anyRequest().access(permissionsAuthorizationManager)
             )
             // http basic auth
             .httpBasic(withDefaults())

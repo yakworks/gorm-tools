@@ -98,9 +98,7 @@ class PermissionsAuthorizationManager implements AuthorizationManager<RequestAut
             // then we can just use the controller and action
             String lastSegment = segments[-1]
             if(op in ['update', 'delete', 'read'] && (lastSegment.isNumber() || isUUID(lastSegment)) ) {
-                //XXX @SUD this is hacky, why are you using the removeAt groovy instead of just java remove?
-                // or just use groovy removeLast
-                segments.removeAt(segments.size() - 1) //removes last item
+                segments.removeLast() //removes last item (id)
             }
             segments << op
             //join all parts except api, so it becomes "autocash:payment:read" for GET /api/autocash/payment

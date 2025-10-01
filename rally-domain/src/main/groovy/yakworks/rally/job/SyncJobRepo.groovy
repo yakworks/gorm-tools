@@ -15,7 +15,6 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.LongIdGormRepo
 import grails.gorm.transactions.ReadOnly
-import yakworks.json.groovy.JsonEngine
 import yakworks.rally.attachment.repo.AttachmentRepo
 
 @GormRepository
@@ -73,25 +72,6 @@ class SyncJobRepo extends LongIdGormRepo<SyncJob> {
     @ReadOnly
     String payloadToString(SyncJob job){
         job.payloadId ? attachmentRepo.get(job.payloadId).getText() : getJsonString(job.payloadBytes)
-    }
-
-    /**
-     * Returns the problems
-     * If DataLayout=List, problems would be in job.problems, or else problems would be mixed with data
-     */
-    List getProblems(SyncJob job) {
-        if (job.ok) {
-            return []
-        } else if (job.problems) {
-            return job.problems
-        } else {
-            //collect problems from data
-            //See SyncJobContext.transformResultToMap
-            String dataStr = dataToString(job)
-            List results = JsonEngine.parseJson(dataStr, List)
-            List problems = results.findAll { !it['ok'] }
-            return problems
-        }
     }
 
     String getJsonString(byte[] bytes){

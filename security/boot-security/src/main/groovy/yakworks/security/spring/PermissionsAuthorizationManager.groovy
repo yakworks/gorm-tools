@@ -25,6 +25,9 @@ class PermissionsAuthorizationManager implements AuthorizationManager<RequestAut
     @Value('${app.security.enabled:true}')
     boolean securityEnabled
 
+    //will intercept urls under this paths
+    List<String> contextPaths = ['api', 'jobs']
+
     @Override
     AuthorizationDecision check(Supplier<Authentication> authenticationSupplier, RequestAuthorizationContext context) {
         Authentication authentication = authenticationSupplier.get()
@@ -90,7 +93,7 @@ class PermissionsAuthorizationManager implements AuthorizationManager<RequestAut
     //FIXME - Cache
     protected String buildPermission(String path, String op) {
         List<String> segments = path.tokenize('/')
-        if (segments.size() >= 2 && segments[0] == 'api') {
+        if (segments.size() >= 2 && (segments[0] in contextPaths)) {
 
             //if its a put or delete request, and last part is number or UUID, eg PUT /api/ar/tran/1
             //then remove the last part (id) to build a permission like ar:tran:read, isntead of ar:tran:1:read

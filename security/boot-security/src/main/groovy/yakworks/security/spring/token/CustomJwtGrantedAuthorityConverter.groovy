@@ -15,7 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.oauth2.jwt.Jwt
 
 /**
- * load authorities from db instead of taking it from jwt token
+ * Used in JwtAuthenticationConverter and will load authorities from db instead of taking it from jwt token
  * so that it will work with permissions, and will always have upto date authorities.
  */
 @CompileStatic

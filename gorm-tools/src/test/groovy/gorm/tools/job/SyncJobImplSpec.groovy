@@ -45,7 +45,6 @@ class SyncJobImplSpec extends Specification  implements GormHibernateTest{
         then:
         j
         res == j.payloadToString()
-
     }
 
 }

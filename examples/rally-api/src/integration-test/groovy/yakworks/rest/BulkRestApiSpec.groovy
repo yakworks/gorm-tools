@@ -19,9 +19,6 @@ import static yakworks.json.groovy.JsonEngine.parseJson
 @Rollback
 class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
 
-    //queue is not configured for test env yet
-    //@Autowired BlockingQueue<SyncJob> syncJobQueue
-
     String path = "/api/rally/org/bulk?jobSource=Oracle&async=false"
 
     def setup(){
@@ -159,6 +156,13 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         json[1].data.num == "Foox2"
         json[1].data.name ==  "Foox2"
         json[1].data.source.sourceId ==  "Foox2"
+
+        when: "verify problems are stored in problems field too for bulk"
+        List problems = job.problems
+
+        then: "should pickup problems from data"
+        problems.size() == 1
+        problems[0].payload.name == "Foox1"
 
         delete("/api/rally/org", json.data[1].id)
     }

@@ -9,7 +9,7 @@ import groovy.transform.CompileStatic
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 @CompileStatic
-@ConfigurationProperties(prefix="yakworks.security.password")
+@ConfigurationProperties(prefix="app.security.password")
 class PasswordConfig {
 
     /**

@@ -216,7 +216,7 @@ class SyncJobContext {
         MsgService msgService = syncJobService.messageSource
         List<Map> resMapList = []
         for (Result r : resultList) {
-            //@JOSH for DataLaout=result - shall we keep problems in data also, also just in problems field, like DataLayout=List
+            //always add problems too
             if (r instanceof Problem) {
                 problems.add(r)
             }

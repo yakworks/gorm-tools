@@ -21,7 +21,7 @@ class CustomJwtGrantedAuthorityConverterSpec extends Specification implements Da
 
     void "test convert"() {
         setup:
-        CustomJwtGrantedAuthorityConverter converter = new CustomJwtGrantedAuthorityConverter(userDetailsService: userDetailsService)
+        CustomJwtGrantedAuthorityConverter converter = new CustomJwtGrantedAuthorityConverter(userDetailsService)
         Jwt jwt = jwtTokenExchanger.exchange("admin")
 
         when:

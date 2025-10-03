@@ -142,6 +142,15 @@ public class DefaultSecurityConfiguration {
         // );
     }
 
+    //XXX @SUD legacy, remove when domain9 is merged
+    public static void applyOauthJwt(HttpSecurity http) throws Exception {
+        http.csrf().disable();
+        http.oauth2ResourceServer((oauth2) -> {
+            oauth2.jwt()
+                .jwtAuthenticationConverter(jwtAuthenticationConverter(null));
+        });
+    }
+
     /**
      * JwtAuthenticationConverter that grabs roles/authorities from jwt token.
      * By default, JwtGrantedAuthoritiesConverter would put `scope_` prefix for every role. eg SCOPE_ROLE_READOLY
@@ -151,10 +160,13 @@ public class DefaultSecurityConfiguration {
     static private JwtAuthenticationConverter jwtAuthenticationConverter(UserDetailsService userDetailsService) {
         //Hook CustomJwtGrantedAuthorityConverter which will load authorities from db instead of taking it from jwt token
         //so that it will work with permissions, and will always have upto date authorities.
-        CustomJwtGrantedAuthorityConverter jwtGrantedAuthoritiesConverter = new CustomJwtGrantedAuthorityConverter();
-        jwtGrantedAuthoritiesConverter.setUserDetailsService(userDetailsService);
+
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+        if(userDetailsService != null){
+            jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(
+                new CustomJwtGrantedAuthorityConverter(userDetailsService)
+            );
+        }
         return jwtAuthenticationConverter;
     }
 

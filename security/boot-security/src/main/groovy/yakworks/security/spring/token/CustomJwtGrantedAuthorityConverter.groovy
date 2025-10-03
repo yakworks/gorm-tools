@@ -21,7 +21,11 @@ import org.springframework.security.oauth2.jwt.Jwt
 @CompileStatic
 class CustomJwtGrantedAuthorityConverter  implements Converter<Jwt, Collection<GrantedAuthority>> {
 
-    @Inject UserDetailsService userDetailsService
+    UserDetailsService userDetailsService
+
+    CustomJwtGrantedAuthorityConverter(UserDetailsService userDetailsService){
+        this.userDetailsService = userDetailsService
+    }
 
     @Override
     Collection<GrantedAuthority> convert(Jwt source) {

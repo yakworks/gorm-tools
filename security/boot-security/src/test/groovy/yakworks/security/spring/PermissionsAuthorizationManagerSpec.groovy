@@ -23,6 +23,10 @@ class PermissionsAuthorizationManagerSpec extends Specification {
         manager.mapToPermission(mockRequest("DELETE", "/api/rally/org")) == "rally:org:delete"
     }
 
+    void "jobs"() {
+        manager.mapToPermission(mockRequest("POST", "/jobs/job/trigger")) == "job:trigger:create"
+    }
+
     void "bulk permissions"() {
         manager.mapToPermission(mockRequest("GET", "/api/rally/org/bulk")) == "rally:org:bulk:read"
         manager.mapToPermission(mockRequest("PUT", "/api/rally/org/bulk")) == "rally:org:bulk:update"

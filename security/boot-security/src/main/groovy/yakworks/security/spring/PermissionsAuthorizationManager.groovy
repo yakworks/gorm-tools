@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest
 
 import org.apache.shiro.authz.permission.WildcardPermission
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.security.authentication.AuthenticationTrustResolver
+import org.springframework.security.authentication.AuthenticationTrustResolverImpl
 import org.springframework.security.authorization.AuthorizationDecision
 import org.springframework.security.authorization.AuthorizationManager
 import org.springframework.security.core.Authentication
@@ -25,6 +27,19 @@ class PermissionsAuthorizationManager implements AuthorizationManager<RequestAut
     @Value('${app.security.enabled:true}')
     boolean securityEnabled
 
+    //will intercept urls under this paths
+    List<String> contextPaths = ['api', 'jobs']
+
+    AuthenticationTrustResolver authenticationTrustResolver
+
+    PermissionsAuthorizationManager() {
+        this(new AuthenticationTrustResolverImpl())
+    }
+
+    PermissionsAuthorizationManager(AuthenticationTrustResolver tr) {
+        this.authenticationTrustResolver = tr
+    }
+
     @Override
     AuthorizationDecision check(Supplier<Authentication> authenticationSupplier, RequestAuthorizationContext context) {
         Authentication authentication = authenticationSupplier.get()
@@ -35,7 +50,8 @@ class PermissionsAuthorizationManager implements AuthorizationManager<RequestAut
             return new AuthorizationDecision(true)
         }
 
-        if (!authentication?.isAuthenticated()) {
+        //just disallow if its unauthenticated or anonymous authentication
+        if (!authentication || !authentication.isAuthenticated() || authenticationTrustResolver.isAnonymous(authentication)) {
             return new AuthorizationDecision(false)
         }
 
@@ -90,7 +106,7 @@ class PermissionsAuthorizationManager implements AuthorizationManager<RequestAut
     //FIXME - Cache
     protected String buildPermission(String path, String op) {
         List<String> segments = path.tokenize('/')
-        if (segments.size() >= 2 && segments[0] == 'api') {
+        if (segments.size() >= 2 && (segments[0] in contextPaths)) {
 
             //if its a put or delete request, and last part is number or UUID, eg PUT /api/ar/tran/1
             //then remove the last part (id) to build a permission like ar:tran:read, isntead of ar:tran:1:read

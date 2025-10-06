@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.web.SecurityFilterChain
 
 import yakworks.gorm.api.support.QueryArgsValidator
@@ -55,6 +56,7 @@ class RallyApiSpringConfiguration {
     @Autowired CookieAuthSuccessHandler cookieAuthSuccessHandler
     @Autowired CookieUrlTokenSuccessHandler cookieUrlTokenSuccessHandler
     @Autowired TokenStore tokenStore
+    @Autowired UserDetailsService userDetailsService
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, PermissionsAuthorizationManager permissionsAuthorizationManager) throws Exception {
@@ -115,7 +117,7 @@ class RallyApiSpringConfiguration {
         // DefaultSecurityConfiguration.addJsonAuthenticationFilter(http, tokenStore)
 
         //enables jwt and oauth
-        DefaultSecurityConfiguration.applyOauthJwt(http)
+        DefaultSecurityConfiguration.applyOauthJwt(http, userDetailsService)
         DefaultSecurityConfiguration.addOpaqueTokenSupport(http, tokenStore)
 
         return http.build()

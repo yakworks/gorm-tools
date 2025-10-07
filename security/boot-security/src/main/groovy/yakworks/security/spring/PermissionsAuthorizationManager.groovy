@@ -7,6 +7,8 @@ package yakworks.security.spring
 import java.util.function.Supplier
 import javax.servlet.http.HttpServletRequest
 
+import groovy.util.logging.Slf4j
+
 import org.apache.shiro.authz.permission.WildcardPermission
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.AuthenticationTrustResolver
@@ -20,6 +22,7 @@ import org.springframework.security.web.access.intercept.RequestAuthorizationCon
 /**
  * AuthorizationManager that uses Shiro permissions to check the URL path against Wilcard permissions
  */
+@Slf4j
 class PermissionsAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext> {
 
     @Value('${app.security.permissions.enabled:true}')
@@ -77,6 +80,7 @@ class PermissionsAuthorizationManager implements AuthorizationManager<RequestAut
 
         if (!requiredPermission) {
             // If no mapping found → deny by default
+            log.warn("Could not determine permission for url ${request.requestURI} ")
             return new AuthorizationDecision(false)
         }
 

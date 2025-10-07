@@ -10,9 +10,14 @@ import yakworks.rest.client.OkAuth
 import yakworks.rest.client.OkHttpRestTrait
 import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRolePermission
+import yakworks.security.spring.PermissionsAuthorizationManager
+
+import javax.inject.Inject
 
 @Integration
 class ApiPermissionsSpec extends Specification implements OkHttpRestTrait {
+
+    @Inject PermissionsAuthorizationManager permissionsAuthorizationManager
 
     String path = "/api/rally/org"
 
@@ -22,6 +27,27 @@ class ApiPermissionsSpec extends Specification implements OkHttpRestTrait {
 
     void cleanupSpec() {
         OkAuth.TOKEN = null
+    }
+
+    void "sanity check"() {
+        expect:
+        permissionsAuthorizationManager
+        permissionsAuthorizationManager.securityEnabled
+        permissionsAuthorizationManager.permissionsEnabled
+    }
+
+    void "security enabled but permissions is disabled"() {
+        setup: "even when permission is disabled"
+        permissionsAuthorizationManager.permissionsEnabled = false
+
+        when:
+        Response resp = get("$path/1")
+
+        then: "still, unauthenticated user should not be authorized"
+        resp.code() == HttpStatus.UNAUTHORIZED.value()
+
+        cleanup:
+        permissionsAuthorizationManager.permissionsEnabled = true
     }
 
     void "unauthorized when user is not logged in"() {

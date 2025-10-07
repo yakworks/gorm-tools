@@ -11,6 +11,7 @@ import org.apache.shiro.authz.permission.WildcardPermission
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.AuthenticationTrustResolver
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl
+import org.springframework.security.authorization.AuthenticatedAuthorizationManager
 import org.springframework.security.authorization.AuthorizationDecision
 import org.springframework.security.authorization.AuthorizationManager
 import org.springframework.security.core.Authentication
@@ -32,6 +33,9 @@ class PermissionsAuthorizationManager implements AuthorizationManager<RequestAut
 
     AuthenticationTrustResolver authenticationTrustResolver
 
+    //checks if user is authenticated, this is same authorisation manager, which is used when  http.anyRequest().authenticated() is used.
+    AuthorizationManager authenticatedAuthorisationManager = AuthenticatedAuthorizationManager.authenticated()
+
     PermissionsAuthorizationManager() {
         this(new AuthenticationTrustResolverImpl())
     }
@@ -40,14 +44,27 @@ class PermissionsAuthorizationManager implements AuthorizationManager<RequestAut
         this.authenticationTrustResolver = tr
     }
 
+    /**
+     * Checks for authenticated user, and if user has permission required to access the url endpoint
+     * If securityEnabled=false - Allows access
+     * permissionsEnabled = false - Allows access to any authenticated user regardless of permission
+     * Else, allows access if user is authenticated and has required permission for endpoint
+     */
     @Override
     AuthorizationDecision check(Supplier<Authentication> authenticationSupplier, RequestAuthorizationContext context) {
         Authentication authentication = authenticationSupplier.get()
         HttpServletRequest request = context.getRequest()
 
-        //if its not enabled then always return true
-        if(!securityEnabled || !permissionsEnabled){
+        //if security is disabled, grant access
+        if(!securityEnabled){
             return new AuthorizationDecision(true)
+        }
+
+        //if permission is disabled but security is enabled, thn grant access to authenticated uesers
+        // Thats what http.anyRequest().authenticated() did.
+        //so if permission is disabled, it would behave, like there was just http.anyRequest().authenticated() in security config.
+        if(!permissionsEnabled) {
+            return authenticatedAuthorisationManager.check(authenticationSupplier, context)
         }
 
         //just disallow if its unauthenticated or anonymous authentication

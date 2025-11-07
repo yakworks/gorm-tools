@@ -230,7 +230,14 @@ public class WildcardPermissionTest {
         assertTrue(p1.implies(p2));
         assertTrue(p1.implies(p6));
 
+        p1 = new WildcardPermission("appConfig:*:*:read");
+        p2 = new WildcardPermission("appConfig:ar:tran:read");
+        p3 = new WildcardPermission("appConfig:meta:ar:tran:read");
+
+        assertTrue(p1.implies(p2));
+        assertFalse(p1.implies(p3));
     }
+
 
     @Test
     void testToString() {

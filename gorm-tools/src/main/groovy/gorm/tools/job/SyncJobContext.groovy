@@ -181,9 +181,9 @@ class SyncJobContext {
             List<Map> renderResults = transformResults(results)
             data.dataBytes = JsonEngine.toJson(renderResults).bytes
         }
-        //if dataLayout is List then we need to save the problems.
-        if(args.dataLayout == DataLayout.List && problems.size() > 0) {
-            //data.errorBytes = JsonEngine.toJson(problems).bytes
+
+        //problems are always stored in problem field, regardless of data layout
+        if(problems.size() > 0) {
             data.problems = problems*.asMap()
         }
 
@@ -216,6 +216,10 @@ class SyncJobContext {
         MsgService msgService = syncJobService.messageSource
         List<Map> resMapList = []
         for (Result r : resultList) {
+            //always add problems too
+            if (r instanceof Problem) {
+                problems.add(r)
+            }
             //these are common across both problems and success results.
             def map = [ok: r.ok, status: r.status.code, data: r.payload] as Map<String, Object>
             //do the failed

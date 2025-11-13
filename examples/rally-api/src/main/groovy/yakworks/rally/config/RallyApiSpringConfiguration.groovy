@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.web.SecurityFilterChain
 
 import yakworks.gorm.api.support.QueryArgsValidator
@@ -24,6 +25,7 @@ import yakworks.rally.RallyConfiguration
 import yakworks.rally.api.TestTimeoutQueryArgsValidator
 import yakworks.rest.grails.AppInfoBuilder
 import yakworks.security.spring.DefaultSecurityConfiguration
+import yakworks.security.spring.PermissionsAuthorizationManager
 import yakworks.security.spring.token.CookieAuthSuccessHandler
 import yakworks.security.spring.token.CookieUrlTokenSuccessHandler
 import yakworks.security.spring.token.TokenUtils
@@ -54,9 +56,10 @@ class RallyApiSpringConfiguration {
     @Autowired CookieAuthSuccessHandler cookieAuthSuccessHandler
     @Autowired CookieUrlTokenSuccessHandler cookieUrlTokenSuccessHandler
     @Autowired TokenStore tokenStore
+    @Autowired UserDetailsService userDetailsService
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, PermissionsAuthorizationManager permissionsAuthorizationManager) throws Exception {
         //var sth = new SubjectThreadState(null);
         //defaults permit all
         List permitAllMatchers = [
@@ -67,6 +70,7 @@ class RallyApiSpringConfiguration {
             "/security-tests/**",
             "/login*",
             "/token",
+            '/oauth/token',
             "/about",
             "/rally/smoke/**"
         ]
@@ -81,7 +85,8 @@ class RallyApiSpringConfiguration {
                 .requestMatchers("/security-tests/error401").authenticated()
                 .requestMatchers("/security-tests/error403").hasRole("SUPER_DUPER")
                 .requestMatchers(permitAllMatchers as String[]).permitAll()
-                .anyRequest().authenticated()
+                .requestMatchers("/validate").authenticated()
+                .anyRequest().access(permissionsAuthorizationManager)
             )
             // http basic auth
             .httpBasic(withDefaults())
@@ -112,7 +117,7 @@ class RallyApiSpringConfiguration {
         // DefaultSecurityConfiguration.addJsonAuthenticationFilter(http, tokenStore)
 
         //enables jwt and oauth
-        DefaultSecurityConfiguration.applyOauthJwt(http)
+        DefaultSecurityConfiguration.applyOauthJwt(http, userDetailsService)
         DefaultSecurityConfiguration.addOpaqueTokenSupport(http, tokenStore)
 
         return http.build()

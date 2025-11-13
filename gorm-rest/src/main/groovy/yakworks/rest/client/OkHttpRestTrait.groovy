@@ -27,7 +27,6 @@ import yakworks.json.groovy.JsonEngine
  * Trait with helper methods to wrap OKHttps HttpClient for rest api testing
  */
 @CompileStatic
-//@CompileDynamic
 trait OkHttpRestTrait {
 
     String jsonHeader = "application/json;charset=utf-8"

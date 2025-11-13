@@ -5,7 +5,7 @@ import okhttp3.Request
 import okhttp3.Response
 import spock.lang.Ignore
 import spock.lang.Specification
-
+import yakworks.rest.client.OkAuth
 import yakworks.rest.client.OkHttpRestTrait
 
 /**
@@ -46,6 +46,9 @@ class JsonUsernamePasswordLoginSpec extends Specification implements OkHttpRestT
         then:
         body.access_token
         //body.access_token == "foo"
+
+        cleanup:
+        OkAuth.TOKEN = null
     }
 
 }

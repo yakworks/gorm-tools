@@ -4,26 +4,17 @@ import org.apache.commons.lang3.RandomStringUtils
 
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.utils.GormMetaUtils
-import spock.lang.IgnoreRest
 import spock.lang.Specification
-import yakworks.security.PasswordConfig
 import yakworks.security.gorm.model.AppUser
-import yakworks.security.gorm.model.SecLoginHistory
 import yakworks.security.gorm.model.SecPasswordHistory
 import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRoleUser
-import yakworks.security.services.PasswordValidator
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
-
-import javax.inject.Inject
-import java.time.LocalDate
 
 class AppUserSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [AppUser, SecRole, SecRoleUser, SecPasswordHistory]
     //static List springBeans = [PasswordConfig]
-
-    @Inject PasswordConfig passwordConfig
 
     String genRandomEmail(){
         String ename = RandomStringUtils.randomAlphabetic(10)
@@ -158,6 +149,7 @@ class AppUserSpec extends Specification implements GormHibernateTest, SecurityTe
         SecRoleUser.count() == 2
         SecRoleUser.findAllByUser(user)*.role.id == [1L, 2L]
         user.getRoles().size() == 2
+
         user.getRoles()[0] instanceof String
         user.getSecRoles().size() == 2
         user.getSecRoles()[0] instanceof SecRole

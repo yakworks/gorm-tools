@@ -244,4 +244,25 @@ class AppUserRepo extends LongIdGormRepo<AppUser> {
         }
     }
 
+    @Transactional(readOnly = true)
+    Set<String> getRoles(AppUser user) {
+        List res = SecRoleUser.executeQuery('select distinct role.code from SecRoleUser where user.id = :uid', [uid: user.id] )
+        return res as Set<String>
+    }
+
+    @Transactional(readOnly = true)
+    Set getPermissions(AppUser user) {
+        //have test
+        return SecRolePermission.executeQuery(
+            """
+              select distinct p.permission
+                    from SecRolePermission p
+                    join p.role r
+                    join SecRoleUser sru on sru.role = r
+                    join sru.user u
+                    where u.id = :uid
+            """,
+            [uid: user.id] ) as Set
+    }
+
 }

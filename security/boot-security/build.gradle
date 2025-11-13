@@ -31,6 +31,12 @@ dependencies {
   //OAUTH
   api "org.springframework.boot:spring-boot-starter-oauth2-resource-server:$springBootVersion"
 
+  //SHIRO
+  // ['aspectj', 'core', 'spring', 'web'].each {
+  //   implementation "org.apache.shiro:shiro-$it:$vShiro"
+  // }
+  api "org.apache.shiro:shiro-core:$vShiro"
+
   //SAML
   compileOnly "org.springframework.security:spring-security-saml2-service-provider:$springSecurityVersion"
   constraints {

@@ -51,6 +51,8 @@ class UrlMappings {
         //to test errors and error handlers
         post "/api/rally/exceptionTest/runtimeException"(controller: 'exceptionTest', action:'runtimeException', namespace:'rally')
         post "/api/rally/exceptionTest/throwable"(controller: 'exceptionTest', action:'throwable', namespace:'rally')
+
+        post "/rally/org/rpc"(controller: 'org', action: 'rpc')
     }
 
     static void runClosure(Closure mappingClosure, Object delegate) {

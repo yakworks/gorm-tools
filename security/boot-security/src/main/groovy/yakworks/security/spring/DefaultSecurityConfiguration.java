@@ -2,6 +2,7 @@ package yakworks.security.spring;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import yakworks.security.PasswordConfig;
@@ -10,6 +11,7 @@ import yakworks.security.services.PasswordValidator;
 import yakworks.security.spring.token.CookieAuthSuccessHandler;
 import yakworks.security.spring.token.CookieBearerTokenResolver;
 import yakworks.security.spring.token.CookieUrlTokenSuccessHandler;
+import yakworks.security.spring.token.CustomJwtGrantedAuthorityConverter;
 import yakworks.security.spring.token.generator.JwtTokenGenerator;
 import yakworks.security.spring.token.generator.OpaqueTokenGenerator;
 import yakworks.security.spring.token.generator.StoreTokenGenerator;
@@ -37,6 +39,8 @@ import org.springframework.security.web.authentication.ForwardAuthenticationSucc
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import javax.inject.Inject;
+
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration @Lazy
@@ -48,7 +52,6 @@ public class DefaultSecurityConfiguration {
 
     @Value("${app.security.frontendCallbackUrl:'/'}")
     String frontendCallbackUrl;
-
 
     /**
      * Helper to set up HttpSecurity builder with default requestMatchers and forms.
@@ -121,7 +124,7 @@ public class DefaultSecurityConfiguration {
     }
 
     /** Sets up the JWT */
-    public static void applyOauthJwt(HttpSecurity http) throws Exception {
+    public static void applyOauthJwt(HttpSecurity http, UserDetailsService userDetailsService) throws Exception {
         // JwtIssuerAuthenticationManagerResolver authenticationManagerResolver = new JwtIssuerAuthenticationManagerResolver
         //     ("https://idp.example.org/issuerOne", "https://idp.example.org/issuerTwo");
         //JWT
@@ -129,7 +132,7 @@ public class DefaultSecurityConfiguration {
         http.csrf().disable();
         http.oauth2ResourceServer((oauth2) -> {
             oauth2.jwt()
-                .jwtAuthenticationConverter(jwtAuthenticationConverter());
+                .jwtAuthenticationConverter(jwtAuthenticationConverter(userDetailsService));
             // oauth2.authenticationManagerResolver(authenticationManagerResolver);
         });
         // .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -139,17 +142,31 @@ public class DefaultSecurityConfiguration {
         // );
     }
 
+    //XXX @SUD legacy, remove when domain9 is merged
+    public static void applyOauthJwt(HttpSecurity http) throws Exception {
+        http.csrf().disable();
+        http.oauth2ResourceServer((oauth2) -> {
+            oauth2.jwt()
+                .jwtAuthenticationConverter(jwtAuthenticationConverter(null));
+        });
+    }
+
     /**
      * JwtAuthenticationConverter that grabs roles/authorities from jwt token.
      * By default, JwtGrantedAuthoritiesConverter would put `scope_` prefix for every role. eg SCOPE_ROLE_READOLY
      * and hence it wont match expressions such as "hasRole("ROLE_READ_ONLY")
      * its here, mainly to set setAuthorityPrefix to empty string
      */
-    static private JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
+    static private JwtAuthenticationConverter jwtAuthenticationConverter(UserDetailsService userDetailsService) {
+        //Hook CustomJwtGrantedAuthorityConverter which will load authorities from db instead of taking it from jwt token
+        //so that it will work with permissions, and will always have upto date authorities.
+
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+        if(userDetailsService != null){
+            jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(
+                new CustomJwtGrantedAuthorityConverter(userDetailsService)
+            );
+        }
         return jwtAuthenticationConverter;
     }
 
@@ -253,4 +270,10 @@ public class DefaultSecurityConfiguration {
     public StoreTokenGenerator storeTokenGenerator() {
         return new StoreTokenGenerator();
     }
+
+    @Bean //FIXME should it have @ConditionalOnMissingBean or will that scramble the pick up when spring sec already has one
+    PermissionsAuthorizationManager permissionsAuthorizationManager() {
+        return new PermissionsAuthorizationManager();
+    }
+
 }

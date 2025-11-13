@@ -22,4 +22,10 @@ class OrgController implements CrudApiController<Org> {
         respondWith(entityMap, [status: CREATED, params: qParams])
     }
 
+    //just here to hit rpc during tests
+    def rpc(){
+        Map qParams = getParamsMap()
+        String op = qParams['op']
+        respond([ok:true, rpc:op])
+    }
 }

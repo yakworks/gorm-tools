@@ -108,20 +108,9 @@ class AppUser implements UserInfo, AuditStampTrait, RepoEntity<AppUser>, Seriali
         return user
     }
 
-    @Override //UserInfo
+    @Override
     Set<String> getRoles() {
-        List res = SecRoleUser.executeQuery('select role.code from SecRoleUser where user.id = :uid',
-            [uid: this.id] )
-        return res as Set<String>
-        // SecRoleUser.findAllByUser(this).collect{ ((SecRole) it.role).code } as Set<String>
-        // SecRoleUser.query {
-        //     eq "user", this
-        // }.projections { property("role") }.list() as Set<String>
-        // def res = SecRoleUser.query {
-        //     eq "user", this
-        // }.projections { property("role") }.list()
-        //
-        // return res*.code as Set<String>
+       return getRepo().getRoles(this)
     }
 
     List<SecRole> getSecRoles() {
@@ -133,6 +122,11 @@ class AppUser implements UserInfo, AuditStampTrait, RepoEntity<AppUser>, Seriali
         }.projections { property("role") }.list()
 
         return res as List<SecRole>
+    }
+
+    @Override
+    Set getPermissions() {
+        return getRepo().getPermissions(this)
     }
 
     /**
@@ -152,11 +146,6 @@ class AppUser implements UserInfo, AuditStampTrait, RepoEntity<AppUser>, Seriali
 
     @Override //UserInfo
     Map getAttributes() {
-        throw new UnsupportedOperationException("Not yet supported here")
-    }
-
-    @Override //UserInfo
-    Set getPermissions() {
         throw new UnsupportedOperationException("Not yet supported here")
     }
 

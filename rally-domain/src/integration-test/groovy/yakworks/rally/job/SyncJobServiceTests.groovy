@@ -4,7 +4,7 @@ import gorm.tools.job.DataLayout
 import gorm.tools.job.SyncJobState
 import groovy.json.JsonException
 import groovy.json.JsonSlurper
-
+import org.apache.tools.ant.taskdefs.Sync
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.job.SyncJobArgs
@@ -103,10 +103,15 @@ class SyncJobServiceTests extends Specification implements DomainIntTest {
 
     void "test update job and save data to file generates valid json"() {
         given:
-        SyncJobContext jobContext = createJob()
-        jobContext.args.saveDataAsFile = true
+        SyncJobArgs syncJobArgs = new SyncJobArgs(sourceId: '123', source: 'some source', jobType: 'foo')
+        syncJobArgs.dataLayout = DataLayout.Result
+        syncJobArgs.saveDataAsFile = true
+        syncJobArgs.jobId = syncJobService.generateId()
+        syncJobArgs.payloadId = syncJobService.writePayloadFile(syncJobArgs.jobId, [[test:"test"]])
+        SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, [:])
 
         when:
+        jobContext.args.saveDataAsFile = true
         ApiResults apiRes = ApiResults.OK()
         (1..20).each {
             apiRes << Result.OK().payload([id:it, num:"num-$it", name: "name-$it"])
@@ -120,16 +125,16 @@ class SyncJobServiceTests extends Specification implements DomainIntTest {
 
         when:
         SyncJob job = SyncJob.get(jobContext.jobId)
+        flush()
 
         then:
         job != null
         job.dataId != null //should have a data id
+        job.payloadId != null
 
-        when: "Verify attachment"
-        Attachment attachment = Attachment.get(job.dataId)
-
-        then:
-        attachment != null
+        and: "Verify attachment"
+        Attachment.exists(job.dataId)
+        Attachment.exists(job.payloadId)
 
         when:
         String jsonText = SyncJob.repo.dataToString(job)
@@ -150,9 +155,15 @@ class SyncJobServiceTests extends Specification implements DomainIntTest {
         json[19].data.num  == "num-20"
         json[19].data.name  == "name-20"
 
-        cleanup:
-        if(attachment) attachment.remove()
+        when: "remove job, removes attachment"
+        job.remove()
+        flush()
 
+        then:
+        noExceptionThrown()
+        !SyncJob.exists(job.id)
+        !Attachment.exists(job.dataId)
+        !Attachment.exists(job.payloadId)
     }
 
     def "test transform result closure"() {

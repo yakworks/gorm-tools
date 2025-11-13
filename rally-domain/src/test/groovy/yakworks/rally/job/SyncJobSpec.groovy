@@ -100,7 +100,6 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
         job
         job.params
         job.params.q == [amount:['$gt':100.00]]
-
     }
 
     void "problems update"() {

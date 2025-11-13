@@ -9,6 +9,7 @@ import groovy.transform.CompileStatic
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
+import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.oauth2.core.DefaultOAuth2AuthenticatedPrincipal
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal
@@ -58,12 +59,12 @@ class OpaqueTokenStoreAuthProvider implements AuthenticationProvider {
         return new DefaultOAuth2AuthenticatedPrincipal(
             user.username,
             [login: user.username, springUser: user] as Map<String, Object>,
-            null
+            user.authorities as Collection<GrantedAuthority>
         )
     }
 
     @Override
-    public boolean supports(Class<?> authentication) {
+    boolean supports(Class<?> authentication) {
         return BearerTokenAuthenticationToken.class.isAssignableFrom(authentication);
     }
     //

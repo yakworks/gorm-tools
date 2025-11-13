@@ -1,3 +1,18 @@
+### v7.3.94
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.93...v7.3.94)
+- release [link](https://github.com/yakworks/gorm-tools/commit/397108262012d93db886edc87a5df1a957e70d15)
+- Merge pull request #949 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/9dc0bd5adc04152523e9d62859cc36b82bccc1c0)
+- Add asserts for wildcard permissions (#950) [link](https://github.com/yakworks/gorm-tools/commit/c1e7d29f811ba17ae04542bc8f68fa9373317fda)
+- Fix yakworks.security.password config key (#945) [link](https://github.com/yakworks/gorm-tools/commit/80e07bbc043acc0fd2ad56b8944b63c620838b1c)
+- Permission manager fix for : when permissionsEnabled is false. (#946) [link](https://github.com/yakworks/gorm-tools/commit/9c628e757148135faece0115f228331831f149f8)
+- cleanup and add old DefaultSecurityConfiguration.applyOauthJwt [link](https://github.com/yakworks/gorm-tools/commit/329e3ccfb6b8a6d030068dec4bf16fd79c054b7d)
+- Syncjob cleanup  (#941) [link](https://github.com/yakworks/gorm-tools/commit/ee53f6b67cc4f543e2301db3fbd3651861ab47b2)
+- Jwt authority converter (#944) [link](https://github.com/yakworks/gorm-tools/commit/83526fd49c18a368eb9df18df21faeff06592210)
+- ACL/Permissions  POC (#933) [link](https://github.com/yakworks/gorm-tools/commit/ec6bdd527b4f7e71b04aadfda18b3ef5841ad4d9)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/bf1565ead717c6d79fd4d59175b4b423a532ae82)
+- merge master [link](https://github.com/yakworks/gorm-tools/commit/dd72e1e394cd068c0f8940287cea8f17390e159d)
+
 ### v7.3.93
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.92...v7.3.93)

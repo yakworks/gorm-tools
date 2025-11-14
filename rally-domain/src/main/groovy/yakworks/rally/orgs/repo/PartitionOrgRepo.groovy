@@ -76,4 +76,13 @@ class PartitionOrgRepo extends LongIdGormRepo<PartitionOrg> {
         }
     }
 
+    @Override
+    PartitionOrg lookup(Map data) {
+        PartitionOrg porg
+        if(data.num)  {
+            porg = PartitionOrg.findWhere(num:data.num)
+        }
+        return porg
+    }
+
 }

@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 class PartitionOrgRepoSpec extends Specification implements GormHibernateTest, SecurityTest {
     static List entityClasses = [Org, OrgTag, OrgType, PartitionOrg]
-    static List springBeans = [OrgProps ]
+    static List springBeans = [OrgProps]
 
     @Inject PartitionOrgRepo repo
     @Inject OrgProps orgProps
@@ -38,5 +38,28 @@ class PartitionOrgRepoSpec extends Specification implements GormHibernateTest, S
 
         then:
         !PartitionOrg.exists(org.id)
+    }
+
+    void "lookup"() {
+        setup:
+        Org org = Org.of("foo", "bar", OrgType.Company).persist()
+        flush()
+
+        expect:
+        PartitionOrg.repo.exists(org.id)
+
+        when: "by num"
+        PartitionOrg porg = repo.findWithData([num: 'foo'])
+
+        then:
+        porg
+        porg.id == org.id
+
+        when: "by id"
+        porg = repo.findWithData([id: org.id])
+
+        then:
+        porg
+        porg.id == org.id
     }
 }

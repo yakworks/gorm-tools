@@ -1,3 +1,9 @@
+### v7.3.95
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.94...v7.3.95)
+- release 7.3.95 [link](https://github.com/yakworks/gorm-tools/commit/19c08f234413e437e17a29b274a84b93d6b679ca)
+- PartitionOrg lookup (#951) [link](https://github.com/yakworks/gorm-tools/commit/b683cca5bd1ba9bd83480f0cf4c9e37ad532f2c4)
+
 ### v7.3.94
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.93...v7.3.94)

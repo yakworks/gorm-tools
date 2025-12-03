@@ -78,6 +78,7 @@ class SecRole implements NameCodeDescription, RepoEntity<SecRole>, Serializable 
     }
 
     boolean hasPermission(String perm) {
+        Validate.notEmpty(perm)
         return permissions && permissions.contains(perm)
     }
 }

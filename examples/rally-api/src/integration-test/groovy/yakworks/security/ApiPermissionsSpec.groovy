@@ -9,7 +9,6 @@ import spock.lang.Specification
 import yakworks.rest.client.OkAuth
 import yakworks.rest.client.OkHttpRestTrait
 import yakworks.security.gorm.model.SecRole
-import yakworks.security.gorm.model.SecRolePermission
 import yakworks.security.spring.PermissionsAuthorizationManager
 
 import javax.inject.Inject
@@ -188,8 +187,9 @@ class ApiPermissionsSpec extends Specification implements OkHttpRestTrait {
         cust
 
         when: "Add permission to do op=rpc1 only"
-        SecRolePermission.withNewTransaction {
-            SecRolePermission.create(cust, "rally:org:rpc:rpc1")
+        SecRole.withNewTransaction {
+            cust.addPermission("rally:org:rpc:rpc1")
+            cust.persist()
         }
         TrxUtils.flush()
 
@@ -213,8 +213,9 @@ class ApiPermissionsSpec extends Specification implements OkHttpRestTrait {
         cleanup:
         OkAuth.TOKEN = null
 
-        SecRolePermission.withNewTransaction {
-            SecRolePermission.query(role:cust, permission:"rally:org:rpc:rpc1").deleteAll()
+        SecRole.withNewTransaction {
+            cust.removePermission("rally:org:rpc:rpc1")
+            cust.persist()
         }
     }
 }

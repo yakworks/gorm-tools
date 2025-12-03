@@ -1,8 +1,6 @@
 package yakworks.security
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.context.SecurityContextHolder
 
 import grails.gorm.transactions.Rollback
 import grails.gorm.transactions.Transactional
@@ -10,7 +8,6 @@ import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
-import yakworks.security.gorm.model.SecRolePermission
 import yakworks.security.gorm.model.SecRoleUser
 import yakworks.security.gorm.model.SecUserPermission
 import yakworks.security.user.CurrentUser
@@ -106,6 +103,8 @@ class CurrentUserSpec extends Specification implements DomainIntTest {
         SecRole roleMgr = SecRole.create(code: "MGR")
         SecRole roleUser = SecRole.create(code: 'CUST')
 
+
+
         new SecUserPermission(admin, 'printer:print:*').persist()
 
         new SecUserPermission(user2, 'printer:print:*').persist()
@@ -118,10 +117,11 @@ class CurrentUserSpec extends Specification implements DomainIntTest {
 
         new SecUserPermission(user3, 'action:kick').persist()
 
-        new SecRolePermission(roleAdmin, 'printer:admin').persist()
+        roleAdmin.addPermission('printer:admin')
+        roleAdmin.persist()
 
-        new SecRolePermission(roleUser, 'printer:use').persist()
-
+        roleUser.addPermission('printer:use')
+        roleUser.persist()
 
         SecRoleUser.create admin, roleAdmin, true
         SecRoleUser.create admin, roleMgr, true

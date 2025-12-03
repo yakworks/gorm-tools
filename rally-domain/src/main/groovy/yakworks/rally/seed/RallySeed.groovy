@@ -40,7 +40,6 @@ import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
-import yakworks.security.gorm.model.SecRolePermission
 import yakworks.security.gorm.model.SecRoleUser
 import yakworks.security.gorm.testing.SecuritySeedData
 import yakworks.spring.AppCtx
@@ -55,7 +54,7 @@ class RallySeed {
     /** the classes to mock for unit tests, NOTE: stackoverflow if this is not specifed with generics */
     static List<Class<?>> getEntityClasses() {
         return [
-            AppUser, SecRole, SecRoleUser, SecRolePermission,
+            AppUser, SecRole, SecRoleUser,
             Org, OrgSource, OrgTypeSetup, OrgTag, OrgMember, PartitionOrg, OrgFlex, OrgCalc, OrgInfo,
             Location, Contact,
             ActivityLink, Activity, TaskType, ActivityNote, ActivityContact,

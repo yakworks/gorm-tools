@@ -180,19 +180,19 @@ class ApiPermissionsSpec extends Specification implements OkHttpRestTrait {
 
     @Rollback
     void "test rpc permission - selected allowed"() {
-        setup: "admin has all the permissions"
+        setup:  "Add permission to do op=rpc1 only"
         SecRole cust = SecRole.query(code:Roles.CUSTOMER).get()
-
-        expect:
-        cust
-
-        when: "Add permission to do op=rpc1 only"
+        assert cust
         SecRole.withNewTransaction {
             cust.addPermission("rally:org:rpc:rpc1")
             cust.persist()
         }
-        TrxUtils.flush()
+        TrxUtils.flushAndClear()
+        SecRole.withNewTransaction {
+         assert SecRole.get(cust.id).hasPermission("rally:org:rpc:rpc1")
+        }
 
+        when:
         login("cust", "123")
 
         and: "op=rpc1 allowed"

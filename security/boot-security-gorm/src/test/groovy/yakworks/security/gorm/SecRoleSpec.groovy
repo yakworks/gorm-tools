@@ -73,4 +73,36 @@ class SecRoleSpec extends Specification implements GormHibernateTest, SecurityTe
         sru.role == role
     }
 
+    void "add remove perms"() {
+        setup:
+        def role = createRole('admin')
+        String p1 = "*:*:test"
+        String p2 = "*:test:test"
+
+        when:
+        role.addPermission(p1)
+        role.addPermission(p2)
+        role.persist()
+
+        then:
+        noExceptionThrown()
+
+        when:
+        role = SecRole.get(role.id)
+
+        then:
+        role
+        role.permissions.size() == 2
+        role.hasPermission(p1)
+        role.hasPermission(p2)
+
+        when:
+        role.removePermission(p1)
+        role.persist()
+        role = SecRole.get(role.id)
+
+        then:
+        role.permissions.size() == 1
+        !role.hasPermission(p1)
+    }
 }

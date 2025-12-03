@@ -10,6 +10,7 @@ import gorm.tools.model.NameCodeDescription
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import yakworks.commons.lang.Validate
 import yakworks.gorm.hibernate.type.JsonType
 
 import static grails.gorm.hibernate.mapping.MappingBuilder.orm
@@ -58,13 +59,25 @@ class SecRole implements NameCodeDescription, RepoEntity<SecRole>, Serializable 
     }
 
     void addPermission(String perm) {
+        Validate.notEmpty(perm)
         if(permissions == null) permissions = []
         permissions << perm
+        //Mark dirty explicitely, because when strings are added to list without replacing reference,
+        // grails do not detect dirty and does not update it.
+        markDirty('permissions')
     }
 
     void removePermission(String perm) {
+        Validate.notEmpty(perm)
         if(permissions) {
             permissions.remove(perm)
+            //Mark dirty explicitely, because when strings are added to list without replacing reference,
+            // grails do not detect dirty and does not update it.
+            markDirty('permissions')
         }
+    }
+
+    boolean hasPermission(String perm) {
+        return permissions && permissions.contains(perm)
     }
 }

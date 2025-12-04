@@ -18,7 +18,6 @@ import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
-import yakworks.security.gorm.model.SecRolePermission
 import yakworks.security.gorm.model.SecRoleUser
 
 @CompileDynamic
@@ -26,7 +25,7 @@ class MockData {
 
     /** common entityClasses for base setup */
     public static List<Class<Entity>> commonEntityClasses = [
-        Org, AppUser, SecRole, SecRoleUser, SecRolePermission ] as List<Class<Entity>>
+        Org, AppUser, SecRole, SecRoleUser ] as List<Class<Entity>>
 
     static Org org(Map dta = [:]) {
         Map vals = [num: 'tsla', name: 'Tesla', type: OrgType.Customer]

@@ -6,7 +6,7 @@ import yakworks.api.problem.data.DataProblemException
 import yakworks.security.PasswordConfig
 import yakworks.security.Roles
 import yakworks.security.gorm.model.SecPasswordHistoryRepo
-import yakworks.security.gorm.model.SecRolePermission
+import yakworks.security.gorm.model.SecRole
 import yakworks.security.gorm.model.SecRoleUser
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.AppUserRepo
@@ -94,7 +94,7 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
 
         then:
         perms.size()
-        perms.size() == SecRolePermission.query("role.code":['$in':[Roles.ADMIN, "MANAGER"]]).countDistinct("permission").get()
+        perms.size() == SecRole.query("code":['$in':[Roles.ADMIN, "MANAGER"]]).property("permissions").get().flatten().unique().size()
     }
 
     /*see SecuritySeedData*/

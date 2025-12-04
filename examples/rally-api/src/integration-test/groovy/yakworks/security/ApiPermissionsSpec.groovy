@@ -9,7 +9,6 @@ import spock.lang.Specification
 import yakworks.rest.client.OkAuth
 import yakworks.rest.client.OkHttpRestTrait
 import yakworks.security.gorm.model.SecRole
-import yakworks.security.gorm.model.SecRolePermission
 import yakworks.security.spring.PermissionsAuthorizationManager
 
 import javax.inject.Inject
@@ -181,18 +180,19 @@ class ApiPermissionsSpec extends Specification implements OkHttpRestTrait {
 
     @Rollback
     void "test rpc permission - selected allowed"() {
-        setup: "admin has all the permissions"
+        setup:  "Add permission to do op=rpc1 only"
         SecRole cust = SecRole.query(code:Roles.CUSTOMER).get()
-
-        expect:
-        cust
-
-        when: "Add permission to do op=rpc1 only"
-        SecRolePermission.withNewTransaction {
-            SecRolePermission.create(cust, "rally:org:rpc:rpc1")
+        assert cust
+        SecRole.withNewTransaction {
+            cust.addPermission("rally:org:rpc:rpc1")
+            cust.persist()
         }
-        TrxUtils.flush()
+        TrxUtils.flushAndClear()
+        SecRole.withNewTransaction {
+         assert SecRole.get(cust.id).hasPermission("rally:org:rpc:rpc1")
+        }
 
+        when:
         login("cust", "123")
 
         and: "op=rpc1 allowed"
@@ -213,8 +213,9 @@ class ApiPermissionsSpec extends Specification implements OkHttpRestTrait {
         cleanup:
         OkAuth.TOKEN = null
 
-        SecRolePermission.withNewTransaction {
-            SecRolePermission.query(role:cust, permission:"rally:org:rpc:rpc1").deleteAll()
+        SecRole.withNewTransaction {
+            cust.removePermission("rally:org:rpc:rpc1")
+            cust.persist()
         }
     }
 }

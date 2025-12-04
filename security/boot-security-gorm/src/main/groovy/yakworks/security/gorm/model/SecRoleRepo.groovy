@@ -4,12 +4,13 @@
 */
 package yakworks.security.gorm.model
 
+import groovy.transform.CompileStatic
+
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.AbstractCrossRefRepo
 import gorm.tools.repository.model.LongIdGormRepo
-import groovy.transform.CompileStatic
 
 @GormRepository
 @CompileStatic

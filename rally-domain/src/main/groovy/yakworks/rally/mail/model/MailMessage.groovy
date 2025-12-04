@@ -130,7 +130,7 @@ class MailMessage implements UuidRepoEntity<MailMessage>, AuditCreatedTrait, Ser
         source       : [d: 'any special source indicator'],
         state        : [d: 'the state of the message', nullable: false],
         subject      : [d: 'email message subject', maxSize: 1000],
-        body         : [d: 'body of message', maxSize: 65535],
+        body         : [d: 'body of message'],
         attachmentIds: [d: 'ids list of attachments'],
         inlineIds    : [d: 'Attachment ids with inline disposition.'],
         sendDate     : [d: 'The send datetime, always in Zulu to match server time'],

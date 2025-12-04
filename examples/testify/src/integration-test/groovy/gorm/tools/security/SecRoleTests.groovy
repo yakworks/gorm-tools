@@ -12,6 +12,26 @@ import yakworks.testing.gorm.integration.SecuritySpecHelper
 @Rollback
 class SecRoleTests  extends Specification implements SecuritySpecHelper, DataIntegrationTest {
 
+    void "update permissions"() {
+        setup:
+        SecRole cust = SecRole.query(code: Roles.CUSTOMER).get()
+        List<String> perms = ["*:*:test"] + cust.permissions
+
+        when:
+        SecRole.repo.update([id:cust.id, permissions:perms])
+        flushAndClear()
+
+        then:
+        noExceptionThrown()
+
+        when:
+        cust.refresh()
+
+        then:
+        cust.permissions.size() == perms.size()
+        cust.hasPermission("*:*:test")
+    }
+
     void "add remove permissions"() {
         setup:
         SecRole cust = SecRole.query(code: Roles.CUSTOMER).get()

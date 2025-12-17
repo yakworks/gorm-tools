@@ -170,7 +170,7 @@ class OrgWebApiSpec extends Specification implements WebClientTrait, WithTrx {
         when:
         List<Map> phones = [[kind: "kind", num: "123"]]
         List<Map> emails = [[kind: "kind", address: "test@9ci.com"]]
-        Map source = [source: "source", sourceType: "RestApi", sourceId: "1"]
+        Map source = [source: "source", sourceType: "ERP", sourceId: "1"]
 
         List<Map> contacts = [
             [name: "C1", firstName: "C1", phones: phones, emails:emails, source: source],

@@ -52,7 +52,7 @@ class SyncJobSpec extends Specification implements GormHibernateTest, SecurityTe
         def dataList = ["id":1,"inactive":false,"name":"name"]
         def sourceId = "api/ar/org"
         def source = "Oracle"
-        def sourceType = SourceType.RestApi
+        def sourceType = SourceType.ERP
         def job = SyncJob.repo.create(
             state: SyncJobState.Running, jobType: 'bulk',
             payloadBytes:dataList.toString().bytes,

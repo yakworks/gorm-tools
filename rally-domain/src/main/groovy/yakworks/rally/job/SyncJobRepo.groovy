@@ -27,8 +27,8 @@ class SyncJobRepo extends LongIdGormRepo<SyncJob> {
     @RepoListener
     void beforeBind(SyncJob job, Map data, BeforeBindEvent be) {
         if (be.isBindCreate()) {
-            // default to RestApi
-            if(!data.sourceType) job.sourceType = SourceType.RestApi
+            // default to ERP
+            if(!data.sourceType) job.sourceType = SourceType.ERP
         }
         //bind doesnt seem to work on the problems list so manaully set it here
         if(data.problems)  job.problems = data.problems as List

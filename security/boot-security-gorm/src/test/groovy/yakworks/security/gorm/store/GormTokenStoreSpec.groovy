@@ -1,7 +1,6 @@
 package yakworks.security.gorm.store
 
 import yakworks.security.PasswordConfig
-import yakworks.security.gorm.model.SecRolePermission
 
 import java.time.Instant
 
@@ -20,7 +19,7 @@ import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
 class GormTokenStoreSpec extends Specification implements GormHibernateTest, SecurityTest  {
-    static List entityClasses = [AppUserToken, AppUser, SecRole, SecRoleUser, SecRolePermission]
+    static List entityClasses = [AppUserToken, AppUser, SecRole, SecRoleUser]
 
     @Autowired GormTokenStore tokenStore
 

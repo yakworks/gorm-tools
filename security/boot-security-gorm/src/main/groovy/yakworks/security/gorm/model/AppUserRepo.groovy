@@ -252,17 +252,18 @@ class AppUserRepo extends LongIdGormRepo<AppUser> {
 
     @Transactional(readOnly = true)
     Set getPermissions(AppUser user) {
-        //have test
-        return SecRolePermission.executeQuery(
-            """
-              select distinct p.permission
-                    from SecRolePermission p
-                    join p.role r
-                    join SecRoleUser sru on sru.role = r
-                    join sru.user u
-                    where u.id = :uid
-            """,
-            [uid: user.id] ) as Set
+        //permissions are stored as json array, hql can not expand it and return unique perms without writing native pgsql query
+        String query = """
+            select role.permissions
+            from SecRole role
+            join SecRoleUser sru on sru.role = role
+            join sru.user u
+            where u.id = :uid
+            and role.permissions is not null
+        """
+
+        List<List<String>> perms = (List<List<String>>) SecRole.executeQuery(query, [uid: user.id])
+        return perms.flatten().unique() as Set
     }
 
 }

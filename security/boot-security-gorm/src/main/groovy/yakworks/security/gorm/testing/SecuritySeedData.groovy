@@ -9,8 +9,6 @@ import groovy.transform.CompileStatic
 import yakworks.security.Roles
 import yakworks.security.gorm.model.AppUser
 import yakworks.security.gorm.model.SecRole
-import yakworks.security.gorm.model.SecRolePermission
-import yakworks.security.gorm.model.SecUserPermission
 
 @CompileStatic
 class SecuritySeedData {
@@ -61,12 +59,13 @@ class SecuritySeedData {
     }
 
     static void readOnlyPermissions(SecRole role) {
-        SecRolePermission.create(role, "rally:*:read")
+        role.permissions = ["rally:*:read"]
+        role.persist()
     }
 
     static void adminPermissions(SecRole role){
 
-        [ "*:*:*",
+        role.permissions = [ "*:*:*",
           'rally:org:*',
          'rally:activityNote:*',
          'rally:company:list,get,post',
@@ -78,20 +77,19 @@ class SecuritySeedData {
          'rally:activity:*',
          'rally:attachment:*',
          'rally:tag:*'
-        ].each{
-            SecRolePermission.create(role, it)
-        }
+        ]
+
+        role.persist()
     }
 
     static void custPermissions(SecRole role){
-        ['rally:org:list,get,post',
+        role.permissions = ['rally:org:list,get,post',
          // 'rally:contact:*',
          'rally:activity:list,get',
          'rally:attachment:*',
          'rally:tag:list,get'
-        ].each{
-            SecRolePermission.create(role, it)
-        }
+        ]
+        role.persist()
     }
 
 }

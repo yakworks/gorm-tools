@@ -52,4 +52,29 @@ class MailMessageSpec extends Specification implements DomainIntTest {
         msg2.tags.size() == 1
     }
 
+    void "large mail message size success"() {
+        String body = RandomStringUtils.randomAlphanumeric(100000)
+        def msg = new MailMessage(
+            state: MailMessage.MsgState.Queued,
+            sendTo: 'test@9ci.com',
+            sendFrom: "test@9ci.com",
+            replyTo: "test@9ci.com",
+            subject: "test",
+            body: body,
+        )
+
+        when:
+        msg.persist()
+        flushAndClear()
+
+        then:
+        noExceptionThrown()
+
+        when:
+        def msg2 = MailMessage.get(msg.id)
+
+        then:
+        msg2.body.length() == 100000
+    }
+
 }

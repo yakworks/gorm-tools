@@ -1,3 +1,12 @@
+### v7.3.96
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.95...v7.3.96)
+- release [link](https://github.com/yakworks/gorm-tools/commit/2df57c614fc1e7ab6d0a6f5471e4f168273aee48)
+- Merge pull request #958 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/91b284d73bc76e68e4f1de6d66fc3aca5579c1df)
+- Fix mail message maxSize - set 2.5MB (#956) [link](https://github.com/yakworks/gorm-tools/commit/6c5170b360d43ebb5733a3afde07696f9897abc1)
+- MailMessage remove maxSize (#955) [link](https://github.com/yakworks/gorm-tools/commit/4b90425cee6a5f20fbe0c44c2309dcd885febb9c)
+- Refactor role permissions (#954) [link](https://github.com/yakworks/gorm-tools/commit/820ea6a225f085a395a7c1809493731338fc26aa)
+
 ### v7.3.95
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.94...v7.3.95)

@@ -27,7 +27,7 @@ class TestSyncJobRepo extends LongIdGormRepo<TestSyncJob> {
 
     @RepoListener
     void beforeBind(TestSyncJob job, Map data, BeforeBindEvent be) {
-        job.sourceType = SourceType.RestApi
+        job.sourceType = SourceType.ERP
         if (be.isBindCreate()) {
             if (data.payload) {
                 String res = JsonEngine.toJson(data.payload)

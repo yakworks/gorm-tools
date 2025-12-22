@@ -12,10 +12,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 enum SourceType {
     App, // indicates that we creatd and are system of record for this
-    Scheduler, //for Job only, more specific App
     ERP, //external system is system of record, rename from ERP.
-    RestApi, // more specific ERP
-    PayGateway
 
     public String getName() {
         return name()

@@ -204,7 +204,7 @@ trait OkHttpRestTrait {
     /**
      * convert the body onject to json strino
      */
-    String toJson(Object body){
-        JsonEngine.toJson(body)
+    String toJson(Object body, boolean removeNullsKeys = true){
+        JsonEngine.toJson(body, removeNullsKeys)
     }
 }

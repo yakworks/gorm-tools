@@ -202,6 +202,12 @@ class OpenApiGenerator {
         processTplFile(pathItem, 'paths/tpl@{id}.yaml', filePathRef, model)
         paths[pathKeyId] = ['$ref': filePathRef]
 
+        //upsert
+        filePathRef = "${pathFileBase}@upsert.yaml"//.toString()
+        processTplFile(pathItem, 'paths/tpl@upsert.yaml', filePathRef, model)
+        paths["${pathKey}/upsert"] = ['$ref': filePathRef]
+
+
         //if bulk operations are enabled
         if(pathItem.bulkOps){
             paths["${pathKey}/bulk"] = ['$ref': "${pathFileBase}@bulk.yaml".toString()]

@@ -1,0 +1,40 @@
+post:
+  tags: [ ${endpoint} ]
+  summary: Upsert ${capitalName}
+  description: >
+    Updates ${capitalName} if exists, or creates new.
+    Lookup is done to find existing record using standard lookup logic for the entity.
+    If json body contains "id" it will be used to lookup existing record.
+
+    Will fails with a not found problem  if json body contains id, but no existing record is found for that id,
+    and parameter bindId=true not passed
+
+  operationId: upsert${capitalName}
+
+  parameters:
+    - \$ref: '${baseDir}components/parameters/bindId.yaml'
+
+  requestBody:
+    description: ${capitalName} resource
+    required: true
+    content:
+      application/json:
+        schema:
+          \$ref: '${baseDir}models/${modelName}.yaml'
+
+  responses:
+    '201':
+      description: ${capitalName} Resource
+      content:
+        application/json:
+          schema:
+            \$ref: '${baseDir}models/${modelName}.yaml'
+    '200':
+      description: ${capitalName} Resource
+      content:
+        application/json:
+          schema:
+            \$ref: '${baseDir}models/${modelName}.yaml'
+    '400': {\$ref: '../../components/responses/400_Problem.yaml'}
+    '403': {\$ref: '../../components/responses/403_Forbidden.yaml'}
+    '404': {\$ref: '../../components/responses/404_NotFound.yaml'}

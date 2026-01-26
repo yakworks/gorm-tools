@@ -15,6 +15,7 @@ import spock.lang.Specification
 import yakworks.etl.DataMimeTypes
 import yakworks.gorm.api.bulk.BulkImportJobArgs
 import yakworks.gorm.api.bulk.BulkImportService
+import yakworks.json.groovy.JsonEngine
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
@@ -62,6 +63,36 @@ class BulkImportTests extends Specification implements DomainIntTest {
         // withNewTrx {
         //     return SyncJob.get(jobId)
         // }
+    }
+
+
+    void "queue job - payload with null key values"() {
+        setup:
+        List payload = [[id:1, flex:[text1:null, text2: "test"]]]
+        BulkImportJobArgs bulkImportJobArgs = BulkImportJobArgs.fromParams(
+            sourceId: '123', source: 'some source',
+            'foo': 'bar'
+        )
+        bulkImportJobArgs.entityClassName = Org.name
+        var bulkImportService = BulkImportService.lookup(Org)
+        SyncJobEntity job = bulkImportService.queueJob(bulkImportJobArgs, payload)
+        flushAndClear()
+
+        expect:
+        job
+
+        when:
+        job = SyncJob.get(job.id)
+        def payloadList = JsonEngine.parseJson(job.payloadToString(), List<Map>)
+
+        then:
+        payloadList
+        payloadList.size() == 1
+        payloadList[0].flex
+        payloadList[0].flex.text2 == "test"
+        payloadList[0].flex.containsKey("text1")
+        payloadList[0].flex.text1 == null
+
     }
 
     void "test queueJob and save payload to file large payload"() {

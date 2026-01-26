@@ -100,7 +100,7 @@ class DefaultSyncJobService extends SyncJobService<SyncJob> {
             syncJob.payloadId = args.payloadId
         }
         else if(args.payload){
-            String res = JsonEngine.toJson(args.payload)
+            String res = JsonEngine.toJson(args.payload, false)
             syncJob.payloadBytes = res.bytes
         }
         syncJob.persist(flush: true)

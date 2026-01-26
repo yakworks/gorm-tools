@@ -1,6 +1,10 @@
 package yakworks.rest
 
+import gorm.tools.transaction.TrxUtils
 import grails.gorm.transactions.Rollback
+import okhttp3.MediaType
+import okhttp3.Request
+import okhttp3.RequestBody
 import org.apache.commons.lang3.StringUtils
 import org.springframework.http.HttpStatus
 
@@ -167,8 +171,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         delete("/api/rally/org", json.data[1].id)
     }
 
-    def "upsert"() {
-
+    void "upsert"() {
         setup:
         int orgCount
         OrgSource.withTransaction {
@@ -179,7 +182,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
 
         List<Map> jsonList = [
             // this should update based on num
-            [num: "91", name: "updated"],
+            [num: "91", name: "updated", flex:[num1:null]],
             //this should update based on id
             [id: "92", name: "updated2"],
             //this should update based on sourceId
@@ -190,9 +193,20 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
             [id: 999999, num: "fox2", name: "Fox2", type: "Customer"]
         ]
 
-        when:
-        Response resp = post("$path&op=upsert", jsonList)
+        expect:
+        Org.repo.getWithTrx(91).flex.num1
 
+        when:
+
+        String jsonBody = toJson(jsonList, false)
+
+        Request request = getRequestBuilder("$path&op=upsert")
+            .method("POST",  RequestBody.create(jsonBody, MediaType.parse(jsonHeader)))
+            .build()
+
+        Response resp  = getHttpClient().newCall(request).execute()
+
+        TrxUtils.flushAndClear()
         Map body = bodyToMap(resp)
 
         then: "sanity check json structure"
@@ -216,6 +230,9 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         failed == 1
         inserted == 1
         updated == 3
+
+        and: "value should have been set to null"
+        Org.repo.getWithTrx(91).flex.num1 == null
     }
 
     void "bulk export"() {

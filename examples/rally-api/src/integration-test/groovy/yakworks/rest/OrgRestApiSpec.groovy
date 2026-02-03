@@ -263,7 +263,7 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
 
         List<Map> phones = [[kind: "kind", num: "123"]]
         List<Map> emails = [[kind: "kind", address: "test@9ci.com"]]
-        Map source = [source: "source", sourceType: "RestApi", sourceId: "11"]
+        Map source = [source: "source", sourceType: "ERP", sourceId: "11"]
 
         List<Map> contacts = [
             [name: "C1", firstName: "C1", phones: phones, emails:emails, source: source],

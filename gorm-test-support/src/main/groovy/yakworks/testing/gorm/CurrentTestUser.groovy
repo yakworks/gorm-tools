@@ -6,7 +6,6 @@ package yakworks.testing.gorm
 
 import groovy.transform.CompileStatic
 
-import yakworks.security.SecService
 import yakworks.security.user.BasicUserInfo
 import yakworks.security.user.CurrentUser
 import yakworks.security.user.UserInfo
@@ -15,7 +14,7 @@ import yakworks.security.user.UserInfo
  * Spring implementation of the generic base SecService
  */
 @CompileStatic
-class CurrentTestUser implements CurrentUser{
+class CurrentTestUser implements CurrentUser {
 
     UserInfo user = BasicUserInfo.create(
         id:1L, username: "testuser", email: "testuser@testing.com", roles: ["ADMIN"], orgId:1L
@@ -39,5 +38,10 @@ class CurrentTestUser implements CurrentUser{
     @Override
     boolean hasRole(String role) {
         return false
+    }
+
+    @Override
+    boolean hasPermission(String permission) {
+        return true
     }
 }

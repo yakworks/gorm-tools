@@ -6,6 +6,7 @@ package yakworks.security.spring
 
 import groovy.transform.CompileStatic
 
+import org.apache.shiro.authz.permission.WildcardPermission
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.expression.SecurityExpressionHandler
 import org.springframework.security.access.expression.SecurityExpressionOperations
@@ -97,7 +98,13 @@ class CurrentSpringUser implements CurrentUser {
         SecurityContextHolder.clearContext()
     }
 
-    /**
+    @Override
+    boolean hasPermission(String requiredPermission) {
+        return getUser().permissions.any { def userPerm ->
+            return toWildcardPermission((String)userPerm).implies(toWildcardPermission(requiredPermission))
+        }
+    }
+/**
      * Get the currently logged in user's <code>Authentication</code>. If not authenticated
      * and the AnonymousAuthenticationFilter is active (true by default) then the anonymous
      * user's auth will be returned (AnonymousAuthenticationToken with username 'anonymousUser' unless overridden).
@@ -120,6 +127,10 @@ class CurrentSpringUser implements CurrentUser {
         def fi = new FilterInvocation('currentUser', 'hasRole')
         def ctx = securityExpressionHandler.createEvaluationContext(getAuthentication(), fi)
         return (SecurityExpressionOperations)ctx.getRootObject().getValue()
+    }
+
+    protected WildcardPermission toWildcardPermission(String perm) {
+        return new WildcardPermission(perm)
     }
 
 }

@@ -54,7 +54,6 @@ class CurrentUserSpec extends Specification implements DomainIntTest {
         currentUser.hasRole('MGR')
         !currentUser.hasRole('CUST')
         currentUser.hasAnyRole(['ADMIN', 'CUST'])
-
     }
 
     void "test hasAnyRole string"() {
@@ -87,6 +86,29 @@ class CurrentUserSpec extends Specification implements DomainIntTest {
         currentUser.hasAnyRole([SecRole.ADMIN, "FakeRole"])
     }
 
+    void "test hasPermission"() {
+        setup:
+        setupPerms()
+        login "userAdmin"
+
+        expect:
+        currentUser.hasPermission('printer:print:*')
+        currentUser.hasPermission('printer:print:1')
+
+        and:
+        !currentUser.hasPermission('printer:poweroff:1')
+    }
+
+    void "test hasAnyPermission"() {
+        setup:
+        setupPerms()
+        login "userAdmin"
+
+        expect:
+        currentUser.hasAnyPermission(['printer:print:1', 'printer:poweroff:1']) //yes, has 1
+        !currentUser.hasAnyPermission(['printer:foo:1', 'printer:poweroff:1']) //nope, none
+    }
+
     // def "test user roles"() {
     //     expect:
     //     roles.size() == currentUser.userInfo.roles.size()
@@ -103,8 +125,6 @@ class CurrentUserSpec extends Specification implements DomainIntTest {
         SecRole roleMgr = SecRole.create(code: "MGR")
         SecRole roleUser = SecRole.create(code: 'CUST')
 
-
-
         new SecUserPermission(admin, 'printer:print:*').persist()
 
         new SecUserPermission(user2, 'printer:print:*').persist()
@@ -118,6 +138,7 @@ class CurrentUserSpec extends Specification implements DomainIntTest {
         new SecUserPermission(user3, 'action:kick').persist()
 
         roleAdmin.addPermission('printer:admin')
+        roleAdmin.addPermission('printer:print:*')
         roleAdmin.persist()
 
         roleUser.addPermission('printer:use')

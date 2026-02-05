@@ -18,6 +18,7 @@ class OrgCalc implements BaseArScoreCard, RepoEntity<OrgCalc>, Serializable {
 
     Long id
 
+
     static mapping = {
         id generator: 'assigned'
         version false

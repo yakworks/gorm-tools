@@ -71,6 +71,18 @@ trait CurrentUser {
     }
 
     /**
+     * Returns true if user has any of the given permission
+     */
+    boolean hasAnyPermission(Collection<String> permissions) {
+        return permissions.any { hasPermission(it)}
+    }
+
+    /**
+     * Returns true if user has the given permission
+     */
+    abstract boolean hasPermission(String permission)
+
+    /**
      * Gets user fields to send to client about their login
      */
     Map getUserMap() {

@@ -1,3 +1,9 @@
+### v7.3.98
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.97...v7.3.98)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/d9713dffb9a3afc859bb03f7b389d80ef9ef6bc3)
+- Add log.error before handleUnExpected to help diagnose errors (#966) [link](https://github.com/yakworks/gorm-tools/commit/a57d71b101a4d22d9202679b6e1ad0c276532e9a)
+
 ### v7.3.97
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.96...v7.3.97)

@@ -90,6 +90,7 @@ class BulkImporter<D> {
             doBulkParallel(dataList, jobContext)
         } catch (ex) {
             //ideally should not happen as the pattern here is that all exceptions should be handled in doBulkParallel
+            log.error("Unhandled exception while running bulkImport")
             jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
         }
         finally {
@@ -133,7 +134,7 @@ class BulkImporter<D> {
                     ApiResults results = doBulkSlice((List<Map>) dataSlice, jobArgs, true)
                     jobContext.updateJobResults(results, false)
                 } catch(Exception ex) {
-                    //log.error("BulkableRepo unexpected exception", ex)
+                    log.error("Unhandled exception while running doBulkParallel")
                     jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
                 }
             }

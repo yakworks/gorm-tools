@@ -115,7 +115,11 @@ class ProblemHandler {
     }
 
     GenericProblem handleUnexpected(Throwable e){
-        log.error("UNEXPECTED Internal Server Error\n${e.message}", deepSanitize(e))
+        //FIXME @SN - temporary - do not sanitize NPEs to help diagnose the errors See cust-rndc-ext/issues/957
+        if(!(e instanceof NullPointerException)) {
+            e = deepSanitize(e)
+        }
+        log.error("UNEXPECTED Internal Server Error\n${e.message}", e)
         if (e instanceof GenericProblem) {
             return (GenericProblem) e
         }

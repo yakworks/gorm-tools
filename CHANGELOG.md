@@ -1,3 +1,15 @@
+### v7.3.99
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.98...v7.3.99)
+- Set release flag to true in version.properties [link](https://github.com/yakworks/gorm-tools/commit/9d1185f1e178c8590ba7af881e582d3794c28e0c)
+- Merge pull request #967 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/05a13c22d25baf9dda8cc5a6df1a9c66fea674ef)
+- Merge branch 'master' into dev [link](https://github.com/yakworks/gorm-tools/commit/ff967da5ead93b3f93bda60c4ab7e8a46ed7cad2)
+- Update vGroovyCommons version from SNAPSHOT to 3.19 (#968) [link](https://github.com/yakworks/gorm-tools/commit/411a9b1c7067d3ea76ad7c95cbe9d0760e9e3e8c)
+- Add hasPermission method to CurrentUser (#964) [link](https://github.com/yakworks/gorm-tools/commit/1102cd3ab27ed683b972c571b3ded362e52ca898)
+- Add upsert end point to docs (#961) [link](https://github.com/yakworks/gorm-tools/commit/f1a26e09fd73f068a948516bf5936893afe79ca1)
+- Add test for bulk - null out value (#960) [link](https://github.com/yakworks/gorm-tools/commit/58b41b37c36e1f5e664539a374cf6915b1846a53)
+- SourceType refactoring (#957) [link](https://github.com/yakworks/gorm-tools/commit/c79a6755643abb9d0c23748a63990f8e8d1d635f)
+
 ### v7.3.98
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.97...v7.3.98)

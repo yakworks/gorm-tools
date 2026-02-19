@@ -127,6 +127,7 @@ class BulkExportService<D> {
             doBulkExport(jobContext)
         } catch (ex) {
             //ideally should not happen as the pattern here is that all exceptions should be handled in doBulkParallel
+            log.error("Unhandled exception while running bulkExport")
             jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
         }
         finally {
@@ -152,7 +153,7 @@ class BulkExportService<D> {
                 jobContext.updateJobResults(result, false, pageData.size())
             }
         } catch (Exception ex) {
-            log.error("BulkExport unexpected exception", ex)
+            log.error("BulkExport unexpected while running doBulkExport")
             jobContext.updateWithResult(problemHandler.handleUnexpected(ex))
         }
     }

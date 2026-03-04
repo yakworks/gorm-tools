@@ -70,6 +70,11 @@ class KitchenSinkRepo extends LongIdGormRepo<KitchenSink> {
     @RepoListener
     void beforePersist(KitchenSink o, BeforePersistEvent e) {
         if(!o.kind) o.kind = KitchenSink.Kind.CLIENT
+        if(e.isBindCreate()) {
+            if(e.args.params && e.args.params.getBoolean('apply')) {
+                o.stampEvent = "applied"
+            }
+        }
     }
 
     @RepoListener

@@ -205,6 +205,11 @@ class BulkImporter<D> {
         def closure = {
             doBeforeBulkSaveEntity(dataClone, jobArgs)
             PersistArgs pargs = jobArgs.persistArgs ? jobArgs.persistArgs.clone() : PersistArgs.of()
+            //passdown query params in persist args params, so if repo events needs access to query params, they can access it.
+            //See #3423
+            if(jobArgs.queryParams) {
+                pargs.params = jobArgs.queryParams
+            }
             D entityInstance
             DataOp op = jobArgs.op
             int statusCode

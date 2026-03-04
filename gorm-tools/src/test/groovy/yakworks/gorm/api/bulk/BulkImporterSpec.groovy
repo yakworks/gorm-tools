@@ -1,6 +1,5 @@
 package yakworks.gorm.api.bulk
 
-import gorm.tools.async.AsyncService
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobService
 import yakworks.api.problem.data.DataProblemException
@@ -15,7 +14,6 @@ import testing.TestSyncJob
 import testing.TestSyncJobService
 import yakworks.commons.map.LazyPathKeyMap
 import yakworks.testing.gorm.model.KitchenSink
-import yakworks.testing.gorm.model.KitchenSinkRepo
 import yakworks.testing.gorm.model.SinkExt
 import yakworks.testing.gorm.unit.GormHibernateTest
 
@@ -26,8 +24,6 @@ class BulkImporterSpec extends Specification implements GormHibernateTest {
     static springBeans = [TestSyncJobService]
 
     @Autowired AsyncConfig asyncConfig
-    @Autowired AsyncService asyncService
-    @Autowired KitchenSinkRepo kitchenSinkRepo
     @Autowired SyncJobService syncJobService
 
 
@@ -66,6 +62,10 @@ class BulkImporterSpec extends Specification implements GormHibernateTest {
         List list = KitchenSink.generateDataList(10)
 
         when: "bulk insert 20 records"
+        SyncJobContext ctx = syncJobContext(list)
+        ctx.args.queryParams = ['apply':"true"]
+        bulkImporter.bulkImport(list, ctx)
+        flush()
         Long jobId = bulkImport(list)
         def job = TestSyncJob.get(jobId)
         List results = job.parseData()
@@ -73,6 +73,9 @@ class BulkImporterSpec extends Specification implements GormHibernateTest {
         then: "verify job"
         job.state == SyncJobState.Finished
         results[0].ok
+
+        and:
+        KitchenSink.get(1000).stampEvent == "applied"
     }
 
     void "success bulk insert"() {

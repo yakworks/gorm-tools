@@ -14,6 +14,7 @@ import gorm.tools.beans.Pager
 import grails.rest.render.RenderContext
 import yakworks.etl.excel.ExcelBuilder
 import yakworks.etl.excel.ExcelBuilderSupport
+import yakworks.meta.MetaMapList
 
 /**
  * Rederer for paged list data
@@ -54,7 +55,11 @@ class XlsxPagerRenderer implements XlsRendererTrait<Pager> {
             //Because if exception is thrown at this place, (eg because socket was closed by client) nothing further action can be taken
             //and trying to send any more response in form of problem result etc would result in another exception
             //see #2596
-            log.debug("Error encountered while rendering xsl file : ${ex.message}")
+            String entityClassName = params['entityClassName']
+            if(dataList instanceof MetaMapList && dataList.metaEntity) {
+                entityClassName = dataList.metaEntity.className
+            }
+            log.warn("Error encountered while rendering xsl file, domain:$entityClassName, error:${ex.message}")
         }
     }
 

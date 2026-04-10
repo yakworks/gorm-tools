@@ -15,7 +15,6 @@ import org.springframework.validation.Errors
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.model.Persistable
-import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.events.AfterBindEvent
@@ -33,13 +32,13 @@ import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.model.TaskStatus
 import yakworks.rally.activity.model.TaskType
-import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.rally.attachment.repo.AttachmentLinkRepo
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.TagLink
-import yakworks.security.user.CurrentUser
 
+import static yakworks.commons.beans.Transform.objectListToIdMapList
 import static yakworks.rally.activity.model.Activity.Kind as ActKind
 
 @GormRepository
@@ -48,8 +47,7 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
 
     @Autowired ActivityLinkRepo activityLinkRepo
     @Autowired AttachmentRepo attachmentRepo
-    @Autowired CurrentUser currentUser
-    @Autowired ProblemHandler problemHandler
+    @Autowired AttachmentLinkRepo attachmentLinkRepo
 
     @RepoListener
     void beforeValidate(Activity activity, Errors errors) {
@@ -218,11 +216,7 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
     // called in afterBind
     void doAttachments(Activity activity, Object attData) {
         List attachments = attachmentRepo.createOrUpdate(attData as List)
-        //FIXME this is not right
-        attachments.each { Attachment attachment ->
-            AttachmentLink.create(activity, attachment)
-        }
-        activity.setHasAttachments(true)
+        attachmentLinkRepo.addOrRemove((Persistable) activity, objectListToIdMapList(attachments))
     }
 
     void doLinks(Activity activity, List<Map> links) {

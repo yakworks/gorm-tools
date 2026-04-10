@@ -145,6 +145,41 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
         attachmentSupport.rimrafAttachmentsDirectory()
     }
 
+    void "update activity with unchanged attachments"() {
+        given:
+        Map params = getNoteParams()
+        params['attachments'] = [getTestAttachment('unchanged-metadata.txt')]
+
+        when: "create with minimal fields and one attachment"
+        Activity activity = activityRepo.create(params)
+        flush()
+        Long attachmentId = activity.attachments[0].id
+        String attachmentName = activity.attachments[0].name
+
+        and: "update activity field and send attachments back unchanged"
+        Map updateParams = [id: activity.id, note: [body: 'Updated body after attachment noop'],
+                            attachments: [[id: attachmentId, name: attachmentName]]]
+        Activity result = activityRepo.update(updateParams)
+        flushAndClear()
+
+        then: "update succeeds"
+        noExceptionThrown()
+        result
+        result.note.body == updateParams.note.body
+
+        when:
+        Activity reloaded = Activity.get(activity.id)
+
+        then: "same attachment remains linked"
+        reloaded.hasAttachments()
+        reloaded.attachments.size() == 1
+        reloaded.attachments[0].id == attachmentId
+        reloaded.attachments[0].name == attachmentName
+
+        cleanup:
+        attachmentSupport.rimrafAttachmentsDirectory()
+    }
+
 
     void testHasAttachments(){
         when:

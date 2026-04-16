@@ -1,5 +1,6 @@
 package yakworks.rally.activity
 
+import java.nio.file.Files
 import java.nio.file.Path
 
 import gorm.tools.databinding.BindAction
@@ -88,7 +89,7 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
         }
     }
 
-    void "not with attachments"() {
+    void "note with attachments"() {
         given:
         Map params = getNoteParams()
 
@@ -104,14 +105,16 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
         Activity.Kind.Note == activity.kind
 
         when:
-        Attachment attachment = activity.attachments[0]
+        flushAndClear()
+        Activity reloaded = Activity.get(activity.id)
+        Attachment attachment = reloaded.attachments[0]
 
         then:
         noExceptionThrown()
-        activity.hasAttachments()
+        reloaded.hasAttachments()
         attachment.id
         'grails_logo.jpg' == attachment.name
-        !activity.task
+        !reloaded.task
 
         cleanup:
         attachmentSupport.rimrafAttachmentsDirectory()
@@ -140,6 +143,105 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
 
         attachment.id
         'foo.pdf' == attachment.name
+
+        cleanup:
+        attachmentSupport.rimrafAttachmentsDirectory()
+    }
+
+    void "update activity attachments with op update appends to existing attachments"() {
+        given: "an activity with one attachment"
+        Map params = getNoteParams()
+        params['attachments'] = [getTestAttachment('existing-attach.txt')]
+        Activity activity = activityRepo.create(params)
+        flush()
+        Long existingAttachmentId = activity.attachments[0].id
+
+        when: "add one more attachment with op=update"
+        Activity result = activityRepo.update([
+            id         : activity.id,
+            attachments: [
+                op  : 'update',
+                data: [getTestAttachment('added-attach.pdf')]
+            ]
+        ])
+        flushAndClear()
+
+        then:
+        result
+
+        when:
+        Activity reloaded = Activity.get(activity.id)
+        List<Long> attachmentIds = reloaded.attachments*.id as List<Long>
+        List<String> attachmentNames = reloaded.attachments*.name as List<String>
+
+        then: "activity has both attachments"
+        reloaded.hasAttachments()
+        reloaded.attachments.size() == 2
+        attachmentIds.contains(existingAttachmentId)
+        attachmentNames.contains('existing-attach.txt')
+        attachmentNames.contains('added-attach.pdf')
+
+        cleanup:
+        attachmentSupport.rimrafAttachmentsDirectory()
+    }
+
+    void "update activity attachments with empty list replaces with none"() {
+        given:
+        Map params = getNoteParams()
+        params['attachments'] = [getTestAttachment('replace-remove.txt')]
+        Activity activity = activityRepo.create(params)
+        flush()
+
+        when:
+        Activity result = activityRepo.update([id: activity.id, attachments: []])
+        flushAndClear()
+
+        then:
+        result
+
+        when:
+        Activity reloaded = Activity.get(activity.id)
+
+        then:
+        !reloaded.hasAttachments()
+        reloaded.attachments.isEmpty()
+
+        cleanup:
+        attachmentSupport.rimrafAttachmentsDirectory()
+    }
+
+    void "update activity attachments with op remove deletes links and attachments"() {
+        given:
+        Map params = getNoteParams()
+        params['attachments'] = [getTestAttachment('remove-me.txt'), getTestAttachment('keep-me.txt')]
+        Activity activity = activityRepo.create(params)
+        flush()
+        def attachmentToRemove = activity.attachments.find { it.name == 'remove-me.txt' }
+        def attachmentToKeep = activity.attachments.find { it.name == 'keep-me.txt' }
+
+        when:
+        Activity result = activityRepo.update([
+            id         : activity.id,
+            attachments: [
+                op  : 'remove',
+                data: [[id: attachmentToRemove.id]]
+            ]
+        ])
+        flushAndClear()
+
+        then:
+        result
+
+        when:
+        Activity reloaded = Activity.get(activity.id)
+
+        then:
+        reloaded.hasAttachments()
+        reloaded.attachments.size() == 1
+        reloaded.attachments[0].id == attachmentToKeep.id
+        reloaded.attachments[0].name == 'keep-me.txt'
+        !Attachment.get(attachmentToRemove.id)
+        Files.notExists(attachmentSupport.getPath(attachmentToRemove.location))
 
         cleanup:
         attachmentSupport.rimrafAttachmentsDirectory()

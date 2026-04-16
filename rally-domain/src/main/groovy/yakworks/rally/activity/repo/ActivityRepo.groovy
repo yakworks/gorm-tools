@@ -22,6 +22,7 @@ import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
+import gorm.tools.repository.model.DataOp
 import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.validation.Rejector
 import grails.gorm.DetachedCriteria
@@ -123,7 +124,7 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
     void doAfterPersist(Activity activity, PersistArgs args) {
         if (args.bindAction && args.data) {
             Map data = args.data
-            if (data.attachments) doAttachments(activity, data.attachments)
+            if (data.attachments != null) doAttachments(activity, data.attachments)
             if (data.contacts != null) ActivityContact.addOrRemove(activity, data.contacts)
             if (data.tags != null) TagLink.addOrRemoveTags(activity, data.tags)
 
@@ -215,8 +216,31 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
     // This adds the realted and children entities from the params to the Activity
     // called in afterBind
     void doAttachments(Activity activity, Object attData) {
-        List attachments = attachmentRepo.createOrUpdate(attData as List)
-        attachmentLinkRepo.addOrRemove((Persistable) activity, objectListToIdMapList(attachments))
+        Object linkData
+        List<Map> attachmentsToDelete = []
+
+        if (attData instanceof List) {
+            List attachments = attachmentRepo.createOrUpdate(attData as List<Map>)
+            linkData = objectListToIdMapList(attachments)
+        } else if (attData instanceof Map) {
+            Map dataMap = attData as Map
+            DataOp op = DataOp.get(dataMap.op)
+            List<Map> dataList = dataMap.data as List<Map>
+
+            if (op == DataOp.remove) {
+                linkData = [op: op.name(), data: dataList]
+                attachmentsToDelete = dataList
+            } else if (op == DataOp.update) {
+                List attachments = attachmentRepo.createOrUpdate(dataList)
+                linkData = [op: op.name(), data: objectListToIdMapList(attachments)]
+            }
+        }
+        attachmentLinkRepo.addOrRemove((Persistable) activity, linkData)
+        if(attachmentsToDelete) {
+            attachmentsToDelete.each { Map attachmentData ->
+                attachmentRepo.removeById(attachmentData.id as Long)
+            }
+        }
     }
 
     void doLinks(Activity activity, List<Map> links) {

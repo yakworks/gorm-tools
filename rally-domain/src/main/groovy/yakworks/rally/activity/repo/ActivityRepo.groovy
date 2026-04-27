@@ -15,7 +15,6 @@ import org.springframework.validation.Errors
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.model.Persistable
-import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.events.AfterBindEvent
@@ -23,6 +22,7 @@ import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
+import gorm.tools.repository.model.DataOp
 import gorm.tools.repository.model.LongIdGormRepo
 import gorm.tools.validation.Rejector
 import grails.gorm.DetachedCriteria
@@ -33,13 +33,13 @@ import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.model.TaskStatus
 import yakworks.rally.activity.model.TaskType
-import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.rally.attachment.repo.AttachmentLinkRepo
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.TagLink
-import yakworks.security.user.CurrentUser
 
+import static yakworks.commons.beans.Transform.objectListToIdMapList
 import static yakworks.rally.activity.model.Activity.Kind as ActKind
 
 @GormRepository
@@ -48,8 +48,7 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
 
     @Autowired ActivityLinkRepo activityLinkRepo
     @Autowired AttachmentRepo attachmentRepo
-    @Autowired CurrentUser currentUser
-    @Autowired ProblemHandler problemHandler
+    @Autowired AttachmentLinkRepo attachmentLinkRepo
 
     @RepoListener
     void beforeValidate(Activity activity, Errors errors) {
@@ -125,7 +124,7 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
     void doAfterPersist(Activity activity, PersistArgs args) {
         if (args.bindAction && args.data) {
             Map data = args.data
-            if (data.attachments) doAttachments(activity, data.attachments)
+            if (data.attachments != null) doAttachments(activity, data.attachments)
             if (data.contacts != null) ActivityContact.addOrRemove(activity, data.contacts)
             if (data.tags != null) TagLink.addOrRemoveTags(activity, data.tags)
 
@@ -217,12 +216,31 @@ class ActivityRepo extends LongIdGormRepo<Activity> {
     // This adds the realted and children entities from the params to the Activity
     // called in afterBind
     void doAttachments(Activity activity, Object attData) {
-        List attachments = attachmentRepo.createOrUpdate(attData as List)
-        //FIXME this is not right
-        attachments.each { Attachment attachment ->
-            AttachmentLink.create(activity, attachment)
+        Object linkData
+        List<Map> attachmentsToDelete = []
+
+        if (attData instanceof List) {
+            List attachments = attachmentRepo.createOrUpdate(attData as List<Map>)
+            linkData = objectListToIdMapList(attachments)
+        } else if (attData instanceof Map) {
+            Map dataMap = attData as Map
+            DataOp op = DataOp.get(dataMap.op)
+            List<Map> dataList = dataMap.data as List<Map>
+
+            if (op == DataOp.remove) {
+                linkData = [op: op.name(), data: dataList]
+                attachmentsToDelete = dataList
+            } else if (op == DataOp.update) {
+                List attachments = attachmentRepo.createOrUpdate(dataList)
+                linkData = [op: op.name(), data: objectListToIdMapList(attachments)]
+            }
         }
-        activity.setHasAttachments(true)
+        attachmentLinkRepo.addOrRemove((Persistable) activity, linkData)
+        if(attachmentsToDelete) {
+            attachmentsToDelete.each { Map attachmentData ->
+                attachmentRepo.removeById(attachmentData.id as Long)
+            }
+        }
     }
 
     void doLinks(Activity activity, List<Map> links) {

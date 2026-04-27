@@ -31,18 +31,18 @@ class AttachmentLinkRepo extends AbstractLinkedEntityRepo<AttachmentLink, Attach
     @Override
     List<AttachmentLink> addOrRemove(Persistable entity, Object itemParams){
         def list = super.addOrRemove(entity, itemParams)
-        updateAttachableHasAttachments(entity, list)
+        updateAttachableHasAttachments(entity)
         return list
     }
 
     /**
      * updates the cached hasAttachments on the attachable entity
      */
-    void updateAttachableHasAttachments(Persistable entity, List linkList){
+    void updateAttachableHasAttachments(Persistable entity){
         // update the has attachments
         if(Attachable.isAssignableFrom(entity.class)){
             def attachableEntity = (Attachable)entity
-            attachableEntity.setHasAttachments(linkList?.size() as Boolean)
+            attachableEntity.setHasAttachments(hasAttachments(entity))
         }
     }
 

@@ -2,4 +2,4 @@ api:
   paths:
     /rally/activity:
       includes:
-        get: ['*', note.body, note.contentType, createdByUser.username]
+        get: ['*', note.body, note.contentType, createdByUser.username, attachments.id, attachments.name,]

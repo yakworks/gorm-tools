@@ -82,6 +82,7 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
 
         then:
         1 == activity.attachments.size()
+        activity.hasAttachments()
         activity.attachments.each {
             'jpg' == it.extension
             'foo.jpg' == it.name
@@ -164,7 +165,7 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
                 data: [getTestAttachment('added-attach.pdf')]
             ]
         ])
-        flushAndClear()
+        flush()
 
         then:
         result
@@ -194,7 +195,7 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
 
         when:
         Activity result = activityRepo.update([id: activity.id, attachments: []])
-        flushAndClear()
+        flush()
 
         then:
         result
@@ -290,6 +291,28 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
         then:
         activity
         !activity.attachments
-    }
 
+        when: "add one attachment with op=update"
+        Activity updated = activityRepo.update([
+            id         : activity.id,
+            attachments: [
+                op  : 'update',
+                data: [getTestAttachment('added-has-attach.txt')]
+            ]
+        ])
+        flush()
+
+        then:
+        updated
+
+        when:
+        Activity reloaded = Activity.get(activity.id)
+
+        then: "hasAttachments now true"
+        reloaded.hasAttachments()
+        reloaded.attachments.size() == 1
+
+        cleanup:
+        attachmentSupport.rimrafAttachmentsDirectory()
+    }
 }

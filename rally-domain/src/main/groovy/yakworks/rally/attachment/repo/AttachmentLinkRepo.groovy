@@ -31,6 +31,7 @@ class AttachmentLinkRepo extends AbstractLinkedEntityRepo<AttachmentLink, Attach
     @Override
     List<AttachmentLink> addOrRemove(Persistable entity, Object itemParams){
         def list = super.addOrRemove(entity, itemParams)
+        flush() //flush, so that the hasAttachments query would pickup changes.
         updateAttachableHasAttachments(entity)
         return list
     }

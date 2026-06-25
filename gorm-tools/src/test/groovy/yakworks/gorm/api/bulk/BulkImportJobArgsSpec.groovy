@@ -80,13 +80,14 @@ class BulkImportJobArgsSpec extends Specification  {
             parallel: "false",
             includes: "a, b ,c", // THIS DOES NOT WORK WITH Jackson Binder
             foo: 1,
-            bar: 'baz'
+            bar: 'baz',
+            bindId: 'true'
         ]
         BulkImportJobArgs biParams = BulkImportJobArgs.fromParams(paramMap)
         Map biMap = biParams.asMap()
 
         then:
-        biMap.keySet().size() == 10 // [op, parallel, dataFormat, dataLayout, attachmentId, includes, jobType, foo, bar]
+        biMap.keySet().size() == 11 // [op, parallel, dataFormat, dataLayout, attachmentId, includes, jobType, foo, bar, bindId]
         biMap.parallel == false
         biMap.attachmentId == 123
         biMap.op == DataOp.add
@@ -94,6 +95,10 @@ class BulkImportJobArgsSpec extends Specification  {
         biMap.foo == 1
         biMap.bar == 'baz'
         biMap.async == true
+
+        and:
+        biMap.bindId == 'true'
+        biParams.persistArgs.bindId
 
         when: "put map back into bulkImportJobArgs"
         BulkImportJobArgs biParams2 = BulkImportJobArgs.fromParams(paramMap)

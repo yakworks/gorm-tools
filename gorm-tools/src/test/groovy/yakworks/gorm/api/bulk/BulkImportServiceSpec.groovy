@@ -1,5 +1,6 @@
 package yakworks.gorm.api.bulk
 
+import gorm.tools.job.SyncJobContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 
@@ -76,8 +77,45 @@ class BulkImportServiceSpec extends Specification implements GormHibernateTest {
         params.q == "{foo: 'bar'}" //[foo: 'bar']
         params.op == 'add'
         params.entityClassName == 'yakworks.testing.gorm.model.KitchenSink'
+    }
 
+    void "test queue and init job with bindId"() {
+        given:
+        def params = [
+            op: "add",
+            sourceId: 'test-job',
+            q: "{foo: 'bar'}",
+            'bindId':true
+        ]
 
+        when:
+        BulkImportJobArgs biArgs = BulkImportJobArgs.fromParams(params)
+
+        then:
+        biArgs
+        biArgs.op == DataOp.add
+        biArgs.persistArgs
+        biArgs.persistArgs.bindId
+
+        when: "queue job"
+        SyncJobEntity jobEnt = bulkImportService.queueJob(biArgs, [[foo:'bar']])
+        flushAndClear()
+
+        then:
+        jobEnt
+        jobEnt.id
+
+        when:
+        def job = TestSyncJob.get(jobEnt.id)
+        SyncJobContext context = bulkImportService.runJobInit(job.id)
+
+        then:
+        context
+        context.args
+        context.args instanceof BulkImportJobArgs
+
+        ((BulkImportJobArgs)context.args).persistArgs
+        ((BulkImportJobArgs)context.args).persistArgs.bindId
     }
 
     void "test queueImportJob with data"() {

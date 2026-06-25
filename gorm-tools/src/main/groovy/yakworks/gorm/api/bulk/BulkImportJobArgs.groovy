@@ -113,6 +113,13 @@ class BulkImportJobArgs extends SyncJobArgs {
         bijParams.queryParams = p
         //XXX remove this once we know its not being used
         if(params.dataFilename) bijParams.payloadFilename = params.dataFilename
+        if(params.containsKey('bindId')) {
+            if(!bijParams.persistArgs) {
+                bijParams.persistArgs = PersistArgs.defaults()
+            }
+            bijParams.persistArgs.bindId = Maps.boolean(params, 'bindId')
+        }
+
         return bijParams
     }
 

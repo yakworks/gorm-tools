@@ -34,8 +34,14 @@ import yakworks.gorm.config.IdGeneratorConfig
 @Slf4j
 @CompileStatic
 class JdbcIdGenerator implements IdGenerator {
+
+    /** Max attempts when another transaction/pod wins the optimistic key update. */
+    private static final int MAX_RETRIES = 5
+
     @Autowired JdbcTemplate jdbcTemplate
     @Autowired IdGeneratorConfig idGenConfig
+
+
 
     //if true then will not automatically create a row for the key and will throw an error if row does not exist
     boolean requireKeyRow = false
@@ -54,46 +60,66 @@ class JdbcIdGenerator implements IdGenerator {
         return updateIncrement(keyName, increment)
     }
 
-    // Transactional!  The annotation only works on public methods, so this method should only be called by transactional
-    // methods.
+    /**
+     * Allocates a batch of ids for "key name" returns the first id in the range and advances {@code NextId} by
+     * {@code increment}. Uses optimistic concurrency
+     *
+     * Transactional!  The annotation only works on public methods, so this method should only be called by transactional methods.
+     */
     private long updateIncrement(String name, long increment) {
-        //println "updateIncrement $name $increment"
         Validate.notEmpty(idColumn, 'idColumn')
         Validate.notEmpty(keyColumn, 'keyColumn')
         Validate.notEmpty(table, 'table')
         Validate.notEmpty(name, 'name argument')
 
-        String query = "Select " + idColumn + " from " + table + " where " + keyColumn + " ='" + name + "'"
-        long oid = 0
-        try {
-            oid = jdbcTemplate.queryForObject(query, Long)
-        } catch (EmptyResultDataAccessException erdax) {
-            if (requireKeyRow) {
-                throw erdax
-            } else {
-                oid = createRow(table, keyColumn, idColumn, name)
-            }
-        } catch (BadSqlGrammarException bge) {
-            log.info("Looks like the idgen table is not found. This will do a automatically setup for the table for the JdbcIdGenerator "+
-                "suggested to set it up properly with something like db-migration"+
-                "or another tools as no indexes or optimization are taken into account")
-            createTable(table, keyColumn, idColumn)
-            oid = createRow(table, keyColumn, idColumn, name)
-            //throw new IllegalArgumentException("The key '" + name + "' does not exist in the object ID table.");
-        }
 
-        if (oid > 0) { //found it
-            if (oid < idGenConfig.startValue) {
-                oid = idGenConfig.startValue
+        //Reads NextId and tries to update it like
+        //Update NewObjectId set NextId = Xxx where KeyName ='Customer.id' and NextId = <old-value>
+        //if another pod had already updated it by the time between read and update, thn the updated row could will be 0
+        //because where NextId = <old-value> will not match in this case we retry till max attempts
+        for (int attempt = 0; attempt < MAX_RETRIES; attempt++) {
+            String query = "Select " + idColumn + " from " + table + " where " + keyColumn + " ='" + name + "'"
+            long oid = 0
+            try {
+                oid = jdbcTemplate.queryForObject(query, Long)
+            } catch (EmptyResultDataAccessException erdax) {
+                if (requireKeyRow) {
+                    throw erdax
+                } else {
+                    oid = createRow(table, keyColumn, idColumn, name)
+                }
+            } catch (BadSqlGrammarException bge) {
+                log.info("Looks like the idgen table is not found. This will do a automatically setup for the table for the JdbcIdGenerator "+
+                    "suggested to set it up properly with something like db-migration"+
+                    "or another tools as no indexes or optimization are taken into account")
+                createTable(table, keyColumn, idColumn)
+                oid = createRow(table, keyColumn, idColumn, name)
+                //throw new IllegalArgumentException("The key '" + name + "' does not exist in the object ID table.");
             }
-            long newValue = oid + increment
-            jdbcTemplate.update("Update " + table + " set " + idColumn + " = " + newValue + " where " + keyColumn
-                + " ='" + name + "'")
+
+            if (oid > 0) { //found it
+                long dbOid = oid // value read from db; used in WHERE for optimistic update
+                if (oid < idGenConfig.startValue) {
+                    oid = idGenConfig.startValue
+                }
+                long newValue = oid + increment
+                // only update if NextId is still dbOid — otherwise another pod/trx had already updated it and we retry
+                int updated = jdbcTemplate.update("Update " + table + " set " + idColumn + " = " + newValue + " where " + keyColumn
+                    + " ='" + name + "' and " + idColumn + " = " + dbOid)
+                if (updated == 1) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Returning id " + oid + " for key '" + name + "'")
+                    }
+                    return oid
+                } else {
+                    log.warn("Concurrent id batch allocation for key '" + name + "' - another transaction/pod updated " + idColumn +
+                        " since read " + dbOid + "; would have returned duplicate ids without optimistic update. " +
+                        "Retrying attempt " + (attempt + 1) + " of " + MAX_RETRIES)
+                }
+            }
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Returning id " + oid + " for key '" + name + "'")
-        }
-        return oid
+        //if all retries are over, should be very rare
+        throw new IllegalStateException("Failed to allocate id batch for key '" + name + "' after " + MAX_RETRIES + " attempts")
     }
 
     private long createRow(String table, String keyColumn, String idColumn, String name) {

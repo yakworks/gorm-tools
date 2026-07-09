@@ -18,6 +18,7 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.validation.Errors
 import org.springframework.validation.ObjectError
+import org.springframework.web.HttpRequestMethodNotSupportedException
 
 import gorm.tools.repository.errors.EmptyErrors
 import yakworks.api.ApiStatus
@@ -102,7 +103,8 @@ class ProblemHandler {
         else if (e instanceof DataAccessException) {
             return buildFromDataAccessException(e)
         }
-        else if (e instanceof HttpMessageNotReadableException || e instanceof JsonException) {
+        else if (e instanceof HttpMessageNotReadableException || e instanceof JsonException
+            || e instanceof HttpRequestMethodNotSupportedException) {
             //this happens if request contains bad data / malformed json. we dont want to log stacktraces for these as they are expected
             return DataProblem.of(e)
         }

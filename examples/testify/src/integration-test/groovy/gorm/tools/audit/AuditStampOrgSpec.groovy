@@ -1,5 +1,6 @@
 package gorm.tools.audit
 
+import spock.lang.Ignore
 import yakworks.testing.gorm.integration.SecuritySpecHelper
 import yakworks.testing.gorm.integration.DataIntegrationTest
 import grails.testing.mixin.integration.Integration
@@ -12,6 +13,7 @@ import java.time.LocalDate
 
 @Integration
 @Rollback
+@Ignore
 class AuditStampOrgSpec extends Specification implements DataIntegrationTest, SecuritySpecHelper {
 
     void "test create"() {

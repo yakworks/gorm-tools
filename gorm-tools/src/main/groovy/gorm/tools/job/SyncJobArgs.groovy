@@ -235,7 +235,7 @@ class SyncJobArgs {
         // entityClass, asyncArgs, queryArgs
         Map<String, Object> mapVals = Maps.prune(MetaUtils.getProperties(this))
         //dont include the full queryParams key
-        ['jobId', 'entityClass', 'asyncArgs', 'queryArgs', 'queryParams', 'payload'].each {
+        ['jobId', 'entityClass', 'asyncArgs', 'queryArgs', 'queryParams', 'payload', 'persistArgs'].each {
             mapVals.remove(it)
         }
         //get any extra queryParams that are not already keys in this object

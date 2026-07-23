@@ -1,3 +1,17 @@
+### v7.3.101
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.99...v7.3.101)
+- Sonatype is whacked right now, comment out release and just publish to repo.9ci [link](https://github.com/yakworks/gorm-tools/commit/85d2329c7b2e00d14e20cd55e7ae200f708ee836)
+- release [link](https://github.com/yakworks/gorm-tools/commit/efb8aa3122001b6629f0f9b621cb3b31064b9e4b)
+- Merge branch 'dev' CIRCLE FIX [link](https://github.com/yakworks/gorm-tools/commit/955403a10213f51a08431763a204bf6e3392d1e8)
+- Circle oom (#1001) [link](https://github.com/yakworks/gorm-tools/commit/749122a3d0664cab1ed599d2b7b4ae897ed51c47)
+- Merge pull request #1000 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/9867a4d32ae8d3fdb8f94466dee681c26504b7ca)
+- Jdbc id generator fix : implement optimistic locking (#998) [link](https://github.com/yakworks/gorm-tools/commit/e06ff5439461c37e00f9de4f7542882acb7e3ab9)
+- joanna@9ci.com [link](https://github.com/yakworks/gorm-tools/commit/ae56993af726d07bcc983ad17e68f59f33fe9e46)
+- Fix activity.hasAttachment issue (#989) [link](https://github.com/yakworks/gorm-tools/commit/b2ba01bc7a937781f560e53712e53f0aab992c06)
+- Fix attachment handling - error pk_attachmentlink (#986) [link](https://github.com/yakworks/gorm-tools/commit/1469cdea48105bfe9f1f40b8bfbfb4a290a14045)
+- Fix BulkImporter : Pass query params in persist args (#971) [link](https://github.com/yakworks/gorm-tools/commit/5c40ad431ee3351af681dee7f0907452804f8ccc)
+
 ### v7.3.99
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.98...v7.3.99)

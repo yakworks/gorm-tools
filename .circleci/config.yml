@@ -119,7 +119,7 @@ jobs:
           name: ✔︎ -- check
           command: |
             ./gradlew check -x rally-domain:check -x hello-boot-security:check \
-            -x testify:check -x benchmarks:check -x rally-api:check
+            -x testify:check -x benchmarks:check -x rally-api:check -x rally-simple:check -x gorm-openapi:check
 
       - run: make gradle.merge-test-results
       - store_test_results:

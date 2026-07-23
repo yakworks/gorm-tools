@@ -85,9 +85,9 @@ jobs:
       - run:
           name: ✔︎ -- compile gorm-tools
           command: ./gradlew gorm-tools:classes
-#      - run:
-#          name: ✔︎ -- compile rally-domain
-#          command: ./gradlew rally-domain:classes
+      - run:
+          name: ✔︎ -- compile rally-domain
+          command: ./gradlew rally-domain:classes
 
       - run:
           name: ✔︎ -- assemble

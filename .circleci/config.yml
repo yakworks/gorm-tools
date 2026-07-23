@@ -6,7 +6,7 @@ executors:
   builder-large:  # 4cpus 8gb ram
     resource_class: 'large'
     environment:
-      # JAVA_OPTIONS: "-Xmx1792m"
+      JAVA_OPTIONS: "-Xmx1792m"
       GRADLE_OPTS: "-Dorg.gradle.caching=true -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=4 -Dorg.gradle.console=plain -Xmx1792m"
     docker:
       - image: yakworks/bullseye:jdk11

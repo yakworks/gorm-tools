@@ -10,18 +10,18 @@ executors:
       JAVA_OPTIONS: "-Xmx1792m"
       GRADLE_OPTS: "-Dorg.gradle.caching=true -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=4 -Dorg.gradle.console=plain"
     docker:
-      - image: yakworks/bullseye:jdk11
+      - image: yakworks/bookworm:jdk11
   builder-medium: # 2cpus 4gb ram
     resource_class: 'medium'
     environment:
       # JAVA_OPTIONS: "-Xmx1792m"
       GRADLE_OPTS: "-Dorg.gradle.caching=true -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dorg.gradle.console=plain"
     docker:
-      - image: yakworks/bullseye:jdk11
+      - image: yakworks/bookworm:jdk11
   builder-small: # 1cpus 2gb ram, cheapest, used for timeout
     resource_class: 'small'
     docker:
-      - image: yakworks/bullseye:jdk11
+      - image: yakworks/bookworm:jdk11
 
 
 commands:
@@ -85,9 +85,9 @@ jobs:
       - run:
           name: ✔︎ -- compile gorm-tools
           command: ./gradlew gorm-tools:classes
-      - run:
-          name: ✔︎ -- compile rally-domain
-          command: ./gradlew rally-domain:classes
+#      - run:
+#          name: ✔︎ -- compile rally-domain
+#          command: ./gradlew rally-domain:classes
 
       - run:
           name: ✔︎ -- assemble

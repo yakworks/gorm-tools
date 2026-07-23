@@ -121,8 +121,8 @@ jobs:
 #            ./gradlew check -x rally-domain:check -x hello-boot-security:check \
 #            -x testify:check -x benchmarks:check -x rally-api:check -x rally-simple:check -x gorm-openapi:check
       - run: ./gradlew gorm-tools:check
-      - run: ./gradlew gorm-audit:check gorm-etl:check gorm-rest:check
-      - run: ./gradlew security-core:check boot-security:check boot-security-gorm:check
+      - run: ./gradlew gorm-audit:check gorm-etl:check gorm-rest:check --parallel
+      - run: ./gradlew security-core:check boot-security:check boot-security-gorm:check --parallel
       - run: make gradle.merge-test-results
       - store_test_results:
           path: gorm-audit/build/test-results/

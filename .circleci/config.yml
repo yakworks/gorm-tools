@@ -82,7 +82,10 @@ jobs:
 
       # do just gorm-tools so we dont run out of memory
       - run:
-          name: ✔︎ -- compile
+          name: ✔︎ -- compile gorm-tools
+          command: ./gradlew gorm-tools:classes
+      - run:
+          name: ✔︎ -- compile rally-domain
           command: ./gradlew gorm-tools:classes
 
       - run:

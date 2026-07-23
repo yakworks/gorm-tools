@@ -6,7 +6,8 @@ executors:
   builder-large:  # 4cpus 8gb ram
     resource_class: 'large'
     environment:
-      # JAVA_OPTIONS: "-Xmx1792m"
+      # max workers is 4  * 1792 = 7192 and leaves a gig for system. the largs circel resource is 8gig ram and 4 cores.
+      JAVA_OPTIONS: "-Xmx1792m"
       GRADLE_OPTS: "-Dorg.gradle.caching=true -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=4 -Dorg.gradle.console=plain"
     docker:
       - image: yakworks/bullseye:jdk11
@@ -135,7 +136,7 @@ jobs:
           path: build/reports/
 
   rally:
-    executor: builder-medium
+    executor: builder-large
     steps:
       - checkout
       - restore_gradle_cache

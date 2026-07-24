@@ -43,11 +43,11 @@ publish:
 			$(gradlew) publishJavaLibraryPublicationToMavenRepository
 			$(logr.done) "- published to repo.9ci.com - libraries with version $(VERSION)"
 
-			$(logr) "Starting publishing to Sonatype Maven Central"
-			$(gradlew) publishToSonatype closeSonatypeStagingRepository
-			sleep 5
-			$(gradlew) findSonatypeStagingRepository releaseSonatypeStagingRepository
-			$(logr.done) "- published to Maven Central - libraries with version $(VERSION)"
+#			$(logr) "Starting publishing to Sonatype Maven Central"
+#			$(gradlew) publishToSonatype closeSonatypeStagingRepository
+#			sleep 5
+#			$(gradlew) findSonatypeStagingRepository releaseSonatypeStagingRepository
+#			$(logr.done) "- published to Maven Central - libraries with version $(VERSION)"
 		fi
 	fi
 

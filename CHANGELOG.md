@@ -1,3 +1,11 @@
+### v7.3.104
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.101...v7.3.104)
+- comment out release to publishToSonatype, its hosed right now [link](https://github.com/yakworks/gorm-tools/commit/f9e30f8705a2784f9aaecac9c07ac4c239529776)
+- try sleeping between find [link](https://github.com/yakworks/gorm-tools/commit/9043a5a0cb84bb1a8d8ce7beaf8447779e10ef6b)
+- release 103 [link](https://github.com/yakworks/gorm-tools/commit/8964130f9254a990389092ae0b422a2f9bd3ed27)
+- upgrade Maven and release to Sonatype Maven Central in 2 steps [link](https://github.com/yakworks/gorm-tools/commit/ad8e28f156cdc0268f402e8da7080622db9dbd6f)
+
 ### v7.3.101
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.3.99...v7.3.101)

@@ -22,6 +22,7 @@ import org.apache.shiro.authz.permission.WildcardPermission;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * COPIED IN FROM SHIRO CORE FOR TESTING AND PLAYGROUND
@@ -220,11 +221,15 @@ public class WildcardPermissionTest {
         p4 = new WildcardPermission("newsletter:read");
         p5 = new WildcardPermission("newsletter:read,write");
         p6 = new WildcardPermission("newsletter:123:read:write");
+
         assertTrue(p1.implies(p2));
         assertFalse(p1.implies(p3));
         assertFalse(p1.implies(p4));
         assertFalse(p1.implies(p5));
         assertTrue(p1.implies(p6));
+        assertTrue(p3.implies(new WildcardPermission("newsletter:123:read,write")));
+        assertTrue(p3.implies(new WildcardPermission("newsletter:456:read")));
+
 
         p1 = new WildcardPermission("newsletter:*:read:*");
         assertTrue(p1.implies(p2));
@@ -236,6 +241,7 @@ public class WildcardPermissionTest {
 
         assertTrue(p1.implies(p2));
         assertFalse(p1.implies(p3));
+
     }
 
 

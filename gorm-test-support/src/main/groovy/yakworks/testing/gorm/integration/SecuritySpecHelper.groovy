@@ -36,6 +36,10 @@ trait SecuritySpecHelper implements WithTrx{
         }
     }
 
+    void authenticate(AppUser user, String ...roles) {
+        authenticate(user, null, null)
+    }
+
     void authenticate(AppUser user, Collection<String> roles = [], Collection<String> permissions = []) {
         def rolesToUse = user.roles
         def permsToUse = user.permissions

@@ -1,22 +1,12 @@
 package yakworks.rest
 
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.springframework.http.HttpStatus
-
 import gorm.tools.transaction.WithTrx
-import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import okhttp3.HttpUrl
-import okhttp3.Request
-import okhttp3.RequestBody
 import okhttp3.Response
+import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.rally.orgs.model.Contact
-import yakworks.rally.orgs.model.Org
-import yakworks.rally.tag.model.Tag
-import yakworks.rest.client.OkHttpRestTrait
 
-import static yakworks.etl.excel.ExcelUtils.getHeader
+import yakworks.rest.client.OkHttpRestTrait
 
 @Integration
 class ExceptionHandlerRestApiSpec extends Specification implements OkHttpRestTrait, WithTrx {
@@ -25,6 +15,37 @@ class ExceptionHandlerRestApiSpec extends Specification implements OkHttpRestTra
 
     def setup(){
         login()
+    }
+
+    //FIXME @SUD - 404 doesnot return our standard json response
+    //currently its being handled by spring's "BasicErrorController"
+    @Ignore
+    void "error 404"() {
+        when:
+        Response resp = get("/api/security-tests/unknown")
+        Map body = bodyToMap(resp)
+
+        then:
+        body
+        body.stats == 404
+        body.code == 'error.notFound'
+        body.title
+        body.detail
+    }
+
+    //This would be handled by error.hbs,
+    //as SecurityTestsController doesnt extend base controllers, and there's no handleException so it wont go through problemHandler
+    void "error hbs 500"() {
+        when:
+        Response resp = get("/api/security-tests/error500")
+        Map body = bodyToMap(resp)
+
+        then:
+        body
+        body.code == 'error.unexpected'
+        body.status == 500
+        body.title == 'Unexpected Exception'
+        body.detail == 'simulate unknown error'
     }
 
     void "test unexpected exception handler - runtimeException"() {

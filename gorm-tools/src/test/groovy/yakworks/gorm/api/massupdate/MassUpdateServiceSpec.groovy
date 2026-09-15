@@ -5,12 +5,15 @@ import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
 import yakworks.api.ApiResults
 import yakworks.api.problem.data.DataProblemException
+import yakworks.gorm.api.ApiConfig
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.SinkExt
+import yakworks.testing.gorm.model.SinkItem
 import yakworks.testing.gorm.unit.GormHibernateTest
 
 class MassUpdateServiceSpec extends Specification implements GormHibernateTest {
-    static entityClasses = [KitchenSink, SinkExt]
+    static entityClasses = [KitchenSink, SinkExt, SinkItem]
+    static List springBeans = [MassUpdateService]
 
     @Autowired MassUpdateService massUpdateService
 
@@ -29,8 +32,8 @@ class MassUpdateServiceSpec extends Specification implements GormHibernateTest {
     }
 
     void "mass update with few failures"() {
-        given:
-        KitchenSink.createKitchenSinks(2)
+        setup:
+        KitchenSink.createKitchenSinks(3)
         List ids = KitchenSink.list()*.id + [99999L]
 
         when:
@@ -38,8 +41,8 @@ class MassUpdateServiceSpec extends Specification implements GormHibernateTest {
 
         then:
         !results.ok
-        results.size() == 3
-        results.list.count { it.ok } == 2
+        results.size() == 4
+        results.list.count { it.ok } == 3
         results.list.count { !it.ok } == 1
     }
 

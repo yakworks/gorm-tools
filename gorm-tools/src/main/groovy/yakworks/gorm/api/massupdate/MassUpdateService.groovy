@@ -61,7 +61,6 @@ class MassUpdateService {
         }
 
         doAfterMassUpdate(entityClass, args, results)
-        AppCtx.publishEvent(new AfterMassUpdateEvent(this, entityClass, args, results))
         return results
     }
 

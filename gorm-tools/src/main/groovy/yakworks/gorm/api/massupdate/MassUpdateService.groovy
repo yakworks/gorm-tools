@@ -26,12 +26,6 @@ import yakworks.spring.AppCtx
 /**
  * Applies the same field changes to many records by id.
  * Each id is updated in its own transaction so failures are collected and the rest still get updated.
- *
- * Register a typed bean with the entity generic, or a subclass of this, and the lookup will use it for that entity.
- * For lighter customization use repo listeners for the before/after mass update entity events
- * and MassUpdateFinishedEvent for batch level work such as creating an activity.
- *
- * @param <D> the entity class this service instance is for
  */
 @CompileStatic
 class MassUpdateService<D> {
@@ -119,7 +113,7 @@ class MassUpdateService<D> {
     }
 
     /**
-     * Called for each item before the doUpdate, inside the trx so it can throw to reject the update.
+     * Called for each item before the update, inside the trx so it can throw to reject the update.
      */
     protected void doBeforeMassUpdateEntity(Map data, MassUpdateArgs args) {
         BeforeMassUpdateEntityEvent<D> event = new BeforeMassUpdateEntityEvent<D>(getRepo(), data, args)
@@ -127,7 +121,7 @@ class MassUpdateService<D> {
     }
 
     /**
-     * Called for each item after the doUpdate, inside the trx.
+     * Called for each item after the update, inside the trx.
      */
     protected void doAfterMassUpdateEntity(D entity, Map data, MassUpdateArgs args) {
         AfterMassUpdateEntityEvent<D> event = new AfterMassUpdateEntityEvent<D>(getRepo(), entity, data, args)

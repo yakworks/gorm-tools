@@ -1,5 +1,6 @@
 package yakworks.gorm.api.massupdate
 
+import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.events.AfterMassUpdateEntityEvent
 import gorm.tools.repository.events.BeforeMassUpdateEntityEvent
 import org.springframework.context.event.EventListener
@@ -34,7 +35,10 @@ class MassUpdateServiceSpec extends Specification implements GormHibernateTest {
         then:
         svc
         svc.entityClass == KitchenSink
-        svc.repo == KitchenSink.repo
+        // KitchenSink.repo is a static INSTANCE that can outlive the Spring ctx in unit tests;
+        // compare against RepoLookup which is what MassUpdateService uses
+        svc.repo == RepoLookup.findRepo(KitchenSink)
+        svc.repo.entityClass == KitchenSink
     }
 
     void "mass update applies shared data to all ids"() {

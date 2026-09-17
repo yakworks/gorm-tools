@@ -22,6 +22,7 @@ import yakworks.gorm.api.DefaultCrudApi
 import yakworks.gorm.api.bulk.BulkExportService
 import yakworks.gorm.api.bulk.BulkImportService
 import yakworks.gorm.api.bulk.BulkImporter
+import yakworks.gorm.api.massupdate.MassUpdateService
 
 @CompileStatic
 @Configuration @Lazy(false)
@@ -87,6 +88,13 @@ class DefaultsApiConfiguration {
     @ConditionalOnMissingBean
     public <D> BulkExportService<D> defaultBulkExportService(Class<D> entityClass) {
         return new BulkExportService(entityClass);
+    }
+
+    @Bean
+    @Scope("prototype")
+    @ConditionalOnMissingBean
+    public <D> MassUpdateService<D> defaultMassUpdateService(Class<D> entityClass) {
+        return new MassUpdateService(entityClass);
     }
 
     // @Bean

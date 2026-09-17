@@ -40,7 +40,6 @@ import gorm.tools.transaction.TrxService
 import gorm.tools.validation.RepoValidatorRegistry
 import yakworks.gorm.api.ApiConfig
 import yakworks.gorm.api.IncludesConfig
-import yakworks.gorm.api.massupdate.MassUpdateService
 import yakworks.gorm.api.support.DefaultQueryArgsValidator
 import yakworks.gorm.api.support.QueryArgsValidator
 import yakworks.gorm.config.DefaultsApiConfiguration
@@ -150,12 +149,6 @@ class GormToolsConfiguration {
     @ConditionalOnMissingBean
     QueryArgsValidator queryArgsValidator(){
         new DefaultQueryArgsValidator()
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    MassUpdateService massUpdateService(){
-        new MassUpdateService()
     }
 
 }

@@ -12,32 +12,57 @@ import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.RepoLookup
+import gorm.tools.repository.events.AfterMassUpdateEntityEvent
+import gorm.tools.repository.events.BeforeMassUpdateEntityEvent
+import gorm.tools.repository.events.RepoEventPublisher
+import gorm.tools.utils.ServiceLookup
 import yakworks.api.ApiResults
 import yakworks.api.HttpStatus
 import yakworks.api.Result
 import yakworks.api.problem.data.DataProblem
 import yakworks.commons.map.Maps
-import yakworks.gorm.api.bulk.AfterMassUpdateEvent
 import yakworks.spring.AppCtx
 
 /**
  * Applies the same field changes to many records by id.
- * One transaction per id so failures are collected and others still update.
+ * Each id is updated in its own transaction so failures are collected and the rest still get updated.
+ *
+ * Register a typed bean with the entity generic, or a subclass of this, and the lookup will use it for that entity.
+ * For lighter customization use repo listeners for the before/after mass update entity events
+ * and MassUpdateFinishedEvent for batch level work such as creating an activity.
+ *
+ * @param <D> the entity class this service instance is for
  */
 @CompileStatic
-class MassUpdateService {
+class MassUpdateService<D> {
 
     @Autowired
     ProblemHandler problemHandler
 
+    @Autowired
+    RepoEventPublisher repoEventPublisher
+
+    Class<D> entityClass // the domain class this is for
+
+    MassUpdateService(Class<D> entityClass){
+        this.entityClass = entityClass
+    }
+
+    static <D> MassUpdateService<D> lookup(Class<D> entityClass){
+        ServiceLookup.lookup(entityClass, MassUpdateService<D>, "defaultMassUpdateService")
+    }
+
+    GormRepo<D> getRepo(){
+        return RepoLookup.findRepo(entityClass)
+    }
+
     /**
-     * Mass update entities of the given class.
+     * Applies args.data to every id in args.ids.
      *
-     * @param entityClass domain class
-     * @param args ids + shared data map
-     * @return ApiResults with per-id success or problem entries
+     * @param args the ids and the shared data map to apply to each of them
+     * @return ApiResults with an entry per id, ok for the ones that updated and a problem for the ones that failed
      */
-    ApiResults massUpdate(Class entityClass, MassUpdateArgs args) {
+    ApiResults massUpdate(MassUpdateArgs args) {
         if (!args.ids) {
             throw DataProblem.of('error.data.emptyPayload').detail("Mass update ids is empty").toException()
         }
@@ -45,52 +70,67 @@ class MassUpdateService {
             throw DataProblem.of('error.data.emptyPayload').detail("Mass update data is empty").toException()
         }
 
-        doBeforeMassUpdate(entityClass, args)
-
         ApiResults results = ApiResults.create(false)
-        GormRepo repo = RepoLookup.findRepo(entityClass)
 
         for (Object id : args.ids) {
             try {
-                Map rowData = prepareData(entityClass, id, args.data, args)
-                updateEntity(repo, entityClass, id, rowData, args)
+                Map rowData = prepareData(id, args)
+                updateEntity(rowData, args)
                 results << Result.OK().payload([id: id]).status(HttpStatus.OK)
             } catch (Exception e) {
                 results << problemHandler.handleException(e, entityClass.simpleName).payload([id: id])
             }
         }
 
-        doAfterMassUpdate(entityClass, args, results)
+        AppCtx.publishEvent(new MassUpdateFinishedEvent<D>(this, entityClass, args, results))
         return results
     }
 
     /**
-     * Build the data map for one id. Default clones shared data and sets id.
+     * Builds the data map for one id, clones the shared data so the repo can not mutate it for the other ids.
      */
-    protected Map prepareData(Class entityClass, Object id, Map data, MassUpdateArgs args) {
-        Map rowData = Maps.clone(data)
+    protected Map prepareData(Object id, MassUpdateArgs args) {
+        Map rowData = Maps.clone(args.data)
         rowData['id'] = id
         return rowData
     }
 
     /**
-     * Update one entity in its own transaction. Override to replace the update path.
+     * Updates one entity in its own transaction, override to replace the update path.
      */
-    protected void updateEntity(GormRepo repo, Class entityClass, Object id, Map rowData, MassUpdateArgs args) {
+    protected D updateEntity(Map rowData, MassUpdateArgs args) {
         PersistArgs pargs = args.persistArgs ? args.persistArgs.clone() : PersistArgs.of()
+        //passdown params so repo events can get at them
         if (args.params) {
             pargs.params = args.params
         }
-        repo.update(rowData, pargs)
+
+        GormRepo<D> repo = getRepo()
+
+        D entity = null
+
+        repo.withTrx {
+            doBeforeMassUpdateEntity(rowData, args)
+            entity = repo.update(rowData, pargs)
+            doAfterMassUpdateEntity(entity, rowData, args)
+        }
+
+      return entity
     }
 
-    /** Override for batch-level setup before any updates. */
-    protected void doBeforeMassUpdate(Class entityClass, MassUpdateArgs args) {
-        // no-op
+    /**
+     * Called for each item before the doUpdate, inside the trx so it can throw to reject the update.
+     */
+    protected void doBeforeMassUpdateEntity(Map data, MassUpdateArgs args) {
+        BeforeMassUpdateEntityEvent<D> event = new BeforeMassUpdateEntityEvent<D>(getRepo(), data, args)
+        repoEventPublisher.publishEvents(getRepo(), event, [event] as Object[])
     }
 
-    /** Override for batch-level work after all ids (e.g. activity). Prefer AfterMassUpdateEvent for loose coupling. */
-    protected void doAfterMassUpdate(Class entityClass, MassUpdateArgs args, ApiResults results) {
-        // no-op
+    /**
+     * Called for each item after the doUpdate, inside the trx.
+     */
+    protected void doAfterMassUpdateEntity(D entity, Map data, MassUpdateArgs args) {
+        AfterMassUpdateEntityEvent<D> event = new AfterMassUpdateEntityEvent<D>(getRepo(), entity, data, args)
+        repoEventPublisher.publishEvents(getRepo(), event, [event] as Object[])
     }
 }

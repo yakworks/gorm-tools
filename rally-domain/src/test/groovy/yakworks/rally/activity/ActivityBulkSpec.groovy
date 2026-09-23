@@ -1,17 +1,13 @@
-package yakworks.rally.domain
-
-import java.nio.file.Path
+package yakworks.rally.activity
 
 import org.apache.commons.io.FileUtils
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.repository.model.RepoEntity
 import grails.persistence.Entity
-import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.commons.lang.IsoDateUtil
 import yakworks.commons.util.BuildSupport
-import yakworks.rally.activity.ActivityBulk
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
@@ -21,6 +17,7 @@ import yakworks.rally.activity.model.TaskType
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.rally.attachment.model.FileData
 import yakworks.rally.config.OrgProps
 import yakworks.rally.orgs.OrgCopier
 import yakworks.rally.orgs.OrgDimensionService
@@ -28,107 +25,72 @@ import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
+import yakworks.spring.AppResourceLoader
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
 
+import java.nio.file.Path
+
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 
-@Ignore //XXX this whole thing is flaky
-class ActivityBulkSpec extends Specification implements GormHibernateTest, SecurityTest  {
+/**
+ * Unit tests for ActivityBulk.insertMassActivity.
+ * Uses slim mock Customer/Payment — only org is needed for grouping/linking.
+ */
+class ActivityBulkSpec extends Specification implements GormHibernateTest, SecurityTest {
+
     static List entityClasses = [
-        Customer, Activity, ActivityNote, ActivityLink, Org, OrgTag, Location, Payment,
-        AttachmentLink, Attachment, Task, TaskType, TaskStatus
+        Customer, Payment, Activity, ActivityNote, ActivityLink, Org, OrgTag, Location,
+        AttachmentLink, Attachment, FileData, Task, TaskType, TaskStatus
     ]
-    static List springBeans = [ActivityBulk, AttachmentSupport, OrgCopier, OrgProps, OrgDimensionService ]
+
+    static List springBeans = [ActivityBulk, AttachmentSupport, AppResourceLoader, OrgCopier, OrgProps, OrgDimensionService]
 
     @Autowired ActivityBulk activityBulk
     @Autowired AttachmentSupport attachmentSupport
 
-    def "test massupdate - with notes "() {
-        setup:
-        Org org = new Org(id:1, num: "test", name: "test", type: OrgType.Customer, companyId: 2)
-        Org org2 = new Org(id:2, num: "test2", name: "test2", type: OrgType.Customer, companyId: 2)
-        Customer customerOne = Customer.repo.create([id: 1, name: "test-1", num: "test-1", org: org],[bindId: true]).persist()
-        Customer customerTwo = Customer.repo.create([id: 2, name: "test-2", num: "test-2", org: org2],[bindId: true]).persist()
+    def cleanup() {
+        attachmentSupport.rimrafAttachmentsDirectory()
+    }
 
+    void "empty targets returns empty list"() {
         expect:
-        Customer.get(1) != null
-        Customer.get(2) != null
+        activityBulk.insertMassActivity([], [name: 'x']) == []
+        activityBulk.insertMassActivity(null, [name: 'x']) == []
+    }
+
+    void "customer notes - one activity per org, no ActivityLinks"() {
+        setup:
+        Org org1 = Org.of("c1", "Cust 1", OrgType.Customer).persist()
+        Org org2 = Org.of("c2", "Cust 2", OrgType.Customer).persist()
+        Customer c1 = new Customer(num: "c1", name: "Cust 1", org: org1).persist()
+        Customer c2 = new Customer(num: "c2", name: "Cust 2", org: org2).persist()
 
         when:
-        activityBulk.insertMassActivity([customerOne, customerTwo], [name: 'note_test'])
+        List<Activity> activities = activityBulk.insertMassActivity([c1, c2], [name: 'note_test'])
+        flush()
 
         then:
-        [customerOne, customerTwo].each { customer ->
-            ActivityLink link = ActivityLink.findByLinkedEntityAndLinkedId('Customer', customer.id)
-            assert link
-            Activity activity = link.activity
-            assert activity
-            assert activity.kind == ActKinds.Note
-            assert activity.note.body == "note_test"
-        }
+        activities.size() == 2
+        ActivityLink.query([:]).count() == 0
+
+        and:
+        Activity a1 = Activity.findWhere(org: org1)
+        Activity a2 = Activity.findWhere(org: org2)
+        a1.kind == ActKinds.Note
+        a1.note.body == 'note_test'
+        a2.kind == ActKinds.Note
+        a2.note.body == 'note_test'
     }
 
-    @Ignore //XTEST flaky test
-    def "test massupdate - with new attachments "() {
+    void "customer task - no ActivityLinks"() {
         setup:
-        Org org = Org.of("test", "test", OrgType.Customer).persist()
-        Payment p1 = Payment.create(amount: 100, org: org).persist()
-        Payment p2 = Payment.create(amount: 200, org: org).persist()
-
-
-        File origFile = new File(BuildSupport.rootProjectDir, "examples/resources/test.txt")
-        byte[] bytes = FileUtils.readFileToByteArray(origFile)
-        Path tmpFile = attachmentSupport.createTempFile('test.txt', bytes)
-        String tempFileName = tmpFile.fileName
-
-        Map changes = [
-            name: 'attachment_test',
-            attachments: [ [name: "test.txt", tempFileName: tempFileName] ]
-        ]
-        expect:
-        Payment.get(p1.id) != null
-        Payment.get(p2.id) != null
-
-        when:
-        activityBulk.insertMassActivity([p1, p2], changes, null, true)
-
-        then: "Activity with attachments is created for each payments"
-        [p1, p2].each { id ->
-            ActivityLink link = ActivityLink.findByLinkedEntityAndLinkedId('Payment', id)
-            assert link
-            Activity activity = link.activity
-            assert activity
-            assert activity.name == "attachment_test"
-            Attachment attachment = activity.attachments[0]
-            assert attachment
-            assert attachment.id
-            assert 'test.txt' == attachment.name
-        }
-
-        cleanup:
-        [p1, p2].each { id ->
-            ActivityLink link = ActivityLink.findByLinkedEntityAndLinkedId('Payment', id)
-            Activity activity = link?.activity
-            Attachment attachment = activity?.attachments[0]
-            if (attachment) {
-                attachment.resource.file.delete()
-            }
-        }
-    }
-
-    def testMassUpdate_with_task() {
-        setup:
-        Org org = Org.of("test", "test", OrgType.Customer).persist()
-        Customer c1 = Customer.create(name: "test-1", num: "test-1", org: org).persist()
-        Customer c2 = Customer.create(name: "test-2", num: "test-2", org: org).persist()
-
-        TaskType todo = build(TaskType, [id:1, code: "TODO"]).persist()
-        TaskStatus open = build(TaskStatus, [id:0, code: "Open"]).persist()
-
-        expect:
-        Customer.get(1) != null
-        Customer.get(2) != null
+        Org org1 = Org.of("t1", "Task Cust 1", OrgType.Customer).persist()
+        Org org2 = Org.of("t2", "Task Cust 2", OrgType.Customer).persist()
+        Customer c1 = new Customer(num: "t1", name: "Task Cust 1", org: org1).persist()
+        Customer c2 = new Customer(num: "t2", name: "Task Cust 2", org: org2).persist()
+        build(TaskType, [id: 1, code: "TODO"]).persist()
+        build(TaskStatus, [id: 0, code: "Open"]).persist()
 
         Map changes = [
             name: 'task_test',
@@ -137,22 +99,20 @@ class ActivityBulkSpec extends Specification implements GormHibernateTest, Secur
                 priority: 10,
                 state   : 1,
                 taskType: [id: 1],
-                user    : [id: 1, contact: [name: "9ci"]]
+                user    : [id: 1]
             ]
         ]
 
-        List targets = [c1, c2]
-
         when:
-        activityBulk.insertMassActivity(targets, changes)
+        List<Activity> activities = activityBulk.insertMassActivity([c1, c2], changes)
+        flush()
 
-        then: "Activity is created with task for each customer"
-        targets.each { Customer it ->
-            ActivityLink link = ActivityLink.findByLinkedEntityAndLinkedId('Customer', it.id)
-            assert link
-            Activity activity = link.activity
-            assert activity
-            assert activity.name == "task_test"
+        then:
+        activities.size() == 2
+        ActivityLink.query([:]).count() == 0
+        [org1, org2].each { Org org ->
+            Activity activity = Activity.findWhere(org: org)
+            assert activity.name == 'task_test'
             assert activity.kind == ActKinds.Todo
             assert activity.task
             assert activity.task.taskType == TaskType.TODO
@@ -161,12 +121,66 @@ class ActivityBulkSpec extends Specification implements GormHibernateTest, Secur
             assert activity.task.dueDate == IsoDateUtil.parseLocalDateTime("2017-04-28")
         }
     }
+
+    void "payment with linkTargets - one activity per org, ActivityLinks for each"() {
+        setup:
+        Org org = Org.of("pay", "Pay Org", OrgType.Customer).persist()
+        Payment p1 = new Payment(amount: 100, org: org).persist()
+        Payment p2 = new Payment(amount: 200, org: org).persist()
+
+        when:
+        List<Activity> activities = activityBulk.insertMassActivity([p1, p2], [name: 'pay_note'], null, true)
+        flush()
+
+        then:
+        activities.size() == 1
+        Activity.query(org: org).count() == 1
+        ActivityLink.query([:]).count() == 2
+
+        and:
+        Activity activity = activities[0]
+        activity.note.body == 'pay_note'
+        ActivityLink.findWhere(linkedEntity: 'Payment', linkedId: p1.id).activity == activity
+        ActivityLink.findWhere(linkedEntity: 'Payment', linkedId: p2.id).activity == activity
+    }
+
+    void "attachments created once and linked to each activity"() {
+        setup:
+        Org org1 = Org.of("a1", "Att Cust 1", OrgType.Customer).persist()
+        Org org2 = Org.of("a2", "Att Cust 2", OrgType.Customer).persist()
+        Customer c1 = new Customer(num: "a1", name: "Att Cust 1", org: org1).persist()
+        Customer c2 = new Customer(num: "a2", name: "Att Cust 2", org: org2).persist()
+
+        File origFile = new File(BuildSupport.rootProjectDir, "examples/resources/test.txt")
+        Path tmpFile = attachmentSupport.createTempFile('test.txt', FileUtils.readFileToByteArray(origFile))
+
+        Map changes = [
+            name: 'attachment_test',
+            attachments: [[name: 'test.txt', tempFileName: tmpFile.fileName.toString()]]
+        ]
+
+        when:
+        List<Activity> activities = activityBulk.insertMassActivity([c1, c2], changes)
+        flush()
+
+        then:
+        activities.size() == 2
+        Attachment.query([:]).count() == 1
+        AttachmentLink.query([:]).count() == 2
+
+        and:
+        Long attachmentId = Attachment.query([:]).list()[0].id
+        activities.each { Activity activity ->
+            assert activity.attachments.size() == 1
+            assert activity.attachments[0].id == attachmentId
+            assert activity.attachments[0].name == 'test.txt'
+        }
+    }
 }
 
-//Just mock the domains for test, we dont need any fields in this domains other then org, because mass udpate uses
-// the domains just to get the orgid and doesnt do anything else with these domains
+/** Mock — mass activity only needs org (and id for links). */
 @Entity
-class Customer implements RepoEntity<Customer>{
+class Customer implements RepoEntity<Customer> {
     String num
     String name
 

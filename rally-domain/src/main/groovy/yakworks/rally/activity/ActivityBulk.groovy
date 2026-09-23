@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service
 
 import gorm.tools.model.SourceType
 import gorm.tools.problem.ProblemHandler
+import gorm.tools.utils.GormMetaUtils
 import grails.gorm.transactions.Transactional
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.Task
@@ -69,85 +70,46 @@ class ActivityBulk {
     }
 
     /**
-     * Insert activities for the given list of target domains
+     * Creates one Activity per org for the given targets.
+     * Attachments are created once and linked to each activity (no copies).
      *
-     * @param targets One of the [ArTran, Customer, CustAccount, Payment]
-     * @param activityData The data for new activity. Example below.
-     *        <pre>
-     *        [
-     *        name: "The text for note/title/summary"
-     *        task: [
-     *          dueDate : "2017-04-28",
-     *          priority: "10",
-     *          state   : "1",
-     *          taskType: [id: "1"],
-     *          user    : [id: 1, contact: [name: "9ci"]]
-     *        ]
-     *        attachments:[
-     *          name: "test.txt",
-     *          tempFileName: tempFileName
-     *        ]
-     *        ]
-     *        </pre>
-     * @param source activity source - if the source is from outside
-     * @param newAttachments if new attachments should be created for each target
-     * @return list of activities
+     * @param targets entities with getOrg() / org (Customer, CustAccount, ArTran, Payment)
+     * @param activityData name, optional task, optional attachments
+     * @param source unused for now (activity.source is set from entity name)
+     * @param linkTargets true for ArTran/Payment (ActivityLinks); false for Customer/CustAccount (org on activity is enough)
      */
     @Transactional
-    List<Activity> insertMassActivity(List targets, Map activityData, String source = null, boolean newAttachments = false) {
+    List<Activity> insertMassActivity(List targets, Map activityData, String source = null, boolean linkTargets = false) {
+        if (!targets) return [] as List<Activity>
 
-        Map<Long, Activity> createdActivities = [:]
-        List attachments = [] as List<Attachment>
+        // create attachments once; each activity gets AttachmentLinks to the same rows
+        List<Attachment> attachments = [] as List<Attachment>
         List attachmentData = activityData?.attachments as List
         if (attachmentData) {
-            attachments = attachmentRepo.createOrUpdate(attachmentData)
-            if (targets[0].class.simpleName == "Payment") {
-                attachments.each { Attachment att ->
-                    String name = activityData?.name
-                    att.description = name?.size() > 255 ? name[0..254] : name
-                    att.persist()
-                }
-            }
-        }
-        List<Activity> activities = []
-        targets.eachWithIndex { target, i ->
-            String entityName = target.getClass().getSimpleName()
-            Org org = (entityName == "ArTran" ? target['customer']['org'] : target['org']) as Org //possible candidates, ArTran,Customer,CustAccount,Payment
-            Activity activity
-            if (createdActivities[org.getId()] && entityName != "Payment") {
-                activity = createdActivities[org.getId()]
-            } else {
-                List copiedAttachments = attachments
-                //Here !=0 = for first payment use the original attachments and for all rest of the payments copy it.
-                //so same attachments are not shared between payments.
-                if (i != 0 && newAttachments) {
-                    copiedAttachments = attachments.collect { attachmentRepo.copy(it as Attachment)}
-                }
-                activity = createActivity(activityData.name.toString(), org, (Map) activityData.task, copiedAttachments, entityName, source)
-                createdActivities[org.getId() as Long] = activity
-            }
-
-            Long linkedId = target['id'] as Long
-            activityLinkRepo.create(linkedId, entityName, activity)
-
-            activities.add(activity)
+            attachments = attachmentRepo.createOrUpdate(attachmentData) as List<Attachment>
         }
 
-        return activities
+        Map<Long, Activity> byOrg = [:]
+        // unwrap Hibernate proxy so linkedEntity/source is e.g. Customer not Customer$HibernateProxy$…
+        String entityName = GormMetaUtils.unwrapIfProxy(targets[0].getClass().simpleName)
+
+        for (Object target : targets) {
+            Org org = target['org'] as Org
+            Activity activity = byOrg[org.id]
+            if (!activity) {
+                activity = createActivity(activityData.name.toString(), org, (Map) activityData.task, attachments, entityName, source)
+                byOrg[org.id] = activity
+            }
+            // ArTran/Payment share an org — link each target; Customer/CustAccount skip (unique org)
+            if (linkTargets) {
+                activityLinkRepo.create(target['id'] as Long, entityName, activity)
+            }
+        }
+
+        return new ArrayList<Activity>(byOrg.values())
     }
 
-    /**
-     * Creates new activity
-     *
-     * @param text Text for note body/title/summary (Title and summary will be trimmed to 255 characters)
-     * @param org the org for the activity
-     * @param task Data for the new task
-     * @param attachments list of attachments to attach to this activity
-     * @param entityName linked entity name for which the activity is created (Eg. ArTran, Customer etc)
-     * @param source activity source -  if this is from outside.
-     * @return Activity
-     */
-    //FIXME this is old and should probably be deprected, currentyl used in insertMassActivity
+    /** Builds a note or task activity and links the given attachments. */
     @Transactional
     Activity createActivity(String text, Org org, Map task, List<Attachment> attachments, String entityName, String source = null) {
 

@@ -25,6 +25,8 @@ import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
+import yakworks.rally.tag.model.Tag
+import yakworks.rally.tag.model.TagLink
 import yakworks.spring.AppResourceLoader
 import yakworks.testing.gorm.unit.GormHibernateTest
 import yakworks.testing.gorm.unit.SecurityTest
@@ -41,7 +43,7 @@ class ActivityBulkSpec extends Specification implements GormHibernateTest, Secur
 
     static List entityClasses = [
         Customer, Payment, Activity, ActivityNote, ActivityLink, Org, OrgTag, Location,
-        AttachmentLink, Attachment, FileData, Task, TaskType, TaskStatus
+        AttachmentLink, Attachment, FileData, Task, TaskType, TaskStatus, Tag, TagLink
     ]
 
     static List springBeans = [ActivityBulk, AttachmentSupport, AppResourceLoader, OrgCopier, OrgProps, OrgDimensionService]
@@ -174,6 +176,30 @@ class ActivityBulkSpec extends Specification implements GormHibernateTest, Secur
             assert activity.attachments.size() == 1
             assert activity.attachments[0].id == attachmentId
             assert activity.attachments[0].name == 'test.txt'
+        }
+    }
+
+    void "tags applied to each activity"() {
+        setup:
+        Org org1 = Org.of("tg1", "Tag Cust 1", OrgType.Customer).persist()
+        Org org2 = Org.of("tg2", "Tag Cust 2", OrgType.Customer).persist()
+        Customer c1 = new Customer(num: "tg1", name: "Tag Cust 1", org: org1).persist()
+        Customer c2 = new Customer(num: "tg2", name: "Tag Cust 2", org: org2).persist()
+        Tag tag = Tag.create(name: 'bulk-tag', code: 'bulk-tag', entityName: 'Activity')
+
+        when:
+        List<Activity> activities = activityBulk.insertMassActivity([c1, c2], [
+            name: 'tagged_note',
+            tags: [[id: tag.id]]
+        ])
+        flush()
+
+        then:
+        activities.size() == 2
+        activities.each { Activity activity ->
+            assert activity.note.body == 'tagged_note'
+            assert activity.hasTags()
+            assert activity.tags*.id == [tag.id]
         }
     }
 }

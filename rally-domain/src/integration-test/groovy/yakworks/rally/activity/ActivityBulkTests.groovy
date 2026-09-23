@@ -15,6 +15,7 @@ import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
+import yakworks.rally.tag.model.Tag
 import yakworks.testing.gorm.integration.DomainIntTest
 
 @Integration
@@ -114,6 +115,29 @@ class ActivityBulkTests extends Specification implements DomainIntTest {
         activities?.each { Activity activity ->
             activity.attachments?.each { it.resource?.file?.delete() }
         }
+    }
+
+    void "insertMassActivity with tags"() {
+        setup:
+        Org org1 = Org.of("ABT1", "ActBulk Tag 1", OrgType.Customer).persist()
+        Org org2 = Org.of("ABT2", "ActBulk Tag 2", OrgType.Customer).persist()
+        Contact c1 = Contact.create(firstName: "Tag1", org: [id: org1.id])
+        Contact c2 = Contact.create(firstName: "Tag2", org: [id: org2.id])
+        Tag tag = Tag.create(code: 'actBulkTag', entityName: 'Activity')
+        flush()
+
+        when:
+        List<Activity> activities = activityBulk.insertMassActivity([c1, c2], [
+            name: 'tagged bulk note',
+            tags: [[id: tag.id]]
+        ])
+        flush()
+
+        then:
+        activities.size() == 2
+        activities.every { it.note.body == 'tagged bulk note' }
+        activities.every { it.hasTags() }
+        activities.every { it.tags*.id.contains(tag.id) }
     }
 
 }

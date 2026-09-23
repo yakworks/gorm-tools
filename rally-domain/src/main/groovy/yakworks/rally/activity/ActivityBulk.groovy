@@ -25,6 +25,7 @@ import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.tag.model.TagLink
 
 /**
  * WIP
@@ -98,6 +99,9 @@ class ActivityBulk {
             Activity activity = byOrg[org.id]
             if (!activity) {
                 activity = createActivity(activityData.name.toString(), org, (Map) activityData.task, attachments, entityName, source)
+                if (activityData.tags) {
+                    TagLink.addOrRemoveTags(activity, activityData.tags)
+                }
                 byOrg[org.id] = activity
             }
             // ArTran/Payment share an org — link each target; Customer/CustAccount skip (unique org)

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service
 
 import gorm.tools.model.SourceType
 import gorm.tools.problem.ProblemHandler
+import gorm.tools.repository.RepoLookup
 import gorm.tools.utils.GormMetaUtils
 import grails.gorm.transactions.Transactional
 import yakworks.rally.activity.model.Activity
@@ -43,6 +44,15 @@ class ActivityBulk {
     @Autowired AttachmentRepo attachmentRepo
 
     @Autowired ProblemHandler problemHandler
+
+    /** Load entities by id and create mass activities (used by MassUpdateService). */
+    void createActivities(Class entityClass, List ids, Map activityData, boolean linkTargets) {
+        if (!ids || !activityData) return
+        // name is required to build the activity note/title
+        if (!activityData.name) return
+        List targets = RepoLookup.findRepo(entityClass).getAll(ids).findAll { it != null } as List
+        insertMassActivity(targets, activityData, null, linkTargets)
+    }
 
     /**
      * insert a single activity and note for a list of domains.

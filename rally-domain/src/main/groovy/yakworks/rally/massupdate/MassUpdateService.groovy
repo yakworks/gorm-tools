@@ -2,7 +2,7 @@
 * Copyright 2026 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.gorm.api.massupdate
+package yakworks.rally.massupdate
 
 import groovy.transform.CompileStatic
 
@@ -16,11 +16,14 @@ import gorm.tools.repository.events.AfterMassUpdateEntityEvent
 import gorm.tools.repository.events.BeforeMassUpdateEntityEvent
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.utils.ServiceLookup
+import grails.gorm.transactions.Transactional
 import yakworks.api.ApiResults
 import yakworks.api.HttpStatus
 import yakworks.api.Result
 import yakworks.api.problem.data.DataProblem
 import yakworks.commons.map.Maps
+import yakworks.gorm.api.massupdate.MassUpdateArgs
+import yakworks.rally.activity.ActivityBulk
 import yakworks.spring.AppCtx
 
 /**
@@ -35,6 +38,9 @@ class MassUpdateService<D> {
 
     @Autowired
     RepoEventPublisher repoEventPublisher
+
+    @Autowired
+    ActivityBulk activityBulk
 
     Class<D> entityClass // the domain class this is for
 
@@ -52,6 +58,8 @@ class MassUpdateService<D> {
 
     /**
      * Applies args.data to every id in args.ids.
+     * If data contains {@code activity}, it is removed from field updates and activities are created
+     * for successful ids before the finished event.
      *
      * @param args the ids and the shared data map to apply to each of them
      * @return ApiResults with an entry per id, ok for the ones that updated and a problem for the ones that failed
@@ -64,16 +72,36 @@ class MassUpdateService<D> {
             throw DataProblem.of('error.data.emptyPayload').detail("Mass update data is empty").toException()
         }
 
+        // pull activity out so it is not bound onto each entity
+        Map activityData = (args.data.remove('activity') ?: null) as Map
+        boolean hasFieldUpdates = !args.data.isEmpty()
+
+        if (!hasFieldUpdates && !activityData) {
+            throw DataProblem.of('error.data.emptyPayload').detail("Mass update data is empty").toException()
+        }
+
         ApiResults results = ApiResults.create(false)
 
-        for (Object id : args.ids) {
-            try {
-                Map rowData = prepareData(id, args)
-                updateEntity(rowData, args)
-                results << Result.OK().payload([id: id]).status(HttpStatus.OK)
-            } catch (Exception e) {
-                results << problemHandler.handleException(e, entityClass.simpleName).payload([id: id])
+        if (hasFieldUpdates) {
+            for (Object id : args.ids) {
+                try {
+                    Map rowData = prepareData(id, args)
+                    updateEntity(rowData, args)
+                    results << Result.OK().payload([id: id]).status(HttpStatus.OK)
+                } catch (Exception e) {
+                    results << problemHandler.handleException(e, entityClass.simpleName).payload([id: id])
+                }
             }
+        } else {
+            // activity-only — no field updates
+            args.ids.each { Object id ->
+                results << Result.OK().payload([id: id]).status(HttpStatus.OK)
+            }
+        }
+
+        if (activityData) {
+            List okIds = results.success.collect { Result r -> ((Map) r.payload).id }
+            activityBulk.createActivities(entityClass, okIds, activityData, args.linkTargets)
         }
 
         AppCtx.publishEvent(new MassUpdateFinishedEvent<D>(this, entityClass, args, results))
@@ -98,18 +126,17 @@ class MassUpdateService<D> {
         if (args.params) {
             pargs.params = args.params
         }
+        args.persistArgs = pargs
+        D entity = doUpdate(rowData, args)
+        return entity
+    }
 
-        GormRepo<D> repo = getRepo()
-
-        D entity = null
-
-        repo.withTrx {
-            doBeforeMassUpdateEntity(rowData, args)
-            entity = repo.update(rowData, pargs)
-            doAfterMassUpdateEntity(entity, rowData, args)
-        }
-
-      return entity
+    @Transactional
+    D doUpdate(Map rowData, MassUpdateArgs args) {
+        doBeforeMassUpdateEntity(rowData, args)
+        D entity = repo.update(rowData, args.persistArgs)
+        doAfterMassUpdateEntity(entity, rowData, args)
+        return entity
     }
 
     /**

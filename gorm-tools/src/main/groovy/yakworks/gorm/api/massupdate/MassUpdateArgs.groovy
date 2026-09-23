@@ -24,6 +24,7 @@ class MassUpdateArgs {
 
     /**
      * Shared field values applied to each id. Should not need an id; it is injected per item.
+     * Optional {@code activity} map is stripped and handled by MassUpdateService.
      */
     Map data
 
@@ -33,9 +34,15 @@ class MassUpdateArgs {
     PersistArgs persistArgs
 
     /**
-     * Extra pass-through for hooks / events (e.g. future activity note).
+     * Extra pass-through for hooks / events / repo PersistArgs.
      */
     Map params = [:]
+
+    /**
+     * When creating mass-update activities, true creates ActivityLinks (ArTran/Payment);
+     * false for Customer/CustAccount where org on the activity is enough.
+     */
+    boolean linkTargets = false
 
     static MassUpdateArgs of(List ids, Map data) {
         new MassUpdateArgs(ids: ids, data: data)

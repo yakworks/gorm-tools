@@ -2,7 +2,7 @@
 * Copyright 2026 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.gorm.api.massupdate
+package yakworks.rally.massupdate
 
 import groovy.transform.CompileStatic
 
@@ -11,10 +11,11 @@ import org.springframework.core.ResolvableType
 import org.springframework.core.ResolvableTypeProvider
 
 import yakworks.api.ApiResults
+import yakworks.gorm.api.massupdate.MassUpdateArgs
 
 /**
  * Fired once after all the items in a mass update have been processed, whether they succeeded or not.
- * This is the spot to hang batch level side effects such as creating a single activity for the run.
+ * Published after optional activity creation.
  *
  * @param <D> the entity domain class
  */

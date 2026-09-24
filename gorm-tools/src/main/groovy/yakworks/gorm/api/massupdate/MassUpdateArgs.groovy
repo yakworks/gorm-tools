@@ -24,7 +24,6 @@ class MassUpdateArgs {
 
     /**
      * Shared field values applied to each id. Should not need an id; it is injected per item.
-     * Optional {@code activity} map is stripped and handled by MassUpdateService.
      */
     Map data
 

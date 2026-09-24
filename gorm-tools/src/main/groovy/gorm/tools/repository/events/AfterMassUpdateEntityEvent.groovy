@@ -11,8 +11,6 @@ import yakworks.gorm.api.massupdate.MassUpdateArgs
 
 /**
  * For mass update this is fired after each individual item is updated.
- *
- * @param D the entity domain class
  */
 @CompileStatic
 class AfterMassUpdateEntityEvent<D> extends RepositoryEvent<D> {

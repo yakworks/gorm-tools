@@ -12,8 +12,6 @@ import yakworks.gorm.api.massupdate.MassUpdateArgs
 /**
  * For mass update this is fired before each individual item is updated.
  * Gives a chance to modify the data before it gets bound.
- *
- * @param D the entity domain class
  */
 @CompileStatic
 class BeforeMassUpdateEntityEvent<D> extends RepositoryEvent<D> {

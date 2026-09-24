@@ -16,8 +16,6 @@ import yakworks.gorm.api.massupdate.MassUpdateArgs
 /**
  * Fired once after all the items in a mass update have been processed, whether they succeeded or not.
  * Published after optional activity creation.
- *
- * @param <D> the entity domain class
  */
 @CompileStatic
 class MassUpdateFinishedEvent<D> extends ApplicationEvent implements ResolvableTypeProvider {

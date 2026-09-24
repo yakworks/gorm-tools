@@ -61,7 +61,7 @@ class ActivityBulkSpec extends Specification implements GormHibernateTest, Secur
         activityBulk.insertMassActivity(null, [name: 'x']) == []
     }
 
-    void "customer notes - one activity per org, no ActivityLinks"() {
+    void "customer activity with note"() {
         setup:
         Org org1 = Org.of("c1", "Cust 1", OrgType.Customer).persist()
         Org org2 = Org.of("c2", "Cust 2", OrgType.Customer).persist()
@@ -69,7 +69,7 @@ class ActivityBulkSpec extends Specification implements GormHibernateTest, Secur
         Customer c2 = new Customer(num: "c2", name: "Cust 2", org: org2).persist()
 
         when:
-        List<Activity> activities = activityBulk.insertMassActivity([c1, c2], [name: 'note_test'])
+        List<Activity> activities = activityBulk.insertMassActivity([c1, c2], [note: [body:'note_test']])
         flush()
 
         then:
@@ -85,7 +85,7 @@ class ActivityBulkSpec extends Specification implements GormHibernateTest, Secur
         a2.note.body == 'note_test'
     }
 
-    void "customer task - no ActivityLinks"() {
+    void "customer activity with task"() {
         setup:
         Org org1 = Org.of("t1", "Task Cust 1", OrgType.Customer).persist()
         Org org2 = Org.of("t2", "Task Cust 2", OrgType.Customer).persist()
@@ -124,14 +124,14 @@ class ActivityBulkSpec extends Specification implements GormHibernateTest, Secur
         }
     }
 
-    void "payment with linkTargets - one activity per org, ActivityLinks for each"() {
+    void "payment with linkTargets - one activity per org, ActivityLinks for each payment"() {
         setup:
         Org org = Org.of("pay", "Pay Org", OrgType.Customer).persist()
         Payment p1 = new Payment(amount: 100, org: org).persist()
         Payment p2 = new Payment(amount: 200, org: org).persist()
 
         when:
-        List<Activity> activities = activityBulk.insertMassActivity([p1, p2], [name: 'pay_note'], null, true)
+        List<Activity> activities = activityBulk.insertMassActivity([p1, p2], [note: [body:'pay_note']], null, true)
         flush()
 
         then:
@@ -189,7 +189,7 @@ class ActivityBulkSpec extends Specification implements GormHibernateTest, Secur
 
         when:
         List<Activity> activities = activityBulk.insertMassActivity([c1, c2], [
-            name: 'tagged_note',
+            note: [body:'tagged_note'],
             tags: [[id: tag.id]]
         ])
         flush()

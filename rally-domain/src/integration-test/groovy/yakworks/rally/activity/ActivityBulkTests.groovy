@@ -46,7 +46,7 @@ class ActivityBulkTests extends Specification implements DomainIntTest {
         }
     }
 
-    void "insertMassActivity note without links"() {
+    void "insertMassActivity with note"() {
         setup:
         Org org1 = Org.of("AB1", "ActBulk 1", OrgType.Customer).persist()
         Org org2 = Org.of("AB2", "ActBulk 2", OrgType.Customer).persist()
@@ -54,7 +54,7 @@ class ActivityBulkTests extends Specification implements DomainIntTest {
         Contact c2 = Contact.create(firstName: "AB2", org: [id: org2.id])
 
         when:
-        List<Activity> activities = activityBulk.insertMassActivity([c1, c2], [name: 'bulk note'])
+        List<Activity> activities = activityBulk.insertMassActivity([c1, c2], [note: [body:'bulk note']])
         flush()
 
         then:
@@ -128,7 +128,7 @@ class ActivityBulkTests extends Specification implements DomainIntTest {
 
         when:
         List<Activity> activities = activityBulk.insertMassActivity([c1, c2], [
-            name: 'tagged bulk note',
+            note: [body:'tagged bulk note'],
             tags: [[id: tag.id]]
         ])
         flush()

@@ -351,8 +351,9 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
         R related = (R)lookup(relatedClass, data)
         if(op == DataOp.remove){
             remove(main, related)
-        } else {
-            if(!exists(main, related)) { //if it already exists then move on
+        } else if(op == DataOp.add || op == null) {
+            if(!exists(main, related)) {
+                //if it already exists then move on
                 xrefEntity = create(main, related)
             }
         }

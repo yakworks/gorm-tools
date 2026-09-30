@@ -23,6 +23,7 @@ import yakworks.api.Result
 import yakworks.api.problem.data.DataProblem
 import yakworks.commons.map.Maps
 import yakworks.gorm.api.massupdate.MassUpdateArgs
+import yakworks.gorm.api.massupdate.MassUpdater
 import yakworks.rally.activity.ActivityBulk
 import yakworks.spring.AppCtx
 
@@ -31,7 +32,7 @@ import yakworks.spring.AppCtx
  * Each id is updated in its own transaction so failures are collected and the rest still get updated.
  */
 @CompileStatic
-class MassUpdateService<D> {
+class MassUpdateService<D> implements MassUpdater<D> {
 
     @Autowired
     ProblemHandler problemHandler
@@ -64,6 +65,7 @@ class MassUpdateService<D> {
      * @param args the ids and the shared data map to apply to each of them
      * @return ApiResults with an entry per id, ok for the ones that updated and a problem for the ones that failed
      */
+    @Override
     ApiResults massUpdate(MassUpdateArgs args) {
         if (!args.ids) {
             throw DataProblem.of('error.data.emptyPayload').detail("Mass update ids is empty").toException()

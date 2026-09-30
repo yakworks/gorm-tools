@@ -26,6 +26,7 @@ import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.model.DataOp
 import gorm.tools.utils.ServiceLookup
 import grails.web.Action
+import yakworks.api.ApiResults
 import yakworks.api.problem.Problem
 import yakworks.gorm.api.CrudApi
 import yakworks.gorm.api.IncludesProps
@@ -161,6 +162,21 @@ trait CrudApiController<D> extends RestApiController {
             CrudApi.CrudApiResult res = getCrudApi().upsert(bodyAsMap(), qParams)
             Map entityMap = res.asMap()
             respondWith(entityMap, [status: res.status, params: qParams])
+        } catch (Exception | AssertionError e) {
+            handleThrowable(e)
+        }
+    }
+
+    /**
+     * PUT /api/entity/massUpdate
+     * Applies the same data to many records by id, body is [ids: [1,2,..], data: [...]]
+     */
+    @Action
+    def massUpdate() {
+        try {
+            Map qParams = getParamsMap()
+            ApiResults results = getCrudApi().massUpdate(bodyAsMap(), qParams)
+            respondWith(results, [status: MULTI_STATUS, params: qParams])
         } catch (Exception | AssertionError e) {
             handleThrowable(e)
         }

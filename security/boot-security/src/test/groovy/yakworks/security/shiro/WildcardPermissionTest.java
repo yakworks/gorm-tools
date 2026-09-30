@@ -291,4 +291,5 @@ public class WildcardPermissionTest {
         assertFalse(p4.implies(p2));
         assertFalse(p4.implies(p3));
     }
+
 }

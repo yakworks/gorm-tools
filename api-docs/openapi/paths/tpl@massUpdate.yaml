@@ -24,10 +24,11 @@ put:
               description: ids of the ${capitalName} records to update
               items: { type: integer, format: int64 }
             data:
+              type: object
+              additionalProperties: true
               description: >
-                Changes to apply to every id. Same schema as a single PUT for this resource, without the id.
-              allOf:
-                - \$ref: '${baseDir}models/${modelName}_Update.yaml'
+                Map of the fields to change and their new values, applied to every id.
+                Takes the same fields as a single PUT for this resource.
 
   responses:
     '207':

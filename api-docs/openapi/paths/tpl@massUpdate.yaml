@@ -1,0 +1,49 @@
+put:
+  tags: [ ${endpoint} ]
+  summary: Mass update ${capitalName}
+  description: >
+    Applies the same changes to many ${capitalName} records by id.
+    Each id is updated in its own transaction, so failures are returned as problems and the rest are still updated.
+
+    The data can also contain an `activity` (note, task, attachments etc.), which creates an activity
+    for each record that updated successfully.
+
+  operationId: massUpdate${capitalName}
+
+  requestBody:
+    description: The ids to update and the changes to apply to each of them
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [ ids, data ]
+          properties:
+            ids:
+              type: array
+              description: ids of the ${capitalName} records to update
+              items: { type: integer, format: int64 }
+            data:
+              description: >
+                Changes to apply to every id. Same schema as a single PUT for this resource, without the id.
+              allOf:
+                - \$ref: '${baseDir}models/${modelName}_Update.yaml'
+
+  responses:
+    '207':
+      description: >
+        Multi-Status - processing finished. ok is false if any id failed, and problems will have the failures.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ok: { type: boolean, description: false if any of the ids failed }
+              status: { type: integer, example: 207 }
+              title: { type: string }
+              problems:
+                type: array
+                items:
+                  \$ref: '${baseDir}components/schemas/Problem.yaml'
+    '400': {\$ref: '${baseDir}components/responses/400_Problem.yaml'}
+    '403': {\$ref: '${baseDir}components/responses/403_Forbidden.yaml'}

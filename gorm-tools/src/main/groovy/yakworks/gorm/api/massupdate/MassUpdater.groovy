@@ -11,7 +11,6 @@ import yakworks.api.ApiResults
 /**
  * Applies the same field changes to many records by id.
  * Default implementation, MassUpdateService, stays in rally-domain, so it can access Activity etc.
- * @param <D> the entity class
  */
 @CompileStatic
 interface MassUpdater<D> {
@@ -19,7 +18,7 @@ interface MassUpdater<D> {
     /**
      * Applies args.data to every id in args.ids.
      *
-     * @return ApiResults with an entry per id
+     * @return ApiResults
      */
     ApiResults massUpdate(MassUpdateArgs args)
 

@@ -224,7 +224,7 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     }
 
     /**
-     * Not transactional, the MassUpdater updates each id in its own transaction.
+     * Not transactional, the MassUpdater updates each id in its own transaction. Not a single big transaction
      */
     @Override
     ApiResults massUpdate(Map data, Map qParams) {

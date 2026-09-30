@@ -108,7 +108,7 @@ interface CrudApi<D> {
      *
      * @param data the body with ids list and the data map to apply to each, eg [ids: [1,2], data: [name: 'foo']]
      * @param params the query params, passed through to the MassUpdateArgs.params
-     * @return ApiResults with an entry per id
+     * @return ApiResults
      */
     ApiResults massUpdate(Map data, Map params)
 

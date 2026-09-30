@@ -3,10 +3,9 @@ put:
   summary: Mass update ${capitalName}
   description: >
     Applies the same changes to many ${capitalName} records by id.
-    Each id is updated in its own transaction, so failures are returned as problems and the rest are still updated.
-
     The data can also contain an `activity` (note, task, attachments etc.), which creates an activity
     for each record that updated successfully.
+    Failures are returned as problems.
 
   operationId: massUpdate${capitalName}
 

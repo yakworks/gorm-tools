@@ -3,12 +3,14 @@ package yakworks.rally.massupdate
 import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.events.AfterMassUpdateEntityEvent
 import gorm.tools.repository.events.BeforeMassUpdateEntityEvent
+import gorm.tools.utils.ServiceLookup
 import groovy.transform.CompileDynamic
 import org.springframework.context.event.EventListener
 import spock.lang.Specification
 import yakworks.api.ApiResults
 import yakworks.api.problem.data.DataProblemException
 import yakworks.gorm.api.massupdate.MassUpdateArgs
+import yakworks.gorm.api.massupdate.MassUpdater
 import yakworks.rally.activity.ActivityBulk
 import yakworks.testing.gorm.model.KitchenSink
 import yakworks.testing.gorm.model.SinkExt
@@ -65,6 +67,15 @@ class MassUpdateServiceSpec extends Specification implements GormHibernateTest {
         // compare against RepoLookup which is what MassUpdateService uses
         svc.repo == RepoLookup.findRepo(KitchenSink)
         svc.repo.entityClass == KitchenSink
+    }
+
+    void "lookup by MassUpdater interface returns the service, as used by DefaultCrudApi"() {
+        when:
+        MassUpdater<KitchenSink> updater = ServiceLookup.lookup(KitchenSink, MassUpdater, "defaultMassUpdateService")
+
+        then:
+        updater instanceof MassUpdateService
+        ((MassUpdateService)updater).entityClass == KitchenSink
     }
 
     void "mass update applies shared data to all ids"() {

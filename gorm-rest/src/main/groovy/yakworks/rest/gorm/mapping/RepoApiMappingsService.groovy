@@ -53,6 +53,11 @@ class RepoApiMappingsService {
                     .httpMethod('POST').action('upsert').suffix('/upsert')
                     .urlMappingBuilder(builderDelegate).build()
 
+                //MASS UPDATE
+                SimpleUrlMappingBuilder.of(contextPath, nspace, ctrlName)
+                    .httpMethod('PUT').action('massUpdate').suffix('/massUpdate')
+                    .urlMappingBuilder(builderDelegate).build()
+
                 // bulks ops at /bulk
                 SimpleUrlMappingBuilder.of(contextPath, nspace, ctrlName)
                     .httpMethod('POST').action('bulkCreate').suffix('/bulk')

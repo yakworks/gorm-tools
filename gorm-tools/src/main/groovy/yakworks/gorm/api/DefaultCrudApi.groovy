@@ -21,12 +21,16 @@ import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.ApiCrudRepo
 import gorm.tools.repository.model.EntityResult
 import gorm.tools.transaction.TrxUtils
+import gorm.tools.utils.ServiceLookup
 import grails.gorm.transactions.Transactional
+import yakworks.api.ApiResults
 import yakworks.api.problem.data.DataProblemException
 import yakworks.gorm.api.bulk.BulkExportJobArgs
 import yakworks.gorm.api.bulk.BulkExportService
 import yakworks.gorm.api.bulk.BulkImportJobArgs
 import yakworks.gorm.api.bulk.BulkImportService
+import yakworks.gorm.api.massupdate.MassUpdateArgs
+import yakworks.gorm.api.massupdate.MassUpdater
 import yakworks.gorm.api.support.QueryArgsValidator
 import yakworks.gorm.config.QueryConfig
 import yakworks.meta.MetaMap
@@ -58,6 +62,9 @@ class DefaultCrudApi<D> implements CrudApi<D> {
 
     /** Not required but if an BulkSupport bean is setup then it will get get used */
     protected BulkImportService<D> bulkImportService
+
+    /** looked up on first use, the defaultMassUpdateService bean or an entity specific MassUpdater bean */
+    protected MassUpdater<D> massUpdater
 
     DefaultCrudApi(Class<D> entityClass){
         this.entityClass = entityClass
@@ -100,6 +107,12 @@ class DefaultCrudApi<D> implements CrudApi<D> {
         if (!bulkExportService)
             this.bulkExportService = BulkExportService.lookup(getEntityClass())
         return bulkExportService
+    }
+
+    MassUpdater<D> getMassUpdater(){
+        if (!massUpdater)
+            this.massUpdater = ServiceLookup.lookup(getEntityClass(), MassUpdater<D>, "defaultMassUpdateService")
+        return massUpdater
     }
 
     /**
@@ -208,6 +221,16 @@ class DefaultCrudApi<D> implements CrudApi<D> {
     @Override
     SyncJobEntity bulkExport(BulkExportJobArgs jobParams) {
         getBulkExportService().queueJob(jobParams)
+    }
+
+    /**
+     * Not transactional, the MassUpdater updates each id in its own transaction. Not a single big transaction
+     */
+    @Override
+    ApiResults massUpdate(Map data, Map qParams) {
+        MassUpdateArgs args = MassUpdateArgs.of(data.ids as List, data.data as Map)
+        args.params = qParams
+        return getMassUpdater().massUpdate(args)
     }
 
     protected List<D> queryList(QueryArgs qargs) {

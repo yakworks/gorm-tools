@@ -202,11 +202,19 @@ class OpenApiGenerator {
         processTplFile(pathItem, 'paths/tpl@{id}.yaml', filePathRef, model)
         paths[pathKeyId] = ['$ref': filePathRef]
 
-        //upsert
-        filePathRef = "${pathFileBase}@upsert.yaml"//.toString()
-        processTplFile(pathItem, 'paths/tpl@upsert.yaml', filePathRef, model)
-        paths["${pathKey}/upsert"] = ['$ref': filePathRef]
+        //upsert - do only if both create/update are allowed
+        if(pathItem.upsertAllowed()) {
+            filePathRef = "${pathFileBase}@upsert.yaml"//.toString()
+            processTplFile(pathItem, 'paths/tpl@upsert.yaml', filePathRef, model)
+            paths["${pathKey}/upsert"] = ['$ref': filePathRef]
+        }
 
+        //massUpdate, only when update is allowed
+        if(isOpAllowed(pathItem, 'update')) {
+            filePathRef = "${pathFileBase}@massUpdate.yaml"//.toString()
+            processTplFile(pathItem, 'paths/tpl@massUpdate.yaml', filePathRef, model)
+            paths["${pathKey}/massUpdate"] = ['$ref': filePathRef]
+        }
 
         //if bulk operations are enabled
         if(pathItem.bulkOps){
@@ -255,6 +263,11 @@ class OpenApiGenerator {
         ymlTpl = StringUtils.parseStringAsGString(ymlTpl, model)
         //parse the yaml
         return new Yaml().load(ymlTpl)
+    }
+
+    /** no allowedOps means everything is allowed, same as modifyForAllowedOps */
+    boolean isOpAllowed(PathItem pathItem, String op){
+        return !pathItem.allowedOps || pathItem.allowedOps.contains(op)
     }
 
     void modifyForAllowedOps(PathItem pathItem, Map pathMap){

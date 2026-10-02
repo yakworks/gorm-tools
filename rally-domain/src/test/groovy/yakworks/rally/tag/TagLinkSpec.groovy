@@ -205,6 +205,49 @@ class TagLinkSpec extends Specification implements GormHibernateTest, SecurityTe
         TagLink.exists(att, t3)
     }
 
+    void "test add and remove in a single op update"() {
+        setup:
+        Attachment att = new Attachment(name: 'foo', location: 'foo').persist()
+        Tag t1 = Tag.create(name: 't1', code:'t1', entityName: 'Attachment')
+        Tag t2 = Tag.create(name: 't2', code:'t2', entityName: 'Attachment')
+        Tag t3 = Tag.create(name: 't3', code:'t3', entityName: 'Attachment')
+        Tag t4 = Tag.create(name: 't4', code:'t4', entityName: 'Attachment')
+        Tag t5 = Tag.create(name: 't5', code:'t5', entityName: 'Attachment')
+
+        when: "start with t1 t2 t3"
+        TagLink.addOrRemoveTags(att, [[id:t1.id], [id:t2.id], [id:t3.id]])
+        flushAndClear()
+
+        then:
+        TagLink.count() == 3
+        TagLink.exists(att, t1)
+        TagLink.exists(att, t2)
+        TagLink.exists(att, t3)
+
+        when: "add t4 t5 and remove t1 t2 in one call"
+        TagLink.addOrRemoveTags(att, [
+            op: "update",
+            data: [
+                [op:"add", id: t4.id],
+                [op:"add", id: t5.id],
+                [op: "remove", id: t1.id],
+                [op: "remove", id: t2.id]
+            ]
+        ])
+        flushAndClear()
+
+        then: "t4 and t5 added, t1 and t2 removed, t3 kept"
+        TagLink.count() == 3
+        !TagLink.exists(att, t1)
+        !TagLink.exists(att, t2)
+        TagLink.exists(att, t3)
+        TagLink.exists(att, t4)
+        TagLink.exists(att, t5)
+        att.tags.containsAll([t3, t4, t5])
+        !att.tags.contains(t1)
+        !att.tags.contains(t2)
+    }
+
     void "test add remove - loose json string "() {
         setup:
         Attachment att = new Attachment(name: 'foo', location: 'foo').persist()

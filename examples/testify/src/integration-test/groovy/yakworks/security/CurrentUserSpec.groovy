@@ -109,6 +109,24 @@ class CurrentUserSpec extends Specification implements DomainIntTest {
         !currentUser.hasAnyPermission(['printer:foo:1', 'printer:poweroff:1']) //nope, none
     }
 
+    void "test hasWildcardPermission"() {
+        setup:
+        setupPerms()
+
+        when:
+        login "userAdmin"
+
+        then:
+        !currentUser.hasWildcardPermission()
+
+        when:
+        login "superUser"
+
+        then:
+        currentUser.hasWildcardPermission()
+        currentUser.hasPermission('ar:tran:update')
+    }
+
     // def "test user roles"() {
     //     expect:
     //     roles.size() == currentUser.userInfo.roles.size()
@@ -121,9 +139,11 @@ class CurrentUserSpec extends Specification implements DomainIntTest {
         AppUser admin = AppUser.create(getUserParams('userAdmin'))
         AppUser user2 = AppUser.create(getUserParams('user2'))
         AppUser user3 = AppUser.create(getUserParams('user3'))
+        AppUser superUser = AppUser.create(getUserParams('superUser'))
         SecRole roleAdmin = SecRole.create(code: "ADMIN")
         SecRole roleMgr = SecRole.create(code: "MGR")
         SecRole roleUser = SecRole.create(code: 'CUST')
+        SecRole roleSuper = SecRole.create(code: "SUPER")
 
         new SecUserPermission(admin, 'printer:print:*').persist()
 
@@ -144,10 +164,14 @@ class CurrentUserSpec extends Specification implements DomainIntTest {
         roleUser.addPermission('printer:use')
         roleUser.persist()
 
+        roleSuper.addPermission('*:*:*')
+        roleSuper.persist()
+
         SecRoleUser.create admin, roleAdmin, true
         SecRoleUser.create admin, roleMgr, true
         SecRoleUser.create user2, roleAdmin, true
         SecRoleUser.create user2, roleUser, true
+        SecRoleUser.create superUser, roleSuper, true
 
         // assert 2 == SecRole.count()
         // assert 3 == AppUser.count()

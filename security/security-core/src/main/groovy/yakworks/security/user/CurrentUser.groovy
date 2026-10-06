@@ -83,6 +83,14 @@ trait CurrentUser {
     abstract boolean hasPermission(String permission)
 
     /**
+     * True when the logged-in user has permission "*:*:*
+     * Matches "*:*:*", and also "*:*", and "*"
+     */
+    boolean hasWildcardPermission() {
+        isLoggedIn() && hasPermission('*:*:*')
+    }
+
+    /**
      * Gets user fields to send to client about their login
      */
     Map getUserMap() {

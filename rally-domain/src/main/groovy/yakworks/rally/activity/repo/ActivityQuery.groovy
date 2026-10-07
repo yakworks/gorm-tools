@@ -56,7 +56,7 @@ class ActivityQuery extends DefaultQueryService<Activity> {
             }
         }
         // notes have no task; an inner join on task.state would drop them
-        //mangoCriteria.join('task', JoinType.LEFT)
+        mangoCriteria.join('task', JoinType.LEFT)
         super.applyCriteria(mangoCriteria)
     }
 

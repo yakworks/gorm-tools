@@ -151,5 +151,4 @@ class GormToolsConfiguration {
         new DefaultQueryArgsValidator()
     }
 
-
 }

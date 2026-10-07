@@ -20,7 +20,10 @@ enum RepositoryEventType {
     AfterPersist(AfterPersistEvent),
 
     BeforeBulkSaveEntity(BeforeBulkSaveEntityEvent),
-    AfterBulkSaveEntity(AfterBulkSaveEntityEvent)
+    AfterBulkSaveEntity(AfterBulkSaveEntityEvent),
+
+    BeforeMassUpdateEntity(BeforeMassUpdateEntityEvent),
+    AfterMassUpdateEntity(AfterMassUpdateEntityEvent)
 
     Class eventClass
     String eventKey

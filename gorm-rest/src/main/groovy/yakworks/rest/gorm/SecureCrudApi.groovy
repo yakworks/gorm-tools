@@ -9,6 +9,7 @@ import groovy.transform.CompileStatic
 import org.springframework.security.access.prepost.PreAuthorize
 
 import gorm.tools.job.SyncJobEntity
+import yakworks.api.ApiResults
 import yakworks.gorm.api.CrudApi
 import yakworks.gorm.api.bulk.BulkImportJobArgs
 
@@ -38,6 +39,12 @@ class SecureCrudApi<D> implements CrudApi<D> {
     @PreAuthorize("!hasRole('ROLE_READ_ONLY')")
     CrudApiResult<D> upsert(Map data, Map params) {
         return defaultCrudApi.upsert(data, params)
+    }
+
+    @Override
+    @PreAuthorize("!hasRole('ROLE_READ_ONLY')")
+    ApiResults massUpdate(Map data, Map params) {
+        return defaultCrudApi.massUpdate(data, params)
     }
 
     @Override

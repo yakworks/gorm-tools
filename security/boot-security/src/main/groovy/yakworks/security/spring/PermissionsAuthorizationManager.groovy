@@ -123,6 +123,7 @@ class PermissionsAuthorizationManager implements AuthorizationManager<RequestAut
     /**
      * Normalize: /api/ar/autocash/123 → ar:autocash:read
      * api/ar/tran/rpc?op=reverse -> ar:tran:rpc:reverse
+     * PUT /api/ar/tran/massUpdate → ar:tran:update
      */
     //FIXME - Cache
     protected String buildPermission(String path, String op) {
@@ -136,6 +137,11 @@ class PermissionsAuthorizationManager implements AuthorizationManager<RequestAut
             String lastSegment = segments[-1]
             if(op in ['update', 'delete', 'read'] && (lastSegment.isNumber() || isUUID(lastSegment)) ) {
                 segments.removeLast() //removes last item (id)
+            }
+            //mass update is allowed when update is allowed, so PUT /api/ar/tran/massUpdate is ar:tran:update
+            //remove last segment, so update and massupdate are same from permissions perspective.
+            if(op == 'update' && lastSegment == 'massUpdate') {
+                segments.removeLast()
             }
             segments << op
             //join all parts except api, so it becomes "autocash:payment:read" for GET /api/autocash/payment

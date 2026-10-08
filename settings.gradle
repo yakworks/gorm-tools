@@ -39,6 +39,7 @@ include 'gorm-test-support'
 include 'gorm-test-domain'
 include 'gorm-audit'
 
+
 include "security/boot-security"
 findProject(':security/boot-security').name = 'boot-security'
 

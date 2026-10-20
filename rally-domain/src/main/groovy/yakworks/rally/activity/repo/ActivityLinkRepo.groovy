@@ -8,7 +8,9 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
+import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.AbstractLinkedEntityRepo
+import grails.gorm.transactions.Transactional
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 
@@ -21,11 +23,31 @@ class ActivityLinkRepo extends AbstractLinkedEntityRepo<ActivityLink, Activity> 
     }
 
     /**
-     * iterates through and removes all by Activity vs doing deleteAll so that delete event is fired
+     * iterates through and removes all by Activity vs doing deleteAll so that delete event is fired.
+     * Called while the activity itself is being deleted, so this does not delete the activity.
      */
     void remove(Activity act, Map args = [:]) {
         for( ActivityLink link : list(act)){
             doRemove(link, PersistArgs.of(args))
+        }
+    }
+
+    /**
+     * Removes the link for one record.
+     * When this is the only link, deletes the activity instead..
+     */
+    @Transactional
+    void removeLink(Long activityId, String linkedEntity, Long linkedId) {
+        Activity activity = Activity.get(activityId)
+        RepoUtil.checkFound(activity, activityId, Activity.simpleName)
+
+        ActivityLink link = query(activity: activity, linkedEntity: linkedEntity, linkedId: linkedId).get()
+        RepoUtil.checkFound(link, "${linkedEntity}:${linkedId}", ActivityLink.simpleName)
+
+        if (count(activity) <= 1) {
+            activity.remove()
+        } else {
+            doRemove(link, PersistArgs.defaults())
         }
     }
 

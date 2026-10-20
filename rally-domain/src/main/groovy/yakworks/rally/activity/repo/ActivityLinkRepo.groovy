@@ -24,7 +24,7 @@ class ActivityLinkRepo extends AbstractLinkedEntityRepo<ActivityLink, Activity> 
 
     /**
      * iterates through and removes all by Activity vs doing deleteAll so that delete event is fired.
-     * Called while the activity itself is being deleted, so this does not delete the activity.
+     * Called while the activity itself is being deleted.
      */
     void remove(Activity act, Map args = [:]) {
         for( ActivityLink link : list(act)){
@@ -33,7 +33,7 @@ class ActivityLinkRepo extends AbstractLinkedEntityRepo<ActivityLink, Activity> 
     }
 
     /**
-     * Removes the link for one record.
+     * Removes the link.
      * When this is the only link, deletes the activity instead..
      */
     @Transactional
@@ -42,11 +42,12 @@ class ActivityLinkRepo extends AbstractLinkedEntityRepo<ActivityLink, Activity> 
         RepoUtil.checkFound(activity, activityId, Activity.simpleName)
 
         ActivityLink link = query(activity: activity, linkedEntity: linkedEntity, linkedId: linkedId).get()
-        RepoUtil.checkFound(link, "${linkedEntity}:${linkedId}", ActivityLink.simpleName)
 
+        //if this is last link, or there are no links, just remove the activity
         if (count(activity) <= 1) {
             activity.remove()
-        } else {
+        } else if(link) {
+            //remove single link
             doRemove(link, PersistArgs.defaults())
         }
     }

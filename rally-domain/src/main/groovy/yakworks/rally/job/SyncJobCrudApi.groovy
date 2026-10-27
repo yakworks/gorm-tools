@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component
 
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobState
+import yakworks.api.ApiResults
 import yakworks.api.HttpStatus
 import yakworks.api.problem.data.DataProblem
 import yakworks.api.problem.data.DataProblemException
@@ -56,6 +57,11 @@ class SyncJobCrudApi extends DefaultCrudApi<SyncJob> {
     @Override
     SyncJobEntity bulkExport(BulkExportJobArgs jobParams) {
         throw notSupported("bulk")
+    }
+
+    @Override
+    ApiResults massUpdate(Map data, Map params) {
+        throw notSupported("massUpdate")
     }
 
     private DataProblemException notSupported(String op) {

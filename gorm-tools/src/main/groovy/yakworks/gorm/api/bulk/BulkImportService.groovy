@@ -46,8 +46,6 @@ class BulkImportService<D> {
 
     @Autowired IncludesConfig includesConfig
 
-    @Autowired ProblemHandler problemHandler
-
     @Autowired CsvToMapTransformer csvToMapTransformer
 
     @Autowired GormConfig gormConfig

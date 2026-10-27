@@ -51,6 +51,14 @@ class ReadonlyRestApiSpec extends Specification implements OkHttpRestTrait {
         assertAccessDenied(resp)
     }
 
+    void "massUpdate"() {
+        when:
+        def resp = put(path+"/massUpdate",  [ids: [1], data: [name: "C1"]])
+
+        then:
+        assertAccessDenied(resp)
+    }
+
     void "remove"() {
         when:
         def resp = delete(path+"/1")

@@ -9,6 +9,7 @@ import groovy.transform.CompileStatic
 import gorm.tools.beans.Pager
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.model.ApiCrudRepo
+import yakworks.api.ApiResults
 import yakworks.api.problem.data.NotFoundProblem
 import yakworks.gorm.api.bulk.BulkExportJobArgs
 import yakworks.gorm.api.bulk.BulkImportJobArgs
@@ -101,6 +102,15 @@ interface CrudApi<D> {
     SyncJobEntity bulkImport(BulkImportJobArgs jobParams, List<Map> bodyList)
 
     SyncJobEntity bulkExport(BulkExportJobArgs jobParams)
+
+    /**
+     * Applies the same data to many records by id.
+     *
+     * @param data the body with ids list and the data map to apply to each, eg [ids: [1,2], data: [name: 'foo']]
+     * @param params the query params, passed through to the MassUpdateArgs.params
+     * @return ApiResults
+     */
+    ApiResults massUpdate(Map data, Map params)
 
     /**
      * Converts the instance to Map using the MetaMap wrapper with {@link gorm.tools.metamap.services.MetaMapService}.

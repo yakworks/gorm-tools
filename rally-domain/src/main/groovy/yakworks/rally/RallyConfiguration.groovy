@@ -6,13 +6,17 @@ package yakworks.rally
 
 import groovy.transform.CompileStatic
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Lazy
+import org.springframework.context.annotation.Scope
 
 import yakworks.rally.mail.MailSpringConfig
+import yakworks.rally.massupdate.MassUpdateService
 import yakworks.security.audit.AuditStampConfiguration
 import yakworks.security.gorm.SecurityGormConfiguration
 import yakworks.security.spring.DefaultSecurityConfiguration
@@ -26,6 +30,11 @@ class RallyConfiguration {
     //@Entity scan packages to include in additions to this Application class's package
     public static final List<String> entityScanPackages = ['yakworks.security.gorm', 'yakworks.rally']
 
-
+    @Bean
+    @Scope("prototype")
+    @ConditionalOnMissingBean(MassUpdateService)
+    public <D> MassUpdateService<D> defaultMassUpdateService(Class<D> entityClass) {
+        return new MassUpdateService(entityClass)
+    }
 
 }

@@ -100,7 +100,9 @@ class CurrentSpringUser implements CurrentUser {
 
     @Override
     boolean hasPermission(String requiredPermission) {
-        return getUser().permissions.any { def userPerm ->
+        def perms = getUser()?.permissions
+        if (!perms) return false
+        return perms.any { def userPerm ->
             return toWildcardPermission((String)userPerm).implies(toWildcardPermission(requiredPermission))
         }
     }

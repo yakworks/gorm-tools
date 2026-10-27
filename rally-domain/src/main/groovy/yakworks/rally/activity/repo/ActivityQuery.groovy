@@ -55,6 +55,8 @@ class ActivityQuery extends DefaultQueryService<Activity> {
                 mangoCriteria.exists(actLinkExists.id())
             }
         }
+        // notes have no task; an inner join on task.state would drop them
+        mangoCriteria.join('task', JoinType.LEFT)
         super.applyCriteria(mangoCriteria)
     }
 

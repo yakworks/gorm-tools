@@ -44,4 +44,13 @@ class PathItem {
      * when true, q is required when doing a GET list.
      */
     boolean qRequired
+
+    /**
+     * Check if upsert is allowed for the given path item / domain
+     * Upsert is allowed if both create/update are allowed.
+     * Note: when allowedOps are not explicitely specified, its considered as all ops are allowed.
+     */
+    boolean upsertAllowed() {
+        return (!allowedOps || allowedOps.containsAll("create", "update"))
+    }
 }

@@ -90,7 +90,7 @@ final class SpringUserUtils {
     }
 
     static SpringUserInfo systemUser(){
-        def u = new BasicUserInfo(username: 'system', passwordHash: "N/A", roles: ['ADMIN'] as Set, id: 1L, orgId: SYSTEM_ORGID)
+        def u = new BasicUserInfo(id: 1L, username: 'system', passwordHash: "N/A", roles: ['ADMIN'] as Set, permissions:['*'] as Set, orgId: SYSTEM_ORGID)
         SpringUser.of(u)
     }
 }
